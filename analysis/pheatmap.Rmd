@@ -1,0 +1,147 @@
+---
+title: "Making a heatmap in R with the pheatmap package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pheatmap)
+library(DESeq)
+library(dendextend)
+library(gridExtra)
+```
+
+Making a heatmap using the `pheatmap` package.
+
+```{r example_data}
+example_file <- system.file ("extra/TagSeqExample.tab", package="DESeq")
+data <- read.delim(example_file, header=T, row.names="gene")
+data_subset <- as.matrix(data[rowSums(data)>50000,])
+```
+
+Default heatmap using `pheatmap`.
+
+```{r pheatmap_default, fig.width=7, fig.height=7}
+pheatmap(data_subset)
+
+cal_z_score <- function(x){
+  (x - mean(x)) / sd(x)
+}
+
+data_subset_norm <- t(apply(data_subset, 1, cal_z_score))
+pheatmap(data_subset_norm)
+```
+
+Two heatmaps.
+
+```{r two_heatmaps}
+one <- pheatmap(data_subset, silent = TRUE)
+two <- pheatmap(data_subset, silent = TRUE)
+
+grid.arrange(grobs = list(one[[4]], two[[4]]))
+```
+
+Reproduce the gene dendrogram.
+
+```{r gene_dendrogram, fig.height=8, fig.width=10}
+par(mar = c(3.1, 2.1, 1.1, 5.1))
+
+my_hclust_gene <- hclust(dist(data_subset), method = "complete")
+my_hclust_gene$height
+
+as.dendrogram(my_hclust_gene) %>%
+  plot(horiz = TRUE)
+```
+
+Reproduce the sample dendrogram.
+
+```{r sample_dendrogram}
+my_hclust_sample <- hclust(dist(t(data_subset)), method = "complete")
+
+as.dendrogram(my_hclust_sample) %>%
+  plot()
+```
+
+Add annotations.
+
+```{r annotation, fig.height=7, fig.width=7}
+my_gene_col <- cutree(tree = as.dendrogram(my_hclust_gene), k = 2)
+my_gene_col <- data.frame(cluster = ifelse(test = my_gene_col == 1, yes = "cluster 1", no = "cluster 2"))
+
+my_sample_col <- data.frame(sample = rep(c("tumour", "normal"), c(4,2)))
+row.names(my_sample_col) <- colnames(data_subset)
+
+set.seed(1984)
+my_random <- as.factor(sample(x = 1:2, size = nrow(my_gene_col), replace = TRUE))
+my_gene_col$random <- my_random
+
+pheatmap(data_subset, annotation_row = my_gene_col, annotation_col = my_sample_col)
+```
+
+Change annotation colours and ordering.
+
+```{r annotation_2}
+my_gene_col <- cutree(tree = as.dendrogram(my_hclust_gene), k = 2)
+my_gene_col <- data.frame(cluster = ifelse(test = my_gene_col == 1, yes = "cluster1", no = "cluster2"))
+
+my_sample_col <- data.frame(sample = rep(c("tumour", "normal"), c(4,2)))
+row.names(my_sample_col) <- colnames(data_subset)
+
+# change order
+my_sample_col$sample <- factor(my_sample_col$sample, levels = c("normal", "tumour"))
+
+set.seed(1984)
+my_random <- as.factor(sample(x = c("random1", "random2"), size = nrow(my_gene_col), replace = TRUE))
+my_gene_col$random <- my_random
+
+my_colour = list(
+    sample = c(normal = "#5977ff", tumour = "#f74747"),
+    random = c(random1 = "#82ed82", random2 = "#9e82ed"),
+    cluster = c(cluster1 = "#e89829", cluster2 = "#cc4ee0")
+)
+
+p <- pheatmap(data_subset,
+              annotation_colors = my_colour,
+              annotation_row = my_gene_col,
+              annotation_col = my_sample_col,
+              cellheight = 7,
+              cellwidth = 18)
+
+save_pheatmap_png <- function(x, filename, width=1200, height=1000, res = 150) {
+  png(filename, width = width, height = height, res = res)
+  grid::grid.newpage()
+  grid::grid.draw(x$gtable)
+  dev.off()
+}
+
+# not run
+# save_pheatmap_png(p, "heatmap_colour.png")
+```
+
+Introduce breaks by cutting the dendrogram.
+
+```{r break, fig.height=7, fig.width=7}
+pheatmap(data_subset,
+         annotation_row = my_gene_col,
+         annotation_col = my_sample_col,
+         cutree_rows = 2,
+         cutree_cols = 2)
+```
+
+Dendrogram results from pheatmap().
+
+```{r pheatmap_result, fig.height=8, fig.width=10}
+par(mar = c(3.1, 2.1, 1.1, 5.1))
+
+my_heatmap <- pheatmap(data_subset, silent = TRUE)
+names(my_heatmap)
+
+my_heatmap$tree_row %>%
+  as.dendrogram() %>%
+  plot(horiz = TRUE)
+```
