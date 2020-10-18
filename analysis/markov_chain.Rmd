@@ -1,0 +1,345 @@
+---
+title: "Markov chain"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(diagram)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+A Markov chain is a mathematical system that undergoes transitions from one state to another on a state space in a stochastic (random) manner. <a href="http://en.wikipedia.org/wiki/Examples_of_Markov_chains">Examples of Markov chains</a> include the board game <a href="http://en.wikipedia.org/wiki/Snakes_and_ladders">snakes and ladders</a>, where each state represents the position of a player on the board and a player moves between states (different positions on the board) by rolling a dice. An important property of Markov chains, called the <a href="http://en.wikipedia.org/wiki/Markov_property">Markov property</a>, is the memoryless property of the stochastic process. Basically what this means is that the transition between states depends only on the current state and not on the states preceding the current state; in terms of the board game, your next position on the board depends only on where you are currently positioned and not on the sequence of moves that got you there. Another way of thinking about it is that **the future is independent of the past, given the present**.
+
+To illustrate some applications of Markov chains, I will follow the examples from this [series of videos](http://www.youtube.com/playlist?list=PLsqSq2S57BwqXZWWvKovvylIcXKcXXWxd) explaining Markov chains.
+
+### Modelling a marketing campaign
+
+A company selling orange juice (call it brand A) has 20% of the market share and wishes to increase their market share via a marketing campaign. They estimated that the marketing campaign has the effect that:
+
+1. Someone using brand A will stay with brand A with 90% probability
+2. Someone NOT using brand A will switch to brand A with 70% probability
+
+In this particular example, we have two states: 1) someone using brand A (**state A**) and 2) someone not using brand A (**state A'**). We can represent this as a transition diagram (using the <a href="http://cran.r-project.org/web/packages/diagram/vignettes/diagram.pdf">diagram</a> package in R); the transition diagram shows the states and the probabilities of switching states.
+
+```{r marketing_chain}
+P <- matrix(c(0.9, 0.7, 0.1, 0.3), byrow=T, nrow=2)
+
+plotmat(P, # transition matrix
+        name = c('A', "A'"), # names of the states
+        pos = c(2), # position of the states
+        box.lwd=1, # outline of state
+        cex.txt=1, # size of probabilities
+        box.prop=1, # size of box
+        box.type = 'circle',
+        self.cex = 0.6, # size of self probability
+        lwd = 1, # outline of probabilities
+        box.cex=2 # size of text in box
+        )
+```
+
+The transition diagram can also be represented as a transition probability matrix (P):
+
+<!--
+$$
+P = \bordermatrix{~ & A & A' \cr
+                  A & 0.9 & 0.1 \cr
+                  A' & 0.7 & 0.3 \cr}
+$$
+-->
+
+<center>
+<table border=1>
+  <tr><td></td><td>A</td><td>A'</td></tr>
+  <tr><td>A</td><td>0.9</td><td>0.1</td></tr>
+  <tr><td>A'</td><td>0.7</td><td>0.3</td></tr>
+</table>
+</center><br />
+
+The initial state distribution matrix called $S_{0}$, is the market share of brand A prior the marketing campaign. Since brand A had a 20% market share, 80% of the market share does not belong to brand A:
+
+<!--
+$$
+S_{0} = \bordermatrix{~ & A & A' \cr
+                      ~ & 0.2 & 0.8 \cr}
+
+$$
+-->
+
+<center>
+<table border=1>
+  <tr><td>A</td><td>A'</td></tr>
+  <tr><td>0.2</td><td>0.8</td></tr>
+</table>
+</center><br />
+
+After the first marketing campaign, the company will be at the first state matrix, $S_{1}$. The first state matrix can be calculated by multiplying the initial state distribution matrix, $S_{0}$ to the transition probability matrix P:
+
+$$
+S_{1} = \begin{bmatrix} 0.2 & 0.8 \end{bmatrix} \cdot \begin{bmatrix} 0.9 & 0.1 \\ 0.7 & 0.3 \end{bmatrix}
+$$
+
+To perform matrix multiplications in R use the syntax %*%:
+
+```{r mat_multi}
+# transition matrix P
+P <- matrix(c(0.9, 0.1, 0.7, 0.3), byrow=T, nrow=2)
+P
+
+# initial state matrix
+state_0 <- matrix(c(0.2, 0.8), nrow=1)
+state_0
+
+# initial state multiplied by transition matrix
+state_0 %*% P
+```
+
+After the first marketing campaign, the market share of brand A is now 74% (first state). What happens if we have another round of marketing (second state) and another and so on?
+
+```{r market_campaign}
+# transition matrix P
+P <- matrix(c(0.9, 0.1, 0.7, 0.3), byrow=T, nrow=2)
+
+# different states
+state_0 <- matrix(c(0.2, 0.8), nrow=1)
+state_1 <- state_0 %*% P
+state_2 <- state_1 %*% P
+state_3 <- state_2 %*% P
+state_4 <- state_3 %*% P
+state_5 <- state_4 %*% P
+state_6 <- state_5 %*% P
+
+# bind the states
+states <- rbind(state_0, state_1, state_2, state_3, state_4, state_5, state_6)
+states
+```
+
+The market share of brand A is starting to plateau around 87.5%, i.e., it is approaching its steady state.
+
+### Finding the steady state
+
+The steady state represents the state at which the system is at an equilibrium; for our previous example, this means that the market share remains the same despite the marketing campaign:
+
+$$
+S \cdot P = S
+$$
+
+Given a transition probability matrix, one can find the steady state by solving the equation. Using the marketing campaign example above:
+
+<p align="center">
+$$
+S \cdot \begin{bmatrix} 0.9 & 0.1 \\ 0.7 & 0.3 \end{bmatrix} = S
+$$
+
+For two states:
+
+$$
+\begin{bmatrix} a & b \end{bmatrix} \cdot \begin{bmatrix} 0.9 & 0.1 \\ 0.7 & 0.3 \end{bmatrix} = \begin{bmatrix} a & b \end{bmatrix}
+$$
+
+From the matrix multiplications we can come up with a system of equations:
+
+$$
+0.9a + 0.7b = a
+$$
+
+$$
+0.1a + 0.3b = b
+$$
+
+Since the two states represent the market share of brand A and not brand A, they should sum to 1:
+
+$$
+a + b = 1
+$$
+
+$$
+a = 1 - b
+$$
+
+We can solve for b by substituting a into $0.9a + 0.7b = a$:
+
+$$
+0.9(1 - b) + 0.7b = 1 - b
+$$
+
+$$
+0.9 - 0.9b + 0.7b = 1 - b
+$$
+
+$$
+b - 0.9b + 0.7b = 1 - 0.9
+$$
+
+$$
+0.8b = 0.1
+$$
+
+$$
+b = 0.125
+$$
+
+$$
+a + 0.125 = 1
+$$
+
+$$
+a = 0.875
+$$
+
+Substitute **a** back:
+
+$$
+0.875 + b = 1
+$$
+
+$$
+b = 0.125
+$$
+
+As we approximated before, the steady state of the transition matrix P is:
+
+$$
+\begin{bmatrix} 0.875 & 0.125 \end{bmatrix}
+$$
+
+### Stationary matrices and regular Markov chains
+
+A) Does every Markov chain have a unique stationary (steady) matrix?
+
+B) If a Markov chain has an unique stationary matrix, will the successive state matrices always approach this stationary matrix?
+
+The answer to both questions is NO except for **regular Markov chains**. A Markov chain is regular if its transition matrix is regular. A transition matrix, P, is regular if some power of P has only positive entries. And in case you were wondering, a positive number is a number that is greater than zero and thus <a href="http://mathforum.org/library/drmath/view/60300.html">zero is NOT a positive number</a>.
+
+Below is a regular transition matrix, because all the values are positive (the first power of P):
+
+$$
+P = \begin{bmatrix} 0.3 & 0.7 \\ 0.1 & 0.9 \end{bmatrix}
+$$
+
+Is the transition matrix below regular?
+
+$$
+P = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}
+$$
+
+Let's take some powers of it:
+
+$$
+P^{2} = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix} \cdot \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
+$$
+
+$$
+P^{3} = P^{2} \cdot P = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} \cdot \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}
+$$
+
+$$
+P^{4} = P^{2} \cdot P^{2} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} \cdot \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix}
+$$
+
+$$
+P^{5} = P^{3} \cdot P^{2} = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix} \cdot \begin{bmatrix} 1 & 0 \\ 0 & 1 \end{bmatrix} = \begin{bmatrix} 0 & 1 \\ 1 & 0 \end{bmatrix}
+$$
+
+The transition matrix above alternates between two matrices, which both do not contain only positive entries, thus it is not a regular transition matrix.
+
+Sometimes we need to calculate the second power of a matrix to reveal that it is a regular transition matrix:
+
+$$
+P = \begin{bmatrix} 0.2 & 0.8 \\ 1 & 0 \end{bmatrix}
+$$
+
+$$
+P^{2} = \begin{bmatrix} 0.2 & 0.8 \\ 1 & 0 \end{bmatrix} \cdot \begin{bmatrix} 0.2 & 0.8 \\ 1 & 0 \end{bmatrix} = \begin{bmatrix} 0.84 & 0.16 \\ 0.2 & 0.8 \end{bmatrix}
+$$
+
+If the transition matrix is regular, given any initial-state matrix $S_{0}$, the state matrices $S_{k}$ will approach the stationary matrix S.
+
+### Insurance statistics
+
+Using one of the examples from <a href="http://www.math.louisville.edu/~ewa/m107/chapter9.pdf">this lecture</a>: Imagine that 23% of drivers involved in an accident are also involved in an accident in the following year. 11% of drivers not involved in an accident are involved in an accident the following year. So if we had state A as accident and A' as no accident:
+
+```{r}
+
+
+P <- matrix(c(0.23, 0.11, 0.77, 0.89), byrow=T, nrow=2)
+plotmat(P, #transition matrix
+        name = c('A', "A'"), # names of the states
+        pos = c(2), # position of the states
+        box.lwd=1, # outline of state
+        cex.txt=1, # size of probabilities
+        box.prop=1, # size of box
+        box.type = 'circle',
+        self.cex = 0.6, # size of self probability
+        lwd = 1, # outline of probabilities
+        box.cex=2 # size of text in box
+        )
+```
+
+Now if 5% of all drivers had an accident one year, what is the probability that a driver, picked at random, has an accident in the following year?
+
+Our initial state, $S_{0} = \begin{bmatrix} 0.05 & 0.95 \end{bmatrix}$ and our transition matrix, P:
+
+$$
+P = \begin{bmatrix} 0.23 & 0.77 \\ 0.11 & 0.89 \end{bmatrix}
+$$
+
+So therefore:
+
+$$
+\begin{bmatrix} 0.05 & 0.95 \end{bmatrix} \cdot \begin{bmatrix} 0.23 & 0.77 \\ 0.11 & 0.89 \end{bmatrix} = \begin{bmatrix} 0.116 & 0.884 \end{bmatrix}
+$$
+
+The probability of an accident in the following year is 11.6%. What about the long run behaviour? What percentage of drivers will have an accident in a given year?
+
+Since our transition matrix has all positive values, this is a regular Markov chain and we can solve the equation:
+
+$$
+S \cdot P = S
+$$
+
+$$
+\begin{bmatrix} A & A' \end{bmatrix} \cdot \begin{bmatrix} 0.23 & 0.77 \\ 0.11 & 0.89 \end{bmatrix} = \begin{bmatrix} A & A' \end{bmatrix}
+$$
+
+Solve these system of equations:
+
+$$
+0.23A + 0.11A' = A
+$$
+
+$$
+A' = 1 - A
+$$
+
+Substitute:
+
+$$
+0.23A + 0.11(1 - A) = A
+$$
+
+$$
+0.23A + 0.11 - 0.11A = A
+$$
+
+$$
+0.11 = 0.88A
+$$
+
+$$
+A = 0.125
+$$
+
+$$
+A' = 0.875
+$$
+
+So in the long run, 12.5% of the drivers will have an accident.
+
+### Conclusions
+
+This post is a lead up to hidden Markov models (HMMs), which I am currently reading about in the book <a href="http://www.amazon.com/Biological-Sequence-Analysis-Probabilistic-Proteins/dp/0521629713">Biological Sequence Analysis: Probabilistic Models of Proteins and Nucleic Acids</a> and learning about from material I can find online.
