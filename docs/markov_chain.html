@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2020-10-18" />
+
+<title>Markov chain</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Markov chain</h1>
+<h4 class="date">2020-10-18</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2020-10-18
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef79342a50f998ed7b3e360274a80d838719429a9targetblankf79342aa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/f79342a50f998ed7b3e360274a80d838719429a9" target="_blank">f79342a</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef79342a50f998ed7b3e360274a80d838719429a9targetblankf79342aa" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/f79342a50f998ed7b3e360274a80d838719429a9" target="_blank">f79342a</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.Rhistory
+
+Untracked files:
+    Untracked:  analysis/linear_regression.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/markov_chain.Rmd</code>) and HTML (<code>docs/markov_chain.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/f79342a50f998ed7b3e360274a80d838719429a9/analysis/markov_chain.Rmd" target="_blank">f79342a</a>
+</td>
+<td>
+davetang
+</td>
+<td>
+2020-10-18
+</td>
+<td>
+Markov chain post
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>A Markov chain is a mathematical system that undergoes transitions from one state to another on a state space in a stochastic (random) manner. <a href="http://en.wikipedia.org/wiki/Examples_of_Markov_chains">Examples of Markov chains</a> include the board game <a href="http://en.wikipedia.org/wiki/Snakes_and_ladders">snakes and ladders</a>, where each state represents the position of a player on the board and a player moves between states (different positions on the board) by rolling a dice. An important property of Markov chains, called the <a href="http://en.wikipedia.org/wiki/Markov_property">Markov property</a>, is the memoryless property of the stochastic process. Basically what this means is that the transition between states depends only on the current state and not on the states preceding the current state; in terms of the board game, your next position on the board depends only on where you are currently positioned and not on the sequence of moves that got you there. Another way of thinking about it is that <strong>the future is independent of the past, given the present</strong>.</p>
+<p>To illustrate some applications of Markov chains, I will follow the examples from this <a href="http://www.youtube.com/playlist?list=PLsqSq2S57BwqXZWWvKovvylIcXKcXXWxd">series of videos</a> explaining Markov chains.</p>
+<div id="modelling-a-marketing-campaign" class="section level3">
+<h3>Modelling a marketing campaign</h3>
+<p>A company selling orange juice (call it brand A) has 20% of the market share and wishes to increase their market share via a marketing campaign. They estimated that the marketing campaign has the effect that:</p>
+<ol style="list-style-type: decimal">
+<li>Someone using brand A will stay with brand A with 90% probability</li>
+<li>Someone NOT using brand A will switch to brand A with 70% probability</li>
+</ol>
+<p>In this particular example, we have two states: 1) someone using brand A (<strong>state A</strong>) and 2) someone not using brand A (<strong>state A’</strong>). We can represent this as a transition diagram (using the <a href="http://cran.r-project.org/web/packages/diagram/vignettes/diagram.pdf">diagram</a> package in R); the transition diagram shows the states and the probabilities of switching states.</p>
+<pre class="r"><code>P &lt;- matrix(c(0.9, 0.7, 0.1, 0.3), byrow=T, nrow=2)
+
+plotmat(P, # transition matrix
+        name = c(&#39;A&#39;, &quot;A&#39;&quot;), # names of the states
+        pos = c(2), # position of the states
+        box.lwd=1, # outline of state
+        cex.txt=1, # size of probabilities
+        box.prop=1, # size of box
+        box.type = &#39;circle&#39;,
+        self.cex = 0.6, # size of self probability
+        lwd = 1, # outline of probabilities
+        box.cex=2 # size of text in box
+        )</code></pre>
+<p><img src="figure/markov_chain.Rmd/marketing_chain-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The transition diagram can also be represented as a transition probability matrix (P):</p>
+<!--
+$$
+P = \bordermatrix{~ & A & A' \cr
+                  A & 0.9 & 0.1 \cr
+                  A' & 0.7 & 0.3 \cr}
+$$
+-->
+<center>
+<table border="1">
+<tr>
+<td>
+</td>
+<td>
+A
+</td>
+<td>
+A’
+</td>
+</tr>
+<tr>
+<td>
+A
+</td>
+<td>
+0.9
+</td>
+<td>
+0.1
+</td>
+</tr>
+<tr>
+<td>
+A’
+</td>
+<td>
+0.7
+</td>
+<td>
+0.3
+</td>
+</tr>
+</table>
+</center>
+<p><br /></p>
+<p>The initial state distribution matrix called <span class="math inline">\(S_{0}\)</span>, is the market share of brand A prior the marketing campaign. Since brand A had a 20% market share, 80% of the market share does not belong to brand A:</p>
+<!--
+$$
+S_{0} = \bordermatrix{~ & A & A' \cr
+                      ~ & 0.2 & 0.8 \cr}
+
+$$
+-->
+<center>
+<table border="1">
+<tr>
+<td>
+A
+</td>
+<td>
+A’
+</td>
+</tr>
+<tr>
+<td>
+0.2
+</td>
+<td>
+0.8
+</td>
+</tr>
+</table>
+</center>
+<p><br /></p>
+<p>After the first marketing campaign, the company will be at the first state matrix, <span class="math inline">\(S_{1}\)</span>. The first state matrix can be calculated by multiplying the initial state distribution matrix, <span class="math inline">\(S_{0}\)</span> to the transition probability matrix P:</p>
+<p><span class="math display">\[
+S_{1} = \begin{bmatrix} 0.2 &amp; 0.8 \end{bmatrix} \cdot \begin{bmatrix} 0.9 &amp; 0.1 \\ 0.7 &amp; 0.3 \end{bmatrix}
+\]</span></p>
+<p>To perform matrix multiplications in R use the syntax %*%:</p>
+<pre class="r"><code># transition matrix P
+P &lt;- matrix(c(0.9, 0.1, 0.7, 0.3), byrow=T, nrow=2)
+P</code></pre>
+<pre><code>     [,1] [,2]
+[1,]  0.9  0.1
+[2,]  0.7  0.3</code></pre>
+<pre class="r"><code># initial state matrix
+state_0 &lt;- matrix(c(0.2, 0.8), nrow=1)
+state_0</code></pre>
+<pre><code>     [,1] [,2]
+[1,]  0.2  0.8</code></pre>
+<pre class="r"><code># initial state multiplied by transition matrix
+state_0 %*% P</code></pre>
+<pre><code>     [,1] [,2]
+[1,] 0.74 0.26</code></pre>
+<p>After the first marketing campaign, the market share of brand A is now 74% (first state). What happens if we have another round of marketing (second state) and another and so on?</p>
+<pre class="r"><code># transition matrix P
+P &lt;- matrix(c(0.9, 0.1, 0.7, 0.3), byrow=T, nrow=2)
+
+# different states
+state_0 &lt;- matrix(c(0.2, 0.8), nrow=1)
+state_1 &lt;- state_0 %*% P
+state_2 &lt;- state_1 %*% P
+state_3 &lt;- state_2 %*% P
+state_4 &lt;- state_3 %*% P
+state_5 &lt;- state_4 %*% P
+state_6 &lt;- state_5 %*% P
+
+# bind the states
+states &lt;- rbind(state_0, state_1, state_2, state_3, state_4, state_5, state_6)
+states</code></pre>
+<pre><code>          [,1]      [,2]
+[1,] 0.2000000 0.8000000
+[2,] 0.7400000 0.2600000
+[3,] 0.8480000 0.1520000
+[4,] 0.8696000 0.1304000
+[5,] 0.8739200 0.1260800
+[6,] 0.8747840 0.1252160
+[7,] 0.8749568 0.1250432</code></pre>
+<p>The market share of brand A is starting to plateau around 87.5%, i.e., it is approaching its steady state.</p>
+</div>
+<div id="finding-the-steady-state" class="section level3">
+<h3>Finding the steady state</h3>
+<p>The steady state represents the state at which the system is at an equilibrium; for our previous example, this means that the market share remains the same despite the marketing campaign:</p>
+<p><span class="math display">\[
+S \cdot P = S
+\]</span></p>
+<p>Given a transition probability matrix, one can find the steady state by solving the equation. Using the marketing campaign example above:</p>
+<p align="center">
+<p><span class="math display">\[
+S \cdot \begin{bmatrix} 0.9 &amp; 0.1 \\ 0.7 &amp; 0.3 \end{bmatrix} = S
+\]</span></p>
+<p>For two states:</p>
+<p><span class="math display">\[
+\begin{bmatrix} a &amp; b \end{bmatrix} \cdot \begin{bmatrix} 0.9 &amp; 0.1 \\ 0.7 &amp; 0.3 \end{bmatrix} = \begin{bmatrix} a &amp; b \end{bmatrix}
+\]</span></p>
+<p>From the matrix multiplications we can come up with a system of equations:</p>
+<p><span class="math display">\[
+0.9a + 0.7b = a
+\]</span></p>
+<p><span class="math display">\[
+0.1a + 0.3b = b
+\]</span></p>
+<p>Since the two states represent the market share of brand A and not brand A, they should sum to 1:</p>
+<p><span class="math display">\[
+a + b = 1
+\]</span></p>
+<p><span class="math display">\[
+a = 1 - b
+\]</span></p>
+<p>We can solve for b by substituting a into <span class="math inline">\(0.9a + 0.7b = a\)</span>:</p>
+<p><span class="math display">\[
+0.9(1 - b) + 0.7b = 1 - b
+\]</span></p>
+<p><span class="math display">\[
+0.9 - 0.9b + 0.7b = 1 - b
+\]</span></p>
+<p><span class="math display">\[
+b - 0.9b + 0.7b = 1 - 0.9
+\]</span></p>
+<p><span class="math display">\[
+0.8b = 0.1
+\]</span></p>
+<p><span class="math display">\[
+b = 0.125
+\]</span></p>
+<p><span class="math display">\[
+a + 0.125 = 1
+\]</span></p>
+<p><span class="math display">\[
+a = 0.875
+\]</span></p>
+<p>Substitute <strong>a</strong> back:</p>
+<p><span class="math display">\[
+0.875 + b = 1
+\]</span></p>
+<p><span class="math display">\[
+b = 0.125
+\]</span></p>
+<p>As we approximated before, the steady state of the transition matrix P is:</p>
+<p><span class="math display">\[
+\begin{bmatrix} 0.875 &amp; 0.125 \end{bmatrix}
+\]</span></p>
+</div>
+<div id="stationary-matrices-and-regular-markov-chains" class="section level3">
+<h3>Stationary matrices and regular Markov chains</h3>
+<ol style="list-style-type: upper-alpha">
+<li><p>Does every Markov chain have a unique stationary (steady) matrix?</p></li>
+<li><p>If a Markov chain has an unique stationary matrix, will the successive state matrices always approach this stationary matrix?</p></li>
+</ol>
+<p>The answer to both questions is NO except for <strong>regular Markov chains</strong>. A Markov chain is regular if its transition matrix is regular. A transition matrix, P, is regular if some power of P has only positive entries. And in case you were wondering, a positive number is a number that is greater than zero and thus <a href="http://mathforum.org/library/drmath/view/60300.html">zero is NOT a positive number</a>.</p>
+<p>Below is a regular transition matrix, because all the values are positive (the first power of P):</p>
+<p><span class="math display">\[
+P = \begin{bmatrix} 0.3 &amp; 0.7 \\ 0.1 &amp; 0.9 \end{bmatrix}
+\]</span></p>
+<p>Is the transition matrix below regular?</p>
+<p><span class="math display">\[
+P = \begin{bmatrix} 0 &amp; 1 \\ 1 &amp; 0 \end{bmatrix}
+\]</span></p>
+<p>Let’s take some powers of it:</p>
+<p><span class="math display">\[
+P^{2} = \begin{bmatrix} 0 &amp; 1 \\ 1 &amp; 0 \end{bmatrix} \cdot \begin{bmatrix} 0 &amp; 1 \\ 1 &amp; 0 \end{bmatrix} = \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; 1 \end{bmatrix}
+\]</span></p>
+<p><span class="math display">\[
+P^{3} = P^{2} \cdot P = \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; 1 \end{bmatrix} \cdot \begin{bmatrix} 0 &amp; 1 \\ 1 &amp; 0 \end{bmatrix} = \begin{bmatrix} 0 &amp; 1 \\ 1 &amp; 0 \end{bmatrix}
+\]</span></p>
+<p><span class="math display">\[
+P^{4} = P^{2} \cdot P^{2} = \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; 1 \end{bmatrix} \cdot \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; 1 \end{bmatrix} = \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; 1 \end{bmatrix}
+\]</span></p>
+<p><span class="math display">\[
+P^{5} = P^{3} \cdot P^{2} = \begin{bmatrix} 0 &amp; 1 \\ 1 &amp; 0 \end{bmatrix} \cdot \begin{bmatrix} 1 &amp; 0 \\ 0 &amp; 1 \end{bmatrix} = \begin{bmatrix} 0 &amp; 1 \\ 1 &amp; 0 \end{bmatrix}
+\]</span></p>
+<p>The transition matrix above alternates between two matrices, which both do not contain only positive entries, thus it is not a regular transition matrix.</p>
+<p>Sometimes we need to calculate the second power of a matrix to reveal that it is a regular transition matrix:</p>
+<p><span class="math display">\[
+P = \begin{bmatrix} 0.2 &amp; 0.8 \\ 1 &amp; 0 \end{bmatrix}
+\]</span></p>
+<p><span class="math display">\[
+P^{2} = \begin{bmatrix} 0.2 &amp; 0.8 \\ 1 &amp; 0 \end{bmatrix} \cdot \begin{bmatrix} 0.2 &amp; 0.8 \\ 1 &amp; 0 \end{bmatrix} = \begin{bmatrix} 0.84 &amp; 0.16 \\ 0.2 &amp; 0.8 \end{bmatrix}
+\]</span></p>
+<p>If the transition matrix is regular, given any initial-state matrix <span class="math inline">\(S_{0}\)</span>, the state matrices <span class="math inline">\(S_{k}\)</span> will approach the stationary matrix S.</p>
+</div>
+<div id="insurance-statistics" class="section level3">
+<h3>Insurance statistics</h3>
+<p>Using one of the examples from <a href="http://www.math.louisville.edu/~ewa/m107/chapter9.pdf">this lecture</a>: Imagine that 23% of drivers involved in an accident are also involved in an accident in the following year. 11% of drivers not involved in an accident are involved in an accident the following year. So if we had state A as accident and A’ as no accident:</p>
+<pre class="r"><code>P &lt;- matrix(c(0.23, 0.11, 0.77, 0.89), byrow=T, nrow=2)
+plotmat(P, #transition matrix
+        name = c(&#39;A&#39;, &quot;A&#39;&quot;), # names of the states
+        pos = c(2), # position of the states
+        box.lwd=1, # outline of state
+        cex.txt=1, # size of probabilities
+        box.prop=1, # size of box
+        box.type = &#39;circle&#39;,
+        self.cex = 0.6, # size of self probability
+        lwd = 1, # outline of probabilities
+        box.cex=2 # size of text in box
+        )</code></pre>
+<p><img src="figure/markov_chain.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Now if 5% of all drivers had an accident one year, what is the probability that a driver, picked at random, has an accident in the following year?</p>
+<p>Our initial state, <span class="math inline">\(S_{0} = \begin{bmatrix} 0.05 &amp; 0.95 \end{bmatrix}\)</span> and our transition matrix, P:</p>
+<p><span class="math display">\[
+P = \begin{bmatrix} 0.23 &amp; 0.77 \\ 0.11 &amp; 0.89 \end{bmatrix}
+\]</span></p>
+<p>So therefore:</p>
+<p><span class="math display">\[
+\begin{bmatrix} 0.05 &amp; 0.95 \end{bmatrix} \cdot \begin{bmatrix} 0.23 &amp; 0.77 \\ 0.11 &amp; 0.89 \end{bmatrix} = \begin{bmatrix} 0.116 &amp; 0.884 \end{bmatrix}
+\]</span></p>
+<p>The probability of an accident in the following year is 11.6%. What about the long run behaviour? What percentage of drivers will have an accident in a given year?</p>
+<p>Since our transition matrix has all positive values, this is a regular Markov chain and we can solve the equation:</p>
+<p><span class="math display">\[
+S \cdot P = S
+\]</span></p>
+<p><span class="math display">\[
+\begin{bmatrix} A &amp; A&#39; \end{bmatrix} \cdot \begin{bmatrix} 0.23 &amp; 0.77 \\ 0.11 &amp; 0.89 \end{bmatrix} = \begin{bmatrix} A &amp; A&#39; \end{bmatrix}
+\]</span></p>
+<p>Solve these system of equations:</p>
+<p><span class="math display">\[
+0.23A + 0.11A&#39; = A
+\]</span></p>
+<p><span class="math display">\[
+A&#39; = 1 - A
+\]</span></p>
+<p>Substitute:</p>
+<p><span class="math display">\[
+0.23A + 0.11(1 - A) = A
+\]</span></p>
+<p><span class="math display">\[
+0.23A + 0.11 - 0.11A = A
+\]</span></p>
+<p><span class="math display">\[
+0.11 = 0.88A
+\]</span></p>
+<p><span class="math display">\[
+A = 0.125
+\]</span></p>
+<p><span class="math display">\[
+A&#39; = 0.875
+\]</span></p>
+<p>So in the long run, 12.5% of the drivers will have an accident.</p>
+</div>
+<div id="conclusions" class="section level3">
+<h3>Conclusions</h3>
+<p>This post is a lead up to hidden Markov models (HMMs), which I am currently reading about in the book <a href="http://www.amazon.com/Biological-Sequence-Analysis-Probabilistic-Proteins/dp/0521629713">Biological Sequence Analysis: Probabilistic Models of Proteins and Nucleic Acids</a> and learning about from material I can find online.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.0.2 (2020-06-22)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Catalina 10.15.7
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_AU.UTF-8/en_AU.UTF-8/en_AU.UTF-8/C/en_AU.UTF-8/en_AU.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] diagram_1.6.5   shape_1.4.5     workflowr_1.6.2
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.5      rstudioapi_0.11 whisker_0.4     knitr_1.29     
+ [5] magrittr_1.5    R6_2.4.1        rlang_0.4.7     stringr_1.4.0  
+ [9] tools_4.0.2     xfun_0.16       git2r_0.27.1    htmltools_0.5.0
+[13] ellipsis_0.3.1  rprojroot_1.3-2 yaml_2.2.1      digest_0.6.25  
+[17] tibble_3.0.3    lifecycle_0.2.0 crayon_1.3.4    later_1.1.0.1  
+[21] vctrs_0.3.4     promises_1.1.1  fs_1.5.0        glue_1.4.2     
+[25] evaluate_0.14   rmarkdown_2.3   stringi_1.4.6   compiler_4.0.2 
+[29] pillar_1.4.6    backports_1.1.9 httpuv_1.5.4    pkgconfig_2.0.3</code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
