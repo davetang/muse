@@ -1,0 +1,190 @@
+---
+title: "Visualising Google Trends results with R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(gtrendsR)
+library(maps)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This post is on plotting Google Trends results with R. If you have never heard of or used Google Trends, it’s fun! You can see how certain keywords have trended over the years and have the results broken down into regions and countries. In this post, I will use the `gtrendsR` package to perform Google Trends searches with R and demonstrate how to plot the data that is returned.
+
+To get started, install the `gtrendsR`, `dplyr`, `ggplot2`, and `maps` packages (if you haven’t already).
+
+```{r install_packages, eval=FALSE}
+install.packages("gtrendsR", "dplyr", "ggplot2", "maps")
+```
+
+The `gtrends` function performs the search. The function has several parameters; I have set `geo` to focus on the United States and `time` to include all results since the beginning of Google Trends (2004). I like the San Antonio Spurs, so that will be the keyword for this example.
+
+```{r gtrends_spurs}
+res <- gtrends("san antonio spurs",
+               geo = "US",
+               time = "all")
+ 
+names(res)
+```
+
+The results are stored in a list that have self-explanatory names. I picked a keyword that should be region- and city-specific. Below I show the interest in “san antonio spurs” stratified by region, city, and DMA and sorted by the interest (highest to lowest).
+
+```{r check_res}
+res$interest_by_region %>%
+  arrange(desc(hits)) %>%
+  head(3)
+ 
+res$interest_by_city %>%
+  arrange(desc(hits)) %>%
+  head(3)
+ 
+res$interest_by_dma %>%
+  arrange(desc(hits)) %>%
+  head(3)
+```
+
+I modified the plotting function from the `gtrendsR` package, so that the function just returns a ggplot object without plotting it, in order to customise the plot.
+
+```{r plot_gtrends_silent}
+plot.gtrends.silent <- function(x, ...) {
+  df <- x$interest_over_time
+  df$date <- as.Date(df$date)
+  df$hits <- if(typeof(df$hits) == 'character'){
+    as.numeric(gsub('<','',df$hits))
+    } else {
+    df$hits
+    }
+ 
+  df$legend <- paste(df$keyword, " (", df$geo, ")", sep = "")
+ 
+  p <- ggplot(df, aes_string(x = "date", y = "hits", color = "legend")) +
+    geom_line() +
+    xlab("Date") +
+    ylab("Search hits") +
+    ggtitle("Interest over time") +
+    theme_bw() +
+    theme(legend.title = element_blank())
+ 
+  invisible(p)
+}
+ 
+my_plot <- plot.gtrends.silent(res)
+ 
+my_plot +
+  scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
+  theme(legend.position = "none")
+```
+
+The seasonal trend is due to when the NBA season starts and ends. The spike in 2014 is when the San Antonio Spurs were the NBA champions; the spike in 2013 is when they reached the NBA finals but lost.
+
+Next, I will show how to plot interest per country; I will colour each city by the interest of a certain keyword. I will use the `map_data` function to obtain coordinates (and polygon drawing groups and orders) of cities in the world as a data frame. In the first example, I will use the keyword “wantok”, which means a close friend in Tok Pisin; this is the main language spoken in Papua New Guinea, the country I grew up in.
+
+```{r search_wantok}
+world <- map_data("world")
+ 
+# change the region names to match the region names returned by Google Trends
+world %>%
+  mutate(region = replace(region, region=="USA", "United States")) %>%
+  mutate(region = replace(region, region=="UK", "United Kingdom")) -> world
+ 
+# perform search
+res_world <- gtrends("wantok", time = "all")
+ 
+# create data frame for plotting
+res_world$interest_by_country %>%
+  filter(location %in% world$region, hits > 0) %>%
+  mutate(region = location, hits = as.numeric(hits)) %>%
+  select(region, hits) -> my_df
+ 
+ggplot() +
+  geom_map(data = world,
+           map = world,
+           aes(x = long, y = lat, map_id = region),
+           fill="#ffffff", color="#ffffff", size=0.15) +
+  geom_map(data = my_df,
+           map = world,
+           aes(fill = hits, map_id = region),
+           color="#ffffff", size=0.15) +
+  scale_fill_continuous(low = 'grey', high = 'red') +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank())
+```
+
+As expected, the top interest in the keyword “wantok” is in Papua New Guinea.
+
+We can also only focus on the United States. Here I will use the keyword "swamp gravy", which was something I learned about while listening to the Planet Money podcast (which I highly recommend).
+
+```{r swamp_gravy}
+res <- gtrends("swamp gravy",
+               geo = "US",
+               time = "all")
+ 
+state <- map_data("state")
+ 
+res$interest_by_region %>%
+  mutate(region = tolower(location)) %>%
+  filter(region %in% state$region) %>%
+  select(region, hits) -> my_df
+ 
+ggplot() +
+  geom_map(data = state,
+           map = state,
+           aes(x = long, y = lat, map_id = region),
+           fill="#ffffff", color="#ffffff", size=0.15) +
+  geom_map(data = my_df,
+           map = state,
+           aes(fill = hits, map_id = region),
+           color="#ffffff", size=0.15) +
+  scale_fill_continuous(low = 'grey', high = 'red') +
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank())
+```
+
+Swamp gravy is a play that has become the U.S. state of Georgia’s official folk-life play. The state of Georgia (and its neighbouring state Alabama) indeed has the highest interest in the keyword.
+
+Since this is a bioinformatics blog, I will show results for the keyword “bioinformatics”.
+
+```{r bioinformatics}
+res <- gtrends("bioinformatics",
+               geo = "US",
+               time = "all")
+ 
+state <- map_data("state")
+ 
+res$interest_by_region %>%
+  mutate(region = tolower(location)) %>%
+  filter(region %in% state$region) %>%
+  select(region, hits) -> my_df
+ 
+ggplot() +
+  geom_map(data = state,
+           map = state,
+           aes(x = long, y = lat, map_id = region),
+           fill="#ffffff", color="#ffffff", size=0.15) +
+  geom_map(data = my_df,
+           map = state,
+           aes(fill = hits, map_id = region),
+           color="#ffffff", size=0.15) +
+  scale_fill_continuous(low = 'grey', high = 'red') +
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank())
+```
+
+Maryland (location of the NIH) and Massachusetts (location of the Broad Institute and various biotech startups) have the highest interest in bioinformatics.
+
+Note that the US plots are missing Alaska and Hawaii and this is because these states are missing from the "state" map.
+
+```{r state_map}
+unique(map_data("state")$region)
+```

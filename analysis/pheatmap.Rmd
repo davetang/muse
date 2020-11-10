@@ -37,6 +37,12 @@ data_subset_norm <- t(apply(data_subset, 1, cal_z_score))
 pheatmap(data_subset_norm)
 ```
 
+Using scale produces the same heatmap as using `cal_z_score`.
+
+```{r pheatmap_scale, fig.width=7, fig.height=7}
+pheatmap(data_subset, scale = "row")
+```
+
 Two heatmaps.
 
 ```{r two_heatmaps}
