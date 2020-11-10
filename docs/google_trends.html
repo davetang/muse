@@ -12,7 +12,7 @@
 
 <meta name="date" content="2020-11-10" />
 
-<title>Making a heatmap in R with the pheatmap package</title>
+<title>Visualising Google Trends results with R</title>
 
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -309,7 +309,7 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Making a heatmap in R with the pheatmap package</h1>
+<h1 class="title toc-ignore">Visualising Google Trends results with R</h1>
 <h4 class="date">2020-11-10</h4>
 
 </div>
@@ -462,7 +462,7 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in t
 <div id="versions" class="tab-pane fade">
 
 <p>
-These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/pheatmap.Rmd</code>) and HTML (<code>docs/pheatmap.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/google_trends.Rmd</code>) and HTML (<code>docs/google_trends.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
 </p>
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
@@ -491,7 +491,7 @@ Message
 Rmd
 </td>
 <td>
-<a href="https://github.com/davetang/muse/blob/268312f66a3d7960297f256354fbb97b75b0fb9b/analysis/pheatmap.Rmd" target="_blank">268312f</a>
+<a href="https://github.com/davetang/muse/blob/268312f66a3d7960297f256354fbb97b75b0fb9b/analysis/google_trends.Rmd" target="_blank">268312f</a>
 </td>
 <td>
 davetang
@@ -503,40 +503,6 @@ davetang
 wflow_publish(files = c(“analysis/index.Rmd”, “analysis/google_trends.Rmd”,
 </td>
 </tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/586b91fa71a61d77d70f93f26838e44498c814c6/docs/pheatmap.html" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/b1d6eddead638344d5faa47e040feb81ff9811f9/analysis/pheatmap.Rmd" target="_blank">b1d6edd</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-<td>
-pheatmap
-</td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -544,449 +510,180 @@ pheatmap
 </div>
 </div>
 </div>
-<p>Making a heatmap using the <code>pheatmap</code> package.</p>
-<pre class="r"><code>example_file &lt;- system.file (&quot;extra/TagSeqExample.tab&quot;, package=&quot;DESeq&quot;)
-data &lt;- read.delim(example_file, header=T, row.names=&quot;gene&quot;)
-data_subset &lt;- as.matrix(data[rowSums(data)&gt;50000,])</code></pre>
-<p>Default heatmap using <code>pheatmap</code>.</p>
-<pre class="r"><code>pheatmap(data_subset)</code></pre>
-<p><img src="figure/pheatmap.Rmd/pheatmap_default-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-pheatmap_default-1">
-Past versions of pheatmap_default-1.png
-</button>
-</p>
-<div id="fig-pheatmap_default-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/pheatmap_default-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<pre class="r"><code>cal_z_score &lt;- function(x){
-  (x - mean(x)) / sd(x)
+<p>This post is on plotting Google Trends results with R. If you have never heard of or used Google Trends, it’s fun! You can see how certain keywords have trended over the years and have the results broken down into regions and countries. In this post, I will use the <code>gtrendsR</code> package to perform Google Trends searches with R and demonstrate how to plot the data that is returned.</p>
+<p>To get started, install the <code>gtrendsR</code>, <code>dplyr</code>, <code>ggplot2</code>, and <code>maps</code> packages (if you haven’t already).</p>
+<pre class="r"><code>install.packages(&quot;gtrendsR&quot;, &quot;dplyr&quot;, &quot;ggplot2&quot;, &quot;maps&quot;)</code></pre>
+<p>The <code>gtrends</code> function performs the search. The function has several parameters; I have set <code>geo</code> to focus on the United States and <code>time</code> to include all results since the beginning of Google Trends (2004). I like the San Antonio Spurs, so that will be the keyword for this example.</p>
+<pre class="r"><code>res &lt;- gtrends(&quot;san antonio spurs&quot;,
+               geo = &quot;US&quot;,
+               time = &quot;all&quot;)
+ 
+names(res)</code></pre>
+<pre><code>[1] &quot;interest_over_time&quot;  &quot;interest_by_country&quot; &quot;interest_by_region&quot; 
+[4] &quot;interest_by_dma&quot;     &quot;interest_by_city&quot;    &quot;related_topics&quot;     
+[7] &quot;related_queries&quot;    </code></pre>
+<p>The results are stored in a list that have self-explanatory names. I picked a keyword that should be region- and city-specific. Below I show the interest in “san antonio spurs” stratified by region, city, and DMA and sorted by the interest (highest to lowest).</p>
+<pre class="r"><code>res$interest_by_region %&gt;%
+  arrange(desc(hits)) %&gt;%
+  head(3)</code></pre>
+<pre><code>    location hits           keyword geo gprop
+1      Texas  100 san antonio spurs  US   web
+2 New Mexico   25 san antonio spurs  US   web
+3   Oklahoma   19 san antonio spurs  US   web</code></pre>
+<pre class="r"><code>res$interest_by_city %&gt;%
+  arrange(desc(hits)) %&gt;%
+  head(3)</code></pre>
+<pre><code>     location hits           keyword geo gprop
+1 San Antonio  100 san antonio spurs  US   web
+2 Canyon Lake   63 san antonio spurs  US   web
+3      Laredo   56 san antonio spurs  US   web</code></pre>
+<pre class="r"><code>res$interest_by_dma %&gt;%
+  arrange(desc(hits)) %&gt;%
+  head(3)</code></pre>
+<pre><code>                                 location hits           keyword geo gprop
+1 Tyler-Longview(Lufkin &amp; Nacogdoches) TX    8 san antonio spurs  US   web
+2                     Dallas-Ft. Worth TX    7 san antonio spurs  US   web
+3            Wichita Falls TX &amp; Lawton OK    7 san antonio spurs  US   web</code></pre>
+<p>I modified the plotting function from the <code>gtrendsR</code> package, so that the function just returns a ggplot object without plotting it, in order to customise the plot.</p>
+<pre class="r"><code>plot.gtrends.silent &lt;- function(x, ...) {
+  df &lt;- x$interest_over_time
+  df$date &lt;- as.Date(df$date)
+  df$hits &lt;- if(typeof(df$hits) == &#39;character&#39;){
+    as.numeric(gsub(&#39;&lt;&#39;,&#39;&#39;,df$hits))
+    } else {
+    df$hits
+    }
+ 
+  df$legend &lt;- paste(df$keyword, &quot; (&quot;, df$geo, &quot;)&quot;, sep = &quot;&quot;)
+ 
+  p &lt;- ggplot(df, aes_string(x = &quot;date&quot;, y = &quot;hits&quot;, color = &quot;legend&quot;)) +
+    geom_line() +
+    xlab(&quot;Date&quot;) +
+    ylab(&quot;Search hits&quot;) +
+    ggtitle(&quot;Interest over time&quot;) +
+    theme_bw() +
+    theme(legend.title = element_blank())
+ 
+  invisible(p)
 }
-
-data_subset_norm &lt;- t(apply(data_subset, 1, cal_z_score))
-pheatmap(data_subset_norm)</code></pre>
-<p><img src="figure/pheatmap.Rmd/pheatmap_default-2.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-pheatmap_default-2">
-Past versions of pheatmap_default-2.png
-</button>
-</p>
-<div id="fig-pheatmap_default-2" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/pheatmap_default-2.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Using scale produces the same heatmap as using <code>cal_z_score</code>.</p>
-<pre class="r"><code>pheatmap(data_subset, scale = &quot;row&quot;)</code></pre>
-<p><img src="figure/pheatmap.Rmd/pheatmap_scale-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>Two heatmaps.</p>
-<pre class="r"><code>one &lt;- pheatmap(data_subset, silent = TRUE)
-two &lt;- pheatmap(data_subset, silent = TRUE)
-
-grid.arrange(grobs = list(one[[4]], two[[4]]))</code></pre>
-<p><img src="figure/pheatmap.Rmd/two_heatmaps-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-two_heatmaps-1">
-Past versions of two_heatmaps-1.png
-</button>
-</p>
-<div id="fig-two_heatmaps-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/two_heatmaps-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Reproduce the gene dendrogram.</p>
-<pre class="r"><code>par(mar = c(3.1, 2.1, 1.1, 5.1))
-
-my_hclust_gene &lt;- hclust(dist(data_subset), method = &quot;complete&quot;)
-my_hclust_gene$height</code></pre>
-<pre><code> [1]  2502.208  3771.244  4252.402  4366.211  4700.444  5069.851  5208.367
- [8]  6439.545  6474.863  6938.482  7983.369  8141.632  9198.185  9849.175
-[15] 10818.256 10868.066 11127.621 11168.654 12699.557 12871.187 13511.763
-[22] 13549.622 14483.876 14856.478 14860.904 15033.046 16304.877 16574.315
-[29] 16935.384 17713.534 18798.131 18904.899 20250.185 22302.634 22512.593
-[36] 24345.199 29826.722 30846.374 31530.137 31849.145 40048.202 43714.148
-[43] 47029.264 48908.962 56038.953 67891.667 74124.247 95015.400</code></pre>
-<pre class="r"><code>as.dendrogram(my_hclust_gene) %&gt;%
-  plot(horiz = TRUE)</code></pre>
-<p><img src="figure/pheatmap.Rmd/gene_dendrogram-1.png" width="960" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-gene_dendrogram-1">
-Past versions of gene_dendrogram-1.png
-</button>
-</p>
-<div id="fig-gene_dendrogram-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/gene_dendrogram-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Reproduce the sample dendrogram.</p>
-<pre class="r"><code>my_hclust_sample &lt;- hclust(dist(t(data_subset)), method = &quot;complete&quot;)
-
-as.dendrogram(my_hclust_sample) %&gt;%
-  plot()</code></pre>
-<p><img src="figure/pheatmap.Rmd/sample_dendrogram-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-sample_dendrogram-1">
-Past versions of sample_dendrogram-1.png
-</button>
-</p>
-<div id="fig-sample_dendrogram-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/sample_dendrogram-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Add annotations.</p>
-<pre class="r"><code>my_gene_col &lt;- cutree(tree = as.dendrogram(my_hclust_gene), k = 2)
-my_gene_col &lt;- data.frame(cluster = ifelse(test = my_gene_col == 1, yes = &quot;cluster 1&quot;, no = &quot;cluster 2&quot;))
-
-my_sample_col &lt;- data.frame(sample = rep(c(&quot;tumour&quot;, &quot;normal&quot;), c(4,2)))
-row.names(my_sample_col) &lt;- colnames(data_subset)
-
-set.seed(1984)
-my_random &lt;- as.factor(sample(x = 1:2, size = nrow(my_gene_col), replace = TRUE))
-my_gene_col$random &lt;- my_random
-
-pheatmap(data_subset, annotation_row = my_gene_col, annotation_col = my_sample_col)</code></pre>
-<p><img src="figure/pheatmap.Rmd/annotation-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-annotation-1">
-Past versions of annotation-1.png
-</button>
-</p>
-<div id="fig-annotation-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/annotation-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Change annotation colours and ordering.</p>
-<pre class="r"><code>my_gene_col &lt;- cutree(tree = as.dendrogram(my_hclust_gene), k = 2)
-my_gene_col &lt;- data.frame(cluster = ifelse(test = my_gene_col == 1, yes = &quot;cluster1&quot;, no = &quot;cluster2&quot;))
-
-my_sample_col &lt;- data.frame(sample = rep(c(&quot;tumour&quot;, &quot;normal&quot;), c(4,2)))
-row.names(my_sample_col) &lt;- colnames(data_subset)
-
-# change order
-my_sample_col$sample &lt;- factor(my_sample_col$sample, levels = c(&quot;normal&quot;, &quot;tumour&quot;))
-
-set.seed(1984)
-my_random &lt;- as.factor(sample(x = c(&quot;random1&quot;, &quot;random2&quot;), size = nrow(my_gene_col), replace = TRUE))
-my_gene_col$random &lt;- my_random
-
-my_colour = list(
-    sample = c(normal = &quot;#5977ff&quot;, tumour = &quot;#f74747&quot;),
-    random = c(random1 = &quot;#82ed82&quot;, random2 = &quot;#9e82ed&quot;),
-    cluster = c(cluster1 = &quot;#e89829&quot;, cluster2 = &quot;#cc4ee0&quot;)
-)
-
-p &lt;- pheatmap(data_subset,
-              annotation_colors = my_colour,
-              annotation_row = my_gene_col,
-              annotation_col = my_sample_col,
-              cellheight = 7,
-              cellwidth = 18)</code></pre>
-<p><img src="figure/pheatmap.Rmd/annotation_2-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-annotation_2-1">
-Past versions of annotation_2-1.png
-</button>
-</p>
-<div id="fig-annotation_2-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/annotation_2-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<pre class="r"><code>save_pheatmap_png &lt;- function(x, filename, width=1200, height=1000, res = 150) {
-  png(filename, width = width, height = height, res = res)
-  grid::grid.newpage()
-  grid::grid.draw(x$gtable)
-  dev.off()
-}
-
-# not run
-# save_pheatmap_png(p, &quot;heatmap_colour.png&quot;)</code></pre>
-<p>Introduce breaks by cutting the dendrogram.</p>
-<pre class="r"><code>pheatmap(data_subset,
-         annotation_row = my_gene_col,
-         annotation_col = my_sample_col,
-         cutree_rows = 2,
-         cutree_cols = 2)</code></pre>
-<p><img src="figure/pheatmap.Rmd/break-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-break-1">
-Past versions of break-1.png
-</button>
-</p>
-<div id="fig-break-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/break-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Dendrogram results from pheatmap().</p>
-<pre class="r"><code>par(mar = c(3.1, 2.1, 1.1, 5.1))
-
-my_heatmap &lt;- pheatmap(data_subset, silent = TRUE)
-names(my_heatmap)</code></pre>
-<pre><code>[1] &quot;tree_row&quot; &quot;tree_col&quot; &quot;kmeans&quot;   &quot;gtable&quot;  </code></pre>
-<pre class="r"><code>my_heatmap$tree_row %&gt;%
-  as.dendrogram() %&gt;%
-  plot(horiz = TRUE)</code></pre>
-<p><img src="figure/pheatmap.Rmd/pheatmap_result-1.png" width="960" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-pheatmap_result-1">
-Past versions of pheatmap_result-1.png
-</button>
-</p>
-<div id="fig-pheatmap_result-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/pheatmap_result-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+ 
+my_plot &lt;- plot.gtrends.silent(res)
+ 
+my_plot +
+  scale_x_date(date_breaks = &quot;1 year&quot;, date_labels = &quot;%Y&quot;) +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="figure/google_trends.Rmd/plot_gtrends_silent-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The seasonal trend is due to when the NBA season starts and ends. The spike in 2014 is when the San Antonio Spurs were the NBA champions; the spike in 2013 is when they reached the NBA finals but lost.</p>
+<p>Next, I will show how to plot interest per country; I will colour each city by the interest of a certain keyword. I will use the <code>map_data</code> function to obtain coordinates (and polygon drawing groups and orders) of cities in the world as a data frame. In the first example, I will use the keyword “wantok”, which means a close friend in Tok Pisin; this is the main language spoken in Papua New Guinea, the country I grew up in.</p>
+<pre class="r"><code>world &lt;- map_data(&quot;world&quot;)
+ 
+# change the region names to match the region names returned by Google Trends
+world %&gt;%
+  mutate(region = replace(region, region==&quot;USA&quot;, &quot;United States&quot;)) %&gt;%
+  mutate(region = replace(region, region==&quot;UK&quot;, &quot;United Kingdom&quot;)) -&gt; world
+ 
+# perform search
+res_world &lt;- gtrends(&quot;wantok&quot;, time = &quot;all&quot;)
+ 
+# create data frame for plotting
+res_world$interest_by_country %&gt;%
+  filter(location %in% world$region, hits &gt; 0) %&gt;%
+  mutate(region = location, hits = as.numeric(hits)) %&gt;%
+  select(region, hits) -&gt; my_df
+ 
+ggplot() +
+  geom_map(data = world,
+           map = world,
+           aes(x = long, y = lat, map_id = region),
+           fill=&quot;#ffffff&quot;, color=&quot;#ffffff&quot;, size=0.15) +
+  geom_map(data = my_df,
+           map = world,
+           aes(fill = hits, map_id = region),
+           color=&quot;#ffffff&quot;, size=0.15) +
+  scale_fill_continuous(low = &#39;grey&#39;, high = &#39;red&#39;) +
+  theme(axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank())</code></pre>
+<pre><code>Warning: Ignoring unknown aesthetics: x, y</code></pre>
+<p><img src="figure/google_trends.Rmd/search_wantok-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>As expected, the top interest in the keyword “wantok” is in Papua New Guinea.</p>
+<p>We can also only focus on the United States. Here I will use the keyword “swamp gravy”, which was something I learned about while listening to the Planet Money podcast (which I highly recommend).</p>
+<pre class="r"><code>res &lt;- gtrends(&quot;swamp gravy&quot;,
+               geo = &quot;US&quot;,
+               time = &quot;all&quot;)
+ 
+state &lt;- map_data(&quot;state&quot;)
+ 
+res$interest_by_region %&gt;%
+  mutate(region = tolower(location)) %&gt;%
+  filter(region %in% state$region) %&gt;%
+  select(region, hits) -&gt; my_df
+ 
+ggplot() +
+  geom_map(data = state,
+           map = state,
+           aes(x = long, y = lat, map_id = region),
+           fill=&quot;#ffffff&quot;, color=&quot;#ffffff&quot;, size=0.15) +
+  geom_map(data = my_df,
+           map = state,
+           aes(fill = hits, map_id = region),
+           color=&quot;#ffffff&quot;, size=0.15) +
+  scale_fill_continuous(low = &#39;grey&#39;, high = &#39;red&#39;) +
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank())</code></pre>
+<pre><code>Warning: Ignoring unknown aesthetics: x, y</code></pre>
+<p><img src="figure/google_trends.Rmd/swamp_gravy-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Swamp gravy is a play that has become the U.S. state of Georgia’s official folk-life play. The state of Georgia (and its neighbouring state Alabama) indeed has the highest interest in the keyword.</p>
+<p>Since this is a bioinformatics blog, I will show results for the keyword “bioinformatics”.</p>
+<pre class="r"><code>res &lt;- gtrends(&quot;bioinformatics&quot;,
+               geo = &quot;US&quot;,
+               time = &quot;all&quot;)
+ 
+state &lt;- map_data(&quot;state&quot;)
+ 
+res$interest_by_region %&gt;%
+  mutate(region = tolower(location)) %&gt;%
+  filter(region %in% state$region) %&gt;%
+  select(region, hits) -&gt; my_df
+ 
+ggplot() +
+  geom_map(data = state,
+           map = state,
+           aes(x = long, y = lat, map_id = region),
+           fill=&quot;#ffffff&quot;, color=&quot;#ffffff&quot;, size=0.15) +
+  geom_map(data = my_df,
+           map = state,
+           aes(fill = hits, map_id = region),
+           color=&quot;#ffffff&quot;, size=0.15) +
+  scale_fill_continuous(low = &#39;grey&#39;, high = &#39;red&#39;) +
+  theme(panel.background = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank())</code></pre>
+<pre><code>Warning: Ignoring unknown aesthetics: x, y</code></pre>
+<p><img src="figure/google_trends.Rmd/bioinformatics-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Maryland (location of the NIH) and Massachusetts (location of the Broad Institute and various biotech startups) have the highest interest in bioinformatics.</p>
+<p>Note that the US plots are missing Alaska and Hawaii and this is because these states are missing from the “state” map.</p>
+<pre class="r"><code>unique(map_data(&quot;state&quot;)$region)</code></pre>
+<pre><code> [1] &quot;alabama&quot;              &quot;arizona&quot;              &quot;arkansas&quot;            
+ [4] &quot;california&quot;           &quot;colorado&quot;             &quot;connecticut&quot;         
+ [7] &quot;delaware&quot;             &quot;district of columbia&quot; &quot;florida&quot;             
+[10] &quot;georgia&quot;              &quot;idaho&quot;                &quot;illinois&quot;            
+[13] &quot;indiana&quot;              &quot;iowa&quot;                 &quot;kansas&quot;              
+[16] &quot;kentucky&quot;             &quot;louisiana&quot;            &quot;maine&quot;               
+[19] &quot;maryland&quot;             &quot;massachusetts&quot;        &quot;michigan&quot;            
+[22] &quot;minnesota&quot;            &quot;mississippi&quot;          &quot;missouri&quot;            
+[25] &quot;montana&quot;              &quot;nebraska&quot;             &quot;nevada&quot;              
+[28] &quot;new hampshire&quot;        &quot;new jersey&quot;           &quot;new mexico&quot;          
+[31] &quot;new york&quot;             &quot;north carolina&quot;       &quot;north dakota&quot;        
+[34] &quot;ohio&quot;                 &quot;oklahoma&quot;             &quot;oregon&quot;              
+[37] &quot;pennsylvania&quot;         &quot;rhode island&quot;         &quot;south carolina&quot;      
+[40] &quot;south dakota&quot;         &quot;tennessee&quot;            &quot;texas&quot;               
+[43] &quot;utah&quot;                 &quot;vermont&quot;              &quot;virginia&quot;            
+[46] &quot;washington&quot;           &quot;west virginia&quot;        &quot;wisconsin&quot;           
+[49] &quot;wyoming&quot;             </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1007,37 +704,29 @@ locale:
 [1] en_AU.UTF-8/en_AU.UTF-8/en_AU.UTF-8/C/en_AU.UTF-8/en_AU.UTF-8
 
 attached base packages:
-[1] parallel  stats     graphics  grDevices utils     datasets  methods  
-[8] base     
+[1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] gridExtra_2.3       dendextend_1.14.0   DESeq_1.39.0       
-[4] lattice_0.20-41     locfit_1.5-9.4      Biobase_2.48.0     
-[7] BiocGenerics_0.34.0 pheatmap_1.0.12     workflowr_1.6.2    
+ [1] maps_3.3.0      gtrendsR_1.4.7  forcats_0.5.0   stringr_1.4.0  
+ [5] dplyr_1.0.2     purrr_0.3.4     readr_1.3.1     tidyr_1.1.2    
+ [9] tibble_3.0.3    ggplot2_3.3.2   tidyverse_1.3.0 workflowr_1.6.2
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.5           rprojroot_1.3-2      digest_0.6.25       
- [4] R6_2.4.1             backports_1.1.9      stats4_4.0.2        
- [7] RSQLite_2.2.0        evaluate_0.14        ggplot2_3.3.2       
-[10] pillar_1.4.6         rlang_0.4.7          rstudioapi_0.11     
-[13] annotate_1.66.0      whisker_0.4          blob_1.2.1          
-[16] S4Vectors_0.26.1     Matrix_1.2-18        rmarkdown_2.3       
-[19] splines_4.0.2        geneplotter_1.66.0   stringr_1.4.0       
-[22] RCurl_1.98-1.2       bit_4.0.4            munsell_0.5.0       
-[25] compiler_4.0.2       httpuv_1.5.4         xfun_0.16           
-[28] pkgconfig_2.0.3      htmltools_0.5.0      tidyselect_1.1.0    
-[31] tibble_3.0.3         IRanges_2.22.2       XML_3.99-0.5        
-[34] viridisLite_0.3.0    crayon_1.3.4         dplyr_1.0.2         
-[37] later_1.1.0.1        bitops_1.0-6         grid_4.0.2          
-[40] xtable_1.8-4         gtable_0.3.0         lifecycle_0.2.0     
-[43] DBI_1.1.0            git2r_0.27.1         magrittr_1.5        
-[46] scales_1.1.1         stringi_1.4.6        farver_2.0.3        
-[49] genefilter_1.70.0    viridis_0.5.1        fs_1.5.0            
-[52] promises_1.1.1       ellipsis_0.3.1       vctrs_0.3.4         
-[55] generics_0.0.2       RColorBrewer_1.1-2   tools_4.0.2         
-[58] bit64_4.0.5          glue_1.4.2           purrr_0.3.4         
-[61] survival_3.2-3       yaml_2.2.1           AnnotationDbi_1.50.3
-[64] colorspace_1.4-1     memoise_1.1.0        knitr_1.29          </code></pre>
+ [1] tidyselect_1.1.0 xfun_0.16        haven_2.3.1      colorspace_1.4-1
+ [5] vctrs_0.3.4      generics_0.0.2   htmltools_0.5.0  yaml_2.2.1      
+ [9] blob_1.2.1       rlang_0.4.7      later_1.1.0.1    pillar_1.4.6    
+[13] withr_2.2.0      glue_1.4.2       DBI_1.1.0        dbplyr_1.4.4    
+[17] modelr_0.1.8     readxl_1.3.1     lifecycle_0.2.0  munsell_0.5.0   
+[21] gtable_0.3.0     cellranger_1.1.0 rvest_0.3.6      evaluate_0.14   
+[25] labeling_0.3     knitr_1.29       httpuv_1.5.4     curl_4.3        
+[29] fansi_0.4.1      broom_0.7.0      Rcpp_1.0.5       promises_1.1.1  
+[33] backports_1.1.9  scales_1.1.1     jsonlite_1.7.0   farver_2.0.3    
+[37] fs_1.5.0         hms_0.5.3        digest_0.6.25    stringi_1.4.6   
+[41] rprojroot_1.3-2  grid_4.0.2       cli_2.0.2        tools_4.0.2     
+[45] magrittr_1.5     crayon_1.3.4     whisker_0.4      pkgconfig_2.0.3 
+[49] ellipsis_0.3.1   xml2_1.3.2       reprex_0.3.0     lubridate_1.7.9 
+[53] assertthat_0.2.1 rmarkdown_2.3    httr_1.4.2       rstudioapi_0.11 
+[57] R6_2.4.1         git2r_0.27.1     compiler_4.0.2  </code></pre>
 </div>
 
 
