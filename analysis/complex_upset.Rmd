@@ -1,0 +1,92 @@
+---
+title: "Complex UpSet plots"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggplot2movies)
+library(ComplexUpset)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Following this [tutorial](https://krassowski.github.io/complex-upset/articles/Examples_R.html). Firstly, install the package.
+
+```{r install_complex_upset, eval=FALSE}
+devtools::install_github("krassowski/complex-upset")
+install.packages("ggplot2movies")
+```
+
+The example uses the `movies` dataset from `ggplot2movies`, so make sure you have that package installed too.
+
+```{r load_movies}
+movies <- as.data.frame(ggplot2movies::movies)
+dim(movies)
+```
+
+The example will plot the overlap of genres of movies.
+
+```{r create_genre}
+genres <- colnames(movies)[18:24]
+head(genres)
+```
+
+Keep only movies with MPAA ratings.
+
+```{r filter_mpaa}
+movies %>% filter(mpaa != "") -> movies
+```
+
+Now to create the UpSet plot.
+
+```{r upset_plot}
+upset(movies,
+      genres,
+      name = 'genre',
+      width_ratio = 0.1,
+      min_size = 10)
+```
+
+Base annotation.
+
+```{r base_annotation}
+upset(
+    movies,
+    genres,
+    base_annotations = list(
+        'Intersection size' = intersection_size(
+            counts = FALSE,
+            aes = aes(fill = mpaa)
+        )
+    ),
+    width_ratio = 0.1,
+    min_size = 10
+)
+```
+
+Add the distribution of ratings.
+
+```{r add_annotation}
+upset(
+    movies,
+    genres,
+    annotations = list(
+        'Rating'=list(
+            aes=aes(x=intersection, y=rating),
+            geom=list(
+                # checkout ggbeeswarm::geom_quasirandom for better results!
+                geom_jitter(aes(color=log10(votes))),
+                geom_violin(width=1.1, alpha=0.5)
+            )
+        )
+    ),
+    min_size=10,
+    width_ratio=0.1
+) + 
+  ggtitle("Movies")
+```
