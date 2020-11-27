@@ -11,7 +11,6 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(pheatmap)
-library(DESeq)
 library(dendextend)
 library(gridExtra)
 ```
@@ -19,8 +18,8 @@ library(gridExtra)
 Making a heatmap using the `pheatmap` package.
 
 ```{r example_data}
-example_file <- system.file ("extra/TagSeqExample.tab", package="DESeq")
-data <- read.delim(example_file, header=T, row.names="gene")
+example_file <- "https://davetang.org/file/TagSeqExample.tab"
+data <- read.delim(example_file, header = TRUE, row.names = "gene")
 data_subset <- as.matrix(data[rowSums(data)>50000,])
 ```
 
@@ -78,6 +77,22 @@ Add annotations.
 ```{r annotation, fig.height=7, fig.width=7}
 my_gene_col <- cutree(tree = as.dendrogram(my_hclust_gene), k = 2)
 my_gene_col <- data.frame(cluster = ifelse(test = my_gene_col == 1, yes = "cluster 1", no = "cluster 2"))
+
+my_sample_col <- data.frame(sample = rep(c("tumour", "normal"), c(4,2)))
+row.names(my_sample_col) <- colnames(data_subset)
+
+set.seed(1984)
+my_random <- as.factor(sample(x = 1:2, size = nrow(my_gene_col), replace = TRUE))
+my_gene_col$random <- my_random
+
+pheatmap(data_subset, annotation_row = my_gene_col, annotation_col = my_sample_col)
+```
+
+More clusters.
+
+```{r more_clusters, fig.height=7, fig.width=7}
+my_gene_col <- cutree(tree = as.dendrogram(my_hclust_gene), k = 6)
+my_gene_col <- data.frame(cluster = paste0("cluster ", my_gene_col), row.names = names(my_gene_col))
 
 my_sample_col <- data.frame(sample = rep(c("tumour", "normal"), c(4,2)))
 row.names(my_sample_col) <- colnames(data_subset)
