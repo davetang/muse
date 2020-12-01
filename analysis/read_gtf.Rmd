@@ -45,7 +45,7 @@ if (!file.exists(paste0("data/", my_gtf))){
 
 We will use [rtracklayer](https://www.bioconductor.org/packages/release/bioc/html/rtracklayer.html) to import the GTF file into R.
 
-```{r import_gtf}
+```{r import_gtf, warning=FALSE, message=FALSE}
 library(rtracklayer)
 my_obj <- import(paste0("data/", my_gtf))
 class(my_obj)
@@ -59,7 +59,7 @@ my_obj
 
 We can use the awesome `plyranges` package by Stuart Lee to find out the number of transcripts on each chromosome.
 
-```{r transcripts_per_chr}
+```{r transcripts_per_chr, warning = FALSE, message=FALSE}
 library(plyranges)
 my_obj %>%
   group_by(seqnames) %>%
@@ -77,7 +77,7 @@ my_obj %>%
 
 Summarise biotypes and plot.
 
-```{r transcript_biotypes}
+```{r transcript_biotypes, warning=FALSE, message=FALSE}
 my_obj %>%
   group_by(transcript_type) %>%
   summarise(number = n()) %>%
@@ -104,7 +104,7 @@ ggplot(my_biotypes, aes(transcript_type, number)) +
 
 Visualise transcripts near chr17:7661779-7687538.
 
-```{r gviz}
+```{r gviz, warning=FALSE, message=FALSE}
 library(Gviz)
 library(GenomicFeatures)
 my_txdb <- makeTxDbFromGFF(paste0("data/", my_gtf))
