@@ -1,0 +1,117 @@
+---
+title: "Read GTF file into R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The [Gene Transfer Format](https://genome.ucsc.edu/FAQ/FAQformat.html#format4) (GTF) is a refinement of the [General Feature Format](https://genome.ucsc.edu/FAQ/FAQformat.html#format3) (GFF). A GFF file has nine columns:
+
+| Column  | Description |
+| :------ | :--------- |
+| seqname | The name of the sequence; must be a chromosome or scaffold |
+| source  | The program that generated this feature |
+| feature | The name of this type of feature, e.g. “CDS”, “start_codon”, “stop_codon”, and “exon” |
+| start   | The starting position of the feature in the sequence; the first base is numbered 1 |
+| end     | The ending position of the feature (inclusive) |
+| score   | A score between 0 and 1000 |
+| strand  | Valid entries include "+", "-", or "." |
+| frame   | If the feature is a coding exon, frame should be a number between 0-2 that represents the reading frame of the first base. If the feature is not a coding exon, the value should be "." |
+| group   | All lines with the same group are linked together into a single item |
+
+The first eight fields in a GTF file are the same as GFF but the group field has been expanded into a list of attributes, where each attribute consists of a type/value pair. Attributes must end in a semi-colon and be separated from any following attribute by exactly one space. The attribute list must begin with the two mandatory attributes:
+
+1. **gene_id value** – A globally unique identifier for the genomic source of the sequence.
+2. **transcript_id value** – A globally unique identifier for the predicted transcript.
+
+To get started, I will use the latest GENCODE GTF file.
+
+```{r download_gencode_gtf}
+gencode_ver <- 36
+my_url <- paste0("ftp://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_", gencode_ver, "/gencode.v", gencode_ver, ".annotation.gtf.gz")
+my_gtf <- basename(my_url)
+
+if (!file.exists(paste0("data/", my_gtf))){
+  download.file(url = my_url, destfile = paste0("data/", my_gtf))
+}
+```
+
+We will use [rtracklayer](https://www.bioconductor.org/packages/release/bioc/html/rtracklayer.html) to import the GTF file into R.
+
+```{r import_gtf}
+library(rtracklayer)
+my_obj <- import(paste0("data/", my_gtf))
+class(my_obj)
+```
+
+The [GenomicRanges](https://www.bioconductor.org/packages/release/bioc/html/GenomicRanges.html) package serves as the foundation for representing genomic locations within the Bioconductor project. The GRanges class represents a collection of genomic features that each have a single start and end location on the genome. This includes features such as contiguous binding sites, transcripts, and exons.
+
+```{r check_out_my_obj}
+my_obj
+```
+
+We can use the awesome `plyranges` package by Stuart Lee to find out the number of transcripts on each chromosome.
+
+```{r transcripts_per_chr}
+library(plyranges)
+my_obj %>%
+  group_by(seqnames) %>%
+  summarise(total = n()) %>%
+  as.data.frame()
+```
+
+Fetch mitochondrial transcripts.
+
+```{r mt_transcripts}
+my_obj %>%
+  filter(seqnames == "chrM") %>%
+  head()
+```
+
+Summarise biotypes and plot.
+
+```{r transcript_biotypes}
+my_obj %>%
+  group_by(transcript_type) %>%
+  summarise(number = n()) %>%
+  as.data.frame() -> my_biotypes
+
+my_biotypes %>%
+  dplyr::filter(!is.na(transcript_type)) -> my_biotypes
+
+my_biotypes %>%
+  arrange(desc(number)) %>%
+  dplyr::pull(transcript_type) -> my_order
+
+my_biotypes$transcript_type <- factor(my_biotypes$transcript_type, levels = my_order)
+
+library(ggplot2)
+
+ggplot(my_biotypes, aes(transcript_type, number)) +
+  geom_col() +
+  theme_bw() +
+  scale_y_log10() +
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+```
+
+Visualise transcripts near chr17:7661779-7687538.
+
+```{r gviz}
+library(Gviz)
+library(GenomicFeatures)
+my_txdb <- makeTxDbFromGFF(paste0("data/", my_gtf))
+
+my_start <- 7661779 - 5000
+my_end <- 7687538 + 5000
+geneTrack <- GeneRegionTrack(my_txdb, chromosome="chr17", from=my_start, to=my_end)
+
+plotTracks(geneTrack, chromosome="chr17", from=my_start, to=my_end, showId=TRUE)
+```
