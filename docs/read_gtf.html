@@ -437,16 +437,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeacb173357057c528ee677e301fd5cc52cf2b8827targetblankacb1733a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/acb173357057c528ee677e301fd5cc52cf2b8827" target="_blank">acb1733</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeed6cd01b15d6706a5684c7f00381db4a3cbf8797targetblanked6cd01a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/ed6cd01b15d6706a5684c7f00381db4a3cbf8797" target="_blank">ed6cd01</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeacb173357057c528ee677e301fd5cc52cf2b8827targetblankacb1733a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeed6cd01b15d6706a5684c7f00381db4a3cbf8797targetblanked6cd01a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/acb173357057c528ee677e301fd5cc52cf2b8827" target="_blank">acb1733</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/ed6cd01b15d6706a5684c7f00381db4a3cbf8797" target="_blank">ed6cd01</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -498,6 +498,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/ed6cd01b15d6706a5684c7f00381db4a3cbf8797/analysis/read_gtf.Rmd" target="_blank">ed6cd01</a>
+</td>
+<td>
+davetang
+</td>
+<td>
+2020-12-01
+</td>
+<td>
+No warning or messages
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/6ef7a6274c3c38b0c4299c1ddef4769838f2df75/docs/read_gtf.html" target="_blank">6ef7a62</a>
+</td>
+<td>
+davetang
+</td>
+<td>
+2020-12-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -587,38 +621,8 @@ if (!file.exists(paste0(&quot;data/&quot;, my_gtf))){
   download.file(url = my_url, destfile = paste0(&quot;data/&quot;, my_gtf))
 }</code></pre>
 <p>We will use <a href="https://www.bioconductor.org/packages/release/bioc/html/rtracklayer.html">rtracklayer</a> to import the GTF file into R.</p>
-<pre class="r"><code>library(rtracklayer)</code></pre>
-<pre><code>Loading required package: GenomicRanges</code></pre>
-<pre><code>Loading required package: stats4</code></pre>
-<pre><code>Loading required package: BiocGenerics</code></pre>
-<pre><code>Loading required package: parallel</code></pre>
-<pre><code>
-Attaching package: &#39;BiocGenerics&#39;</code></pre>
-<pre><code>The following objects are masked from &#39;package:parallel&#39;:
-
-    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
-    clusterExport, clusterMap, parApply, parCapply, parLapply,
-    parLapplyLB, parRapply, parSapply, parSapplyLB</code></pre>
-<pre><code>The following objects are masked from &#39;package:stats&#39;:
-
-    IQR, mad, sd, var, xtabs</code></pre>
-<pre><code>The following objects are masked from &#39;package:base&#39;:
-
-    anyDuplicated, append, as.data.frame, basename, cbind, colnames,
-    dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
-    grepl, intersect, is.unsorted, lapply, Map, mapply, match, mget,
-    order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
-    rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply,
-    union, unique, unsplit, which, which.max, which.min</code></pre>
-<pre><code>Loading required package: S4Vectors</code></pre>
-<pre><code>
-Attaching package: &#39;S4Vectors&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:base&#39;:
-
-    expand.grid</code></pre>
-<pre><code>Loading required package: IRanges</code></pre>
-<pre><code>Loading required package: GenomeInfoDb</code></pre>
-<pre class="r"><code>my_obj &lt;- import(paste0(&quot;data/&quot;, my_gtf))
+<pre class="r"><code>library(rtracklayer)
+my_obj &lt;- import(paste0(&quot;data/&quot;, my_gtf))
 class(my_obj)</code></pre>
 <pre><code>[1] &quot;GRanges&quot;
 attr(,&quot;package&quot;)
@@ -707,16 +711,8 @@ attr(,&quot;package&quot;)
   -------
   seqinfo: 25 sequences from an unspecified genome; no seqlengths</code></pre>
 <p>We can use the awesome <code>plyranges</code> package by Stuart Lee to find out the number of transcripts on each chromosome.</p>
-<pre class="r"><code>library(plyranges)</code></pre>
-<pre><code>
-Attaching package: &#39;plyranges&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:IRanges&#39;:
-
-    slice</code></pre>
-<pre><code>The following object is masked from &#39;package:stats&#39;:
-
-    filter</code></pre>
-<pre class="r"><code>my_obj %&gt;%
+<pre class="r"><code>library(plyranges)
+my_obj %&gt;%
   group_by(seqnames) %&gt;%
   summarise(total = n()) %&gt;%
   as.data.frame()</code></pre>
@@ -817,36 +813,91 @@ ggplot(my_biotypes, aes(transcript_type, number)) +
   theme(axis.title.x = element_blank(),
         axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))</code></pre>
 <p><img src="figure/read_gtf.Rmd/transcript_biotypes-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-transcript_biotypes-1">
+Past versions of transcript_biotypes-1.png
+</button>
+</p>
+<div id="fig-transcript_biotypes-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/6ef7a6274c3c38b0c4299c1ddef4769838f2df75/docs/figure/read_gtf.Rmd/transcript_biotypes-1.png" target="_blank">6ef7a62</a>
+</td>
+<td>
+davetang
+</td>
+<td>
+2020-12-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Visualise transcripts near chr17:7661779-7687538.</p>
-<pre class="r"><code>library(Gviz)</code></pre>
-<pre><code>Loading required package: grid</code></pre>
-<pre class="r"><code>library(GenomicFeatures)</code></pre>
-<pre><code>Loading required package: AnnotationDbi</code></pre>
-<pre><code>Loading required package: Biobase</code></pre>
-<pre><code>Welcome to Bioconductor
+<pre class="r"><code>library(Gviz)
+library(GenomicFeatures)
+my_txdb &lt;- makeTxDbFromGFF(paste0(&quot;data/&quot;, my_gtf))
 
-    Vignettes contain introductory material; view with
-    &#39;browseVignettes()&#39;. To cite Bioconductor, see
-    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
-<pre><code>
-Attaching package: &#39;AnnotationDbi&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:plyranges&#39;:
-
-    select</code></pre>
-<pre class="r"><code>my_txdb &lt;- makeTxDbFromGFF(paste0(&quot;data/&quot;, my_gtf))</code></pre>
-<pre><code>Import genomic features from the file as a GRanges object ...</code></pre>
-<pre><code>OK</code></pre>
-<pre><code>Prepare the &#39;metadata&#39; data frame ... OK
-Make the TxDb object ... </code></pre>
-<pre><code>Warning in .get_cds_IDX(mcols0$type, mcols0$phase): The &quot;phase&quot; metadata column contains non-NA values for features of type
-  stop_codon. This information was ignored.</code></pre>
-<pre><code>OK</code></pre>
-<pre class="r"><code>my_start &lt;- 7661779 - 5000
+my_start &lt;- 7661779 - 5000
 my_end &lt;- 7687538 + 5000
 geneTrack &lt;- GeneRegionTrack(my_txdb, chromosome=&quot;chr17&quot;, from=my_start, to=my_end)
 
 plotTracks(geneTrack, chromosome=&quot;chr17&quot;, from=my_start, to=my_end, showId=TRUE)</code></pre>
 <p><img src="figure/read_gtf.Rmd/gviz-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-gviz-1">
+Past versions of gviz-1.png
+</button>
+</p>
+<div id="fig-gviz-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/6ef7a6274c3c38b0c4299c1ddef4769838f2df75/docs/figure/read_gtf.Rmd/gviz-1.png" target="_blank">6ef7a62</a>
+</td>
+<td>
+davetang
+</td>
+<td>
+2020-12-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
