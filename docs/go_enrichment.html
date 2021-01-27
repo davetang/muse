@@ -515,16 +515,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree687a6cafb1b8cb6b6e9e56578c5682c8ac2a2943targetblank687a6caa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/687a6cafb1b8cb6b6e9e56578c5682c8ac2a2943" target="_blank">687a6ca</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3c146e58c756ef9e7a1d8ca30043ee3891c5b32ftargetblank3c146e5a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/3c146e58c756ef9e7a1d8ca30043ee3891c5b32f" target="_blank">3c146e5</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree687a6cafb1b8cb6b6e9e56578c5682c8ac2a2943targetblank687a6caa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3c146e58c756ef9e7a1d8ca30043ee3891c5b32ftargetblank3c146e5a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/687a6cafb1b8cb6b6e9e56578c5682c8ac2a2943" target="_blank">687a6ca</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/3c146e58c756ef9e7a1d8ca30043ee3891c5b32f" target="_blank">3c146e5</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -580,6 +580,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/3c146e58c756ef9e7a1d8ca30043ee3891c5b32f/analysis/go_enrichment.Rmd" target="_blank">3c146e5</a>
+</td>
+<td>
+davetang
+</td>
+<td>
+2021-01-27
+</td>
+<td>
+Include clusterProfiler
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/1cd1577dd916311354eeb438daf50370bfe4e855/docs/go_enrichment.html" target="_blank">1cd1577</a>
+</td>
+<td>
+davetang
+</td>
+<td>
+2021-01-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -698,6 +732,52 @@ Selected gene set size: 205
 my_idx &lt;- my_df$go_id == &quot;GO:0007411&quot;
 length(unique(my_df[my_idx, &quot;gene_id&quot;])) == length(axon_gene)</code></pre>
 <pre><code>[1] TRUE</code></pre>
+<div id="clusterprofiler" class="section level2">
+<h2>clusterProfiler</h2>
+<p>The <code>enrichGO</code> function in the <code>clusterProfiler</code> package can also perform a GOEA with FDR control.</p>
+<pre class="r"><code>my_test2 &lt;- enrichGO(axon_gene,
+                     org.Hs.eg.db,
+                     keyType = &quot;ENTREZID&quot;,
+                     ont = &quot;BP&quot;,
+                     pvalueCutoff = 0.001,
+                     pAdjustMethod = &quot;BH&quot;,
+                     universe,
+                     qvalueCutoff = 0.1,
+                     minGSSize = 10,
+                     maxGSSize = 500,
+                     readable = FALSE)
+
+head(data.frame(my_test2))</code></pre>
+<pre><code>                   ID                                 Description GeneRatio
+GO:0007409 GO:0007409                                axonogenesis   205/205
+GO:0007411 GO:0007411                               axon guidance   205/205
+GO:0097485 GO:0097485                  neuron projection guidance   205/205
+GO:0050770 GO:0050770                  regulation of axonogenesis    41/205
+GO:0008038 GO:0008038                          neuron recognition    27/205
+GO:0010975 GO:0010975 regulation of neuron projection development    56/205
+             BgRatio       pvalue     p.adjust       qvalue
+GO:0007409 468/18670 0.000000e+00 0.000000e+00 0.000000e+00
+GO:0007411 276/18670 0.000000e+00 0.000000e+00 0.000000e+00
+GO:0097485 277/18670 0.000000e+00 0.000000e+00 0.000000e+00
+GO:0050770 183/18670 2.592496e-42 2.143346e-39 1.300341e-39
+GO:0008038  48/18670 3.898825e-41 2.578683e-38 1.564455e-38
+GO:0010975 499/18670 1.042084e-40 5.743620e-38 3.484583e-38
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    geneID
+GO:0007409 323/474/627/655/682/1002/1400/1436/1600/1630/1796/1808/1826/1855/1942/1943/1944/1945/1946/1947/1948/1949/1969/2041/2042/2043/2044/2045/2046/2047/2048/2049/2050/2051/2115/2131/2297/2534/2549/2625/2637/2668/2674/2675/2676/2736/2737/2817/2885/2886/2887/2909/3730/3798/3800/3897/3908/3913/4009/4089/4147/4628/4684/4756/4902/4914/4917/4983/5015/5080/5290/5291/5293/5295/5335/5458/5578/5588/5594/5595/5598/5623/5649/5747/5781/5786/5800/5818/5909/5979/6091/6092/6259/6324/6387/6405/6464/6469/6477/6585/6586/6654/6708/6709/6710/6711/6712/6714/6900/7080/7143/7204/7408/7430/7436/7473/7474/7852/7869/8013/8399/8609/8633/8660/8828/8829/8851/9046/9048/9211/9252/9260/9353/9355/9369/9378/9499/9637/9638/9846/10048/10371/10381/10500/10505/10512/10678/10752/10818/11023/11127/11313/23022/23032/23114/23191/23767/23768/26999/27020/27255/30011/51332/51466/53358/54538/55715/55740/55816/56896/57408/57453/57549/57556/57731/59277/59352/64096/64221/64855/84665/85358/89780/90249/91624/91653/128434/133418/137970/151449/152330/170302/219699/220164/223117/283297/284217/284656/285220/374946/375790/389549/644168/654429/729920
+GO:0007411 323/474/627/655/682/1002/1400/1436/1600/1630/1796/1808/1826/1855/1942/1943/1944/1945/1946/1947/1948/1949/1969/2041/2042/2043/2044/2045/2046/2047/2048/2049/2050/2051/2115/2131/2297/2534/2549/2625/2637/2668/2674/2675/2676/2736/2737/2817/2885/2886/2887/2909/3730/3798/3800/3897/3908/3913/4009/4089/4147/4628/4684/4756/4902/4914/4917/4983/5015/5080/5290/5291/5293/5295/5335/5458/5578/5588/5594/5595/5598/5623/5649/5747/5781/5786/5800/5818/5909/5979/6091/6092/6259/6324/6387/6405/6464/6469/6477/6585/6586/6654/6708/6709/6710/6711/6712/6714/6900/7080/7143/7204/7408/7430/7436/7473/7474/7852/7869/8013/8399/8609/8633/8660/8828/8829/8851/9046/9048/9211/9252/9260/9353/9355/9369/9378/9499/9637/9638/9846/10048/10371/10381/10500/10505/10512/10678/10752/10818/11023/11127/11313/23022/23032/23114/23191/23767/23768/26999/27020/27255/30011/51332/51466/53358/54538/55715/55740/55816/56896/57408/57453/57549/57556/57731/59277/59352/64096/64221/64855/84665/85358/89780/90249/91624/91653/128434/133418/137970/151449/152330/170302/219699/220164/223117/283297/284217/284656/285220/374946/375790/389549/644168/654429/729920
+GO:0097485 323/474/627/655/682/1002/1400/1436/1600/1630/1796/1808/1826/1855/1942/1943/1944/1945/1946/1947/1948/1949/1969/2041/2042/2043/2044/2045/2046/2047/2048/2049/2050/2051/2115/2131/2297/2534/2549/2625/2637/2668/2674/2675/2676/2736/2737/2817/2885/2886/2887/2909/3730/3798/3800/3897/3908/3913/4009/4089/4147/4628/4684/4756/4902/4914/4917/4983/5015/5080/5290/5291/5293/5295/5335/5458/5578/5588/5594/5595/5598/5623/5649/5747/5781/5786/5800/5818/5909/5979/6091/6092/6259/6324/6387/6405/6464/6469/6477/6585/6586/6654/6708/6709/6710/6711/6712/6714/6900/7080/7143/7204/7408/7430/7436/7473/7474/7852/7869/8013/8399/8609/8633/8660/8828/8829/8851/9046/9048/9211/9252/9260/9353/9355/9369/9378/9499/9637/9638/9846/10048/10371/10381/10500/10505/10512/10678/10752/10818/11023/11127/11313/23022/23032/23114/23191/23767/23768/26999/27020/27255/30011/51332/51466/53358/54538/55715/55740/55816/56896/57408/57453/57549/57556/57731/59277/59352/64096/64221/64855/84665/85358/89780/90249/91624/91653/128434/133418/137970/151449/152330/170302/219699/220164/223117/283297/284217/284656/285220/374946/375790/389549/644168/654429/729920
+GO:0050770                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          627/1002/1600/1630/1808/1826/1942/1946/1949/2043/2045/2048/2049/2909/3897/5458/5747/5800/5979/6091/6092/6259/6387/6405/6900/7143/7473/7474/7869/8829/8851/9353/10371/10500/10505/10512/23191/57556/89780/223117/374946
+GO:0008038                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           682/1826/1949/2042/2043/2048/2049/2909/6091/6092/6900/7852/8829/8851/10371/23022/27020/27255/54538/57453/57549/64221/84665/91624/128434/133418/152330
+GO:0010975                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              627/655/1002/1400/1600/1630/1808/1826/1855/1942/1946/1948/1949/2042/2043/2045/2048/2049/2534/2625/2909/3897/4914/5458/5649/5747/5800/5979/6091/6092/6259/6324/6387/6405/6900/7143/7436/7473/7474/7852/7869/8829/8851/9353/9638/10371/10500/10505/10512/23191/27020/57556/85358/89780/223117/374946
+           Count
+GO:0007409   205
+GO:0007411   205
+GO:0097485   205
+GO:0050770    41
+GO:0008038    27
+GO:0010975    56</code></pre>
+<p>The output now includes adjusted p-values and the geneIDs that are associated with a given GO ID. Note that the full list of genes for <a href="GO:0007411" class="uri">GO:0007411</a> is 276 again.</p>
+</div>
 <div id="what-if-my-gene-list-ids-are-not-entrez-gene-ids" class="section level2">
 <h2>What if my gene list IDs are not Entrez gene IDs?</h2>
 <p>We can use the <code>biomaRt</code> package for converting between different gene identifiers and in this example, we will convert Ensembl gene IDs to Entrez gene IDs.</p>
