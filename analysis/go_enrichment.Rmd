@@ -1,0 +1,165 @@
+---
+title: "Gene Ontology Enrichment Analysis"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The Gene Ontology Enrichment Analysis (GOEA) is a typical analysis carried out on transcriptome data. Online tools for performing a GOEA include [DAVID](https://david.ncifcrf.gov/), [Enrichr](https://maayanlab.cloud/Enrichr/), and [PANTHER](http://www.pantherdb.org/) just to name a few. While web-based tools are easy to use, it becomes tedious when you have to analyse (or re-analyse) lots of datasets. Therefore, it is preferable to use a programmatic approach and in this post we will check out some Bioconductor packages that allow to perform a GOEA.
+
+First install the following packages, if necessary, and then load them.
+
+```{r install_and_or_load_packages, message=FALSE, warning=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+my_packages <- c("clusterProfiler",
+                 "GOstats",
+                 "GO.db",
+                 "org.Hs.eg.db")
+
+to_install <- my_packages[!my_packages %in% installed.packages()]
+BiocManager::install(pkgs = to_install)
+
+# load all packages and suppress output of sapply
+invisible(sapply(my_packages, library, character.only = TRUE))
+```
+
+Create a positive control where the gene set are composed of genes that are all associated with `GO:0007411` (axon guidance); we will use the `org.Hs.eg.db` package to achieve this based on [the vignette](https://www.bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf).
+
+```{r ls_org_hs_eg_db, include=FALSE}
+ls("package:org.Hs.eg.db")
+```
+
+Methods that can be applied to `AnnotationDbi` objects such as `org.Hs.eg.db` include: `columns`, `keytypes`, `keys`, and `select`.
+
+Use `columns` to find out what data can be retrived using `select`.
+
+```{r columns}
+columns(org.Hs.eg.db)
+```
+
+Use `keytypes` to find out what fields we can use as keys to query the database.
+
+```{r keytypes}
+keytypes(org.Hs.eg.db)
+```
+
+Select all genes with `GO:0007411`.
+
+```{r go_to_entrez}
+go_to_entrez <- select(org.Hs.eg.db,
+                       keys = "GO:0007411",
+                       columns = "ENTREZID",
+                       keytype = "GO")
+
+axon_gene <- unique(go_to_entrez$ENTREZID)
+length(axon_gene)
+```
+
+To perform the GOEA we need to create a gene background called the `universe` and we will use all genes with a GO term. Normally the `universe` should be the list of genes that were actually assayed in your transcriptome analysis.
+
+```{r universe}
+all_go_terms <- keys(org.Hs.eg.db, keytype = "GO")
+all_go <- select(org.Hs.eg.db, keys = all_go_terms, columns = c("ENTREZID", "GO"), keytype = "GO")
+universe <- unique(all_go$ENTREZID)
+length(universe)
+```
+
+The function `hyperGTest` will perform the GOEA based on a set of parameters; in this example, we are testing for the over-representation of biological process (BP) terms and using a p-value cutoff of 0.001 or less.
+
+```{r hypergeometric_test}
+params <- new('GOHyperGParams',
+              geneIds = axon_gene,
+              universeGeneIds = universe,
+              ontology = 'BP',
+              pvalueCutoff = 0.001,
+              conditional = FALSE,
+              testDirection = 'over',
+              annotation = "org.Hs.eg.db"
+             )
+ 
+my_test <- hyperGTest(params)
+my_test
+```
+
+Use `summary` to get a summary of the results. The summary contains the `GOID`, `Pvalue`, `OddsRatio`, `ExpCount`, `Count`, and `Size`.
+
+* `ExpCount` is the expected count
+* `Count` is how many instances of that term were actually observed in your gene list
+* `Size` is the number that could have been found in your gene list if every instance had turned up
+
+```{r summary}
+head(summary(my_test))
+```
+
+GO terms associated to axons are enriched as expected. Note that the `Count` and `Size` for GO:0007411 is not identical even though we had selected all genes associated with GO:0007411.
+
+If we manually select Entrez gene IDs using `org.Hs.egGO`, we still get the same list of genes, so I'm not sure how the size is calculated by `hyperGTest`.
+
+```{r check_go_0007411}
+my_df <- as.data.frame(org.Hs.egGO)
+my_idx <- my_df$go_id == "GO:0007411"
+length(unique(my_df[my_idx, "gene_id"])) == length(axon_gene)
+```
+
+## What if my gene list IDs are not Entrez gene IDs?
+
+We can use the `biomaRt` package for converting between different gene identifiers and in this example, we will convert Ensembl gene IDs to Entrez gene IDs.
+
+```{r load_biomart}
+if (!"biomaRt" %in% installed.packages()){
+  BiocManager::install("biomaRt")
+}
+
+library("biomaRt")
+```
+
+We will fetch every Ensembl gene ID and randomly select 10 IDs to convert into Entrez gene IDs.
+
+```{r fetch_all_ensembl}
+ensembl <- useMart("ensembl", dataset="hsapiens_gene_ensembl")
+ 
+my_chr <- c(1:22, 'M', 'X', 'Y')
+my_ensembl_gene <- getBM(attributes = 'ensembl_gene_id',
+                         filters = 'chromosome_name',
+                         values = my_chr,
+                         mart = ensembl)
+ 
+head(my_ensembl_gene)
+```
+
+Select 10 Ensembl gene IDs.
+
+```{r sample}
+set.seed(1984)
+to_convert <- sample(x = my_ensembl_gene$ensembl_gene_id, size = 10, replace = FALSE)
+```
+
+Now to convert the IDs.
+
+```{r to_entrez}
+to_entrez <- getBM(attributes = c('ensembl_gene_id', 'entrezgene_id'),
+                   filters = 'ensembl_gene_id',
+                   values = to_convert,
+                   mart = ensembl)
+
+to_entrez
+```
+
+Note that not all Ensembl IDs have Entrez IDs. We can find out how many Ensembl IDs do not have Entrez IDs.
+
+```{r ensembl_to_entrez}
+my_entrez_gene <- getBM(attributes = c('ensembl_gene_id', 'entrezgene_id'),
+                        filters = 'ensembl_gene_id',
+                        values = my_ensembl_gene,
+                        mart = ensembl)
+
+table(is.na(my_entrez_gene$entrezgene_id))
+```
+
+`r sum(is.na(my_entrez_gene$entrezgene_id))` out of `r length(my_entrez_gene$entrezgene_id)` Ensembl gene IDs do not have corresponding Entrez gene IDs. To learn more about the missing Entrez ID values from the Ensembl conversion see [this useful post](https://www.biostars.org/p/16505/) on BioStars.
