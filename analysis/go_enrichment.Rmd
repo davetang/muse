@@ -107,6 +107,28 @@ my_idx <- my_df$go_id == "GO:0007411"
 length(unique(my_df[my_idx, "gene_id"])) == length(axon_gene)
 ```
 
+## clusterProfiler
+
+The `enrichGO` function in the `clusterProfiler` package can also perform a GOEA with FDR control.
+
+```{r enrich_go}
+my_test2 <- enrichGO(axon_gene,
+                     org.Hs.eg.db,
+                     keyType = "ENTREZID",
+                     ont = "BP",
+                     pvalueCutoff = 0.001,
+                     pAdjustMethod = "BH",
+                     universe,
+                     qvalueCutoff = 0.1,
+                     minGSSize = 10,
+                     maxGSSize = 500,
+                     readable = FALSE)
+
+head(data.frame(my_test2))
+```
+
+The output now includes adjusted p-values and the geneIDs that are associated with a given GO ID. Note that the full list of genes for GO:0007411 is 276 again.
+
 ## What if my gene list IDs are not Entrez gene IDs?
 
 We can use the `biomaRt` package for converting between different gene identifiers and in this example, we will convert Ensembl gene IDs to Entrez gene IDs.
