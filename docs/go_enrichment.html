@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2021-01-27" />
+
+<title>Gene Ontology Enrichment Analysis</title>
+
+<script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fas fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Gene Ontology Enrichment Analysis</h1>
+<h4 class="date">2021-01-27</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2021-01-27
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree687a6cafb1b8cb6b6e9e56578c5682c8ac2a2943targetblank687a6caa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/687a6cafb1b8cb6b6e9e56578c5682c8ac2a2943" target="_blank">687a6ca</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree687a6cafb1b8cb6b6e9e56578c5682c8ac2a2943targetblank687a6caa" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/687a6cafb1b8cb6b6e9e56578c5682c8ac2a2943" target="_blank">687a6ca</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .DS_Store
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/.Rhistory
+
+Untracked files:
+    Untracked:  analysis/linear_regression.Rmd
+    Untracked:  data/gencode.v36.annotation.gtf.gz
+
+Unstaged changes:
+    Modified:   .gitignore
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/go_enrichment.Rmd</code>) and HTML (<code>docs/go_enrichment.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/687a6cafb1b8cb6b6e9e56578c5682c8ac2a2943/analysis/go_enrichment.Rmd" target="_blank">687a6ca</a>
+</td>
+<td>
+davetang
+</td>
+<td>
+2021-01-27
+</td>
+<td>
+Gene Ontology Enrichment Analysis
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>The Gene Ontology Enrichment Analysis (GOEA) is a typical analysis carried out on transcriptome data. Online tools for performing a GOEA include <a href="https://david.ncifcrf.gov/">DAVID</a>, <a href="https://maayanlab.cloud/Enrichr/">Enrichr</a>, and <a href="http://www.pantherdb.org/">PANTHER</a> just to name a few. While web-based tools are easy to use, it becomes tedious when you have to analyse (or re-analyse) lots of datasets. Therefore, it is preferable to use a programmatic approach and in this post we will check out some Bioconductor packages that allow to perform a GOEA.</p>
+<p>First install the following packages, if necessary, and then load them.</p>
+<pre class="r"><code>if (!requireNamespace(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+
+my_packages &lt;- c(&quot;clusterProfiler&quot;,
+                 &quot;GOstats&quot;,
+                 &quot;GO.db&quot;,
+                 &quot;org.Hs.eg.db&quot;)
+
+to_install &lt;- my_packages[!my_packages %in% installed.packages()]
+BiocManager::install(pkgs = to_install)
+
+# load all packages and suppress output of sapply
+invisible(sapply(my_packages, library, character.only = TRUE))</code></pre>
+<p>Create a positive control where the gene set are composed of genes that are all associated with <code>GO:0007411</code> (axon guidance); we will use the <code>org.Hs.eg.db</code> package to achieve this based on <a href="https://www.bioconductor.org/packages/release/bioc/vignettes/AnnotationDbi/inst/doc/IntroToAnnotationPackages.pdf">the vignette</a>.</p>
+<p>Methods that can be applied to <code>AnnotationDbi</code> objects such as <code>org.Hs.eg.db</code> include: <code>columns</code>, <code>keytypes</code>, <code>keys</code>, and <code>select</code>.</p>
+<p>Use <code>columns</code> to find out what data can be retrived using <code>select</code>.</p>
+<pre class="r"><code>columns(org.Hs.eg.db)</code></pre>
+<pre><code> [1] &quot;ACCNUM&quot;       &quot;ALIAS&quot;        &quot;ENSEMBL&quot;      &quot;ENSEMBLPROT&quot;  &quot;ENSEMBLTRANS&quot;
+ [6] &quot;ENTREZID&quot;     &quot;ENZYME&quot;       &quot;EVIDENCE&quot;     &quot;EVIDENCEALL&quot;  &quot;GENENAME&quot;    
+[11] &quot;GO&quot;           &quot;GOALL&quot;        &quot;IPI&quot;          &quot;MAP&quot;          &quot;OMIM&quot;        
+[16] &quot;ONTOLOGY&quot;     &quot;ONTOLOGYALL&quot;  &quot;PATH&quot;         &quot;PFAM&quot;         &quot;PMID&quot;        
+[21] &quot;PROSITE&quot;      &quot;REFSEQ&quot;       &quot;SYMBOL&quot;       &quot;UCSCKG&quot;       &quot;UNIGENE&quot;     
+[26] &quot;UNIPROT&quot;     </code></pre>
+<p>Use <code>keytypes</code> to find out what fields we can use as keys to query the database.</p>
+<pre class="r"><code>keytypes(org.Hs.eg.db)</code></pre>
+<pre><code> [1] &quot;ACCNUM&quot;       &quot;ALIAS&quot;        &quot;ENSEMBL&quot;      &quot;ENSEMBLPROT&quot;  &quot;ENSEMBLTRANS&quot;
+ [6] &quot;ENTREZID&quot;     &quot;ENZYME&quot;       &quot;EVIDENCE&quot;     &quot;EVIDENCEALL&quot;  &quot;GENENAME&quot;    
+[11] &quot;GO&quot;           &quot;GOALL&quot;        &quot;IPI&quot;          &quot;MAP&quot;          &quot;OMIM&quot;        
+[16] &quot;ONTOLOGY&quot;     &quot;ONTOLOGYALL&quot;  &quot;PATH&quot;         &quot;PFAM&quot;         &quot;PMID&quot;        
+[21] &quot;PROSITE&quot;      &quot;REFSEQ&quot;       &quot;SYMBOL&quot;       &quot;UCSCKG&quot;       &quot;UNIGENE&quot;     
+[26] &quot;UNIPROT&quot;     </code></pre>
+<p>Select all genes with <code>GO:0007411</code>.</p>
+<pre class="r"><code>go_to_entrez &lt;- select(org.Hs.eg.db,
+                       keys = &quot;GO:0007411&quot;,
+                       columns = &quot;ENTREZID&quot;,
+                       keytype = &quot;GO&quot;)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>axon_gene &lt;- unique(go_to_entrez$ENTREZID)
+length(axon_gene)</code></pre>
+<pre><code>[1] 205</code></pre>
+<p>To perform the GOEA we need to create a gene background called the <code>universe</code> and we will use all genes with a GO term. Normally the <code>universe</code> should be the list of genes that were actually assayed in your transcriptome analysis.</p>
+<pre class="r"><code>all_go_terms &lt;- keys(org.Hs.eg.db, keytype = &quot;GO&quot;)
+all_go &lt;- select(org.Hs.eg.db, keys = all_go_terms, columns = c(&quot;ENTREZID&quot;, &quot;GO&quot;), keytype = &quot;GO&quot;)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>universe &lt;- unique(all_go$ENTREZID)
+length(universe)</code></pre>
+<pre><code>[1] 20488</code></pre>
+<p>The function <code>hyperGTest</code> will perform the GOEA based on a set of parameters; in this example, we are testing for the over-representation of biological process (BP) terms and using a p-value cutoff of 0.001 or less.</p>
+<pre class="r"><code>params &lt;- new(&#39;GOHyperGParams&#39;,
+              geneIds = axon_gene,
+              universeGeneIds = universe,
+              ontology = &#39;BP&#39;,
+              pvalueCutoff = 0.001,
+              conditional = FALSE,
+              testDirection = &#39;over&#39;,
+              annotation = &quot;org.Hs.eg.db&quot;
+             )
+ 
+my_test &lt;- hyperGTest(params)
+my_test</code></pre>
+<pre><code>Gene to GO BP  test for over-representation 
+4723 GO BP ids tested (1069 have p &lt; 0.001)
+Selected gene set size: 205 
+    Gene universe size: 18670 
+    Annotation package: org.Hs.eg </code></pre>
+<p>Use <code>summary</code> to get a summary of the results. The summary contains the <code>GOID</code>, <code>Pvalue</code>, <code>OddsRatio</code>, <code>ExpCount</code>, <code>Count</code>, and <code>Size</code>.</p>
+<ul>
+<li><code>ExpCount</code> is the expected count</li>
+<li><code>Count</code> is how many instances of that term were actually observed in your gene list</li>
+<li><code>Size</code> is the number that could have been found in your gene list if every instance had turned up</li>
+</ul>
+<pre class="r"><code>head(summary(my_test))</code></pre>
+<pre><code>      GOBPID       Pvalue OddsRatio ExpCount Count Size
+1 GO:0007409  0.00000e+00       Inf 5.138725   205  468
+2 GO:0007411  0.00000e+00       Inf 3.030530   205  276
+3 GO:0048667  0.00000e+00       Inf 6.401446   205  583
+4 GO:0061564  0.00000e+00       Inf 5.643814   205  514
+5 GO:0097485  0.00000e+00       Inf 3.041510   205  277
+6 GO:0006935 6.87054e-316       Inf 7.071237   205  644
+                                                   Term
+1                                          axonogenesis
+2                                         axon guidance
+3 cell morphogenesis involved in neuron differentiation
+4                                      axon development
+5                            neuron projection guidance
+6                                            chemotaxis</code></pre>
+<p>GO terms associated to axons are enriched as expected. Note that the <code>Count</code> and <code>Size</code> for <a href="GO:0007411" class="uri">GO:0007411</a> is not identical even though we had selected all genes associated with <a href="GO:0007411" class="uri">GO:0007411</a>.</p>
+<p>If we manually select Entrez gene IDs using <code>org.Hs.egGO</code>, we still get the same list of genes, so I’m not sure how the size is calculated by <code>hyperGTest</code>.</p>
+<pre class="r"><code>my_df &lt;- as.data.frame(org.Hs.egGO)
+my_idx &lt;- my_df$go_id == &quot;GO:0007411&quot;
+length(unique(my_df[my_idx, &quot;gene_id&quot;])) == length(axon_gene)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<div id="what-if-my-gene-list-ids-are-not-entrez-gene-ids" class="section level2">
+<h2>What if my gene list IDs are not Entrez gene IDs?</h2>
+<p>We can use the <code>biomaRt</code> package for converting between different gene identifiers and in this example, we will convert Ensembl gene IDs to Entrez gene IDs.</p>
+<pre class="r"><code>if (!&quot;biomaRt&quot; %in% installed.packages()){
+  BiocManager::install(&quot;biomaRt&quot;)
+}
+
+library(&quot;biomaRt&quot;)</code></pre>
+<p>We will fetch every Ensembl gene ID and randomly select 10 IDs to convert into Entrez gene IDs.</p>
+<pre class="r"><code>ensembl &lt;- useMart(&quot;ensembl&quot;, dataset=&quot;hsapiens_gene_ensembl&quot;)
+ 
+my_chr &lt;- c(1:22, &#39;M&#39;, &#39;X&#39;, &#39;Y&#39;)
+my_ensembl_gene &lt;- getBM(attributes = &#39;ensembl_gene_id&#39;,
+                         filters = &#39;chromosome_name&#39;,
+                         values = my_chr,
+                         mart = ensembl)
+ 
+head(my_ensembl_gene)</code></pre>
+<pre><code>  ensembl_gene_id
+1 ENSG00000223972
+2 ENSG00000227232
+3 ENSG00000278267
+4 ENSG00000243485
+5 ENSG00000284332
+6 ENSG00000237613</code></pre>
+<p>Select 10 Ensembl gene IDs.</p>
+<pre class="r"><code>set.seed(1984)
+to_convert &lt;- sample(x = my_ensembl_gene$ensembl_gene_id, size = 10, replace = FALSE)</code></pre>
+<p>Now to convert the IDs.</p>
+<pre class="r"><code>to_entrez &lt;- getBM(attributes = c(&#39;ensembl_gene_id&#39;, &#39;entrezgene_id&#39;),
+                   filters = &#39;ensembl_gene_id&#39;,
+                   values = to_convert,
+                   mart = ensembl)
+
+to_entrez</code></pre>
+<pre><code>   ensembl_gene_id entrezgene_id
+1  ENSG00000124568          6568
+2  ENSG00000131400          9476
+3  ENSG00000212191            NA
+4  ENSG00000225315            NA
+5  ENSG00000228658            NA
+6  ENSG00000256659     101927694
+7  ENSG00000257890            NA
+8  ENSG00000267552            NA
+9  ENSG00000280344            NA
+10 ENSG00000281133            NA</code></pre>
+<p>Note that not all Ensembl IDs have Entrez IDs. We can find out how many Ensembl IDs do not have Entrez IDs.</p>
+<pre class="r"><code>my_entrez_gene &lt;- getBM(attributes = c(&#39;ensembl_gene_id&#39;, &#39;entrezgene_id&#39;),
+                        filters = &#39;ensembl_gene_id&#39;,
+                        values = my_ensembl_gene,
+                        mart = ensembl)
+
+table(is.na(my_entrez_gene$entrezgene_id))</code></pre>
+<pre><code>
+FALSE  TRUE 
+25628 35099 </code></pre>
+<p>35099 out of 60727 Ensembl gene IDs do not have corresponding Entrez gene IDs. To learn more about the missing Entrez ID values from the Ensembl conversion see <a href="https://www.biostars.org/p/16505/">this useful post</a> on BioStars.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.0.3 (2020-10-10)
+Platform: x86_64-apple-darwin17.0 (64-bit)
+Running under: macOS Big Sur 10.16
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_AU.UTF-8/en_AU.UTF-8/en_AU.UTF-8/C/en_AU.UTF-8/en_AU.UTF-8
+
+attached base packages:
+[1] stats4    parallel  stats     graphics  grDevices utils     datasets 
+[8] methods   base     
+
+other attached packages:
+ [1] biomaRt_2.44.4         org.Hs.eg.db_3.11.4    GO.db_3.11.4          
+ [4] GOstats_2.54.0         graph_1.66.0           Category_2.54.0       
+ [7] Matrix_1.3-2           AnnotationDbi_1.50.3   IRanges_2.22.2        
+[10] S4Vectors_0.26.1       Biobase_2.48.0         BiocGenerics_0.34.0   
+[13] clusterProfiler_3.16.1 workflowr_1.6.2       
+
+loaded via a namespace (and not attached):
+  [1] fgsea_1.14.0           colorspace_2.0-0       ellipsis_0.3.1        
+  [4] ggridges_0.5.3         rprojroot_2.0.2        qvalue_2.20.0         
+  [7] fs_1.5.0               rstudioapi_0.13        farver_2.0.3          
+ [10] urltools_1.7.3         graphlayouts_0.7.1     ggrepel_0.9.1         
+ [13] bit64_4.0.5            scatterpie_0.1.5       xml2_1.3.2            
+ [16] splines_4.0.3          cachem_1.0.1           GOSemSim_2.14.2       
+ [19] knitr_1.30             polyclip_1.10-0        jsonlite_1.7.2        
+ [22] annotate_1.66.0        dbplyr_2.0.0           ggforce_0.3.2         
+ [25] BiocManager_1.30.10    compiler_4.0.3         httr_1.4.2            
+ [28] rvcheck_0.1.8          assertthat_0.2.1       fastmap_1.1.0         
+ [31] later_1.1.0.1          tweenr_1.0.1           htmltools_0.5.1.1     
+ [34] prettyunits_1.1.1      tools_4.0.3            igraph_1.2.6          
+ [37] gtable_0.3.0           glue_1.4.2             reshape2_1.4.4        
+ [40] DO.db_2.9              dplyr_1.0.3            rappdirs_0.3.1        
+ [43] fastmatch_1.1-0        Rcpp_1.0.6             enrichplot_1.8.1      
+ [46] vctrs_0.3.6            ggraph_2.0.4           xfun_0.20             
+ [49] stringr_1.4.0          lifecycle_0.2.0        XML_3.99-0.5          
+ [52] DOSE_3.14.0            europepmc_0.4          MASS_7.3-53           
+ [55] scales_1.1.1           tidygraph_1.2.0        hms_1.0.0             
+ [58] promises_1.1.1         RBGL_1.64.0            RColorBrewer_1.1-2    
+ [61] curl_4.3               yaml_2.2.1             memoise_2.0.0         
+ [64] gridExtra_2.3          ggplot2_3.3.3          downloader_0.4        
+ [67] triebeard_0.3.0        stringi_1.5.3          RSQLite_2.2.3         
+ [70] genefilter_1.70.0      BiocParallel_1.22.0    rlang_0.4.10          
+ [73] pkgconfig_2.0.3        bitops_1.0-6           evaluate_0.14         
+ [76] lattice_0.20-41        purrr_0.3.4            cowplot_1.1.1         
+ [79] bit_4.0.4              tidyselect_1.1.0       AnnotationForge_1.30.1
+ [82] GSEABase_1.50.1        plyr_1.8.6             magrittr_2.0.1        
+ [85] R6_2.5.0               generics_0.1.0         DBI_1.1.1             
+ [88] withr_2.4.1            pillar_1.4.7           whisker_0.4           
+ [91] survival_3.2-7         RCurl_1.98-1.2         tibble_3.0.5          
+ [94] crayon_1.3.4           BiocFileCache_1.12.1   rmarkdown_2.6         
+ [97] viridis_0.5.1          progress_1.2.2         grid_4.0.3            
+[100] data.table_1.13.6      Rgraphviz_2.32.0       blob_1.2.1            
+[103] git2r_0.28.0           digest_0.6.27          xtable_1.8-4          
+[106] tidyr_1.1.2            httpuv_1.5.5           gridGraphics_0.5-1    
+[109] openssl_1.4.3          munsell_0.5.0          viridisLite_0.3.0     
+[112] ggplotify_0.0.5        askpass_1.1           </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+http://docs.mathjax.org/en/latest/configuration.html.  This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
