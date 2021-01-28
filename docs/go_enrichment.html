@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2021-01-27" />
+<meta name="date" content="2021-01-28" />
 
 <title>Gene Ontology Enrichment Analysis</title>
 
@@ -399,7 +399,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Gene Ontology Enrichment Analysis</h1>
-<h4 class="date">2021-01-27</h4>
+<h4 class="date">2021-01-28</h4>
 
 </div>
 
@@ -424,7 +424,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-01-27
+<strong>Last updated:</strong> 2021-01-28
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -515,16 +515,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3c146e58c756ef9e7a1d8ca30043ee3891c5b32ftargetblank3c146e5a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/3c146e58c756ef9e7a1d8ca30043ee3891c5b32f" target="_blank">3c146e5</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9cf163e03751d49ea70c62414436823d81b5a4c5targetblank9cf163ea"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/9cf163e03751d49ea70c62414436823d81b5a4c5" target="_blank">9cf163e</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3c146e58c756ef9e7a1d8ca30043ee3891c5b32ftargetblank3c146e5a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9cf163e03751d49ea70c62414436823d81b5a4c5targetblank9cf163ea" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/3c146e58c756ef9e7a1d8ca30043ee3891c5b32f" target="_blank">3c146e5</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/9cf163e03751d49ea70c62414436823d81b5a4c5" target="_blank">9cf163e</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -537,6 +537,7 @@ Ignored files:
     Ignored:    analysis/.Rhistory
 
 Untracked files:
+    Untracked:  analysis/cluster_profiler.Rmd
     Untracked:  analysis/linear_regression.Rmd
     Untracked:  data/gencode.v36.annotation.gtf.gz
 
@@ -580,6 +581,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/9cf163e03751d49ea70c62414436823d81b5a4c5/analysis/go_enrichment.Rmd" target="_blank">9cf163e</a>
+</td>
+<td>
+davetang
+</td>
+<td>
+2021-01-28
+</td>
+<td>
+GO primer and included visualisations
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/795f0f4e3c0fa9b82a755eb66aae4c54bd79b367/docs/go_enrichment.html" target="_blank">795f0f4</a>
+</td>
+<td>
+davetang
+</td>
+<td>
+2021-01-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -638,6 +673,8 @@ Gene Ontology Enrichment Analysis
 </div>
 </div>
 </div>
+<div id="getting-started" class="section level2">
+<h2>Getting started</h2>
 <p>The Gene Ontology Enrichment Analysis (GOEA) is a typical analysis carried out on transcriptome data. Online tools for performing a GOEA include <a href="https://david.ncifcrf.gov/">DAVID</a>, <a href="https://maayanlab.cloud/Enrichr/">Enrichr</a>, and <a href="http://www.pantherdb.org/">PANTHER</a> just to name a few. While web-based tools are easy to use, it becomes tedious when you have to analyse (or re-analyse) lots of datasets. Therefore, it is preferable to use a programmatic approach and in this post we will check out some Bioconductor packages that allow to perform a GOEA.</p>
 <p>First install the following packages, if necessary, and then load them.</p>
 <pre class="r"><code>if (!requireNamespace(&quot;BiocManager&quot;, quietly = TRUE))
@@ -649,7 +686,11 @@ my_packages &lt;- c(&quot;clusterProfiler&quot;,
                  &quot;org.Hs.eg.db&quot;)
 
 to_install &lt;- my_packages[!my_packages %in% installed.packages()]
-BiocManager::install(pkgs = to_install)
+
+# install missing packages, if any
+if (length(to_install) &gt; 0){
+  BiocManager::install(pkgs = to_install)
+}
 
 # load all packages and suppress output of sapply
 invisible(sapply(my_packages, library, character.only = TRUE))</code></pre>
@@ -680,6 +721,18 @@ invisible(sapply(my_packages, library, character.only = TRUE))</code></pre>
 <pre class="r"><code>axon_gene &lt;- unique(go_to_entrez$ENTREZID)
 length(axon_gene)</code></pre>
 <pre><code>[1] 205</code></pre>
+<p>Note that we can also use <code>select</code> on <code>GO.db</code> to fetch more information on <code>GO:0007411</code>.</p>
+<pre class="r"><code>select(GO.db,
+       keys = &quot;GO:0007411&quot;,
+       columns = columns(GO.db),
+       keytype = &quot;GOID&quot;)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:1 mapping between keys and columns</code></pre>
+<pre><code>        GOID
+1 GO:0007411
+                                                                                                                                                         DEFINITION
+1 The chemotaxis process that directs the migration of an axon growth cone to a specific target site in response to a combination of attractive and repulsive cues.
+  ONTOLOGY          TERM
+1       BP axon guidance</code></pre>
 <p>To perform the GOEA we need to create a gene background called the <code>universe</code> and we will use all genes with a GO term. Normally the <code>universe</code> should be the list of genes that were actually assayed in your transcriptome analysis.</p>
 <pre class="r"><code>all_go_terms &lt;- keys(org.Hs.eg.db, keytype = &quot;GO&quot;)
 all_go &lt;- select(org.Hs.eg.db, keys = all_go_terms, columns = c(&quot;ENTREZID&quot;, &quot;GO&quot;), keytype = &quot;GO&quot;)</code></pre>
@@ -726,16 +779,91 @@ Selected gene set size: 205
 4                                      axon development
 5                            neuron projection guidance
 6                                            chemotaxis</code></pre>
-<p>GO terms associated to axons are enriched as expected. Note that the <code>Count</code> and <code>Size</code> for <a href="GO:0007411" class="uri">GO:0007411</a> is not identical even though we had selected all genes associated with <a href="GO:0007411" class="uri">GO:0007411</a>.</p>
-<p>If we manually select Entrez gene IDs using <code>org.Hs.egGO</code>, we still get the same list of genes, so I’m not sure how the size is calculated by <code>hyperGTest</code>.</p>
+<p>GO terms associated to axons are enriched as expected. Note that the <code>Count</code> and <code>Size</code> for <a href="GO:0007411" class="uri">GO:0007411</a> is not identical even though we had selected all genes associated with <a href="GO:0007411" class="uri">GO:0007411</a>. If we manually select Entrez gene IDs using <code>org.Hs.egGO</code>, we still get the same list of genes.</p>
 <pre class="r"><code>my_df &lt;- as.data.frame(org.Hs.egGO)
 my_idx &lt;- my_df$go_id == &quot;GO:0007411&quot;
 length(unique(my_df[my_idx, &quot;gene_id&quot;])) == length(axon_gene)</code></pre>
 <pre><code>[1] TRUE</code></pre>
+<p>This is probably because genes containing GO terms that are descendants of <a href="GO:0007411" class="uri">GO:0007411</a> are also included.</p>
+</div>
+<div id="relations-in-the-gene-ontology" class="section level2">
+<h2>Relations in the Gene Ontology</h2>
+<p>Gene ontologies (GO) are structured as a directed acyclic graph with GO terms as nodes and their relationships as edges. The most commonly used relationships in GO are:</p>
+<ul>
+<li>is a</li>
+<li>part of</li>
+<li>has part</li>
+<li>regulates</li>
+<li>negatively regulates</li>
+<li>positively regulates</li>
+</ul>
+<p>Below is <a href="http://geneontology.org/docs/ontology-relations/">an example</a> of the <code>is a</code> and <code>part of</code> relationships.</p>
+<p><img src="assets/diag-graph-example.gif" /></p>
+<p>We can use the <code>GOBPCHILDREN</code> <a href="https://rdrr.io/bioc/AnnotationDbi/man/Bimap.html">annotation map or Bimap</a> from the <a href="https://www.bioconductor.org/packages/release/data/annotation/manuals/GO.db/man/GO.db.pdf">GO.db package</a> to retrieve all descendants of <a href="GO:0007411" class="uri">GO:0007411</a>.</p>
+<pre class="r"><code>bp_children &lt;- as.list(GOBPCHILDREN)
+bp_children[[&quot;GO:0007411&quot;]]</code></pre>
+<pre><code>                 isa              part of                  isa 
+        &quot;GO:0008045&quot;         &quot;GO:0016198&quot;         &quot;GO:0021966&quot; 
+                 isa                  isa                  isa 
+        &quot;GO:0021967&quot;         &quot;GO:0021968&quot;         &quot;GO:0021969&quot; 
+                 isa                  isa                  isa 
+        &quot;GO:0021970&quot;         &quot;GO:0021971&quot;         &quot;GO:0021972&quot; 
+                 isa                  isa                  isa 
+        &quot;GO:0031290&quot;         &quot;GO:0033563&quot;         &quot;GO:0033564&quot; 
+                 isa                  isa              part of 
+        &quot;GO:0036514&quot;         &quot;GO:0036515&quot;         &quot;GO:0048846&quot; 
+             part of              part of                  isa 
+        &quot;GO:0061642&quot;         &quot;GO:0061643&quot;         &quot;GO:0071678&quot; 
+                 isa                  isa                  isa 
+        &quot;GO:0071679&quot;         &quot;GO:0072499&quot;         &quot;GO:0097374&quot; 
+                 isa                  isa              part of 
+        &quot;GO:0097376&quot;         &quot;GO:0097492&quot;         &quot;GO:1902287&quot; 
+             part of            regulates negatively regulates 
+        &quot;GO:1902378&quot;         &quot;GO:1902667&quot;         &quot;GO:1902668&quot; 
+positively regulates              part of              part of 
+        &quot;GO:1902669&quot;         &quot;GO:1904938&quot;         &quot;GO:2001266&quot; </code></pre>
+<p>We can include these GO terms in our <code>select</code> query.</p>
+<pre class="r"><code>my_keys &lt;- c(&quot;GO:0007411&quot;, bp_children[[&quot;GO:0007411&quot;]])
+
+go_to_entrez_children &lt;- select(org.Hs.eg.db,
+                                keys = my_keys,
+                                columns = &quot;ENTREZID&quot;,
+                                keytype = &quot;GO&quot;)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>length(unique(go_to_entrez_children$ENTREZID))</code></pre>
+<pre><code>[1] 261</code></pre>
+<p>We are still missing some genes that are associated with <a href="GO:0007411" class="uri">GO:0007411</a>, which is probably due to the exclusion of descendants in the descendants of <a href="GO:0007411" class="uri">GO:0007411</a>. We need to recursively search all terms that are descendants of <a href="GO:0007411" class="uri">GO:0007411</a>.</p>
+<pre class="r"><code>params &lt;- new(&#39;GOHyperGParams&#39;,
+              geneIds = unique(go_to_entrez_children$ENTREZID),
+              universeGeneIds = universe,
+              ontology = &#39;BP&#39;,
+              pvalueCutoff = 0.001,
+              conditional = FALSE,
+              testDirection = &#39;over&#39;,
+              annotation = &quot;org.Hs.eg.db&quot;
+             )</code></pre>
+<pre><code>Warning in makeValidParams(.Object): removing geneIds not in universeGeneIds</code></pre>
+<pre class="r"><code>my_test2 &lt;- hyperGTest(params)
+head(summary(my_test2))</code></pre>
+<pre><code>      GOBPID Pvalue OddsRatio  ExpCount Count Size
+1 GO:0000902      0       Inf 14.399572   260 1034
+2 GO:0000904      0       Inf 10.361007   260  744
+3 GO:0006935      0       Inf  8.968399   260  644
+4 GO:0007409      0       Inf  6.517408   260  468
+5 GO:0007411      0       Inf  3.843599   260  276
+6 GO:0031175      0       Inf 13.619711   260  978
+                                            Term
+1                             cell morphogenesis
+2 cell morphogenesis involved in differentiation
+3                                     chemotaxis
+4                                   axonogenesis
+5                                  axon guidance
+6                  neuron projection development</code></pre>
+</div>
 <div id="clusterprofiler" class="section level2">
 <h2>clusterProfiler</h2>
 <p>The <code>enrichGO</code> function in the <code>clusterProfiler</code> package can also perform a GOEA with FDR control.</p>
-<pre class="r"><code>my_test2 &lt;- enrichGO(axon_gene,
+<pre class="r"><code>my_test3 &lt;- enrichGO(axon_gene,
                      org.Hs.eg.db,
                      keyType = &quot;ENTREZID&quot;,
                      ont = &quot;BP&quot;,
@@ -747,7 +875,7 @@ length(unique(my_df[my_idx, &quot;gene_id&quot;])) == length(axon_gene)</code></
                      maxGSSize = 500,
                      readable = FALSE)
 
-head(data.frame(my_test2))</code></pre>
+head(data.frame(my_test3))</code></pre>
 <pre><code>                   ID                                 Description GeneRatio
 GO:0007409 GO:0007409                                axonogenesis   205/205
 GO:0007411 GO:0007411                               axon guidance   205/205
@@ -777,6 +905,24 @@ GO:0050770    41
 GO:0008038    27
 GO:0010975    56</code></pre>
 <p>The output now includes adjusted p-values and the geneIDs that are associated with a given GO ID. Note that the full list of genes for <a href="GO:0007411" class="uri">GO:0007411</a> is 276 again.</p>
+<p>In addition to performing the GOEA, <code>clusterProfiler</code> also has some nice plotting functions.</p>
+<p>Bar plot showing each enriched GO term coloured by the adjusted p-value.</p>
+<pre class="r"><code>barplot(my_test3, showCategory=10)</code></pre>
+<p><img src="figure/go_enrichment.Rmd/barplot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Dot plot showing each enriched GO term with associated statistics.</p>
+<pre class="r"><code>dotplot(my_test3, showCategory=10)</code></pre>
+<p><img src="figure/go_enrichment.Rmd/dotplot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Heat plot showing the enriched GO terms on the y-axis and the genes on the x-axis. Genes with the associated GO term are highlighted.</p>
+<pre class="r"><code>heatplot(my_test3, showCategory=10)</code></pre>
+<p><img src="figure/go_enrichment.Rmd/heatplot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Enrichment map organises enriched terms into a network with edges connecting overlapping gene sets.</p>
+<pre class="r"><code>emapplot(my_test3, showCategory = 10)</code></pre>
+<p><img src="figure/go_enrichment.Rmd/emapplot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><code>goplot</code> shows the gene ontology graph with the enriched GO terms highlighted.</p>
+<pre class="r"><code>goplot(my_test3)</code></pre>
+<pre><code>Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+increasing max.overlaps</code></pre>
+<p><img src="figure/go_enrichment.Rmd/goplot-1.png" width="1152" style="display: block; margin: auto;" /></p>
 </div>
 <div id="what-if-my-gene-list-ids-are-not-entrez-gene-ids" class="section level2">
 <h2>What if my gene list IDs are not Entrez gene IDs?</h2>
@@ -787,9 +933,10 @@ GO:0010975    56</code></pre>
 
 library(&quot;biomaRt&quot;)</code></pre>
 <p>We will fetch every Ensembl gene ID and randomly select 10 IDs to convert into Entrez gene IDs.</p>
-<pre class="r"><code>ensembl &lt;- useMart(&quot;ensembl&quot;, dataset=&quot;hsapiens_gene_ensembl&quot;)
- 
-my_chr &lt;- c(1:22, &#39;M&#39;, &#39;X&#39;, &#39;Y&#39;)
+<pre class="r"><code>ensembl &lt;- useMart(&quot;ensembl&quot;, dataset=&quot;hsapiens_gene_ensembl&quot;)</code></pre>
+<pre><code>Ensembl site unresponsive, trying uswest mirror</code></pre>
+<pre><code>Ensembl site unresponsive, trying useast mirror</code></pre>
+<pre class="r"><code>my_chr &lt;- c(1:22, &#39;M&#39;, &#39;X&#39;, &#39;Y&#39;)
 my_ensembl_gene &lt;- getBM(attributes = &#39;ensembl_gene_id&#39;,
                          filters = &#39;chromosome_name&#39;,
                          values = my_chr,
@@ -872,14 +1019,14 @@ loaded via a namespace (and not attached):
  [10] urltools_1.7.3         graphlayouts_0.7.1     ggrepel_0.9.1         
  [13] bit64_4.0.5            scatterpie_0.1.5       xml2_1.3.2            
  [16] splines_4.0.3          cachem_1.0.1           GOSemSim_2.14.2       
- [19] knitr_1.30             polyclip_1.10-0        jsonlite_1.7.2        
+ [19] knitr_1.31             polyclip_1.10-0        jsonlite_1.7.2        
  [22] annotate_1.66.0        dbplyr_2.0.0           ggforce_0.3.2         
  [25] BiocManager_1.30.10    compiler_4.0.3         httr_1.4.2            
  [28] rvcheck_0.1.8          assertthat_0.2.1       fastmap_1.1.0         
  [31] later_1.1.0.1          tweenr_1.0.1           htmltools_0.5.1.1     
  [34] prettyunits_1.1.1      tools_4.0.3            igraph_1.2.6          
  [37] gtable_0.3.0           glue_1.4.2             reshape2_1.4.4        
- [40] DO.db_2.9              dplyr_1.0.3            rappdirs_0.3.1        
+ [40] DO.db_2.9              dplyr_1.0.3            rappdirs_0.3.2        
  [43] fastmatch_1.1-0        Rcpp_1.0.6             enrichplot_1.8.1      
  [46] vctrs_0.3.6            ggraph_2.0.4           xfun_0.20             
  [49] stringr_1.4.0          lifecycle_0.2.0        XML_3.99-0.5          
@@ -889,21 +1036,22 @@ loaded via a namespace (and not attached):
  [61] curl_4.3               yaml_2.2.1             memoise_2.0.0         
  [64] gridExtra_2.3          ggplot2_3.3.3          downloader_0.4        
  [67] triebeard_0.3.0        stringi_1.5.3          RSQLite_2.2.3         
- [70] genefilter_1.70.0      BiocParallel_1.22.0    rlang_0.4.10          
- [73] pkgconfig_2.0.3        bitops_1.0-6           evaluate_0.14         
- [76] lattice_0.20-41        purrr_0.3.4            cowplot_1.1.1         
- [79] bit_4.0.4              tidyselect_1.1.0       AnnotationForge_1.30.1
- [82] GSEABase_1.50.1        plyr_1.8.6             magrittr_2.0.1        
- [85] R6_2.5.0               generics_0.1.0         DBI_1.1.1             
- [88] withr_2.4.1            pillar_1.4.7           whisker_0.4           
- [91] survival_3.2-7         RCurl_1.98-1.2         tibble_3.0.5          
- [94] crayon_1.3.4           BiocFileCache_1.12.1   rmarkdown_2.6         
- [97] viridis_0.5.1          progress_1.2.2         grid_4.0.3            
-[100] data.table_1.13.6      Rgraphviz_2.32.0       blob_1.2.1            
-[103] git2r_0.28.0           digest_0.6.27          xtable_1.8-4          
-[106] tidyr_1.1.2            httpuv_1.5.5           gridGraphics_0.5-1    
-[109] openssl_1.4.3          munsell_0.5.0          viridisLite_0.3.0     
-[112] ggplotify_0.0.5        askpass_1.1           </code></pre>
+ [70] highr_0.8              genefilter_1.70.0      BiocParallel_1.22.0   
+ [73] rlang_0.4.10           pkgconfig_2.0.3        bitops_1.0-6          
+ [76] evaluate_0.14          lattice_0.20-41        purrr_0.3.4           
+ [79] labeling_0.4.2         cowplot_1.1.1          bit_4.0.4             
+ [82] tidyselect_1.1.0       AnnotationForge_1.30.1 GSEABase_1.50.1       
+ [85] plyr_1.8.6             magrittr_2.0.1         R6_2.5.0              
+ [88] generics_0.1.0         DBI_1.1.1              withr_2.4.1           
+ [91] pillar_1.4.7           whisker_0.4            survival_3.2-7        
+ [94] RCurl_1.98-1.2         tibble_3.0.5           crayon_1.3.4          
+ [97] BiocFileCache_1.12.1   rmarkdown_2.6          viridis_0.5.1         
+[100] progress_1.2.2         grid_4.0.3             data.table_1.13.6     
+[103] Rgraphviz_2.32.0       blob_1.2.1             git2r_0.28.0          
+[106] digest_0.6.27          xtable_1.8-4           tidyr_1.1.2           
+[109] httpuv_1.5.5           gridGraphics_0.5-1     openssl_1.4.3         
+[112] munsell_0.5.0          viridisLite_0.3.0      ggplotify_0.0.5       
+[115] askpass_1.1           </code></pre>
 </div>
 </div>
 
