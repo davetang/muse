@@ -9,6 +9,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Getting started
+
 The Gene Ontology Enrichment Analysis (GOEA) is a typical analysis carried out on transcriptome data. Online tools for performing a GOEA include [DAVID](https://david.ncifcrf.gov/), [Enrichr](https://maayanlab.cloud/Enrichr/), and [PANTHER](http://www.pantherdb.org/) just to name a few. While web-based tools are easy to use, it becomes tedious when you have to analyse (or re-analyse) lots of datasets. Therefore, it is preferable to use a programmatic approach and in this post we will check out some Bioconductor packages that allow to perform a GOEA.
 
 First install the following packages, if necessary, and then load them.
@@ -23,7 +25,11 @@ my_packages <- c("clusterProfiler",
                  "org.Hs.eg.db")
 
 to_install <- my_packages[!my_packages %in% installed.packages()]
-BiocManager::install(pkgs = to_install)
+
+# install missing packages, if any
+if (length(to_install) > 0){
+  BiocManager::install(pkgs = to_install)
+}
 
 # load all packages and suppress output of sapply
 invisible(sapply(my_packages, library, character.only = TRUE))
@@ -59,6 +65,15 @@ go_to_entrez <- select(org.Hs.eg.db,
 
 axon_gene <- unique(go_to_entrez$ENTREZID)
 length(axon_gene)
+```
+
+Note that we can also use `select` on `GO.db` to fetch more information on `GO:0007411`.
+
+```{r select_go_db}
+select(GO.db,
+       keys = "GO:0007411",
+       columns = columns(GO.db),
+       keytype = "GOID")
 ```
 
 To perform the GOEA we need to create a gene background called the `universe` and we will use all genes with a GO term. Normally the `universe` should be the list of genes that were actually assayed in your transcriptome analysis.
@@ -97,9 +112,7 @@ Use `summary` to get a summary of the results. The summary contains the `GOID`, 
 head(summary(my_test))
 ```
 
-GO terms associated to axons are enriched as expected. Note that the `Count` and `Size` for GO:0007411 is not identical even though we had selected all genes associated with GO:0007411.
-
-If we manually select Entrez gene IDs using `org.Hs.egGO`, we still get the same list of genes, so I'm not sure how the size is calculated by `hyperGTest`.
+GO terms associated to axons are enriched as expected. Note that the `Count` and `Size` for GO:0007411 is not identical even though we had selected all genes associated with GO:0007411. If we manually select Entrez gene IDs using `org.Hs.egGO`, we still get the same list of genes.
 
 ```{r check_go_0007411}
 my_df <- as.data.frame(org.Hs.egGO)
@@ -107,12 +120,66 @@ my_idx <- my_df$go_id == "GO:0007411"
 length(unique(my_df[my_idx, "gene_id"])) == length(axon_gene)
 ```
 
+This is probably because genes containing GO terms that are descendants of GO:0007411 are also included.
+
+## Relations in the Gene Ontology
+
+Gene ontologies (GO) are structured as a directed acyclic graph with GO terms as nodes and their relationships as edges. The most commonly used relationships in GO are:
+
+* is a
+* part of
+* has part
+* regulates
+* negatively regulates
+* positively regulates
+
+Below is [an example](http://geneontology.org/docs/ontology-relations/) of the `is a` and `part of` relationships.
+
+![](assets/diag-graph-example.gif)
+
+We can use the `GOBPCHILDREN` [annotation map or Bimap](https://rdrr.io/bioc/AnnotationDbi/man/Bimap.html) from the [GO.db package](https://www.bioconductor.org/packages/release/data/annotation/manuals/GO.db/man/GO.db.pdf) to retrieve all descendants of GO:0007411.
+
+```{r bp_children}
+bp_children <- as.list(GOBPCHILDREN)
+bp_children[["GO:0007411"]]
+```
+
+We can include these GO terms in our `select` query.
+
+```{r fetch_children}
+my_keys <- c("GO:0007411", bp_children[["GO:0007411"]])
+
+go_to_entrez_children <- select(org.Hs.eg.db,
+                                keys = my_keys,
+                                columns = "ENTREZID",
+                                keytype = "GO")
+
+length(unique(go_to_entrez_children$ENTREZID))
+```
+
+We are still missing some genes that are associated with GO:0007411, which is probably due to the exclusion of descendants in the descendants of GO:0007411. We need to recursively search all terms that are descendants of GO:0007411.
+
+```{r hypergeometric_test_take_two}
+params <- new('GOHyperGParams',
+              geneIds = unique(go_to_entrez_children$ENTREZID),
+              universeGeneIds = universe,
+              ontology = 'BP',
+              pvalueCutoff = 0.001,
+              conditional = FALSE,
+              testDirection = 'over',
+              annotation = "org.Hs.eg.db"
+             )
+ 
+my_test2 <- hyperGTest(params)
+head(summary(my_test2))
+```
+
 ## clusterProfiler
 
 The `enrichGO` function in the `clusterProfiler` package can also perform a GOEA with FDR control.
 
 ```{r enrich_go}
-my_test2 <- enrichGO(axon_gene,
+my_test3 <- enrichGO(axon_gene,
                      org.Hs.eg.db,
                      keyType = "ENTREZID",
                      ont = "BP",
@@ -124,10 +191,42 @@ my_test2 <- enrichGO(axon_gene,
                      maxGSSize = 500,
                      readable = FALSE)
 
-head(data.frame(my_test2))
+head(data.frame(my_test3))
 ```
 
 The output now includes adjusted p-values and the geneIDs that are associated with a given GO ID. Note that the full list of genes for GO:0007411 is 276 again.
+
+In addition to performing the GOEA, `clusterProfiler` also has some nice plotting functions.
+
+Bar plot showing each enriched GO term coloured by the adjusted p-value.
+
+```{r barplot}
+barplot(my_test3, showCategory=10)
+```
+
+Dot plot showing each enriched GO term with associated statistics.
+
+```{r dotplot}
+dotplot(my_test3, showCategory=10)
+```
+
+Heat plot showing the enriched GO terms on the y-axis and the genes on the x-axis. Genes with the associated GO term are highlighted.
+
+```{r heatplot}
+heatplot(my_test3, showCategory=10)
+```
+
+Enrichment map organises enriched terms into a network with edges connecting overlapping gene sets.
+
+```{r emapplot}
+emapplot(my_test3, showCategory = 10)
+```
+
+`goplot` shows the gene ontology graph with the enriched GO terms highlighted.
+
+```{r goplot, fig.height=10, fig.width=12}
+goplot(my_test3)
+```
 
 ## What if my gene list IDs are not Entrez gene IDs?
 
