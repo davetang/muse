@@ -228,6 +228,45 @@ emapplot(my_test3, showCategory = 10)
 goplot(my_test3)
 ```
 
+Another nice feature of `clusterProfiler` is that you can plot multiple gene lists together. We can create another gene list using genes associated with `GO:0010975` to demonstrate.
+
+```{r neuron_proj_genes}
+go_to_entrez <- select(org.Hs.eg.db,
+                       keys = "GO:0010975",
+                       columns = "ENTREZID",
+                       keytype = "GO")
+
+neuron_proj <- unique(go_to_entrez$ENTREZID)
+```
+
+Perform GO enrichment on two gene lists.
+
+```{r compare_cluster_go}
+my_gene_list <- list(axon = axon_gene,
+                     neuron = neuron_proj)
+
+gene_list_go <- compareCluster(geneCluster = my_gene_list,
+                               fun = "enrichGO",
+                               universe = universe,
+                               OrgDb = org.Hs.eg.db,
+                               keyType = "ENTREZID",
+                               ont = "BP",
+                               pvalueCutoff = 0.001,
+                               pAdjustMethod = "BH",
+                               qvalueCutoff = 0.1,
+                               minGSSize = 10,
+                               maxGSSize = 500,
+                               readable = FALSE)
+
+head(as.data.frame(gene_list_go))
+```
+
+Dot plot with enriched GO terms by gene list.
+
+```{r dotplot_gene_list}
+dotplot(gene_list_go)
+```
+
 ## What if my gene list IDs are not Entrez gene IDs?
 
 We can use the `biomaRt` package for converting between different gene identifiers and in this example, we will convert Ensembl gene IDs to Entrez gene IDs.
