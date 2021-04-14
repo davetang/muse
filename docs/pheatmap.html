@@ -10,21 +10,29 @@
 
 
 
-<meta name="date" content="2020-11-27" />
+<meta name="date" content="2021-04-14" />
 
 <title>Making a heatmap in R with the pheatmap package</title>
 
+<script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/anchor-sections-1.0/anchor-sections.css" rel="stylesheet" />
-<script src="site_libs/anchor-sections-1.0/anchor-sections.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -36,6 +44,8 @@ div.section {
 }
 </style>
 
+
+
 <style type="text/css">
   code{white-space: pre-wrap;}
   span.smallcaps{font-variant: small-caps;}
@@ -46,11 +56,6 @@ div.section {
     </style>
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-  pre:not([class]) {
-    background-color: white;
-  }
-</style>
 <script type="text/javascript">
 if (window.hljs) {
   hljs.configure({languages: []});
@@ -63,32 +68,7 @@ if (window.hljs) {
 
 
 
-<style type="text/css">
-h1 {
-  font-size: 34px;
-}
-h1.title {
-  font-size: 38px;
-}
-h2 {
-  font-size: 30px;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 12px;
-}
-.table th:not([align]) {
-  text-align: left;
-}
-</style>
+
 
 
 
@@ -98,10 +78,6 @@ h6 {
   max-width: 940px;
   margin-left: auto;
   margin-right: auto;
-}
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
 }
 img {
   max-width:100%;
@@ -118,40 +94,13 @@ button.code-folding-btn:focus {
 summary {
   display: list-item;
 }
+pre code {
+  padding: 0;
+}
 </style>
 
 
 <style type="text/css">
-/* padding for bootstrap navbar */
-body {
-  padding-top: 51px;
-  padding-bottom: 40px;
-}
-/* offset scroll position for anchor links (for fixed navbar)  */
-.section h1 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h2 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h3 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h4 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h5 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h6 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
 .dropdown-submenu {
   position: relative;
 }
@@ -179,7 +128,7 @@ body {
   margin-right: -10px;
 }
 .dropdown-submenu:hover>a:after {
-  border-left-color: #ffffff;
+  border-left-color: #adb5bd;
 }
 .dropdown-submenu.pull-left {
   float: none;
@@ -191,7 +140,7 @@ body {
 }
 </style>
 
-<script>
+<script type="text/javascript">
 // manage active state of menu based on current page
 $(document).ready(function () {
   // active menu anchor
@@ -202,10 +151,23 @@ $(document).ready(function () {
   var menuAnchor = $('a[href="' + href + '"]');
 
   // mark it active
-  menuAnchor.parent().addClass('active');
+  menuAnchor.tab('show');
 
   // if it's got a parent navbar menu mark it active as well
   menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
 });
 </script>
 
@@ -217,7 +179,6 @@ $(document).ready(function () {
   max-height: 500px;
   min-height: 44px;
   overflow-y: auto;
-  background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
@@ -306,7 +267,7 @@ $(document).ready(function () {
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/davetang/muse">
-    <span class="fa fa-github"></span>
+    <span class="fas fa-github"></span>
      
     Source code
   </a>
@@ -316,12 +277,12 @@ $(document).ready(function () {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-<div class="fluid-row" id="header">
+<div id="header">
 
 
 
 <h1 class="title toc-ignore">Making a heatmap in R with the pheatmap package</h1>
-<h4 class="date">2020-11-27</h4>
+<h4 class="date">2021-04-14</h4>
 
 </div>
 
@@ -346,7 +307,7 @@ $(document).ready(function () {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2020-11-27
+<strong>Last updated:</strong> 2021-04-14
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -437,16 +398,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4da96c03d84a68d5a453b2e18cb53c8276add42ctargetblank4da96c0a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/4da96c03d84a68d5a453b2e18cb53c8276add42c" target="_blank">4da96c0</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree500529bbe27c0593e755580b5d63d81bf4a2285etargetblank500529ba"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/500529bbe27c0593e755580b5d63d81bf4a2285e" target="_blank">500529b</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4da96c03d84a68d5a453b2e18cb53c8276add42ctargetblank4da96c0a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree500529bbe27c0593e755580b5d63d81bf4a2285etargetblank500529ba" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/4da96c03d84a68d5a453b2e18cb53c8276add42c" target="_blank">4da96c0</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/500529bbe27c0593e755580b5d63d81bf4a2285e" target="_blank">500529b</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -455,6 +416,9 @@ Note that you need to be careful to ensure that all relevant files for the analy
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+
+Unstaged changes:
+    Modified:   muse.Rproj
 
 </code></pre>
 <p>
@@ -493,6 +457,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/500529bbe27c0593e755580b5d63d81bf4a2285e/analysis/pheatmap.Rmd" target="_blank">500529b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2021-04-14
+</td>
+<td>
+<a href="https://davetang.org/muse/2018/05/15/making-a-heatmap-in-r-with-the-pheatmap-package/#comment-8339" class="uri">https://davetang.org/muse/2018/05/15/making-a-heatmap-in-r-with-the-pheatmap-package/#comment-8339</a>
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/c54efbf422bb2a7ce9fa36e42b109b451afb0908/docs/pheatmap.html" target="_blank">c54efbf</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2020-11-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -592,43 +590,6 @@ data_subset &lt;- as.matrix(data[rowSums(data)&gt;50000,])</code></pre>
 <p>Default heatmap using <code>pheatmap</code>.</p>
 <pre class="r"><code>pheatmap(data_subset)</code></pre>
 <p><img src="figure/pheatmap.Rmd/pheatmap_default-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-pheatmap_default-1">
-Past versions of pheatmap_default-1.png
-</button>
-</p>
-<div id="fig-pheatmap_default-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/pheatmap_default-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
 <pre class="r"><code>cal_z_score &lt;- function(x){
   (x - mean(x)) / sd(x)
 }
@@ -636,126 +597,15 @@ Dave Tang
 data_subset_norm &lt;- t(apply(data_subset, 1, cal_z_score))
 pheatmap(data_subset_norm)</code></pre>
 <p><img src="figure/pheatmap.Rmd/pheatmap_default-2.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-pheatmap_default-2">
-Past versions of pheatmap_default-2.png
-</button>
-</p>
-<div id="fig-pheatmap_default-2" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/pheatmap_default-2.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
 <p>Using scale produces the same heatmap as using <code>cal_z_score</code>.</p>
 <pre class="r"><code>pheatmap(data_subset, scale = &quot;row&quot;)</code></pre>
 <p><img src="figure/pheatmap.Rmd/pheatmap_scale-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-pheatmap_scale-1">
-Past versions of pheatmap_scale-1.png
-</button>
-</p>
-<div id="fig-pheatmap_scale-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/2db13eac0170d39c4755bc242a91d74eacafd7e4/docs/figure/pheatmap.Rmd/pheatmap_scale-1.png" target="_blank">2db13ea</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2020-11-10
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
 <p>Two heatmaps.</p>
 <pre class="r"><code>one &lt;- pheatmap(data_subset, silent = TRUE)
 two &lt;- pheatmap(data_subset, silent = TRUE)
 
 grid.arrange(grobs = list(one[[4]], two[[4]]))</code></pre>
 <p><img src="figure/pheatmap.Rmd/two_heatmaps-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-two_heatmaps-1">
-Past versions of two_heatmaps-1.png
-</button>
-</p>
-<div id="fig-two_heatmaps-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/two_heatmaps-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
 <p>Reproduce the gene dendrogram.</p>
 <pre class="r"><code>par(mar = c(3.1, 2.1, 1.1, 5.1))
 
@@ -771,86 +621,24 @@ my_hclust_gene$height</code></pre>
 <pre class="r"><code>as.dendrogram(my_hclust_gene) %&gt;%
   plot(horiz = TRUE)</code></pre>
 <p><img src="figure/pheatmap.Rmd/gene_dendrogram-1.png" width="960" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-gene_dendrogram-1">
-Past versions of gene_dendrogram-1.png
-</button>
-</p>
-<div id="fig-gene_dendrogram-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/gene_dendrogram-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<p>Obtaining the gene IDs as per the order of the dendrogram (from top to bottom).</p>
+<pre class="r"><code>rev(row.names(data_subset)[my_hclust_gene$order])</code></pre>
+<pre><code> [1] &quot;Gene_08819&quot; &quot;Gene_08743&quot; &quot;Gene_12940&quot; &quot;Gene_13540&quot; &quot;Gene_12804&quot;
+ [6] &quot;Gene_11672&quot; &quot;Gene_16632&quot; &quot;Gene_17743&quot; &quot;Gene_07390&quot; &quot;Gene_16114&quot;
+[11] &quot;Gene_00562&quot; &quot;Gene_14672&quot; &quot;Gene_08694&quot; &quot;Gene_14450&quot; &quot;Gene_09238&quot;
+[16] &quot;Gene_08042&quot; &quot;Gene_03194&quot; &quot;Gene_02420&quot; &quot;Gene_11002&quot; &quot;Gene_05960&quot;
+[21] &quot;Gene_03450&quot; &quot;Gene_02800&quot; &quot;Gene_09969&quot; &quot;Gene_07404&quot; &quot;Gene_08576&quot;
+[26] &quot;Gene_09610&quot; &quot;Gene_03852&quot; &quot;Gene_12318&quot; &quot;Gene_04164&quot; &quot;Gene_15334&quot;
+[31] &quot;Gene_09952&quot; &quot;Gene_10924&quot; &quot;Gene_12834&quot; &quot;Gene_03861&quot; &quot;Gene_13444&quot;
+[36] &quot;Gene_06899&quot; &quot;Gene_17849&quot; &quot;Gene_07132&quot; &quot;Gene_05761&quot; &quot;Gene_02296&quot;
+[41] &quot;Gene_09505&quot; &quot;Gene_12576&quot; &quot;Gene_17992&quot; &quot;Gene_15286&quot; &quot;Gene_17865&quot;
+[46] &quot;Gene_10648&quot; &quot;Gene_05004&quot; &quot;Gene_14928&quot; &quot;Gene_02115&quot;</code></pre>
 <p>Reproduce the sample dendrogram.</p>
 <pre class="r"><code>my_hclust_sample &lt;- hclust(dist(t(data_subset)), method = &quot;complete&quot;)
 
 as.dendrogram(my_hclust_sample) %&gt;%
   plot()</code></pre>
 <p><img src="figure/pheatmap.Rmd/sample_dendrogram-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-sample_dendrogram-1">
-Past versions of sample_dendrogram-1.png
-</button>
-</p>
-<div id="fig-sample_dendrogram-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/sample_dendrogram-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
 <p>Add annotations.</p>
 <pre class="r"><code>my_gene_col &lt;- cutree(tree = as.dendrogram(my_hclust_gene), k = 2)
 my_gene_col &lt;- data.frame(cluster = ifelse(test = my_gene_col == 1, yes = &quot;cluster 1&quot;, no = &quot;cluster 2&quot;))
@@ -864,43 +652,6 @@ my_gene_col$random &lt;- my_random
 
 pheatmap(data_subset, annotation_row = my_gene_col, annotation_col = my_sample_col)</code></pre>
 <p><img src="figure/pheatmap.Rmd/annotation-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-annotation-1">
-Past versions of annotation-1.png
-</button>
-</p>
-<div id="fig-annotation-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/annotation-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
 <p>More clusters.</p>
 <pre class="r"><code>my_gene_col &lt;- cutree(tree = as.dendrogram(my_hclust_gene), k = 6)
 my_gene_col &lt;- data.frame(cluster = paste0(&quot;cluster &quot;, my_gene_col), row.names = names(my_gene_col))
@@ -941,43 +692,6 @@ p &lt;- pheatmap(data_subset,
               cellheight = 7,
               cellwidth = 18)</code></pre>
 <p><img src="figure/pheatmap.Rmd/annotation_2-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-annotation_2-1">
-Past versions of annotation_2-1.png
-</button>
-</p>
-<div id="fig-annotation_2-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/annotation_2-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
 <pre class="r"><code>save_pheatmap_png &lt;- function(x, filename, width=1200, height=1000, res = 150) {
   png(filename, width = width, height = height, res = res)
   grid::grid.newpage()
@@ -994,43 +708,6 @@ Dave Tang
          cutree_rows = 2,
          cutree_cols = 2)</code></pre>
 <p><img src="figure/pheatmap.Rmd/break-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-break-1">
-Past versions of break-1.png
-</button>
-</p>
-<div id="fig-break-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/break-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
 <p>Dendrogram results from pheatmap().</p>
 <pre class="r"><code>par(mar = c(3.1, 2.1, 1.1, 5.1))
 
@@ -1041,43 +718,6 @@ names(my_heatmap)</code></pre>
   as.dendrogram() %&gt;%
   plot(horiz = TRUE)</code></pre>
 <p><img src="figure/pheatmap.Rmd/pheatmap_result-1.png" width="960" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-pheatmap_result-1">
-Past versions of pheatmap_result-1.png
-</button>
-</p>
-<div id="fig-pheatmap_result-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/586b91fa71a61d77d70f93f26838e44498c814c6/docs/figure/pheatmap.Rmd/pheatmap_result-1.png" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1086,20 +726,17 @@ Dave Tang
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.0.3 (2020-10-10)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 20.04.1 LTS
+<pre><code>R version 4.0.5 (2021-03-31)
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+Running under: Windows 10 x64 (build 19042)
 
 Matrix products: default
-BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.8.so
 
 locale:
- [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
- [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
- [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=C             
- [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
- [9] LC_ADDRESS=C               LC_TELEPHONE=C            
-[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+[1] LC_COLLATE=English_Australia.1252  LC_CTYPE=English_Australia.1252   
+[3] LC_MONETARY=English_Australia.1252 LC_NUMERIC=C                      
+[5] LC_TIME=English_Australia.1252    
+system code page: 932
 
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
@@ -1108,17 +745,17 @@ other attached packages:
 [1] gridExtra_2.3     dendextend_1.14.0 pheatmap_1.0.12   workflowr_1.6.2  
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.5         pillar_1.4.7       compiler_4.0.3     later_1.1.0.1     
- [5] RColorBrewer_1.1-2 git2r_0.27.1       viridis_0.5.1      tools_4.0.3       
- [9] digest_0.6.27      viridisLite_0.3.0  evaluate_0.14      lifecycle_0.2.0   
-[13] tibble_3.0.4       gtable_0.3.0       pkgconfig_2.0.3    rlang_0.4.8       
-[17] rstudioapi_0.13    yaml_2.2.1         xfun_0.19          dplyr_1.0.2       
-[21] stringr_1.4.0      knitr_1.30         generics_0.1.0     fs_1.5.0          
-[25] vctrs_0.3.5        tidyselect_1.1.0   rprojroot_2.0.2    grid_4.0.3        
-[29] glue_1.4.2         R6_2.5.0           rmarkdown_2.5      farver_2.0.3      
-[33] purrr_0.3.4        ggplot2_3.3.2      magrittr_2.0.1     whisker_0.4       
-[37] scales_1.1.1       promises_1.1.1     ellipsis_0.3.1     htmltools_0.5.0   
-[41] colorspace_2.0-0   httpuv_1.5.4       stringi_1.5.3      munsell_0.5.0     
+ [1] Rcpp_1.0.4.6       compiler_4.0.5     pillar_1.4.4       later_1.1.0.1     
+ [5] RColorBrewer_1.1-2 git2r_0.27.1       viridis_0.5.1      tools_4.0.5       
+ [9] digest_0.6.25      viridisLite_0.3.0  evaluate_0.14      lifecycle_0.2.0   
+[13] tibble_3.0.1       gtable_0.3.0       pkgconfig_2.0.3    rlang_0.4.6       
+[17] yaml_2.2.1         xfun_0.15          stringr_1.4.0      dplyr_1.0.0       
+[21] knitr_1.29         generics_0.0.2     fs_1.4.1           vctrs_0.3.1       
+[25] tidyselect_1.1.0   rprojroot_1.3-2    grid_4.0.5         glue_1.4.1        
+[29] R6_2.4.1           rmarkdown_2.7      farver_2.0.3       purrr_0.3.4       
+[33] ggplot2_3.3.2      magrittr_1.5       whisker_0.4        backports_1.1.7   
+[37] scales_1.1.1       promises_1.1.1     htmltools_0.5.0    ellipsis_0.3.1    
+[41] colorspace_1.4-1   httpuv_1.5.4       stringi_1.4.6      munsell_0.5.0     
 [45] crayon_1.3.4      </code></pre>
 </div>
 
@@ -1134,6 +771,8 @@ footer is added to webpages before the MathJax javascript. -->
     "HTML-CSS": { availableFonts: ["TeX"] }
   });
 </script>
+
+
 
 
 
@@ -1161,7 +800,7 @@ $(document).ready(function () {
 
 $(document).ready(function () {
   $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
+    $(this).parent().toggleClass('nav-tabs-open');
   });
 });
 </script>
