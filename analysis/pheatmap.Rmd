@@ -63,6 +63,12 @@ as.dendrogram(my_hclust_gene) %>%
   plot(horiz = TRUE)
 ```
 
+Obtaining the gene IDs as per the order of the dendrogram (from top to bottom).
+
+```{r heatmap_gene}
+rev(row.names(data_subset)[my_hclust_gene$order])
+```
+
 Reproduce the sample dendrogram.
 
 ```{r sample_dendrogram}
