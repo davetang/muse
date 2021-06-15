@@ -94,6 +94,17 @@ my_gene_col$random <- my_random
 pheatmap(data_subset, annotation_row = my_gene_col, annotation_col = my_sample_col)
 ```
 
+Define your own column order by modifying `data_subset` and setting `cluster_cols` to FALSE.
+
+```{r own_col_order}
+my_col_order <- c("N2", "T1a", "N1", "T1b", "T2", "T3")
+
+pheatmap(data_subset[, my_col_order],
+         annotation_col = my_sample_col,
+         cluster_cols = FALSE
+         )
+```
+
 More clusters.
 
 ```{r more_clusters, fig.height=7, fig.width=7}
