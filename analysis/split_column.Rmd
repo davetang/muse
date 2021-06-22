@@ -1,0 +1,64 @@
+---
+title: "Split single column of annotations into multiple columns"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Use [importbio](https://github.com/davetang/importbio) to load a VCF file (or load any file that has a single column containing multiple annotations that are consistently defined).
+
+```{r importvcf}
+library(importbio)
+my_vcf <- importvcf("https://raw.githubusercontent.com/davetang/learning_vcf_file/master/eg/Pfeiffer.vcf")
+
+head(my_vcf)
+```
+
+We will be functions within the `tidyverse`.
+
+```{r tidyverse}
+library(tidyverse)
+```
+
+Use `separate_rows` to create a new row for each annotation. The `mutate` call is to remove a trailing semicolon, if it exists.
+
+```{r separate_rows}
+library(tidyverse)
+my_vcf %>%
+  mutate(info = sub(pattern = ";$", replacement = "", x = .data$info)) %>%
+  separate_rows(info, sep = ";\\s*") %>%
+  head()
+```
+
+Use `separate` to split key-value annotation pair (separated by an equal sign) into two columns. Missing values will have a NA value.
+
+```{r separate, warning=FALSE, message=FALSE}
+my_vcf %>%
+  mutate(info = sub(pattern = ";$", replacement = "", x = .data$info)) %>%
+  separate_rows(info, sep = ";\\s*") %>%
+  separate(info, c('key', 'value'), sep = "=") %>%
+  head(10)
+```
+
+Finally, use `pivot_wider` to convert the data back into wide format. In the example below, I show three new columns created from splitting the `info` column.
+
+```{r pivot_wider}
+my_vcf %>%
+  mutate(info = sub(pattern = ";$", replacement = "", x = .data$info)) %>%
+  separate_rows(info, sep = ";\\s*") %>%
+  separate(info, c('key', 'value'), sep = "=") %>%
+  distinct() %>% # remove duplication annotations, if any
+  filter(key == "AC" | key == "DP" | key == "MQ") %>%
+  pivot_wider(id_cols = vid, names_from = key, values_from = value)
+```
+
+## Summary
+
+1. Use `separate_rows` to split a single column with multiple annotations into rows
+2. Use `separate` to split a key-value annotation pair into two columns
+3. Use `pivot_wider` to convert the table in long format back to wide format
