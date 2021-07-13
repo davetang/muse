@@ -12,6 +12,7 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 library(pheatmap)
 library(dendextend)
+library(grid)
 library(gridExtra)
 ```
 
@@ -40,6 +41,20 @@ Using scale produces the same heatmap as using `cal_z_score`.
 
 ```{r pheatmap_scale, fig.width=7, fig.height=7}
 pheatmap(data_subset, scale = "row")
+```
+
+Add a title using `main`.
+
+```{r pheatmap_title_main, fig.width=7, fig.height=7}
+pheatmap(data_subset, main = "My title")
+```
+
+Add a title using `textGrob`; you will need the `grid` and `gridExtra` packages.
+
+```{r pheatmap_title_textgrob, fig.width=7, fig.height=7}
+my_title <- textGrob("My title", gp = gpar(fontsize = 21, fontface = "bold"))
+one <- pheatmap(data_subset, silent = TRUE)
+grid.arrange(grobs = list(my_title, one[[4]]), heights = c(0.1, 1))
 ```
 
 Two heatmaps.
