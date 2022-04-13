@@ -7,7 +7,7 @@ rstudio_image=davetang/rstudio:${version}
 container_name=rstudio_muse
 port=7777
 package_dir=$(pwd)/r_packages_${version}
-path=$(realpath $(dirname $0))
+path=$(realpath $(dirname $0)/..)
 
 if [[ ! -d ${package_dir} ]]; then
    mkdir ${package_dir}
