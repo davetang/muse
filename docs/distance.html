@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2022-04-14" />
+
+<title>Distance metrics</title>
+
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.10.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Distance metrics</h1>
+<h4 class="date">2022-04-14</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-04-14
+</p>
+<p>
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version 1.7.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea9f5e22bfb4c585d025e62dc52299fdb8491277dtargetblanka9f5e22a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/a9f5e22bfb4c585d025e62dc52299fdb8491277d" target="_blank">a9f5e22</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea9f5e22bfb4c585d025e62dc52299fdb8491277dtargetblanka9f5e22a" class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/a9f5e22bfb4c585d025e62dc52299fdb8491277d" target="_blank">a9f5e22</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    r_packages_4.1.2/
+
+Untracked files:
+    Untracked:  analysis/cell_ranger.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/distance.Rmd</code>) and HTML (<code>docs/distance.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/a9f5e22bfb4c585d025e62dc52299fdb8491277d/analysis/distance.Rmd" target="_blank">a9f5e22</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-04-14
+</td>
+<td>
+Distance metrics
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>The <code>dist</code> function in R computes and returns a distance matrix computed between the rows of a data matrix. The available distance measures include: “euclidean”, “maximum”, “manhattan”, “canberra”, “binary” or “minkowski”.</p>
+<p>Prepare a small dataset for calculating the distances.</p>
+<pre class="r"><code>set.seed(123)
+eg1 &lt;- data.frame(
+  x = sample(1:10000, 7), 
+  y = sample(1:10000, 7), 
+  z = sample(1:10000, 7)
+)
+
+eg1</code></pre>
+<pre><code>     x    y    z
+1 2463 4761 2888
+2 2511 6746 6170
+3 8718 9819 2567
+4 2986 2757 9642
+5 1842 5107 9982
+6 9334 9145 2980
+7 3371 9209 1614</code></pre>
+<p>Plot in 3D and we can see that points 4 and 6 are far away from each other.</p>
+<pre class="r"><code>plot_ly(
+  eg1,
+  x = ~x,
+  y = ~y,
+  z = ~z,
+  color = row.names(eg1),
+  text = row.names(eg1)
+) %&gt;%
+  add_markers(marker = list(size = 10)) %&gt;%
+  add_text(showlegend = FALSE)</code></pre>
+<div id="htmlwidget-502a66744b8e1fe96c06" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-502a66744b8e1fe96c06">{"x":{"visdat":{"cdf4ce71dfb":["function () ","plotlyVisDat"]},"cur_data":"cdf4ce71dfb","attrs":{"cdf4ce71dfb":{"x":{},"y":{},"z":{},"text":["1","2","3","4","5","6","7"],"color":["1","2","3","4","5","6","7"],"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","marker":{"size":10},"inherit":true},"cdf4ce71dfb.1":{"x":{},"y":{},"z":{},"text":["1","2","3","4","5","6","7"],"color":["1","2","3","4","5","6","7"],"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"text","showlegend":false,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[2463],"y":[4761],"z":[2888],"text":"1","type":"scatter3d","mode":"markers","marker":{"color":"rgba(102,194,165,1)","size":10,"line":{"color":"rgba(102,194,165,1)"}},"name":"1","textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[2511],"y":[6746],"z":[6170],"text":"2","type":"scatter3d","mode":"markers","marker":{"color":"rgba(252,141,98,1)","size":10,"line":{"color":"rgba(252,141,98,1)"}},"name":"2","textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[8718],"y":[9819],"z":[2567],"text":"3","type":"scatter3d","mode":"markers","marker":{"color":"rgba(141,160,203,1)","size":10,"line":{"color":"rgba(141,160,203,1)"}},"name":"3","textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null},{"x":[2986],"y":[2757],"z":[9642],"text":"4","type":"scatter3d","mode":"markers","marker":{"color":"rgba(231,138,195,1)","size":10,"line":{"color":"rgba(231,138,195,1)"}},"name":"4","textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"frame":null},{"x":[1842],"y":[5107],"z":[9982],"text":"5","type":"scatter3d","mode":"markers","marker":{"color":"rgba(166,216,84,1)","size":10,"line":{"color":"rgba(166,216,84,1)"}},"name":"5","textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"frame":null},{"x":[9334],"y":[9145],"z":[2980],"text":"6","type":"scatter3d","mode":"markers","marker":{"color":"rgba(255,217,47,1)","size":10,"line":{"color":"rgba(255,217,47,1)"}},"name":"6","textfont":{"color":"rgba(255,217,47,1)"},"error_y":{"color":"rgba(255,217,47,1)"},"error_x":{"color":"rgba(255,217,47,1)"},"line":{"color":"rgba(255,217,47,1)"},"frame":null},{"x":[3371],"y":[9209],"z":[1614],"text":"7","type":"scatter3d","mode":"markers","marker":{"color":"rgba(229,196,148,1)","size":10,"line":{"color":"rgba(229,196,148,1)"}},"name":"7","textfont":{"color":"rgba(229,196,148,1)"},"error_y":{"color":"rgba(229,196,148,1)"},"error_x":{"color":"rgba(229,196,148,1)"},"line":{"color":"rgba(229,196,148,1)"},"frame":null},{"x":[2463],"y":[4761],"z":[2888],"text":"1","type":"scatter3d","mode":"text","showlegend":false,"name":"1","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[2511],"y":[6746],"z":[6170],"text":"2","type":"scatter3d","mode":"text","showlegend":false,"name":"2","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[8718],"y":[9819],"z":[2567],"text":"3","type":"scatter3d","mode":"text","showlegend":false,"name":"3","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null},{"x":[2986],"y":[2757],"z":[9642],"text":"4","type":"scatter3d","mode":"text","showlegend":false,"name":"4","marker":{"color":"rgba(231,138,195,1)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"frame":null},{"x":[1842],"y":[5107],"z":[9982],"text":"5","type":"scatter3d","mode":"text","showlegend":false,"name":"5","marker":{"color":"rgba(166,216,84,1)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"frame":null},{"x":[9334],"y":[9145],"z":[2980],"text":"6","type":"scatter3d","mode":"text","showlegend":false,"name":"6","marker":{"color":"rgba(255,217,47,1)","line":{"color":"rgba(255,217,47,1)"}},"textfont":{"color":"rgba(255,217,47,1)"},"error_y":{"color":"rgba(255,217,47,1)"},"error_x":{"color":"rgba(255,217,47,1)"},"line":{"color":"rgba(255,217,47,1)"},"frame":null},{"x":[3371],"y":[9209],"z":[1614],"text":"7","type":"scatter3d","mode":"text","showlegend":false,"name":"7","marker":{"color":"rgba(229,196,148,1)","line":{"color":"rgba(229,196,148,1)"}},"textfont":{"color":"rgba(229,196,148,1)"},"error_y":{"color":"rgba(229,196,148,1)"},"error_x":{"color":"rgba(229,196,148,1)"},"line":{"color":"rgba(229,196,148,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="euclidean-distance" class="section level2">
+<h2>Euclidean distance</h2>
+<p>The first distance metric is the <a href="https://en.wikipedia.org/wiki/Euclidean_distance">Euclidean distance</a>, which is the default of <code>dist</code>. The Euclidean distance is simply the distance one would physically measure, say with a ruler. For <span class="math inline">\(n\)</span> dimensions the formula for the Euclidean distance between points <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span> is:</p>
+<p><span class="math display">\[ d(p,q) = d(q,p) = \sqrt{\sum^n_{i=1} (p_i - q_i)^2} \]</span></p>
+<p>We create a function that calculates the Euclidean distance.</p>
+<pre class="r"><code>euclid_dist &lt;- function(p, q){
+   as.numeric(sqrt(sum((p - q)^2)))
+}</code></pre>
+<p>The Euclidean distances in one dimension between two points.</p>
+<pre class="r"><code>euclid_dist(1,5)</code></pre>
+<pre><code>[1] 4</code></pre>
+<pre class="r"><code>euclid_dist(100,5)</code></pre>
+<pre><code>[1] 95</code></pre>
+<p>The Euclidean distances in two dimensions between two points.</p>
+<pre class="r"><code>euclid_dist(p = c(2, 2), q = c(5.535534, 5.535534))</code></pre>
+<pre><code>[1] 5</code></pre>
+<p>The Euclidean distances in three dimensions between points 4 and 6.</p>
+<pre class="r"><code>euclid_dist(eg1[4,], eg1[6,])</code></pre>
+<pre><code>[1] 11202.05</code></pre>
+<p>We can calculate all the (row-wise) pairwise distances by providing the entire dataset.</p>
+<pre class="r"><code>dist(eg1)</code></pre>
+<pre><code>          1         2         3         4         5         6
+2  3835.890                                                  
+3  8050.555  7807.163                                        
+4  7064.422  5309.664 11523.163                              
+5  7129.530  4203.002 11156.368  2635.685                    
+6  8150.985  7904.722  1002.148 11202.049 11021.049          
+7  4715.108  5250.058  5465.411 10306.566  9443.922  6117.795</code></pre>
+</div>
+<div id="maximum-distance" class="section level2">
+<h2>Maximum distance</h2>
+<p>The documentation for <code>dist</code> describes the maximum distance as:</p>
+<blockquote>
+<p>Maximum distance between two components of x and y (supremum norm)</p>
+</blockquote>
+<p>Let’s create an example to figure out what this means.</p>
+<pre class="r"><code>eg2 &lt;- data.frame(x = c(2, 6), y = c(4, 6))
+plot(eg2, pch = 16)
+ 
+# lines is in the format (x1, x2) (y1, y2)
+lines(c(eg2[1,1], eg2[2,1]), c(eg2[1,2], eg2[2,2]))
+lines(c(eg2[1,1], eg2[2,1]), c(eg2[1,2], eg2[1,2]))
+lines(c(eg2[2,1], eg2[2,1]), c(eg2[1,2], eg2[2,2]))</code></pre>
+<p><img src="figure/distance.Rmd/eg2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The Euclidean distance is the hypotenuse, which you can calculate using the Pythagoras theorem.</p>
+<pre class="r"><code>dist(eg2)</code></pre>
+<pre><code>         1
+2 4.472136</code></pre>
+<p>The maximum distance is the longest edge that is not the hypotenuse.</p>
+<pre class="r"><code>dist(eg2, method = &quot;maximum&quot;)</code></pre>
+<pre><code>  1
+2 4</code></pre>
+<p>The maximum distance is maximum distance of all edge distances. In <code>eg1</code> we have three edges between two points.</p>
+<pre class="r"><code>edge_dist &lt;- function(p, q){
+  as.numeric(sqrt((p-q)^2))
+}
+
+edge_dist(eg1[1, ], eg1[2, ])</code></pre>
+<pre><code>[1]   48 1985 3282</code></pre>
+<p>The longest edge is between the <code>z</code> coordinates and this is what the maximum distance returns below.</p>
+<pre class="r"><code>dist(eg1[1:2, ], method = &quot;maximum&quot;)</code></pre>
+<pre><code>     1
+2 3282</code></pre>
+<p>The results using <code>dist</code> and <code>max(edge_dist())</code> are identical.</p>
+<pre class="r"><code>identical(
+  as.vector(dist(eg1[6:7, ], method = &quot;maximum&quot;)),
+  max(edge_dist(eg1[6, ], eg1[7, ]))
+)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<p>We can create another example to confirm our observation.</p>
+<pre class="r"><code>set.seed(1984)
+eg3 &lt;- data.frame(
+  w = sample(1:10000, 10),
+  x = sample(1:10000, 10),
+  y = sample(1:10000, 10),
+  z = sample(1:10000, 10)
+)
+
+identical(
+  as.vector(dist(eg3[1:2, ], method = &quot;maximum&quot;)),
+  max(edge_dist(eg3[1, ], eg3[2, ]))
+)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div id="manhattan-distance" class="section level2">
+<h2>Manhattan distance</h2>
+<p>The documentation for <code>dist</code> describes the Manhattan distance as:</p>
+<blockquote>
+<p>Absolute distance between the two vectors (1 norm aka L_1).</p>
+</blockquote>
+<p><a href="https://en.wikipedia.org/wiki/Taxicab_geometry" class="uri">https://en.wikipedia.org/wiki/Taxicab_geometry</a></p>
+<p><span class="math display">\[
+\sum^n_{i=1} |p_i - q_i|, \\
+where\ p = (p_1, p_2, \dots, p_n)\ and\ q = (q_1, q_2, \dots, q_n)
+\]</span></p>
+<p>As an R function.</p>
+<pre class="r"><code>man_dist &lt;- function(p, q){
+  as.numeric(sum(abs(p-q)))
+}</code></pre>
+<p>The Manhattan distance is the sum of all edges.</p>
+<pre class="r"><code>man_dist(eg3[1, ], eg3[2, ])</code></pre>
+<pre><code>[1] 13540</code></pre>
+<pre class="r"><code>sum(edge_dist(eg3[1, ], eg3[2, ]))</code></pre>
+<pre><code>[1] 13540</code></pre>
+<p>We can calculate all Manhattan distances and confirm the distance between points 1 and 2 in <code>eg3</code>.</p>
+<pre class="r"><code>dist(eg3, method=&quot;manhattan&quot;)</code></pre>
+<pre><code>       1     2     3     4     5     6     7     8     9
+2  13540                                                
+3  15962  7212                                          
+4  10870 11072 16032                                    
+5  16386  4974  3868 13070                              
+6  17850 14052 11484 18896 12814                        
+7  15207 16665 15215 12911 12397 23153                  
+8  24977 19209 16147 14107 14235 13649 11436            
+9  17959  5493 12119 12425  9739 18959 16100 19976      
+10 12946 11900  5406 12464  7068 10652 12501 12031 16807</code></pre>
+</div>
+<div id="canberra-distance" class="section level2">
+<h2>Canberra distance</h2>
+<p>The <a href="https://en.wikipedia.org/wiki/Canberra_distance">Canberra distance</a> is formulated as:</p>
+<p><span class="math display">\[
+d(p, q) = \sum^n_{i = 1}\frac{|p_i-q_i|}{|p_i|+|q_i|}, \\
+where\ p = (p_1, p_2, \dots, p_n)\ and\ q = (q_1, q_2, \dots, q_n)
+\]</span></p>
+<p>I guess the name is a play on Manhattan distance, since at least one of the researchers (William T. Williams) that devised the distance worked in Australia (Canberra is the capital of Australia).</p>
+<p>As an R function.</p>
+<pre class="r"><code>canberra_dist &lt;- function(p,q){
+  sum( (abs(p-q)) / (abs(p) + abs(q)) )
+}</code></pre>
+<p>The main difference is that the distance is “weighted” by dividing by the sum of two points.</p>
+<pre class="r"><code>canberra_dist(1, 10)</code></pre>
+<pre><code>[1] 0.8181818</code></pre>
+<p>All Canberra distances.</p>
+<pre class="r"><code>dist(eg1, method=&quot;canberra&quot;)</code></pre>
+<pre><code>          1         2         3         4         5         6
+2 0.5444855                                                  
+3 0.9651899 1.1506609                                        
+4 0.9015675 0.7257530 1.6307834                              
+5 0.7305181 0.5279723 1.5577108 0.5531070                    
+6 0.9133741 1.0756235 0.1441193 1.5797848 1.4938881          
+7 0.7570213 0.8858836 0.7022968 1.3129772 1.3014659 0.7701741</code></pre>
+</div>
+<div id="minkowski-distance" class="section level2">
+<h2>Minkowski distance</h2>
+<p>The <a href="https://en.wikipedia.org/wiki/Minkowski_distance">Minkowski distance</a> of order <span class="math inline">\(p\)</span> (where <span class="math inline">\(p\)</span> is an integer) is formulated as:</p>
+<p><span class="math display">\[
+D(X, Y) = \left( \sum^n_{i=1} |x_i - y_i|^p\right)^{\frac{1}{p}}, \\
+where\ X = (x_1, x_2, \dots, x_n)\ and\ Y = (y_1, y_2, \dots, y_n) \in \mathbb{R}^n
+\]</span></p>
+<p>The Minkowski distance is a metric that can be considered as a generalisation of both the Euclidean distance and the Manhattan distance and is named after Hermann Minkowski.</p>
+<p>As an R function and check result with <code>dist</code>.</p>
+<pre class="r"><code>minkowski_dist &lt;- function(x, y, p){
+  (sum(abs(x -y)^p))^(1/p)
+}
+
+identical(
+  minkowski_dist(eg1[1, ], eg1[2, ], 1),
+  as.vector(dist(eg1[1:2, ], method = &quot;minkowski&quot;, p = 1))
+)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<p>If <code>p</code> is 1, then the distance is the same as the Manhattan distance.</p>
+<pre class="r"><code>identical(
+  minkowski_dist(eg3[1, ], eg3[2, ], 1),
+  man_dist(eg3[1, ], eg3[2, ])
+)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<p>If <code>p</code> is 2, then the distance is the same as the Euclidean distance.</p>
+<pre class="r"><code>identical(
+  minkowski_dist(eg3[1, ], eg3[2, ], 2),
+  euclid_dist(eg3[1, ], eg3[2, ])
+)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<p>As we increase <code>p</code>, the Minkowski approaches a limit (and we obtain the <a href="https://en.wikipedia.org/wiki/Chebyshev_distance">Chebyshev distance</a>).</p>
+<pre class="r"><code>sapply(1:20, function(x) minkowski_dist(eg3[1, ], eg3[2, ], p = x))</code></pre>
+<pre><code> [1] 13540.000  8318.523  7522.088  7315.580  7253.782  7234.047  7227.482
+ [8]  7225.232  7224.443  7224.162  7224.060  7224.022  7224.008  7224.003
+[15]  7224.001  7224.000  7224.000  7224.000  7224.000  7224.000</code></pre>
+</div>
+<div id="negative-distances" class="section level2">
+<h2>Negative distances</h2>
+<p>I learned of negative distances from the paper <a href="https://pubmed.ncbi.nlm.nih.gov/17218491/">Clustering by Passing Messages Between Data Points</a>, which are specifically called the negative squared Euclidean distance. The R package <code>apcluster</code> contains the function <code>negDistMat</code>, which can be used to calculate the negative squared Euclidean distance (among others). The paper is shared <a href="https://utstat.toronto.edu/reid/sta414/frey-affinity.pdf">here</a> for your reading pleasure.</p>
+<p>As stated in the paper, the negative distance between points <span class="math inline">\(x_i\)</span> and <span class="math inline">\(x_k\)</span> is:</p>
+<p><span class="math display">\[
+s(i, k) = -||x_i - x_k||^2
+\]</span></p>
+<p>Example data.</p>
+<pre class="r"><code>eg4 &lt;- matrix(
+  data = c(0, 0.5, 0.8, 1, 0, 0.2, 0.5, 0.7, 0.1, 0, 1, 0.3, 1, 0.8, 0.2),
+  nrow = 5,
+  ncol = 3,
+  byrow = TRUE
+)
+
+eg4</code></pre>
+<pre><code>     [,1] [,2] [,3]
+[1,]  0.0  0.5  0.8
+[2,]  1.0  0.0  0.2
+[3,]  0.5  0.7  0.1
+[4,]  0.0  1.0  0.3
+[5,]  1.0  0.8  0.2</code></pre>
+<p>Use <code>negDistMat</code> to calculate the negative distances or just calculate the Euclidean distance and turn it negative.</p>
+<pre class="r"><code>library(apcluster)</code></pre>
+<pre><code>
+Attaching package: &#39;apcluster&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:stats&#39;:
+
+    heatmap</code></pre>
+<pre class="r"><code>identical(
+  negDistMat(eg4),
+  as.matrix(-dist(eg4, diag = TRUE, upper = TRUE))
+)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div id="clustering-using-different-distances" class="section level2">
+<h2>Clustering using different distances</h2>
+<p>We will perform hierarchical clustering using different distances to compare the results. For plotting the dendrograms, we will use the <a href="https://cran.r-project.org/web/packages/ggdendro/vignettes/ggdendro.html">ggdendro package</a> and use the <a href="https://patchwork.data-imaginist.com/">patchwork package</a> for adding plots together.</p>
+<pre class="r"><code>library(ggdendro)
+library(patchwork)
+
+euc_d &lt;- dist(eg1)
+max_d &lt;- dist(eg1, method = &quot;maximum&quot;)
+man_d &lt;- dist(eg1, method = &quot;manhattan&quot;)
+can_d &lt;- dist(eg1, method = &quot;canberra&quot;)
+min_d &lt;- dist(eg1, method = &quot;minkowski&quot;)
+
+ggdendrogram(hclust(euc_d)) + ggtitle(&quot;Euclidean distance&quot;) +
+ggdendrogram(hclust(max_d)) + ggtitle(&quot;Maximum distance&quot;) +
+ggdendrogram(hclust(man_d)) + ggtitle(&quot;Manhattan distance&quot;) +
+ggdendrogram(hclust(can_d)) + ggtitle(&quot;Canberra distance&quot;) +
+ggdendrogram(hclust(min_d)) + ggtitle(&quot;Minkowski&quot;)</code></pre>
+<p><img src="figure/distance.Rmd/plot_dendrograms-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="correlation-between-distances" class="section level2">
+<h2>Correlation between distances</h2>
+<p>The <a href="https://en.wikipedia.org/wiki/Mantel_test">Mantel test</a> performs a correlation between two distance matrices and this is available in the <a href="https://cran.r-project.org/web/packages/ade4/index.html">ade4 package</a>.</p>
+<p>Let’s compare identical distance matrices and see what results we get.</p>
+<pre class="r"><code>library(ade4)
+
+mantel.randtest(euc_d, euc_d, nrepet = 10000)</code></pre>
+<pre><code>Monte-Carlo test
+Call: mantel.randtest(m1 = euc_d, m2 = euc_d, nrepet = 10000)
+
+Observation: 1 
+
+Based on 10000 replicates
+Simulated p-value: 0.00029997 
+Alternative hypothesis: greater 
+
+      Std.Obs   Expectation      Variance 
+ 4.2633060551 -0.0007816083  0.0551043151 </code></pre>
+<p>The correlation is reported as the observation and the null hypothesis is that there is no relation between the two matrices, which is rejected. The idea of the test is to permute the rows and columns and observe whether the correlation coefficient is affected. From <a href="https://en.wikipedia.org/wiki/Mantel_test">Wikipedia</a>:</p>
+<blockquote>
+<p>The reasoning is that if the null hypothesis of there being no relation between the two matrices is true, then permuting the rows and columns of the matrix should be equally likely to produce a larger or a smaller coefficient.</p>
+</blockquote>
+<p>We can calculate all correlations on the <code>mtcars</code> dataset and see how similar different distances are to each other.</p>
+<pre class="r"><code>my_dist &lt;- c(
+  &quot;euclidean&quot;,
+  &quot;maximum&quot;,
+  &quot;manhattan&quot;,
+  &quot;canberra&quot;,
+  &quot;minkowski&quot;
+)
+
+my_comp &lt;- as.list(as.data.frame(combn(x = my_dist, 2)))
+my_mantel &lt;- lapply(my_comp, function(x){
+  mantel.randtest(dist(mtcars, method = x[1]), dist(mtcars, method = x[2]), nrepet = 10000)
+})
+
+my_cors &lt;- sapply(my_mantel, function(x) x$obs)
+names(my_cors) &lt;- sapply(my_comp, function(x) paste0(tools::toTitleCase(x[1]), &quot; vs &quot;, tools::toTitleCase(x[2])))
+
+my_cors</code></pre>
+<pre><code>  Euclidean vs Maximum Euclidean vs Manhattan  Euclidean vs Canberra 
+             0.9901299              0.9918907              0.7705224 
+Euclidean vs Minkowski   Maximum vs Manhattan    Maximum vs Canberra 
+             1.0000000              0.9667454              0.7560396 
+  Maximum vs Minkowski  Manhattan vs Canberra Manhattan vs Minkowski 
+             0.9901299              0.7915281              0.9918907 
+ Canberra vs Minkowski 
+             0.7705224 </code></pre>
+<p>Most distances are similar to each other except the Canberra distance. Since <code>mantel.rtest</code> uses the Pearson correlation, the weighted Canberra distances are less similar to the other unweighted distances.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.1.2 (2021-11-01)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.04.3 LTS
+
+Matrix products: default
+BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.8.so
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] ade4_1.7-18     patchwork_1.1.1 ggdendro_0.1.23 apcluster_1.4.9
+ [5] plotly_4.10.0   forcats_0.5.1   stringr_1.4.0   dplyr_1.0.7    
+ [9] purrr_0.3.4     readr_2.1.1     tidyr_1.1.4     tibble_3.1.6   
+[13] ggplot2_3.3.5   tidyverse_1.3.1 workflowr_1.7.0
+
+loaded via a namespace (and not attached):
+ [1] httr_1.4.2         jsonlite_1.7.3     viridisLite_0.4.0  modelr_0.1.8      
+ [5] assertthat_0.2.1   getPass_0.2-2      highr_0.9          cellranger_1.1.0  
+ [9] yaml_2.2.2         pillar_1.6.5       backports_1.4.1    lattice_0.20-45   
+[13] glue_1.6.1         digest_0.6.29      RColorBrewer_1.1-2 promises_1.2.0.1  
+[17] rvest_1.0.2        colorspace_2.0-2   htmltools_0.5.2    httpuv_1.6.5      
+[21] Matrix_1.3-4       pkgconfig_2.0.3    broom_0.7.11       haven_2.4.3       
+[25] scales_1.1.1       processx_3.5.2     whisker_0.4        later_1.3.0       
+[29] tzdb_0.2.0         git2r_0.29.0       generics_0.1.1     farver_2.1.0      
+[33] ellipsis_0.3.2     withr_2.4.3        lazyeval_0.2.2     cli_3.1.1         
+[37] magrittr_2.0.2     crayon_1.4.2       readxl_1.3.1       evaluate_0.14     
+[41] ps_1.6.0           fs_1.5.2           fansi_1.0.2        MASS_7.3-54       
+[45] xml2_1.3.3         tools_4.1.2        data.table_1.14.2  hms_1.1.1         
+[49] lifecycle_1.0.1    munsell_0.5.0      reprex_2.0.1       callr_3.7.0       
+[53] compiler_4.1.2     jquerylib_0.1.4    rlang_1.0.0        grid_4.1.2        
+[57] rstudioapi_0.13    htmlwidgets_1.5.4  crosstalk_1.2.0    labeling_0.4.2    
+[61] rmarkdown_2.11     gtable_0.3.0       DBI_1.1.2          R6_2.5.1          
+[65] lubridate_1.8.0    knitr_1.37         fastmap_1.1.0      utf8_1.2.2        
+[69] rprojroot_2.0.2    stringi_1.7.6      Rcpp_1.0.8         vctrs_0.3.8       
+[73] dbplyr_2.1.1       tidyselect_1.1.1   xfun_0.29         </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
