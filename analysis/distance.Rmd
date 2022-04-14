@@ -1,0 +1,364 @@
+---
+title: "Distance metrics"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(plotly)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The `dist` function in R computes and returns a distance matrix computed between the rows of a data matrix. The available distance measures include: "euclidean", "maximum", "manhattan", "canberra", "binary" or "minkowski".
+
+Prepare a small dataset for calculating the distances.
+
+```{r eg1}
+set.seed(123)
+eg1 <- data.frame(
+  x = sample(1:10000, 7), 
+  y = sample(1:10000, 7), 
+  z = sample(1:10000, 7)
+)
+
+eg1
+```
+
+Plot in 3D and we can see that points 4 and 6 are far away from each other.
+
+```{r scatter_plot_eg1}
+plot_ly(
+  eg1,
+  x = ~x,
+  y = ~y,
+  z = ~z,
+  color = row.names(eg1),
+  text = row.names(eg1)
+) %>%
+  add_markers(marker = list(size = 10)) %>%
+  add_text(showlegend = FALSE)
+```
+
+## Euclidean distance
+
+The first distance metric is the [Euclidean distance](https://en.wikipedia.org/wiki/Euclidean_distance), which is the default of `dist`. The Euclidean distance is simply the distance one would physically measure, say with a ruler. For $n$ dimensions the formula for the Euclidean distance between points $p$ and $q$ is:
+
+$$ d(p,q) = d(q,p) = \sqrt{\sum^n_{i=1} (p_i - q_i)^2} $$
+
+We create a function that calculates the Euclidean distance.
+
+```{r euclid_dist}
+euclid_dist <- function(p, q){
+   as.numeric(sqrt(sum((p - q)^2)))
+}
+```
+
+The Euclidean distances in one dimension between two points.
+
+```{r euclid_dist_1d}
+euclid_dist(1,5)
+euclid_dist(100,5)
+```
+ 
+The Euclidean distances in two dimensions between two points.
+
+```{r euclid_dist_2d}
+euclid_dist(p = c(2, 2), q = c(5.535534, 5.535534))
+```
+ 
+The Euclidean distances in three dimensions between points 4 and 6.
+
+```{r euclid_dist_3d}
+euclid_dist(eg1[4,], eg1[6,])
+```
+
+We can calculate all the (row-wise) pairwise distances by providing the entire dataset.
+
+```{r euclid_dist_all}
+dist(eg1)
+```
+
+## Maximum distance 
+
+The documentation for `dist` describes the maximum distance as:
+
+>Maximum distance between two components of x and y (supremum norm)
+
+Let's create an example to figure out what this means.
+
+```{r eg2}
+eg2 <- data.frame(x = c(2, 6), y = c(4, 6))
+plot(eg2, pch = 16)
+ 
+# lines is in the format (x1, x2) (y1, y2)
+lines(c(eg2[1,1], eg2[2,1]), c(eg2[1,2], eg2[2,2]))
+lines(c(eg2[1,1], eg2[2,1]), c(eg2[1,2], eg2[1,2]))
+lines(c(eg2[2,1], eg2[2,1]), c(eg2[1,2], eg2[2,2]))
+```
+
+The Euclidean distance is the hypotenuse, which you can calculate using the Pythagoras theorem.
+
+```{r eg2_euclid}
+dist(eg2)
+```
+
+The maximum distance is the longest edge that is not the hypotenuse.
+
+```{r eg2_maximum}
+dist(eg2, method = "maximum")
+```
+
+The maximum distance is maximum distance of all edge distances. In `eg1` we have three edges between two points.
+
+```{r edge_dist}
+edge_dist <- function(p, q){
+  as.numeric(sqrt((p-q)^2))
+}
+
+edge_dist(eg1[1, ], eg1[2, ])
+```
+
+The longest edge is between the `z` coordinates and this is what the maximum distance returns below.
+
+```{r dist_max}
+dist(eg1[1:2, ], method = "maximum")
+```
+
+The results using `dist` and `max(edge_dist())` are identical.
+
+```{r compare_max_dist}
+identical(
+  as.vector(dist(eg1[6:7, ], method = "maximum")),
+  max(edge_dist(eg1[6, ], eg1[7, ]))
+)
+```
+
+We can create another example to confirm our observation.
+
+```{r eg3}
+set.seed(1984)
+eg3 <- data.frame(
+  w = sample(1:10000, 10),
+  x = sample(1:10000, 10),
+  y = sample(1:10000, 10),
+  z = sample(1:10000, 10)
+)
+
+identical(
+  as.vector(dist(eg3[1:2, ], method = "maximum")),
+  max(edge_dist(eg3[1, ], eg3[2, ]))
+)
+```
+
+## Manhattan distance
+
+The documentation for `dist` describes the Manhattan distance as:
+
+>Absolute distance between the two vectors (1 norm aka L_1).
+
+https://en.wikipedia.org/wiki/Taxicab_geometry
+
+$$
+\sum^n_{i=1} |p_i - q_i|, \\
+where\ p = (p_1, p_2, \dots, p_n)\ and\ q = (q_1, q_2, \dots, q_n)
+$$
+
+As an R function.
+
+```{r man_dist}
+man_dist <- function(p, q){
+  as.numeric(sum(abs(p-q)))
+}
+```
+
+The Manhattan distance is the sum of all edges.
+
+```{r man_dist_eg3}
+man_dist(eg3[1, ], eg3[2, ])
+sum(edge_dist(eg3[1, ], eg3[2, ]))
+```
+
+We can calculate all Manhattan distances and confirm the distance between points 1 and 2 in `eg3`.
+
+```{r dist_man_eg3_all}
+dist(eg3, method="manhattan")
+```
+
+## Canberra distance
+
+The [Canberra distance](https://en.wikipedia.org/wiki/Canberra_distance) is formulated as:
+
+$$
+d(p, q) = \sum^n_{i = 1}\frac{|p_i-q_i|}{|p_i|+|q_i|}, \\
+where\ p = (p_1, p_2, \dots, p_n)\ and\ q = (q_1, q_2, \dots, q_n)
+$$
+
+I guess the name is a play on Manhattan distance, since at least one of the researchers (William T. Williams) that devised the distance worked in Australia (Canberra is the capital of Australia).
+
+As an R function.
+
+```{r canberra_dist}
+canberra_dist <- function(p,q){
+  sum( (abs(p-q)) / (abs(p) + abs(q)) )
+}
+```
+
+The main difference is that the distance is "weighted" by dividing by the sum of two points.
+
+```{r canberra_dist_1d}
+canberra_dist(1, 10)
+```
+
+All Canberra distances.
+
+```{r canberra_dist_eg1}
+dist(eg1, method="canberra")
+```
+
+## Minkowski distance
+
+The [Minkowski distance](https://en.wikipedia.org/wiki/Minkowski_distance) of order $p$ (where $p$ is an integer) is formulated as:
+
+$$
+D(X, Y) = \left( \sum^n_{i=1} |x_i - y_i|^p\right)^{\frac{1}{p}}, \\
+where\ X = (x_1, x_2, \dots, x_n)\ and\ Y = (y_1, y_2, \dots, y_n) \in \mathbb{R}^n
+$$
+
+The Minkowski distance is a metric that can be considered as a generalisation of both the Euclidean distance and the Manhattan distance and is named after Hermann Minkowski.
+
+As an R function and check result with `dist`.
+
+```{r minkowski_dist}
+minkowski_dist <- function(x, y, p){
+  (sum(abs(x -y)^p))^(1/p)
+}
+
+identical(
+  minkowski_dist(eg1[1, ], eg1[2, ], 1),
+  as.vector(dist(eg1[1:2, ], method = "minkowski", p = 1))
+)
+```
+
+If `p` is 1, then the distance is the same as the Manhattan distance.
+
+```{r minkowski_vs_manhattan}
+identical(
+  minkowski_dist(eg3[1, ], eg3[2, ], 1),
+  man_dist(eg3[1, ], eg3[2, ])
+)
+```
+
+If `p` is 2, then the distance is the same as the Euclidean distance.
+
+```{r minkowski_vs_euclidean}
+identical(
+  minkowski_dist(eg3[1, ], eg3[2, ], 2),
+  euclid_dist(eg3[1, ], eg3[2, ])
+)
+```
+
+As we increase `p`, the Minkowski approaches a limit (and we obtain the [Chebyshev distance](https://en.wikipedia.org/wiki/Chebyshev_distance)).
+
+```{r minkowski_limit}
+sapply(1:20, function(x) minkowski_dist(eg3[1, ], eg3[2, ], p = x))
+```
+
+## Negative distances
+
+I learned of negative distances from the paper [Clustering by Passing Messages Between Data Points](https://pubmed.ncbi.nlm.nih.gov/17218491/), which are specifically called the negative squared Euclidean distance. The R package `apcluster` contains the function `negDistMat`, which can be used to calculate the negative squared Euclidean distance (among others). The paper is shared [here](https://utstat.toronto.edu/reid/sta414/frey-affinity.pdf) for your reading pleasure.
+
+As stated in the paper, the negative distance between points $x_i$ and $x_k$ is:
+
+$$
+s(i, k) = -||x_i - x_k||^2
+$$
+
+Example data.
+
+```{r eg4}
+eg4 <- matrix(
+  data = c(0, 0.5, 0.8, 1, 0, 0.2, 0.5, 0.7, 0.1, 0, 1, 0.3, 1, 0.8, 0.2),
+  nrow = 5,
+  ncol = 3,
+  byrow = TRUE
+)
+
+eg4
+```
+
+Use `negDistMat` to calculate the negative distances or just calculate the Euclidean distance and turn it negative.
+
+```{r neg_dist_mat}
+library(apcluster)
+
+identical(
+  negDistMat(eg4),
+  as.matrix(-dist(eg4, diag = TRUE, upper = TRUE))
+)
+```
+
+## Clustering using different distances
+
+We will perform hierarchical clustering using different distances to compare the results. For plotting the dendrograms, we will use the [ggdendro package](https://cran.r-project.org/web/packages/ggdendro/vignettes/ggdendro.html) and use the [patchwork package](https://patchwork.data-imaginist.com/) for adding plots together.
+
+```{r plot_dendrograms}
+library(ggdendro)
+library(patchwork)
+
+euc_d <- dist(eg1)
+max_d <- dist(eg1, method = "maximum")
+man_d <- dist(eg1, method = "manhattan")
+can_d <- dist(eg1, method = "canberra")
+min_d <- dist(eg1, method = "minkowski")
+
+ggdendrogram(hclust(euc_d)) + ggtitle("Euclidean distance") +
+ggdendrogram(hclust(max_d)) + ggtitle("Maximum distance") +
+ggdendrogram(hclust(man_d)) + ggtitle("Manhattan distance") +
+ggdendrogram(hclust(can_d)) + ggtitle("Canberra distance") +
+ggdendrogram(hclust(min_d)) + ggtitle("Minkowski")
+```
+
+## Correlation between distances
+
+The [Mantel test](https://en.wikipedia.org/wiki/Mantel_test) performs a correlation between two distance matrices and this is available in the [ade4 package](https://cran.r-project.org/web/packages/ade4/index.html).
+
+Let's compare identical distance matrices and see what results we get.
+
+```{r mantel_rtest}
+library(ade4)
+
+mantel.randtest(euc_d, euc_d, nrepet = 10000)
+```
+
+The correlation is reported as the observation and the null hypothesis is that there is no relation between the two matrices, which is rejected. The idea of the test is to permute the rows and columns and observe whether the correlation coefficient is affected. From [Wikipedia](https://en.wikipedia.org/wiki/Mantel_test):
+
+>The reasoning is that if the null hypothesis of there being no relation between the two matrices is true, then permuting the rows and columns of the matrix should be equally likely to produce a larger or a smaller coefficient.
+
+We can calculate all correlations on the `mtcars` dataset and see how similar different distances are to each other.
+
+```{r mantel_rtest_pairwise}
+my_dist <- c(
+  "euclidean",
+  "maximum",
+  "manhattan",
+  "canberra",
+  "minkowski"
+)
+
+my_comp <- as.list(as.data.frame(combn(x = my_dist, 2)))
+my_mantel <- lapply(my_comp, function(x){
+  mantel.randtest(dist(mtcars, method = x[1]), dist(mtcars, method = x[2]), nrepet = 10000)
+})
+
+my_cors <- sapply(my_mantel, function(x) x$obs)
+names(my_cors) <- sapply(my_comp, function(x) paste0(tools::toTitleCase(x[1]), " vs ", tools::toTitleCase(x[2])))
+
+my_cors
+```
+
+Most distances are similar to each other except the Canberra distance. Since `mantel.rtest` uses the Pearson correlation, the weighted Canberra distances are less similar to the other unweighted distances.
