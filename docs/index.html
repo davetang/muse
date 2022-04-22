@@ -13,7 +13,7 @@
 
 <title>Home</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.13/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -72,6 +72,7 @@ if (window.hljs) {
 
 
 
+
 <style type = "text/css">
 .main-container {
   max-width: 940px;
@@ -92,6 +93,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -244,7 +248,7 @@ $(document).ready(function () {
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -305,7 +309,7 @@ $(document).ready(function () {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2022-04-14
+<strong>Last updated:</strong> 2022-04-22
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -336,16 +340,16 @@ This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysi
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea9f5e22bfb4c585d025e62dc52299fdb8491277dtargetblanka9f5e22a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/a9f5e22bfb4c585d025e62dc52299fdb8491277d" target="_blank">a9f5e22</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee372c815ee309a4b014e441268a2ec5416f8ced8targetblanke372c81a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/e372c815ee309a4b014e441268a2ec5416f8ced8" target="_blank">e372c81</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea9f5e22bfb4c585d025e62dc52299fdb8491277dtargetblanka9f5e22a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee372c815ee309a4b014e441268a2ec5416f8ced8targetblanke372c81a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/a9f5e22bfb4c585d025e62dc52299fdb8491277d" target="_blank">a9f5e22</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/e372c815ee309a4b014e441268a2ec5416f8ced8" target="_blank">e372c81</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -396,6 +400,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/e372c815ee309a4b014e441268a2ec5416f8ced8/analysis/index.Rmd" target="_blank">e372c81</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-04-22
+</td>
+<td>
+TSS
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/d334dbdada984c6154ca542f528a02c3b13fbb6f/docs/index.html" target="_blank">d334dbd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-04-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -721,6 +759,8 @@ Start workflowr project.
 <li>Gene Ontology Enrichment Analysis - <a href="https://davetang.org/muse/2010/11/10/gene-ontology-enrichment-analysis/">original</a> / <a href="go_enrichment.html">updated</a></li>
 <li>Split single column of annotations into multiple columns - original / <a href="split_column.html">updated</a></li>
 <li>Distance Matrix Computation - <a href="https://davetang.org/muse/2013/08/15/distance-matrix-computation/">original</a> / <a href="distance.html">updated</a></li>
+<li>Sequence composition and random forests</li>
+<li><a href="https://davetang.org/muse/2013/09/14/sequence-composition-random-forests/">original</a> / <a href="tss_predict.html">updated</a></li>
 </ul>
 </div>
 
