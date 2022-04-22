@@ -1,0 +1,138 @@
+---
+title: "Sequence composition and Random Forests"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(biomaRt)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Transcriptional starting sites (TSSs) demarcate the first position in the DNA sequence that gets transcribed into RNA. In this work, we will try to build a classifier to try to predict TSSs. We will train our classifier using the NCBI Reference Sequence Database also known as RefSeq.
+
+## Packages
+
+Function for loading required Bioconductor packages (and install them first, if missing).
+
+```{r load_package, message=FALSE, warning=FALSE}
+load_bioc_package <- function(x){
+  if(!require(x, character.only = TRUE, quietly = TRUE)){
+    BiocManager::install(x, character.only = TRUE)
+    library(x, character.only = TRUE)
+  }
+}
+```
+
+## RefSeq
+
+We will use the Bioconductor package `biomaRt` to download the entire collection of RefSeq sequences.
+
+```{r load_biomart}
+load_bioc_package('biomaRt')
+```
+
+Find the human gene set.
+
+```{r list_datasets}
+ensembl <- useMart('ensembl')
+biomaRt::listDatasets(ensembl) %>%
+  filter(grepl('human', description, TRUE))
+```
+
+Find RefSeq attributes.
+
+```{r list_filters}
+ensembl <- useMart('ensembl', dataset = 'hsapiens_gene_ensembl')
+listAttributes(ensembl) %>%
+  filter(grepl('refseq', description, TRUE))
+```
+
+Fetch all RefSeq mRNAs on assembled chromosomes.
+
+```{r fetch_refseq_mrna}
+my_chr <- c(1:22, 'X', 'Y')
+
+my_refseq <- getBM(
+  attributes='refseq_mrna',
+  filters = 'chromosome_name',
+  values = my_chr,
+  mart = ensembl
+)
+```
+
+Number of RefSeq IDs.
+
+```{r number_refseq_id}
+dim(my_refseq)
+```
+
+Build table. Note that when working with transcripts, use the attributes `transcript_start` and `transcript_end`, and not the attributes `start_position` and `end_position`; using those will give you the Ensembl gene coordinates and not the RefSeq coordinates, which is what we want! (I have retrieved the Ensembl coordinates for illustrative purposes.)
+
+```{r my_refseq_loci}
+my_att <- c(
+  'refseq_mrna',
+  'chromosome_name',
+  'transcript_start',
+  'transcript_end',
+  'start_position',
+  'end_position',
+  'strand'
+)
+
+my_refseq_loci <- getBM(
+  attributes = my_att,
+  filters = c('refseq_mrna', 'chromosome_name'),
+  values = list(refseq_mrna = my_refseq$refseq_mrna, chromosome_name = my_chr),
+  mart = ensembl
+)
+```
+
+Check out the table.
+
+```{r check_out_refseq_loci}
+head(my_refseq_loci)
+```
+
+Check for duplicated entries.
+
+```{r dup_refseq}
+table(duplicated(my_refseq_loci$refseq_mrna))
+```
+
+Removed duplicated entries.
+
+```{r remove_dup}
+my_refseq_loci_uniq <- my_refseq_loci[!duplicated(my_refseq_loci$refseq_mrna),]
+dim(my_refseq_loci_uniq)
+```
+
+We will modify `chromosome_name` and `strand` to make it compatible with `BSgenome.Hsapiens.UCSC.hg38`.
+
+```{r}
+my_refseq_loci_uniq %>%
+  mutate(strand = ifelse(strand == 1, yes = '+', no = '-')) %>%
+  mutate(chromosome_name = sub("^", "chr", chromosome_name)) -> my_refseq_loci_uniq
+
+head(my_refseq_loci_uniq)
+```
+
+## Transcription Start Site
+
+The TSS is `transcript_start` when the transcript is on the `+` strand and is `transcript_end` on the `-` strand. We want to retrieve sequence upstream and downstream of the TSS, so we will subtract and add coordinates accordingly.
+
+```{r tss_span}
+my_span <- 2
+
+my_refseq_loci_uniq %>%
+  dplyr::select(-c(start_position, end_position)) %>%
+  mutate(tss_start = if_else(strand == "+", transcript_start - my_span, transcript_end - my_span)) %>%
+  mutate(tss_end = if_else(strand == "+", transcript_start + my_span, transcript_end + my_span)) -> my_tss
+
+head(my_tss)
+```
