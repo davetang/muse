@@ -8,7 +8,6 @@ output:
 
 ```{r setup, include=FALSE}
 library(tidyverse)
-library(biomaRt)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -21,9 +20,15 @@ Transcriptional starting sites (TSSs) demarcate the first position in the DNA se
 Function for loading required Bioconductor packages (and install them first, if missing).
 
 ```{r load_package, message=FALSE, warning=FALSE}
-load_bioc_package <- function(x){
+load_package <- function(x, source = "bioc"){
   if(!require(x, character.only = TRUE, quietly = TRUE)){
-    BiocManager::install(x, character.only = TRUE)
+    if (source == "bioc"){
+      BiocManager::install(x, character.only = TRUE)
+    } else if (source == "cran"){
+      install.packages(x, character.only = TRUE)
+    } else {
+      stop("Unrecognised source")
+    }
     library(x, character.only = TRUE)
   }
 }
@@ -34,7 +39,7 @@ load_bioc_package <- function(x){
 We will use the Bioconductor package `biomaRt` to download the entire collection of RefSeq sequences.
 
 ```{r load_biomart}
-load_bioc_package('biomaRt')
+load_package('biomaRt')
 ```
 
 Find the human gene set.
@@ -135,4 +140,263 @@ my_refseq_loci_uniq %>%
   mutate(tss_end = if_else(strand == "+", transcript_start + my_span, transcript_end + my_span)) -> my_tss
 
 head(my_tss)
+```
+
+## Random loci
+
+Sample a bunch of random sequences in hg38.
+
+```{r load_hg38, message=FALSE, warning=FALSE}
+load_package('BSgenome.Hsapiens.UCSC.hg38')
+```
+
+Save chromosomes and their sizes.
+
+```{r hg38}
+hg38_ref <- seqnames(BSgenome.Hsapiens.UCSC.hg38)
+hg38_chr <- hg38_ref[!grepl("_", hg38_ref)]
+hg38_chr <- hg38_chr[!grepl("chrM", hg38_chr)]
+
+hg38_chr_size <- sapply(hg38_chr, function(x){
+  length(BSgenome.Hsapiens.UCSC.hg38[[x]])
+})
+
+head(hg38_chr_size)
+```
+
+Sample chromosome based on length of chromosome.
+
+```{r my_random_loci}
+set.seed(1984)
+n <- nrow(my_tss)
+schr <- sample(
+  hg38_chr,
+  n,
+  TRUE,
+  prob = hg38_chr_size/sum(hg38_chr_size)
+)
+
+sstrand <- sample(c("+", "-"), n, TRUE)
+sstart <- sapply(schr, function(x){
+  sample(hg38_chr_size[x] - (my_span * 2), 1)
+})
+send <- sstart + (my_span*2)
+
+my_random_loci <- data.frame(
+  chr = schr,
+  start = sstart,
+  end = send,
+  strand = sstrand
+)
+
+head(my_random_loci)
+```
+
+## Removing overlaps
+
+Since some of the randomly sampled regions may overlap/intersect with TSSs, I used the GenomicRanges package to remove these overlapping regions:
+
+```{r load_genomic_ranges}
+load_package("GenomicRanges")
+```
+
+Create a GRanges object given an object, my_refseq_loci
+
+```{r my_tss_gr}
+my_tss_gr <- with(
+  my_tss,
+  GRanges(chromosome_name,
+          IRanges(tss_start, tss_end, names = refseq_mrna),
+          strand
+  )
+)
+
+my_tss_gr
+```
+
+Create random GRanges object.
+
+```{r my_random_gr}
+my_random_gr <- with(
+  my_random_loci,
+  GRanges(chr,
+          IRanges(start, end, names = paste(chr, start, end, sep = "_")),
+          strand
+  )
+)
+
+head(my_random_gr)
+```
+
+How many overlap?
+
+```{r count_overlaps}
+table(countOverlaps(my_random_gr, my_tss_gr))
+table(countOverlaps(my_tss_gr, my_tss_gr, minoverlap = 5))
+```
+
+Remove overlapping sites.
+
+```{r random_loci_no_overlap}
+my_random_loci <- my_random_loci[countOverlaps(my_random_gr, my_tss_gr) == 0, ]
+dim(my_random_loci)
+```
+
+## Sequence
+
+Now to fetch the sequences and calculate the dinucleotide frequencies:
+
+```{r get_seq}
+my_random_seq <- getSeq(
+  BSgenome.Hsapiens.UCSC.hg38,
+  names = my_random_loci$chr,
+  start = my_random_loci$start,
+  end = my_random_loci$end,
+  strand = my_random_loci$strand
+)
+
+head(my_random_seq)
+```
+
+Remove entries with N's.
+
+```{r remove_n}
+my_random_seq <- my_random_seq[! grepl("N", my_random_seq)]
+head(my_random_seq)
+```
+
+Obtain TSS sequences.
+
+```{r my_tss_seq}
+my_tss_seq <- getSeq(
+  BSgenome.Hsapiens.UCSC.hg38,
+  names = my_tss$chromosome_name,
+  start = my_tss$tss_start,
+  end = my_tss$tss_end,
+  strand = my_tss$strand
+)
+
+my_tss_seq <- my_tss_seq[! grepl("N", my_tss_seq)]
+head(my_tss_seq)
+```
+
+Calculate the di-nucleotide frequency.
+
+```{r}
+my_random_di <- dinucleotideFrequency(my_random_seq)
+
+head(my_random_di)
+colSums(my_random_di)
+
+my_tss_di <- dinucleotideFrequency(my_tss_seq)
+colSums(my_tss_di)
+```
+
+Plot the two di-nucleotide frequencies.
+
+```{r plot_di}
+my_df <- data.frame(
+  x = colSums(my_tss_di),
+  y = colSums(my_random_di),
+  di = colnames(my_tss_di)
+)
+
+ggplot(my_df, aes(x, y, label = di)) +
+  geom_point() +
+  geom_text(nudge_x = 425) +
+  geom_abline(slope = 1, lty = 3) +
+  theme_bw()
+```
+
+## Random Forests
+
+Use Random Forests to train a predictor using the TSSs and random di-nucleotide frequencies.
+
+```{r load_random_forest}
+load_package('randomForest', source = "cran")
+```
+
+Combine TSS and random data.
+
+```{r create_my_data}
+as.data.frame(my_tss_di) %>%
+  mutate(class = 'tss') -> my_data
+
+as.data.frame(my_random_di) %>%
+  mutate(class = 'random') %>%
+  rbind(my_data) %>%
+  mutate(class = factor(class)) -> my_data
+
+dim(my_data)
+```
+
+Split 80/20.
+
+```{r train_and_test_data}
+set.seed(1984)
+idx <- sample(nrow(my_data), nrow(my_data)*0.8)
+
+train <- my_data[idx, ]
+test <- my_data[-idx, ]
+
+dim(train)
+dim(test)
+```
+
+Train Random Forest.
+
+```{r random_forest}
+r <- randomForest(
+  class ~ .,
+  data = train,
+  importance = TRUE,
+  do.trace=100
+)
+r
+```
+
+Feature importance.
+
+```{r importance}
+rn <- round(importance(r), 2)
+rn[order(rn[,3], decreasing=TRUE),]
+```
+
+As a plot.
+
+```{r importance_plot}
+varImpPlot(r)
+```
+
+Predict.
+
+```{r predict}
+data.predict <- predict(r, test)
+prop.table(table(observed = test$class, predict = data.predict), 1)
+```
+Use `pROC` package to get area under curve.
+
+```{r load_proc, message=FALSE, warning=FALSE}
+load_package("pROC", source = "cran")
+```
+
+Check ROC.
+
+```{r roc}
+roc(r$y, r$votes[, 'random'])
+```
+
+Plot ROC with the `verification` package.
+
+```{r load_verification, message=FALSE, warning=FALSE}
+load_package('verification', source = "cran")
+```
+
+Plot ROC.
+
+```{r plot_roc}
+aucc <- roc.area(as.integer(train$class=='tss'), r$votes[,2])$A
+roc.plot(as.integer(train$class=='tss'), r$votes[,2], main="")
+legend("bottomright", bty="n", sprintf("Area Under the Curve (AUC) = %1.3f", aucc))
+title(main="OOB ROC Curve Random Forest for predicting TSS")
 ```
