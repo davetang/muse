@@ -1,0 +1,121 @@
+---
+title: "Using dplyr to aggregate in R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Investopedia has a good definition of an [aggregate function](https://www.investopedia.com/terms/a/aggregate-function.asp):
+
+>An aggregate function is a mathematical computation involving a range of values that results in just a single value expressing the significance of the accumulated data it is derived from. Aggregate functions are often used to derive descriptive statistics.
+
+In base R, aggregation is achieved using the `aggregate` function, which according to its help page, computes summary statistics of data subsets. I wrote a [post](https://davetang.org/muse/2013/05/22/using-aggregate-and-apply-in-r/) on using the `aggregate` function because the function was not intuitive to me (at the time I wrote the post). In this post, I will use the `ChickWeight` dataset to illustrate aggregation. The `ChickWeight` data frame contains 578 rows and 4 columns from an experiment on the effect of diet on early growth of chicks. Use `?ChickWeight` to find out more about the dataset.
+
+```{r chick_weight_dataset}
+data("ChickWeight")
+str(ChickWeight)
+```
+
+Groups of chicks were fed the same diet and most chicks had 12 measurements.
+
+```{r table_diet_chick}
+table(ChickWeight$Diet, ChickWeight$Chick)
+```
+
+These 12 measurements correspond to different timepoints (days since birth) where their weight was measured.
+
+```{r chick_13}
+ChickWeight[ChickWeight$Chick == 13, ]
+```
+
+Aggregating weight (using mean) as a function of diet can show us whether different diets resulted in different weights.
+
+```{r weight_vs_diet}
+aggregate(weight ~ Diet, data = ChickWeight, mean)
+```
+
+The `weight ~ Diet` expression is a [R formula](https://cran.r-project.org/web/packages/lazyeval/vignettes/lazyeval.html#formulas), which is commonly used to generate [design matrices](https://f1000research.com/articles/9-1444) but can be used as a general expression.
+
+```{r formula}
+class(weight ~ Diet)
+```
+
+The same expression can be used for boxplots.
+
+```{r boxplot}
+boxplot(weight ~ Diet, ChickWeight)
+```
+
+However, using R formula may not be intuitive and the following `dplyr` approach may make more sense, especially to those familiar with the [group by](https://en.wikipedia.org/wiki/Group_by_(SQL)) statement.
+ 
+```{r summarise_weight}
+group_by(ChickWeight, Diet) %>%
+  summarise(weight = mean(weight))
+```
+
+To aggregate with two factors.
+
+```{r agg_time_diet}
+head(aggregate(weight ~ Diet + Time, data = ChickWeight, mean))
+```
+
+Using a `dplyr` approach.
+
+```{r agg_time_diet_dplyr}
+group_by(ChickWeight, Diet, Time) %>%
+  summarise(weight = mean(weight)) %>%
+  head()
+```
+ 
+Aggregating and calculating two summaries.
+
+```{r agg_two_sum}
+aggregate(
+  weight ~ Diet,
+  data = ChickWeight,
+  FUN = function(x) c(mean = mean(x), n = length(x))
+)
+```
+
+Using a `dplyr` approach.
+
+```{r agg_two_sum_dplyr}
+group_by(ChickWeight, Diet) %>%
+  summarise(
+    weight.mean = mean(weight),
+    weight.n = length(weight)
+  )
+```
+
+Aggregating on a data subset, for example only keeping chicks with 12 measurements.
+
+```{r agg_subset}
+chick_table <- table(ChickWeight$Chick)
+my_keep <- as.integer(names(chick_table[chick_table == 12]))
+
+aggregate(
+  weight ~ Diet,
+  data = subset(ChickWeight, Chick %in% my_keep),
+  FUN = function(x) c(mean = mean(x), n = length(x))
+)
+```
+
+Using a `dplyr` approach.
+
+```{r agg_subset_dplyr}
+ChickWeight %>%
+  filter(Chick %in% my_keep) %>%
+  group_by(Diet) %>%
+  summarise(
+    weight.mean = mean(weight),
+    weight.n = length(weight)
+  )
+```
+
+In summary, the `group_by` function from `dplyr` helps with carrying out aggregation functions within factors.
