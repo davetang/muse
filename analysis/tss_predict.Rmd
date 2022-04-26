@@ -4,11 +4,15 @@ date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
     toc: true
+params:
+  span: 2
+  host: "https://asia.ensembl.org"
 ---
 
 ```{r setup, include=FALSE}
 library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
+httr::set_config(httr::config(ssl_verifypeer = FALSE))
 ```
 
 ## Introduction
@@ -45,7 +49,7 @@ load_package('biomaRt')
 Find the human gene set.
 
 ```{r list_datasets}
-ensembl <- useMart('ensembl')
+ensembl <- useMart('ensembl', host = params$host)
 biomaRt::listDatasets(ensembl) %>%
   filter(grepl('human', description, TRUE))
 ```
@@ -53,7 +57,7 @@ biomaRt::listDatasets(ensembl) %>%
 Find RefSeq attributes.
 
 ```{r list_filters}
-ensembl <- useMart('ensembl', dataset = 'hsapiens_gene_ensembl')
+ensembl <- useMart('ensembl', dataset = 'hsapiens_gene_ensembl', host = params$host)
 listAttributes(ensembl) %>%
   filter(grepl('refseq', description, TRUE))
 ```
@@ -119,7 +123,7 @@ dim(my_refseq_loci_uniq)
 
 We will modify `chromosome_name` and `strand` to make it compatible with `BSgenome.Hsapiens.UCSC.hg38`.
 
-```{r}
+```{r add_chr_and_strand}
 my_refseq_loci_uniq %>%
   mutate(strand = ifelse(strand == 1, yes = '+', no = '-')) %>%
   mutate(chromosome_name = sub("^", "chr", chromosome_name)) -> my_refseq_loci_uniq
@@ -132,14 +136,14 @@ head(my_refseq_loci_uniq)
 The TSS is `transcript_start` when the transcript is on the `+` strand and is `transcript_end` on the `-` strand. We want to retrieve sequence upstream and downstream of the TSS, so we will subtract and add coordinates accordingly.
 
 ```{r tss_span}
-my_span <- 2
+my_tss <- list()
 
-my_refseq_loci_uniq %>%
+my_tss$loci <- my_refseq_loci_uniq %>%
   dplyr::select(-c(start_position, end_position)) %>%
-  mutate(tss_start = if_else(strand == "+", transcript_start - my_span, transcript_end - my_span)) %>%
-  mutate(tss_end = if_else(strand == "+", transcript_start + my_span, transcript_end + my_span)) -> my_tss
+  mutate(tss_start = if_else(strand == "+", transcript_start - params$span, transcript_end - params$span)) %>%
+  mutate(tss_end = if_else(strand == "+", transcript_start + params$span, transcript_end + params$span))
 
-head(my_tss)
+head(my_tss$loci)
 ```
 
 ## Random loci
@@ -168,7 +172,7 @@ Sample chromosome based on length of chromosome.
 
 ```{r my_random_loci}
 set.seed(1984)
-n <- nrow(my_tss)
+n <- nrow(my_tss$loci)
 schr <- sample(
   hg38_chr,
   n,
@@ -178,18 +182,20 @@ schr <- sample(
 
 sstrand <- sample(c("+", "-"), n, TRUE)
 sstart <- sapply(schr, function(x){
-  sample(hg38_chr_size[x] - (my_span * 2), 1)
+  sample(hg38_chr_size[x] - (params$span * 2), 1)
 })
-send <- sstart + (my_span*2)
+send <- sstart + (params$span*2)
 
-my_random_loci <- data.frame(
+my_random <- list()
+
+my_random$loci <- data.frame(
   chr = schr,
   start = sstart,
   end = send,
   strand = sstrand
 )
 
-head(my_random_loci)
+head(my_random$loci)
 ```
 
 ## Removing overlaps
@@ -203,108 +209,154 @@ load_package("GenomicRanges")
 Create a GRanges object given an object, my_refseq_loci
 
 ```{r my_tss_gr}
-my_tss_gr <- with(
-  my_tss,
+my_tss$gr <- with(
+  my_tss$loci,
   GRanges(chromosome_name,
           IRanges(tss_start, tss_end, names = refseq_mrna),
           strand
   )
 )
 
-my_tss_gr
+head(my_tss$gr)
 ```
 
 Create random GRanges object.
 
 ```{r my_random_gr}
-my_random_gr <- with(
-  my_random_loci,
+my_random$gr <- with(
+  my_random$loci,
   GRanges(chr,
           IRanges(start, end, names = paste(chr, start, end, sep = "_")),
           strand
   )
 )
 
-head(my_random_gr)
+head(my_random$gr)
 ```
 
-How many overlap?
+Overlap between random regions and TSS's. Note that there are cases where a random region overlaps more than one TSS, which indicates that TSS regions are overlapping.
 
-```{r count_overlaps}
-table(countOverlaps(my_random_gr, my_tss_gr))
-table(countOverlaps(my_tss_gr, my_tss_gr, minoverlap = 5))
+```{r count_overlaps_gr}
+table(countOverlaps(my_random$gr, my_tss$gr))
 ```
 
-Remove overlapping sites.
+Remove overlapping random sites.
 
 ```{r random_loci_no_overlap}
-my_random_loci <- my_random_loci[countOverlaps(my_random_gr, my_tss_gr) == 0, ]
-dim(my_random_loci)
+my_random$loci_no <- my_random$loci[countOverlaps(my_random$gr, my_tss$gr) == 0, ]
+dim(my_random$loci_no)
+```
+
+Check overlapping TSS regions.
+
+```{r count_overlaps_tss}
+table(countOverlaps(my_tss$gr, my_tss$gr, minoverlap = 1))
+```
+
+Create a set of non-overlapping TSS regions (the conditional is `== 1` because we are comparing regions against itself and 1 is the self overlap), where a TSS does not overlap by a single bp.
+
+```{r tss_loci_no_overlap}
+my_tss$loci_no <- my_tss$loci[countOverlaps(my_tss$gr, my_tss$gr, minoverlap = 1) == 1, ]
+dim(my_tss$loci_no)
 ```
 
 ## Sequence
 
 Now to fetch the sequences and calculate the dinucleotide frequencies:
 
-```{r get_seq}
-my_random_seq <- getSeq(
+```{r random_seq}
+my_random$seq <- getSeq(
   BSgenome.Hsapiens.UCSC.hg38,
-  names = my_random_loci$chr,
-  start = my_random_loci$start,
-  end = my_random_loci$end,
-  strand = my_random_loci$strand
+  names = my_random$loci$chr,
+  start = my_random$loci$start,
+  end = my_random$loci$end,
+  strand = my_random$loci$strand
 )
 
-head(my_random_seq)
+head(my_random$seq)
 ```
 
 Remove entries with N's.
 
 ```{r remove_n}
-my_random_seq <- my_random_seq[! grepl("N", my_random_seq)]
-head(my_random_seq)
+my_random$seq <- my_random$seq[! grepl("N", my_random$seq)]
+head(my_random$seq)
 ```
 
 Obtain TSS sequences.
 
-```{r my_tss_seq}
-my_tss_seq <- getSeq(
+```{r tss_seq}
+my_tss$seq <- getSeq(
   BSgenome.Hsapiens.UCSC.hg38,
-  names = my_tss$chromosome_name,
-  start = my_tss$tss_start,
-  end = my_tss$tss_end,
-  strand = my_tss$strand
+  names = my_tss$loci$chromosome_name,
+  start = my_tss$loci$tss_start,
+  end = my_tss$loci$tss_end,
+  strand = my_tss$loci$strand
 )
 
-my_tss_seq <- my_tss_seq[! grepl("N", my_tss_seq)]
-head(my_tss_seq)
+my_tss$seq <- my_tss$seq[! grepl("N", my_tss$seq)]
+head(my_tss$seq)
+```
+
+Obtain TSS sequences non-overlapping.
+
+```{r my_tss_seq_non_overlap}
+my_tss$seq_no <- getSeq(
+  BSgenome.Hsapiens.UCSC.hg38,
+  names = my_tss$loci_no$chromosome_name,
+  start = my_tss$loci_no$tss_start,
+  end = my_tss$loci_no$tss_end,
+  strand = my_tss$loci_no$strand
+)
+
+my_tss$seq_no <- my_tss$seq_no[! grepl("N", my_tss$seq_no)]
+head(my_tss$seq_no)
 ```
 
 Calculate the di-nucleotide frequency.
 
-```{r}
-my_random_di <- dinucleotideFrequency(my_random_seq)
+```{r di_freq}
+my_random$di <- dinucleotideFrequency(my_random$seq)
+colSums(my_random$di)
 
-head(my_random_di)
-colSums(my_random_di)
+my_tss$di <- dinucleotideFrequency(my_tss$seq)
+colSums(my_tss$di)
 
-my_tss_di <- dinucleotideFrequency(my_tss_seq)
-colSums(my_tss_di)
+my_tss$di_no <- dinucleotideFrequency(my_tss$seq_no)
+colSums(my_tss$di_no)
 ```
 
-Plot the two di-nucleotide frequencies.
+Plot di-nucleotide frequencies between TSS and random regions.
 
 ```{r plot_di}
 my_df <- data.frame(
-  x = colSums(my_tss_di),
-  y = colSums(my_random_di),
-  di = colnames(my_tss_di)
+  x = colMeans(my_tss$di),
+  y = colMeans(my_random$di),
+  di = colnames(my_tss$di)
 )
 
 ggplot(my_df, aes(x, y, label = di)) +
   geom_point() +
-  geom_text(nudge_x = 425) +
+  geom_text(nudge_x = 0.005) +
   geom_abline(slope = 1, lty = 3) +
+  labs(x = "TSS", y = "Random") +
+  theme_bw()
+```
+
+Plot di-nucleotide frequencies between overlapping and non-overlapping TSS regions.
+
+```{r plot_di_tss}
+my_df <- data.frame(
+  x = colMeans(my_tss$di),
+  y = colMeans(my_tss$di_no),
+  di = colnames(my_tss$di)
+)
+
+ggplot(my_df, aes(x, y, label = di)) +
+  geom_point() +
+  geom_text(nudge_x = 0.005) +
+  geom_abline(slope = 1, lty = 3) +
+  labs(x = "TSS", y = "TSS no overlap") +
   theme_bw()
 ```
 
@@ -312,17 +364,17 @@ ggplot(my_df, aes(x, y, label = di)) +
 
 Use Random Forests to train a predictor using the TSSs and random di-nucleotide frequencies.
 
-```{r load_random_forest}
+```{r load_random_forest, message=FALSE, warning=FALSE}
 load_package('randomForest', source = "cran")
 ```
 
 Combine TSS and random data.
 
 ```{r create_my_data}
-as.data.frame(my_tss_di) %>%
+as.data.frame(my_tss$di) %>%
   mutate(class = 'tss') -> my_data
 
-as.data.frame(my_random_di) %>%
+as.data.frame(my_random$di) %>%
   mutate(class = 'random') %>%
   rbind(my_data) %>%
   mutate(class = factor(class)) -> my_data
@@ -346,34 +398,37 @@ dim(test)
 Train Random Forest.
 
 ```{r random_forest}
-r <- randomForest(
+my_rf <- randomForest(
   class ~ .,
   data = train,
   importance = TRUE,
-  do.trace=100
+  do.trace = 100,
+  ntree = 200
 )
-r
+
+my_rf
 ```
 
 Feature importance.
 
 ```{r importance}
-rn <- round(importance(r), 2)
+rn <- round(importance(my_rf), 2)
 rn[order(rn[,3], decreasing=TRUE),]
 ```
 
 As a plot.
 
 ```{r importance_plot}
-varImpPlot(r)
+varImpPlot(my_rf)
 ```
 
 Predict.
 
 ```{r predict}
-data.predict <- predict(r, test)
+data.predict <- predict(my_rf, test)
 prop.table(table(observed = test$class, predict = data.predict), 1)
 ```
+
 Use `pROC` package to get area under curve.
 
 ```{r load_proc, message=FALSE, warning=FALSE}
@@ -383,7 +438,7 @@ load_package("pROC", source = "cran")
 Check ROC.
 
 ```{r roc}
-roc(r$y, r$votes[, 'random'])
+roc(my_rf$y, my_rf$votes[, 'random'])
 ```
 
 Plot ROC with the `verification` package.
@@ -395,8 +450,120 @@ load_package('verification', source = "cran")
 Plot ROC.
 
 ```{r plot_roc}
-aucc <- roc.area(as.integer(train$class=='tss'), r$votes[,2])$A
-roc.plot(as.integer(train$class=='tss'), r$votes[,2], main="")
+aucc <- roc.area(as.integer(train$class=='tss'), my_rf$votes[,2])$A
+roc.plot(as.integer(train$class=='tss'), my_rf$votes[,2], main="")
 legend("bottomright", bty="n", sprintf("Area Under the Curve (AUC) = %1.3f", aucc))
 title(main="OOB ROC Curve Random Forest for predicting TSS")
 ```
+
+### Nucleotide frequency across TSS
+
+The `nucleotideFrequencyAt` function will return the single nucleotide frequency at a specific location.
+
+```{r nuc_freq_at}
+nucleotideFrequencyAt(my_tss$seq, 3)
+```
+
+Use `sapply` to calculate at all sites.
+
+There is a higher CT (pyrimidine) ratio one position before the TSS (second column) and a higher AG (purine) ratio at the TSS (third column) forming the classic pyrimidine–purine (PyPu) di-nucleotide at a TSS.
+
+```{r nuc_freq_at_all}
+nuc_freq <- sapply(1:((params$span*2)+1), function(x) nucleotideFrequencyAt(my_tss$seq, x))
+apply(nuc_freq, 2, function(x) x/sum(x))
+```
+
+Calculate di-nucleotide frequencies at all sites.
+
+```{r dinuc_freq}
+dinuc_freq_tss <- lapply(1:(params$span*2), function(x){
+  dinucleotideFrequency(subseq(my_tss$seq, x, x+1))
+})
+
+dinuc_freq_random <- lapply(1:(params$span*2), function(x){
+  dinucleotideFrequency(subseq(my_random$seq, x, x+1))
+})
+
+dinuc_freq_tss_df <- do.call(cbind.data.frame, dinuc_freq_tss)
+dinuc_freq_random_df <- do.call(cbind.data.frame, dinuc_freq_random)
+
+my_colname <- paste0(
+  'X',
+  rep(1:(params$span*2), each = 16),
+  "_",
+  colnames(dinuc_freq_tss_df)[1:16]
+)
+
+colnames(dinuc_freq_tss_df) <- my_colname
+colnames(dinuc_freq_random_df) <- my_colname
+
+head(dinuc_freq_tss_df)
+```
+
+Combine TSS and random data.
+
+```{r create_my_data2}
+dinuc_freq_tss_df %>%
+  mutate(class = 'tss') -> my_data2
+
+dinuc_freq_random_df %>%
+  mutate(class = 'random') %>%
+  rbind(my_data2) %>%
+  mutate(class = factor(class)) -> my_data2
+
+dim(my_data2)
+```
+
+Split 80/20.
+
+```{r train_and_test_data2}
+set.seed(1984)
+idx <- sample(nrow(my_data2), nrow(my_data2)*0.8)
+
+train2 <- my_data2[idx, ]
+test2 <- my_data2[-idx, ]
+
+dim(train2)
+dim(test2)
+```
+
+Train Random Forest.
+
+```{r random_forest2}
+my_rf2 <- randomForest(
+  class ~ .,
+  data = train2,
+  importance = TRUE,
+  do.trace = 100,
+  ntree = 200
+)
+
+my_rf2
+```
+
+Feature importance.
+
+```{r importance2}
+rn2 <- round(importance(my_rf2), 2)
+head(rn2[order(rn2[,3], decreasing=TRUE),])
+```
+
+As a plot.
+
+```{r importance_plot2, fig.height=8, fig.width=5}
+varImpPlot(my_rf2)
+```
+
+Compare prediction results of our first model and our second model.
+
+```{r predict2}
+# results from first model
+data.predict <- predict(my_rf, test)
+prop.table(table(observed = test$class, predict = data.predict), 1)
+
+# results from second model
+data.predict2 <- predict(my_rf2, test2)
+prop.table(table(observed = test2$class, predict = data.predict2), 1)
+```
+
+By including the positional information of the di-nucleotides, we have a better TSS classifier, which makes sense since not all the bases upstream and downstream of the TSS have a nucleotide preference and thus were diluting the signal in our first model where we calculated the overall di-nucleotide frequency.
