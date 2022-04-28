@@ -1,0 +1,225 @@
+---
+title: "Using the R seqinr package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The [seqinr package](https://cran.r-project.org/web/packages/seqinr/index.html) provides many useful functions for working with biological sequences in R. We will use data from [NONCODE](http://noncode.org/download.php) to demonstrate some features of `seqinr`.
+
+```
+wget 'http://www.noncode.org/datadownload/ncrna_NONCODE[v3.0].fasta.tar.gz'
+tar xzf ncrna_NONCODE\[v3.0\].fasta.tar.gz
+mv ncrna_NONCODE\[v3.0\].fasta ncrna_noncode_v3.fa
+cat ncrna_noncode_v3.fa | grep "^>" | wc -l
+411553
+```
+
+Show last couple of entries.
+
+```{bash}
+cat ../data/ncrna_noncode_v3.fa | grep "^>" | tail -3
+```
+
+Install (if missing) and load `seqinr`.
+
+```{r seqinr_package, message=FALSE, warning=FALSE}
+if(!require("seqinr", quietly = TRUE)){
+  install.packages("seqinr")
+}
+library("seqinr")
+```
+
+The `read.fasta` function is used to load a FASTA file and we will use it to load `ncrna_noncode_v3.fa`.
+
+```{r read.fasta}
+ncrna <- read.fasta("data/ncrna_noncode_v3.fa")
+length(ncrna)
+```
+
+The entries are saved in a list.
+
+```{r ncrna_class}
+class(ncrna)
+```
+
+Each list item is named after the first annotation in the FASTA file.
+
+```{r ncrna_names}
+head(names(ncrna))
+```
+
+Check the first entry, which is stored in index 2, as the first entry is a fake FASTA entry that contains some information on the annotations stored in the FASTA file.
+
+```{r entry_2}
+ncrna[[2]]
+```
+
+Count nucleotides.
+
+```{r count_nuc}
+count(ncrna[[2]], 1)
+```
+
+Count di-nucleotides.
+
+```{r count_di_nuc}
+count(ncrna[[2]], 2)
+```
+
+GC percent.
+
+```{r gc_percent}
+GC(ncrna[[2]])
+```
+
+Store entire FASTA headers.
+
+```{r store_header}
+my_header <- getAnnot(ncrna)
+```
+
+Create data frame using FASTA header.
+
+```{r my_df}
+head(my_header[-1])
+
+my_split <- lapply(my_header[-1], function(x){
+  str_split(x, " \\| ", simplify = TRUE)
+})
+
+my_df <- do.call(rbind.data.frame, my_split)
+
+names(my_df) <- as.vector(str_split(my_header[[1]], " \\| ", simplify = TRUE))
+
+my_df %>%
+  rename(nncid = ">nncid") %>%
+  mutate(nncid = sub("^>", "", nncid)) -> my_df
+
+head(my_df)
+```
+
+Organisms with the most ncRNAs.
+
+```{r organism_ncrna}
+my_df %>%
+  group_by(organism) %>%
+  summarise(tally = n()) %>%
+  arrange(desc(tally)) %>%
+  head()
+```
+
+Class with the most ncRNAs.
+
+```{r class_ncrna}
+my_df %>%
+  group_by(class) %>%
+  summarise(tally = n()) %>%
+  arrange(desc(tally)) %>%
+  head()
+```
+
+Find all human piwi-interacting RNAs (piRNAs) and store their `nncid`.
+
+```{r nncid_human_pirna}
+my_df %>%
+  filter(class == "piRNA", organism =="Homo sapiens") %>%
+  pull(nncid) -> nncid_human_pirna
+
+length(nncid_human_pirna)
+```
+
+Create `pirna_human` for storing human piRNAs.
+
+```{r pirna_human}
+pirna_human <- ncrna[nncid_human_pirna]
+getSequence(pirna_human[[1]], as.string = TRUE)
+```
+
+Report number of sequences with N's and remove them.
+
+```{r num_n}
+my_n <- grepl('n', unlist(getSequence(pirna_human, as.string = TRUE)))
+pirna_human <- pirna_human[!my_n]
+table(my_n)
+```
+
+Save `pirna_human` as a FASTA file (not run).
+
+```{r write_fasta, eval=FALSE}
+my_anno <- getAnnot(pirna_human)
+my_anno <- lapply(my_anno, function(x) sub("^>", "", x))
+write.fasta(sequences = pirna_human, names = my_anno, file.out = "human_pirna.fa")
+```
+
+piRNAs typically start with U/T.
+
+```{r first_base}
+prop.table(table(sapply(pirna_human, function(x) x[1])))
+```
+In addition, piRNAs typically have an A at the tenth base and the proportion below is slightly higher than 0.25 if we expect an equal distribution.
+
+```{r tenth_base}
+prop.table(table(sapply(pirna_human, function(x) x[10])))
+```
+
+Length distribution of piRNAs.
+
+```{r length_dist}
+table(getLength(pirna_human))
+```
+
+piRNAs are typically 26-31 nucleotide long, as observed below.
+
+```{r plot_length_dist}
+as.data.frame(table(getLength(pirna_human))) %>%
+  ggplot(., aes(Var1, Freq)) +
+    geom_col() +
+    labs(x = "piRNA length", y = "Frequency") +
+    theme_bw()
+```
+
+10th base proportion for different lengths.
+
+```{r tenth_base_per_length}
+my_len <- 26:32
+my_prop <- sapply(my_len, function(x){
+  wanted <- getLength(pirna_human) == x
+  prop.table(table(sapply(pirna_human[wanted], function(x) x[10])))
+})
+
+as.data.frame(t(my_prop), row.names = my_len)
+```
+
+Frequencies of nucleotides along every position.
+
+```{r freq_nuc_along}
+my_lens <- 26:32
+for (my_len in my_lens){
+  wanted <- getLength(pirna_human) == my_len
+  my_seq <- getSequence(pirna_human[wanted])
+  my_freq <- apply(do.call(rbind, my_seq), 2, function(x) prop.table(table(x)))
+  
+  as.data.frame(my_freq) %>%
+    mutate(nuc = c('A', 'C', 'G', 'T')) %>%
+    select(nuc, everything()) %>%
+    pivot_longer(!nuc, names_to = "Position", values_to = "Frequency") %>%
+    mutate(Position = as.integer(sub("^V", "", Position))) -> my_freq_df
+  
+  ggplot(my_freq_df, aes(Position, Frequency, colour = nuc)) +
+    geom_line() +
+    geom_point() +
+    theme_bw() +
+    ggtitle(paste0("Nucleotide frequencies along ", my_len, " nt human piRNAs")) -> p
+  
+  print(p)
+}
+```
+
+Please refer to the [seqinr manual](https://cran.r-project.org/web/packages/seqinr/seqinr.pdf) for further information.
