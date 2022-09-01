@@ -10,12 +10,12 @@
 
 
 
-<meta name="date" content="2021-06-22" />
+<meta name="date" content="2022-09-01" />
 
-<title>Split single column of annotations into multiple columns</title>
+<title>Split single column of annotations into multiple columns in R</title>
 
-<script src="site_libs/header-attrs-2.8/header-attrs.js"></script>
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -36,7 +36,7 @@
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
-<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/master/img/reproducible.png">
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
 <style type="text/css">
 div.section {
@@ -73,6 +73,7 @@ if (window.hljs) {
 
 
 
+
 <style type = "text/css">
 .main-container {
   max-width: 940px;
@@ -93,6 +94,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -245,7 +249,7 @@ $(document).ready(function () {
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -267,7 +271,7 @@ $(document).ready(function () {
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/davetang/muse">
-    <span class="fas fa-github"></span>
+    <span class="fa fa-github"></span>
      
     Source code
   </a>
@@ -281,15 +285,18 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Split single column of annotations into multiple columns</h1>
-<h4 class="date">2021-06-22</h4>
+<h1 class="title toc-ignore">Split single column of annotations into
+multiple columns in R</h1>
+<h4 class="date">2022-09-01</h4>
 
 </div>
 
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -298,7 +305,9 @@ $(document).ready(function () {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -307,17 +316,27 @@ $(document).ready(function () {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-06-22
+<strong>Last updated:</strong> 2022-09-01
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
 </p>
 <p>
-<strong>Knit directory:</strong> <code>muse/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
 </p>
 <p>
-This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
-  href="https://github.com/jdblischak/workflowr">workflowr</a> (version 1.6.2). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
@@ -326,103 +345,159 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
 </p>
 </div>
 <div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20200712)</code> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
 </p>
 </div>
-<div id="strongSeedstrongcodesetseed20200712code" class="panel-collapse collapse">
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
 <div class="panel-body">
-<p>The command <code>set.seed(20200712)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
 </p>
 </div>
-<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
 </p>
 </div>
 <div id="strongCachestrongnone" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
 </p>
 </div>
 <div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8ae8e21a9a830ad4293cc7ac59dd03763d6945d8targetblank8ae8e21a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/8ae8e21a9a830ad4293cc7ac59dd03763d6945d8" target="_blank">8ae8e21</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec8588b7211da908a96779e6e88c053b112e6ea7etargetblankc8588b7a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/c8588b7211da908a96779e6e88c053b112e6ea7e" target="_blank">c8588b7</a>
+</a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8ae8e21a9a830ad4293cc7ac59dd03763d6945d8targetblank8ae8e21a" class="panel-collapse collapse">
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec8588b7211da908a96779e6e88c053b112e6ea7etargetblankc8588b7a"
+class="panel-collapse collapse">
 <div class="panel-body">
 <p>
-Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/8ae8e21a9a830ad4293cc7ac59dd03763d6945d8" target="_blank">8ae8e21</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/c8588b7211da908a96779e6e88c053b112e6ea7e" target="_blank">c8588b7</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
 </p>
 <p>
-Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
 </p>
 <pre><code>
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    r_packages_4.1.2/
+    Ignored:    r_packages_4.2.0/
+
+Untracked files:
+    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
+    Untracked:  data/ncrna_noncode_v3.fa
 
 Unstaged changes:
-    Modified:   muse.Rproj
+    Modified:   script/run_rstudio.sh
 
 </code></pre>
 <p>
-Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
 </p>
 </div>
 </div>
@@ -433,7 +508,12 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in t
 <div id="versions" class="tab-pane fade">
 
 <p>
-These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/split_column.Rmd</code>) and HTML (<code>docs/split_column.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/split_column.Rmd</code>) and HTML
+(<code>docs/split_column.html</code>) files. If you’ve configured a
+remote Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
 </p>
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
@@ -462,6 +542,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/c8588b7211da908a96779e6e88c053b112e6ea7e/analysis/split_column.Rmd" target="_blank">c8588b7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-09-01
+</td>
+<td>
+Split GTF group column
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/d6644d22c3cb83eda1a8cf0e25dda89805a5dac3/docs/split_column.html" target="_blank">d6644d2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2021-06-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/8ae8e21a9a830ad4293cc7ac59dd03763d6945d8/analysis/split_column.Rmd" target="_blank">8ae8e21</a>
 </td>
 <td>
@@ -481,148 +595,357 @@ Post on splitting a single column of annotations
 </div>
 </div>
 </div>
-<p>Use <a href="https://github.com/davetang/importbio">importbio</a> to load a VCF file (or load any file that has a single column containing multiple annotations that are consistently defined).</p>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Two widely used file formats in bioinformatics, VCF and GTF, have
+single columns that are packed with annotation information. This makes
+them a bit inconvenient to work with in R when using data frames because
+the values need to be unpacked, i.e. split. In addition, this violates
+one of the conditions for tidy data, which is that every cell is a
+single value. In this post, we will use tools from the
+<code>tidyverse</code> to split the values into multiple columns to make
+the data easier to work with in R.</p>
+<p>To get started, install the <code>tidyverse</code> if you haven’t
+already.</p>
+<pre class="r"><code>if(!require(&quot;tidyverse&quot;)){
+  install.packages(&quot;tidyverse&quot;)
+}
+library(tidyverse)</code></pre>
+<p>I have a small package called <a
+href="https://github.com/davetang/importbio">importbio</a> that can be
+used to load a VCF and GTF file. You can install it using the
+<code>remotes</code> package.</p>
+<pre class="r"><code>if(!require(&quot;remotes&quot;)){
+  install.packages(&quot;remotes&quot;)
+}
+
+if(!require(&quot;importbio&quot;)){
+  remotes::install_github(&#39;davetang/importbio&#39;)
+}</code></pre>
+</div>
+<div id="splitting-the-info-column-in-a-vcf-file"
+class="section level2">
+<h2>Splitting the info column in a VCF file</h2>
+<p>We will load a small VCF file using <code>importvcf</code>.</p>
 <pre class="r"><code>library(importbio)
 my_vcf &lt;- importvcf(&quot;https://raw.githubusercontent.com/davetang/learning_vcf_file/master/eg/Pfeiffer.vcf&quot;)
 
-head(my_vcf)</code></pre>
-<pre><code># A tibble: 6 x 10
-  vid      chrom    pos id     ref   alt   qual  filter info               type 
-  &lt;chr&gt;    &lt;fct&gt;  &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;              &lt;chr&gt;
-1 1_86651~ 1     866511 rs607~ C     CCCCT 258.~ PASS   AC=2;AF=1.00;AN=2~ ins  
-2 1_87931~ 1     879317 rs752~ C     T     150.~ PASS   AC=1;AF=0.50;AN=2~ snv  
-3 1_87948~ 1     879482 .      G     C     484.~ PASS   AC=1;AF=0.50;AN=2~ snv  
-4 1_88039~ 1     880390 rs374~ C     A     288.~ PASS   AC=1;AF=0.50;AN=2~ snv  
-5 1_88162~ 1     881627 rs227~ G     A     486.~ PASS   AC=1;AF=0.50;AN=2~ snv  
-6 1_88409~ 1     884091 rs752~ C     G     65.46 PASS   AC=1;AF=0.50;AN=2~ snv  </code></pre>
-<p>We will be functions within the <code>tidyverse</code>.</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>-- Attaching packages --------------------------------------- tidyverse 1.3.1 --</code></pre>
-<pre><code>v ggplot2 3.3.3     v purrr   0.3.4
-v tibble  3.1.1     v dplyr   1.0.6
-v tidyr   1.1.3     v stringr 1.4.0
-v readr   1.4.0     v forcats 0.5.1</code></pre>
-<pre><code>-- Conflicts ------------------------------------------ tidyverse_conflicts() --
-x dplyr::filter() masks stats::filter()
-x dplyr::lag()    masks stats::lag()</code></pre>
-<p>Use <code>separate_rows</code> to create a new row for each annotation. The <code>mutate</code> call is to remove a trailing semicolon, if it exists.</p>
-<pre class="r"><code>library(tidyverse)
 my_vcf %&gt;%
+  select(info) %&gt;%
+  head()</code></pre>
+<pre><code># A tibble: 6 × 1
+  info                                                                          
+  &lt;chr&gt;                                                                         
+1 AC=2;AF=1.00;AN=2;DB;DP=11;FS=0.000;HRun=0;HaplotypeScore=41.3338;MQ0=0;MQ=61…
+2 AC=1;AF=0.50;AN=2;BaseQRankSum=1.455;DB;DP=21;Dels=0.00;FS=1.984;HRun=0;Haplo…
+3 AC=1;AF=0.50;AN=2;BaseQRankSum=1.934;DP=48;Dels=0.00;FS=4.452;HRun=0;Haplotyp…
+4 AC=1;AF=0.50;AN=2;BaseQRankSum=-4.517;DB;DP=29;Dels=0.00;FS=1.485;HRun=0;Hapl…
+5 AC=1;AF=0.50;AN=2;BaseQRankSum=0.199;DB;DP=33;Dels=0.00;FS=0.000;HRun=1;Haplo…
+6 AC=1;AF=0.50;AN=2;BaseQRankSum=-0.259;DB;DP=12;Dels=0.00;FS=0.000;HRun=1;Hapl…</code></pre>
+<p>Note that the <code>info</code> column is packed with all sorts of
+information for each variant. Also note the consistent format of the
+<code>info</code> column: each annotation is separated by a semi-colon
+(<code>;</code>) and annotations are stored as key-value pairs with an
+equal sign in between.</p>
+<p>Firstly, we will use <code>separate_rows</code> to create a new row
+for each annotation by using <code>;</code> as the separator/delimiter;
+note that I have included <code>\\s*</code> after <code>;</code>, which
+is a regex for specifying a single whitespace occurring 0 or more times.
+By including the regex, whitespace after <code>;</code> will be removed,
+which is good because we do not want whitespace in our data. In
+addition, a <code>mutate</code> call is used prior to calling
+<code>separate_rows</code> and it is used to remove a trailing
+semicolon, if it exists.</p>
+<pre class="r"><code>my_vcf %&gt;%
   mutate(info = sub(pattern = &quot;;$&quot;, replacement = &quot;&quot;, x = .data$info)) %&gt;%
   separate_rows(info, sep = &quot;;\\s*&quot;) %&gt;%
   head()</code></pre>
-<pre><code># A tibble: 6 x 10
-  vid             chrom    pos id         ref   alt   qual  filter info    type 
-  &lt;chr&gt;           &lt;fct&gt;  &lt;int&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;
-1 1_866511_C_CCC~ 1     866511 rs60722469 C     CCCCT 258.~ PASS   AC=2    ins  
-2 1_866511_C_CCC~ 1     866511 rs60722469 C     CCCCT 258.~ PASS   AF=1.00 ins  
-3 1_866511_C_CCC~ 1     866511 rs60722469 C     CCCCT 258.~ PASS   AN=2    ins  
-4 1_866511_C_CCC~ 1     866511 rs60722469 C     CCCCT 258.~ PASS   DB      ins  
-5 1_866511_C_CCC~ 1     866511 rs60722469 C     CCCCT 258.~ PASS   DP=11   ins  
-6 1_866511_C_CCC~ 1     866511 rs60722469 C     CCCCT 258.~ PASS   FS=0.0~ ins  </code></pre>
-<p>Use <code>separate</code> to split key-value annotation pair (separated by an equal sign) into two columns. Missing values will have a NA value.</p>
+<pre><code># A tibble: 6 × 10
+  vid              chrom    pos id         ref   alt   qual   filter info  type 
+  &lt;chr&gt;            &lt;fct&gt;  &lt;int&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;
+1 1_866511_C_CCCCT 1     866511 rs60722469 C     CCCCT 258.62 PASS   AC=2  ins  
+2 1_866511_C_CCCCT 1     866511 rs60722469 C     CCCCT 258.62 PASS   AF=1… ins  
+3 1_866511_C_CCCCT 1     866511 rs60722469 C     CCCCT 258.62 PASS   AN=2  ins  
+4 1_866511_C_CCCCT 1     866511 rs60722469 C     CCCCT 258.62 PASS   DB    ins  
+5 1_866511_C_CCCCT 1     866511 rs60722469 C     CCCCT 258.62 PASS   DP=11 ins  
+6 1_866511_C_CCCCT 1     866511 rs60722469 C     CCCCT 258.62 PASS   FS=0… ins  </code></pre>
+<p>The next step is to split the key-value pairs and we will use the
+<code>separate</code> function to separate the pairs into two columns,
+which we will name <code>key</code> and <code>value</code>, using the
+equal sign as the separator/delimiter. Sometimes a key is missing a
+value and in these cases, the value will be <code>NA</code>.</p>
 <pre class="r"><code>my_vcf %&gt;%
   mutate(info = sub(pattern = &quot;;$&quot;, replacement = &quot;&quot;, x = .data$info)) %&gt;%
   separate_rows(info, sep = &quot;;\\s*&quot;) %&gt;%
   separate(info, c(&#39;key&#39;, &#39;value&#39;), sep = &quot;=&quot;) %&gt;%
   head(10)</code></pre>
-<pre><code># A tibble: 10 x 11
-   vid       chrom    pos id      ref   alt   qual   filter key      value type 
-   &lt;chr&gt;     &lt;fct&gt;  &lt;int&gt; &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;
- 1 1_866511~ 1     866511 rs6072~ C     CCCCT 258.62 PASS   AC       2     ins  
- 2 1_866511~ 1     866511 rs6072~ C     CCCCT 258.62 PASS   AF       1.00  ins  
- 3 1_866511~ 1     866511 rs6072~ C     CCCCT 258.62 PASS   AN       2     ins  
- 4 1_866511~ 1     866511 rs6072~ C     CCCCT 258.62 PASS   DB       &lt;NA&gt;  ins  
- 5 1_866511~ 1     866511 rs6072~ C     CCCCT 258.62 PASS   DP       11    ins  
- 6 1_866511~ 1     866511 rs6072~ C     CCCCT 258.62 PASS   FS       0.000 ins  
- 7 1_866511~ 1     866511 rs6072~ C     CCCCT 258.62 PASS   HRun     0     ins  
- 8 1_866511~ 1     866511 rs6072~ C     CCCCT 258.62 PASS   Haploty~ 41.3~ ins  
- 9 1_866511~ 1     866511 rs6072~ C     CCCCT 258.62 PASS   MQ0      0     ins  
-10 1_866511~ 1     866511 rs6072~ C     CCCCT 258.62 PASS   MQ       61.94 ins  </code></pre>
-<p>Finally, use <code>pivot_wider</code> to convert the data back into wide format. In the example below, I show three new columns created from splitting the <code>info</code> column.</p>
+<pre><code># A tibble: 10 × 11
+   vid             chrom    pos id    ref   alt   qual  filter key   value type 
+   &lt;chr&gt;           &lt;fct&gt;  &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+ 1 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   AC    2     ins  
+ 2 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   AF    1.00  ins  
+ 3 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   AN    2     ins  
+ 4 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   DB    &lt;NA&gt;  ins  
+ 5 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   DP    11    ins  
+ 6 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   FS    0.000 ins  
+ 7 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   HRun  0     ins  
+ 8 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   Hapl… 41.3… ins  
+ 9 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   MQ0   0     ins  
+10 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   MQ    61.94 ins  </code></pre>
+<p>The current state of the transformation produces a new row for each
+variant annotation and two columns containing the key and value. If we
+want our data in wide format where each annotation is a column, we can
+use the <code>pivot_wider</code> function.</p>
+<p>In the code below, I have used the first eight columns
+(<code>id_cols = vid:filter</code>) to specify the columns that uniquely
+identifies each variant, i.e. the same variant will have the same values
+in these columns. We specify our column names from the <code>key</code>
+column and the values for these cells will come from the
+<code>value</code> column.</p>
 <pre class="r"><code>my_vcf %&gt;%
   mutate(info = sub(pattern = &quot;;$&quot;, replacement = &quot;&quot;, x = .data$info)) %&gt;%
   separate_rows(info, sep = &quot;;\\s*&quot;) %&gt;%
   separate(info, c(&#39;key&#39;, &#39;value&#39;), sep = &quot;=&quot;) %&gt;%
-  distinct() %&gt;% # remove duplication annotations, if any
-  filter(key == &quot;AC&quot; | key == &quot;DP&quot; | key == &quot;MQ&quot;) %&gt;%
-  pivot_wider(id_cols = vid, names_from = key, values_from = value)</code></pre>
-<pre><code>Warning: Expected 2 pieces. Missing pieces filled with `NA` in 35503 rows [4,
-17, 48, 64, 80, 96, 112, 128, 144, 159, 172, 188, 204, 220, 236, 251, 266, 282,
-298, 314, ...].</code></pre>
-<pre><code># A tibble: 37,708 x 4
-   vid              AC    DP    MQ   
-   &lt;chr&gt;            &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
- 1 1_866511_C_CCCCT 2     11    61.94
- 2 1_879317_C_T     1     21    60.00
- 3 1_879482_G_C     1     48    59.13
- 4 1_880390_C_A     1     29    56.93
- 5 1_881627_G_A     1     33    60.00
- 6 1_884091_C_G     1     12    53.22
- 7 1_884101_A_C     1     12    53.22
- 8 1_892460_G_C     1     152   58.85
- 9 1_897730_C_T     1     21    58.89
-10 1_909238_G_C     1     19    60.00
-# ... with 37,698 more rows</code></pre>
+  distinct() %&gt;% # remove duplicated annotations, if any
+  pivot_wider(id_cols = vid:filter, names_from = key, values_from = value) %&gt;%
+  head(10)</code></pre>
+<pre><code># A tibble: 10 × 28
+   vid       chrom    pos id    ref   alt   qual  filter AC    AF    AN    DB   
+   &lt;chr&gt;     &lt;fct&gt;  &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+ 1 1_866511… 1     866511 rs60… C     CCCCT 258.… PASS   2     1.00  2     &lt;NA&gt; 
+ 2 1_879317… 1     879317 rs75… C     T     150.… PASS   1     0.50  2     &lt;NA&gt; 
+ 3 1_879482… 1     879482 .     G     C     484.… PASS   1     0.50  2     &lt;NA&gt; 
+ 4 1_880390… 1     880390 rs37… C     A     288.… PASS   1     0.50  2     &lt;NA&gt; 
+ 5 1_881627… 1     881627 rs22… G     A     486.… PASS   1     0.50  2     &lt;NA&gt; 
+ 6 1_884091… 1     884091 rs75… C     G     65.46 PASS   1     0.50  2     &lt;NA&gt; 
+ 7 1_884101… 1     884101 rs49… A     C     85.81 PASS   1     0.50  2     &lt;NA&gt; 
+ 8 1_892460… 1     892460 rs41… G     C     1736… PASS   1     0.50  2     &lt;NA&gt; 
+ 9 1_897730… 1     897730 rs75… C     T     225.… PASS   1     0.50  2     &lt;NA&gt; 
+10 1_909238… 1     909238 rs38… G     C     247.… PASS   1     0.50  2     &lt;NA&gt; 
+# … with 16 more variables: DP &lt;chr&gt;, FS &lt;chr&gt;, HRun &lt;chr&gt;,
+#   HaplotypeScore &lt;chr&gt;, MQ0 &lt;chr&gt;, MQ &lt;chr&gt;, QD &lt;chr&gt;, set &lt;chr&gt;,
+#   BaseQRankSum &lt;chr&gt;, Dels &lt;chr&gt;, MQRankSum &lt;chr&gt;, ReadPosRankSum &lt;chr&gt;,
+#   DS &lt;chr&gt;, GENE &lt;chr&gt;, INHERITANCE &lt;chr&gt;, MIM &lt;chr&gt;</code></pre>
+<p>Now each row is a single variant and each column is a variable.</p>
+</div>
+<div id="splitting-the-group-column-in-a-gtf-file"
+class="section level2">
+<h2>Splitting the group column in a GTF file</h2>
+<p>The GTF also has a column packed with key-value pairs.</p>
+<pre class="r"><code>my_gtf &lt;- read_tsv(
+  file = &quot;https://github.com/davetang/importbio/raw/master/inst/extdata/gencode.v38.annotation.sample.gtf.gz&quot;,
+  comment = &quot;#&quot;,
+  show_col_types = FALSE,
+  col_names = c(&#39;chr&#39;, &#39;src&#39;, &#39;feat&#39;, &#39;start&#39;, &#39;end&#39;, &#39;score&#39;, &#39;strand&#39;, &#39;frame&#39;, &#39;group&#39;))
+
+my_gtf %&gt;%
+  select(group) %&gt;%
+  head()</code></pre>
+<pre><code># A tibble: 6 × 1
+  group                                                                         
+  &lt;chr&gt;                                                                         
+1 &quot;gene_id \&quot;ENSG00000223972.5\&quot;; gene_type \&quot;transcribed_unprocessed_pseudogen…
+2 &quot;gene_id \&quot;ENSG00000223972.5\&quot;; transcript_id \&quot;ENST00000456328.2\&quot;; gene_typ…
+3 &quot;gene_id \&quot;ENSG00000223972.5\&quot;; transcript_id \&quot;ENST00000456328.2\&quot;; gene_typ…
+4 &quot;gene_id \&quot;ENSG00000223972.5\&quot;; transcript_id \&quot;ENST00000456328.2\&quot;; gene_typ…
+5 &quot;gene_id \&quot;ENSG00000223972.5\&quot;; transcript_id \&quot;ENST00000456328.2\&quot;; gene_typ…
+6 &quot;gene_id \&quot;ENSG00000223972.5\&quot;; transcript_id \&quot;ENST00000450305.2\&quot;; gene_typ…</code></pre>
+<p>We can use the same strategy (but with some additional formatting
+steps) to split the column up.</p>
+<pre class="r"><code>my_gtf %&gt;%
+  mutate(group = sub(pattern = &quot;;$&quot;, replacement = &quot;&quot;, x = .data$group)) %&gt;%
+  mutate(group = gsub(pattern = &#39;&quot;&#39;, replacement = &quot;&quot;, x = .data$group)) %&gt;%
+  separate_rows(group, sep = &quot;;\\s*&quot;) %&gt;%
+  separate(group, c(&#39;key&#39;, &#39;value&#39;), sep = &quot;\\s&quot;) %&gt;%
+  distinct() %&gt;% # remove duplicated annotations, if any
+  pivot_wider(id_cols = chr:frame, names_from = key, values_from = value) -&gt; my_gtf_split</code></pre>
+<pre><code>Warning: Values from `value` are not uniquely identified; output will contain list-cols.
+* Use `values_fn = list` to suppress this warning.
+* Use `values_fn = {summary_fun}` to summarise duplicates.
+* Use the following dplyr code to identify duplicates.
+  {data} %&gt;%
+    dplyr::group_by(chr, src, feat, start, end, score, strand, frame, key) %&gt;%
+    dplyr::summarise(n = dplyr::n(), .groups = &quot;drop&quot;) %&gt;%
+    dplyr::filter(n &gt; 1L)</code></pre>
+<pre class="r"><code>head(my_gtf_split, 10)</code></pre>
+<pre><code># A tibble: 10 × 24
+   chr   src    feat      start   end score strand frame gene_id gene_…¹ gene_…²
+   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;list&gt;  &lt;list&gt;  &lt;list&gt; 
+ 1 chr1  HAVANA gene      11869 14409 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 2 chr1  HAVANA transcri… 11869 14409 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 3 chr1  HAVANA exon      11869 12227 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 4 chr1  HAVANA exon      12613 12721 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 5 chr1  HAVANA exon      13221 14409 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 6 chr1  HAVANA transcri… 12010 13670 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 7 chr1  HAVANA exon      12010 12057 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 8 chr1  HAVANA exon      12179 12227 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 9 chr1  HAVANA exon      12613 12697 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+10 chr1  HAVANA exon      12975 13052 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+# … with 13 more variables: level &lt;list&gt;, hgnc_id &lt;list&gt;, havana_gene &lt;list&gt;,
+#   transcript_id &lt;list&gt;, transcript_type &lt;list&gt;, transcript_name &lt;list&gt;,
+#   transcript_support_level &lt;list&gt;, tag &lt;list&gt;, havana_transcript &lt;list&gt;,
+#   exon_number &lt;list&gt;, exon_id &lt;list&gt;, ont &lt;list&gt;, protein_id &lt;list&gt;, and
+#   abbreviated variable names ¹​gene_type, ²​gene_name</code></pre>
+<p>However, the split columns are lists because there were some cases
+where there were multiple annotations with the same key and a list is
+needed to store multiple values (which was what the warning above was
+about). For example the <code>tag</code> key was repeated more than once
+with different unique values for some annotations.</p>
+<pre class="r"><code>map_lgl(my_gtf_split$tag, function(x) length(x) &gt; 1)</code></pre>
+<pre><code> [1] FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+[13] FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+[25]  TRUE FALSE  TRUE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+[37] FALSE  TRUE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE FALSE FALSE FALSE FALSE
+[49]  TRUE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE  TRUE  TRUE
+[61]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE  TRUE  TRUE
+[73]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE FALSE
+[85] FALSE FALSE FALSE FALSE FALSE FALSE FALSE  TRUE  TRUE  TRUE</code></pre>
+<p>We can check which columns have multiple values.</p>
+<pre class="r"><code>check_column &lt;- function(x){
+  any(map_lgl(x, function(y) length(y) &gt; 1))
+}
+
+my_check &lt;- map_lgl(my_gtf_split, check_column)
+my_check[my_check]</code></pre>
+<pre><code>    transcript_id   transcript_name               tag havana_transcript 
+             TRUE              TRUE              TRUE              TRUE 
+      exon_number               ont 
+             TRUE              TRUE </code></pre>
+<p>Therefore despite only a subset of the columns containing multiple
+values, all the pivoted columns were turned into lists. However we can
+turn the columns back into characters, which makes sense for the
+<code>gene_id</code> column which only contained single unique character
+values in the first place.</p>
+<pre class="r"><code>my_gtf_split %&gt;%
+  mutate(gene_id = as.character(gene_id)) %&gt;%
+  head()</code></pre>
+<pre><code># A tibble: 6 × 24
+  chr   src   feat  start   end score strand frame gene_id gene_…¹ gene_…² level
+  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;list&gt;  &lt;list&gt;  &lt;lis&gt;
+1 chr1  HAVA… gene  11869 14409 .     +      .     ENSG00… &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
+2 chr1  HAVA… tran… 11869 14409 .     +      .     ENSG00… &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
+3 chr1  HAVA… exon  11869 12227 .     +      .     ENSG00… &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
+4 chr1  HAVA… exon  12613 12721 .     +      .     ENSG00… &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
+5 chr1  HAVA… exon  13221 14409 .     +      .     ENSG00… &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
+6 chr1  HAVA… tran… 12010 13670 .     +      .     ENSG00… &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
+# … with 12 more variables: hgnc_id &lt;list&gt;, havana_gene &lt;list&gt;,
+#   transcript_id &lt;list&gt;, transcript_type &lt;list&gt;, transcript_name &lt;list&gt;,
+#   transcript_support_level &lt;list&gt;, tag &lt;list&gt;, havana_transcript &lt;list&gt;,
+#   exon_number &lt;list&gt;, exon_id &lt;list&gt;, ont &lt;list&gt;, protein_id &lt;list&gt;, and
+#   abbreviated variable names ¹​gene_type, ²​gene_name</code></pre>
+<p>But we can also do this to the <code>tag</code> column (even if it
+needed a list to store the multiple values) and entries with multiple
+values get turned into R (character) code!</p>
+<pre class="r"><code>my_gtf_split %&gt;%
+  mutate(tag = as.character(tag)) %&gt;%
+  select(tag) %&gt;%
+  head()</code></pre>
+<pre><code># A tibble: 6 × 1
+  tag                                  
+  &lt;chr&gt;                                
+1 &quot;NULL&quot;                               
+2 &quot;basic&quot;                              
+3 &quot;basic&quot;                              
+4 &quot;basic&quot;                              
+5 &quot;basic&quot;                              
+6 &quot;c(\&quot;basic\&quot;, \&quot;Ensembl_canonical\&quot;)&quot;</code></pre>
+<p>If you don’t mind having R (character) code in your data, you can
+perform this transformation across all pivoted columns.</p>
+<pre class="r"><code>my_gtf_split %&gt;%
+  mutate(across(gene_id:protein_id, as.character))</code></pre>
+<pre><code># A tibble: 94 × 24
+   chr   src    feat      start   end score strand frame gene_id gene_…¹ gene_…²
+   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 1 chr1  HAVANA gene      11869 14409 .     +      .     ENSG00… transc… DDX11L1
+ 2 chr1  HAVANA transcri… 11869 14409 .     +      .     ENSG00… transc… DDX11L1
+ 3 chr1  HAVANA exon      11869 12227 .     +      .     ENSG00… transc… DDX11L1
+ 4 chr1  HAVANA exon      12613 12721 .     +      .     ENSG00… transc… DDX11L1
+ 5 chr1  HAVANA exon      13221 14409 .     +      .     ENSG00… transc… DDX11L1
+ 6 chr1  HAVANA transcri… 12010 13670 .     +      .     ENSG00… transc… DDX11L1
+ 7 chr1  HAVANA exon      12010 12057 .     +      .     ENSG00… transc… DDX11L1
+ 8 chr1  HAVANA exon      12179 12227 .     +      .     ENSG00… transc… DDX11L1
+ 9 chr1  HAVANA exon      12613 12697 .     +      .     ENSG00… transc… DDX11L1
+10 chr1  HAVANA exon      12975 13052 .     +      .     ENSG00… transc… DDX11L1
+# … with 84 more rows, 13 more variables: level &lt;chr&gt;, hgnc_id &lt;chr&gt;,
+#   havana_gene &lt;chr&gt;, transcript_id &lt;chr&gt;, transcript_type &lt;chr&gt;,
+#   transcript_name &lt;chr&gt;, transcript_support_level &lt;chr&gt;, tag &lt;chr&gt;,
+#   havana_transcript &lt;chr&gt;, exon_number &lt;chr&gt;, exon_id &lt;chr&gt;, ont &lt;chr&gt;,
+#   protein_id &lt;chr&gt;, and abbreviated variable names ¹​gene_type, ²​gene_name</code></pre>
+</div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
+<p>The following steps can be used to split a column containing
+key-value pairs into separate columns:</p>
 <ol style="list-style-type: decimal">
-<li>Use <code>separate_rows</code> to split a single column with multiple annotations into rows</li>
-<li>Use <code>separate</code> to split a key-value annotation pair into two columns</li>
-<li>Use <code>pivot_wider</code> to convert the table in long format back to wide format</li>
+<li>Use <code>separate_rows</code> to split a single column into
+rows</li>
+<li>Use <code>separate</code> to split a key-value pair into two
+columns</li>
+<li>Use <code>pivot_wider</code> to convert the long format table back
+to wide format</li>
 </ol>
+<p>However, sometimes data is packed into a single column because it
+cannot be nicely formatted in the first place.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
-<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
 </button>
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.0.5 (2021-03-31)
-Platform: x86_64-w64-mingw32/x64 (64-bit)
-Running under: Windows 10 x64 (build 19043)
+<pre><code>R version 4.2.0 (2022-04-22)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.04.4 LTS
 
 Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3
 
 locale:
-[1] LC_COLLATE=English_Australia.1252  LC_CTYPE=English_Australia.1252   
-[3] LC_MONETARY=English_Australia.1252 LC_NUMERIC=C                      
-[5] LC_TIME=English_Australia.1252    
-system code page: 932
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] forcats_0.5.1        stringr_1.4.0        dplyr_1.0.6         
- [4] purrr_0.3.4          readr_1.4.0          tidyr_1.1.3         
- [7] tibble_3.1.1         ggplot2_3.3.3        tidyverse_1.3.1     
-[10] importbio_0.0.0.9000 workflowr_1.6.2     
+ [1] importbio_0.0.0.9000 remotes_2.4.2        forcats_0.5.1       
+ [4] stringr_1.4.0        dplyr_1.0.9          purrr_0.3.4         
+ [7] readr_2.1.2          tidyr_1.2.0          tibble_3.1.8        
+[10] ggplot2_3.3.6        tidyverse_1.3.1      workflowr_1.7.0     
 
 loaded via a namespace (and not attached):
- [1] tidyselect_1.1.1  xfun_0.22         haven_2.4.1       colorspace_2.0-1 
- [5] vctrs_0.3.8       generics_0.1.0    htmltools_0.5.1.1 yaml_2.2.1       
- [9] utf8_1.2.1        rlang_0.4.11      later_1.2.0       pillar_1.6.1     
-[13] withr_2.4.2       glue_1.4.2        DBI_1.1.1         dbplyr_2.1.1     
-[17] readxl_1.3.1      modelr_0.1.8      lifecycle_1.0.0   cellranger_1.1.0 
-[21] munsell_0.5.0     gtable_0.3.0      rvest_1.0.0       evaluate_0.14    
-[25] knitr_1.33        httpuv_1.6.1      ps_1.6.0          curl_4.3.1       
-[29] fansi_0.4.2       broom_0.7.6       Rcpp_1.0.6        promises_1.2.0.1 
-[33] backports_1.2.1   scales_1.1.1      jsonlite_1.7.2    fs_1.5.0         
-[37] hms_1.1.0         digest_0.6.27     stringi_1.5.3     rprojroot_2.0.2  
-[41] grid_4.0.5        cli_2.5.0         tools_4.0.5       magrittr_2.0.1   
-[45] crayon_1.4.1      whisker_0.4       pkgconfig_2.0.3   ellipsis_0.3.2   
-[49] xml2_1.3.2        reprex_2.0.0      lubridate_1.7.10  httr_1.4.2       
-[53] assertthat_0.2.1  rmarkdown_2.8     rstudioapi_0.13   R6_2.5.0         
-[57] git2r_0.28.0      compiler_4.0.5   </code></pre>
+ [1] Rcpp_1.0.8.3     lubridate_1.8.0  getPass_0.2-2    ps_1.7.0        
+ [5] assertthat_0.2.1 rprojroot_2.0.3  digest_0.6.29    utf8_1.2.2      
+ [9] R6_2.5.1         cellranger_1.1.0 backports_1.4.1  reprex_2.0.1    
+[13] evaluate_0.15    httr_1.4.3       pillar_1.8.1     rlang_1.0.4     
+[17] curl_4.3.2       readxl_1.4.0     rstudioapi_0.13  whisker_0.4     
+[21] callr_3.7.0      jquerylib_0.1.4  rmarkdown_2.14   bit_4.0.4       
+[25] munsell_0.5.0    broom_0.8.0      compiler_4.2.0   httpuv_1.6.5    
+[29] modelr_0.1.8     xfun_0.31        pkgconfig_2.0.3  htmltools_0.5.2 
+[33] tidyselect_1.1.2 fansi_1.0.3      crayon_1.5.1     tzdb_0.3.0      
+[37] dbplyr_2.1.1     withr_2.5.0      later_1.3.0      grid_4.2.0      
+[41] jsonlite_1.8.0   gtable_0.3.0     lifecycle_1.0.1  DBI_1.1.2       
+[45] git2r_0.30.1     magrittr_2.0.3   scales_1.2.0     vroom_1.5.7     
+[49] cli_3.3.0        stringi_1.7.6    fs_1.5.2         promises_1.2.0.1
+[53] xml2_1.3.3       bslib_0.3.1      ellipsis_0.3.2   generics_0.1.3  
+[57] vctrs_0.4.1      tools_4.2.0      bit64_4.0.5      glue_1.6.2      
+[61] hms_1.1.2        parallel_4.2.0   processx_3.5.3   fastmap_1.1.0   
+[65] yaml_2.3.5       colorspace_2.0-3 rvest_1.0.2      knitr_1.39      
+[69] haven_2.5.0      sass_0.4.1      </code></pre>
 </div>
 </div>
 
 
 <!-- Adjust MathJax settings so that all math formulae are shown using
 TeX fonts only; see
-http://docs.mathjax.org/en/latest/configuration.html.  This will make
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
 the presentation more consistent at the cost of the webpage sometimes
 taking slightly longer to load. Note that this only works because the
 footer is added to webpages before the MathJax javascript. -->
