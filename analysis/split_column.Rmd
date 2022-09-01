@@ -1,5 +1,5 @@
 ---
-title: "Split single column of annotations into multiple columns"
+title: "Split single column of annotations into multiple columns in R"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
@@ -10,32 +10,56 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Use [importbio](https://github.com/davetang/importbio) to load a VCF file (or load any file that has a single column containing multiple annotations that are consistently defined).
+## Introduction
+
+Two widely used file formats in bioinformatics, VCF and GTF, have single columns that are packed with annotation information. This makes them a bit inconvenient to work with in R when using data frames because the values need to be unpacked, i.e. split. In addition, this violates one of the conditions for tidy data, which is that every cell is a single value. In this post, we will use tools from the `tidyverse` to split the values into multiple columns to make the data easier to work with in R.
+
+To get started, install the `tidyverse` if you haven't already.
+
+```{r install_tidyverse, message=FALSE, warning=FALSE}
+if(!require("tidyverse")){
+  install.packages("tidyverse")
+}
+library(tidyverse)
+```
+
+I have a small package called [importbio](https://github.com/davetang/importbio) that can be used to load a VCF and GTF file. You can install it using the `remotes` package.
+
+```{r install_packages, message=FALSE, warning=FALSE}
+if(!require("remotes")){
+  install.packages("remotes")
+}
+
+if(!require("importbio")){
+  remotes::install_github('davetang/importbio')
+}
+```
+
+## Splitting the info column in a VCF file
+
+We will load a small VCF file using `importvcf`.
 
 ```{r importvcf}
 library(importbio)
 my_vcf <- importvcf("https://raw.githubusercontent.com/davetang/learning_vcf_file/master/eg/Pfeiffer.vcf")
 
-head(my_vcf)
+my_vcf %>%
+  select(info) %>%
+  head()
 ```
 
-We will be functions within the `tidyverse`.
+Note that the `info` column is packed with all sorts of information for each variant. Also note the consistent format of the `info` column: each annotation is separated by a semi-colon (`;`) and annotations are stored as key-value pairs with an equal sign in between.
 
-```{r tidyverse}
-library(tidyverse)
-```
-
-Use `separate_rows` to create a new row for each annotation. The `mutate` call is to remove a trailing semicolon, if it exists.
+Firstly, we will use `separate_rows` to create a new row for each annotation by using `;` as the separator/delimiter; note that I have included `\\s*` after `;`, which is a regex for specifying a single whitespace occurring 0 or more times. By including the regex, whitespace after `;` will be removed, which is good because we do not want whitespace in our data. In addition, a `mutate` call is used prior to calling `separate_rows` and it is used to remove a trailing semicolon, if it exists.
 
 ```{r separate_rows}
-library(tidyverse)
 my_vcf %>%
   mutate(info = sub(pattern = ";$", replacement = "", x = .data$info)) %>%
   separate_rows(info, sep = ";\\s*") %>%
   head()
 ```
 
-Use `separate` to split key-value annotation pair (separated by an equal sign) into two columns. Missing values will have a NA value.
+The next step is to split the key-value pairs and we will use the `separate` function to separate the pairs into two columns, which we will name `key` and `value`, using the equal sign as the separator/delimiter. Sometimes a key is missing a value and in these cases, the value will be `NA`.
 
 ```{r separate, warning=FALSE, message=FALSE}
 my_vcf %>%
@@ -45,20 +69,99 @@ my_vcf %>%
   head(10)
 ```
 
-Finally, use `pivot_wider` to convert the data back into wide format. In the example below, I show three new columns created from splitting the `info` column.
+The current state of the transformation produces a new row for each variant annotation and two columns containing the key and value. If we want our data in wide format where each annotation is a column, we can use the `pivot_wider` function.
 
-```{r pivot_wider}
+In the code below, I have used the first eight columns (`id_cols = vid:filter`) to specify the columns that uniquely identifies each variant, i.e. the same variant will have the same values in these columns. We specify our column names from the `key` column and the values for these cells will come from the `value` column.
+
+```{r pivot_wider, warning=FALSE, message=FALSE}
 my_vcf %>%
   mutate(info = sub(pattern = ";$", replacement = "", x = .data$info)) %>%
   separate_rows(info, sep = ";\\s*") %>%
   separate(info, c('key', 'value'), sep = "=") %>%
-  distinct() %>% # remove duplication annotations, if any
-  filter(key == "AC" | key == "DP" | key == "MQ") %>%
-  pivot_wider(id_cols = vid, names_from = key, values_from = value)
+  distinct() %>% # remove duplicated annotations, if any
+  pivot_wider(id_cols = vid:filter, names_from = key, values_from = value) %>%
+  head(10)
+```
+
+Now each row is a single variant and each column is a variable.
+
+## Splitting the group column in a GTF file
+
+The GTF also has a column packed with key-value pairs.
+
+```{r my_gtf}
+my_gtf <- read_tsv(
+  file = "https://github.com/davetang/importbio/raw/master/inst/extdata/gencode.v38.annotation.sample.gtf.gz",
+  comment = "#",
+  show_col_types = FALSE,
+  col_names = c('chr', 'src', 'feat', 'start', 'end', 'score', 'strand', 'frame', 'group'))
+
+my_gtf %>%
+  select(group) %>%
+  head()
+```
+
+We can use the same strategy (but with some additional formatting steps) to split the column up.
+
+```{r gtf_example}
+my_gtf %>%
+  mutate(group = sub(pattern = ";$", replacement = "", x = .data$group)) %>%
+  mutate(group = gsub(pattern = '"', replacement = "", x = .data$group)) %>%
+  separate_rows(group, sep = ";\\s*") %>%
+  separate(group, c('key', 'value'), sep = "\\s") %>%
+  distinct() %>% # remove duplicated annotations, if any
+  pivot_wider(id_cols = chr:frame, names_from = key, values_from = value) -> my_gtf_split
+
+head(my_gtf_split, 10)
+```
+
+However, the split columns are lists because there were some cases where there were multiple annotations with the same key and a list is needed to store multiple values (which was what the warning above was about). For example the `tag` key was repeated more than once with different unique values for some annotations.
+
+```{r gtf_tag}
+map_lgl(my_gtf_split$tag, function(x) length(x) > 1)
+```
+
+We can check which columns have multiple values.
+
+```{r check_column}
+check_column <- function(x){
+  any(map_lgl(x, function(y) length(y) > 1))
+}
+
+my_check <- map_lgl(my_gtf_split, check_column)
+my_check[my_check]
+```
+
+Therefore despite only a subset of the columns containing multiple values, all the pivoted columns were turned into lists. However we can turn the columns back into characters, which makes sense for the `gene_id` column which only contained single unique character values in the first place.
+
+```{r gene_id_as_chr}
+my_gtf_split %>%
+  mutate(gene_id = as.character(gene_id)) %>%
+  head()
+```
+
+But we can also do this to the `tag` column (even if it needed a list to store the multiple values) and entries with multiple values get turned into R (character) code!
+
+```{r tag_as_chr}
+my_gtf_split %>%
+  mutate(tag = as.character(tag)) %>%
+  select(tag) %>%
+  head()
+```
+
+If you don't mind having R (character) code in your data, you can perform this transformation across all pivoted columns.
+
+```{r mutate_across}
+my_gtf_split %>%
+  mutate(across(gene_id:protein_id, as.character))
 ```
 
 ## Summary
 
-1. Use `separate_rows` to split a single column with multiple annotations into rows
-2. Use `separate` to split a key-value annotation pair into two columns
-3. Use `pivot_wider` to convert the table in long format back to wide format
+The following steps can be used to split a column containing key-value pairs into separate columns:
+
+1. Use `separate_rows` to split a single column into rows
+2. Use `separate` to split a key-value pair into two columns
+3. Use `pivot_wider` to convert the long format table back to wide format
+
+However, sometimes data is packed into a single column because it cannot be nicely formatted in the first place.
