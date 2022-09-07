@@ -13,7 +13,7 @@
 
 <title>Home</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -72,6 +72,7 @@ if (window.hljs) {
 
 
 
+
 <style type = "text/css">
 .main-container {
   max-width: 940px;
@@ -92,6 +93,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -244,7 +248,7 @@ $(document).ready(function () {
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -287,7 +291,9 @@ $(document).ready(function () {
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -296,7 +302,9 @@ $(document).ready(function () {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -305,17 +313,27 @@ $(document).ready(function () {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2022-04-28
+<strong>Last updated:</strong> 2022-09-07
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
 </p>
 <p>
-<strong>Knit directory:</strong> <code>muse/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
 </p>
 <p>
-This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
-  href="https://github.com/workflowr/workflowr">workflowr</a> (version 1.7.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
@@ -324,37 +342,61 @@ This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysi
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9b739a1064d159ea0b0dd6d1a140857d3177dd74targetblank9b739a1a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/9b739a1064d159ea0b0dd6d1a140857d3177dd74" target="_blank">9b739a1</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0a02109b1a5cb7ed5b347f33865e6dace4407971targetblank0a02109a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/0a02109b1a5cb7ed5b347f33865e6dace4407971" target="_blank">0a02109</a>
+</a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9b739a1064d159ea0b0dd6d1a140857d3177dd74targetblank9b739a1a" class="panel-collapse collapse">
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0a02109b1a5cb7ed5b347f33865e6dace4407971targetblank0a02109a"
+class="panel-collapse collapse">
 <div class="panel-body">
 <p>
-Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/9b739a1064d159ea0b0dd6d1a140857d3177dd74" target="_blank">9b739a1</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/0a02109b1a5cb7ed5b347f33865e6dace4407971" target="_blank">0a02109</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
 </p>
 <p>
-Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
 </p>
 <pre><code>
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
     Ignored:    r_packages_4.1.2/
+    Ignored:    r_packages_4.2.0/
 
 Untracked files:
     Untracked:  analysis/cell_ranger.Rmd
@@ -363,7 +405,9 @@ Untracked files:
 
 </code></pre>
 <p>
-Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
 </p>
 </div>
 </div>
@@ -374,7 +418,11 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in t
 <div id="versions" class="tab-pane fade">
 
 <p>
-These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/index.Rmd</code>) and HTML (<code>docs/index.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/index.Rmd</code>) and HTML
+(<code>docs/index.html</code>) files. If you’ve configured a remote Git
+repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
+in the table below to view the files as they were in that past version.
 </p>
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
@@ -398,6 +446,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/0a02109b1a5cb7ed5b347f33865e6dace4407971/analysis/index.Rmd" target="_blank">0a02109</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-09-07
+</td>
+<td>
+Backticks in R
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/b814eb157bc5fda2affabe514c6c5df78bd14a2b/docs/index.html" target="_blank">b814eb1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-04-28
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -752,7 +834,8 @@ davetang
 2020-11-10
 </td>
 <td>
-wflow_publish(files = c("analysis/index.Rmd", "analysis/google_trends.Rmd",
+wflow_publish(files = c("analysis/index.Rmd",
+"analysis/google_trends.Rmd",
 </td>
 </tr>
 <tr>
@@ -847,21 +930,48 @@ Start workflowr project.
 </div>
 </div>
 </div>
-<p>I refer to <a href="https://davetang.org/muse/">my blog</a> often to look up notes and code I have written. I will recreate my blog posts here, to make it easier to reuse and also maintain my code. Some posts only exist here and not on my blog, so there is no <code>original</code> hyperlink back to my blog.</p>
+<p>I refer to <a href="https://davetang.org/muse/">my blog</a> often to
+look up notes and code I have written. I will recreate my blog posts
+here, to make it easier to reuse and also maintain my code. Some posts
+only exist here and not on my blog, so there is no <code>original</code>
+hyperlink back to my blog.</p>
 <div id="blog-posts" class="section level3">
 <h3>Blog posts</h3>
 <ul>
-<li>Making a heatmap in R with the pheatmap package - <a href="https://davetang.org/muse/2018/05/15/making-a-heatmap-in-r-with-the-pheatmap-package/">original</a> / <a href="pheatmap.html">updated</a></li>
-<li>Markov chain - <a href="https://davetang.org/muse/2014/01/23/markov-chain/">original</a> / <a href="markov_chain.html">updated</a></li>
-<li>Visualising Google Trends results with R - <a href="https://davetang.org/muse/2018/12/31/visualising-google-trends-results-with-r/">original</a> / <a href="google_trends.html">updated</a></li>
-<li>Complex UpSet plots - original / <a href="complex_upset.html">updated</a></li>
-<li>Read GTF file into R - <a href="https://davetang.org/muse/2017/08/04/read-gtf-file-r/">original</a> / <a href="read_gtf.html">updated</a></li>
-<li>Gene Ontology Enrichment Analysis - <a href="https://davetang.org/muse/2010/11/10/gene-ontology-enrichment-analysis/">original</a> / <a href="go_enrichment.html">updated</a></li>
-<li>Split single column of annotations into multiple columns - original / <a href="split_column.html">updated</a></li>
-<li>Distance Matrix Computation - <a href="https://davetang.org/muse/2013/08/15/distance-matrix-computation/">original</a> / <a href="distance.html">updated</a></li>
-<li>Sequence composition and random forests - <a href="https://davetang.org/muse/2013/09/14/sequence-composition-random-forests/">original</a> / <a href="tss_predict.html">updated</a></li>
-<li>Using dplyr to aggregate in R - <a href="https://davetang.org/muse/2016/10/13/using-dplyr-aggregate-r/">original</a> / <a href="dplyr_agg.html">updated</a></li>
-<li>Using the R <code>seqinr</code> package - <a href="https://davetang.org/muse/2013/05/09/using-the-r-seqinr-package/">original</a> / <a href="seqinr.html">updated</a></li>
+<li>Making a heatmap in R with the pheatmap package - <a
+href="https://davetang.org/muse/2018/05/15/making-a-heatmap-in-r-with-the-pheatmap-package/">original</a>
+/ <a href="pheatmap.html">updated</a></li>
+<li>Markov chain - <a
+href="https://davetang.org/muse/2014/01/23/markov-chain/">original</a> /
+<a href="markov_chain.html">updated</a></li>
+<li>Visualising Google Trends results with R - <a
+href="https://davetang.org/muse/2018/12/31/visualising-google-trends-results-with-r/">original</a>
+/ <a href="google_trends.html">updated</a></li>
+<li>Complex UpSet plots - original / <a
+href="complex_upset.html">updated</a></li>
+<li>Read GTF file into R - <a
+href="https://davetang.org/muse/2017/08/04/read-gtf-file-r/">original</a>
+/ <a href="read_gtf.html">updated</a></li>
+<li>Gene Ontology Enrichment Analysis - <a
+href="https://davetang.org/muse/2010/11/10/gene-ontology-enrichment-analysis/">original</a>
+/ <a href="go_enrichment.html">updated</a></li>
+<li>Split single column of annotations into multiple columns - original
+/ <a href="split_column.html">updated</a></li>
+<li>Distance Matrix Computation - <a
+href="https://davetang.org/muse/2013/08/15/distance-matrix-computation/">original</a>
+/ <a href="distance.html">updated</a></li>
+<li>Sequence composition and random forests - <a
+href="https://davetang.org/muse/2013/09/14/sequence-composition-random-forests/">original</a>
+/ <a href="tss_predict.html">updated</a></li>
+<li>Using dplyr to aggregate in R - <a
+href="https://davetang.org/muse/2016/10/13/using-dplyr-aggregate-r/">original</a>
+/ <a href="dplyr_agg.html">updated</a></li>
+<li>Using the R <code>seqinr</code> package - <a
+href="https://davetang.org/muse/2013/05/09/using-the-r-seqinr-package/">original</a>
+/ <a href="seqinr.html">updated</a></li>
+<li>Backticks in R - <a
+href="https://davetang.org/muse/2022/09/07/backticks-in-r/">original</a>
+/ <a href="r_backticks.html">updated</a></li>
 </ul>
 </div>
 
