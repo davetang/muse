@@ -1,0 +1,72 @@
+---
+title: "Backticks in R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The only times I used backticks in R was when a file was imported into R and the column names had spaces (as a side note, please don't use spaces in your column or file names but use an underscore, i.e. `_`). For example, you can access `col a` by using backticks.
+
+```{r my_df}
+my_df <- data.frame(
+  "col a" = 1:5,
+  "col b" = letters[1:5],
+  check.names = FALSE)
+
+my_df$`col a`
+```
+
+However, I have seen backticks used in combination with symbols, especially with the square bracket. The following code let's you subset (fourth item) each list item.
+
+```{r my_list}
+my_list <- list(
+  l = letters[1:5],
+  u = LETTERS[1:5]
+)
+
+lapply(my_list, `[`, 4)
+```
+
+It turns out that the use of backticks in the examples above are consistent, despite two very different applications: the backtick lets you refer to functions or variables that have otherwise reserved or illegal names. The first example with `my_df` shows the use of backticks to refer to an illegal column name and the second example with `my_list` shows the use of backticks to refer to a reserved function name. The square bracket is a function!
+
+You can look up the help pages on the `[` function, by typing `?"["` and the manual will indicate that `[` is used to extract or replace parts of vectors, matrices, or arrays. In R a function is invoked using parentheses, so to use `[` like a typical function call, we can perform the following to get the first five heights in the dataset:
+
+```{r women_weight}
+`[`(women, 1:5, 1)
+```
+
+The code above is actually the same as how you would usually subset a data frame, and is probably the syntax that most people are familiar with.
+
+```{r women_weight_subset}
+women[1:5, 1]
+```
+
+But it turns out you do not have to use backticks and single- or double-quotes works the same. Despite this, I have seen backticks used more often, which could be due to the fact that in Bash (and Perl!) backticks are used to indicate that the text between the backticks should be executed as a command.
+
+```{r women_weight_quotes}
+'['(women, 1:5, 1)
+"["(women, 1:5, 1)
+```
+
+It also turns out that `(` is a function as well, which was what I surmised in [my previous post](https://davetang.org/muse/2022/09/05/wrapping-r-vectors-with-parentheses/). I can run the first example of my previous post with backticks.
+
+```{r v_log}
+`(`(v_log <- c(TRUE, FALSE, FALSE, TRUE))
+```
+
+In closing, I'll end with the following quote, which I found while researching this post, that helped me understand backticks in R.
+
+>"To understand computations in R, two slogans are helpful:
+>
+> * Everything that exists is an object.
+> * Everything that happens is a function call."
+>
+> --John Chambers
