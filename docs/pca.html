@@ -10,8 +10,9 @@
 
 
 
+<meta name="date" content="2022-10-20" />
 
-<title>Home</title>
+<title>Step by step Principal Components Analysis in R</title>
 
 <script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -284,7 +285,9 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">Home</h1>
+<h1 class="title toc-ignore">Step by step Principal Components Analysis
+in R</h1>
+<h4 class="date">2022-10-20</h4>
 
 </div>
 
@@ -317,7 +320,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 </p>
 <p>
 <strong>Checks:</strong> <span
-class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
 <span class="glyphicon glyphicon-exclamation-sign text-danger"
 aria-hidden="true"></span> 0
 </p>
@@ -354,6 +357,90 @@ class="panel-collapse collapse">
 <p>Great! Since the R Markdown file has been committed to the Git
 repository, you know the exact version of the code that produced these
 results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
 </div>
 </div>
 </div>
@@ -419,8 +506,8 @@ have uncommitted changes.
 
 <p>
 These are the previous versions of the repository in which changes were
-made to the R Markdown (<code>analysis/index.Rmd</code>) and HTML
-(<code>docs/index.html</code>) files. If you’ve configured a remote Git
+made to the R Markdown (<code>analysis/pca.Rmd</code>) and HTML
+(<code>docs/pca.html</code>) files. If you’ve configured a remote Git
 repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
 in the table below to view the files as they were in that past version.
 </p>
@@ -451,7 +538,7 @@ Message
 Rmd
 </td>
 <td>
-<a href="https://github.com/davetang/muse/blob/f9bfceccccaf63309090a1db41fc96ba9c8121a5/analysis/index.Rmd" target="_blank">f9bfcec</a>
+<a href="https://github.com/davetang/muse/blob/f9bfceccccaf63309090a1db41fc96ba9c8121a5/analysis/pca.Rmd" target="_blank">f9bfcec</a>
 </td>
 <td>
 Dave Tang
@@ -463,500 +550,6 @@ Dave Tang
 PCA
 </td>
 </tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/81070826e2d1ca549a90afc50b3d5ad48970240c/docs/index.html" target="_blank">8107082</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2022-09-07
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/0a02109b1a5cb7ed5b347f33865e6dace4407971/analysis/index.Rmd" target="_blank">0a02109</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2022-09-07
-</td>
-<td>
-Backticks in R
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/b814eb157bc5fda2affabe514c6c5df78bd14a2b/docs/index.html" target="_blank">b814eb1</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2022-04-28
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/9b739a1064d159ea0b0dd6d1a140857d3177dd74/analysis/index.Rmd" target="_blank">9b739a1</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2022-04-28
-</td>
-<td>
-Using the seqinr package
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/b743be887f50eb86bba1d334de4fd583f40afe5b/docs/index.html" target="_blank">b743be8</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2022-04-26
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/9ae1c279d41e5f0b5998df6eb4c7e13a6b764134/analysis/index.Rmd" target="_blank">9ae1c27</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2022-04-26
-</td>
-<td>
-Aggregation with dplyr
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/1229a4947449ba1d9073f72101e1952640e3a137/docs/index.html" target="_blank">1229a49</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2022-04-22
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/8e4bd290cf02ddf3d0542d2333f17f21d4ce20b4/analysis/index.Rmd" target="_blank">8e4bd29</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2022-04-22
-</td>
-<td>
-Fix bullet point
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/fd41c759545ae9429df95eaf79a7ddca9447d5c9/docs/index.html" target="_blank">fd41c75</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2022-04-22
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/e372c815ee309a4b014e441268a2ec5416f8ced8/analysis/index.Rmd" target="_blank">e372c81</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2022-04-22
-</td>
-<td>
-TSS
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/d334dbdada984c6154ca542f528a02c3b13fbb6f/docs/index.html" target="_blank">d334dbd</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2022-04-14
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/a9f5e22bfb4c585d025e62dc52299fdb8491277d/analysis/index.Rmd" target="_blank">a9f5e22</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2022-04-14
-</td>
-<td>
-Distance metrics
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/d6644d22c3cb83eda1a8cf0e25dda89805a5dac3/docs/index.html" target="_blank">d6644d2</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2021-06-22
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/8ae8e21a9a830ad4293cc7ac59dd03763d6945d8/analysis/index.Rmd" target="_blank">8ae8e21</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2021-06-22
-</td>
-<td>
-Post on splitting a single column of annotations
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/1cd1577dd916311354eeb438daf50370bfe4e855/docs/index.html" target="_blank">1cd1577</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2021-01-27
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/687a6cafb1b8cb6b6e9e56578c5682c8ac2a2943/analysis/index.Rmd" target="_blank">687a6ca</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2021-01-27
-</td>
-<td>
-Gene Ontology Enrichment Analysis
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/6ef7a6274c3c38b0c4299c1ddef4769838f2df75/docs/index.html" target="_blank">6ef7a62</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2020-12-01
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/acb173357057c528ee677e301fd5cc52cf2b8827/analysis/index.Rmd" target="_blank">acb1733</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2020-12-01
-</td>
-<td>
-Read GTF files into R
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/e8c866153a4b360f1283e2699480de6d229a1a17/docs/index.html" target="_blank">e8c8661</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2020-11-15
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/ab3533f99cde9993692e8c35c0e4c3cfc3d5e844/analysis/index.Rmd" target="_blank">ab3533f</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2020-11-15
-</td>
-<td>
-Fix link
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/5dc50c66ba44576ff4460fd61d97a4bdce7b3ce7/docs/index.html" target="_blank">5dc50c6</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2020-11-15
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/9639627fa09bf40bb9e1c103998f7833f75e0069/analysis/index.Rmd" target="_blank">9639627</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2020-11-15
-</td>
-<td>
-Complex UpSet plots
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/2db13eac0170d39c4755bc242a91d74eacafd7e4/docs/index.html" target="_blank">2db13ea</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2020-11-10
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/268312f66a3d7960297f256354fbb97b75b0fb9b/analysis/index.Rmd" target="_blank">268312f</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2020-11-10
-</td>
-<td>
-wflow_publish(files = c("analysis/index.Rmd",
-"analysis/google_trends.Rmd",
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/03f05e8e8fdf43b5d5527ab3eadd2cb57f8242d1/docs/index.html" target="_blank">03f05e8</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2020-10-18
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/f79342a50f998ed7b3e360274a80d838719429a9/analysis/index.Rmd" target="_blank">f79342a</a>
-</td>
-<td>
-davetang
-</td>
-<td>
-2020-10-18
-</td>
-<td>
-Markov chain post
-</td>
-</tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/davetang/muse/586b91fa71a61d77d70f93f26838e44498c814c6/docs/index.html" target="_blank">586b91f</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/b1d6eddead638344d5faa47e040feb81ff9811f9/analysis/index.Rmd" target="_blank">b1d6edd</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-<td>
-pheatmap
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/davetang/muse/blob/b3f3dc1b9a564ff029cf0c1a5435e9fe89aee07e/analysis/index.Rmd" target="_blank">b3f3dc1</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2020-07-12
-</td>
-<td>
-Start workflowr project.
-</td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -964,52 +557,230 @@ Start workflowr project.
 </div>
 </div>
 </div>
-<p>I refer to <a href="https://davetang.org/muse/">my blog</a> often to
-look up notes and code I have written. I will recreate my blog posts
-here, to make it easier to reuse and also maintain my code. Some posts
-only exist here and not on my blog, so there is no <code>original</code>
-hyperlink back to my blog.</p>
-<div id="blog-posts" class="section level3">
-<h3>Blog posts</h3>
+<p>I have always wondered what goes on behind the scenes of a Principal
+Components Analysis (PCA). I found this extremely useful <a
+href="https://davetang.org/file/principal_components.pdf">tutorial</a>
+(that I have hosted on my server for the sake of prosperity), which
+explains the key concepts behind the PCA and also shows the step by step
+calculations. Here, I use R to perform each step of a PCA as per the
+tutorial.</p>
+<pre class="r"><code>pca_data &lt;- data.frame(
+  x = c(2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2, 1, 1.5, 1.1),
+  y = c(2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9)
+)
+ 
+plot(
+  pca_data,
+  pch = &#39;+&#39;,
+  main = &quot;Original PCA data&quot;
+)</code></pre>
+<p><img src="figure/pca.Rmd/pca_data-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Next, we need to work out the mean of each dimension and subtract it
+from each value from the respective dimensions. This is known as <a
+href="https://en.wikipedia.org/wiki/Feature_scaling#Standardization">standardisation</a>,
+where the dimensions now have a mean of zero.</p>
+<pre class="r"><code>pca_data_scaled &lt;- apply(pca_data, 2, function(x) x - mean(x))
+
+plot(
+  pca_data_scaled,
+  pch = &#39;+&#39;,
+  main = &quot;Scaled PCA data&quot;
+)</code></pre>
+<p><img src="figure/pca.Rmd/pca_data_scaled-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The next step is to calculate the covariance matrix. Covariance
+measures how dimensions vary with respect to each other and the
+covariance matrix contains all covariance measures between all
+dimensions.</p>
+<pre class="r"><code>m &lt;- cov(pca_data_scaled)
+m</code></pre>
+<pre><code>          x         y
+x 0.6165556 0.6154444
+y 0.6154444 0.7165556</code></pre>
+<p>Next we need to find the eigenvector and eigenvalues of the
+covariance matrix. An eigenvector is a direction and an eigenvalue is a
+number that indicates how much variance is in the data in that
+direction. Note that the eigenvalues calculated here are the same as the
+tutorial (but in a different order). However, the first eigenvector
+calculated are negative in the tutorial.</p>
+<pre class="r"><code>e &lt;- eigen(m)
+e</code></pre>
+<pre><code>eigen() decomposition
+$values
+[1] 1.2840277 0.0490834
+
+$vectors
+          [,1]       [,2]
+[1,] 0.6778734 -0.7351787
+[2,] 0.7351787  0.6778734</code></pre>
+<p>The largest eigenvalue is the first principal component and the
+second largest is the second principal component; we multiply the
+standardised values to the eigenvectors to obtain the principal
+components.</p>
+<pre class="r"><code>my_pca &lt;- as.matrix(pca_data_scaled) %*% e$vectors
+ 
+plot(
+  my_pca,
+  pch = &#39;+&#39;,
+  xlab = &quot;PC1&quot;,
+  ylab = &quot;PC2&quot;,
+  main = &quot;PCA (manual) plot&quot;
+)</code></pre>
+<p><img src="figure/pca.Rmd/pcs-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Now to perform PCA using the prcomp() function.</p>
+<pre class="r"><code>pca &lt;- prcomp(pca_data)
+summary(pca)</code></pre>
+<pre><code>Importance of components:
+                          PC1     PC2
+Standard deviation     1.1331 0.22155
+Proportion of Variance 0.9632 0.03682
+Cumulative Proportion  0.9632 1.00000</code></pre>
+<pre class="r"><code>plot(
+  pca$x,
+  pch = 16,
+  col = 1,
+  xlab = &quot;PC1&quot;,
+  ylab = &quot;PC2&quot;,
+  main = &quot;PCA (prcomp) plot&quot;
+)
+
+points(
+  my_pca,
+  pch = 16,
+  col = 2
+)</code></pre>
+<p><img src="figure/pca.Rmd/prcomp-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This <a
+href="https://stackoverflow.com/questions/17998228/sign-of-eigenvectors-change-depending-on-specification-of-the-symmetric-argument">post
+on Stack Overflow</a> suggests that setting the <code>symmetric</code>
+argument is the reason for the difference in the eigenvector signs and
+the bottom line is that this does not matter anyway.</p>
+<pre class="r"><code>eigen(m)</code></pre>
+<pre><code>eigen() decomposition
+$values
+[1] 1.2840277 0.0490834
+
+$vectors
+          [,1]       [,2]
+[1,] 0.6778734 -0.7351787
+[2,] 0.7351787  0.6778734</code></pre>
+<pre class="r"><code>pca</code></pre>
+<pre><code>Standard deviations (1, .., p=2):
+[1] 1.1331495 0.2215477
+
+Rotation (n x k) = (2 x 2):
+         PC1        PC2
+x -0.6778734  0.7351787
+y -0.7351787 -0.6778734</code></pre>
+<p>But I still can’t replicate the sign from <code>prcomp</code>.</p>
+<pre class="r"><code>eigen(m, symmetric = TRUE)</code></pre>
+<pre><code>eigen() decomposition
+$values
+[1] 1.2840277 0.0490834
+
+$vectors
+          [,1]       [,2]
+[1,] 0.6778734 -0.7351787
+[2,] 0.7351787  0.6778734</code></pre>
+<pre class="r"><code>eigen(m, symmetric = FALSE)</code></pre>
+<pre><code>eigen() decomposition
+$values
+[1] 1.2840277 0.0490834
+
+$vectors
+           [,1]       [,2]
+[1,] -0.6778734 -0.7351787
+[2,] -0.7351787  0.6778734</code></pre>
+<pre class="r"><code>pca</code></pre>
+<pre><code>Standard deviations (1, .., p=2):
+[1] 1.1331495 0.2215477
+
+Rotation (n x k) = (2 x 2):
+         PC1        PC2
+x -0.6778734  0.7351787
+y -0.7351787 -0.6778734</code></pre>
+<p>However, the eigenvectors calculated in the tutorial can be
+replicated with <code>symmetric = FALSE</code> (but with the larger
+eigenvalue displayed last).</p>
+<pre class="r"><code>tut_eigen &lt;- matrix(c(-0.735178656, -0.677873399, 0.677873399, -0.735178656), nrow = 2, byrow = TRUE)
+eigen(m, symmetric = FALSE)</code></pre>
+<pre><code>eigen() decomposition
+$values
+[1] 1.2840277 0.0490834
+
+$vectors
+           [,1]       [,2]
+[1,] -0.6778734 -0.7351787
+[2,] -0.7351787  0.6778734</code></pre>
+<pre class="r"><code>tut_eigen</code></pre>
+<pre><code>           [,1]       [,2]
+[1,] -0.7351787 -0.6778734
+[2,]  0.6778734 -0.7351787</code></pre>
+<p>The help page of <code>eigen</code> states that if symmetric is TRUE,
+the matrix is assumed to be symmetric (or Hermitian if complex) and only
+its lower triangle (diagonal included) is used. Since the covariance
+matrix is symmetric, we should really use
+<code>symmetric = TRUE</code>.</p>
+<pre class="r"><code>isSymmetric(m)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<div id="further-reading" class="section level2">
+<h2>Further reading</h2>
 <ul>
-<li>Making a heatmap in R with the pheatmap package - <a
-href="https://davetang.org/muse/2018/05/15/making-a-heatmap-in-r-with-the-pheatmap-package/">original</a>
-/ <a href="pheatmap.html">updated</a></li>
-<li>Markov chain - <a
-href="https://davetang.org/muse/2014/01/23/markov-chain/">original</a> /
-<a href="markov_chain.html">updated</a></li>
-<li>Visualising Google Trends results with R - <a
-href="https://davetang.org/muse/2018/12/31/visualising-google-trends-results-with-r/">original</a>
-/ <a href="google_trends.html">updated</a></li>
-<li>Complex UpSet plots - original / <a
-href="complex_upset.html">updated</a></li>
-<li>Read GTF file into R - <a
-href="https://davetang.org/muse/2017/08/04/read-gtf-file-r/">original</a>
-/ <a href="read_gtf.html">updated</a></li>
-<li>Gene Ontology Enrichment Analysis - <a
-href="https://davetang.org/muse/2010/11/10/gene-ontology-enrichment-analysis/">original</a>
-/ <a href="go_enrichment.html">updated</a></li>
-<li>Split single column of annotations into multiple columns - original
-/ <a href="split_column.html">updated</a></li>
-<li>Distance Matrix Computation - <a
-href="https://davetang.org/muse/2013/08/15/distance-matrix-computation/">original</a>
-/ <a href="distance.html">updated</a></li>
-<li>Sequence composition and random forests - <a
-href="https://davetang.org/muse/2013/09/14/sequence-composition-random-forests/">original</a>
-/ <a href="tss_predict.html">updated</a></li>
-<li>Using dplyr to aggregate in R - <a
-href="https://davetang.org/muse/2016/10/13/using-dplyr-aggregate-r/">original</a>
-/ <a href="dplyr_agg.html">updated</a></li>
-<li>Using the R <code>seqinr</code> package - <a
-href="https://davetang.org/muse/2013/05/09/using-the-r-seqinr-package/">original</a>
-/ <a href="seqinr.html">updated</a></li>
-<li>Backticks in R - <a
-href="https://davetang.org/muse/2022/09/07/backticks-in-r/">original</a>
-/ <a href="r_backticks.html">updated</a></li>
-<li>Step by step Principal Component Analysis using R <a
-href="https://davetang.org/muse/2012/02/01/step-by-step-principal-components-analysis-using-r/">original</a>
-/ <a href="pca.html">updated</a></li>
+<li><a
+href="https://stats.stackexchange.com/questions/2691/making-sense-of-principal-component-analysis-eigenvectors-eigenvalues/2700#2700"
+class="uri">https://stats.stackexchange.com/questions/2691/making-sense-of-principal-component-analysis-eigenvectors-eigenvalues/2700#2700</a></li>
 </ul>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.2.0 (2022-04-22)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] forcats_0.5.1   stringr_1.4.0   dplyr_1.0.9     purrr_0.3.4    
+ [5] readr_2.1.2     tidyr_1.2.0     tibble_3.1.8    ggplot2_3.3.6  
+ [9] tidyverse_1.3.1 workflowr_1.7.0
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.8.3     lubridate_1.8.0  getPass_0.2-2    ps_1.7.0        
+ [5] assertthat_0.2.1 rprojroot_2.0.3  digest_0.6.29    utf8_1.2.2      
+ [9] R6_2.5.1         cellranger_1.1.0 backports_1.4.1  reprex_2.0.1    
+[13] evaluate_0.15    highr_0.9        httr_1.4.3       pillar_1.8.1    
+[17] rlang_1.0.4      readxl_1.4.0     rstudioapi_0.13  whisker_0.4     
+[21] callr_3.7.0      jquerylib_0.1.4  rmarkdown_2.14   munsell_0.5.0   
+[25] broom_0.8.0      compiler_4.2.0   httpuv_1.6.5     modelr_0.1.8    
+[29] xfun_0.31        pkgconfig_2.0.3  htmltools_0.5.2  tidyselect_1.1.2
+[33] fansi_1.0.3      crayon_1.5.1     tzdb_0.3.0       dbplyr_2.1.1    
+[37] withr_2.5.0      later_1.3.0      grid_4.2.0       jsonlite_1.8.0  
+[41] gtable_0.3.0     lifecycle_1.0.1  DBI_1.1.2        git2r_0.30.1    
+[45] magrittr_2.0.3   scales_1.2.0     cli_3.3.0        stringi_1.7.6   
+[49] fs_1.5.2         promises_1.2.0.1 xml2_1.3.3       bslib_0.3.1     
+[53] ellipsis_0.3.2   generics_0.1.3   vctrs_0.4.1      tools_4.2.0     
+[57] glue_1.6.2       hms_1.1.2        processx_3.5.3   fastmap_1.1.0   
+[61] yaml_2.3.5       colorspace_2.0-3 rvest_1.0.2      knitr_1.39      
+[65] haven_2.5.0      sass_0.4.1      </code></pre>
+</div>
 </div>
 
 
