@@ -1,0 +1,125 @@
+---
+title: "Step by step Principal Components Analysis in R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I have always wondered what goes on behind the scenes of a Principal Components Analysis (PCA). I found this extremely useful [tutorial](https://davetang.org/file/principal_components.pdf) (that I have hosted on my server for the sake of prosperity), which explains the key concepts behind the PCA and also shows the step by step calculations. Here, I use R to perform each step of a PCA as per the tutorial.
+
+```{r pca_data}
+pca_data <- data.frame(
+  x = c(2.5, 0.5, 2.2, 1.9, 3.1, 2.3, 2, 1, 1.5, 1.1),
+  y = c(2.4, 0.7, 2.9, 2.2, 3.0, 2.7, 1.6, 1.1, 1.6, 0.9)
+)
+ 
+plot(
+  pca_data,
+  pch = '+',
+  main = "Original PCA data"
+)
+```
+
+Next, we need to work out the mean of each dimension and subtract it from each value from the respective dimensions. This is known as [standardisation](https://en.wikipedia.org/wiki/Feature_scaling#Standardization), where the dimensions now have a mean of zero.
+
+```{r pca_data_scaled}
+pca_data_scaled <- apply(pca_data, 2, function(x) x - mean(x))
+
+plot(
+  pca_data_scaled,
+  pch = '+',
+  main = "Scaled PCA data"
+)
+```
+
+The next step is to calculate the covariance matrix. Covariance measures how dimensions vary with respect to each other and the covariance matrix contains all covariance measures between all dimensions.
+
+```{r cov}
+m <- cov(pca_data_scaled)
+m
+```
+
+Next we need to find the eigenvector and eigenvalues of the covariance matrix. An eigenvector is a direction and an eigenvalue is a number that indicates how much variance is in the data in that direction. Note that the eigenvalues calculated here are the same as the tutorial (but in a different order). However, the first eigenvector calculated are negative in the tutorial.
+
+```{r eigen}
+e <- eigen(m)
+e
+```
+
+The largest eigenvalue is the first principal component and the second largest is the second principal component; we multiply the standardised values to the eigenvectors to obtain the principal components.
+
+```{r pcs}
+my_pca <- as.matrix(pca_data_scaled) %*% e$vectors
+ 
+plot(
+  my_pca,
+  pch = '+',
+  xlab = "PC1",
+  ylab = "PC2",
+  main = "PCA (manual) plot"
+)
+```
+
+Now to perform PCA using the prcomp() function.
+
+```{r prcomp}
+pca <- prcomp(pca_data)
+summary(pca)
+ 
+plot(
+  pca$x,
+  pch = 16,
+  col = 1,
+  xlab = "PC1",
+  ylab = "PC2",
+  main = "PCA (prcomp) plot"
+)
+
+points(
+  my_pca,
+  pch = 16,
+  col = 2
+)
+```
+
+This [post on Stack Overflow](https://stackoverflow.com/questions/17998228/sign-of-eigenvectors-change-depending-on-specification-of-the-symmetric-argument) suggests that setting the `symmetric` argument is the reason for the difference in the eigenvector signs and the bottom line is that this does not matter anyway.
+
+```{r compare_eigen}
+eigen(m)
+
+pca
+```
+
+But I still can't replicate the sign from `prcomp`.
+
+```{r symmetric_check}
+eigen(m, symmetric = TRUE)
+eigen(m, symmetric = FALSE)
+pca
+```
+
+However, the eigenvectors calculated in the tutorial can be replicated with `symmetric = FALSE` (but with the larger eigenvalue displayed last).
+
+```{r tut_eigen}
+tut_eigen <- matrix(c(-0.735178656, -0.677873399, 0.677873399, -0.735178656), nrow = 2, byrow = TRUE)
+eigen(m, symmetric = FALSE)
+tut_eigen
+```
+
+The help page of `eigen` states that if symmetric is TRUE, the matrix is assumed to be symmetric (or Hermitian if complex) and only its lower triangle (diagonal included) is used. Since the covariance matrix is symmetric, we should really use `symmetric = TRUE`.
+
+```{r check_symmetry}
+isSymmetric(m)
+```
+
+## Further reading
+
+* https://stats.stackexchange.com/questions/2691/making-sense-of-principal-component-analysis-eigenvectors-eigenvalues/2700#2700
