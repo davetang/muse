@@ -30,6 +30,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -232,6 +235,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -239,6 +305,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -443,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec15c249c0db268be30187b0fd673fcd443b95468targetblankc15c249a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4e8398adc7de0461edf4f3b4ba7f3595386b463atargetblank4e8398aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/c15c249c0db268be30187b0fd673fcd443b95468" target="_blank">c15c249</a>
+<a href="https://github.com/davetang/muse/tree/4e8398adc7de0461edf4f3b4ba7f3595386b463a" target="_blank">4e8398a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec15c249c0db268be30187b0fd673fcd443b95468targetblankc15c249a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4e8398adc7de0461edf4f3b4ba7f3595386b463atargetblank4e8398aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/c15c249c0db268be30187b0fd673fcd443b95468" target="_blank">c15c249</a>.
+<a href="https://github.com/davetang/muse/tree/4e8398adc7de0461edf4f3b4ba7f3595386b463a" target="_blank">4e8398a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -530,6 +606,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/4e8398adc7de0461edf4f3b4ba7f3595386b463a/analysis/adj_list.Rmd" target="_blank">4e8398a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-11-04
+</td>
+<td>
+Include TOC
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/bb49878e19cf4b42b30a678be79c409f65db9c6c/docs/adj_list.html" target="_blank">bb49878</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-11-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -607,29 +717,9 @@ functions for Bioconductor.</p>
   install.packages(&quot;BiocManager&quot;)
 
 if (!require(&quot;Biobase&quot;, quietly = TRUE))
-  BiocManager::install(&quot;Biobase&quot;)</code></pre>
-<pre><code>
-Attaching package: &#39;BiocGenerics&#39;</code></pre>
-<pre><code>The following objects are masked from &#39;package:dplyr&#39;:
+  BiocManager::install(&quot;Biobase&quot;)
 
-    combine, intersect, setdiff, union</code></pre>
-<pre><code>The following objects are masked from &#39;package:stats&#39;:
-
-    IQR, mad, sd, var, xtabs</code></pre>
-<pre><code>The following objects are masked from &#39;package:base&#39;:
-
-    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
-    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
-    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
-    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
-    Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
-    table, tapply, union, unique, unsplit, which.max, which.min</code></pre>
-<pre><code>Welcome to Bioconductor
-
-    Vignettes contain introductory material; view with
-    &#39;browseVignettes()&#39;. To cite Bioconductor, see
-    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
-<pre class="r"><code>library(Biobase)</code></pre>
+library(Biobase)</code></pre>
 <p>A description of the data is provided with
 <code>?geneData</code>:</p>
 <blockquote>
@@ -707,31 +797,8 @@ head(my_adj_list)</code></pre>
 <h2>Getting started with igraph</h2>
 <p>The <code>igraph</code> package is very useful for working with and
 visualising graph data.</p>
-<pre class="r"><code>library(igraph)</code></pre>
-<pre><code>
-Attaching package: &#39;igraph&#39;</code></pre>
-<pre><code>The following objects are masked from &#39;package:BiocGenerics&#39;:
-
-    normalize, path, union</code></pre>
-<pre><code>The following objects are masked from &#39;package:dplyr&#39;:
-
-    as_data_frame, groups, union</code></pre>
-<pre><code>The following objects are masked from &#39;package:purrr&#39;:
-
-    compose, simplify</code></pre>
-<pre><code>The following object is masked from &#39;package:tidyr&#39;:
-
-    crossing</code></pre>
-<pre><code>The following object is masked from &#39;package:tibble&#39;:
-
-    as_data_frame</code></pre>
-<pre><code>The following objects are masked from &#39;package:stats&#39;:
-
-    decompose, spectrum</code></pre>
-<pre><code>The following object is masked from &#39;package:base&#39;:
-
-    union</code></pre>
-<pre class="r"><code>net &lt;- graph_from_data_frame(my_adj_list, directed = FALSE)
+<pre class="r"><code>library(igraph)
+net &lt;- graph_from_data_frame(my_adj_list, directed = FALSE)
 E(net)$weight &lt;- my_adj_list$cor
 plot(net, layout = layout_components(net), edge.width = E(net)$weight, vertex.shape=&quot;none&quot;)</code></pre>
 <p><img src="figure/adj_list.Rmd/simple_graph-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -927,7 +994,7 @@ Dave Tang
 <h2>igraph functions</h2>
 <p>Get the edges of a graph.</p>
 <pre class="r"><code>E(net_high_cor)</code></pre>
-<pre><code>+ 89/89 edges from 44ec768 (vertex names):
+<pre><code>+ 89/89 edges from 747a245 (vertex names):
  [1] A--E A--F A--G A--I A--J A--K A--L A--M A--O A--P A--U A--V A--W A--Y B--E
 [16] B--I B--K B--P B--W B--Y D--M D--Q D--S D--X E--F E--I E--K E--L E--M E--P
 [31] E--T E--W E--X E--Y F--K F--M F--P F--W F--Y G--U G--V H--I H--K H--L H--P
@@ -936,7 +1003,7 @@ Dave Tang
 [76] M--Y O--U O--Y P--T P--W P--Y Q--S Q--T Q--X S--X T--W T--X U--V W--Y</code></pre>
 <p>Get the vertices.</p>
 <pre class="r"><code>V(net_high_cor)</code></pre>
-<pre><code>+ 23/23 vertices, named, from 44ec768:
+<pre><code>+ 23/23 vertices, named, from 747a245:
  [1] A B D E F G H I K L M O P Q S T U W J V Y X N</code></pre>
 <p>The proportion of present edges from all possible edges in the
 network (1).</p>
@@ -956,7 +1023,7 @@ network (1).</p>
 <p>Largest clique.</p>
 <pre class="r"><code>largest_cliques(net_high_cor)</code></pre>
 <pre><code>[[1]]
-+ 9/23 vertices, named, from 44ec768:
++ 9/23 vertices, named, from 747a245:
 [1] L A Y W P M K I E</code></pre>
 </div>
 <div id="further-reading" class="section level2">
@@ -1045,6 +1112,8 @@ footer is added to webpages before the MathJax javascript. -->
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -1077,6 +1146,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
