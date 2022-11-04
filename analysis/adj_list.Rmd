@@ -1,0 +1,174 @@
+---
+title: "Matrix to adjacency list in R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+An [adjacency list](https://en.wikipedia.org/wiki/Adjacency_list) is simply an unordered list that describes connections between vertices (or nodes) and is a commonly used input format for graphs. In this post, I use the `pivot_longer` function from the `tidyr` package to create an adjacency list from a correlation matrix. I will use the `geneData` dataset, which contains real but anonymised microarray expression data, from the `Biobase` package as an example. Finally, I will show some features of the `igraph` package.
+
+In the first section, I will load the dataset, calculate the correlations, and finally create the adjacency list.
+
+## Data
+
+Install Biobase (if necessary), a package that contains base functions for Bioconductor.
+
+```{r biobase}
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+if (!require("Biobase", quietly = TRUE))
+  BiocManager::install("Biobase")
+
+library(Biobase)
+```
+
+A description of the data is provided with `?geneData`:
+
+>The geneData data.frame has 500 rows and 26 columns. It consists of a subset of real expression data from an Affymetrix U95v2 chip. The data are anonymous. The covariate data geneCov and geneCovariate are made up. The standard error data seD is also made up.
+
+```{r gene_data}
+data("geneData")
+geneData[1:6, 1:6]
+```
+
+The `cor` function can be used to calculate the correlations of each sample (columns) to every other sample (all-vs-all).
+
+```{r cor}
+my_cor_mat <- cor(geneData)
+dim(my_cor_mat)
+```
+
+Since the correlation between A and B is the same as the correlation between B and A, we will remove the values in the lower triangle of the matrix as well as the self correlations.
+
+```{r upper_tri_rm}
+my_cor_mat[1:6, 1:6]
+my_cor_mat[lower.tri(my_cor_mat, diag = TRUE)] <- NA
+my_cor_mat[1:6, 1:6]
+```
+
+## Adjacency list
+
+We will use `pivot_longer` to generate the adjacency list.
+
+```{r pivot_longer}
+my_cor_df <- as_tibble(my_cor_mat, rownames = "sample1")
+
+pivot_longer(
+  data = my_cor_df,
+  cols = -sample1,
+  names_to = "sample2",
+  values_to = "cor"
+) %>%
+  filter(!is.na(cor)) -> my_adj_list
+
+head(my_adj_list)
+```
+
+All samples are positively correlated to each other.
+
+```{r cor_summary}
+summary(my_adj_list$cor)
+```
+
+## Getting started with igraph
+
+The `igraph` package is very useful for working with and visualising graph data.
+
+```{r simple_graph}
+library(igraph)
+net <- graph_from_data_frame(my_adj_list, directed = FALSE)
+E(net)$weight <- my_adj_list$cor
+plot(net, layout = layout_components(net), edge.width = E(net)$weight, vertex.shape="none")
+```
+
+Plot only samples that are highly correlated to each other.
+
+```{r net_high_cor}
+net_high_cor <- graph_from_data_frame(my_adj_list %>% filter(cor > 0.95), directed = FALSE)
+E(net_high_cor)$weight <- my_adj_list %>% filter(cor > 0.95) %>% pull(cor)
+plot(net_high_cor, layout = layout_components(net_high_cor), edge.width = E(net_high_cor)$weight, vertex.shape="none")
+```
+
+[Louvain clustering](https://igraph.org/r/doc/cluster_louvain.html).
+
+```{r louvain}
+cluster_louvain(net_high_cor, weights = E(net_high_cor)$weight)
+```
+
+Detect communities or subgraphs using the [Newman-Girvan algorithm](https://en.wikipedia.org/wiki/Girvan%E2%80%93Newman_algorithm), which is based on edge betweenness.
+
+```{r newman_girvan}
+ceb <- cluster_edge_betweenness(net_high_cor)
+plot(ceb, net_high_cor)
+```
+
+Use `membership` to get the clusters.
+
+```{r membership}
+membership(ceb)
+```
+
+Plot a dendrogram.
+
+```{r dend_plot}
+dendPlot(ceb, mode = "hclust")
+```
+
+## igraph functions
+
+Get the edges of a graph.
+
+```{r edges}
+E(net_high_cor)
+```
+
+Get the vertices.
+
+```{r vertices}
+V(net_high_cor)
+```
+
+The proportion of present edges from all possible edges in the network (1).
+
+```{r edge_density}
+edge_density(net, loops = FALSE)
+edge_density(net_high_cor, loops = FALSE)
+```
+
+Make a full connected graph.
+
+```{r full_graph}
+full_graph <- make_full_graph(26)
+```
+
+Degree distribution of the vertices.
+
+```{r degree}
+degree(net_high_cor, mode = "all")
+```
+
+Number of cliques.
+
+```{r cliques}
+length(cliques(net_high_cor))
+```
+
+Largest clique.
+
+```{r largest_clique}
+largest_cliques(net_high_cor)
+```
+
+## Further reading
+
+* [R igraph manual pages](https://igraph.org/r/doc/)
+* [Network Analysis and Visualisation with R and igraph](https://kateto.net/netscix2016.html)
