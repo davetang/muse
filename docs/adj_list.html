@@ -14,7 +14,7 @@
 
 <title>Matrix to adjacency list in R</title>
 
-<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.17/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -154,11 +154,15 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.tab('show');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
   // Navbar adjustments
   var navHeight = $(".navbar").first().height() + 15;
@@ -187,8 +191,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -196,16 +200,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -446,15 +443,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6def24cdfd99085b9efbd2094365b4055301f1b9targetblank6def24ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec15c249c0db268be30187b0fd673fcd443b95468targetblankc15c249a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/6def24cdfd99085b9efbd2094365b4055301f1b9" target="_blank">6def24c</a>
+<a href="https://github.com/davetang/muse/tree/c15c249c0db268be30187b0fd673fcd443b95468" target="_blank">c15c249</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6def24cdfd99085b9efbd2094365b4055301f1b9targetblank6def24ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec15c249c0db268be30187b0fd673fcd443b95468targetblankc15c249a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -464,7 +461,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/6def24cdfd99085b9efbd2094365b4055301f1b9" target="_blank">6def24c</a>.
+<a href="https://github.com/davetang/muse/tree/c15c249c0db268be30187b0fd673fcd443b95468" target="_blank">c15c249</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -538,6 +535,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/c15c249c0db268be30187b0fd673fcd443b95468/analysis/adj_list.Rmd" target="_blank">c15c249</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-11-04
+</td>
+<td>
+Update Bioconductor
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/7a6571a3cdd033f51fdbcda2ab0cac914b4f32ca/docs/adj_list.html" target="_blank">7a6571a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-11-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/6def24cdfd99085b9efbd2094365b4055301f1b9/analysis/adj_list.Rmd" target="_blank">6def24c</a>
 </td>
 <td>
@@ -573,10 +604,9 @@ correlations, and finally create the adjacency list.</p>
 <p>Install Biobase (if necessary), a package that contains base
 functions for Bioconductor.</p>
 <pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
-  install.packages(&quot;BiocManager&quot;)</code></pre>
-<pre><code>Bioconductor version &#39;3.15&#39; is out-of-date; the current release version &#39;3.16&#39;
-  is available with R version &#39;4.2&#39;; see https://bioconductor.org/install</code></pre>
-<pre class="r"><code>if (!require(&quot;Biobase&quot;, quietly = TRUE))
+  install.packages(&quot;BiocManager&quot;)
+
+if (!require(&quot;Biobase&quot;, quietly = TRUE))
   BiocManager::install(&quot;Biobase&quot;)</code></pre>
 <pre><code>
 Attaching package: &#39;BiocGenerics&#39;</code></pre>
@@ -588,12 +618,12 @@ Attaching package: &#39;BiocGenerics&#39;</code></pre>
     IQR, mad, sd, var, xtabs</code></pre>
 <pre><code>The following objects are masked from &#39;package:base&#39;:
 
-    anyDuplicated, append, as.data.frame, basename, cbind, colnames,
-    dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
-    grepl, intersect, is.unsorted, lapply, Map, mapply, match, mget,
-    order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
-    rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply,
-    union, unique, unsplit, which.max, which.min</code></pre>
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
+    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
+    Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which.max, which.min</code></pre>
 <pre><code>Welcome to Bioconductor
 
     Vignettes contain introductory material; view with
@@ -705,11 +735,85 @@ Attaching package: &#39;igraph&#39;</code></pre>
 E(net)$weight &lt;- my_adj_list$cor
 plot(net, layout = layout_components(net), edge.width = E(net)$weight, vertex.shape=&quot;none&quot;)</code></pre>
 <p><img src="figure/adj_list.Rmd/simple_graph-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-simple_graph-1">
+Past versions of simple_graph-1.png
+</button>
+</p>
+<div id="fig-simple_graph-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/7a6571a3cdd033f51fdbcda2ab0cac914b4f32ca/docs/figure/adj_list.Rmd/simple_graph-1.png" target="_blank">7a6571a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-11-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Plot only samples that are highly correlated to each other.</p>
 <pre class="r"><code>net_high_cor &lt;- graph_from_data_frame(my_adj_list %&gt;% filter(cor &gt; 0.95), directed = FALSE)
 E(net_high_cor)$weight &lt;- my_adj_list %&gt;% filter(cor &gt; 0.95) %&gt;% pull(cor)
 plot(net_high_cor, layout = layout_components(net_high_cor), edge.width = E(net_high_cor)$weight, vertex.shape=&quot;none&quot;)</code></pre>
 <p><img src="figure/adj_list.Rmd/net_high_cor-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-net_high_cor-1">
+Past versions of net_high_cor-1.png
+</button>
+</p>
+<div id="fig-net_high_cor-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/7a6571a3cdd033f51fdbcda2ab0cac914b4f32ca/docs/figure/adj_list.Rmd/net_high_cor-1.png" target="_blank">7a6571a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-11-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p><a href="https://igraph.org/r/doc/cluster_louvain.html">Louvain
 clustering</a>.</p>
 <pre class="r"><code>cluster_louvain(net_high_cor, weights = E(net_high_cor)$weight)</code></pre>
@@ -737,6 +841,43 @@ community detection might not make sense -- modularity treats edge weights as
 similarities while edge betwenness treats them as distances.</code></pre>
 <pre class="r"><code>plot(ceb, net_high_cor)</code></pre>
 <p><img src="figure/adj_list.Rmd/newman_girvan-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-newman_girvan-1">
+Past versions of newman_girvan-1.png
+</button>
+</p>
+<div id="fig-newman_girvan-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/7a6571a3cdd033f51fdbcda2ab0cac914b4f32ca/docs/figure/adj_list.Rmd/newman_girvan-1.png" target="_blank">7a6571a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-11-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Use <code>membership</code> to get the clusters.</p>
 <pre class="r"><code>membership(ceb)</code></pre>
 <pre><code>A B D E F G H I K L M O P Q S T U W J V Y X N 
@@ -744,12 +885,49 @@ similarities while edge betwenness treats them as distances.</code></pre>
 <p>Plot a dendrogram.</p>
 <pre class="r"><code>dendPlot(ceb, mode = &quot;hclust&quot;)</code></pre>
 <p><img src="figure/adj_list.Rmd/dend_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-dend_plot-1">
+Past versions of dend_plot-1.png
+</button>
+</p>
+<div id="fig-dend_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/7a6571a3cdd033f51fdbcda2ab0cac914b4f32ca/docs/figure/adj_list.Rmd/dend_plot-1.png" target="_blank">7a6571a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-11-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="igraph-functions" class="section level2">
 <h2>igraph functions</h2>
 <p>Get the edges of a graph.</p>
 <pre class="r"><code>E(net_high_cor)</code></pre>
-<pre><code>+ 89/89 edges from cd1acd1 (vertex names):
+<pre><code>+ 89/89 edges from 44ec768 (vertex names):
  [1] A--E A--F A--G A--I A--J A--K A--L A--M A--O A--P A--U A--V A--W A--Y B--E
 [16] B--I B--K B--P B--W B--Y D--M D--Q D--S D--X E--F E--I E--K E--L E--M E--P
 [31] E--T E--W E--X E--Y F--K F--M F--P F--W F--Y G--U G--V H--I H--K H--L H--P
@@ -758,7 +936,7 @@ similarities while edge betwenness treats them as distances.</code></pre>
 [76] M--Y O--U O--Y P--T P--W P--Y Q--S Q--T Q--X S--X T--W T--X U--V W--Y</code></pre>
 <p>Get the vertices.</p>
 <pre class="r"><code>V(net_high_cor)</code></pre>
-<pre><code>+ 23/23 vertices, named, from cd1acd1:
+<pre><code>+ 23/23 vertices, named, from 44ec768:
  [1] A B D E F G H I K L M O P Q S T U W J V Y X N</code></pre>
 <p>The proportion of present edges from all possible edges in the
 network (1).</p>
@@ -778,7 +956,7 @@ network (1).</p>
 <p>Largest clique.</p>
 <pre class="r"><code>largest_cliques(net_high_cor)</code></pre>
 <pre><code>[[1]]
-+ 9/23 vertices, named, from cd1acd1:
++ 9/23 vertices, named, from 44ec768:
 [1] L A Y W P M K I E</code></pre>
 </div>
 <div id="further-reading" class="section level2">
@@ -817,30 +995,37 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] igraph_1.3.5        Biobase_2.56.0      BiocGenerics_0.42.0
- [4] BiocManager_1.30.17 forcats_0.5.1       stringr_1.4.0      
- [7] dplyr_1.0.9         purrr_0.3.4         readr_2.1.2        
-[10] tidyr_1.2.0         tibble_3.1.8        ggplot2_3.3.6      
-[13] tidyverse_1.3.1     workflowr_1.7.0    
+ [1] igraph_1.3.5        Biobase_2.58.0      BiocGenerics_0.44.0
+ [4] BiocManager_1.30.19 forcats_0.5.2       stringr_1.4.1      
+ [7] dplyr_1.0.10        purrr_0.3.5         readr_2.1.3        
+[10] tidyr_1.2.1         tibble_3.1.8        ggplot2_3.3.6      
+[13] tidyverse_1.3.2     workflowr_1.7.0    
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.8.3     lubridate_1.8.0  getPass_0.2-2    ps_1.7.0        
- [5] assertthat_0.2.1 rprojroot_2.0.3  digest_0.6.29    utf8_1.2.2      
- [9] R6_2.5.1         cellranger_1.1.0 backports_1.4.1  reprex_2.0.1    
-[13] evaluate_0.15    highr_0.9        httr_1.4.3       pillar_1.8.1    
-[17] rlang_1.0.4      readxl_1.4.0     rstudioapi_0.13  whisker_0.4     
-[21] callr_3.7.0      jquerylib_0.1.4  rmarkdown_2.14   munsell_0.5.0   
-[25] broom_0.8.0      compiler_4.2.0   httpuv_1.6.5     modelr_0.1.8    
-[29] xfun_0.31        pkgconfig_2.0.3  htmltools_0.5.2  tidyselect_1.1.2
-[33] fansi_1.0.3      crayon_1.5.1     tzdb_0.3.0       dbplyr_2.1.1    
-[37] withr_2.5.0      later_1.3.0      grid_4.2.0       jsonlite_1.8.0  
-[41] gtable_0.3.0     lifecycle_1.0.1  DBI_1.1.2        git2r_0.30.1    
-[45] magrittr_2.0.3   scales_1.2.0     cli_3.3.0        stringi_1.7.6   
-[49] fs_1.5.2         promises_1.2.0.1 xml2_1.3.3       bslib_0.3.1     
-[53] ellipsis_0.3.2   generics_0.1.3   vctrs_0.4.1      tools_4.2.0     
-[57] glue_1.6.2       hms_1.1.2        processx_3.5.3   fastmap_1.1.0   
-[61] yaml_2.3.5       colorspace_2.0-3 rvest_1.0.2      knitr_1.39      
-[65] haven_2.5.0      sass_0.4.1      </code></pre>
+ [1] Rcpp_1.0.9          lubridate_1.8.0     getPass_0.2-2      
+ [4] ps_1.7.2            assertthat_0.2.1    rprojroot_2.0.3    
+ [7] digest_0.6.30       utf8_1.2.2          R6_2.5.1           
+[10] cellranger_1.1.0    backports_1.4.1     reprex_2.0.2       
+[13] evaluate_0.17       highr_0.9           httr_1.4.4         
+[16] pillar_1.8.1        rlang_1.0.6         readxl_1.4.1       
+[19] googlesheets4_1.0.1 rstudioapi_0.14     whisker_0.4        
+[22] callr_3.7.3         jquerylib_0.1.4     rmarkdown_2.17     
+[25] googledrive_2.0.0   munsell_0.5.0       broom_1.0.1        
+[28] compiler_4.2.0      httpuv_1.6.6        modelr_0.1.9       
+[31] xfun_0.34           pkgconfig_2.0.3     htmltools_0.5.3    
+[34] tidyselect_1.2.0    fansi_1.0.3         crayon_1.5.2       
+[37] withr_2.5.0         tzdb_0.3.0          dbplyr_2.2.1       
+[40] later_1.3.0         grid_4.2.0          jsonlite_1.8.3     
+[43] gtable_0.3.1        lifecycle_1.0.3     DBI_1.1.3          
+[46] git2r_0.30.1        magrittr_2.0.3      scales_1.2.1       
+[49] cli_3.4.1           stringi_1.7.8       cachem_1.0.6       
+[52] fs_1.5.2            promises_1.2.0.1    xml2_1.3.3         
+[55] bslib_0.4.1         ellipsis_0.3.2      generics_0.1.3     
+[58] vctrs_0.5.0         tools_4.2.0         glue_1.6.2         
+[61] hms_1.1.2           processx_3.8.0      fastmap_1.1.0      
+[64] yaml_2.3.6          colorspace_2.0-3    gargle_1.2.1       
+[67] rvest_1.0.3         knitr_1.40          haven_2.5.1        
+[70] sass_0.4.2         </code></pre>
 </div>
 </div>
 
