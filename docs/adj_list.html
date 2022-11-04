@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2022-11-04" />
+
+<title>Matrix to adjacency list in R</title>
+
+<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Matrix to adjacency list in R</h1>
+<h4 class="date">2022-11-04</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-11-04
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6def24cdfd99085b9efbd2094365b4055301f1b9targetblank6def24ca">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/6def24cdfd99085b9efbd2094365b4055301f1b9" target="_blank">6def24c</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6def24cdfd99085b9efbd2094365b4055301f1b9targetblank6def24ca"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/6def24cdfd99085b9efbd2094365b4055301f1b9" target="_blank">6def24c</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    r_packages_4.1.2/
+    Ignored:    r_packages_4.2.0/
+
+Untracked files:
+    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
+    Untracked:  data/ncrna_noncode_v3.fa
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/adj_list.Rmd</code>) and HTML
+(<code>docs/adj_list.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/6def24cdfd99085b9efbd2094365b4055301f1b9/analysis/adj_list.Rmd" target="_blank">6def24c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-11-04
+</td>
+<td>
+Adjacency list
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>An <a href="https://en.wikipedia.org/wiki/Adjacency_list">adjacency
+list</a> is simply an unordered list that describes connections between
+vertices (or nodes) and is a commonly used input format for graphs. In
+this post, I use the <code>pivot_longer</code> function from the
+<code>tidyr</code> package to create an adjacency list from a
+correlation matrix. I will use the <code>geneData</code> dataset, which
+contains real but anonymised microarray expression data, from the
+<code>Biobase</code> package as an example. Finally, I will show some
+features of the <code>igraph</code> package.</p>
+<p>In the first section, I will load the dataset, calculate the
+correlations, and finally create the adjacency list.</p>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p>Install Biobase (if necessary), a package that contains base
+functions for Bioconductor.</p>
+<pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+  install.packages(&quot;BiocManager&quot;)</code></pre>
+<pre><code>Bioconductor version &#39;3.15&#39; is out-of-date; the current release version &#39;3.16&#39;
+  is available with R version &#39;4.2&#39;; see https://bioconductor.org/install</code></pre>
+<pre class="r"><code>if (!require(&quot;Biobase&quot;, quietly = TRUE))
+  BiocManager::install(&quot;Biobase&quot;)</code></pre>
+<pre><code>
+Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:dplyr&#39;:
+
+    combine, intersect, setdiff, union</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    IQR, mad, sd, var, xtabs</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    anyDuplicated, append, as.data.frame, basename, cbind, colnames,
+    dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+    grepl, intersect, is.unsorted, lapply, Map, mapply, match, mget,
+    order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply,
+    union, unique, unsplit, which.max, which.min</code></pre>
+<pre><code>Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    &#39;browseVignettes()&#39;. To cite Bioconductor, see
+    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
+<pre class="r"><code>library(Biobase)</code></pre>
+<p>A description of the data is provided with
+<code>?geneData</code>:</p>
+<blockquote>
+<p>The geneData data.frame has 500 rows and 26 columns. It consists of a
+subset of real expression data from an Affymetrix U95v2 chip. The data
+are anonymous. The covariate data geneCov and geneCovariate are made up.
+The standard error data seD is also made up.</p>
+</blockquote>
+<pre class="r"><code>data(&quot;geneData&quot;)
+geneData[1:6, 1:6]</code></pre>
+<pre><code>                       A         B        C        D        E       F
+AFFX-MurIL2_at  192.7420  85.75330 176.7570 135.5750 64.49390 76.3569
+AFFX-MurIL10_at  97.1370 126.19600  77.9216  93.3713 24.39860 85.5088
+AFFX-MurIL4_at   45.8192   8.83135  33.0632  28.7072  5.94492 28.2925
+AFFX-MurFAS_at   22.5445   3.60093  14.6883  12.3397 36.86630 11.2568
+AFFX-BioB-5_at   96.7875  30.43800  46.1271  70.9319 56.17440 42.6756
+AFFX-BioB-M_at   89.0730  25.84610  57.2033  69.9766 49.58220 26.1262</code></pre>
+<p>The <code>cor</code> function can be used to calculate the
+correlations of each sample (columns) to every other sample
+(all-vs-all).</p>
+<pre class="r"><code>my_cor_mat &lt;- cor(geneData)
+dim(my_cor_mat)</code></pre>
+<pre><code>[1] 26 26</code></pre>
+<p>Since the correlation between A and B is the same as the correlation
+between B and A, we will remove the values in the lower triangle of the
+matrix as well as the self correlations.</p>
+<pre class="r"><code>my_cor_mat[1:6, 1:6]</code></pre>
+<pre><code>          A         B         C         D         E         F
+A 1.0000000 0.9471591 0.9191233 0.9403129 0.9689690 0.9621362
+B 0.9471591 1.0000000 0.8888108 0.9108174 0.9703906 0.9425248
+C 0.9191233 0.8888108 1.0000000 0.8788107 0.9077245 0.9078971
+D 0.9403129 0.9108174 0.8788107 1.0000000 0.9477058 0.9017977
+E 0.9689690 0.9703906 0.9077245 0.9477058 1.0000000 0.9531459
+F 0.9621362 0.9425248 0.9078971 0.9017977 0.9531459 1.0000000</code></pre>
+<pre class="r"><code>my_cor_mat[lower.tri(my_cor_mat, diag = TRUE)] &lt;- NA
+my_cor_mat[1:6, 1:6]</code></pre>
+<pre><code>   A         B         C         D         E         F
+A NA 0.9471591 0.9191233 0.9403129 0.9689690 0.9621362
+B NA        NA 0.8888108 0.9108174 0.9703906 0.9425248
+C NA        NA        NA 0.8788107 0.9077245 0.9078971
+D NA        NA        NA        NA 0.9477058 0.9017977
+E NA        NA        NA        NA        NA 0.9531459
+F NA        NA        NA        NA        NA        NA</code></pre>
+</div>
+<div id="adjacency-list" class="section level2">
+<h2>Adjacency list</h2>
+<p>We will use <code>pivot_longer</code> to generate the adjacency
+list.</p>
+<pre class="r"><code>my_cor_df &lt;- as_tibble(my_cor_mat, rownames = &quot;sample1&quot;)
+
+pivot_longer(
+  data = my_cor_df,
+  cols = -sample1,
+  names_to = &quot;sample2&quot;,
+  values_to = &quot;cor&quot;
+) %&gt;%
+  filter(!is.na(cor)) -&gt; my_adj_list
+
+head(my_adj_list)</code></pre>
+<pre><code># A tibble: 6 × 3
+  sample1 sample2   cor
+  &lt;chr&gt;   &lt;chr&gt;   &lt;dbl&gt;
+1 A       B       0.947
+2 A       C       0.919
+3 A       D       0.940
+4 A       E       0.969
+5 A       F       0.962
+6 A       G       0.953</code></pre>
+<p>All samples are positively correlated to each other.</p>
+<pre class="r"><code>summary(my_adj_list$cor)</code></pre>
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.6645  0.8945  0.9284  0.9140  0.9522  0.9923 </code></pre>
+</div>
+<div id="getting-started-with-igraph" class="section level2">
+<h2>Getting started with igraph</h2>
+<p>The <code>igraph</code> package is very useful for working with and
+visualising graph data.</p>
+<pre class="r"><code>library(igraph)</code></pre>
+<pre><code>
+Attaching package: &#39;igraph&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:BiocGenerics&#39;:
+
+    normalize, path, union</code></pre>
+<pre><code>The following objects are masked from &#39;package:dplyr&#39;:
+
+    as_data_frame, groups, union</code></pre>
+<pre><code>The following objects are masked from &#39;package:purrr&#39;:
+
+    compose, simplify</code></pre>
+<pre><code>The following object is masked from &#39;package:tidyr&#39;:
+
+    crossing</code></pre>
+<pre><code>The following object is masked from &#39;package:tibble&#39;:
+
+    as_data_frame</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    decompose, spectrum</code></pre>
+<pre><code>The following object is masked from &#39;package:base&#39;:
+
+    union</code></pre>
+<pre class="r"><code>net &lt;- graph_from_data_frame(my_adj_list, directed = FALSE)
+E(net)$weight &lt;- my_adj_list$cor
+plot(net, layout = layout_components(net), edge.width = E(net)$weight, vertex.shape=&quot;none&quot;)</code></pre>
+<p><img src="figure/adj_list.Rmd/simple_graph-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Plot only samples that are highly correlated to each other.</p>
+<pre class="r"><code>net_high_cor &lt;- graph_from_data_frame(my_adj_list %&gt;% filter(cor &gt; 0.95), directed = FALSE)
+E(net_high_cor)$weight &lt;- my_adj_list %&gt;% filter(cor &gt; 0.95) %&gt;% pull(cor)
+plot(net_high_cor, layout = layout_components(net_high_cor), edge.width = E(net_high_cor)$weight, vertex.shape=&quot;none&quot;)</code></pre>
+<p><img src="figure/adj_list.Rmd/net_high_cor-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><a href="https://igraph.org/r/doc/cluster_louvain.html">Louvain
+clustering</a>.</p>
+<pre class="r"><code>cluster_louvain(net_high_cor, weights = E(net_high_cor)$weight)</code></pre>
+<pre><code>IGRAPH clustering multi level, groups: 3, mod: 0.23
++ groups:
+  $`1`
+  [1] &quot;A&quot; &quot;G&quot; &quot;O&quot; &quot;U&quot; &quot;J&quot; &quot;V&quot;
+  
+  $`2`
+   [1] &quot;B&quot; &quot;E&quot; &quot;F&quot; &quot;H&quot; &quot;I&quot; &quot;K&quot; &quot;L&quot; &quot;P&quot; &quot;W&quot; &quot;Y&quot; &quot;N&quot;
+  
+  $`3`
+  [1] &quot;D&quot; &quot;M&quot; &quot;Q&quot; &quot;S&quot; &quot;T&quot; &quot;X&quot;
+  </code></pre>
+<p>Detect communities or subgraphs using the <a
+href="https://en.wikipedia.org/wiki/Girvan%E2%80%93Newman_algorithm">Newman-Girvan
+algorithm</a>, which is based on edge betweenness.</p>
+<pre class="r"><code>ceb &lt;- cluster_edge_betweenness(net_high_cor)</code></pre>
+<pre><code>Warning in cluster_edge_betweenness(net_high_cor): At core/community/
+edge_betweenness.c:492 : Membership vector will be selected based on the highest
+modularity score.</code></pre>
+<pre><code>Warning in cluster_edge_betweenness(net_high_cor): At core/community/
+edge_betweenness.c:497 : Modularity calculation with weighted edge betweenness
+community detection might not make sense -- modularity treats edge weights as
+similarities while edge betwenness treats them as distances.</code></pre>
+<pre class="r"><code>plot(ceb, net_high_cor)</code></pre>
+<p><img src="figure/adj_list.Rmd/newman_girvan-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Use <code>membership</code> to get the clusters.</p>
+<pre class="r"><code>membership(ceb)</code></pre>
+<pre><code>A B D E F G H I K L M O P Q S T U W J V Y X N 
+1 1 2 1 1 3 1 1 1 1 1 4 1 2 2 1 3 1 5 3 1 2 1 </code></pre>
+<p>Plot a dendrogram.</p>
+<pre class="r"><code>dendPlot(ceb, mode = &quot;hclust&quot;)</code></pre>
+<p><img src="figure/adj_list.Rmd/dend_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="igraph-functions" class="section level2">
+<h2>igraph functions</h2>
+<p>Get the edges of a graph.</p>
+<pre class="r"><code>E(net_high_cor)</code></pre>
+<pre><code>+ 89/89 edges from cd1acd1 (vertex names):
+ [1] A--E A--F A--G A--I A--J A--K A--L A--M A--O A--P A--U A--V A--W A--Y B--E
+[16] B--I B--K B--P B--W B--Y D--M D--Q D--S D--X E--F E--I E--K E--L E--M E--P
+[31] E--T E--W E--X E--Y F--K F--M F--P F--W F--Y G--U G--V H--I H--K H--L H--P
+[46] H--T H--W I--K I--L I--M I--P I--Q I--T I--W I--Y K--L K--M K--N K--P K--Q
+[61] K--T K--W K--Y L--M L--N L--P L--Q L--T L--W L--Y M--P M--S M--T M--W M--X
+[76] M--Y O--U O--Y P--T P--W P--Y Q--S Q--T Q--X S--X T--W T--X U--V W--Y</code></pre>
+<p>Get the vertices.</p>
+<pre class="r"><code>V(net_high_cor)</code></pre>
+<pre><code>+ 23/23 vertices, named, from cd1acd1:
+ [1] A B D E F G H I K L M O P Q S T U W J V Y X N</code></pre>
+<p>The proportion of present edges from all possible edges in the
+network (1).</p>
+<pre class="r"><code>edge_density(net, loops = FALSE)</code></pre>
+<pre><code>[1] 1</code></pre>
+<pre class="r"><code>edge_density(net_high_cor, loops = FALSE)</code></pre>
+<pre><code>[1] 0.3517787</code></pre>
+<p>Make a full connected graph.</p>
+<pre class="r"><code>full_graph &lt;- make_full_graph(26)</code></pre>
+<p>Degree distribution of the vertices.</p>
+<pre class="r"><code>degree(net_high_cor, mode = &quot;all&quot;)</code></pre>
+<pre><code> A  B  D  E  F  G  H  I  K  L  M  O  P  Q  S  T  U  W  J  V  Y  X  N 
+14  6  4 12  7  3  6 12 14 12 13  3 12  7  4 10  4 12  1  3 11  6  2 </code></pre>
+<p>Number of cliques.</p>
+<pre class="r"><code>length(cliques(net_high_cor))</code></pre>
+<pre><code>[1] 965</code></pre>
+<p>Largest clique.</p>
+<pre class="r"><code>largest_cliques(net_high_cor)</code></pre>
+<pre><code>[[1]]
++ 9/23 vertices, named, from cd1acd1:
+[1] L A Y W P M K I E</code></pre>
+</div>
+<div id="further-reading" class="section level2">
+<h2>Further reading</h2>
+<ul>
+<li><a href="https://igraph.org/r/doc/">R igraph manual pages</a></li>
+<li><a href="https://kateto.net/netscix2016.html">Network Analysis and
+Visualisation with R and igraph</a></li>
+</ul>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.2.0 (2022-04-22)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] igraph_1.3.5        Biobase_2.56.0      BiocGenerics_0.42.0
+ [4] BiocManager_1.30.17 forcats_0.5.1       stringr_1.4.0      
+ [7] dplyr_1.0.9         purrr_0.3.4         readr_2.1.2        
+[10] tidyr_1.2.0         tibble_3.1.8        ggplot2_3.3.6      
+[13] tidyverse_1.3.1     workflowr_1.7.0    
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.8.3     lubridate_1.8.0  getPass_0.2-2    ps_1.7.0        
+ [5] assertthat_0.2.1 rprojroot_2.0.3  digest_0.6.29    utf8_1.2.2      
+ [9] R6_2.5.1         cellranger_1.1.0 backports_1.4.1  reprex_2.0.1    
+[13] evaluate_0.15    highr_0.9        httr_1.4.3       pillar_1.8.1    
+[17] rlang_1.0.4      readxl_1.4.0     rstudioapi_0.13  whisker_0.4     
+[21] callr_3.7.0      jquerylib_0.1.4  rmarkdown_2.14   munsell_0.5.0   
+[25] broom_0.8.0      compiler_4.2.0   httpuv_1.6.5     modelr_0.1.8    
+[29] xfun_0.31        pkgconfig_2.0.3  htmltools_0.5.2  tidyselect_1.1.2
+[33] fansi_1.0.3      crayon_1.5.1     tzdb_0.3.0       dbplyr_2.1.1    
+[37] withr_2.5.0      later_1.3.0      grid_4.2.0       jsonlite_1.8.0  
+[41] gtable_0.3.0     lifecycle_1.0.1  DBI_1.1.2        git2r_0.30.1    
+[45] magrittr_2.0.3   scales_1.2.0     cli_3.3.0        stringi_1.7.6   
+[49] fs_1.5.2         promises_1.2.0.1 xml2_1.3.3       bslib_0.3.1     
+[53] ellipsis_0.3.2   generics_0.1.3   vctrs_0.4.1      tools_4.2.0     
+[57] glue_1.6.2       hms_1.1.2        processx_3.5.3   fastmap_1.1.0   
+[61] yaml_2.3.5       colorspace_2.0-3 rvest_1.0.2      knitr_1.39      
+[65] haven_2.5.0      sass_0.4.1      </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
