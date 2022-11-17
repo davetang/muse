@@ -1,0 +1,189 @@
+---
+title: "Parallel computation in R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+params:
+  threads: 8
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+As stated in the [foreach vignette](https://cran.r-project.org/web/packages/foreach/vignettes/foreach.html#conclusion):
+
+>Much of parallel computing comes to doing three things: splitting the problem into pieces, executing the pieces in parallel, and combining the results back together.
+
+There are several packages that make it easy to run tasks in parallel:
+
+* The [parallel](https://bookdown.org/rdpeng/rprogdatascience/parallel-computation.html#the-parallel-package) package that comes with R.
+* The [doParallel](https://cran.r-project.org/web/packages/doParallel/vignettes/gettingstartedParallel.pdf) package is a parallel backend for the `foreach` package and acts as an interface between `foreach` and the `parallel` package.
+* The [BiocParallel](https://bioconductor.org/packages/release/bioc/html/BiocParallel.html) package tailored for use with Bioconductor.
+* The [furrr](https://furrr.futureverse.org/) package parallelises mapping functions from the [purrr](https://purrr.tidyverse.org/) package.
+
+## `system.time`
+
+From `?proc.time`:
+
+>The "user time" is the CPU time charged for the execution of user instructions of the calling process.
+>
+>The "system time" is the CPU time charged for execution by the system on behalf of the calling process.
+
+Elapsed time is the amount of time that has elapsed/passed. The `user` and `system` time while sleeping is close to zero because the CPU is idly waiting and not executing anything.
+
+```{r sleep}
+system.time(
+  Sys.sleep(5)
+)
+```
+
+More information is provided on [Stack Overflow](https://stackoverflow.com/questions/5688949/what-are-user-and-system-times-measuring-in-r-system-timeexp-output):
+
+>"User CPU time" gives the CPU time spent by the current process (i.e., the current R session and outside the kernel)
+>
+>"System CPU time" gives the CPU time spent by the kernel (the operating system) on behalf of the current process. The operating system is used for things like opening files, doing input or output, starting other processes, and looking at the system clock: operations that involve resources that many processes must share.
+
+## Data
+
+Create a list of 100 data frames each with 5,000 observations across 100 variables.
+
+```{r create_data}
+create_df <- function(n, m, seed = 1984){
+  set.seed(seed)
+  as.data.frame(
+    matrix(
+      data = rnorm(n = n * m),
+      nrow = n,
+      ncol = m
+    )
+  )
+}
+
+my_list <- lapply(1:100, function(x) create_df(5000, 100, x))
+length(my_list)
+```
+
+## `parallel`
+
+Load the `parallel` package.
+
+```{r load_parallel}
+library(parallel)
+```
+
+Create a summary of each variable in each data frame without parallelisation.
+
+```{r lapply_summary}
+system.time(
+  my_sum <- lapply(my_list, summary)
+)
+```
+
+The `mclapply` function can be used to process a list in parallel. Note that this function uses forking, which is not available on Windows.
+
+```{r mclapply}
+system.time(
+  my_sum_mc <- mclapply(my_list, summary, mc.cores = params$threads)
+)
+```
+
+Compare the two summaries.
+
+```{r compare_my_sum}
+identical(my_sum, my_sum_mc)
+```
+
+Another way to run the jobs in parallel is via sockets. For Windows users, you will need to use this method for parallelisation. In addition, you need to use the `parLapply` function instead of `mclapply`.
+
+```{r parlapply}
+cl <- makeCluster(params$threads)
+system.time(
+  my_sum_sock <- parLapply(cl, my_list, summary)
+)
+stopCluster(cl)
+
+identical(my_sum_mc, my_sum_sock)
+```
+
+## `doParallel`
+
+Load the `doParallel` package.
+
+```{r load_doparallel}
+library(doParallel)
+```
+
+Using `foreach`.
+
+```{r foreach_dopar}
+cl <- makeCluster(params$threads)
+registerDoParallel(cl)
+
+system.time(
+  my_sum_dopar <- foreach(l = my_list) %dopar% {
+    summary(l)
+  }
+)
+stopCluster(cl)
+
+identical(my_sum_mc, my_sum_dopar)
+```
+
+## `BiocParallel`
+
+Load `BiocParallel`.
+
+```{r load_biocparallel}
+library(BiocParallel)
+```
+
+Using `bplapply`.
+
+```{r bplapply}
+param <- SnowParam(workers = params$threads, type = "SOCK")
+system.time(
+  my_sum_bp <- bplapply(my_list, summary, BPPARAM = param)
+)
+
+identical(my_sum_mc, my_sum_bp)
+```
+
+## `furrr`
+
+Load required libraries.
+
+```{r rrr}
+library(furrr)
+library(purrr)
+```
+
+Map without parallelisation.
+
+```{r map}
+system.time(
+  my_sum_pur <- map(my_list, summary)
+)
+
+identical(my_sum_mc, my_sum_pur)
+```
+
+Map with parallelisation.
+
+```{r future_map}
+plan(multisession, workers = params$threads)
+system.time(
+  my_sum_fur <- future_map(my_list, summary)
+)
+
+identical(my_sum_pur, my_sum_fur)
+```
+
+## Summary
+
+So, which package should you use? `BiocParallel` and `furrr` are tailored for use with Bioconductor and `purrr`, so use those packages accordingly.
+
+For parallelisation over a list, use `parallel`. The [foreach](https://cran.r-project.org/web/packages/foreach/vignettes/foreach.html) function provides more flexibility when parallelising, so use the `doParallel` package if you have a more complicated task.
