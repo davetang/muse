@@ -34,7 +34,7 @@ jobs:
 
       - name: Commit report
         run: |
-          if [[ $(git diff --exit-code output/views.png) ]]; then
+          if [[ $(git diff --exit-code .) ]]; then
             git config --global user.name 'GitHub Actions'
             git config --global user.email 'davetingpongtang@gmail.com'
             git config --global --add safe.directory /__w/muse/muse
