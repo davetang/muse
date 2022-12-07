@@ -31,5 +31,5 @@ p <- ggplot(slice_tail(views, n = 30), aes(date, views, fill = weekend)) +
   ggtitle("Site views in the last 30 days") +
   NULL
 
-ggsave("../output/views.png", p)
+ggsave("output/views.png", p)
 quit()
