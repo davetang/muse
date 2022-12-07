@@ -30,15 +30,17 @@ jobs:
       - run: echo "The workflow is now ready to test your code on the runner."
 
       - name: Plot views
-        run: code/plot_view.R https://davetang.org/site_stat/latest.csv
+        run: code/plot_view.R https://davetang.org/site_stat/blog_views.csv
 
       - name: Commit report
         run: |
-          git config --global user.name 'GitHub Actions'
-          git config --global user.email 'davetingpongtang@gmail.com'
-          git config --global --add safe.directory /__w/muse/muse
-          git add "output/views.png"
-          git commit -m "Update views.png"
-          git push origin main
+          if [[ $(git diff --exit-code output/views.png) ]]; then
+            git config --global user.name 'GitHub Actions'
+            git config --global user.email 'davetingpongtang@gmail.com'
+            git config --global --add safe.directory /__w/muse/muse
+            git add "output/views.png"
+            git commit -m "Update views.png"
+            git push origin main
+          fi
 
       - run: echo "This job's status is ${{ job.status }}."
