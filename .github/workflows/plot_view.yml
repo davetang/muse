@@ -4,7 +4,7 @@ name: Plot views
 # execute workflow only when these files are modified
 on:
   schedule:
-    - cron: '5 0 * * *'
+    - cron: '5 * * * *'
   workflow_dispatch:
 
 # a list of the jobs that run as part of the workflow
@@ -28,13 +28,12 @@ jobs:
       - name: Plot views
         run: code/plot_view.R https://davetang.org/site_stat/blog_views.csv.gz
 
-      - name: Commit report
+      - name: Install wput
         run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git config --global --add safe.directory /__w/muse/muse
-          git add "output/views.png"
-          git commit -m 'Update views'
-          git push origin main
+          sudo apt update
+          sudo apt install -y wput
+      
+      - name: FTP put
+        run: wput output/views.png ftp://${{ secrets.FTPUSER }}:${{ secrets.FTPPASS }}@davetang.org
 
       - run: echo "This job's status is ${{ job.status }}."
