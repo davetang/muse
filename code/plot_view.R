@@ -20,7 +20,6 @@ views$weekend <- grepl(pattern = "^S", x = views$day)
 views$month <- factor(months(views$date), levels = month.name)
 views$quarter <- factor(quarters(views$date))
 views$year <- factor(format(views$date, "%Y"))
-views <- views[-nrow(views), ]
 
 p <- ggplot(slice_tail(views, n = 30), aes(date, views, fill = weekend)) +
   geom_col() +
@@ -28,7 +27,7 @@ p <- ggplot(slice_tail(views, n = 30), aes(date, views, fill = weekend)) +
   scale_fill_manual(values = c("skyblue", "grey")) +
   coord_flip() +
   theme(axis.title.y = element_blank()) +
-  ggtitle("Site views in the last 30 days") +
+  ggtitle(paste0("Site views in the last 30 days as of "), Sys.time()) +
   NULL
 
 ggsave("output/views.png", p)
