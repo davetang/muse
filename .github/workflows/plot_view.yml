@@ -4,7 +4,7 @@ name: Plot views
 # execute workflow only when these files are modified
 on:
   schedule:
-    - cron: '30 0 * * *'
+    - cron: '5 * * * *'
   push:
     paths:
       - '.github/workflows/plot_view.yml'
@@ -37,6 +37,8 @@ jobs:
           git config --global user.name 'GitHub Actions'
           git config --global user.email 'davetingpongtang@gmail.com'
           git config --global --add safe.directory /__w/muse/muse
-          git diff --quiet "output/views.png" || git commit -am "Update views.png" && git push origin main
+          git add "output/views.png"
+          git commit -m 'Update views'
+          git push origin main
 
       - run: echo "This job's status is ${{ job.status }}."
