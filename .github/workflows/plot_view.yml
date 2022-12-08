@@ -5,10 +5,6 @@ name: Plot views
 on:
   schedule:
     - cron: '5 * * * *'
-  push:
-    paths:
-      - '.github/workflows/plot_view.yml'
-      - 'code/plot_view.R'
   workflow_dispatch:
 
 # a list of the jobs that run as part of the workflow
@@ -34,8 +30,8 @@ jobs:
 
       - name: Commit report
         run: |
-          git config --global user.name 'GitHub Actions'
-          git config --global user.email 'davetingpongtang@gmail.com'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git config --global --add safe.directory /__w/muse/muse
           git add "output/views.png"
           git commit -m 'Update views'
