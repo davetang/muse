@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2022-12-12" />
+
+<title>Getting started with tidymodels</title>
+
+<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Getting started with tidymodels</h1>
+<h4 class="date">2022-12-12</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2022-12-12
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree419613abf1c5de5bb3451c0bdbcb86d8fe5d8e2dtargetblank419613aa">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/419613abf1c5de5bb3451c0bdbcb86d8fe5d8e2d" target="_blank">419613a</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree419613abf1c5de5bb3451c0bdbcb86d8fe5d8e2dtargetblank419613aa"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/419613abf1c5de5bb3451c0bdbcb86d8fe5d8e2d" target="_blank">419613a</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    r_packages_4.1.2/
+    Ignored:    r_packages_4.2.0/
+
+Untracked files:
+    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
+    Untracked:  data/ncrna_noncode_v3.fa
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/tidymodels.Rmd</code>) and HTML
+(<code>docs/tidymodels.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/419613abf1c5de5bb3451c0bdbcb86d8fe5d8e2d/analysis/tidymodels.Rmd" target="_blank">419613a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-12-12
+</td>
+<td>
+Tidymodels
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="build-a-model" class="section level2">
+<h2>Build a model</h2>
+<p><a href="https://www.tidymodels.org/start/models/"
+class="uri">https://www.tidymodels.org/start/models/</a></p>
+<pre class="r"><code>my_packages &lt;- c(&#39;tidyverse&#39;, &#39;tidymodels&#39;, &#39;broom.mixed&#39;, &#39;dotwhisker&#39;, &#39;rstanarm&#39;)
+
+for (my_package in my_packages){
+   if(!require(my_package, character.only = TRUE)){
+      install.packages(my_package)
+   }
+  library(my_package, character.only = TRUE)
+}</code></pre>
+<pre><code>Loading required package: tidyverse</code></pre>
+<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+✔ ggplot2 3.4.0      ✔ purrr   0.3.5 
+✔ tibble  3.1.8      ✔ dplyr   1.0.10
+✔ tidyr   1.2.1      ✔ stringr 1.4.1 
+✔ readr   2.1.3      ✔ forcats 0.5.2 
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+Loading required package: tidymodels
+
+── Attaching packages ────────────────────────────────────── tidymodels 1.0.0 ──
+
+✔ broom        1.0.1     ✔ rsample      1.1.1
+✔ dials        1.1.0     ✔ tune         1.0.1
+✔ infer        1.0.4     ✔ workflows    1.1.2
+✔ modeldata    1.0.1     ✔ workflowsets 1.0.0
+✔ parsnip      1.0.3     ✔ yardstick    1.1.0
+✔ recipes      1.0.3     
+
+── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
+✖ scales::discard() masks purrr::discard()
+✖ dplyr::filter()   masks stats::filter()
+✖ recipes::fixed()  masks stringr::fixed()
+✖ dplyr::lag()      masks stats::lag()
+✖ yardstick::spec() masks readr::spec()
+✖ recipes::step()   masks stats::step()
+• Dig deeper into tidy modeling with R at https://www.tmwr.org
+
+Loading required package: broom.mixed
+
+Loading required package: dotwhisker
+
+Loading required package: rstanarm
+
+Loading required package: Rcpp
+
+
+Attaching package: &#39;Rcpp&#39;
+
+
+The following object is masked from &#39;package:rsample&#39;:
+
+    populate
+
+
+This is rstanarm version 2.21.3
+
+- See https://mc-stan.org/rstanarm/articles/priors for changes to default priors!
+
+- Default priors may change, so it&#39;s safest to specify priors, even if equivalent to the defaults.
+
+- For execution on a local, multicore CPU with excess RAM we recommend calling
+
+  options(mc.cores = parallel::detectCores())</code></pre>
+<pre class="r"><code>theme_set(theme_bw())</code></pre>
+<p>Data from Constable (1993) to explore how three different feeding
+regimes affect the size of sea urchins over time. The initial size of
+the sea urchins at the beginning of the experiment probably affects how
+big they grow as they are fed.</p>
+<pre class="r"><code>my_csv &lt;- read_csv(&quot;https://tidymodels.org/start/models/urchins.csv&quot;, show_col_types = FALSE)
+head(my_csv)</code></pre>
+<pre><code># A tibble: 6 × 3
+  TREAT      IV  SUTW
+  &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt;
+1 Initial   3.5 0.01 
+2 Initial   5   0.02 
+3 Initial   8   0.061
+4 Initial  10   0.051
+5 Initial  13   0.041
+6 Initial  13   0.061</code></pre>
+<p>Change the column names to be more descriptive and change
+<code>food_regime</code> into a factor.</p>
+<p>For each of the 72 urchins, we know their:</p>
+<ul>
+<li>experimental feeding regime group (<code>food_regime</code>: either
+<code>Initial</code>, <code>Low</code>, or <code>High</code>),</li>
+<li>size in milliliters at the start of the experiment
+(<code>initial_volume</code>), and</li>
+<li>suture width at the end of the experiment (<code>width</code>).</li>
+</ul>
+<pre class="r"><code>my_csv %&gt;%
+  setNames(c(&quot;food_regime&quot;, &quot;initial_volume&quot;, &quot;width&quot;)) %&gt;% 
+  mutate(food_regime = factor(food_regime, levels = c(&quot;Initial&quot;, &quot;Low&quot;, &quot;High&quot;))) -&gt; urchins
+dim(urchins)</code></pre>
+<pre><code>[1] 72  3</code></pre>
+<p>Plot the data.</p>
+<pre class="r"><code>ggplot(
+  urchins,
+  aes(x = initial_volume, 
+      y = width, 
+      group = food_regime, 
+      colour = food_regime)
+) + 
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE) +
+  scale_color_viridis_d(option = &quot;plasma&quot;, end = .7)</code></pre>
+<pre><code>`geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
+<p><img src="figure/tidymodels.Rmd/plot_urchins-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>A standard two-way analysis of variance (ANOVA) model makes sense for
+this dataset because we have both a continuous predictor
+(<code>initial_volume</code>) and a categorical predictor
+(<code>food_regime</code>). Since the slopes appear to be different for
+at least two of the feeding regimes, let’s build a model that allows for
+two-way interactions.</p>
+<p>Specifying an R formula with our variables as defined below allows
+our regression model depending on initial volume to have separate slopes
+and intercepts for each food regime.</p>
+<pre class="r"><code>width ~ initial_volume * food_regime</code></pre>
+<pre><code>width ~ initial_volume * food_regime</code></pre>
+<p>With <code>tidymodels</code>, we start by specifying the functional
+form of the model that we want by using the <code>parsnip</code>
+package. Since there is a numeric outcome and the model should be linear
+with slopes and intercepts, the model type is “linear regression”.</p>
+<pre class="r"><code>linear_reg()</code></pre>
+<pre><code>Linear Regression Model Specification (regression)
+
+Computational engine: lm </code></pre>
+<p>Now we can think about a method for fitting or training the model,
+i.e. the model engine. The engine value is often a mash-up of the
+software that can be used to fit or train the model as well as the
+estimation method. The default for <code>linear_reg()</code> is
+<code>lm</code> for ordinary least squares. The documentation page for
+<code>linear_reg()</code> lists all the possible engines.</p>
+<p>We’ll save our model object as <code>lm_mod</code> using the default
+engine.</p>
+<pre class="r"><code>lm_mod &lt;- linear_reg()</code></pre>
+<p>The model can now be estimated or trained using the
+<code>fit()</code> function.</p>
+<pre class="r"><code>lm_mod %&gt;%
+  fit(width ~ initial_volume * food_regime, data = urchins) -&gt; lm_fit
+
+lm_fit</code></pre>
+<pre><code>parsnip model object
+
+
+Call:
+stats::lm(formula = width ~ initial_volume * food_regime, data = data)
+
+Coefficients:
+                   (Intercept)                  initial_volume  
+                     0.0331216                       0.0015546  
+                food_regimeLow                 food_regimeHigh  
+                     0.0197824                       0.0214111  
+ initial_volume:food_regimeLow  initial_volume:food_regimeHigh  
+                    -0.0012594                       0.0005254  </code></pre>
+<p>Many models have a <code>tidy()</code> method that provides the
+summary results in a more predictable and useful format.</p>
+<pre class="r"><code>tidy(lm_fit)</code></pre>
+<pre><code># A tibble: 6 × 5
+  term                            estimate std.error statistic  p.value
+  &lt;chr&gt;                              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)                     0.0331    0.00962      3.44  0.00100 
+2 initial_volume                  0.00155   0.000398     3.91  0.000222
+3 food_regimeLow                  0.0198    0.0130       1.52  0.133   
+4 food_regimeHigh                 0.0214    0.0145       1.47  0.145   
+5 initial_volume:food_regimeLow  -0.00126   0.000510    -2.47  0.0162  
+6 initial_volume:food_regimeHigh  0.000525  0.000702     0.748 0.457   </code></pre>
+<p>Generate a dot-and-whisker plot of our regression results using the
+<code>dotwhisker</code> package.</p>
+<pre class="r"><code>tidy(lm_fit) %&gt;% 
+  dwplot(
+    dot_args = list(size = 2, color = &quot;black&quot;),
+    whisker_args = list(color = &quot;black&quot;),
+    vline = geom_vline(
+      xintercept = 0,
+      colour = &quot;grey50&quot;,
+      linetype = 2
+    )
+  )</code></pre>
+<p><img src="figure/tidymodels.Rmd/dwplot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The fitted object <code>lm_fit</code> has the <code>lm</code> model
+output built-in, which you can access with <code>lm_fit$fit</code>, but
+there are some benefits to using the fitted <code>parsnip</code> model
+object when it comes to predicting.</p>
+<p>Suppose that, for a publication, it would be particularly interesting
+to make a plot of the mean body size for urchins that started the
+experiment with an initial volume of 20ml. To create such a graph, we
+start with some new example data that we will make predictions for.</p>
+<pre class="r"><code>new_points &lt;- expand.grid(
+  initial_volume = 20, 
+  food_regime = c(&quot;Initial&quot;, &quot;Low&quot;, &quot;High&quot;)
+)
+
+new_points</code></pre>
+<pre><code>  initial_volume food_regime
+1             20     Initial
+2             20         Low
+3             20        High</code></pre>
+<p>Generate the mean body width values.</p>
+<pre class="r"><code>mean_pred &lt;- predict(lm_fit, new_data = new_points)
+mean_pred</code></pre>
+<pre><code># A tibble: 3 × 1
+   .pred
+   &lt;dbl&gt;
+1 0.0642
+2 0.0588
+3 0.0961</code></pre>
+<p>When making predictions, the tidymodels convention is to always
+produce a tibble of results with standardized column names. This makes
+it easy to combine the original data and the predictions in a usable
+format.</p>
+<pre class="r"><code>conf_int_pred &lt;- predict(
+  lm_fit, 
+  new_data = new_points, 
+  type = &quot;conf_int&quot;
+)
+
+plot_data &lt;- 
+  new_points %&gt;% 
+  bind_cols(mean_pred) %&gt;% 
+  bind_cols(conf_int_pred)
+
+ggplot(
+  plot_data,
+  aes(x = food_regime)
+) + 
+  geom_point(aes(y = .pred)) + 
+  geom_errorbar(
+    aes(ymin = .pred_lower, ymax = .pred_upper),
+    width = .2
+  ) + 
+  labs(y = &quot;urchin size&quot;)</code></pre>
+<p><img src="figure/tidymodels.Rmd/conf_int_pred-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>We are interested in knowing if the results would be different if the
+model were estimated using a Bayesian approach. In such an analysis, a
+prior distribution needs to be declared for each model parameter that
+represents the possible values of the parameters (before being exposed
+to the observed data). After some discussion, the group agrees that the
+priors should be bell-shaped but, since no one has any idea what the
+range of values should be, to take a conservative approach and make the
+priors wide using a Cauchy distribution (which is the same as a
+t-distribution with a single degree of freedom).</p>
+<p>The documentation on the <code>rstanarm</code> package shows us that
+the <code>stan_glm()</code> function can be used to estimate this model,
+and that the function arguments that need to be specified are called
+<code>prior</code> and <code>prior_intercept</code>.</p>
+<p>It turns out that <code>linear_reg()</code> has a <code>stan</code>
+engine. Since these prior distribution arguments are specific to the
+Stan software, they are passed as arguments to
+<code>parsnip::set_engine()</code>.</p>
+<pre class="r"><code># set the prior distribution
+prior_dist &lt;- rstanarm::student_t(df = 1)
+
+set.seed(123)
+
+# make the parsnip model
+bayes_mod &lt;-   
+  linear_reg() %&gt;% 
+  set_engine(&quot;stan&quot;, 
+             prior_intercept = prior_dist, 
+             prior = prior_dist) 
+
+# train the model
+bayes_fit &lt;- 
+  bayes_mod %&gt;% 
+  fit(width ~ initial_volume * food_regime, data = urchins)
+
+print(bayes_fit, digits = 5)</code></pre>
+<pre><code>parsnip model object
+
+stan_glm
+ family:       gaussian [identity]
+ formula:      width ~ initial_volume * food_regime
+ observations: 72
+ predictors:   6
+------
+                               Median   MAD_SD  
+(Intercept)                     0.03314  0.00998
+initial_volume                  0.00155  0.00040
+food_regimeLow                  0.01991  0.01332
+food_regimeHigh                 0.02132  0.01487
+initial_volume:food_regimeLow  -0.00125  0.00051
+initial_volume:food_regimeHigh  0.00053  0.00072
+
+Auxiliary parameter(s):
+      Median  MAD_SD 
+sigma 0.02135 0.00185
+
+------
+* For help interpreting the printed output see ?print.stanreg
+* For info on the priors used see ?prior_summary.stanreg</code></pre>
+<p>To update the parameter table, the <code>tidy()</code> method is once
+again used.</p>
+<pre class="r"><code>tidy(bayes_fit, conf.int = TRUE)</code></pre>
+<pre><code># A tibble: 6 × 5
+  term                            estimate std.error  conf.low conf.high
+  &lt;chr&gt;                              &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)                     0.0331    0.00998   0.0167    0.0493  
+2 initial_volume                  0.00155   0.000402  0.000891  0.00223 
+3 food_regimeLow                  0.0199    0.0133   -0.00251   0.0418  
+4 food_regimeHigh                 0.0213    0.0149   -0.00379   0.0462  
+5 initial_volume:food_regimeLow  -0.00125   0.000515 -0.00212  -0.000396
+6 initial_volume:food_regimeHigh  0.000533  0.000725 -0.000628  0.00170 </code></pre>
+<p>A goal of the <code>tidymodels</code> packages is that the interfaces
+to common tasks are standardised (as seen in the <code>tidy()</code>
+results above). The same is true for getting predictions; we can use the
+same code even though the underlying packages use very different
+syntax.</p>
+<pre class="r"><code>bayes_plot_data &lt;- 
+  new_points %&gt;% 
+  bind_cols(predict(bayes_fit, new_data = new_points)) %&gt;% 
+  bind_cols(predict(bayes_fit, new_data = new_points, type = &quot;conf_int&quot;))
+
+ggplot(bayes_plot_data, aes(x = food_regime)) + 
+  geom_point(aes(y = .pred)) + 
+  geom_errorbar(aes(ymin = .pred_lower, ymax = .pred_upper), width = .2) + 
+  labs(y = &quot;urchin size&quot;) + 
+  ggtitle(&quot;Bayesian model with t(1) prior distribution&quot;)</code></pre>
+<p><img src="figure/tidymodels.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.2.0 (2022-04-22)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] rstanarm_2.21.3     Rcpp_1.0.9          dotwhisker_0.7.4   
+ [4] broom.mixed_0.2.9.4 yardstick_1.1.0     workflowsets_1.0.0 
+ [7] workflows_1.1.2     tune_1.0.1          rsample_1.1.1      
+[10] recipes_1.0.3       parsnip_1.0.3       modeldata_1.0.1    
+[13] infer_1.0.4         dials_1.1.0         scales_1.2.1       
+[16] broom_1.0.1         tidymodels_1.0.0    forcats_0.5.2      
+[19] stringr_1.4.1       dplyr_1.0.10        purrr_0.3.5        
+[22] readr_2.1.3         tidyr_1.2.1         tibble_3.1.8       
+[25] ggplot2_3.4.0       tidyverse_1.3.2     workflowr_1.7.0    
+
+loaded via a namespace (and not attached):
+  [1] utf8_1.2.2           ggstance_0.3.6       tidyselect_1.2.0    
+  [4] lme4_1.1-31          htmlwidgets_1.5.4    grid_4.2.0          
+  [7] munsell_0.5.0        codetools_0.2-18     DT_0.26             
+ [10] future_1.29.0        miniUI_0.1.1.1       withr_2.5.0         
+ [13] colorspace_2.0-3     highr_0.9            knitr_1.40          
+ [16] rstudioapi_0.14      stats4_4.2.0         bayesplot_1.10.0    
+ [19] listenv_0.8.0        labeling_0.4.2       git2r_0.30.1        
+ [22] rstan_2.21.7         farver_2.1.1         bit64_4.0.5         
+ [25] DiceDesign_1.9       datawizard_0.6.4     rprojroot_2.0.3     
+ [28] parallelly_1.32.1    vctrs_0.5.0          generics_0.1.3      
+ [31] ipred_0.9-13         xfun_0.34            R6_2.5.1            
+ [34] markdown_1.3         lhs_1.1.5            cachem_1.0.6        
+ [37] assertthat_0.2.1     promises_1.2.0.1     vroom_1.6.0         
+ [40] nnet_7.3-18          googlesheets4_1.0.1  gtable_0.3.1        
+ [43] globals_0.16.1       processx_3.8.0       timeDate_4021.107   
+ [46] rlang_1.0.6          splines_4.2.0        gargle_1.2.1        
+ [49] inline_0.3.19        yaml_2.3.6           reshape2_1.4.4      
+ [52] modelr_0.1.10        threejs_0.3.3        crosstalk_1.2.0     
+ [55] backports_1.4.1      httpuv_1.6.6         tools_4.2.0         
+ [58] lava_1.7.0           ellipsis_0.3.2       jquerylib_0.1.4     
+ [61] plyr_1.8.8           base64enc_0.1-3      ps_1.7.2            
+ [64] prettyunits_1.1.1    rpart_4.1.19         zoo_1.8-11          
+ [67] haven_2.5.1          fs_1.5.2             furrr_0.3.1         
+ [70] magrittr_2.0.3       colourpicker_1.2.0   reprex_2.0.2        
+ [73] GPfit_1.0-8          googledrive_2.0.0    whisker_0.4         
+ [76] matrixStats_0.62.0   hms_1.1.2            shinyjs_2.1.0       
+ [79] mime_0.12            evaluate_0.18        xtable_1.8-4        
+ [82] shinystan_2.6.0      readxl_1.4.1         gridExtra_2.3       
+ [85] rstantools_2.2.0     compiler_4.2.0       crayon_1.5.2        
+ [88] minqa_1.2.5          StanHeaders_2.21.0-7 htmltools_0.5.3     
+ [91] mgcv_1.8-41          later_1.3.0          tzdb_0.3.0          
+ [94] RcppParallel_5.1.5   lubridate_1.8.0      DBI_1.1.3           
+ [97] dbplyr_2.2.1         MASS_7.3-58.1        boot_1.3-28         
+[100] Matrix_1.5-3         cli_3.4.1            parallel_4.2.0      
+[103] insight_0.18.8       gower_1.0.0          igraph_1.3.5        
+[106] pkgconfig_2.0.3      getPass_0.2-2        xml2_1.3.3          
+[109] foreach_1.5.2        dygraphs_1.1.1.6     bslib_0.4.1         
+[112] hardhat_1.2.0        prodlim_2019.11.13   rvest_1.0.3         
+[115] callr_3.7.3          digest_0.6.30        parameters_0.20.0   
+[118] rmarkdown_2.18       cellranger_1.1.0     curl_4.3.3          
+[121] shiny_1.7.3          gtools_3.9.4         nloptr_2.0.3        
+[124] lifecycle_1.0.3      nlme_3.1-160         jsonlite_1.8.3      
+[127] viridisLite_0.4.1    fansi_1.0.3          pillar_1.8.1        
+[130] lattice_0.20-45      loo_2.5.1            fastmap_1.1.0       
+[133] httr_1.4.4           pkgbuild_1.4.0       survival_3.4-0      
+[136] glue_1.6.2           xts_0.12.2           bayestestR_0.13.0   
+[139] shinythemes_1.2.0    iterators_1.0.14     bit_4.0.4           
+[142] class_7.3-20         stringi_1.7.8        sass_0.4.2          
+[145] future.apply_1.10.0 </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
