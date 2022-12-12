@@ -1,0 +1,213 @@
+---
+title: "Getting started with tidymodels"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Build a model
+
+https://www.tidymodels.org/start/models/
+
+```{r load_packages}
+my_packages <- c('tidyverse', 'tidymodels', 'broom.mixed', 'dotwhisker', 'rstanarm')
+
+for (my_package in my_packages){
+   if(!require(my_package, character.only = TRUE)){
+      install.packages(my_package)
+   }
+  library(my_package, character.only = TRUE)
+}
+
+theme_set(theme_bw())
+```
+
+Data from Constable (1993) to explore how three different feeding regimes affect the size of sea urchins over time. The initial size of the sea urchins at the beginning of the experiment probably affects how big they grow as they are fed.
+
+```{r read_csv}
+my_csv <- read_csv("https://tidymodels.org/start/models/urchins.csv", show_col_types = FALSE)
+head(my_csv)
+```
+
+Change the column names to be more descriptive and change `food_regime` into a factor.
+
+For each of the 72 urchins, we know their:
+
+* experimental feeding regime group (`food_regime`: either `Initial`, `Low`, or `High`),
+* size in milliliters at the start of the experiment (`initial_volume`), and
+* suture width at the end of the experiment (`width`).
+
+```{r urchins}
+my_csv %>%
+  setNames(c("food_regime", "initial_volume", "width")) %>% 
+  mutate(food_regime = factor(food_regime, levels = c("Initial", "Low", "High"))) -> urchins
+dim(urchins)
+```
+
+Plot the data.
+
+```{r plot_urchins}
+ggplot(
+  urchins,
+  aes(x = initial_volume, 
+      y = width, 
+      group = food_regime, 
+      colour = food_regime)
+) + 
+  geom_point() + 
+  geom_smooth(method = lm, se = FALSE) +
+  scale_color_viridis_d(option = "plasma", end = .7)
+```
+
+A standard two-way analysis of variance (ANOVA) model makes sense for this dataset because we have both a continuous predictor (`initial_volume`) and a categorical predictor (`food_regime`). Since the slopes appear to be different for at least two of the feeding regimes, let's build a model that allows for two-way interactions.
+
+Specifying an R formula with our variables as defined below allows our regression model depending on initial volume to have separate slopes and intercepts for each food regime.
+
+```{r formula}
+width ~ initial_volume * food_regime
+```
+
+With `tidymodels`, we start by specifying the functional form of the model that we want by using the `parsnip` package. Since there is a numeric outcome and the model should be linear with slopes and intercepts, the model type is "linear regression".
+
+```{r linear_reg}
+linear_reg()
+```
+
+Now we can think about a method for fitting or training the model, i.e. the model engine. The engine value is often a mash-up of the software that can be used to fit or train the model as well as the estimation method. The default for `linear_reg()` is `lm` for ordinary least squares. The documentation page for `linear_reg()` lists all the possible engines.
+
+We'll save our model object as `lm_mod` using the default engine.
+
+```{r lm_mod}
+lm_mod <- linear_reg()
+```
+
+The model can now be estimated or trained using the `fit()` function.
+
+```{r lm_fit}
+lm_mod %>%
+  fit(width ~ initial_volume * food_regime, data = urchins) -> lm_fit
+
+lm_fit
+```
+
+Many models have a `tidy()` method that provides the summary results in a more predictable and useful format.
+
+```{r tidy_lm}
+tidy(lm_fit)
+```
+
+Generate a dot-and-whisker plot of our regression results using the `dotwhisker` package.
+
+```{r dwplot}
+tidy(lm_fit) %>% 
+  dwplot(
+    dot_args = list(size = 2, color = "black"),
+    whisker_args = list(color = "black"),
+    vline = geom_vline(
+      xintercept = 0,
+      colour = "grey50",
+      linetype = 2
+    )
+  )
+```
+
+The fitted object `lm_fit` has the `lm` model output built-in, which you can access with `lm_fit$fit`, but there are some benefits to using the fitted `parsnip` model object when it comes to predicting.
+
+Suppose that, for a publication, it would be particularly interesting to make a plot of the mean body size for urchins that started the experiment with an initial volume of 20ml. To create such a graph, we start with some new example data that we will make predictions for.
+
+```{r new_points}
+new_points <- expand.grid(
+  initial_volume = 20, 
+  food_regime = c("Initial", "Low", "High")
+)
+
+new_points
+```
+
+Generate the mean body width values.
+
+```{r}
+mean_pred <- predict(lm_fit, new_data = new_points)
+mean_pred
+```
+
+When making predictions, the tidymodels convention is to always produce a tibble of results with standardized column names. This makes it easy to combine the original data and the predictions in a usable format.
+
+```{r conf_int_pred}
+conf_int_pred <- predict(
+  lm_fit, 
+  new_data = new_points, 
+  type = "conf_int"
+)
+
+plot_data <- 
+  new_points %>% 
+  bind_cols(mean_pred) %>% 
+  bind_cols(conf_int_pred)
+
+ggplot(
+  plot_data,
+  aes(x = food_regime)
+) + 
+  geom_point(aes(y = .pred)) + 
+  geom_errorbar(
+    aes(ymin = .pred_lower, ymax = .pred_upper),
+    width = .2
+  ) + 
+  labs(y = "urchin size")
+```
+
+We are interested in knowing if the results would be different if the model were estimated using a Bayesian approach. In such an analysis, a prior distribution needs to be declared for each model parameter that represents the possible values of the parameters (before being exposed to the observed data). After some discussion, the group agrees that the priors should be bell-shaped but, since no one has any idea what the range of values should be, to take a conservative approach and make the priors wide using a Cauchy distribution (which is the same as a t-distribution with a single degree of freedom).
+
+The documentation on the `rstanarm` package shows us that the `stan_glm()` function can be used to estimate this model, and that the function arguments that need to be specified are called `prior` and `prior_intercept`.
+
+It turns out that `linear_reg()` has a `stan` engine. Since these prior distribution arguments are specific to the Stan software, they are passed as arguments to `parsnip::set_engine()`.
+
+```{r bayes_mod}
+# set the prior distribution
+prior_dist <- rstanarm::student_t(df = 1)
+
+set.seed(123)
+
+# make the parsnip model
+bayes_mod <-   
+  linear_reg() %>% 
+  set_engine("stan", 
+             prior_intercept = prior_dist, 
+             prior = prior_dist) 
+
+# train the model
+bayes_fit <- 
+  bayes_mod %>% 
+  fit(width ~ initial_volume * food_regime, data = urchins)
+
+print(bayes_fit, digits = 5)
+```
+
+To update the parameter table, the `tidy()` method is once again used.
+
+```{r tidy_bayes_fit}
+tidy(bayes_fit, conf.int = TRUE)
+```
+
+A goal of the `tidymodels` packages is that the interfaces to common tasks are standardised (as seen in the `tidy()` results above). The same is true for getting predictions; we can use the same code even though the underlying packages use very different syntax.
+
+```{r}
+bayes_plot_data <- 
+  new_points %>% 
+  bind_cols(predict(bayes_fit, new_data = new_points)) %>% 
+  bind_cols(predict(bayes_fit, new_data = new_points, type = "conf_int"))
+
+ggplot(bayes_plot_data, aes(x = food_regime)) + 
+  geom_point(aes(y = .pred)) + 
+  geom_errorbar(aes(ymin = .pred_lower, ymax = .pred_upper), width = .2) + 
+  labs(y = "urchin size") + 
+  ggtitle("Bayesian model with t(1) prior distribution")
+```
