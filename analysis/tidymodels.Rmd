@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 https://www.tidymodels.org/start/models/
 
 ```{r load_packages, message=FALSE, warning=FALSE}
-my_packages <- c('tidyverse', 'tidymodels', 'broom.mixed', 'dotwhisker', 'rstanarm')
+my_packages <- c('tidyverse', 'tidymodels', 'broom.mixed', 'dotwhisker', 'rstanarm', 'mlbench', 'ranger', 'randomForest')
 
 for (my_package in my_packages){
    if(!require(my_package, character.only = TRUE)){
@@ -210,4 +210,111 @@ ggplot(bayes_plot_data, aes(x = food_regime)) +
   geom_errorbar(aes(ymin = .pred_lower, ymax = .pred_upper), width = .2) + 
   labs(y = "urchin size") + 
   ggtitle("Bayesian model with t(1) prior distribution")
+```
+
+## Sonar data
+
+Load and [split data](https://rsample.tidymodels.org/reference/initial_split.html).
+
+```{r sonar}
+data(Sonar, package = "mlbench")
+
+sonar_split <- initial_split(data = Sonar, prop = 0.8, strata = 'Class')
+train_data <- training(sonar_split)
+test_data <- testing(sonar_split)
+```
+
+## `parsnip`
+
+The [parsnip](https://parsnip.tidymodels.org/index.html) package provides a tidy and unified interface to a range of models.
+
+```{r train_rf}
+my_mtry <- ceiling(sqrt(ncol(Sonar)))
+
+rf_ranger <- list()
+rand_forest(mtry = my_mtry, trees = 500) %>%
+  set_engine("ranger", importance = "impurity") %>%
+  set_mode("classification") %>%
+  fit(Class ~ ., data = train_data) -> rf_ranger$model
+
+rf_randomForest <- list()
+rand_forest(mtry = my_mtry, trees = 500) %>%
+  set_engine("randomForest") %>%
+  set_mode("classification") %>%
+  fit(Class ~ ., data = train_data) -> rf_randomForest$model
+```
+
+## `yardstick`
+
+Example data to check how to prepare our data.
+
+```{r two_class_example}
+data(two_class_example)
+str(two_class_example)
+```
+
+Predict and generate table in the format of `two_class_example`.
+
+```{r predict}
+predict_wrapper <- function(model, test_data, type = 'prob'){
+  predict(model, test_data, type = type) %>%
+    mutate(truth = test_data$Class) %>%
+    rename(
+      M = .pred_M,
+      R = .pred_R
+    ) %>%
+    mutate(predicted = as.factor(ifelse(M > 0.5, 'M', 'R'))) %>%
+    select(truth, everything())
+}
+
+rf_ranger$predictions <- predict_wrapper(rf_ranger$model, test_data)
+rf_randomForest$predictions <- predict_wrapper(rf_randomForest$model, test_data)
+```
+
+Area under the PR curve.
+
+```{r pr_auc}
+pr_auc(rf_ranger$predictions, truth, M)
+pr_auc(rf_randomForest$predictions, truth, M)
+```
+
+[PR curve](https://yardstick.tidymodels.org/reference/pr_curve.html).
+
+```{r pr_curve}
+pr_curve(rf_ranger$predictions, truth, M) %>%
+  ggplot(aes(x = recall, y = precision)) +
+  geom_path() +
+  coord_equal() +
+  ggtitle('PR curve (ranger package model)')
+
+pr_curve(rf_randomForest$predictions, truth, M) %>%
+  ggplot(aes(x = recall, y = precision)) +
+  geom_path() +
+  coord_equal() +
+  ggtitle('PR curve (randomForest package model)')
+```
+
+Area under the ROC curve.
+
+```{r roc_auc}
+roc_auc(rf_ranger$predictions, truth, M)
+roc_auc(rf_randomForest$predictions, truth, M)
+```
+
+[ROC curve](https://yardstick.tidymodels.org/reference/roc_curve.html).
+
+```{r roc_curve}
+roc_curve(rf_ranger$predictions, truth, M) %>%
+  ggplot(aes(x = 1 - specificity, y = sensitivity)) +
+  geom_path() +
+  geom_abline(lty = 3) +
+  coord_equal() +
+  ggtitle('ROC curve (ranger package model)')
+
+roc_curve(rf_randomForest$predictions, truth, M) %>%
+  ggplot(aes(x = 1 - specificity, y = sensitivity)) +
+  geom_path() +
+  geom_abline(lty = 3) +
+  coord_equal() +
+  ggtitle('ROC curve (randomForest package model)')
 ```
