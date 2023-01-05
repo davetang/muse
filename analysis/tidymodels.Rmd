@@ -17,7 +17,7 @@ knitr::opts_chunk$set(echo = TRUE)
 https://www.tidymodels.org/start/models/
 
 ```{r load_packages, message=FALSE, warning=FALSE}
-my_packages <- c('tidyverse', 'tidymodels', 'broom.mixed', 'dotwhisker', 'rstanarm', 'mlbench', 'ranger', 'randomForest')
+my_packages <- c('tidyverse', 'tidymodels', 'broom.mixed', 'dotwhisker', 'rstanarm', 'mlbench', 'ranger', 'randomForest', 'rpart.plot', 'vip', 'modeldata')
 
 for (my_package in my_packages){
    if(!require(my_package, character.only = TRUE)){
@@ -214,14 +214,19 @@ ggplot(bayes_plot_data, aes(x = food_regime)) +
 
 ## Sonar data
 
-Load and [split data](https://rsample.tidymodels.org/reference/initial_split.html).
+Load and [split data](https://www.tidymodels.org/start/resampling/#data-split) using [rsample](https://rsample.tidymodels.org/).
+
+The `initial_split()` function takes the original data and saves the information on how to make the partitions. 
+
+The `strata` argument conducts a stratified split ensuring that our training and test data sets will keep roughly the same proportion of classes.
 
 ```{r sonar}
 data(Sonar, package = "mlbench")
 
+set.seed(1984)
 sonar_split <- initial_split(data = Sonar, prop = 0.8, strata = 'Class')
-train_data <- training(sonar_split)
-test_data <- testing(sonar_split)
+sonar_train <- training(sonar_split)
+sonar_test <- testing(sonar_split)
 ```
 
 ## `parsnip`
@@ -232,16 +237,22 @@ The [parsnip](https://parsnip.tidymodels.org/index.html) package provides a tidy
 my_mtry <- ceiling(sqrt(ncol(Sonar)))
 
 rf_ranger <- list()
+
 rand_forest(mtry = my_mtry, trees = 500) %>%
   set_engine("ranger", importance = "impurity") %>%
-  set_mode("classification") %>%
-  fit(Class ~ ., data = train_data) -> rf_ranger$model
+  set_mode("classification") -> rf_ranger$model
+
+rf_ranger$model %>%
+  fit(Class ~ ., data = sonar_train) -> rf_ranger$fit
 
 rf_randomForest <- list()
+
 rand_forest(mtry = my_mtry, trees = 500) %>%
   set_engine("randomForest") %>%
-  set_mode("classification") %>%
-  fit(Class ~ ., data = train_data) -> rf_randomForest$model
+  set_mode("classification") -> rf_randomForest$model
+
+rf_randomForest$model %>%
+  fit(Class ~ ., data = sonar_train) -> rf_randomForest$fit
 ```
 
 ## `yardstick`
@@ -256,8 +267,8 @@ str(two_class_example)
 Predict and generate table in the format of `two_class_example`.
 
 ```{r predict}
-predict_wrapper <- function(model, test_data, type = 'prob'){
-  predict(model, test_data, type = type) %>%
+predict_wrapper <- function(fit, test_data, type = 'prob'){
+  predict(fit, test_data, type = type) %>%
     mutate(truth = test_data$Class) %>%
     rename(
       M = .pred_M,
@@ -267,8 +278,8 @@ predict_wrapper <- function(model, test_data, type = 'prob'){
     select(truth, everything())
 }
 
-rf_ranger$predictions <- predict_wrapper(rf_ranger$model, test_data)
-rf_randomForest$predictions <- predict_wrapper(rf_randomForest$model, test_data)
+rf_ranger$predictions <- predict_wrapper(rf_ranger$fit, sonar_test)
+rf_randomForest$predictions <- predict_wrapper(rf_randomForest$fit, sonar_test)
 ```
 
 Area under the PR curve.
@@ -317,4 +328,191 @@ roc_curve(rf_randomForest$predictions, truth, M) %>%
   geom_abline(lty = 3) +
   coord_equal() +
   ggtitle('ROC curve (randomForest package model)')
+```
+
+## Resampling
+
+Resampling methods, such as cross-validation and the bootstrap, are empirical simulation systems. They create a series of data sets similar to the training/testing split discussed previously; a subset of the data are used for creating the model and a different subset is used to measure performance. **Resampling is always used with the training set**.
+
+Cross-validation folds can be created using `vfold_cv()`. Here we perform a 5-fold cross-validation, which splits the data into 80/20, repeated 3 times.
+
+```{r vfold_cv}
+set.seed(1984)
+folds <- vfold_cv(sonar_train, v = 5, repeats = 3)
+folds
+```
+
+Use `workflow()` to bundle a model and formula.
+
+```{r workflow}
+workflow() %>%
+  add_model(rf_ranger$model) %>%
+  add_formula(Class ~ .) -> rf_ranger$wf
+
+set.seed(1984)
+rf_ranger$wf %>%
+  fit_resamples(folds) -> rf_ranger$fit_rs
+
+workflow() %>%
+  add_model(rf_randomForest$model) %>%
+  add_formula(Class ~ .) -> rf_randomForest$wf
+
+set.seed(1984)
+rf_randomForest$wf %>%
+  fit_resamples(folds) -> rf_randomForest$fit_rs
+```
+
+Metrics.
+
+```{r collect_metrics}
+collect_metrics(rf_ranger$fit_rs)
+collect_metrics(rf_randomForest$fit_rs)
+```
+
+Compare with single sample.
+
+```{r roc_auc_again}
+roc_auc(rf_ranger$predictions, truth, M)
+roc_auc(rf_randomForest$predictions, truth, M)
+```
+
+## Tuning
+
+Some model parameters cannot be learned directly from a data set during model training; these kinds of parameters are called hyperparameters. Instead of learning these kinds of hyperparameters during model training, we can estimate the best values for these values by training many models on resampled data sets and exploring how well all these models perform. This process is called tuning.
+
+Prepare data.
+
+```{r prepare_cells_data}
+data(cells, package = "modeldata")
+
+set.seed(123)
+cell_split <- initial_split(
+  cells %>% select(-case), 
+  strata = class
+)
+cell_train <- training(cell_split)
+cell_test  <- testing(cell_split)
+```
+
+Tune `cost_complexity` and `tree_depth`. Use `args()` to see which parsnip object arguments are available for tuning.
+
+```{r tune_spec}
+tune_spec <- 
+  decision_tree(
+    cost_complexity = tune(),
+    tree_depth = tune()
+  ) %>% 
+  set_engine("rpart") %>% 
+  set_mode("classification")
+
+tune_spec
+```
+
+Create grid using `grid_regular`, which chooses sensible values to try for each hyperparameter. Since we have two parameters to tune, there are 25 different combinations.
+
+```{r tree_grid}
+tree_grid <- grid_regular(
+  cost_complexity(),
+  tree_depth(),
+  levels = 5
+)
+
+tree_grid
+```
+
+Create cross-validation folds (default is 10-fold).
+
+```{r cell_folds}
+set.seed(234)
+cell_folds <- vfold_cv(cell_train)
+cell_folds
+```
+
+Workflow.
+
+```{r tree_wf}
+set.seed(345)
+
+tree_wf <- workflow() %>%
+  add_model(tune_spec) %>%
+  add_formula(class ~ .)
+
+system.time(
+  tree_res <- 
+    tree_wf %>% 
+    tune_grid(
+      resamples = cell_folds,
+      grid = tree_grid
+    )
+)
+```
+
+Show best and select best metrics.
+
+```{r tree_res_show_best}
+tree_res %>%
+  show_best("roc_auc")
+
+tree_res %>%
+  select_best("roc_auc")
+```
+
+Plot.
+
+```{r tree_res_plot}
+tree_res %>%
+  collect_metrics() %>%
+  mutate(tree_depth = factor(tree_depth)) %>%
+  ggplot(aes(cost_complexity, mean, color = tree_depth)) +
+  geom_line(linewidth = 1.5, alpha = 0.6) +
+  geom_point(size = 2) +
+  facet_wrap(~ .metric, scales = "free", nrow = 2) +
+  scale_x_log10(labels = scales::label_number()) +
+  scale_color_viridis_d(option = "plasma", begin = .9, end = 0)
+```
+
+Finalise.
+
+```{r final_wf}
+tree_res %>%
+  select_best("accuracy") -> best_tree
+
+final_wf <- 
+  tree_wf %>% 
+  finalize_workflow(best_tree)
+
+final_wf
+```
+
+Last fit using `last_fit`, which _fits_ the finalised model on the full training data set and _evaluates_ the finalised model on the testing data.
+
+```{r last_fit}
+final_fit <- 
+  final_wf %>%
+  last_fit(cell_split) 
+
+final_fit %>%
+  collect_metrics()
+
+final_fit %>%
+  collect_predictions() %>% 
+  roc_curve(class, .pred_PS) %>% 
+  autoplot()
+```
+
+The `final_fit` object contains a finalised, fitted workflow that you can use for predicting on new data or further understanding the results. You may want to extract this object, using one of the `extract_` helper functions.
+
+```{r final_tree}
+final_tree <- extract_workflow(final_fit)
+final_tree %>%
+  extract_fit_engine() %>%
+  rpart.plot(roundint = FALSE)
+```
+
+Variable importance.
+
+```{r vip}
+final_tree %>% 
+  extract_fit_parsnip() %>% 
+  vip()
 ```
