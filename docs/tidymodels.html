@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-01-04" />
+<meta name="date" content="2023-01-05" />
 
 <title>Getting started with tidymodels</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Getting started with tidymodels</h1>
-<h4 class="date">2023-01-04</h4>
+<h4 class="date">2023-01-05</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-01-04
+<strong>Last updated:</strong> 2023-01-05
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree69cc7f42fdf3a0cbab84dfc1acdaafe24e4f6907targetblank69cc7f4a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebf76efac480f7549bcf9b9f627230e3f0b4cb9d2targetblankbf76efaa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/69cc7f42fdf3a0cbab84dfc1acdaafe24e4f6907" target="_blank">69cc7f4</a>
+<a href="https://github.com/davetang/muse/tree/bf76efac480f7549bcf9b9f627230e3f0b4cb9d2" target="_blank">bf76efa</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree69cc7f42fdf3a0cbab84dfc1acdaafe24e4f6907targetblank69cc7f4a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebf76efac480f7549bcf9b9f627230e3f0b4cb9d2targetblankbf76efaa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/69cc7f42fdf3a0cbab84dfc1acdaafe24e4f6907" target="_blank">69cc7f4</a>.
+<a href="https://github.com/davetang/muse/tree/bf76efac480f7549bcf9b9f627230e3f0b4cb9d2" target="_blank">bf76efa</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -607,6 +607,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/bf76efac480f7549bcf9b9f627230e3f0b4cb9d2/analysis/tidymodels.Rmd" target="_blank">bf76efa</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-01-05
+</td>
+<td>
+Resampling and tuning
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/5eaca4e9121c17c3aa1388e3edd94eabb64a994d/docs/tidymodels.html" target="_blank">5eaca4e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-01-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -703,7 +737,7 @@ Tidymodels
 <h2>Build a model</h2>
 <p><a href="https://www.tidymodels.org/start/models/"
 class="uri">https://www.tidymodels.org/start/models/</a></p>
-<pre class="r"><code>my_packages &lt;- c(&#39;tidyverse&#39;, &#39;tidymodels&#39;, &#39;broom.mixed&#39;, &#39;dotwhisker&#39;, &#39;rstanarm&#39;, &#39;mlbench&#39;, &#39;ranger&#39;, &#39;randomForest&#39;)
+<pre class="r"><code>my_packages &lt;- c(&#39;tidyverse&#39;, &#39;tidymodels&#39;, &#39;broom.mixed&#39;, &#39;dotwhisker&#39;, &#39;rstanarm&#39;, &#39;mlbench&#39;, &#39;ranger&#39;, &#39;randomForest&#39;, &#39;rpart.plot&#39;, &#39;vip&#39;, &#39;modeldata&#39;)
 
 for (my_package in my_packages){
    if(!require(my_package, character.only = TRUE)){
@@ -1119,13 +1153,20 @@ Dave Tang
 <div id="sonar-data" class="section level2">
 <h2>Sonar data</h2>
 <p>Load and <a
-href="https://rsample.tidymodels.org/reference/initial_split.html">split
-data</a>.</p>
+href="https://www.tidymodels.org/start/resampling/#data-split">split
+data</a> using <a
+href="https://rsample.tidymodels.org/">rsample</a>.</p>
+<p>The <code>initial_split()</code> function takes the original data and
+saves the information on how to make the partitions.</p>
+<p>The <code>strata</code> argument conducts a stratified split ensuring
+that our training and test data sets will keep roughly the same
+proportion of classes.</p>
 <pre class="r"><code>data(Sonar, package = &quot;mlbench&quot;)
 
+set.seed(1984)
 sonar_split &lt;- initial_split(data = Sonar, prop = 0.8, strata = &#39;Class&#39;)
-train_data &lt;- training(sonar_split)
-test_data &lt;- testing(sonar_split)</code></pre>
+sonar_train &lt;- training(sonar_split)
+sonar_test &lt;- testing(sonar_split)</code></pre>
 </div>
 <div id="parsnip" class="section level2">
 <h2><code>parsnip</code></h2>
@@ -1134,16 +1175,22 @@ package provides a tidy and unified interface to a range of models.</p>
 <pre class="r"><code>my_mtry &lt;- ceiling(sqrt(ncol(Sonar)))
 
 rf_ranger &lt;- list()
+
 rand_forest(mtry = my_mtry, trees = 500) %&gt;%
   set_engine(&quot;ranger&quot;, importance = &quot;impurity&quot;) %&gt;%
-  set_mode(&quot;classification&quot;) %&gt;%
-  fit(Class ~ ., data = train_data) -&gt; rf_ranger$model
+  set_mode(&quot;classification&quot;) -&gt; rf_ranger$model
+
+rf_ranger$model %&gt;%
+  fit(Class ~ ., data = sonar_train) -&gt; rf_ranger$fit
 
 rf_randomForest &lt;- list()
+
 rand_forest(mtry = my_mtry, trees = 500) %&gt;%
   set_engine(&quot;randomForest&quot;) %&gt;%
-  set_mode(&quot;classification&quot;) %&gt;%
-  fit(Class ~ ., data = train_data) -&gt; rf_randomForest$model</code></pre>
+  set_mode(&quot;classification&quot;) -&gt; rf_randomForest$model
+
+rf_randomForest$model %&gt;%
+  fit(Class ~ ., data = sonar_train) -&gt; rf_randomForest$fit</code></pre>
 </div>
 <div id="yardstick" class="section level2">
 <h2><code>yardstick</code></h2>
@@ -1157,8 +1204,8 @@ str(two_class_example)</code></pre>
  $ predicted: Factor w/ 2 levels &quot;Class1&quot;,&quot;Class2&quot;: 2 1 2 1 2 1 1 1 2 2 ...</code></pre>
 <p>Predict and generate table in the format of
 <code>two_class_example</code>.</p>
-<pre class="r"><code>predict_wrapper &lt;- function(model, test_data, type = &#39;prob&#39;){
-  predict(model, test_data, type = type) %&gt;%
+<pre class="r"><code>predict_wrapper &lt;- function(fit, test_data, type = &#39;prob&#39;){
+  predict(fit, test_data, type = type) %&gt;%
     mutate(truth = test_data$Class) %&gt;%
     rename(
       M = .pred_M,
@@ -1168,19 +1215,19 @@ str(two_class_example)</code></pre>
     select(truth, everything())
 }
 
-rf_ranger$predictions &lt;- predict_wrapper(rf_ranger$model, test_data)
-rf_randomForest$predictions &lt;- predict_wrapper(rf_randomForest$model, test_data)</code></pre>
+rf_ranger$predictions &lt;- predict_wrapper(rf_ranger$fit, sonar_test)
+rf_randomForest$predictions &lt;- predict_wrapper(rf_randomForest$fit, sonar_test)</code></pre>
 <p>Area under the PR curve.</p>
 <pre class="r"><code>pr_auc(rf_ranger$predictions, truth, M)</code></pre>
 <pre><code># A tibble: 1 × 3
   .metric .estimator .estimate
   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 pr_auc  binary         0.914</code></pre>
+1 pr_auc  binary         0.926</code></pre>
 <pre class="r"><code>pr_auc(rf_randomForest$predictions, truth, M)</code></pre>
 <pre><code># A tibble: 1 × 3
   .metric .estimator .estimate
   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 pr_auc  binary         0.945</code></pre>
+1 pr_auc  binary         0.913</code></pre>
 <p><a href="https://yardstick.tidymodels.org/reference/pr_curve.html">PR
 curve</a>.</p>
 <pre class="r"><code>pr_curve(rf_ranger$predictions, truth, M) %&gt;%
@@ -1189,23 +1236,97 @@ curve</a>.</p>
   coord_equal() +
   ggtitle(&#39;PR curve (ranger package model)&#39;)</code></pre>
 <p><img src="figure/tidymodels.Rmd/pr_curve-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-pr_curve-1">
+Past versions of pr_curve-1.png
+</button>
+</p>
+<div id="fig-pr_curve-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/5eaca4e9121c17c3aa1388e3edd94eabb64a994d/docs/figure/tidymodels.Rmd/pr_curve-1.png" target="_blank">5eaca4e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-01-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>pr_curve(rf_randomForest$predictions, truth, M) %&gt;%
   ggplot(aes(x = recall, y = precision)) +
   geom_path() +
   coord_equal() +
   ggtitle(&#39;PR curve (randomForest package model)&#39;)</code></pre>
 <p><img src="figure/tidymodels.Rmd/pr_curve-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-pr_curve-2">
+Past versions of pr_curve-2.png
+</button>
+</p>
+<div id="fig-pr_curve-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/5eaca4e9121c17c3aa1388e3edd94eabb64a994d/docs/figure/tidymodels.Rmd/pr_curve-2.png" target="_blank">5eaca4e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-01-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Area under the ROC curve.</p>
 <pre class="r"><code>roc_auc(rf_ranger$predictions, truth, M)</code></pre>
 <pre><code># A tibble: 1 × 3
   .metric .estimator .estimate
   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 roc_auc binary         0.909</code></pre>
+1 roc_auc binary         0.904</code></pre>
 <pre class="r"><code>roc_auc(rf_randomForest$predictions, truth, M)</code></pre>
 <pre><code># A tibble: 1 × 3
   .metric .estimator .estimate
   &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 roc_auc binary         0.940</code></pre>
+1 roc_auc binary         0.890</code></pre>
 <p><a
 href="https://yardstick.tidymodels.org/reference/roc_curve.html">ROC
 curve</a>.</p>
@@ -1216,6 +1337,43 @@ curve</a>.</p>
   coord_equal() +
   ggtitle(&#39;ROC curve (ranger package model)&#39;)</code></pre>
 <p><img src="figure/tidymodels.Rmd/roc_curve-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-roc_curve-1">
+Past versions of roc_curve-1.png
+</button>
+</p>
+<div id="fig-roc_curve-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/5eaca4e9121c17c3aa1388e3edd94eabb64a994d/docs/figure/tidymodels.Rmd/roc_curve-1.png" target="_blank">5eaca4e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-01-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>roc_curve(rf_randomForest$predictions, truth, M) %&gt;%
   ggplot(aes(x = 1 - specificity, y = sensitivity)) +
   geom_path() +
@@ -1223,6 +1381,299 @@ curve</a>.</p>
   coord_equal() +
   ggtitle(&#39;ROC curve (randomForest package model)&#39;)</code></pre>
 <p><img src="figure/tidymodels.Rmd/roc_curve-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-roc_curve-2">
+Past versions of roc_curve-2.png
+</button>
+</p>
+<div id="fig-roc_curve-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/5eaca4e9121c17c3aa1388e3edd94eabb64a994d/docs/figure/tidymodels.Rmd/roc_curve-2.png" target="_blank">5eaca4e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-01-04
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="resampling" class="section level2">
+<h2>Resampling</h2>
+<p>Resampling methods, such as cross-validation and the bootstrap, are
+empirical simulation systems. They create a series of data sets similar
+to the training/testing split discussed previously; a subset of the data
+are used for creating the model and a different subset is used to
+measure performance. <strong>Resampling is always used with the training
+set</strong>.</p>
+<p>Cross-validation folds can be created using <code>vfold_cv()</code>.
+Here we perform a 5-fold cross-validation, which splits the data into
+80/20, repeated 3 times.</p>
+<pre class="r"><code>set.seed(1984)
+folds &lt;- vfold_cv(sonar_train, v = 5, repeats = 3)
+folds</code></pre>
+<pre><code>#  5-fold cross-validation repeated 3 times 
+# A tibble: 15 × 3
+   splits           id      id2  
+   &lt;list&gt;           &lt;chr&gt;   &lt;chr&gt;
+ 1 &lt;split [132/33]&gt; Repeat1 Fold1
+ 2 &lt;split [132/33]&gt; Repeat1 Fold2
+ 3 &lt;split [132/33]&gt; Repeat1 Fold3
+ 4 &lt;split [132/33]&gt; Repeat1 Fold4
+ 5 &lt;split [132/33]&gt; Repeat1 Fold5
+ 6 &lt;split [132/33]&gt; Repeat2 Fold1
+ 7 &lt;split [132/33]&gt; Repeat2 Fold2
+ 8 &lt;split [132/33]&gt; Repeat2 Fold3
+ 9 &lt;split [132/33]&gt; Repeat2 Fold4
+10 &lt;split [132/33]&gt; Repeat2 Fold5
+11 &lt;split [132/33]&gt; Repeat3 Fold1
+12 &lt;split [132/33]&gt; Repeat3 Fold2
+13 &lt;split [132/33]&gt; Repeat3 Fold3
+14 &lt;split [132/33]&gt; Repeat3 Fold4
+15 &lt;split [132/33]&gt; Repeat3 Fold5</code></pre>
+<p>Use <code>workflow()</code> to bundle a model and formula.</p>
+<pre class="r"><code>workflow() %&gt;%
+  add_model(rf_ranger$model) %&gt;%
+  add_formula(Class ~ .) -&gt; rf_ranger$wf
+
+set.seed(1984)
+rf_ranger$wf %&gt;%
+  fit_resamples(folds) -&gt; rf_ranger$fit_rs
+
+workflow() %&gt;%
+  add_model(rf_randomForest$model) %&gt;%
+  add_formula(Class ~ .) -&gt; rf_randomForest$wf
+
+set.seed(1984)
+rf_randomForest$wf %&gt;%
+  fit_resamples(folds) -&gt; rf_randomForest$fit_rs</code></pre>
+<p>Metrics.</p>
+<pre class="r"><code>collect_metrics(rf_ranger$fit_rs)</code></pre>
+<pre><code># A tibble: 2 × 6
+  .metric  .estimator  mean     n std_err .config             
+  &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy binary     0.810    15  0.0183 Preprocessor1_Model1
+2 roc_auc  binary     0.918    15  0.0125 Preprocessor1_Model1</code></pre>
+<pre class="r"><code>collect_metrics(rf_randomForest$fit_rs)</code></pre>
+<pre><code># A tibble: 2 × 6
+  .metric  .estimator  mean     n std_err .config             
+  &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy binary     0.818    15  0.0156 Preprocessor1_Model1
+2 roc_auc  binary     0.925    15  0.0110 Preprocessor1_Model1</code></pre>
+<p>Compare with single sample.</p>
+<pre class="r"><code>roc_auc(rf_ranger$predictions, truth, M)</code></pre>
+<pre><code># A tibble: 1 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 roc_auc binary         0.904</code></pre>
+<pre class="r"><code>roc_auc(rf_randomForest$predictions, truth, M)</code></pre>
+<pre><code># A tibble: 1 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 roc_auc binary         0.890</code></pre>
+</div>
+<div id="tuning" class="section level2">
+<h2>Tuning</h2>
+<p>Some model parameters cannot be learned directly from a data set
+during model training; these kinds of parameters are called
+hyperparameters. Instead of learning these kinds of hyperparameters
+during model training, we can estimate the best values for these values
+by training many models on resampled data sets and exploring how well
+all these models perform. This process is called tuning.</p>
+<p>Prepare data.</p>
+<pre class="r"><code>data(cells, package = &quot;modeldata&quot;)
+
+set.seed(123)
+cell_split &lt;- initial_split(
+  cells %&gt;% select(-case), 
+  strata = class
+)
+cell_train &lt;- training(cell_split)
+cell_test  &lt;- testing(cell_split)</code></pre>
+<p>Tune <code>cost_complexity</code> and <code>tree_depth</code>. Use
+<code>args()</code> to see which parsnip object arguments are available
+for tuning.</p>
+<pre class="r"><code>tune_spec &lt;- 
+  decision_tree(
+    cost_complexity = tune(),
+    tree_depth = tune()
+  ) %&gt;% 
+  set_engine(&quot;rpart&quot;) %&gt;% 
+  set_mode(&quot;classification&quot;)
+
+tune_spec</code></pre>
+<pre><code>Decision Tree Model Specification (classification)
+
+Main Arguments:
+  cost_complexity = tune()
+  tree_depth = tune()
+
+Computational engine: rpart </code></pre>
+<p>Create grid using <code>grid_regular</code>, which chooses sensible
+values to try for each hyperparameter. Since we have two parameters to
+tune, there are 25 different combinations.</p>
+<pre class="r"><code>tree_grid &lt;- grid_regular(
+  cost_complexity(),
+  tree_depth(),
+  levels = 5
+)
+
+tree_grid</code></pre>
+<pre><code># A tibble: 25 × 2
+   cost_complexity tree_depth
+             &lt;dbl&gt;      &lt;int&gt;
+ 1    0.0000000001          1
+ 2    0.0000000178          1
+ 3    0.00000316            1
+ 4    0.000562              1
+ 5    0.1                   1
+ 6    0.0000000001          4
+ 7    0.0000000178          4
+ 8    0.00000316            4
+ 9    0.000562              4
+10    0.1                   4
+# … with 15 more rows</code></pre>
+<p>Create cross-validation folds (default is 10-fold).</p>
+<pre class="r"><code>set.seed(234)
+cell_folds &lt;- vfold_cv(cell_train)
+cell_folds</code></pre>
+<pre><code>#  10-fold cross-validation 
+# A tibble: 10 × 2
+   splits             id    
+   &lt;list&gt;             &lt;chr&gt; 
+ 1 &lt;split [1362/152]&gt; Fold01
+ 2 &lt;split [1362/152]&gt; Fold02
+ 3 &lt;split [1362/152]&gt; Fold03
+ 4 &lt;split [1362/152]&gt; Fold04
+ 5 &lt;split [1363/151]&gt; Fold05
+ 6 &lt;split [1363/151]&gt; Fold06
+ 7 &lt;split [1363/151]&gt; Fold07
+ 8 &lt;split [1363/151]&gt; Fold08
+ 9 &lt;split [1363/151]&gt; Fold09
+10 &lt;split [1363/151]&gt; Fold10</code></pre>
+<p>Workflow.</p>
+<pre class="r"><code>set.seed(345)
+
+tree_wf &lt;- workflow() %&gt;%
+  add_model(tune_spec) %&gt;%
+  add_formula(class ~ .)
+
+system.time(
+  tree_res &lt;- 
+    tree_wf %&gt;% 
+    tune_grid(
+      resamples = cell_folds,
+      grid = tree_grid
+    )
+)</code></pre>
+<pre><code>    user   system  elapsed 
+ 356.093 1569.760   86.919 </code></pre>
+<p>Show best and select best metrics.</p>
+<pre class="r"><code>tree_res %&gt;%
+  show_best(&quot;roc_auc&quot;)</code></pre>
+<pre><code># A tibble: 5 × 8
+  cost_complexity tree_depth .metric .estimator  mean     n std_err .config     
+            &lt;dbl&gt;      &lt;int&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;       
+1    0.000562             11 roc_auc binary     0.855    10  0.0147 Preprocesso…
+2    0.0000000001         11 roc_auc binary     0.854    10  0.0146 Preprocesso…
+3    0.0000000178         11 roc_auc binary     0.854    10  0.0146 Preprocesso…
+4    0.00000316           11 roc_auc binary     0.854    10  0.0146 Preprocesso…
+5    0.000562              8 roc_auc binary     0.854    10  0.0145 Preprocesso…</code></pre>
+<pre class="r"><code>tree_res %&gt;%
+  select_best(&quot;roc_auc&quot;)</code></pre>
+<pre><code># A tibble: 1 × 3
+  cost_complexity tree_depth .config              
+            &lt;dbl&gt;      &lt;int&gt; &lt;chr&gt;                
+1        0.000562         11 Preprocessor1_Model19</code></pre>
+<p>Plot.</p>
+<pre class="r"><code>tree_res %&gt;%
+  collect_metrics() %&gt;%
+  mutate(tree_depth = factor(tree_depth)) %&gt;%
+  ggplot(aes(cost_complexity, mean, color = tree_depth)) +
+  geom_line(linewidth = 1.5, alpha = 0.6) +
+  geom_point(size = 2) +
+  facet_wrap(~ .metric, scales = &quot;free&quot;, nrow = 2) +
+  scale_x_log10(labels = scales::label_number()) +
+  scale_color_viridis_d(option = &quot;plasma&quot;, begin = .9, end = 0)</code></pre>
+<p><img src="figure/tidymodels.Rmd/tree_res_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Finalise.</p>
+<pre class="r"><code>tree_res %&gt;%
+  select_best(&quot;accuracy&quot;) -&gt; best_tree
+
+final_wf &lt;- 
+  tree_wf %&gt;% 
+  finalize_workflow(best_tree)
+
+final_wf</code></pre>
+<pre><code>══ Workflow ════════════════════════════════════════════════════════════════════
+Preprocessor: Formula
+Model: decision_tree()
+
+── Preprocessor ────────────────────────────────────────────────────────────────
+class ~ .
+
+── Model ───────────────────────────────────────────────────────────────────────
+Decision Tree Model Specification (classification)
+
+Main Arguments:
+  cost_complexity = 1e-10
+  tree_depth = 4
+
+Computational engine: rpart </code></pre>
+<p>Last fit using <code>last_fit</code>, which <em>fits</em> the
+finalised model on the full training data set and <em>evaluates</em> the
+finalised model on the testing data.</p>
+<pre class="r"><code>final_fit &lt;- 
+  final_wf %&gt;%
+  last_fit(cell_split) 
+
+final_fit %&gt;%
+  collect_metrics()</code></pre>
+<pre><code># A tibble: 2 × 4
+  .metric  .estimator .estimate .config             
+  &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;               
+1 accuracy binary         0.802 Preprocessor1_Model1
+2 roc_auc  binary         0.840 Preprocessor1_Model1</code></pre>
+<pre class="r"><code>final_fit %&gt;%
+  collect_predictions() %&gt;% 
+  roc_curve(class, .pred_PS) %&gt;% 
+  autoplot()</code></pre>
+<p><img src="figure/tidymodels.Rmd/last_fit-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The <code>final_fit</code> object contains a finalised, fitted
+workflow that you can use for predicting on new data or further
+understanding the results. You may want to extract this object, using
+one of the <code>extract_</code> helper functions.</p>
+<pre class="r"><code>final_tree &lt;- extract_workflow(final_fit)
+final_tree %&gt;%
+  extract_fit_engine() %&gt;%
+  rpart.plot(roundint = FALSE)</code></pre>
+<p><img src="figure/tidymodels.Rmd/final_tree-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Variable importance.</p>
+<pre class="r"><code>final_tree %&gt;% 
+  extract_fit_parsnip() %&gt;% 
+  vip()</code></pre>
+<p><img src="figure/tidymodels.Rmd/vip-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1252,16 +1703,17 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] randomForest_4.7-1.1 ranger_0.14.1        mlbench_2.1-3       
- [4] rstanarm_2.21.3      Rcpp_1.0.9           dotwhisker_0.7.4    
- [7] broom.mixed_0.2.9.4  yardstick_1.1.0      workflowsets_1.0.0  
-[10] workflows_1.1.2      tune_1.0.1           rsample_1.1.1       
-[13] recipes_1.0.3        parsnip_1.0.3        modeldata_1.0.1     
-[16] infer_1.0.4          dials_1.1.0          scales_1.2.1        
-[19] broom_1.0.1          tidymodels_1.0.0     forcats_0.5.2       
-[22] stringr_1.4.1        dplyr_1.0.10         purrr_0.3.5         
-[25] readr_2.1.3          tidyr_1.2.1          tibble_3.1.8        
-[28] ggplot2_3.4.0        tidyverse_1.3.2      workflowr_1.7.0     
+ [1] vip_0.3.2            rpart.plot_3.1.1     rpart_4.1.19        
+ [4] randomForest_4.7-1.1 ranger_0.14.1        mlbench_2.1-3       
+ [7] rstanarm_2.21.3      Rcpp_1.0.9           dotwhisker_0.7.4    
+[10] broom.mixed_0.2.9.4  yardstick_1.1.0      workflowsets_1.0.0  
+[13] workflows_1.1.2      tune_1.0.1           rsample_1.1.1       
+[16] recipes_1.0.3        parsnip_1.0.3        modeldata_1.0.1     
+[19] infer_1.0.4          dials_1.1.0          scales_1.2.1        
+[22] broom_1.0.1          tidymodels_1.0.0     forcats_0.5.2       
+[25] stringr_1.4.1        dplyr_1.0.10         purrr_0.3.5         
+[28] readr_2.1.3          tidyr_1.2.1          tibble_3.1.8        
+[31] ggplot2_3.4.0        tidyverse_1.3.2      workflowr_1.7.0     
 
 loaded via a namespace (and not attached):
   [1] utf8_1.2.2           ggstance_0.3.6       tidyselect_1.2.0    
@@ -1269,23 +1721,23 @@ loaded via a namespace (and not attached):
   [7] munsell_0.5.0        codetools_0.2-18     DT_0.26             
  [10] future_1.29.0        miniUI_0.1.1.1       withr_2.5.0         
  [13] colorspace_2.0-3     highr_0.9            knitr_1.40          
- [16] rstudioapi_0.14      stats4_4.2.0         bayesplot_1.10.0    
- [19] listenv_0.8.0        labeling_0.4.2       git2r_0.30.1        
- [22] rstan_2.21.7         farver_2.1.1         bit64_4.0.5         
- [25] DiceDesign_1.9       datawizard_0.6.4     rprojroot_2.0.3     
- [28] parallelly_1.32.1    vctrs_0.5.0          generics_0.1.3      
- [31] ipred_0.9-13         xfun_0.34            R6_2.5.1            
- [34] markdown_1.3         lhs_1.1.5            cachem_1.0.6        
- [37] assertthat_0.2.1     vroom_1.6.0          promises_1.2.0.1    
- [40] nnet_7.3-18          googlesheets4_1.0.1  gtable_0.3.1        
- [43] globals_0.16.1       processx_3.8.0       timeDate_4021.107   
- [46] rlang_1.0.6          splines_4.2.0        gargle_1.2.1        
- [49] inline_0.3.19        yaml_2.3.6           reshape2_1.4.4      
- [52] modelr_0.1.10        threejs_0.3.3        crosstalk_1.2.0     
- [55] backports_1.4.1      httpuv_1.6.6         tools_4.2.0         
- [58] lava_1.7.0           ellipsis_0.3.2       jquerylib_0.1.4     
- [61] plyr_1.8.8           base64enc_0.1-3      ps_1.7.2            
- [64] prettyunits_1.1.1    rpart_4.1.19         zoo_1.8-11          
+ [16] rstudioapi_0.14      stats4_4.2.0         modelenv_0.1.0      
+ [19] bayesplot_1.10.0     listenv_0.8.0        labeling_0.4.2      
+ [22] git2r_0.30.1         rstan_2.21.7         farver_2.1.1        
+ [25] bit64_4.0.5          DiceDesign_1.9       datawizard_0.6.4    
+ [28] rprojroot_2.0.3      parallelly_1.32.1    vctrs_0.5.0         
+ [31] generics_0.1.3       ipred_0.9-13         xfun_0.34           
+ [34] R6_2.5.1             markdown_1.3         lhs_1.1.5           
+ [37] cachem_1.0.6         assertthat_0.2.1     vroom_1.6.0         
+ [40] promises_1.2.0.1     nnet_7.3-18          googlesheets4_1.0.1 
+ [43] gtable_0.3.1         globals_0.16.1       processx_3.8.0      
+ [46] timeDate_4021.107    rlang_1.0.6          splines_4.2.0       
+ [49] gargle_1.2.1         inline_0.3.19        yaml_2.3.6          
+ [52] reshape2_1.4.4       modelr_0.1.10        threejs_0.3.3       
+ [55] crosstalk_1.2.0      backports_1.4.1      httpuv_1.6.6        
+ [58] tools_4.2.0          lava_1.7.0           ellipsis_0.3.2      
+ [61] jquerylib_0.1.4      plyr_1.8.8           base64enc_0.1-3     
+ [64] ps_1.7.2             prettyunits_1.1.1    zoo_1.8-11          
  [67] haven_2.5.1          fs_1.5.2             furrr_0.3.1         
  [70] magrittr_2.0.3       colourpicker_1.2.0   reprex_2.0.2        
  [73] GPfit_1.0-8          googledrive_2.0.0    whisker_0.4         
