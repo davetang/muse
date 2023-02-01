@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2023-02-01" />
+
+<title>Using the Fast preranked Gene Set Enrichment Analysis (fgsea) package</title>
+
+<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Using the Fast preranked Gene Set
+Enrichment Analysis (fgsea) package</h1>
+<h4 class="date">2023-02-01</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2023-02-01
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefb915380459c4cba93cbbaa75828886048e1935atargetblankfb91538a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/fb915380459c4cba93cbbaa75828886048e1935a" target="_blank">fb91538</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefb915380459c4cba93cbbaa75828886048e1935atargetblankfb91538a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/fb915380459c4cba93cbbaa75828886048e1935a" target="_blank">fb91538</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    r_packages_4.1.2/
+    Ignored:    r_packages_4.2.0/
+
+Untracked files:
+    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  analysis/tss_xgboost.Rmd
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
+    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
+    Untracked:  data/ncrna_noncode_v3.fa
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/fgsea.Rmd</code>) and HTML
+(<code>docs/fgsea.html</code>) files. If you’ve configured a remote Git
+repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
+in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/fb915380459c4cba93cbbaa75828886048e1935a/analysis/fgsea.Rmd" target="_blank">fb91538</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-02-01
+</td>
+<td>
+fgsea example data
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>From the <a href="https://pubmed.ncbi.nlm.nih.gov/16199517/">original
+paper</a> describing the Gene Set Enrichment Analysis (GSEA):</p>
+<blockquote>
+<p>The goal of GSEA is to determine whether members of a gene set
+<strong>S</strong> tend to occur toward the top (or bottom) of the list
+<strong>L</strong>, in which case the gene set is correlated with the
+phenotypic class distinction.</p>
+</blockquote>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>First install <a
+href="https://bioconductor.org/packages/release/bioc/html/fgsea.html">fgsea</a>.</p>
+<pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+  install.packages(&quot;BiocManager&quot;)
+
+if (!require(&quot;fgsea&quot;, quietly = TRUE))
+  BiocManager::install(&quot;fgsea&quot;)
+
+library(fgsea)</code></pre>
+</div>
+<div id="example-data" class="section level2">
+<h2>Example data</h2>
+<p>The example pathways are packaged with <code>fgsea</code> and can be
+loaded with <code>data()</code>. The example pathways are stored in a
+list.</p>
+<pre class="r"><code>data(&quot;examplePathways&quot;, package = &quot;fgsea&quot;)
+class(examplePathways)</code></pre>
+<pre><code>[1] &quot;list&quot;</code></pre>
+<p>There are 1457 example pathways.</p>
+<pre class="r"><code>length(examplePathways)</code></pre>
+<pre><code>[1] 1457</code></pre>
+<p>The first pathway 1221633_Meiotic_Synapsis contains Entrez Gene IDs
+that belong to this gene set.</p>
+<pre class="r"><code>examplePathways[1]</code></pre>
+<pre><code>$`1221633_Meiotic_Synapsis`
+ [1] &quot;12189&quot;     &quot;13006&quot;     &quot;15077&quot;     &quot;15078&quot;     &quot;15270&quot;     &quot;15512&quot;    
+ [7] &quot;16905&quot;     &quot;16906&quot;     &quot;19357&quot;     &quot;20842&quot;     &quot;20843&quot;     &quot;20957&quot;    
+[13] &quot;20962&quot;     &quot;21749&quot;     &quot;21750&quot;     &quot;22196&quot;     &quot;23856&quot;     &quot;24061&quot;    
+[19] &quot;28113&quot;     &quot;50878&quot;     &quot;56739&quot;     &quot;57321&quot;     &quot;64009&quot;     &quot;66654&quot;    
+[25] &quot;69386&quot;     &quot;71846&quot;     &quot;74075&quot;     &quot;77053&quot;     &quot;94244&quot;     &quot;97114&quot;    
+[31] &quot;97122&quot;     &quot;97908&quot;     &quot;101185&quot;    &quot;140557&quot;    &quot;223697&quot;    &quot;260423&quot;   
+[37] &quot;319148&quot;    &quot;319149&quot;    &quot;319150&quot;    &quot;319151&quot;    &quot;319152&quot;    &quot;319153&quot;   
+[43] &quot;319154&quot;    &quot;319155&quot;    &quot;319156&quot;    &quot;319157&quot;    &quot;319158&quot;    &quot;319159&quot;   
+[49] &quot;319160&quot;    &quot;319161&quot;    &quot;319565&quot;    &quot;320332&quot;    &quot;320558&quot;    &quot;326619&quot;   
+[55] &quot;326620&quot;    &quot;360198&quot;    &quot;497652&quot;    &quot;544973&quot;    &quot;625328&quot;    &quot;667250&quot;   
+[61] &quot;100041230&quot; &quot;102641229&quot; &quot;102641751&quot; &quot;102642045&quot;</code></pre>
+<p>The gene ranks are also packaged with <code>fgsea</code> but we will
+re-generate the ranks based on the <a
+href="https://github.com/ctlab/fgsea/blob/master/inst/gen_gene_ranks.R">author’s
+code</a> to see how the ranks were created. Several other Bioconductor
+packages are required.</p>
+<pre class="r"><code>bioc_pac &lt;- c(&quot;GEOquery&quot;, &quot;limma&quot;, &quot;org.Mm.eg.db&quot;)
+cran_pac &lt;- c(&quot;data.table&quot;, &quot;pheatmap&quot;)
+
+install_pac &lt;- function(x, repo){
+  if (!require(x, quietly = TRUE, character.only = TRUE)){
+    if(repo == &quot;bioc&quot;){
+      BiocManager::install(x, character.only = TRUE)
+    } else if (repo == &quot;cran&quot;){
+      install.packages(x, character.only = TRUE)
+    } else {
+      stop(&quot;Unknown repo&quot;)
+    }
+  }
+}
+
+sapply(bioc_pac, install_pac, repo = &quot;bioc&quot;)</code></pre>
+<pre><code>
+Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    IQR, mad, sd, var, xtabs</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
+    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
+    Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
+    table, tapply, union, unique, unsplit, which.max, which.min</code></pre>
+<pre><code>Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    &#39;browseVignettes()&#39;. To cite Bioconductor, see
+    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
+<pre><code>Setting options(&#39;download.file.method.GEOquery&#39;=&#39;auto&#39;)</code></pre>
+<pre><code>Setting options(&#39;GEOquery.inmemory.gpl&#39;=FALSE)</code></pre>
+<pre><code>
+Attaching package: &#39;limma&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:BiocGenerics&#39;:
+
+    plotMA</code></pre>
+<pre><code>
+Attaching package: &#39;S4Vectors&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    expand.grid, I, unname</code></pre>
+<pre><code></code></pre>
+<pre><code>$GEOquery
+NULL
+
+$limma
+NULL
+
+$org.Mm.eg.db
+NULL</code></pre>
+<pre class="r"><code>sapply(cran_pac, install_pac, repo = &quot;cran&quot;)</code></pre>
+<pre><code>
+Attaching package: &#39;data.table&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:IRanges&#39;:
+
+    shift</code></pre>
+<pre><code>The following objects are masked from &#39;package:S4Vectors&#39;:
+
+    first, second</code></pre>
+<pre><code>$data.table
+NULL
+
+$pheatmap
+NULL</code></pre>
+<p>Load packages.</p>
+<pre class="r"><code>library(GEOquery)
+library(limma)
+library(org.Mm.eg.db)
+library(data.table)
+# for collapseBy
+source(&quot;https://raw.githubusercontent.com/assaron/r-utils/master/R/exprs.R&quot;)</code></pre>
+<p>Download <a
+href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE14308">mouse
+microarray data</a>.</p>
+<pre class="r"><code>gse14308 &lt;- getGEO(&quot;GSE14308&quot;)[[1]]</code></pre>
+<pre><code>Found 1 file(s)</code></pre>
+<pre><code>GSE14308_series_matrix.txt.gz</code></pre>
+<p>Add condition to the phenotypic data.</p>
+<pre class="r"><code>pData(gse14308)$condition &lt;- sub(&quot;-.*$&quot;, &quot;&quot;, gse14308$title)
+pData(gse14308)[, c(&#39;platform_id&#39;, &#39;type&#39;, &#39;condition&#39;)]</code></pre>
+<pre><code>          platform_id type condition
+GSM357839     GPL1261  RNA       Th2
+GSM357841     GPL1261  RNA       Th2
+GSM357842     GPL1261  RNA       Th1
+GSM357843     GPL1261  RNA      Th17
+GSM357844     GPL1261  RNA       Th1
+GSM357845     GPL1261  RNA      Th17
+GSM357847     GPL1261  RNA     Naive
+GSM357848     GPL1261  RNA     Naive
+GSM357849     GPL1261  RNA     iTreg
+GSM357850     GPL1261  RNA     iTreg
+GSM357852     GPL1261  RNA     nTreg
+GSM357853     GPL1261  RNA     nTreg</code></pre>
+<p><code>fData</code> retrieves information on features.</p>
+<pre class="r"><code>feature_dat &lt;- fData(gse14308)
+colnames(feature_dat)</code></pre>
+<pre><code> [1] &quot;ID&quot;                               &quot;GB_ACC&quot;                          
+ [3] &quot;SPOT_ID&quot;                          &quot;Species Scientific Name&quot;         
+ [5] &quot;Annotation Date&quot;                  &quot;Sequence Type&quot;                   
+ [7] &quot;Sequence Source&quot;                  &quot;Target Description&quot;              
+ [9] &quot;Representative Public ID&quot;         &quot;Gene Title&quot;                      
+[11] &quot;Gene Symbol&quot;                      &quot;ENTREZ_GENE_ID&quot;                  
+[13] &quot;RefSeq Transcript ID&quot;             &quot;Gene Ontology Biological Process&quot;
+[15] &quot;Gene Ontology Cellular Component&quot; &quot;Gene Ontology Molecular Function&quot;</code></pre>
+<p>The <code>collapseBy</code> function is sourced from <a
+href="https://raw.githubusercontent.com/assaron/r-utils/master/R/exprs.R">exprs.R</a>
+and the source is shown below.</p>
+<pre class="r"><code>collapseBy_ &lt;- function(es, factor, FUN=median) {
+  ranks &lt;- apply(exprs(es), 1, FUN)
+  t &lt;- data.frame(f=factor, i=seq_along(ranks), r=ranks)
+  t &lt;- t[order(t$r, decreasing=T), ]
+  keep &lt;- t[!duplicated(t$f) &amp; !is.na(t$f),]$i
+  res &lt;- es[keep, ]
+  fData(res)$origin &lt;- rownames(res)
+  rownames(res) &lt;- factor[keep]
+  res
+}</code></pre>
+<p><code>ranks</code> contains the median probe intensity.</p>
+<pre class="r"><code>ranks &lt;- apply(exprs(gse14308), 1, median)
+head(ranks)</code></pre>
+<pre><code>  1415670_at   1415671_at   1415672_at   1415673_at 1415674_a_at   1415675_at 
+    3324.740     4933.035    11202.750     3239.865     4007.050     1830.655 </code></pre>
+<p>The <code>ENTREZ_GENE_ID</code>, index, and median get saved into a
+data frame. (I’ve used <code>my_df</code> here because <code>t</code> is
+the name of the transpose function.) The data frame is then ordered from
+highest intensity to lowest.</p>
+<pre class="r"><code>my_df &lt;- data.frame(
+  f=fData(gse14308)$ENTREZ_GENE_ID,
+  i=seq_along(ranks),
+  r=ranks
+)
+my_df &lt;- my_df[order(my_df$r, decreasing=TRUE), ]
+
+head(my_df)</code></pre>
+<pre><code>                                             f     i        r
+1438859_x_at                             20090 23165 99737.85
+1454859_a_at 65019 /// 100044627 /// 100862455 39154 99078.75
+1416404_s_at 20055 /// 100039355 /// 100862433   735 97947.30
+1455485_x_at                             22121 39780 97510.75
+1422475_a_at                             20091  6781 97177.05
+1435873_a_at               22121 /// 100504632 20179 96558.85</code></pre>
+<p>A vector called <code>keep</code> is created to keep only rows with
+non-duplicated and non-missing Entrez Gene IDs.</p>
+<pre class="r"><code>keep &lt;- my_df[!duplicated(my_df$f) &amp; !is.na(my_df$f),]$i
+length(keep)</code></pre>
+<pre><code>[1] 21603</code></pre>
+<p>Finally, <code>keep</code> is used to subset the data;
+<code>origin</code> is created to store the original probe IDs before
+replacing the row names with Entrez Gene IDs.</p>
+<pre class="r"><code>res &lt;- gse14308[keep, ]
+fData(res)$origin &lt;- rownames(res)
+rownames(res) &lt;- fData(gse14308)$ENTREZ_GENE_ID[keep]
+res</code></pre>
+<pre><code>ExpressionSet (storageMode: lockedEnvironment)
+assayData: 21603 features, 12 samples 
+  element names: exprs 
+protocolData: none
+phenoData
+  sampleNames: GSM357839 GSM357841 ... GSM357853 (12 total)
+  varLabels: title geo_accession ... condition (34 total)
+  varMetadata: labelDescription
+featureData
+  featureNames: 20090 65019 /// 100044627 /// 100862455 ... 194227
+    (21603 total)
+  fvarLabels: ID GB_ACC ... origin (17 total)
+  fvarMetadata: Column Description labelDescription
+experimentData: use &#39;experimentData(object)&#39;
+  pubMedIds: 19144320 
+Annotation: GPL1261 </code></pre>
+<p>Now that we know what <code>collapseBy</code> does, we can use
+it.</p>
+<pre class="r"><code>es &lt;- collapseBy(gse14308, fData(gse14308)$ENTREZ_GENE_ID, FUN=median)
+es</code></pre>
+<pre><code>ExpressionSet (storageMode: lockedEnvironment)
+assayData: 21603 features, 12 samples 
+  element names: exprs 
+protocolData: none
+phenoData
+  sampleNames: GSM357839 GSM357841 ... GSM357853 (12 total)
+  varLabels: title geo_accession ... condition (34 total)
+  varMetadata: labelDescription
+featureData
+  featureNames: 20090 65019 /// 100044627 /// 100862455 ... 194227
+    (21603 total)
+  fvarLabels: ID GB_ACC ... origin (17 total)
+  fvarMetadata: Column Description labelDescription
+experimentData: use &#39;experimentData(object)&#39;
+  pubMedIds: 19144320 
+Annotation: GPL1261 </code></pre>
+<p>Probe IDs that mapped to several Entrez Gene IDs and empty entries
+are removed.</p>
+<pre class="r"><code>es &lt;- es[!grepl(&quot;///&quot;, rownames(es)), ]
+es &lt;- es[rownames(es) != &quot;&quot;, ]
+dim(exprs(es))</code></pre>
+<pre><code>[1] 20770    12</code></pre>
+<p>Quantile normalisation is carried out.</p>
+<pre class="r"><code>exprs(es) &lt;- normalizeBetweenArrays(log2(exprs(es)+1), method=&quot;quantile&quot;)</code></pre>
+<p>A <a href="https://f1000research.com/articles/9-1444">design
+matrix</a> is defined.</p>
+<pre class="r"><code>es.design &lt;- model.matrix(~0+condition, data=pData(es))
+es.design</code></pre>
+<pre><code>          conditioniTreg conditionNaive conditionnTreg conditionTh1
+GSM357839              0              0              0            0
+GSM357841              0              0              0            0
+GSM357842              0              0              0            1
+GSM357843              0              0              0            0
+GSM357844              0              0              0            1
+GSM357845              0              0              0            0
+GSM357847              0              1              0            0
+GSM357848              0              1              0            0
+GSM357849              1              0              0            0
+GSM357850              1              0              0            0
+GSM357852              0              0              1            0
+GSM357853              0              0              1            0
+          conditionTh17 conditionTh2
+GSM357839             0            1
+GSM357841             0            1
+GSM357842             0            0
+GSM357843             1            0
+GSM357844             0            0
+GSM357845             1            0
+GSM357847             0            0
+GSM357848             0            0
+GSM357849             0            0
+GSM357850             0            0
+GSM357852             0            0
+GSM357853             0            0
+attr(,&quot;assign&quot;)
+[1] 1 1 1 1 1 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$condition
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>A linear model is fit given the design.</p>
+<pre class="r"><code>fit &lt;- lmFit(es, es.design)</code></pre>
+<p>A contrasts matrix is used to compute contrasts using our fitted
+linear model. Here we’re contrasting naive T-cells to T-helper 1
+cells.</p>
+<pre class="r"><code>makeContrasts(
+  conditionTh1-conditionNaive,
+  levels=es.design
+)</code></pre>
+<pre><code>                Contrasts
+Levels           conditionTh1 - conditionNaive
+  conditioniTreg                             0
+  conditionNaive                            -1
+  conditionnTreg                             0
+  conditionTh1                               1
+  conditionTh17                              0
+  conditionTh2                               0</code></pre>
+<pre class="r"><code>fit2 &lt;- contrasts.fit(
+  fit,
+  makeContrasts(
+    conditionTh1-conditionNaive,
+    levels=es.design
+  )
+)
+
+fit2</code></pre>
+<pre><code>An object of class &quot;MArrayLM&quot;
+$coefficients
+       Contrasts
+        conditionTh1 - conditionNaive
+  20090                   0.011485524
+  22121                  -0.003602942
+  20091                   0.035573263
+  67671                   0.092303053
+  19241                   0.013452656
+20765 more rows ...
+
+$rank
+[1] 6
+
+$assign
+[1] 1 1 1 1 1 1
+
+$qr
+$qr
+          conditioniTreg conditionNaive conditionnTreg conditionTh1
+GSM357839      -1.414214       0.000000       0.000000    0.0000000
+GSM357841       0.000000      -1.414214       0.000000    0.0000000
+GSM357842       0.000000       0.000000      -1.414214    0.0000000
+GSM357843       0.000000       0.000000       0.000000   -1.4142136
+GSM357844       0.000000       0.000000       0.000000    0.7071068
+          conditionTh17 conditionTh2
+GSM357839      0.000000            0
+GSM357841      0.000000            0
+GSM357842      0.000000            0
+GSM357843      0.000000            0
+GSM357844      1.414214            0
+7 more rows ...
+
+$qraux
+[1] 1.0 1.0 1.0 1.0 1.5 1.0
+
+$pivot
+[1] 1 2 3 4 5 6
+
+$tol
+[1] 1e-07
+
+$rank
+[1] 6
+
+
+$df.residual
+[1] 6 6 6 6 6
+20765 more elements ...
+
+$sigma
+     20090      22121      20091      67671      19241 
+0.03820456 0.03984248 0.05377004 0.03935491 0.03240994 
+20765 more elements ...
+
+$cov.coefficients
+                               Contrasts
+Contrasts                       conditionTh1 - conditionNaive
+  conditionTh1 - conditionNaive                             1
+
+$stdev.unscaled
+       Contrasts
+        conditionTh1 - conditionNaive
+  20090                             1
+  22121                             1
+  20091                             1
+  67671                             1
+  19241                             1
+20765 more rows ...
+
+$pivot
+[1] 1 2 3 4 5 6
+
+$genes
+                ID    GB_ACC SPOT_ID Species Scientific Name Annotation Date
+20090 1438859_x_at  AV037157                    Mus musculus     Oct 6, 2014
+22121 1455485_x_at  AI324936                    Mus musculus     Oct 6, 2014
+20091 1422475_a_at NM_016959                    Mus musculus     Oct 6, 2014
+67671 1433472_x_at  AA050777                    Mus musculus     Oct 6, 2014
+19241   1415906_at NM_021278                    Mus musculus     Oct 6, 2014
+           Sequence Type Sequence Source
+20090 Consensus sequence         GenBank
+22121 Consensus sequence         GenBank
+20091 Consensus sequence         GenBank
+67671 Consensus sequence         GenBank
+19241 Consensus sequence         GenBank
+                                                                                                                                                                                                                                                                Target Description
+20090                                                                              gb:AV037157 /DB_XREF=gi:4856822 /DB_XREF=AV037157 /CLONE=1600022O04 /FEA=EST /CNT=10 /TID=Mm.154915.5 /TIER=Stack /STK=9 /UG=Mm.154915 /LL=20090 /UG_GENE=Rps29 /UG_TITLE=ribosomal protein S29
+22121                                                                         gb:AI324936 /DB_XREF=gi:4059365 /DB_XREF=mb49d08.x1 /CLONE=IMAGE:332751 /FEA=EST /CNT=24 /TID=Mm.13020.6 /TIER=Stack /STK=12 /UG=Mm.13020 /LL=22121 /UG_GENE=Rpl13a /UG_TITLE=ribosomal protein L13a
+20091                                         gb:NM_016959.1 /DB_XREF=gi:8394217 /GEN=Rps3a /FEA=FLmRNA /CNT=122 /TID=Mm.6957.1 /TIER=FL+Stack /STK=78 /UG=Mm.6957 /LL=20091 /DEF=Mus musculus ribosomal protein S3a (Rps3a), mRNA. /PROD=ribosomal protein S3a /FL=gb:NM_016959.1
+67671                                                            gb:AA050777 /DB_XREF=gi:1530594 /DB_XREF=mg72a01.r1 /CLONE=IMAGE:438504 /FEA=EST /CNT=215 /TID=Mm.43330.3 /TIER=Stack /STK=151 /UG=Mm.43330 /LL=67671 /UG_GENE=0610025G13Rik /UG_TITLE=RIKEN cDNA 0610025G13 gene
+19241 gb:NM_021278.1 /DB_XREF=gi:10946577 /GEN=Tmsb4x /FEA=FLmRNA /CNT=360 /TID=Mm.142729.1 /TIER=FL+Stack /STK=172 /UG=Mm.142729 /LL=19241 /DEF=Mus musculus thymosin, beta 4, X chromosome (Tmsb4x), mRNA. /PROD=thymosin, beta 4, X chromosome /FL=gb:NM_021278.1 gb:BC018286.1
+      Representative Public ID                     Gene Title Gene Symbol
+20090                 AV037157          ribosomal protein S29       Rps29
+22121                 AI324936         ribosomal protein L13A      Rpl13a
+20091                NM_016959         ribosomal protein S3A1      Rps3a1
+67671                 AA050777          ribosomal protein L38       Rpl38
+19241                NM_021278 thymosin, beta 4, X chromosome      Tmsb4x
+      ENTREZ_GENE_ID
+20090          20090
+22121          22121
+20091          20091
+67671          67671
+19241          19241
+                                                                                RefSeq Transcript ID
+20090                                                                                      NM_009093
+22121                                                                                      NM_009438
+20091                                                                                      NM_016959
+67671 NM_001048057 /// NM_001048058 /// NM_023372 /// XM_006534007 /// XM_006534008 /// XM_006534009
+19241                                                                     NM_021278 /// XM_006528759
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    Gene Ontology Biological Process
+20090                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         0006412 // translation // not recorded
+22121 0006351 // transcription, DNA-templated // inferred from electronic annotation /// 0006355 // regulation of transcription, DNA-templated // inferred from electronic annotation /// 0006412 // translation // inferred from electronic annotation /// 0006417 // regulation of translation // inferred from electronic annotation /// 0017148 // negative regulation of translation // inferred from direct assay /// 0017148 // negative regulation of translation // not recorded /// 0032496 // response to lipopolysaccharide // inferred from mutant phenotype /// 0032844 // regulation of homeostatic process // inferred from mutant phenotype /// 0048246 // macrophage chemotaxis // inferred from mutant phenotype /// 0060425 // lung morphogenesis // inferred from mutant phenotype /// 0071346 // cellular response to interferon-gamma // inferred from direct assay /// 0071346 // cellular response to interferon-gamma // not recorded /// 1901194 // negative regulation of formation of translation preinitiation complex // not recorded
+20091                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      0002181 // cytoplasmic translation // not recorded /// 0006412 // translation // inferred from electronic annotation /// 0030154 // cell differentiation // inferred from electronic annotation /// 0043066 // negative regulation of apoptotic process // inferred from sequence or structural similarity /// 0097194 // execution phase of apoptosis // inferred from sequence or structural similarity
+67671                                                                                                                                                                                                                                                                                                                                                                                          0001501 // skeletal system development // inferred from mutant phenotype /// 0001501 // skeletal system development // traceable author statement /// 0001503 // ossification // inferred from mutant phenotype /// 0006412 // translation // inferred from electronic annotation /// 0006417 // regulation of translation // inferred from mutant phenotype /// 0007605 // sensory perception of sound // inferred from mutant phenotype /// 0034463 // 90S preribosome assembly // inferred from direct assay /// 0042474 // middle ear morphogenesis // inferred from mutant phenotype /// 0048318 // axial mesoderm development // inferred from mutant phenotype
+19241                                                                                                                                                                                                                                                                                                                                                                                                                      0007010 // cytoskeleton organization // inferred from electronic annotation /// 0014911 // positive regulation of smooth muscle cell migration // traceable author statement /// 0030036 // actin cytoskeleton organization // inferred from electronic annotation /// 0030334 // regulation of cell migration // inferred from direct assay /// 0042989 // sequestering of actin monomers // inferred from electronic annotation /// 0045893 // positive regulation of transcription, DNA-templated // traceable author statement /// 0051152 // positive regulation of smooth muscle cell differentiation // traceable author statement
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      Gene Ontology Cellular Component
+20090                                                                                                                                                                                   0005622 // intracellular // inferred from electronic annotation /// 0005737 // cytoplasm // not recorded /// 0005840 // ribosome // inferred from electronic annotation /// 0015935 // small ribosomal subunit // not recorded /// 0022627 // cytosolic small ribosomal subunit // not recorded /// 0030529 // ribonucleoprotein complex // inferred from electronic annotation /// 0070062 // extracellular vesicular exosome // not recorded
+22121 0005576 // extracellular region // inferred from electronic annotation /// 0005634 // nucleus // not recorded /// 0005840 // ribosome // inferred from electronic annotation /// 0015934 // large ribosomal subunit // inferred from electronic annotation /// 0016020 // membrane // inferred from electronic annotation /// 0022625 // cytosolic large ribosomal subunit // not recorded /// 0030529 // ribonucleoprotein complex // inferred from direct assay /// 0030529 // ribonucleoprotein complex // not recorded /// 0097452 // GAIT complex // inferred from direct assay /// 0097452 // GAIT complex // not recorded
+20091                                                                                                                                                                                               0005622 // intracellular // inferred from electronic annotation /// 0005634 // nucleus // inferred from direct assay /// 0005737 // cytoplasm // inferred from electronic annotation /// 0005829 // cytosol // inferred from direct assay /// 0005840 // ribosome // inferred from electronic annotation /// 0022627 // cytosolic small ribosomal subunit // not recorded /// 0030529 // ribonucleoprotein complex // not recorded
+67671                                                                                                                                                                                                                                                                   0005622 // intracellular // inferred from electronic annotation /// 0005840 // ribosome // inferred from electronic annotation /// 0022625 // cytosolic large ribosomal subunit // not recorded /// 0030529 // ribonucleoprotein complex // inferred from electronic annotation /// 0033291 // eukaryotic 80S initiation complex // inferred from direct assay
+19241                                                                                                                                                                                                                                                                                                                                                                                         0005634 // nucleus // inferred from direct assay /// 0005737 // cytoplasm // inferred from electronic annotation /// 0005829 // cytosol // inferred from direct assay /// 0005856 // cytoskeleton // inferred from electronic annotation
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                    Gene Ontology Molecular Function
+20090                                                                                                                                                                                                                                                                                                          0003735 // structural constituent of ribosome // not recorded /// 0008270 // zinc ion binding // not recorded /// 0046872 // metal ion binding // inferred from electronic annotation
+22121 0003676 // nucleic acid binding // inferred from electronic annotation /// 0003677 // DNA binding // inferred from electronic annotation /// 0003729 // mRNA binding // inferred from direct assay /// 0003735 // structural constituent of ribosome // inferred from electronic annotation /// 0005125 // cytokine activity // inferred from electronic annotation /// 0044822 // poly(A) RNA binding // not recorded /// 0046872 // metal ion binding // inferred from electronic annotation
+20091                                                                                                                                                                                                                                                                                        0003735 // structural constituent of ribosome // not recorded /// 0005515 // protein binding // inferred from physical interaction /// 0031369 // translation initiation factor binding // not recorded
+67671                                                                                                                                                                                                                                                                                                                                                                                                           0003735 // structural constituent of ribosome // inferred from electronic annotation
+19241                                                                                                                                                                                                                                                                                                                                                           0003779 // actin binding // inferred from electronic annotation /// 0005515 // protein binding // inferred from physical interaction
+            origin
+20090 1438859_x_at
+22121 1455485_x_at
+20091 1422475_a_at
+67671 1433472_x_at
+19241   1415906_at
+20765 more rows ...
+
+$Amean
+   20090    22121    20091    67671    19241 
+16.28272 16.27241 16.25759 16.23408 16.23061 
+20765 more elements ...
+
+$method
+[1] &quot;ls&quot;
+
+$design
+          conditioniTreg conditionNaive conditionnTreg conditionTh1
+GSM357839              0              0              0            0
+GSM357841              0              0              0            0
+GSM357842              0              0              0            1
+GSM357843              0              0              0            0
+GSM357844              0              0              0            1
+          conditionTh17 conditionTh2
+GSM357839             0            1
+GSM357841             0            1
+GSM357842             0            0
+GSM357843             1            0
+GSM357844             0            0
+7 more rows ...
+
+$contrasts
+                Contrasts
+Levels           conditionTh1 - conditionNaive
+  conditioniTreg                             0
+  conditionNaive                            -1
+  conditionnTreg                             0
+  conditionTh1                               1
+  conditionTh17                              0
+  conditionTh2                               0</code></pre>
+<p>Finally, the differential expression analysis is carried out and the
+results saved. The results are ranked by <a
+href="https://support.bioconductor.org/p/6124/">limma’s moderated
+t-statistic</a>.</p>
+<pre class="r"><code>fit2 &lt;- eBayes(fit2)
+names(topTable(fit2, adjust.method=&quot;BH&quot;, number=12000, sort.by = &quot;B&quot;))</code></pre>
+<pre><code> [1] &quot;ID&quot;                               &quot;GB_ACC&quot;                          
+ [3] &quot;SPOT_ID&quot;                          &quot;Species.Scientific.Name&quot;         
+ [5] &quot;Annotation.Date&quot;                  &quot;Sequence.Type&quot;                   
+ [7] &quot;Sequence.Source&quot;                  &quot;Target.Description&quot;              
+ [9] &quot;Representative.Public.ID&quot;         &quot;Gene.Title&quot;                      
+[11] &quot;Gene.Symbol&quot;                      &quot;ENTREZ_GENE_ID&quot;                  
+[13] &quot;RefSeq.Transcript.ID&quot;             &quot;Gene.Ontology.Biological.Process&quot;
+[15] &quot;Gene.Ontology.Cellular.Component&quot; &quot;Gene.Ontology.Molecular.Function&quot;
+[17] &quot;origin&quot;                           &quot;logFC&quot;                           
+[19] &quot;AveExpr&quot;                          &quot;t&quot;                               
+[21] &quot;P.Value&quot;                          &quot;adj.P.Val&quot;                       
+[23] &quot;B&quot;                               </code></pre>
+<pre class="r"><code>de &lt;- data.table(topTable(fit2, adjust.method=&quot;BH&quot;, number=12000, sort.by = &quot;B&quot;), keep.rownames = TRUE)
+ranks &lt;- de[order(t), list(rn, t)]
+ranks</code></pre>
+<pre><code>           rn         t
+    1: 170942 -62.22877
+    2: 109711 -49.47829
+    3:  18124 -43.40540
+    4:  12775 -41.16952
+    5:  72148 -33.23463
+   ---                 
+11996:  58801  49.10222
+11997:  13730  50.02863
+11998:  15937  50.29120
+11999:  12772  50.52651
+12000:  80876  52.59930</code></pre>
+<p>Load <code>exampleRanks</code>.</p>
+<pre class="r"><code>data(&quot;exampleRanks&quot;, package = &quot;fgsea&quot;)
+head(exampleRanks)</code></pre>
+<pre><code>   170942    109711     18124     12775     72148     16010 
+-63.33703 -49.74779 -43.63878 -41.51889 -33.26039 -32.77626 </code></pre>
+<p>Compare with our results.</p>
+<pre class="r"><code>wanted &lt;- head(names(exampleRanks))
+
+ranks[rn %in% wanted]</code></pre>
+<pre><code>       rn         t
+1: 170942 -62.22877
+2: 109711 -49.47829
+3:  18124 -43.40540
+4:  12775 -41.16952
+5:  72148 -33.23463
+6:  16010 -32.38200</code></pre>
+<p>Visualise the six most significantly down- and up-regulated
+genes.</p>
+<pre class="r"><code>library(pheatmap)
+
+my_sample &lt;- pData(es)$condition == &quot;Th1&quot; | pData(es)$condition == &quot;Naive&quot; 
+my_group &lt;- data.frame(group = pData(es)$condition[my_sample])
+row.names(my_group) &lt;- colnames(exprs(es))[my_sample]
+ 
+pheatmap(
+  mat = es[c(head(de[order(t), 1])$rn, tail(de[order(t), 1])$rn), my_sample],
+  annotation_col = my_group,
+  cluster_rows = FALSE,
+  cellwidth=25,
+  cellheight=15,
+  scale = &quot;row&quot;
+)</code></pre>
+<p><img src="figure/fgsea.Rmd/pheatmap-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="vignette" class="section level2">
+<h2>Vignette</h2>
+<p>The following section is based on the <a
+href="https://bioconductor.org/packages/release/bioc/vignettes/fgsea/inst/doc/fgsea-tutorial.html">fgsea
+tutorial</a> but with my elaborations. The pathways are stored in
+<code>examplePathways</code> and the ranked gene list in
+<code>exampleRanks</code>.</p>
+<p>TBC.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.2.0 (2022-04-22)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] pheatmap_1.0.12      data.table_1.14.6    org.Mm.eg.db_3.16.0 
+ [4] AnnotationDbi_1.60.0 IRanges_2.32.0       S4Vectors_0.36.1    
+ [7] limma_3.54.1         GEOquery_2.66.0      Biobase_2.58.0      
+[10] BiocGenerics_0.44.0  fgsea_1.24.0         BiocManager_1.30.19 
+[13] workflowr_1.7.0     
+
+loaded via a namespace (and not attached):
+ [1] bitops_1.0-7           fs_1.6.0               bit64_4.0.5           
+ [4] RColorBrewer_1.1-3     httr_1.4.4             rprojroot_2.0.3       
+ [7] GenomeInfoDb_1.34.7    tools_4.2.0            bslib_0.4.2           
+[10] utf8_1.2.2             R6_2.5.1               DBI_1.1.3             
+[13] colorspace_2.1-0       withr_2.5.0            tidyselect_1.2.0      
+[16] processx_3.8.0         curl_5.0.0             bit_4.0.5             
+[19] compiler_4.2.0         git2r_0.31.0           cli_3.6.0             
+[22] xml2_1.3.3             sass_0.4.5             scales_1.2.1          
+[25] readr_2.1.3            callr_3.7.3            stringr_1.5.0         
+[28] digest_0.6.31          R.utils_2.12.2         rmarkdown_2.20        
+[31] XVector_0.38.0         pkgconfig_2.0.3        htmltools_0.5.4       
+[34] highr_0.10             fastmap_1.1.0          rlang_1.0.6           
+[37] rstudioapi_0.14        RSQLite_2.2.20         farver_2.1.1          
+[40] jquerylib_0.1.4        generics_0.1.3         jsonlite_1.8.4        
+[43] BiocParallel_1.32.5    R.oo_1.25.0            dplyr_1.1.0           
+[46] RCurl_1.98-1.10        magrittr_2.0.3         GenomeInfoDbData_1.2.9
+[49] Matrix_1.5-3           Rcpp_1.0.10            munsell_0.5.0         
+[52] fansi_1.0.4            R.methodsS3_1.8.2      lifecycle_1.0.3       
+[55] stringi_1.7.12         whisker_0.4.1          yaml_2.3.7            
+[58] zlibbioc_1.44.0        grid_4.2.0             blob_1.2.3            
+[61] parallel_4.2.0         promises_1.2.0.1       crayon_1.5.2          
+[64] lattice_0.20-45        Biostrings_2.66.0      cowplot_1.1.1         
+[67] hms_1.1.2              KEGGREST_1.38.0        knitr_1.42            
+[70] ps_1.7.2               pillar_1.8.1           codetools_0.2-18      
+[73] fastmatch_1.1-3        glue_1.6.2             evaluate_0.20         
+[76] getPass_0.2-2          png_0.1-8              vctrs_0.5.2           
+[79] tzdb_0.3.0             httpuv_1.6.8           gtable_0.3.1          
+[82] purrr_1.0.1            tidyr_1.3.0            cachem_1.0.6          
+[85] ggplot2_3.4.0          xfun_0.36              later_1.3.0           
+[88] tibble_3.1.8           memoise_2.0.1          ellipsis_0.3.2        </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
