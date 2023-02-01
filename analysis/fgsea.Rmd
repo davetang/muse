@@ -1,0 +1,259 @@
+---
+title: "Using the Fast preranked Gene Set Enrichment Analysis (fgsea) package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+From the [original paper](https://pubmed.ncbi.nlm.nih.gov/16199517/) describing the Gene Set Enrichment Analysis (GSEA):
+
+>The goal of GSEA is to determine whether members of a gene set **S** tend to occur toward the top (or bottom) of the list **L**, in which case the gene set is correlated with the phenotypic class distinction.
+
+## Installation
+
+First install [fgsea](https://bioconductor.org/packages/release/bioc/html/fgsea.html).
+
+```{r install_fgsea, message=FALSE, warning=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+if (!require("fgsea", quietly = TRUE))
+  BiocManager::install("fgsea")
+
+library(fgsea)
+```
+
+## Example data
+
+The example pathways are packaged with `fgsea` and can be loaded with `data()`. The example pathways are stored in a list.
+
+```{r example_pathways}
+data("examplePathways", package = "fgsea")
+class(examplePathways)
+```
+
+There are `r length(examplePathways)` example pathways.
+
+```{r example_pathways_n}
+length(examplePathways)
+```
+
+The first pathway `r head(names(examplePathways), 1)` contains Entrez Gene IDs that belong to this gene set.
+
+```{r first_pathway}
+examplePathways[1]
+```
+
+The gene ranks are also packaged with `fgsea` but we will re-generate the ranks based on the [author's code](https://github.com/ctlab/fgsea/blob/master/inst/gen_gene_ranks.R) to see how the ranks were created. Several other Bioconductor packages are required.
+
+```{r install_bioc}
+bioc_pac <- c("GEOquery", "limma", "org.Mm.eg.db")
+cran_pac <- c("data.table", "pheatmap")
+
+install_pac <- function(x, repo){
+  if (!require(x, quietly = TRUE, character.only = TRUE)){
+    if(repo == "bioc"){
+      BiocManager::install(x, character.only = TRUE)
+    } else if (repo == "cran"){
+      install.packages(x, character.only = TRUE)
+    } else {
+      stop("Unknown repo")
+    }
+  }
+}
+
+sapply(bioc_pac, install_pac, repo = "bioc")
+sapply(cran_pac, install_pac, repo = "cran")
+```
+
+Load packages.
+
+```{r gen_gene_ranks_packages}
+library(GEOquery)
+library(limma)
+library(org.Mm.eg.db)
+library(data.table)
+# for collapseBy
+source("https://raw.githubusercontent.com/assaron/r-utils/master/R/exprs.R")
+```
+
+Download [mouse microarray data](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE14308).
+
+```{r download_gse14308}
+gse14308 <- getGEO("GSE14308")[[1]]
+```
+
+Add condition to the phenotypic data.
+
+```{r add_condition}
+pData(gse14308)$condition <- sub("-.*$", "", gse14308$title)
+pData(gse14308)[, c('platform_id', 'type', 'condition')]
+```
+
+`fData` retrieves information on features.
+
+```{r feature_dat}
+feature_dat <- fData(gse14308)
+colnames(feature_dat)
+```
+
+The `collapseBy` function is sourced from [exprs.R](https://raw.githubusercontent.com/assaron/r-utils/master/R/exprs.R) and the source is shown below.
+
+```{r collapse_by_}
+collapseBy_ <- function(es, factor, FUN=median) {
+  ranks <- apply(exprs(es), 1, FUN)
+  t <- data.frame(f=factor, i=seq_along(ranks), r=ranks)
+  t <- t[order(t$r, decreasing=T), ]
+  keep <- t[!duplicated(t$f) & !is.na(t$f),]$i
+  res <- es[keep, ]
+  fData(res)$origin <- rownames(res)
+  rownames(res) <- factor[keep]
+  res
+}
+```
+
+`ranks` contains the median probe intensity.
+
+```{r ranks}
+ranks <- apply(exprs(gse14308), 1, median)
+head(ranks)
+```
+
+The `ENTREZ_GENE_ID`, index, and median get saved into a data frame. (I've used `my_df` here because `t` is the name of the transpose function.) The data frame is then ordered from highest intensity to lowest.
+
+```{r my_df}
+my_df <- data.frame(
+  f=fData(gse14308)$ENTREZ_GENE_ID,
+  i=seq_along(ranks),
+  r=ranks
+)
+my_df <- my_df[order(my_df$r, decreasing=TRUE), ]
+
+head(my_df)
+```
+
+A vector called `keep` is created to keep only rows with non-duplicated and non-missing Entrez Gene IDs.
+
+```{r keep}
+keep <- my_df[!duplicated(my_df$f) & !is.na(my_df$f),]$i
+length(keep)
+```
+
+Finally, `keep` is used to subset the data; `origin` is created to store the original probe IDs before replacing the row names with Entrez Gene IDs.
+
+```{r subset_keep}
+res <- gse14308[keep, ]
+fData(res)$origin <- rownames(res)
+rownames(res) <- fData(gse14308)$ENTREZ_GENE_ID[keep]
+res
+```
+
+Now that we know what `collapseBy` does, we can use it.
+
+```{r collapse_by}
+es <- collapseBy(gse14308, fData(gse14308)$ENTREZ_GENE_ID, FUN=median)
+es
+```
+
+Probe IDs that mapped to several Entrez Gene IDs and empty entries are removed.
+
+```{r es_subset}
+es <- es[!grepl("///", rownames(es)), ]
+es <- es[rownames(es) != "", ]
+dim(exprs(es))
+```
+
+Quantile normalisation is carried out.
+
+```{r quantile_normalisation}
+exprs(es) <- normalizeBetweenArrays(log2(exprs(es)+1), method="quantile")
+```
+
+A [design matrix](https://f1000research.com/articles/9-1444) is defined.
+
+```{r design}
+es.design <- model.matrix(~0+condition, data=pData(es))
+es.design
+```
+
+A linear model is fit given the design.
+
+```{r lm_fit}
+fit <- lmFit(es, es.design)
+```
+
+A contrasts matrix is used to compute contrasts using our fitted linear model. Here we're contrasting naive T-cells to T-helper 1 cells.
+
+```{r make_and_fit_contrasts}
+makeContrasts(
+  conditionTh1-conditionNaive,
+  levels=es.design
+)
+
+fit2 <- contrasts.fit(
+  fit,
+  makeContrasts(
+    conditionTh1-conditionNaive,
+    levels=es.design
+  )
+)
+
+fit2
+```
+
+Finally, the differential expression analysis is carried out and the results saved. The results are ranked by [limma's moderated t-statistic](https://support.bioconductor.org/p/6124/).
+
+```{r ebayes}
+fit2 <- eBayes(fit2)
+names(topTable(fit2, adjust.method="BH", number=12000, sort.by = "B"))
+de <- data.table(topTable(fit2, adjust.method="BH", number=12000, sort.by = "B"), keep.rownames = TRUE)
+ranks <- de[order(t), list(rn, t)]
+ranks
+```
+
+Load `exampleRanks`.
+
+```{r example_ranks}
+data("exampleRanks", package = "fgsea")
+head(exampleRanks)
+```
+
+Compare with our results.
+
+```{r compare}
+wanted <- head(names(exampleRanks))
+
+ranks[rn %in% wanted]
+```
+
+Visualise the six most significantly down- and up-regulated genes.
+
+```{r pheatmap}
+library(pheatmap)
+
+my_sample <- pData(es)$condition == "Th1" | pData(es)$condition == "Naive" 
+my_group <- data.frame(group = pData(es)$condition[my_sample])
+row.names(my_group) <- colnames(exprs(es))[my_sample]
+ 
+pheatmap(
+  mat = es[c(head(de[order(t), 1])$rn, tail(de[order(t), 1])$rn), my_sample],
+  annotation_col = my_group,
+  cluster_rows = FALSE,
+  cellwidth=25,
+  cellheight=15,
+  scale = "row"
+)
+```
+
+## Vignette
+
+The following section is based on the [fgsea tutorial](https://bioconductor.org/packages/release/bioc/vignettes/fgsea/inst/doc/fgsea-tutorial.html) but with my elaborations. The pathways are stored in `examplePathways` and the ranked gene list in `exampleRanks`.
+
+TBC.
