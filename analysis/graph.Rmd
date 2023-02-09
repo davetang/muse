@@ -1,0 +1,181 @@
+---
+title: "Solving problems with graphs"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Perfect squares
+
+I saw this question on [Quora](https://www.quora.com/Is-there-any-quick-way-to-solve-this-math-problem):
+
+>A teacher assigns each of her 18 students a different integer from 1 through
+>18. The teacher forms pairs of study partners by using the rule that the sum
+>of the pair of numbers is a perfect square. Assuming the 9 pairs of students
+>follow this rule, the student assigned which number must be paired with the
+>student assigned the number 1?
+>
+>A. 16
+>B. 15
+>C. 9
+>D. 8
+>E. 3
+
+Firstly, a perfect square is a number made by squaring a whole number. The first ten perfect squares are listed below.
+
+```{r perfect_squares}
+(1:10)^2
+```
+
+We can already narrow the answer to either A (16) or C (9), which means that the student assigned 1 can either pair with the student assigned 8 or 15. But the student assigned 8 can also pair with 17 and the student assigned 15 can also pair with 10. A graph is a nice way to visualise the possibilities to narrow down on a solution.
+
+We can use the `combn()` function to generate all the pair combinations.
+
+```{r student_pairs}
+student_pairs <- t(combn(1:18, 2))
+tail(student_pairs)
+```
+
+However, not all pairs form perfect squares so we need to eliminate those pairings. Given the definition of a perfect square, we can write a function to check if a number is a perfect square. The tricky bit is writing a test in R to check whether a number is a whole number because the `sqrt()` function does not return an integer even when a number is a perfect square.
+
+```{r sqrt_eg}
+class(sqrt(25))
+class(sqrt(26))
+```
+
+We can use modulus one because a whole number will equally divide by one.
+
+```{r modulus}
+25 %% 1
+25.5 %% 1
+```
+
+Now we can write a function to check whether a number is a perfect square.
+
+```{r check_perfect_square}
+check_ps <- function(n){
+  stopifnot(n > 0)
+  sqrt(n) %% 1 == 0
+}
+
+check_ps(100)
+```
+
+Remove the pairs that are not perfect squares.
+
+```{r filter_student_pairs}
+wanted <- check_ps(apply(student_pairs, 1, sum))
+student_pairs <- student_pairs[wanted, ]
+student_pairs
+```
+
+Let's check whether all students are present, to see if they were included in at least one pair. The `all()` function checks whether all values are true.
+
+```{r check_pairs}
+all(1:18 %in% student_pairs)
+```
+
+Finally, we can visualise the pairs as a graph.
+
+```{r graph_pairs}
+suppressPackageStartupMessages(library(igraph))
+net <- graph.data.frame(student_pairs, directed = FALSE)
+plot(net, layout = layout_components(net))
+```
+
+Since 16, 17, and 18 must pair with 9, 8, and 7, respectively, 2 must pair with 14, 11 with 5, 4 with 12, 13 with 3, 6 with 10. Therefore 1 has to pair with 15.
+
+I'm curious whether this type of pairing is possible with any class size that is even.
+
+```{r plot_pairs}
+gen_pairs <- function(n){
+  spairs <- t(combn(1:n, 2))
+  wanted <- check_ps(apply(spairs, 1, sum))
+  spairs[wanted, ]
+}
+
+plot_pairs <- function(spairs){
+  net <- graph.data.frame(spairs, directed = FALSE)
+  plot(net, layout = layout_components(net))
+}
+
+plot_pairs(gen_pairs(20))
+```
+
+To check whether a solution exists, we:
+
+1. Check whether all students are in at least one potential pair.
+2. Find pairs where one number is unique, i.e. unique pair, (and save them) and then remove other pairs that include either number of the unique pair.
+3. Keep repeating step 2 until no pairs are left or if no unique pair exists, we will have to use a backtracking algorithm to pick a random pair (not implemented).
+
+Let's see if this works for our example with a class of 18.
+
+```{r eg1}
+eg1 <- gen_pairs(18)
+
+get_row_idx <- function(mat, vec){
+  unique(which(t(apply(mat, 1, function(x) x %in% vec)), arr.ind = TRUE)[, 1])
+}
+
+get_unique_pair_idx <- function(mat){
+  vec <- as.vector(mat)
+  dup <- unique(vec[duplicated(vec)])
+  wanted <- setdiff(unique(vec), dup)
+  get_row_idx(mat, wanted)
+}
+
+find_solution <- function(mat, iter = 100){
+  solution <- matrix(nrow = 0, ncol = 2)
+  i <- 1
+  while(nrow(mat) > 0){
+    uniq_row <- get_unique_pair_idx(mat)
+    if(length(uniq_row) == 0){
+      message("No unique row")
+      plot_pairs(mat)
+      return(mat)
+    }
+    up <- mat[uniq_row, ]
+    solution <- rbind(solution, up, deparse.level = 0)
+    vec <- as.vector(up)
+    wanted <- get_row_idx(mat, vec)
+    mat <- mat[-wanted,, drop = FALSE]
+    if(length(unique(as.vector(mat))) %% 2 != 0){
+      message("Odd number remaining")
+      plot_pairs(mat)
+      return(mat)
+    }
+    i <- i + 1
+    if(i == iter){
+      print(solution)
+      stop("Too many iterations")
+    }
+  }
+  return(solution)
+}
+
+find_solution(eg1)
+```
+
+The code works nicely for a class size of 18 and 24 but doesn't handle a class size of 20 properly because there is no solution.
+
+```{r eg2}
+eg2 <- gen_pairs(20)
+plot_pairs(eg2)
+```
+
+When 18 is paired with 7, one number will be left without a pair.
+
+The code also doesn't work when we have to make a choice because each number has two or more possible pairs. Backtracking needs to be implemented at this point to find a possible solution.
+
+```{r eg3}
+eg3 <- gen_pairs(30)
+find_solution(eg3)
+```
