@@ -366,10 +366,10 @@ The `fgsea` results includes the leading edge, which contains the genes that con
 fgsea_reactome[order(pval),][1,]
 ```
 
-The set of leading edge genes is made up of `r length(fgsea_reactome[order(pval),][1,]$leadingEdge)` genes.
+The set of leading edge genes is made up of `r length(fgsea_reactome[order(pval),][1,]$leadingEdge[[1]])` genes.
 
 ```{r leading_edge}
-fgsea_reactome[order(pval),][1,]$leadingEdge
+fgsea_reactome[order(pval),][1,]$leadingEdge[[1]]
 ```
 
 The `r fgsea_reactome[order(pval),][1,]$pathway` contains `r length(my_pathways[[fgsea_reactome[order(pval),][1,]$pathway]])` genes, which was indicated in the `fgsea` result as size (but it's always good to double-check).
