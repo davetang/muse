@@ -1,0 +1,111 @@
+---
+title: "Using the Bioconductor ensembldb package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The `ensembldb` package can be used to retrieve genomic and protein annotations and to map between protein, transcript, and genome coordinates. This mapping relies on annotations of proteins (their sequences) to their encoding transcripts which are stored in `EnsDb` databases.
+
+>All functions, except `proteinToGenome` and `transcriptToGenome` return `IRanges` with negative coordinates if the mapping failed (e.g. because the identifier is unknown to the database, or if, for mappings to and from protein coordinates, the input coordinates are not within the coding region of a transcript). `proteinToGenome` and `transcriptToGenome` return empty `GRanges` if mappings fail.
+
+## Installation
+
+To begin, install the [ensembldb](https://bioconductor.org/packages/release/bioc/html/ensembldb.html) and [AnnotationHub](https://bioconductor.org/packages/release/bioc/html/AnnotationHub.html) packages.
+
+```{r install_ensembldb, message=FALSE, warning=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+if (!require("ensembldb", quietly = TRUE))
+  BiocManager::install("ensembldb")
+
+if (!require("AnnotationHub", quietly = TRUE))
+  BiocManager::install("AnnotationHub")
+
+library(ensembldb)
+library(AnnotationHub)
+```
+
+## AnnotationHub
+
+>The AnnotationHub server provides easy R / Bioconductor access to large collections of publicly available whole genome resources, e.g,. ENSEMBL genome fasta or gtf files, UCSC chain resources, ENCODE data tracks at UCSC, etc.
+
+Create an `AnnotationHub` object.
+
+```{r ah}
+ah <- AnnotationHub(ask = FALSE)
+```
+
+Query.
+
+```{r query}
+ensdb_homo <- query(ah, c("EnsDb", "Homo sapiens"))
+ensdb_homo
+```
+
+Latest available Ensembl version.
+
+```{r latest_ensembl}
+latest <- nrow(mcols(ensdb_homo))
+edb <- ensdb_homo[[latest]]
+edb
+```
+
+## Mapping protein coordinates to the genome
+
+>The `proteinToGenome` function allows to map coordinates within the amino acid sequence of a protein to the corresponding DNA sequence on the genome. A protein identifier and the coordinates of the sequence within its amino acid sequence are required and have to be passed as an `IRanges` object to the function. The protein identifier can either be passed as names of this object, or provided in a metadata column (mcols).
+
+The example below (from the vignette) maps positions 5 to 9 within the amino acid sequence of the protein ENSP00000385415.
+
+```{r protein_to_genome}
+GAGE10_prt <- IRanges(start = 5, end = 9, names = "ENSP00000385415")
+GAGE10_gnm <- proteinToGenome(GAGE10_prt, edb)
+GAGE10_gnm
+```
+
+The result is returned in a list, with one element for each range in the input `IRanges`.
+
+Below is an example with two proteins.
+
+```{r two_proteins_to_genome}
+two_prt <- IRanges(
+  start = c(6, 15),
+  end = c(6, 15),
+  names = c("ENSP00000366863", "ENSP00000358262")
+)
+
+two_prt_to_gnm <- proteinToGenome(two_prt, edb)
+two_prt_to_gnm
+```
+
+We use `sapply()` to convert the results into a data frame.
+
+```{r to_dataframe}
+get_pos <- function(x, add_chr = TRUE){
+  chr <- as.character(seqnames(x))
+  if(add_chr){
+    chr <- paste0("chr", chr)
+  }
+  list(
+    chr = chr,
+    start = start(x),
+    end = end(x)
+  )
+}
+
+as.data.frame(
+  t(sapply(two_prt_to_gnm, get_pos))
+)
+```
+
+## Further reading
+
+* [Mapping between genome, transcript, and protein coordinates](https://bioconductor.org/packages/release/bioc/vignettes/ensembldb/inst/doc/coordinate-mapping.html)
