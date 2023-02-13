@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2023-02-13" />
+
+<title>Using the Bioconductor GenomicsRanges package</title>
+
+<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Using the Bioconductor GenomicsRanges
+package</h1>
+<h4 class="date">2023-02-13</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2023-02-13
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree124288861c285da5c0bfa3bd150233a04a9a3638targetblank1242888a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/124288861c285da5c0bfa3bd150233a04a9a3638" target="_blank">1242888</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree124288861c285da5c0bfa3bd150233a04a9a3638targetblank1242888a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/124288861c285da5c0bfa3bd150233a04a9a3638" target="_blank">1242888</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    r_packages_4.1.2/
+    Ignored:    r_packages_4.2.0/
+
+Untracked files:
+    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  analysis/tss_xgboost.Rmd
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
+    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
+    Untracked:  data/ncrna_noncode_v3.fa
+
+Unstaged changes:
+    Modified:   analysis/graph.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/genomic_ranges.Rmd</code>) and
+HTML (<code>docs/genomic_ranges.html</code>) files. If you’ve configured
+a remote Git repository (see <code>?wflow_git_remote</code>), click on
+the hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/124288861c285da5c0bfa3bd150233a04a9a3638/analysis/genomic_ranges.Rmd" target="_blank">1242888</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-02-13
+</td>
+<td>
+GenomicRanges
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>From the <a
+href="https://bioconductor.org/packages/release/bioc/vignettes/GenomicRanges/inst/doc/GenomicRangesIntroduction.html">introductory
+article</a> for GenomicRanges:</p>
+<blockquote>
+<p>The GenomicRanges package serves as the foundation for representing
+genomic locations within the Bioconductor project. In the Bioconductor
+package hierarchy, it builds upon the IRanges (infrastructure) package
+and provides support for the BSgenome (infrastructure), Rsamtools (I/O),
+ShortRead (I/O &amp; QA), rtracklayer (I/O), GenomicFeatures
+(infrastructure), GenomicAlignments (sequence reads), VariantAnnotation
+(called variants), and many other Bioconductor packages.</p>
+<p>This package lays a foundation for genomic analysis by introducing
+three classes (GRanges, GPos, and GRangesList), which are used to
+represent genomic ranges, genomic positions, and groups of genomic
+ranges. This vignette focuses on the GRanges and GRangesList classes and
+their associated methods.</p>
+</blockquote>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>To being, install <a
+href="https://www.bioconductor.org/packages/release/bioc/html/GenomicRanges.html">GenomicRanges</a>.</p>
+<pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+  install.packages(&quot;BiocManager&quot;)
+
+if (!require(&quot;GenomicRanges&quot;, quietly = TRUE))
+  BiocManager::install(&quot;GenomicRanges&quot;)
+
+library(GenomicRanges)</code></pre>
+</div>
+<div id="getting-started" class="section level2">
+<h2>Getting started</h2>
+<p>The introduction article starts with creating a <code>GRanges</code>
+object:</p>
+<blockquote>
+<p>The GRanges class represents a collection of genomic features that
+each have a single start and end location on the genome. This includes
+features such as contiguous binding sites, transcripts, and exons. These
+objects can be created by using the GRanges constructor function.</p>
+</blockquote>
+<pre class="r"><code>gr &lt;- GRanges(
+  seqnames = Rle(c(&quot;chr1&quot;, &quot;chr2&quot;, &quot;chr1&quot;, &quot;chr3&quot;), c(1, 3, 2, 4)),
+  ranges = IRanges(101:110, end = 111:120, names = letters[1:10]),
+  strand = Rle(strand(c(&quot;-&quot;, &quot;+&quot;, &quot;*&quot;, &quot;+&quot;, &quot;-&quot;)), c(1, 2, 2, 3, 2)),
+  score = 1:10,
+  GC = seq(1, 0, length=10)
+)
+ 
+class(gr)</code></pre>
+<pre><code>[1] &quot;GRanges&quot;
+attr(,&quot;package&quot;)
+[1] &quot;GenomicRanges&quot;</code></pre>
+<p>The <code>GRanges()</code> function was used to specify a list of
+sequence names, their ranges, strand, score, and GC content. For the
+<code>seqnames</code> and <code>strand</code>, the <code>Rle()</code>
+function was used; RLE is an abbreviation for <a
+href="https://en.wikipedia.org/wiki/Run-length_encoding">run-length
+encoding</a>, which is a way of representing and compressing data. The
+function saves us from typing
+<code>c("chr1", "chr2", "chr2", "chr2", "chr1", "chr1", "chr3", "chr3", "chr3", "chr3")</code>,
+which would also work.</p>
+<p>The <code>IRanges()</code> function was used to create a vector
+representation of sequence ranges; 10 ranges were created and named
+using the first ten letters of the alphabet.</p>
+<p><code>Rle()</code> was also used to indicate the strandedness of the
+ranges.</p>
+<p>Metadata can also be added to a <code>GRanges</code> object and in
+the example, a score and the GC content were included.</p>
+<p>The genomic coordinates (seqnames, ranges, and strand) are displayed
+on the left-hand side and the metadata columns (annotations) are
+displayed on the right-hand side.</p>
+<pre class="r"><code>gr</code></pre>
+<pre><code>GRanges object with 10 ranges and 2 metadata columns:
+    seqnames    ranges strand |     score        GC
+       &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;integer&gt; &lt;numeric&gt;
+  a     chr1   101-111      - |         1  1.000000
+  b     chr2   102-112      + |         2  0.888889
+  c     chr2   103-113      + |         3  0.777778
+  d     chr2   104-114      * |         4  0.666667
+  e     chr1   105-115      * |         5  0.555556
+  f     chr1   106-116      + |         6  0.444444
+  g     chr3   107-117      + |         7  0.333333
+  h     chr3   108-118      + |         8  0.222222
+  i     chr3   109-119      - |         9  0.111111
+  j     chr3   110-120      - |        10  0.000000
+  -------
+  seqinfo: 3 sequences from an unspecified genome; no seqlengths</code></pre>
+<p>Each component of the genomic coordinates can be extracted using the
+accessor functions that have the same name as the column names. For
+example to retrieve the ranges we use the <code>ranges()</code>
+function.</p>
+<pre class="r"><code>ranges(gr)</code></pre>
+<pre><code>IRanges object with 10 ranges and 0 metadata columns:
+        start       end     width
+    &lt;integer&gt; &lt;integer&gt; &lt;integer&gt;
+  a       101       111        11
+  b       102       112        11
+  c       103       113        11
+  d       104       114        11
+  e       105       115        11
+  f       106       116        11
+  g       107       117        11
+  h       108       118        11
+  i       109       119        11
+  j       110       120        11</code></pre>
+<p>Metadata is extracted using the <code>mcols()</code> function.</p>
+<pre class="r"><code>mcols(gr)</code></pre>
+<pre><code>DataFrame with 10 rows and 2 columns
+      score        GC
+  &lt;integer&gt; &lt;numeric&gt;
+a         1  1.000000
+b         2  0.888889
+c         3  0.777778
+d         4  0.666667
+e         5  0.555556
+f         6  0.444444
+g         7  0.333333
+h         8  0.222222
+i         9  0.111111
+j        10  0.000000</code></pre>
+</div>
+<div id="bed-to-granges" class="section level2">
+<h2>BED to GRanges</h2>
+<p>The <a
+href="https://genome.ucsc.edu/FAQ/FAQformat.html#format1">Browser
+Extensible Data</a> (BED) format is quite ubiquitous in bioinformatics,
+so it is useful to know how a <code>GRanges</code> object can be created
+from a BED file.</p>
+<p>We first create a data frame from a small BED file hosted on my web
+server and then we create a <code>GRanges</code> object using the data
+frame. Since BED is 0-based, we add one to make it 1-based.</p>
+<pre class="r"><code>data &lt;- read.table(
+  &quot;https://davetang.org/file/granges.bed&quot;,
+  col.names = c(&#39;chr&#39;,&#39;start&#39;,&#39;end&#39;,&#39;id&#39;,&#39;score&#39;,&#39;strand&#39;)
+)
+ 
+bed &lt;- with(data, GRanges(chr, IRanges(start+1L, end), strand, score, refseq=id))
+bed</code></pre>
+<pre><code>GRanges object with 6 ranges and 2 metadata columns:
+      seqnames            ranges strand |     score       refseq
+         &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; | &lt;integer&gt;  &lt;character&gt;
+  [1]     chr1 66999825-67210768      + |         0    NM_032291
+  [2]     chr1 33546714-33585995      + |         0    NM_052998
+  [3]     chr1 48998527-50489626      - |         0    NM_032785
+  [4]     chr1 16767167-16786584      + |         0 NM_001145278
+  [5]     chr1 16767167-16786584      + |         0 NM_001145277
+  [6]     chr1   8384390-8404227      + |         0 NM_001080397
+  -------
+  seqinfo: 1 sequence from an unspecified genome; no seqlengths</code></pre>
+<p>The <code>elementMetadata</code> function can be used to fetch
+metadata.</p>
+<pre class="r"><code>elementMetadata(bed)</code></pre>
+<pre><code>DataFrame with 6 rows and 2 columns
+      score       refseq
+  &lt;integer&gt;  &lt;character&gt;
+1         0    NM_032291
+2         0    NM_052998
+3         0    NM_032785
+4         0 NM_001145278
+5         0 NM_001145277
+6         0 NM_001080397</code></pre>
+<p>The <code>with()</code> function used to create the
+<code>GRanges</code> object is nice because it <a
+href="https://stackoverflow.com/questions/42283479/when-to-use-with-function-and-why-is-it-good">saves
+us some typing</a>; we can directly refer to the column names.</p>
+<pre class="r"><code>bed &lt;- with(
+  data,
+  GRanges(
+    chr,
+    IRanges(start+1, end),
+    strand,
+    score,
+    refseq=id
+  )
+)
+ 
+bed2 &lt;- GRanges(
+  data$chr,
+  IRanges(data$start+1L, data$end),
+  data$strand,
+  score = data$score,
+  refseq = data$id
+)
+ 
+identical(bed, bed2)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<p>Let’s load another BED file to demonstrate how we can <a
+href="https://stackoverflow.com/questions/5200946/coverage-by-intersecting-smaller-genomic-interval-data-over-larger-genomic-inter">intersect
+ranges</a>.</p>
+<pre class="r"><code>data2 &lt;- read.table(
+  &quot;https://davetang.org/file/granges2.bed&quot;,
+  col.names = c(&#39;chr&#39;,&#39;start&#39;,&#39;end&#39;,&#39;id&#39;,&#39;score&#39;,&#39;strand&#39;)
+)
+ 
+bed2 &lt;- with(data2, GRanges(chr, IRanges(start+1, end), strand, score, refseq = id))
+bed2</code></pre>
+<pre><code>GRanges object with 4 ranges and 2 metadata columns:
+      seqnames    ranges strand |     score      refseq
+         &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt; | &lt;integer&gt; &lt;character&gt;
+  [1]     chr1  66999823      + |         0        1_no
+  [2]     chr1  33585997      + |         0        2_no
+  [3]     chr1  16786584      + |         0       3_yes
+  [4]     chr1   8384390      + |         0       4_yes
+  -------
+  seqinfo: 1 sequence from an unspecified genome; no seqlengths</code></pre>
+<p>We can use the <code>intersect</code> function to perform an
+intersect on the two <code>GRanges</code> objects; note that
+<code>ignore.strand=FALSE</code> is the default, which means the strand
+information is taken into account (but not illustrated in my
+example).</p>
+<pre class="r"><code>GenomicRanges::intersect(bed, bed2)</code></pre>
+<pre><code>GRanges object with 2 ranges and 0 metadata columns:
+      seqnames    ranges strand
+         &lt;Rle&gt; &lt;IRanges&gt;  &lt;Rle&gt;
+  [1]     chr1   8384390      +
+  [2]     chr1  16786584      +
+  -------
+  seqinfo: 1 sequence from an unspecified genome; no seqlengths</code></pre>
+<p>Note that the metadata from both BED files is lost. Thanks to a <a
+href="https://davetang.org/muse/2013/01/02/iranges-and-genomicranges/#comment-2900">suggestion
+by Daniel</a>, we can use the <code>subsetByOverlaps()</code> function
+to find overlapping genomic ranges and returns results that retain the
+metadata. This function returns an additional result because when
+considering the <code>refseq</code> metadata, there are two unique
+ranges.</p>
+<pre class="r"><code>subsetByOverlaps(bed, bed2)</code></pre>
+<pre><code>GRanges object with 3 ranges and 2 metadata columns:
+      seqnames            ranges strand |     score       refseq
+         &lt;Rle&gt;         &lt;IRanges&gt;  &lt;Rle&gt; | &lt;integer&gt;  &lt;character&gt;
+  [1]     chr1 16767167-16786584      + |         0 NM_001145278
+  [2]     chr1 16767167-16786584      + |         0 NM_001145277
+  [3]     chr1   8384390-8404227      + |         0 NM_001080397
+  -------
+  seqinfo: 1 sequence from an unspecified genome; no seqlengths</code></pre>
+</div>
+<div id="matching-the-overlaps" class="section level2">
+<h2>Matching the overlaps</h2>
+<p>In the previous example, <code>subsetByOverlaps()</code> does not
+indicate which features overlapped, only that there is an overlap. In
+this section, we will demonstrate the use of the
+<code>GenomicRanges</code> functions <code>countOverlaps()</code>,
+<code>findOverlaps()</code>, <code>queryHits()</code>, and
+<code>subjectHits()</code>.</p>
+<pre class="r"><code>my_ranges &lt;- GRanges(
+  seqnames = rep(&#39;chr1&#39;,6),
+  ranges = IRanges(
+    start = c(66999824,33546713,48998526,16767166,16767166,8384389),
+    end = c(67210768,33585995,50489626,16786584,16786584,8404227)
+  ),
+  strand = c(&#39;+&#39;,&#39;+&#39;,&#39;-&#39;,&#39;+&#39;,&#39;+&#39;,&#39;+&#39;),
+  score = rep(0,6),
+  refseq = c(&#39;NM_032291&#39;,&#39;NM_052998&#39;,&#39;NM_032785&#39;,&#39;NM_001145278&#39;,&#39;NM_001145277&#39;,&#39;NM_001080397&#39;)
+)
+ 
+my_snps &lt;- GRanges(
+  seqnames = rep(&#39;chr1&#39;,3),
+  ranges = IRanges(
+    start = c(66999900,33546793,8384389),
+    end = c(66999901,33546794,8384390)
+  ),
+  strand = c(&#39;+&#39;,&#39;+&#39;,&#39;+&#39;),
+  id = c(&#39;snp1&#39;,&#39;snp2&#39;,&#39;snp3&#39;),
+  score = rep(0,3)
+)</code></pre>
+<p>The function <code>countOverlaps()</code> counts the overlaps with
+respect to the first <code>GRanges</code> object.</p>
+<pre class="r"><code>countOverlaps(my_ranges, my_snps)</code></pre>
+<pre><code>[1] 1 1 0 0 0 1</code></pre>
+<p>The function <code>findOverlaps()</code> returns the matching indexes
+between two <code>GRanges</code> objects; a subject and a query.</p>
+<pre class="r"><code>my_overlaps &lt;- findOverlaps(
+  subject = my_ranges,
+  query = my_snps
+)
+my_overlaps</code></pre>
+<pre><code>Hits object with 3 hits and 0 metadata columns:
+      queryHits subjectHits
+      &lt;integer&gt;   &lt;integer&gt;
+  [1]         1           1
+  [2]         2           2
+  [3]         3           6
+  -------
+  queryLength: 3 / subjectLength: 6</code></pre>
+<p>Finally, we create a data frame that displays the matches by their
+metadata; the functions <code>queryHits()</code> and
+<code>subjectHits()</code> are used to retrieve the match indexes from
+the <code>findOverlaps()</code> result and these indexes are used to
+retrieve the metadata. This process is similar to using the base R
+function <code>match()</code>.</p>
+<pre class="r"><code>my_query &lt;- queryHits(my_overlaps)
+my_subject &lt;- subjectHits(my_overlaps)
+ 
+data.frame(
+  subject = my_ranges[my_subject]$refseq,
+  query = my_snps[my_query]$id
+)</code></pre>
+<pre><code>       subject query
+1    NM_032291  snp1
+2    NM_052998  snp2
+3 NM_001080397  snp3</code></pre>
+</div>
+<div id="further-reading" class="section level2">
+<h2>Further reading</h2>
+<ul>
+<li><a
+href="https://stat.ethz.ch/pipermail/bioconductor/2013-August/054504.html">subsetByOverlaps
+to keep info from both GRanges objects?</a></li>
+</ul>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.2.0 (2022-04-22)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+[1] GenomicRanges_1.50.2 GenomeInfoDb_1.34.7  IRanges_2.32.0      
+[4] S4Vectors_0.36.1     BiocGenerics_0.44.0  BiocManager_1.30.19 
+[7] workflowr_1.7.0     
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.10            XVector_0.38.0         compiler_4.2.0        
+ [4] pillar_1.8.1           bslib_0.4.2            later_1.3.0           
+ [7] git2r_0.30.1           jquerylib_0.1.4        zlibbioc_1.44.0       
+[10] bitops_1.0-7           tools_4.2.0            getPass_0.2-2         
+[13] digest_0.6.31          jsonlite_1.8.4         evaluate_0.20         
+[16] lifecycle_1.0.3        tibble_3.1.8           pkgconfig_2.0.3       
+[19] rlang_1.0.6            cli_3.6.0              rstudioapi_0.14       
+[22] yaml_2.3.7             xfun_0.36              fastmap_1.1.0         
+[25] GenomeInfoDbData_1.2.9 httr_1.4.4             stringr_1.5.0         
+[28] knitr_1.42             fs_1.5.2               vctrs_0.5.2           
+[31] sass_0.4.5             rprojroot_2.0.3        glue_1.6.2            
+[34] R6_2.5.1               processx_3.8.0         fansi_1.0.3           
+[37] rmarkdown_2.20         callr_3.7.3            magrittr_2.0.3        
+[40] whisker_0.4            ps_1.7.2               promises_1.2.0.1      
+[43] htmltools_0.5.4        httpuv_1.6.8           utf8_1.2.2            
+[46] stringi_1.7.12         RCurl_1.98-1.10        cachem_1.0.6          </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
