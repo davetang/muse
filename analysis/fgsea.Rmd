@@ -16,6 +16,10 @@ From the [original paper](https://pubmed.ncbi.nlm.nih.gov/16199517/) describing 
 
 >The goal of GSEA is to determine whether members of a gene set **S** tend to occur toward the top (or bottom) of the list **L**, in which case the gene set is correlated with the phenotypic class distinction.
 
+To provide an example, consider carrying out RNA-seq experiments with two conditions, where one set of experiments are the control and another set are the treatment. A differential gene expression analysis is carried out and each gene is **ranked** by the fold-change between the control and treatment; genes that are up-regulated (fold-change > 1) are ranked at the top and genes that are down-regulated (fold-change < 1) are ranked at the bottom.
+
+Besides inspecting the individual genes that are up- or down-regulated, you wish to find out whether a pathway of genes is up- or down-regulated. Therefore you carry out GSEA using a set of gene pathways (**S**) and check whether genes belonging to the same pathway tend to occur at the start or the end of the list of ranked genes (**L**).
+
 ## Installation
 
 First install [fgsea](https://bioconductor.org/packages/release/bioc/html/fgsea.html).
@@ -51,10 +55,10 @@ The first pathway `r head(names(examplePathways), 1)` contains Entrez Gene IDs t
 examplePathways[1]
 ```
 
-The gene ranks are also packaged with `fgsea` but we will re-generate the ranks based on the [author's code](https://github.com/ctlab/fgsea/blob/master/inst/gen_gene_ranks.R) to see how the ranks were created. Several other Bioconductor packages are required.
+The gene ranks are also packaged with `fgsea` but we will re-generate the ranks based on the [author's code](https://github.com/ctlab/fgsea/blob/master/inst/gen_gene_ranks.R) to see how the ranks were created. Several other Bioconductor packages are required to generate the ranks. The Reactome database is also installed here for later use.
 
 ```{r install_bioc}
-bioc_pac <- c("GEOquery", "limma", "org.Mm.eg.db")
+bioc_pac <- c("GEOquery", "limma", "org.Mm.eg.db", "reactome.db")
 cran_pac <- c("data.table", "pheatmap")
 
 install_pac <- function(x, repo){
@@ -84,27 +88,27 @@ library(data.table)
 source("https://raw.githubusercontent.com/assaron/r-utils/master/R/exprs.R")
 ```
 
-Download [mouse microarray data](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE14308).
+The example gene ranks were created using [mouse microarray data](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE14308), which we can download using `getGEO` from the `GEOquery` package.
 
 ```{r download_gse14308}
 gse14308 <- getGEO("GSE14308")[[1]]
 ```
 
-Add condition to the phenotypic data.
+Conditions (are extracted from the title and) are added to the phenotypic data.
 
 ```{r add_condition}
 pData(gse14308)$condition <- sub("-.*$", "", gse14308$title)
 pData(gse14308)[, c('platform_id', 'type', 'condition')]
 ```
 
-`fData` retrieves information on features.
+`fData` retrieves information on features, which are microarray probe sets.
 
 ```{r feature_dat}
 feature_dat <- fData(gse14308)
 colnames(feature_dat)
 ```
 
-The `collapseBy` function is sourced from [exprs.R](https://raw.githubusercontent.com/assaron/r-utils/master/R/exprs.R) and the source is shown below.
+The `collapseBy` function is sourced from [exprs.R](https://raw.githubusercontent.com/assaron/r-utils/master/R/exprs.R) and the source is shown below but named as `collapseBy_` so we do not overwrite the sourced function. We will go through each line of code to try to understand what the function is doing.
 
 ```{r collapse_by_}
 collapseBy_ <- function(es, factor, FUN=median) {
@@ -119,14 +123,14 @@ collapseBy_ <- function(es, factor, FUN=median) {
 }
 ```
 
-`ranks` contains the median probe intensity.
+`ranks` contains the median probe intensity across all samples.
 
 ```{r ranks}
 ranks <- apply(exprs(gse14308), 1, median)
 head(ranks)
 ```
 
-The `ENTREZ_GENE_ID`, index, and median get saved into a data frame. (I've used `my_df` here because `t` is the name of the transpose function.) The data frame is then ordered from highest intensity to lowest.
+The `ENTREZ_GENE_ID`, index, and median get saved into a data frame. (I've used `my_df` here because `t` is the name of the transpose function.) Next, the data frame is ordered from highest intensity to lowest.
 
 ```{r my_df}
 my_df <- data.frame(
@@ -155,6 +159,8 @@ rownames(res) <- fData(gse14308)$ENTREZ_GENE_ID[keep]
 res
 ```
 
+Therefore, the `collapseBy` function is used to calculate the median intensity across samples/experiments, which is used to rank features, and to remove features that are duplicated or have no Entrez Gene ID.
+
 Now that we know what `collapseBy` does, we can use it.
 
 ```{r collapse_by}
@@ -162,7 +168,7 @@ es <- collapseBy(gse14308, fData(gse14308)$ENTREZ_GENE_ID, FUN=median)
 es
 ```
 
-Probe IDs that mapped to several Entrez Gene IDs and empty entries are removed.
+Probe IDs that mapped to several Entrez Gene IDs and empty entries are also removed.
 
 ```{r es_subset}
 es <- es[!grepl("///", rownames(es)), ]
@@ -208,7 +214,7 @@ fit2 <- contrasts.fit(
 fit2
 ```
 
-Finally, the differential expression analysis is carried out and the results saved. The results are ranked by [limma's moderated t-statistic](https://support.bioconductor.org/p/6124/).
+Finally, the differential expression analysis is carried out and the results saved. The results are ranked by [limma's moderated t-statistic](https://support.bioconductor.org/p/6124/) and this creates the ranked list of genes.
 
 ```{r ebayes}
 fit2 <- eBayes(fit2)
@@ -224,6 +230,8 @@ Load `exampleRanks`.
 data("exampleRanks", package = "fgsea")
 head(exampleRanks)
 ```
+
+The names of the vector are the Entrez Gene IDs and the values are the rank metric.
 
 Compare with our results.
 
@@ -252,8 +260,128 @@ pheatmap(
 )
 ```
 
-## Vignette
+## Vignette analysis
 
 The following section is based on the [fgsea tutorial](https://bioconductor.org/packages/release/bioc/vignettes/fgsea/inst/doc/fgsea-tutorial.html) but with my elaborations. The pathways are stored in `examplePathways` and the ranked gene list in `exampleRanks`.
 
-TBC.
+The `fgsea()` function runs the pre-ranked gene set enrichment analysis.
+
+```{r fgsea}
+data(examplePathways)
+data(exampleRanks)
+set.seed(42)
+
+system.time(
+  fgseaRes <- fgsea(
+    pathways = examplePathways, 
+    stats = exampleRanks,
+    minSize=15,
+    maxSize=500
+  )
+) 
+ 
+class(fgseaRes)
+```
+
+Top 6 enriched pathways; see the [data.table Wiki](https://github.com/Rdatatable/data.table/wiki) for more information on the `data.table` package.
+
+```{r fgsea_result}
+head(fgseaRes[order(pval), ])
+```
+
+Number of significant pathways at padj < 0.01.
+
+```{r fgsea_sign_result}
+sum(fgseaRes[, padj < 0.01])
+```
+
+Plot the most significantly enriched pathway.
+
+```{r plot_sign_pathway}
+plotEnrichment(
+  examplePathways[[head(fgseaRes[order(pval), ], 1)$pathway]],
+  exampleRanks
+) +
+  ggplot2::labs(title=head(fgseaRes[order(pval), ], 1)$pathway)
+```
+
+Plot the top 10 pathways enriched at the top and bottom of the ranked list, respectively.
+
+```{r plot_gsea_table}
+topPathwaysUp <- fgseaRes[ES > 0][head(order(pval), n=10), pathway]
+topPathwaysDown <- fgseaRes[ES < 0][head(order(pval), n=10), pathway]
+topPathways <- c(topPathwaysUp, rev(topPathwaysDown))
+plotGseaTable(
+  examplePathways[topPathways],
+  exampleRanks,
+  fgseaRes, 
+  gseaParam = 0.5
+)
+```
+
+Since the genes were ranked according to their differential expression significance and fold change, with the most significantly down-regulated genes at the top and up-regulated genes at the bottom of the list, the enriched gene sets provides us with some idea of the function of these genes. For example, `exampleRanks` was generated by testing naive T cells against T helper 1 cells, so the enriched pathways may suggest how naive cells are differentiated into T helper 1 cells.
+
+## Reactome
+
+[Reactome pathways](https://reactome.org/) can also be used with fgsea and this database is available via Bioconductor (and was installed earlier in this post).
+
+The `reactomePathways()` function returns a list of Reactome pathways given a list of Entrez Gene IDs. In the example data, the IDs are stored as the names in the `exampleRanks` vector.
+
+```{r my_pathways}
+my_pathways <- reactomePathways(names(exampleRanks))
+```
+
+Out of interest, let's check the median number of genes in the pathways.
+
+```{r my_pathways_median}
+summary(sapply(my_pathways, length))
+```
+
+The results are very similar to the example pathways, where the pathways are related to the cell cycle and mitosis.
+
+```{r fgsea_reactome}
+set.seed(42)
+
+system.time(
+  fgsea_reactome <- fgsea(
+    pathways = my_pathways, 
+    stats = exampleRanks,
+    minSize=15,
+    maxSize=500
+  )
+)
+
+head(fgsea_reactome[order(pval), ])
+```
+
+## Leading edge
+
+Again quote the [original paper](https://pubmed.ncbi.nlm.nih.gov/16199517/):
+
+> Often it is useful to extract the core members of high scoring gene sets that contribute to the enrichment score. We define the leading-edge subset to be those genes in the gene set **S** that appear in the ranked list **L** at, or before, the point where the running sum reaches its maximum deviation from zero.
+
+The `fgsea` results includes the leading edge, which contains the genes that contributed to the enrichment score. To illustrate, let's take the leader edge genes from the most significant Reactome pathway.
+
+```{r fgsea_reactome_most_sign}
+fgsea_reactome[order(pval),][1,]
+```
+
+The set of leading edge genes is made up of `r length(fgsea_reactome[order(pval),][1,]$leadingEdge)` genes.
+
+```{r leading_edge}
+fgsea_reactome[order(pval),][1,]$leadingEdge
+```
+
+The `r fgsea_reactome[order(pval),][1,]$pathway` contains `r length(my_pathways[[fgsea_reactome[order(pval),][1,]$pathway]])` genes, which was indicated in the `fgsea` result as size (but it's always good to double-check).
+
+```{r length_pathway}
+length(my_pathways[[fgsea_reactome[order(pval),][1,]$pathway]])
+```
+
+## Summary
+
+The Gene Set Enrichment Analysis (GSEA) has been around since 2005 and has become a routine step when analysing gene expression data. It differs from Gene Ontology enrichment analysis in that it considers all genes in contrast to taking only significantly differentially expressed genes.
+
+The `fgsea` package allows one to conduct a pre-ranked GSEA in R, which is one approach in a GSEA. A p-value is estimated by permuting the genes in a gene set, which leads to randomly assigned gene sets of the same size. Note that "This approach is not strictly accurate because it ignores gene-gene correlations and will overestimate the significance levels and may lead to false positives." However, it is still useful in getting an idea of the potential roles of the genes that are up- and down-regulated. If your pre-ranked GSEA returns no significant gene sets, you may still get an idea of what roles the up- and down-regulated genes may be involved in by examining the leading edge set. This set indicates the genes that contributed to the enrichment score.
+
+The example ranks in the `fgsea` package were ranked based on the moderated t-statistic. [Another metric](https://genomespot.blogspot.com/2014/09/data-analysis-step-8-pathway-analysis.html) that you may consider is to take the signed fold change and multiply it by the $-log_{10}$p-value. For example, if you performed your differential expression analysis with `edgeR`, you can simply multiply the signed fold change column to the $-log_{10}$p-value column. This metric is based on the paper: [Rank-rank hypergeometric overlap: identification of statistically significant overlap between gene-expression signatures](https://pubmed.ncbi.nlm.nih.gov/20660011/).
