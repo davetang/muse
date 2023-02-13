@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef90ae592bd3971c4a362ab00880294996f019c8ftargetblankf90ae59a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree380c988691bee78a82f4c4a98a08b027c56d3fe0targetblank380c988a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/f90ae592bd3971c4a362ab00880294996f019c8f" target="_blank">f90ae59</a>
+<a href="https://github.com/davetang/muse/tree/380c988691bee78a82f4c4a98a08b027c56d3fe0" target="_blank">380c988</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef90ae592bd3971c4a362ab00880294996f019c8ftargetblankf90ae59a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree380c988691bee78a82f4c4a98a08b027c56d3fe0targetblank380c988a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/f90ae592bd3971c4a362ab00880294996f019c8f" target="_blank">f90ae59</a>.
+<a href="https://github.com/davetang/muse/tree/380c988691bee78a82f4c4a98a08b027c56d3fe0" target="_blank">380c988</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -612,6 +612,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/380c988691bee78a82f4c4a98a08b027c56d3fe0/analysis/fgsea.Rmd" target="_blank">380c988</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-02-13
+</td>
+<td>
+Fix leading edge gene count
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/f48870229f7197cbea7eca54661b1a1d6a26167f/docs/fgsea.html" target="_blank">f488702</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-02-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1307,7 +1341,7 @@ system.time(
   )
 ) </code></pre>
 <pre><code>   user  system elapsed 
- 20.104  18.102   8.999 </code></pre>
+ 19.765  19.232   8.883 </code></pre>
 <pre class="r"><code>class(fgseaRes)</code></pre>
 <pre><code>[1] &quot;data.table&quot; &quot;data.frame&quot;</code></pre>
 <p>Top 6 enriched pathways; see the <a
@@ -1338,6 +1372,43 @@ for more information on the <code>data.table</code> package.</p>
 ) +
   ggplot2::labs(title=head(fgseaRes[order(pval), ], 1)$pathway)</code></pre>
 <p><img src="figure/fgsea.Rmd/plot_sign_pathway-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_sign_pathway-1">
+Past versions of plot_sign_pathway-1.png
+</button>
+</p>
+<div id="fig-plot_sign_pathway-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/f48870229f7197cbea7eca54661b1a1d6a26167f/docs/figure/fgsea.Rmd/plot_sign_pathway-1.png" target="_blank">f488702</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-02-13
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Plot the top 10 pathways enriched at the top and bottom of the ranked
 list, respectively.</p>
 <pre class="r"><code>topPathwaysUp &lt;- fgseaRes[ES &gt; 0][head(order(pval), n=10), pathway]
@@ -1350,6 +1421,43 @@ plotGseaTable(
   gseaParam = 0.5
 )</code></pre>
 <p><img src="figure/fgsea.Rmd/plot_gsea_table-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_gsea_table-1">
+Past versions of plot_gsea_table-1.png
+</button>
+</p>
+<div id="fig-plot_gsea_table-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/f48870229f7197cbea7eca54661b1a1d6a26167f/docs/figure/fgsea.Rmd/plot_gsea_table-1.png" target="_blank">f488702</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-02-13
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Since the genes were ranked according to their differential
 expression significance and fold change, with the most significantly
 down-regulated genes at the top and up-regulated genes at the bottom of
@@ -1389,7 +1497,7 @@ system.time(
   )
 )</code></pre>
 <pre><code>   user  system elapsed 
- 17.282  13.663   4.457 </code></pre>
+ 17.238  14.202   4.482 </code></pre>
 <pre class="r"><code>head(fgsea_reactome[order(pval), ])</code></pre>
 <pre><code>                                   pathway         pval         padj   log2err
 1:                     Cell Cycle, Mitotic 9.197580e-27 6.318737e-24 1.3422338
@@ -1426,10 +1534,9 @@ Reactome pathway.</p>
 1: Cell Cycle, Mitotic 9.19758e-27 6.318737e-24 1.342234 0.5402875 2.696019
    size                              leadingEdge
 1:  362 66336,66977,15366,12442,107995,66442,...</code></pre>
-<p>The set of leading edge genes is made up of 1 genes.</p>
-<pre class="r"><code>fgsea_reactome[order(pval),][1,]$leadingEdge</code></pre>
-<pre><code>[[1]]
-  [1] &quot;66336&quot;  &quot;66977&quot;  &quot;15366&quot;  &quot;12442&quot;  &quot;107995&quot; &quot;66442&quot;  &quot;12571&quot;  &quot;12428&quot; 
+<p>The set of leading edge genes is made up of 164 genes.</p>
+<pre class="r"><code>fgsea_reactome[order(pval),][1,]$leadingEdge[[1]]</code></pre>
+<pre><code>  [1] &quot;66336&quot;  &quot;66977&quot;  &quot;15366&quot;  &quot;12442&quot;  &quot;107995&quot; &quot;66442&quot;  &quot;12571&quot;  &quot;12428&quot; 
   [9] &quot;52276&quot;  &quot;54392&quot;  &quot;215387&quot; &quot;67629&quot;  &quot;54124&quot;  &quot;72415&quot;  &quot;56150&quot;  &quot;57441&quot; 
  [17] &quot;20877&quot;  &quot;67121&quot;  &quot;12615&quot;  &quot;66468&quot;  &quot;67849&quot;  &quot;19053&quot;  &quot;73804&quot;  &quot;76044&quot; 
  [25] &quot;20878&quot;  &quot;15270&quot;  &quot;13555&quot;  &quot;60411&quot;  &quot;17219&quot;  &quot;69270&quot;  &quot;12575&quot;  &quot;69263&quot; 
