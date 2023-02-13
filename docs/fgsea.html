@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-02-01" />
+<meta name="date" content="2023-02-13" />
 
 <title>Using the Fast preranked Gene Set Enrichment Analysis (fgsea) package</title>
 
@@ -360,7 +360,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Using the Fast preranked Gene Set
 Enrichment Analysis (fgsea) package</h1>
-<h4 class="date">2023-02-01</h4>
+<h4 class="date">2023-02-13</h4>
 
 </div>
 
@@ -389,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-02-01
+<strong>Last updated:</strong> 2023-02-13
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefb915380459c4cba93cbbaa75828886048e1935atargetblankfb91538a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef90ae592bd3971c4a362ab00880294996f019c8ftargetblankf90ae59a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/fb915380459c4cba93cbbaa75828886048e1935a" target="_blank">fb91538</a>
+<a href="https://github.com/davetang/muse/tree/f90ae592bd3971c4a362ab00880294996f019c8f" target="_blank">f90ae59</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefb915380459c4cba93cbbaa75828886048e1935atargetblankfb91538a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef90ae592bd3971c4a362ab00880294996f019c8ftargetblankf90ae59a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/fb915380459c4cba93cbbaa75828886048e1935a" target="_blank">fb91538</a>.
+<a href="https://github.com/davetang/muse/tree/f90ae592bd3971c4a362ab00880294996f019c8f" target="_blank">f90ae59</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -565,6 +565,9 @@ Untracked files:
     Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
     Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
     Untracked:  data/ncrna_noncode_v3.fa
+
+Unstaged changes:
+    Modified:   analysis/graph.Rmd
 
 </code></pre>
 <p>
@@ -614,6 +617,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/f90ae592bd3971c4a362ab00880294996f019c8f/analysis/fgsea.Rmd" target="_blank">f90ae59</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-02-13
+</td>
+<td>
+fgsea analysis and summary
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/b82b4fccdedc76ac273db0a488b52fbe64437164/docs/fgsea.html" target="_blank">b82b4fc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-02-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/fb915380459c4cba93cbbaa75828886048e1935a/analysis/fgsea.Rmd" target="_blank">fb91538</a>
 </td>
 <td>
@@ -641,6 +678,19 @@ paper</a> describing the Gene Set Enrichment Analysis (GSEA):</p>
 <strong>L</strong>, in which case the gene set is correlated with the
 phenotypic class distinction.</p>
 </blockquote>
+<p>To provide an example, consider carrying out RNA-seq experiments with
+two conditions, where one set of experiments are the control and another
+set are the treatment. A differential gene expression analysis is
+carried out and each gene is <strong>ranked</strong> by the fold-change
+between the control and treatment; genes that are up-regulated
+(fold-change &gt; 1) are ranked at the top and genes that are
+down-regulated (fold-change &lt; 1) are ranked at the bottom.</p>
+<p>Besides inspecting the individual genes that are up- or
+down-regulated, you wish to find out whether a pathway of genes is up-
+or down-regulated. Therefore you carry out GSEA using a set of gene
+pathways (<strong>S</strong>) and check whether genes belonging to the
+same pathway tend to occur at the start or the end of the list of ranked
+genes (<strong>L</strong>).</p>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
 <p>First install <a
@@ -683,8 +733,9 @@ that belong to this gene set.</p>
 re-generate the ranks based on the <a
 href="https://github.com/ctlab/fgsea/blob/master/inst/gen_gene_ranks.R">author’s
 code</a> to see how the ranks were created. Several other Bioconductor
-packages are required.</p>
-<pre class="r"><code>bioc_pac &lt;- c(&quot;GEOquery&quot;, &quot;limma&quot;, &quot;org.Mm.eg.db&quot;)
+packages are required to generate the ranks. The Reactome database is
+also installed here for later use.</p>
+<pre class="r"><code>bioc_pac &lt;- c(&quot;GEOquery&quot;, &quot;limma&quot;, &quot;org.Mm.eg.db&quot;, &quot;reactome.db&quot;)
 cran_pac &lt;- c(&quot;data.table&quot;, &quot;pheatmap&quot;)
 
 install_pac &lt;- function(x, repo){
@@ -738,6 +789,9 @@ $limma
 NULL
 
 $org.Mm.eg.db
+NULL
+
+$reactome.db
 NULL</code></pre>
 <pre class="r"><code>sapply(cran_pac, install_pac, repo = &quot;cran&quot;)</code></pre>
 <pre><code>
@@ -760,13 +814,15 @@ library(org.Mm.eg.db)
 library(data.table)
 # for collapseBy
 source(&quot;https://raw.githubusercontent.com/assaron/r-utils/master/R/exprs.R&quot;)</code></pre>
-<p>Download <a
+<p>The example gene ranks were created using <a
 href="https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE14308">mouse
-microarray data</a>.</p>
+microarray data</a>, which we can download using <code>getGEO</code>
+from the <code>GEOquery</code> package.</p>
 <pre class="r"><code>gse14308 &lt;- getGEO(&quot;GSE14308&quot;)[[1]]</code></pre>
 <pre><code>Found 1 file(s)</code></pre>
 <pre><code>GSE14308_series_matrix.txt.gz</code></pre>
-<p>Add condition to the phenotypic data.</p>
+<p>Conditions (are extracted from the title and) are added to the
+phenotypic data.</p>
 <pre class="r"><code>pData(gse14308)$condition &lt;- sub(&quot;-.*$&quot;, &quot;&quot;, gse14308$title)
 pData(gse14308)[, c(&#39;platform_id&#39;, &#39;type&#39;, &#39;condition&#39;)]</code></pre>
 <pre><code>          platform_id type condition
@@ -782,7 +838,8 @@ GSM357849     GPL1261  RNA     iTreg
 GSM357850     GPL1261  RNA     iTreg
 GSM357852     GPL1261  RNA     nTreg
 GSM357853     GPL1261  RNA     nTreg</code></pre>
-<p><code>fData</code> retrieves information on features.</p>
+<p><code>fData</code> retrieves information on features, which are
+microarray probe sets.</p>
 <pre class="r"><code>feature_dat &lt;- fData(gse14308)
 colnames(feature_dat)</code></pre>
 <pre><code> [1] &quot;ID&quot;                               &quot;GB_ACC&quot;                          
@@ -795,7 +852,9 @@ colnames(feature_dat)</code></pre>
 [15] &quot;Gene Ontology Cellular Component&quot; &quot;Gene Ontology Molecular Function&quot;</code></pre>
 <p>The <code>collapseBy</code> function is sourced from <a
 href="https://raw.githubusercontent.com/assaron/r-utils/master/R/exprs.R">exprs.R</a>
-and the source is shown below.</p>
+and the source is shown below but named as <code>collapseBy_</code> so
+we do not overwrite the sourced function. We will go through each line
+of code to try to understand what the function is doing.</p>
 <pre class="r"><code>collapseBy_ &lt;- function(es, factor, FUN=median) {
   ranks &lt;- apply(exprs(es), 1, FUN)
   t &lt;- data.frame(f=factor, i=seq_along(ranks), r=ranks)
@@ -806,15 +865,16 @@ and the source is shown below.</p>
   rownames(res) &lt;- factor[keep]
   res
 }</code></pre>
-<p><code>ranks</code> contains the median probe intensity.</p>
+<p><code>ranks</code> contains the median probe intensity across all
+samples.</p>
 <pre class="r"><code>ranks &lt;- apply(exprs(gse14308), 1, median)
 head(ranks)</code></pre>
 <pre><code>  1415670_at   1415671_at   1415672_at   1415673_at 1415674_a_at   1415675_at 
     3324.740     4933.035    11202.750     3239.865     4007.050     1830.655 </code></pre>
 <p>The <code>ENTREZ_GENE_ID</code>, index, and median get saved into a
 data frame. (I’ve used <code>my_df</code> here because <code>t</code> is
-the name of the transpose function.) The data frame is then ordered from
-highest intensity to lowest.</p>
+the name of the transpose function.) Next, the data frame is ordered
+from highest intensity to lowest.</p>
 <pre class="r"><code>my_df &lt;- data.frame(
   f=fData(gse14308)$ENTREZ_GENE_ID,
   i=seq_along(ranks),
@@ -858,6 +918,10 @@ featureData
 experimentData: use &#39;experimentData(object)&#39;
   pubMedIds: 19144320 
 Annotation: GPL1261 </code></pre>
+<p>Therefore, the <code>collapseBy</code> function is used to calculate
+the median intensity across samples/experiments, which is used to rank
+features, and to remove features that are duplicated or have no Entrez
+Gene ID.</p>
 <p>Now that we know what <code>collapseBy</code> does, we can use
 it.</p>
 <pre class="r"><code>es &lt;- collapseBy(gse14308, fData(gse14308)$ENTREZ_GENE_ID, FUN=median)
@@ -879,7 +943,7 @@ experimentData: use &#39;experimentData(object)&#39;
   pubMedIds: 19144320 
 Annotation: GPL1261 </code></pre>
 <p>Probe IDs that mapped to several Entrez Gene IDs and empty entries
-are removed.</p>
+are also removed.</p>
 <pre class="r"><code>es &lt;- es[!grepl(&quot;///&quot;, rownames(es)), ]
 es &lt;- es[rownames(es) != &quot;&quot;, ]
 dim(exprs(es))</code></pre>
@@ -1118,7 +1182,7 @@ Levels           conditionTh1 - conditionNaive
 <p>Finally, the differential expression analysis is carried out and the
 results saved. The results are ranked by <a
 href="https://support.bioconductor.org/p/6124/">limma’s moderated
-t-statistic</a>.</p>
+t-statistic</a> and this creates the ranked list of genes.</p>
 <pre class="r"><code>fit2 &lt;- eBayes(fit2)
 names(topTable(fit2, adjust.method=&quot;BH&quot;, number=12000, sort.by = &quot;B&quot;))</code></pre>
 <pre><code> [1] &quot;ID&quot;                               &quot;GB_ACC&quot;                          
@@ -1153,6 +1217,8 @@ ranks</code></pre>
 head(exampleRanks)</code></pre>
 <pre><code>   170942    109711     18124     12775     72148     16010 
 -63.33703 -49.74779 -43.63878 -41.51889 -33.26039 -32.77626 </code></pre>
+<p>The names of the vector are the Entrez Gene IDs and the values are
+the rank metric.</p>
 <p>Compare with our results.</p>
 <pre class="r"><code>wanted &lt;- head(names(exampleRanks))
 
@@ -1181,15 +1247,247 @@ pheatmap(
   scale = &quot;row&quot;
 )</code></pre>
 <p><img src="figure/fgsea.Rmd/pheatmap-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-pheatmap-1">
+Past versions of pheatmap-1.png
+</button>
+</p>
+<div id="fig-pheatmap-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/b82b4fccdedc76ac273db0a488b52fbe64437164/docs/figure/fgsea.Rmd/pheatmap-1.png" target="_blank">b82b4fc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-02-01
+</td>
+</tr>
+</tbody>
+</table>
 </div>
-<div id="vignette" class="section level2">
-<h2>Vignette</h2>
+</div>
+</div>
+<div id="vignette-analysis" class="section level2">
+<h2>Vignette analysis</h2>
 <p>The following section is based on the <a
 href="https://bioconductor.org/packages/release/bioc/vignettes/fgsea/inst/doc/fgsea-tutorial.html">fgsea
 tutorial</a> but with my elaborations. The pathways are stored in
 <code>examplePathways</code> and the ranked gene list in
 <code>exampleRanks</code>.</p>
-<p>TBC.</p>
+<p>The <code>fgsea()</code> function runs the pre-ranked gene set
+enrichment analysis.</p>
+<pre class="r"><code>data(examplePathways)
+data(exampleRanks)
+set.seed(42)
+
+system.time(
+  fgseaRes &lt;- fgsea(
+    pathways = examplePathways, 
+    stats = exampleRanks,
+    minSize=15,
+    maxSize=500
+  )
+) </code></pre>
+<pre><code>   user  system elapsed 
+ 20.104  18.102   8.999 </code></pre>
+<pre class="r"><code>class(fgseaRes)</code></pre>
+<pre><code>[1] &quot;data.table&quot; &quot;data.frame&quot;</code></pre>
+<p>Top 6 enriched pathways; see the <a
+href="https://github.com/Rdatatable/data.table/wiki">data.table Wiki</a>
+for more information on the <code>data.table</code> package.</p>
+<pre class="r"><code>head(fgseaRes[order(pval), ])</code></pre>
+<pre><code>                                           pathway         pval         padj
+1:                     5990979_Cell_Cycle,_Mitotic 6.690481e-27 3.920622e-24
+2:                              5990980_Cell_Cycle 3.312565e-26 9.705816e-24
+3:                    5991851_Mitotic_Prometaphase 8.470173e-19 1.654507e-16
+4: 5992217_Resolution_of_Sister_Chromatid_Cohesion 2.176649e-18 3.188791e-16
+5:                                 5991454_M_Phase 1.873997e-14 2.196325e-12
+6:         5991599_Separation_of_Sister_Chromatids 8.733223e-14 8.529448e-12
+     log2err        ES      NES size                              leadingEdge
+1: 1.3422338 0.5594755 2.769070  317 66336,66977,12442,107995,66442,12571,...
+2: 1.3267161 0.5388497 2.705894  369 66336,66977,12442,107995,66442,19361,...
+3: 1.1239150 0.7253270 2.972690   82 66336,66977,12442,107995,66442,52276,...
+4: 1.1053366 0.7347987 2.957518   74 66336,66977,12442,107995,66442,52276,...
+5: 0.9759947 0.5576247 2.554076  173 66336,66977,12442,107995,66442,52276,...
+6: 0.9545416 0.6164600 2.670030  116 66336,66977,107995,66442,52276,67629,...</code></pre>
+<p>Number of significant pathways at padj &lt; 0.01.</p>
+<pre class="r"><code>sum(fgseaRes[, padj &lt; 0.01])</code></pre>
+<pre><code>[1] 76</code></pre>
+<p>Plot the most significantly enriched pathway.</p>
+<pre class="r"><code>plotEnrichment(
+  examplePathways[[head(fgseaRes[order(pval), ], 1)$pathway]],
+  exampleRanks
+) +
+  ggplot2::labs(title=head(fgseaRes[order(pval), ], 1)$pathway)</code></pre>
+<p><img src="figure/fgsea.Rmd/plot_sign_pathway-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Plot the top 10 pathways enriched at the top and bottom of the ranked
+list, respectively.</p>
+<pre class="r"><code>topPathwaysUp &lt;- fgseaRes[ES &gt; 0][head(order(pval), n=10), pathway]
+topPathwaysDown &lt;- fgseaRes[ES &lt; 0][head(order(pval), n=10), pathway]
+topPathways &lt;- c(topPathwaysUp, rev(topPathwaysDown))
+plotGseaTable(
+  examplePathways[topPathways],
+  exampleRanks,
+  fgseaRes, 
+  gseaParam = 0.5
+)</code></pre>
+<p><img src="figure/fgsea.Rmd/plot_gsea_table-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Since the genes were ranked according to their differential
+expression significance and fold change, with the most significantly
+down-regulated genes at the top and up-regulated genes at the bottom of
+the list, the enriched gene sets provides us with some idea of the
+function of these genes. For example, <code>exampleRanks</code> was
+generated by testing naive T cells against T helper 1 cells, so the
+enriched pathways may suggest how naive cells are differentiated into T
+helper 1 cells.</p>
+</div>
+<div id="reactome" class="section level2">
+<h2>Reactome</h2>
+<p><a href="https://reactome.org/">Reactome pathways</a> can also be
+used with fgsea and this database is available via Bioconductor (and was
+installed earlier in this post).</p>
+<p>The <code>reactomePathways()</code> function returns a list of
+Reactome pathways given a list of Entrez Gene IDs. In the example data,
+the IDs are stored as the names in the <code>exampleRanks</code>
+vector.</p>
+<pre class="r"><code>my_pathways &lt;- reactomePathways(names(exampleRanks))</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre><code>&#39;select()&#39; returned 1:1 mapping between keys and columns</code></pre>
+<p>Out of interest, let’s check the median number of genes in the
+pathways.</p>
+<pre class="r"><code>summary(sapply(my_pathways, length))</code></pre>
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+   1.00    4.00   11.00   30.83   30.00 1259.00 </code></pre>
+<p>The results are very similar to the example pathways, where the
+pathways are related to the cell cycle and mitosis.</p>
+<pre class="r"><code>set.seed(42)
+
+system.time(
+  fgsea_reactome &lt;- fgsea(
+    pathways = my_pathways, 
+    stats = exampleRanks,
+    minSize=15,
+    maxSize=500
+  )
+)</code></pre>
+<pre><code>   user  system elapsed 
+ 17.282  13.663   4.457 </code></pre>
+<pre class="r"><code>head(fgsea_reactome[order(pval), ])</code></pre>
+<pre><code>                                   pathway         pval         padj   log2err
+1:                     Cell Cycle, Mitotic 9.197580e-27 6.318737e-24 1.3422338
+2:                              Cell Cycle 2.728253e-26 9.371549e-24 1.3267161
+3:                  Cell Cycle Checkpoints 5.199802e-21 1.190755e-18 1.1866510
+4: Resolution of Sister Chromatid Cohesion 1.016111e-15 1.745171e-13 1.0175448
+5:                    Mitotic Prometaphase 4.945771e-15 6.795490e-13 0.9969862
+6:                                 S Phase 8.047505e-14 9.214393e-12 0.9545416
+          ES      NES size                              leadingEdge
+1: 0.5402875 2.696019  362 66336,66977,15366,12442,107995,66442,...
+2: 0.5182161 2.625451  426 66336,66977,15366,12442,107995,66442,...
+3: 0.5986002 2.816356  200 66336,66977,12442,107995,66442,12428,...
+4: 0.6781403 2.790455   90 66336,66977,12442,107995,66442,52276,...
+5: 0.5863302 2.636189  149 66336,66977,12442,107995,66442,52276,...
+6: 0.6160483 2.629359  115  12428,54124,57441,67849,17219,69270,...</code></pre>
+</div>
+<div id="leading-edge" class="section level2">
+<h2>Leading edge</h2>
+<p>Again quote the <a
+href="https://pubmed.ncbi.nlm.nih.gov/16199517/">original paper</a>:</p>
+<blockquote>
+<p>Often it is useful to extract the core members of high scoring gene
+sets that contribute to the enrichment score. We define the leading-edge
+subset to be those genes in the gene set <strong>S</strong> that appear
+in the ranked list <strong>L</strong> at, or before, the point where the
+running sum reaches its maximum deviation from zero.</p>
+</blockquote>
+<p>The <code>fgsea</code> results includes the leading edge, which
+contains the genes that contributed to the enrichment score. To
+illustrate, let’s take the leader edge genes from the most significant
+Reactome pathway.</p>
+<pre class="r"><code>fgsea_reactome[order(pval),][1,]</code></pre>
+<pre><code>               pathway        pval         padj  log2err        ES      NES
+1: Cell Cycle, Mitotic 9.19758e-27 6.318737e-24 1.342234 0.5402875 2.696019
+   size                              leadingEdge
+1:  362 66336,66977,15366,12442,107995,66442,...</code></pre>
+<p>The set of leading edge genes is made up of 1 genes.</p>
+<pre class="r"><code>fgsea_reactome[order(pval),][1,]$leadingEdge</code></pre>
+<pre><code>[[1]]
+  [1] &quot;66336&quot;  &quot;66977&quot;  &quot;15366&quot;  &quot;12442&quot;  &quot;107995&quot; &quot;66442&quot;  &quot;12571&quot;  &quot;12428&quot; 
+  [9] &quot;52276&quot;  &quot;54392&quot;  &quot;215387&quot; &quot;67629&quot;  &quot;54124&quot;  &quot;72415&quot;  &quot;56150&quot;  &quot;57441&quot; 
+ [17] &quot;20877&quot;  &quot;67121&quot;  &quot;12615&quot;  &quot;66468&quot;  &quot;67849&quot;  &quot;19053&quot;  &quot;73804&quot;  &quot;76044&quot; 
+ [25] &quot;20878&quot;  &quot;15270&quot;  &quot;13555&quot;  &quot;60411&quot;  &quot;17219&quot;  &quot;69270&quot;  &quot;12575&quot;  &quot;69263&quot; 
+ [33] &quot;12448&quot;  &quot;14211&quot;  &quot;20873&quot;  &quot;18005&quot;  &quot;72119&quot;  &quot;71988&quot;  &quot;17215&quot;  &quot;12534&quot; 
+ [41] &quot;66156&quot;  &quot;208628&quot; &quot;22390&quot;  &quot;68240&quot;  &quot;228421&quot; &quot;68014&quot;  &quot;19348&quot;  &quot;12236&quot; 
+ [49] &quot;72151&quot;  &quot;18817&quot;  &quot;21781&quot;  &quot;18968&quot;  &quot;66934&quot;  &quot;272551&quot; &quot;227613&quot; &quot;67141&quot; 
+ [57] &quot;67951&quot;  &quot;68612&quot;  &quot;68298&quot;  &quot;108000&quot; &quot;23834&quot;  &quot;106344&quot; &quot;242705&quot; &quot;18141&quot; 
+ [65] &quot;223921&quot; &quot;26886&quot;  &quot;13557&quot;  &quot;72787&quot;  &quot;268697&quot; &quot;72155&quot;  &quot;56371&quot;  &quot;12531&quot; 
+ [73] &quot;327762&quot; &quot;12567&quot;  &quot;229841&quot; &quot;67052&quot;  &quot;16319&quot;  &quot;66634&quot;  &quot;26931&quot;  &quot;67203&quot; 
+ [81] &quot;12235&quot;  &quot;74470&quot;  &quot;72083&quot;  &quot;66570&quot;  &quot;17216&quot;  &quot;76308&quot;  &quot;19687&quot;  &quot;17218&quot; 
+ [89] &quot;102920&quot; &quot;29870&quot;  &quot;18973&quot;  &quot;16881&quot;  &quot;17463&quot;  &quot;75786&quot;  &quot;19645&quot;  &quot;19075&quot; 
+ [97] &quot;26417&quot;  &quot;69736&quot;  &quot;19357&quot;  &quot;76816&quot;  &quot;70385&quot;  &quot;22628&quot;  &quot;22627&quot;  &quot;52683&quot; 
+[105] &quot;19076&quot;  &quot;18972&quot;  &quot;26932&quot;  &quot;12544&quot;  &quot;17997&quot;  &quot;51788&quot;  &quot;26440&quot;  &quot;68549&quot; 
+[113] &quot;12445&quot;  &quot;19088&quot;  &quot;269113&quot; &quot;26444&quot;  &quot;19324&quot;  &quot;103733&quot; &quot;59001&quot;  &quot;19179&quot; 
+[121] &quot;12579&quot;  &quot;232987&quot; &quot;17420&quot;  &quot;228769&quot; &quot;219072&quot; &quot;26445&quot;  &quot;105988&quot; &quot;69745&quot; 
+[129] &quot;18538&quot;  &quot;69928&quot;  &quot;11651&quot;  &quot;68097&quot;  &quot;57296&quot;  &quot;63955&quot;  &quot;19170&quot;  &quot;17220&quot; 
+[137] &quot;50793&quot;  &quot;77605&quot;  &quot;18392&quot;  &quot;236930&quot; &quot;67151&quot;  &quot;70024&quot;  &quot;66296&quot;  &quot;16906&quot; 
+[145] &quot;109145&quot; &quot;71819&quot;  &quot;67733&quot;  &quot;12447&quot;  &quot;75430&quot;  &quot;12532&quot;  &quot;68942&quot;  &quot;26442&quot; 
+[153] &quot;19177&quot;  &quot;230376&quot; &quot;229776&quot; &quot;16563&quot;  &quot;16328&quot;  &quot;18971&quot;  &quot;225659&quot; &quot;68953&quot; 
+[161] &quot;100088&quot; &quot;66671&quot;  &quot;19718&quot;  &quot;78177&quot; </code></pre>
+<p>The Cell Cycle, Mitotic contains 362 genes, which was indicated in
+the <code>fgsea</code> result as size (but it’s always good to
+double-check).</p>
+<pre class="r"><code>length(my_pathways[[fgsea_reactome[order(pval),][1,]$pathway]])</code></pre>
+<pre><code>[1] 362</code></pre>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>The Gene Set Enrichment Analysis (GSEA) has been around since 2005
+and has become a routine step when analysing gene expression data. It
+differs from Gene Ontology enrichment analysis in that it considers all
+genes in contrast to taking only significantly differentially expressed
+genes.</p>
+<p>The <code>fgsea</code> package allows one to conduct a pre-ranked
+GSEA in R, which is one approach in a GSEA. A p-value is estimated by
+permuting the genes in a gene set, which leads to randomly assigned gene
+sets of the same size. Note that “This approach is not strictly accurate
+because it ignores gene-gene correlations and will overestimate the
+significance levels and may lead to false positives.” However, it is
+still useful in getting an idea of the potential roles of the genes that
+are up- and down-regulated. If your pre-ranked GSEA returns no
+significant gene sets, you may still get an idea of what roles the up-
+and down-regulated genes may be involved in by examining the leading
+edge set. This set indicates the genes that contributed to the
+enrichment score.</p>
+<p>The example ranks in the <code>fgsea</code> package were ranked based
+on the moderated t-statistic. <a
+href="https://genomespot.blogspot.com/2014/09/data-analysis-step-8-pathway-analysis.html">Another
+metric</a> that you may consider is to take the signed fold change and
+multiply it by the <span
+class="math inline">\(-log_{10}\)</span>p-value. For example, if you
+performed your differential expression analysis with <code>edgeR</code>,
+you can simply multiply the signed fold change column to the <span
+class="math inline">\(-log_{10}\)</span>p-value column. This metric is
+based on the paper: <a
+href="https://pubmed.ncbi.nlm.nih.gov/20660011/">Rank-rank
+hypergeometric overlap: identification of statistically significant
+overlap between gene-expression signatures</a>.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1220,43 +1518,44 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] pheatmap_1.0.12      data.table_1.14.6    org.Mm.eg.db_3.16.0 
- [4] AnnotationDbi_1.60.0 IRanges_2.32.0       S4Vectors_0.36.1    
- [7] limma_3.54.1         GEOquery_2.66.0      Biobase_2.58.0      
-[10] BiocGenerics_0.44.0  fgsea_1.24.0         BiocManager_1.30.19 
-[13] workflowr_1.7.0     
+ [1] pheatmap_1.0.12      data.table_1.14.6    reactome.db_1.82.0  
+ [4] org.Mm.eg.db_3.16.0  AnnotationDbi_1.60.0 IRanges_2.32.0      
+ [7] S4Vectors_0.36.1     limma_3.54.1         GEOquery_2.66.0     
+[10] Biobase_2.58.0       BiocGenerics_0.44.0  fgsea_1.24.0        
+[13] BiocManager_1.30.19  workflowr_1.7.0     
 
 loaded via a namespace (and not attached):
- [1] bitops_1.0-7           fs_1.6.0               bit64_4.0.5           
+ [1] bitops_1.0-7           fs_1.6.1               bit64_4.0.5           
  [4] RColorBrewer_1.1-3     httr_1.4.4             rprojroot_2.0.3       
- [7] GenomeInfoDb_1.34.7    tools_4.2.0            bslib_0.4.2           
-[10] utf8_1.2.2             R6_2.5.1               DBI_1.1.3             
+ [7] GenomeInfoDb_1.34.9    tools_4.2.0            bslib_0.4.2           
+[10] utf8_1.2.3             R6_2.5.1               DBI_1.1.3             
 [13] colorspace_2.1-0       withr_2.5.0            tidyselect_1.2.0      
 [16] processx_3.8.0         curl_5.0.0             bit_4.0.5             
 [19] compiler_4.2.0         git2r_0.31.0           cli_3.6.0             
-[22] xml2_1.3.3             sass_0.4.5             scales_1.2.1          
-[25] readr_2.1.3            callr_3.7.3            stringr_1.5.0         
-[28] digest_0.6.31          R.utils_2.12.2         rmarkdown_2.20        
-[31] XVector_0.38.0         pkgconfig_2.0.3        htmltools_0.5.4       
-[34] highr_0.10             fastmap_1.1.0          rlang_1.0.6           
-[37] rstudioapi_0.14        RSQLite_2.2.20         farver_2.1.1          
-[40] jquerylib_0.1.4        generics_0.1.3         jsonlite_1.8.4        
-[43] BiocParallel_1.32.5    R.oo_1.25.0            dplyr_1.1.0           
-[46] RCurl_1.98-1.10        magrittr_2.0.3         GenomeInfoDbData_1.2.9
-[49] Matrix_1.5-3           Rcpp_1.0.10            munsell_0.5.0         
-[52] fansi_1.0.4            R.methodsS3_1.8.2      lifecycle_1.0.3       
-[55] stringi_1.7.12         whisker_0.4.1          yaml_2.3.7            
-[58] zlibbioc_1.44.0        grid_4.2.0             blob_1.2.3            
-[61] parallel_4.2.0         promises_1.2.0.1       crayon_1.5.2          
-[64] lattice_0.20-45        Biostrings_2.66.0      cowplot_1.1.1         
-[67] hms_1.1.2              KEGGREST_1.38.0        knitr_1.42            
-[70] ps_1.7.2               pillar_1.8.1           codetools_0.2-18      
-[73] fastmatch_1.1-3        glue_1.6.2             evaluate_0.20         
-[76] getPass_0.2-2          png_0.1-8              vctrs_0.5.2           
-[79] tzdb_0.3.0             httpuv_1.6.8           gtable_0.3.1          
-[82] purrr_1.0.1            tidyr_1.3.0            cachem_1.0.6          
-[85] ggplot2_3.4.0          xfun_0.36              later_1.3.0           
-[88] tibble_3.1.8           memoise_2.0.1          ellipsis_0.3.2        </code></pre>
+[22] xml2_1.3.3             labeling_0.4.2         sass_0.4.5            
+[25] scales_1.2.1           readr_2.1.3            callr_3.7.3           
+[28] stringr_1.5.0          digest_0.6.31          R.utils_2.12.2        
+[31] rmarkdown_2.20         XVector_0.38.0         pkgconfig_2.0.3       
+[34] htmltools_0.5.4        highr_0.10             fastmap_1.1.0         
+[37] rlang_1.0.6            rstudioapi_0.14        RSQLite_2.2.20        
+[40] farver_2.1.1           jquerylib_0.1.4        generics_0.1.3        
+[43] jsonlite_1.8.4         BiocParallel_1.32.5    R.oo_1.25.0           
+[46] dplyr_1.1.0            RCurl_1.98-1.10        magrittr_2.0.3        
+[49] GenomeInfoDbData_1.2.9 Matrix_1.5-3           Rcpp_1.0.10           
+[52] munsell_0.5.0          fansi_1.0.4            R.methodsS3_1.8.2     
+[55] lifecycle_1.0.3        stringi_1.7.12         whisker_0.4.1         
+[58] yaml_2.3.7             zlibbioc_1.44.0        grid_4.2.0            
+[61] blob_1.2.3             parallel_4.2.0         promises_1.2.0.1      
+[64] crayon_1.5.2           lattice_0.20-45        Biostrings_2.66.0     
+[67] cowplot_1.1.1          hms_1.1.2              KEGGREST_1.38.0       
+[70] knitr_1.42             ps_1.7.2               pillar_1.8.1          
+[73] codetools_0.2-18       fastmatch_1.1-3        glue_1.6.2            
+[76] evaluate_0.20          getPass_0.2-2          png_0.1-8             
+[79] vctrs_0.5.2            tzdb_0.3.0             httpuv_1.6.8          
+[82] gtable_0.3.1           purrr_1.0.1            tidyr_1.3.0           
+[85] cachem_1.0.6           ggplot2_3.4.0          xfun_0.37             
+[88] later_1.3.0            tibble_3.1.8           memoise_2.0.1         
+[91] ellipsis_0.3.2        </code></pre>
 </div>
 </div>
 
