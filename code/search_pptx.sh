@@ -94,9 +94,9 @@ fi
 
 search=unset
 if [[ ${ignorecase} -eq 1 ]]; then
-   search=$(grep -li ${word} ppt/slides/*.xml || true)
+   search=$(grep -li "${word}" ppt/slides/*.xml || true)
 else
-   search=$(grep -l ${word} ppt/slides/*.xml || true)
+   search=$(grep -l "${word}" ppt/slides/*.xml || true)
 fi
 
 if [[ -z ${search} ]]; then
