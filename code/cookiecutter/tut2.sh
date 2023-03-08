@@ -35,10 +35,11 @@ EOF
 
 cd ../..
 ZIP=cookiecutter.zip
-zip -r $ZIP ${pn}
+zip --quiet -r ${ZIP} ${pn}
 
 rm -rf ${pn}
 cookiecutter ${ZIP}
+rm ${ZIP}
 
 >&2 echo Done
 exit 0
