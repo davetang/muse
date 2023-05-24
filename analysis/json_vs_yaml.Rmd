@@ -16,10 +16,15 @@ JSON and YAML are popular [serialisation](https://en.wikipedia.org/wiki/Serializ
 
 >In computing, serialization (or serialisation) is the process of translating a data structure or object state into a format that can be stored (e.g. files in secondary storage devices, data buffers in primary storage devices) or transmitted (e.g. data streams over computer networks) and reconstructed later (possibly in a different computer environment).
 
-Install the [jsonlite](https://github.com/jeroen/jsonlite) and [yaml](https://github.com/vubiostat/r-yaml) packages, so that we can generate JSON and YAML.
+Install the following packages:
+
+* [jsonlite](https://github.com/jeroen/jsonlite) for parsing JSON
+* [yaml](https://github.com/vubiostat/r-yaml) for parsing YAML
+* [tidyjson](https://github.com/colearendt/tidyjson) for converting JSON to tidy data frames
+* [rjson](https://github.com/alexcb/rjson) for parsing JSON
 
 ```{r install}
-install.packages(c("jsonlite", "yaml"))
+install.packages(c("jsonlite", "yaml", "tidyjson", "rjson"))
 ```
 
 Load libraries.
@@ -27,6 +32,8 @@ Load libraries.
 ```{r load}
 library(jsonlite)
 library(yaml)
+library(tidyjson)
+library(rjson)
 ```
 
 As a first example, we will convert the `women` data set, which is a small data set with 15 observations for 2 variables.
@@ -35,11 +42,24 @@ As a first example, we will convert the `women` data set, which is a small data 
 women
 ```
 
-Convert `women` to JSON.
+Convert `women` to JSON using `jsonlite`.
 
 ```{r women_json}
-women_json <- toJSON(women, pretty = TRUE)
+women_json <- jsonlite::toJSON(women, pretty = TRUE)
 women_json
+```
+
+`read_json` does not parse the output of `toJSON`.
+
+```{r read_json}
+jsonlite::write_json(x = women_json, path = "women.json")
+tidyjson::read_json(path = "women.json")
+```
+
+Converts into list.
+
+```{r rjson_from_json}
+str(rjson::fromJSON(women_json))
 ```
 
 Convert `women` to YAML.
@@ -54,7 +74,7 @@ writeLines(women_yaml)
 JSON to data frame.
 
 ```{r json_to_df}
-fromJSON(women_json)
+jsonlite::fromJSON(women_json)
 ```
 
 YAML to data frame. This does not work for more complex data structures (see below).
@@ -84,7 +104,7 @@ my_df
 Convert `my_df` to JSON.
 
 ```{r my_df_json}
-my_df_json <- toJSON(my_df, pretty = TRUE)
+my_df_json <- jsonlite::toJSON(my_df, pretty = TRUE)
 my_df_json
 ```
 
@@ -100,7 +120,7 @@ writeLines(my_df_yaml)
 Converting from JSON to YAML is easy.
 
 ```{r json_to_yaml}
-identical(writeLines(as.yaml(fromJSON(my_df_json))), writeLines(my_df_yaml))
+identical(writeLines(as.yaml(jsonlite::fromJSON(my_df_json))), writeLines(my_df_yaml))
 ```
 
 Converting from YAML to JSON for `my_df` is not as straight-forward because of the different number of keywords.
@@ -113,7 +133,7 @@ my_df_list
 This conversion is different from the original data frame to JSON conversion because this creates a single object, where as the original conversion creates an array with three objects.
 
 ```{r yaml_to_json_wrong}
-toJSON(my_df_list, pretty = TRUE)
+jsonlite::toJSON(my_df_list, pretty = TRUE)
 my_df_json
 ```
 
