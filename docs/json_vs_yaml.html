@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-05-19" />
+<meta name="date" content="2023-05-24" />
 
 <title>JSON versus YAML</title>
 
@@ -283,7 +283,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">JSON versus YAML</h1>
-<h4 class="date">2023-05-19</h4>
+<h4 class="date">2023-05-24</h4>
 
 </div>
 
@@ -312,7 +312,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-05-19
+<strong>Last updated:</strong> 2023-05-24
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -443,15 +443,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree50c92d7216f8e09adcaa390b558e4647b5d6fcbdtargetblank50c92d7a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb72b5b38c67a74d70b76ff0f246e466ae4427abbtargetblankb72b5b3a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/50c92d7216f8e09adcaa390b558e4647b5d6fcbd" target="_blank">50c92d7</a>
+<a href="https://github.com/davetang/muse/tree/b72b5b38c67a74d70b76ff0f246e466ae4427abb" target="_blank">b72b5b3</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree50c92d7216f8e09adcaa390b558e4647b5d6fcbdtargetblank50c92d7a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb72b5b38c67a74d70b76ff0f246e466ae4427abbtargetblankb72b5b3a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +461,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/50c92d7216f8e09adcaa390b558e4647b5d6fcbd" target="_blank">50c92d7</a>.
+<a href="https://github.com/davetang/muse/tree/b72b5b38c67a74d70b76ff0f246e466ae4427abb" target="_blank">b72b5b3</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -490,10 +490,10 @@ Untracked files:
     Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
     Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
     Untracked:  data/ncrna_noncode_v3.fa
+    Untracked:  women.json
 
 Unstaged changes:
     Modified:   analysis/graph.Rmd
-    Modified:   script/run_rstudio.sh
 
 </code></pre>
 <p>
@@ -544,6 +544,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/b72b5b38c67a74d70b76ff0f246e466ae4427abb/analysis/json_vs_yaml.Rmd" target="_blank">b72b5b3</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-05-24
+</td>
+<td>
+Check out additional packages
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/3bb32451d34101733fe138231c3f76d09b3cacab/docs/json_vs_yaml.html" target="_blank">3bb3245</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-05-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/50c92d7216f8e09adcaa390b558e4647b5d6fcbd/analysis/json_vs_yaml.Rmd" target="_blank">50c92d7</a>
 </td>
 <td>
@@ -574,15 +608,38 @@ storage devices) or transmitted (e.g. data streams over computer
 networks) and reconstructed later (possibly in a different computer
 environment).</p>
 </blockquote>
-<p>Install the <a href="https://github.com/jeroen/jsonlite">jsonlite</a>
-and <a href="https://github.com/vubiostat/r-yaml">yaml</a> packages, so
-that we can generate JSON and YAML.</p>
-<pre class="r"><code>install.packages(c(&quot;jsonlite&quot;, &quot;yaml&quot;))</code></pre>
+<p>Install the following packages:</p>
+<ul>
+<li><a href="https://github.com/jeroen/jsonlite">jsonlite</a> for
+parsing JSON</li>
+<li><a href="https://github.com/vubiostat/r-yaml">yaml</a> for parsing
+YAML</li>
+<li><a href="https://github.com/colearendt/tidyjson">tidyjson</a> for
+converting JSON to tidy data frames</li>
+<li><a href="https://github.com/alexcb/rjson">rjson</a> for parsing
+JSON</li>
+</ul>
+<pre class="r"><code>install.packages(c(&quot;jsonlite&quot;, &quot;yaml&quot;, &quot;tidyjson&quot;, &quot;rjson&quot;))</code></pre>
 <pre><code>Installing packages into &#39;/packages&#39;
 (as &#39;lib&#39; is unspecified)</code></pre>
 <p>Load libraries.</p>
 <pre class="r"><code>library(jsonlite)
-library(yaml)</code></pre>
+library(yaml)
+library(tidyjson)</code></pre>
+<pre><code>
+Attaching package: &#39;tidyjson&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:jsonlite&#39;:
+
+    read_json</code></pre>
+<pre><code>The following object is masked from &#39;package:stats&#39;:
+
+    filter</code></pre>
+<pre class="r"><code>library(rjson)</code></pre>
+<pre><code>
+Attaching package: &#39;rjson&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:jsonlite&#39;:
+
+    fromJSON, toJSON</code></pre>
 <p>As a first example, we will convert the <code>women</code> data set,
 which is a small data set with 15 observations for 2 variables.</p>
 <pre class="r"><code>women</code></pre>
@@ -602,8 +659,8 @@ which is a small data set with 15 observations for 2 variables.</p>
 13     70    154
 14     71    159
 15     72    164</code></pre>
-<p>Convert <code>women</code> to JSON.</p>
-<pre class="r"><code>women_json &lt;- toJSON(women, pretty = TRUE)
+<p>Convert <code>women</code> to JSON using <code>jsonlite</code>.</p>
+<pre class="r"><code>women_json &lt;- jsonlite::toJSON(women, pretty = TRUE)
 women_json</code></pre>
 <pre><code>[
   {
@@ -667,6 +724,62 @@ women_json</code></pre>
     &quot;weight&quot;: 164
   }
 ] </code></pre>
+<p><code>read_json</code> does not parse the output of
+<code>toJSON</code>.</p>
+<pre class="r"><code>jsonlite::write_json(x = women_json, path = &quot;women.json&quot;)
+tidyjson::read_json(path = &quot;women.json&quot;)</code></pre>
+<pre><code># A tbl_json: 1 x 2 tibble with a &quot;JSON&quot; attribute
+  ..JSON                   document.id
+  &lt;chr&gt;                          &lt;int&gt;
+1 &quot;[\&quot;[\\n  {\\n    \\...&quot;           1</code></pre>
+<p>Converts into list.</p>
+<pre class="r"><code>str(rjson::fromJSON(women_json))</code></pre>
+<pre><code>List of 15
+ $ :List of 2
+  ..$ height: num 58
+  ..$ weight: num 115
+ $ :List of 2
+  ..$ height: num 59
+  ..$ weight: num 117
+ $ :List of 2
+  ..$ height: num 60
+  ..$ weight: num 120
+ $ :List of 2
+  ..$ height: num 61
+  ..$ weight: num 123
+ $ :List of 2
+  ..$ height: num 62
+  ..$ weight: num 126
+ $ :List of 2
+  ..$ height: num 63
+  ..$ weight: num 129
+ $ :List of 2
+  ..$ height: num 64
+  ..$ weight: num 132
+ $ :List of 2
+  ..$ height: num 65
+  ..$ weight: num 135
+ $ :List of 2
+  ..$ height: num 66
+  ..$ weight: num 139
+ $ :List of 2
+  ..$ height: num 67
+  ..$ weight: num 142
+ $ :List of 2
+  ..$ height: num 68
+  ..$ weight: num 146
+ $ :List of 2
+  ..$ height: num 69
+  ..$ weight: num 150
+ $ :List of 2
+  ..$ height: num 70
+  ..$ weight: num 154
+ $ :List of 2
+  ..$ height: num 71
+  ..$ weight: num 159
+ $ :List of 2
+  ..$ height: num 72
+  ..$ weight: num 164</code></pre>
 <p>Convert <code>women</code> to YAML.</p>
 <pre class="r"><code>women_yaml &lt;- as.yaml(women, indent = 3)
 writeLines(women_yaml)</code></pre>
@@ -705,7 +818,7 @@ weight:
 <div id="to-data-frame" class="section level2">
 <h2>To data frame</h2>
 <p>JSON to data frame.</p>
-<pre class="r"><code>fromJSON(women_json)</code></pre>
+<pre class="r"><code>jsonlite::fromJSON(women_json)</code></pre>
 <pre><code>   height weight
 1      58    115
 2      59    117
@@ -761,7 +874,7 @@ my_df</code></pre>
 2  2     b              bb, bbb
 3  3     c cc, ccc, cccc, ccccc</code></pre>
 <p>Convert <code>my_df</code> to JSON.</p>
-<pre class="r"><code>my_df_json &lt;- toJSON(my_df, pretty = TRUE)
+<pre class="r"><code>my_df_json &lt;- jsonlite::toJSON(my_df, pretty = TRUE)
 my_df_json</code></pre>
 <pre><code>[
   {
@@ -805,7 +918,7 @@ keywords:
 <div id="json-to-yaml-and-vice-versa" class="section level2">
 <h2>JSON to YAML and vice versa</h2>
 <p>Converting from JSON to YAML is easy.</p>
-<pre class="r"><code>identical(writeLines(as.yaml(fromJSON(my_df_json))), writeLines(my_df_yaml))</code></pre>
+<pre class="r"><code>identical(writeLines(as.yaml(jsonlite::fromJSON(my_df_json))), writeLines(my_df_yaml))</code></pre>
 <pre><code>id:
 - 1
 - 2
@@ -866,7 +979,7 @@ $keywords[[3]]
 <p>This conversion is different from the original data frame to JSON
 conversion because this creates a single object, where as the original
 conversion creates an array with three objects.</p>
-<pre class="r"><code>toJSON(my_df_list, pretty = TRUE)</code></pre>
+<pre class="r"><code>jsonlite::toJSON(my_df_list, pretty = TRUE)</code></pre>
 <pre><code>{
   &quot;id&quot;: [1, 2, 3],
   &quot;title&quot;: [&quot;a&quot;, &quot;b&quot;, &quot;c&quot;],
@@ -928,20 +1041,22 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] yaml_2.3.7      jsonlite_1.8.4  workflowr_1.7.0
+[1] rjson_0.2.21    tidyjson_0.3.2  yaml_2.3.7      jsonlite_1.8.4 
+[5] workflowr_1.7.0
 
 loaded via a namespace (and not attached):
- [1] vctrs_0.6.2      httr_1.4.5       cli_3.6.1        knitr_1.42      
- [5] rlang_1.1.0      xfun_0.39        stringi_1.7.12   processx_3.8.1  
- [9] promises_1.2.0.1 glue_1.6.2       rprojroot_2.0.3  git2r_0.32.0    
-[13] htmltools_0.5.5  httpuv_1.6.9     ps_1.7.5         sass_0.4.5      
-[17] fansi_1.0.4      rmarkdown_2.21   jquerylib_0.1.4  tibble_3.2.1    
-[21] evaluate_0.20    fastmap_1.1.1    lifecycle_1.0.3  whisker_0.4.1   
-[25] stringr_1.5.0    compiler_4.3.0   fs_1.6.2         pkgconfig_2.0.3 
-[29] Rcpp_1.0.10      rstudioapi_0.14  later_1.3.0      digest_0.6.31   
-[33] R6_2.5.1         utf8_1.2.3       pillar_1.9.0     callr_3.7.3     
-[37] magrittr_2.0.3   bslib_0.4.2      tools_4.3.0      cachem_1.0.7    
-[41] getPass_0.2-2   </code></pre>
+ [1] dplyr_1.1.2      compiler_4.3.0   promises_1.2.0.1 tidyselect_1.2.0
+ [5] Rcpp_1.0.10      stringr_1.5.0    git2r_0.32.0     assertthat_0.2.1
+ [9] tidyr_1.3.0      callr_3.7.3      later_1.3.0      jquerylib_0.1.4 
+[13] fastmap_1.1.1    R6_2.5.1         generics_0.1.3   knitr_1.42      
+[17] tibble_3.2.1     rprojroot_2.0.3  bslib_0.4.2      pillar_1.9.0    
+[21] rlang_1.1.0      utf8_1.2.3       cachem_1.0.7     stringi_1.7.12  
+[25] httpuv_1.6.9     xfun_0.39        getPass_0.2-2    fs_1.6.2        
+[29] sass_0.4.5       cli_3.6.1        magrittr_2.0.3   ps_1.7.5        
+[33] digest_0.6.31    processx_3.8.1   rstudioapi_0.14  lifecycle_1.0.3 
+[37] vctrs_0.6.2      evaluate_0.20    glue_1.6.2       whisker_0.4.1   
+[41] fansi_1.0.4      purrr_1.0.1      rmarkdown_2.21   httr_1.4.5      
+[45] tools_4.3.0      pkgconfig_2.0.3  htmltools_0.5.5 </code></pre>
 </div>
 </div>
 
