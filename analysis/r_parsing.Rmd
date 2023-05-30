@@ -1,0 +1,98 @@
+---
+title: "Reading irregular data into R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Some bioinformatics tools output files that are visually nice and are meant for manual inspection. This practice of generating visually nice output (and/or) Excel files may be rooted in how bioinformaticians and biologists used to work with each other; give the bioinformatician/s some data and they will generate output that will be manually inspected and verified by the biologist/s. I say "used to" because nowadays a lot of biologists are much more savvy with data processing and analysis, and don't need to do things manually.
+
+One such tool is NetMHCIIpan, which generates output that requires a bit more work to parse in contrast to parsing a CSV or TSV file.
+
+```{bash}
+gunzip -c data/netmhciipan.out.gz | head -20
+```
+
+We will use the `readr` package, a very useful package for loading data into R.
+
+```{r load_readr}
+library(readr)
+```
+
+The [read_lines()](https://readr.tidyverse.org/reference/read_lines.html) function reads up to `n_max` lines from a file and stores each line as a character vector.
+
+* Files ending in `.gz`, `.bz2`, `.xz` or `.zip` will be automatically uncompressed.
+* Files starting with `http://`, `https://`, `ftp://`, or `ftps://` will be automatically downloaded.
+* `n_max = -1L` will read all lines.
+
+```{r read_line}
+read_lines("data/netmhciipan.out.gz", n_max = -1L) |>
+  str()
+```
+
+We will define a `skip_line` function that can be used to skip lines that match a regular expression (regex). The regex below will match (and skip) lines that:
+
+* start with a `-` (`^-`) or (`|`)
+* start with `Number` (`^Number`) or (`|`)
+* start with a `#` (`^#`) or (`|`)
+* are blank, i.e. does not contain any characters (`^$`) or (`|`)
+* start with a space and `Pos` (`^\\sPos`).
+
+```{r skip_line}
+skip_line <- function(x, regex = "^#"){
+  wanted <- !grepl(pattern = regex, x = x, perl = TRUE)
+  return(x[wanted])
+}
+
+read_lines("data/netmhciipan.out.gz", n_max = -1L) |>
+  skip_line(x = _, regex = "^-|^Number|^#|^$|^\\sPos") |>
+  head()
+```
+
+We use the native R pipe (`|>`) to pipe the character vector to the `skip_line` function, which will then skip entries matching our regex. Note the use of the `_` placeholder for the input vector; this is not necessary since the vector will be automatically forwarded to the `skip_line` function when using `|>`.
+
+Finally, we will use the [read_table](https://readr.tidyverse.org/reference/read_table.html) function to output a `tibble` from the lines that we want, i.e. were not skipped. This function is very useful for this type of data where each column is separated by an irregular number of spaces (one or more).
+
+We will define the column names and the column types that are stored as a vector and list, respectively. This is good practice because this ensures that your column contains the same data type.
+
+```{r read_table}
+my_colnames <- c(
+  "pos",
+  "mhc",
+  "peptide",
+  "offset",
+  "core",
+  "core_rel",
+  "id",
+  "score_el",
+  "perc_rank_el",
+  "exp_bind",
+  "bind_level"
+)
+
+my_coltypes <- list(
+  pos = "i",
+  mhc = "c",
+  peptide = "c",
+  offset = "i",
+  core = "c",
+  core_rel = "d",
+  id = "c",
+  score_el = "d",
+  perc_rank_el = "d",
+  exp_bind = "d",
+  bind_level = "c"
+)
+
+read_lines("data/netmhciipan.out.gz", n_max = -1L) |>
+  skip_line(x = _, regex = "^-|^Number|^#|^$|^\\sPos") |>
+  read_table(col_names = my_colnames, col_types = my_coltypes) |>
+  tail()
+```
