@@ -12,32 +12,41 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Some bioinformatics tools output files that are visually nice and are meant for manual inspection. This practice of generating visually nice output (and/or) Excel files may be rooted in how bioinformaticians and biologists used to work with each other; give the bioinformatician/s some data and they will generate output that will be manually inspected and verified by the biologist/s. I say "used to" because nowadays a lot of biologists are much more savvy with data processing and analysis, and don't need to do things manually.
+Some bioinformatics tools output files that are visually nice and are meant for manual inspection. This practice of generating visually nice output (and/or) Excel files may be rooted in how bioinformaticians and biologists used to work with each other; give the bioinformatician/s some data to analyse and they will generate output that will be manually inspected and verified by the biologist/s. I say "used to" because nowadays a lot of biologists are much more savvy with data processing and analysis, and can either analyse their own data or don't need to do everything manually.
 
-One such tool is NetMHCIIpan, which generates output that requires a bit more work to parse in contrast to parsing a CSV or TSV file.
+One such tool is NetMHCIIpan, which generates output that requires a bit more work to parse in contrast to parsing a CSV or TSV file. Here's how the output looks:
 
 ```{bash}
 gunzip -c data/netmhciipan.out.gz | head -20
 ```
 
-We will use the `readr` package, a very useful package for loading data into R.
+The base R function `read.table()` can skip `n` number of lines at the start of a file, which would have solved the problem (after figuring out how many lines to skip) but the end of the file contains some free text and lines starting with hyphens, i.e. `-`.
+
+```{bash}
+gunzip -c data/netmhciipan.out.gz | tail
+```
+
+The approach I opted for, for parsing this output, was to create a function that skips lines that match a specified pattern called a regular expression or regex. We will use the `readr` package, a very useful package for loading data into R.
 
 ```{r load_readr}
 library(readr)
 ```
 
-The [read_lines()](https://readr.tidyverse.org/reference/read_lines.html) function reads up to `n_max` lines from a file and stores each line as a character vector.
+The [read_lines()](https://readr.tidyverse.org/reference/read_lines.html) function will be used first to read the input. This function reads up to `n_max` lines from a file and stores each line as a character vector. Notably:
 
 * Files ending in `.gz`, `.bz2`, `.xz` or `.zip` will be automatically uncompressed.
 * Files starting with `http://`, `https://`, `ftp://`, or `ftps://` will be automatically downloaded.
-* `n_max = -1L` will read all lines.
+
+Specifying `n_max = -1L` will read all lines of a file; `read_lines` is typically used to scan only a small portion of a file to figure out its content but here we will use it to read every line.
 
 ```{r read_line}
 read_lines("data/netmhciipan.out.gz", n_max = -1L) |>
   str()
 ```
 
-We will define a `skip_line` function that can be used to skip lines that match a regular expression (regex). The regex below will match (and skip) lines that:
+We will define a `skip_line` function that can be used to skip lines that match a regex. This is typical of how I use Perl or Python to read and store files.
+
+The regex below will match (and therefore skip) lines that:
 
 * start with a `-` (`^-`) or (`|`)
 * start with `Number` (`^Number`) or (`|`)
@@ -56,11 +65,11 @@ read_lines("data/netmhciipan.out.gz", n_max = -1L) |>
   head()
 ```
 
-We use the native R pipe (`|>`) to pipe the character vector to the `skip_line` function, which will then skip entries matching our regex. Note the use of the `_` placeholder for the input vector; this is not necessary since the vector will be automatically forwarded to the `skip_line` function when using `|>`.
+We use the native R pipe (`|>`) to pipe the character vector to the `skip_line` function, which will then skip entries matching our regex; this requires R-4.1.0 or above. Note the use of the `_` placeholder for the input vector (this requires R-4.2.0 or above); this is not necessary since the vector will be automatically forwarded to the `skip_line` function when using `|>` but I have included it here to show how you can refer to piped input.
 
-Finally, we will use the [read_table](https://readr.tidyverse.org/reference/read_table.html) function to output a `tibble` from the lines that we want, i.e. were not skipped. This function is very useful for this type of data where each column is separated by an irregular number of spaces (one or more).
+Finally, we will use the [read_table](https://readr.tidyverse.org/reference/read_table.html) function (this is similar to the `read.table` function) to output a `tibble` from the lines that we want, i.e. those that were not skipped. This function is very useful for this type of data where each column is separated by an irregular number of spaces (one or more).
 
-We will define the column names and the column types that are stored as a vector and list, respectively. This is good practice because this ensures that your column contains the same data type.
+We will define the column names and the column types that are stored as a vector and list, respectively. This is good practice because this ensures that your column contains the same data type. In addition, by explicitly defining the columns, `read_table` can assign `NA`s when data is not available.
 
 ```{r read_table}
 my_colnames <- c(
@@ -96,3 +105,7 @@ read_lines("data/netmhciipan.out.gz", n_max = -1L) |>
   read_table(col_names = my_colnames, col_types = my_coltypes) |>
   tail()
 ```
+
+## Summary
+
+My initial approach was to use `read_lines` to figure out how many lines to skip when using `read_table` but the text at the end of the output resulted in parsing errors. This was when I thought a better approach is to explicitly state which lines to skip, no matter where they occur in the output.
