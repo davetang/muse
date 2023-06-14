@@ -138,3 +138,27 @@ my_df_json
 ```
 
 I could probably write a hacky function to make the conversion but I won't.
+
+## Parsing JSON
+
+The [ffq](https://github.com/pachterlab/ffq) tool generates metadata in JSON:
+
+    ffq SRX079566 > data/SRX079566.json
+
+```{r read_ffq_json}
+ffq_json <- jsonlite::read_json(path = "data/SRX079566.json", simplifyVector = TRUE)
+str(ffq_json)
+```
+
+Use a recursive apply to create a named character vector, which is convenient for plucking values.
+
+```{r rapply_ffq}
+test <- rapply(object = ffq_json, f = function(x) x)
+class(test)
+```
+
+Subset the FTP links.
+
+```{r ftp_url}
+test[grepl("ftp.url\\d+$", names(test))]
+```
