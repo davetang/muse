@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-05-24" />
+<meta name="date" content="2023-06-14" />
 
 <title>JSON versus YAML</title>
 
@@ -283,7 +283,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">JSON versus YAML</h1>
-<h4 class="date">2023-05-24</h4>
+<h4 class="date">2023-06-14</h4>
 
 </div>
 
@@ -312,7 +312,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-05-24
+<strong>Last updated:</strong> 2023-06-14
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -443,15 +443,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb72b5b38c67a74d70b76ff0f246e466ae4427abbtargetblankb72b5b3a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec7dcdf2fbdb48445e1909a69edb7a308c1004128targetblankc7dcdf2a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/b72b5b38c67a74d70b76ff0f246e466ae4427abb" target="_blank">b72b5b3</a>
+<a href="https://github.com/davetang/muse/tree/c7dcdf2fbdb48445e1909a69edb7a308c1004128" target="_blank">c7dcdf2</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb72b5b38c67a74d70b76ff0f246e466ae4427abbtargetblankb72b5b3a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec7dcdf2fbdb48445e1909a69edb7a308c1004128targetblankc7dcdf2a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +461,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/b72b5b38c67a74d70b76ff0f246e466ae4427abb" target="_blank">b72b5b3</a>.
+<a href="https://github.com/davetang/muse/tree/c7dcdf2fbdb48445e1909a69edb7a308c1004128" target="_blank">c7dcdf2</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -486,10 +486,13 @@ Ignored files:
 Untracked files:
     Untracked:  analysis/cell_ranger.Rmd
     Untracked:  analysis/tss_xgboost.Rmd
+    Untracked:  code/multiz100way/
     Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
     Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
+    Untracked:  data/SRX079566.json
     Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
     Untracked:  data/ncrna_noncode_v3.fa
+    Untracked:  data/netmhciipan.out.gz
     Untracked:  women.json
 
 Unstaged changes:
@@ -539,6 +542,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/c7dcdf2fbdb48445e1909a69edb7a308c1004128/analysis/json_vs_yaml.Rmd" target="_blank">c7dcdf2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-06-14
+</td>
+<td>
+Parsing JSON
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/ca51b55320e809449923f5dc79ddfe9ae961b90a/docs/json_vs_yaml.html" target="_blank">ca51b55</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-05-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1009,6 +1046,136 @@ conversion creates an array with three objects.</p>
 ] </code></pre>
 <p>I could probably write a hacky function to make the conversion but I
 won’t.</p>
+</div>
+<div id="parsing-json" class="section level2">
+<h2>Parsing JSON</h2>
+<p>The <a href="https://github.com/pachterlab/ffq">ffq</a> tool
+generates metadata in JSON:</p>
+<pre><code>ffq SRX079566 &gt; data/SRX079566.json</code></pre>
+<pre class="r"><code>ffq_json &lt;- jsonlite::read_json(path = &quot;data/SRX079566.json&quot;, simplifyVector = TRUE)
+str(ffq_json)</code></pre>
+<pre><code>List of 1
+ $ SRX079566:List of 5
+  ..$ accession : chr &quot;SRX079566&quot;
+  ..$ title     : chr &quot;Illumina Genome Analyzer IIx paired end sequencing; RNA-Seq (polyA+) analysis of DLBCL cell line HS0798&quot;
+  ..$ platform  : chr &quot;ILLUMINA&quot;
+  ..$ instrument: chr &quot;Illumina Genome Analyzer IIx&quot;
+  ..$ runs      :List of 2
+  .. ..$ SRR292241:List of 7
+  .. .. ..$ accession : chr &quot;SRR292241&quot;
+  .. .. ..$ experiment: chr &quot;SRX079566&quot;
+  .. .. ..$ study     : chr &quot;SRP020237&quot;
+  .. .. ..$ sample    : chr &quot;SRS212581&quot;
+  .. .. ..$ title     : chr &quot;Illumina Genome Analyzer IIx paired end sequencing; RNA-Seq (polyA+) analysis of DLBCL cell line HS0798&quot;
+  .. .. ..$ attributes:List of 6
+  .. .. .. ..$ RUN             : chr &quot;94367&quot;
+  .. .. .. ..$ instrument_model: chr &quot;Illumina Genome Analyzer II&quot;
+  .. .. .. ..$ ENA-SPOT-COUNT  : int 9721384
+  .. .. .. ..$ ENA-BASE-COUNT  : int 699939648
+  .. .. .. ..$ ENA-FIRST-PUBLIC: chr &quot;2011-07-05&quot;
+  .. .. .. ..$ ENA-LAST-UPDATE : chr &quot;2019-10-07&quot;
+  .. .. ..$ files     :List of 4
+  .. .. .. ..$ ftp :&#39;data.frame&#39;:   2 obs. of  8 variables:
+  .. .. .. .. ..$ accession : chr [1:2] &quot;SRR292241&quot; &quot;SRR292241&quot;
+  .. .. .. .. ..$ filename  : chr [1:2] &quot;SRR292241_1.fastq.gz&quot; &quot;SRR292241_2.fastq.gz&quot;
+  .. .. .. .. ..$ filetype  : chr [1:2] &quot;fastq&quot; &quot;fastq&quot;
+  .. .. .. .. ..$ filesize  : int [1:2] 387227151 395115704
+  .. .. .. .. ..$ filenumber: int [1:2] 1 2
+  .. .. .. .. ..$ md5       : chr [1:2] &quot;a5e0d2d51550127ea9ce3a0219deb375&quot; &quot;e9ce7abd3bce9d5ff194d6e045a36c1c&quot;
+  .. .. .. .. ..$ urltype   : chr [1:2] &quot;ftp&quot; &quot;ftp&quot;
+  .. .. .. .. ..$ url       : chr [1:2] &quot;ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292241/SRR292241_1.fastq.gz&quot; &quot;ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292241/SRR292241_2.fastq.gz&quot;
+  .. .. .. ..$ aws :&#39;data.frame&#39;:   2 obs. of  8 variables:
+  .. .. .. .. ..$ accession : chr [1:2] &quot;SRR292241&quot; &quot;SRR292241&quot;
+  .. .. .. .. ..$ filename  : chr [1:2] &quot;Run94367Lane6.srf&quot; &quot;SRR292241&quot;
+  .. .. .. .. ..$ filetype  : chr [1:2] &quot;sra&quot; &quot;sra&quot;
+  .. .. .. .. ..$ filesize  : logi [1:2] NA NA
+  .. .. .. .. ..$ filenumber: int [1:2] 1 1
+  .. .. .. .. ..$ md5       : logi [1:2] NA NA
+  .. .. .. .. ..$ urltype   : chr [1:2] &quot;aws&quot; &quot;aws&quot;
+  .. .. .. .. ..$ url       : chr [1:2] &quot;s3://sra-pub-src-13/SRR292241/Run94367Lane6.srf&quot; &quot;https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR292241/SRR292241&quot;
+  .. .. .. ..$ gcp :&#39;data.frame&#39;:   1 obs. of  8 variables:
+  .. .. .. .. ..$ accession : chr &quot;SRR292241&quot;
+  .. .. .. .. ..$ filename  : chr &quot;SRR292241.3&quot;
+  .. .. .. .. ..$ filetype  : chr &quot;sra&quot;
+  .. .. .. .. ..$ filesize  : logi NA
+  .. .. .. .. ..$ filenumber: int 1
+  .. .. .. .. ..$ md5       : logi NA
+  .. .. .. .. ..$ urltype   : chr &quot;gcp&quot;
+  .. .. .. .. ..$ url       : chr &quot;gs://sra-pub-crun-3/SRR292241/SRR292241.3&quot;
+  .. .. .. ..$ ncbi:&#39;data.frame&#39;:   1 obs. of  8 variables:
+  .. .. .. .. ..$ accession : chr &quot;SRR292241&quot;
+  .. .. .. .. ..$ filename  : chr &quot;SRR292241.3&quot;
+  .. .. .. .. ..$ filetype  : chr &quot;sra&quot;
+  .. .. .. .. ..$ filesize  : logi NA
+  .. .. .. .. ..$ filenumber: int 1
+  .. .. .. .. ..$ md5       : logi NA
+  .. .. .. .. ..$ urltype   : chr &quot;ncbi&quot;
+  .. .. .. .. ..$ url       : chr &quot;https://sra-downloadb.be-md.ncbi.nlm.nih.gov/sos5/sra-pub-run-32/SRR000/292/SRR292241/SRR292241.3&quot;
+  .. ..$ SRR390728:List of 7
+  .. .. ..$ accession : chr &quot;SRR390728&quot;
+  .. .. ..$ experiment: chr &quot;SRX079566&quot;
+  .. .. ..$ study     : chr &quot;SRP020237&quot;
+  .. .. ..$ sample    : chr &quot;SRS212581&quot;
+  .. .. ..$ title     : chr &quot;Illumina Genome Analyzer IIx paired end sequencing; RNA-Seq (polyA+) analysis of DLBCL cell line HS0798&quot;
+  .. .. ..$ attributes:List of 6
+  .. .. .. ..$ RUN             : chr &quot;94367&quot;
+  .. .. .. ..$ assembly        : chr &quot;NCBI36_BCCAGSC_variant&quot;
+  .. .. .. ..$ ENA-SPOT-COUNT  : int 7178576
+  .. .. .. ..$ ENA-BASE-COUNT  : int 516857472
+  .. .. .. ..$ ENA-FIRST-PUBLIC: chr &quot;2011-12-23&quot;
+  .. .. .. ..$ ENA-LAST-UPDATE : chr &quot;2016-06-28&quot;
+  .. .. ..$ files     :List of 4
+  .. .. .. ..$ ftp :&#39;data.frame&#39;:   2 obs. of  8 variables:
+  .. .. .. .. ..$ accession : chr [1:2] &quot;SRR390728&quot; &quot;SRR390728&quot;
+  .. .. .. .. ..$ filename  : chr [1:2] &quot;SRR390728_1.fastq.gz&quot; &quot;SRR390728_2.fastq.gz&quot;
+  .. .. .. .. ..$ filetype  : chr [1:2] &quot;fastq&quot; &quot;fastq&quot;
+  .. .. .. .. ..$ filesize  : int [1:2] 170346275 168836179
+  .. .. .. .. ..$ filenumber: int [1:2] 1 2
+  .. .. .. .. ..$ md5       : chr [1:2] &quot;9a3d37cbb3e47cf8930ed2ba6c8d2cef&quot; &quot;bc4e6304170876186522f4175ee39a8f&quot;
+  .. .. .. .. ..$ urltype   : chr [1:2] &quot;ftp&quot; &quot;ftp&quot;
+  .. .. .. .. ..$ url       : chr [1:2] &quot;ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR390/SRR390728/SRR390728_1.fastq.gz&quot; &quot;ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR390/SRR390728/SRR390728_2.fastq.gz&quot;
+  .. .. .. ..$ aws :&#39;data.frame&#39;:   2 obs. of  8 variables:
+  .. .. .. .. ..$ accession : chr [1:2] &quot;SRR390728&quot; &quot;SRR390728&quot;
+  .. .. .. .. ..$ filename  : chr [1:2] &quot;30KWMAAXX_6.sorted_withJunctionsOnGenome_dupsFlagged.bam.1&quot; &quot;SRR390728&quot;
+  .. .. .. .. ..$ filetype  : chr [1:2] &quot;bam&quot; &quot;sra&quot;
+  .. .. .. .. ..$ filesize  : logi [1:2] NA NA
+  .. .. .. .. ..$ filenumber: int [1:2] 1 1
+  .. .. .. .. ..$ md5       : logi [1:2] NA NA
+  .. .. .. .. ..$ urltype   : chr [1:2] &quot;aws&quot; &quot;aws&quot;
+  .. .. .. .. ..$ url       : chr [1:2] &quot;s3://sra-pub-src-15/SRR390728/30KWMAAXX_6.sorted_withJunctionsOnGenome_dupsFlagged.bam.1&quot; &quot;https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR390728/SRR390728&quot;
+  .. .. .. ..$ gcp :&#39;data.frame&#39;:   1 obs. of  8 variables:
+  .. .. .. .. ..$ accession : chr &quot;SRR390728&quot;
+  .. .. .. .. ..$ filename  : chr &quot;SRR390728.lite.2&quot;
+  .. .. .. .. ..$ filetype  : chr &quot;sra&quot;
+  .. .. .. .. ..$ filesize  : logi NA
+  .. .. .. .. ..$ filenumber: int 1
+  .. .. .. .. ..$ md5       : logi NA
+  .. .. .. .. ..$ urltype   : chr &quot;gcp&quot;
+  .. .. .. .. ..$ url       : chr &quot;gs://sra-pub-zq-5/SRR390728/SRR390728.lite.2&quot;
+  .. .. .. ..$ ncbi:&#39;data.frame&#39;:   1 obs. of  8 variables:
+  .. .. .. .. ..$ accession : chr &quot;SRR390728&quot;
+  .. .. .. .. ..$ filename  : chr &quot;SRR390728.lite.2&quot;
+  .. .. .. .. ..$ filetype  : chr &quot;sra&quot;
+  .. .. .. .. ..$ filesize  : logi NA
+  .. .. .. .. ..$ filenumber: int 1
+  .. .. .. .. ..$ md5       : logi NA
+  .. .. .. .. ..$ urltype   : chr &quot;ncbi&quot;
+  .. .. .. .. ..$ url       : chr &quot;https://sra-downloadb.be-md.ncbi.nlm.nih.gov/sos2/sra-pub-zq-20/SRR000/390/SRR390728/SRR390728.lite.2&quot;</code></pre>
+<p>Use a recursive apply to create a named character vector, which is
+convenient for plucking values.</p>
+<pre class="r"><code>test &lt;- rapply(object = ffq_json, f = function(x) x)
+class(test)</code></pre>
+<pre><code>[1] &quot;character&quot;</code></pre>
+<p>Subset the FTP links.</p>
+<pre class="r"><code>test[grepl(&quot;ftp.url\\d+$&quot;, names(test))]</code></pre>
+<pre><code>                                   SRX079566.runs.SRR292241.files.ftp.url1 
+&quot;ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292241/SRR292241_1.fastq.gz&quot; 
+                                   SRX079566.runs.SRR292241.files.ftp.url2 
+&quot;ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR292/SRR292241/SRR292241_2.fastq.gz&quot; 
+                                   SRX079566.runs.SRR390728.files.ftp.url1 
+&quot;ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR390/SRR390728/SRR390728_1.fastq.gz&quot; 
+                                   SRX079566.runs.SRR390728.files.ftp.url2 
+&quot;ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR390/SRR390728/SRR390728_2.fastq.gz&quot; </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1041,7 +1208,7 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] rjson_0.2.21    tidyjson_0.3.2  yaml_2.3.7      jsonlite_1.8.4 
+[1] rjson_0.2.21    tidyjson_0.3.2  yaml_2.3.7      jsonlite_1.8.5 
 [5] workflowr_1.7.0
 
 loaded via a namespace (and not attached):
