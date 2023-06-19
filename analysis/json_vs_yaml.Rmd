@@ -162,3 +162,157 @@ Subset the FTP links.
 ```{r ftp_url}
 test[grepl("ftp.url\\d+$", names(test))]
 ```
+
+## Appendix
+
+### JSON defined
+
+Notes from [JSON Defined](https://www.oracle.com/database/what-is-json/).
+
+JavaScript Object Notation (JSON) is a data-exchange format that makes it
+possible to transfer populated data structures between different
+languages/tools.
+
+JSON can be used in JavaScript programs without any need for parsing or
+serialising. It is a text-based way of representing JavaScript object literals,
+arrays, and scalar data.
+
+JSON is relatively easy to read and write, while also easy for software to
+parse and generate. It is often used for serialising structured data and
+exchanging it over a network, typically between a server and web applications.
+
+At the granular level, JSON consists of data types.
+
+1. String - composed of Unicode characters, with backslash (`\`) escaping.
+
+    { "name" : "Bob" }
+
+2. Number - a JSON number follows JavaScript's double-precision floating-point
+   format.
+
+```json
+{
+   "number_1" : 210,
+   "number_2" : 215,
+   "number_3" : 21.05,
+   "number_4" : 10.05
+}
+```
+
+3. Boolean - either `true` or `false`, not surrounded with quotes, and are
+   treated as string values.
+
+    { "AllowPartialShipment" : false }
+
+4. Null - empty value and can be used when there is no value assigned to a key.
+
+    { "Special Instructions" : null }
+
+5. Object - a set of name or value pairs inserted between curly braces (`{}`).
+   The keys must be strings and should be unique, and separated by comma/s.
+
+```json
+{
+  "Influencer" : { "name" : "Jaxon" , "age" : "42" , "city" , "New York" }
+}
+```
+
+6. Array - an ordered collection of values. Array values must be of type
+   string, number, object, array, Boolean, or null.
+
+```json
+{
+   "Influencers" : [ 
+      {
+         "name" : "Jaxon", 
+         "age" : 42, 
+         "Works At" : "Tech News"
+      }
+      {
+         "name" : "Miller", 
+         "age" : 35
+         "Works At" : "IT Day"
+      }
+   ] 
+}
+```
+
+### Use cases
+
+1. Generating a JSON object from user-generated data
+
+JSON is perfect for storing temporary data. For example, temporary data can be
+user-generated data, such as a submitted form on a website. JSON can also be
+used as a data format for any programming language to provide a high level of
+interoperability.
+
+2. Transferring data between systems
+
+A website database has a customer's mailing address, but the address needs to
+be verified via an API to make sure it is valid. Send the address data in JSON
+format to the address validation service API.
+
+3. Configuring data for applications
+
+When developing applications, each application needs the credentials to connect
+to a database as well as a log file path. The credentials and the file path can
+be specified in a JSON file.
+
+4. Simplifying complex data models
+
+JSON simplifies complex documents down to the components that have been
+identified as being meaningful by converting the process of data extraction to
+a predictable and human readable JSON file.
+
+### Why JSON is popular
+
+JSON has gained momentum in API code programming and web services because it
+helps in faster data interchange and web service results.
+
+It is text-based, lightweight, and has an easy-to-parse data format requiring
+no additional code for parsing. For web services, the need to return and
+display a lot of data makes JSON the ideal choice.
+
+### What is a document database?
+
+A document database is a type of nonrelational database designed to store,
+retrieve, and manage document-oriented information. Rather than having a schema
+defined upfront, document databases allow for storing data in collections
+consisting of documents. NoSQL databases and JSON databases are types of
+document databases.
+
+Document databases are often popular among developers because they store data
+in a document-model format (semi-structured) rather than relational
+(structured).
+
+Document databases offer more flexibility, because developers do not have to
+plan out the schemas ahead of time and they can use the same format they are
+using in their application code. This means the careful planning of a SQL
+database is not as necessary, which makes document databases useful for rapidly
+evolving schemas, which can be common in software development. However, this
+can come at the cost of speed, size, and specificity.
+
+### What is a JSON document database?
+
+Applications that use different JSON data types and JSON-oriented query
+language can interact with data stored in a JSON document database. The JSON
+document database also provides native support for JSON.
+
+Characterisitics that define a JSON document database:
+
+* Non-relational database designed to store and query as a JSON document.
+* Data is in plain text but can be stored using the data types `BLOB`,
+  `VARCHAR2`, `CLOB`, or binary JSON in 21c.
+* Accessing JSON data stored in the database is similar to accessing other
+  database data, including using OCI, .NET, and JDBC.
+* A schema is not necessary
+
+Storing JSON data in a JSON document database makes use of columns whose data
+types are `VARCHAR2`, `CLOB`, `BLOB`, or binary JSON in 21c. The choice of
+which to use is usually determined by the size of the JSON documents. Storing
+JSON data in the database using standard SQL data types means that JSON data
+can be manipulated like any other data type.
+
+JSON data can be managed and manipulated with tables in a JSON document
+database, regardless of the data type. The choice of which table to use is
+typically motivated by the size of the JSON documents.
