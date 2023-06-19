@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-06-14" />
+<meta name="date" content="2023-06-19" />
 
 <title>JSON versus YAML</title>
 
@@ -283,7 +283,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">JSON versus YAML</h1>
-<h4 class="date">2023-06-14</h4>
+<h4 class="date">2023-06-19</h4>
 
 </div>
 
@@ -312,7 +312,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-06-14
+<strong>Last updated:</strong> 2023-06-19
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -443,15 +443,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec7dcdf2fbdb48445e1909a69edb7a308c1004128targetblankc7dcdf2a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree032e05867ea3c9d694d484b30ea0be4ee23b5d86targetblank032e058a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/c7dcdf2fbdb48445e1909a69edb7a308c1004128" target="_blank">c7dcdf2</a>
+<a href="https://github.com/davetang/muse/tree/032e05867ea3c9d694d484b30ea0be4ee23b5d86" target="_blank">032e058</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec7dcdf2fbdb48445e1909a69edb7a308c1004128targetblankc7dcdf2a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree032e05867ea3c9d694d484b30ea0be4ee23b5d86targetblank032e058a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +461,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/c7dcdf2fbdb48445e1909a69edb7a308c1004128" target="_blank">c7dcdf2</a>.
+<a href="https://github.com/davetang/muse/tree/032e05867ea3c9d694d484b30ea0be4ee23b5d86" target="_blank">032e058</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -484,12 +484,12 @@ Ignored files:
     Ignored:    r_packages_4.3.0/
 
 Untracked files:
+    Untracked:  analysis/.json_vs_yaml.Rmd.swp
     Untracked:  analysis/cell_ranger.Rmd
     Untracked:  analysis/tss_xgboost.Rmd
     Untracked:  code/multiz100way/
     Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
     Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
-    Untracked:  data/SRX079566.json
     Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
     Untracked:  data/ncrna_noncode_v3.fa
     Untracked:  data/netmhciipan.out.gz
@@ -542,6 +542,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/032e05867ea3c9d694d484b30ea0be4ee23b5d86/analysis/json_vs_yaml.Rmd" target="_blank">032e058</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-06-19
+</td>
+<td>
+More details on JSON
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/643530fd4fe102b150f9e4da6e9538a1895a8ebd/docs/json_vs_yaml.html" target="_blank">643530f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-06-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1176,6 +1210,152 @@ class(test)</code></pre>
 &quot;ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR390/SRR390728/SRR390728_1.fastq.gz&quot; 
                                    SRX079566.runs.SRR390728.files.ftp.url2 
 &quot;ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR390/SRR390728/SRR390728_2.fastq.gz&quot; </code></pre>
+</div>
+<div id="appendix" class="section level2">
+<h2>Appendix</h2>
+<div id="json-defined" class="section level3">
+<h3>JSON defined</h3>
+<p>Notes from <a
+href="https://www.oracle.com/database/what-is-json/">JSON
+Defined</a>.</p>
+<p>JavaScript Object Notation (JSON) is a data-exchange format that
+makes it possible to transfer populated data structures between
+different languages/tools.</p>
+<p>JSON can be used in JavaScript programs without any need for parsing
+or serialising. It is a text-based way of representing JavaScript object
+literals, arrays, and scalar data.</p>
+<p>JSON is relatively easy to read and write, while also easy for
+software to parse and generate. It is often used for serialising
+structured data and exchanging it over a network, typically between a
+server and web applications.</p>
+<p>At the granular level, JSON consists of data types.</p>
+<ol style="list-style-type: decimal">
+<li><p>String - composed of Unicode characters, with backslash
+(<code>\</code>) escaping.</p>
+<p>{ “name” : “Bob” }</p></li>
+<li><p>Number - a JSON number follows JavaScript’s double-precision
+floating-point format.</p></li>
+</ol>
+<pre class="json"><code>{
+   &quot;number_1&quot; : 210,
+   &quot;number_2&quot; : 215,
+   &quot;number_3&quot; : 21.05,
+   &quot;number_4&quot; : 10.05
+}</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li><p>Boolean - either <code>true</code> or <code>false</code>, not
+surrounded with quotes, and are treated as string values.</p>
+<p>{ “AllowPartialShipment” : false }</p></li>
+<li><p>Null - empty value and can be used when there is no value
+assigned to a key.</p>
+<p>{ “Special Instructions” : null }</p></li>
+<li><p>Object - a set of name or value pairs inserted between curly
+braces (<code>{}</code>). The keys must be strings and should be unique,
+and separated by comma/s.</p></li>
+</ol>
+<pre class="json"><code>{
+  &quot;Influencer&quot; : { &quot;name&quot; : &quot;Jaxon&quot; , &quot;age&quot; : &quot;42&quot; , &quot;city&quot; , &quot;New York&quot; }
+}</code></pre>
+<ol start="6" style="list-style-type: decimal">
+<li>Array - an ordered collection of values. Array values must be of
+type string, number, object, array, Boolean, or null.</li>
+</ol>
+<pre class="json"><code>{
+   &quot;Influencers&quot; : [ 
+      {
+         &quot;name&quot; : &quot;Jaxon&quot;, 
+         &quot;age&quot; : 42, 
+         &quot;Works At&quot; : &quot;Tech News&quot;
+      }
+      {
+         &quot;name&quot; : &quot;Miller&quot;, 
+         &quot;age&quot; : 35
+         &quot;Works At&quot; : &quot;IT Day&quot;
+      }
+   ] 
+}</code></pre>
+</div>
+<div id="use-cases" class="section level3">
+<h3>Use cases</h3>
+<ol style="list-style-type: decimal">
+<li>Generating a JSON object from user-generated data</li>
+</ol>
+<p>JSON is perfect for storing temporary data. For example, temporary
+data can be user-generated data, such as a submitted form on a website.
+JSON can also be used as a data format for any programming language to
+provide a high level of interoperability.</p>
+<ol start="2" style="list-style-type: decimal">
+<li>Transferring data between systems</li>
+</ol>
+<p>A website database has a customer’s mailing address, but the address
+needs to be verified via an API to make sure it is valid. Send the
+address data in JSON format to the address validation service API.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Configuring data for applications</li>
+</ol>
+<p>When developing applications, each application needs the credentials
+to connect to a database as well as a log file path. The credentials and
+the file path can be specified in a JSON file.</p>
+<ol start="4" style="list-style-type: decimal">
+<li>Simplifying complex data models</li>
+</ol>
+<p>JSON simplifies complex documents down to the components that have
+been identified as being meaningful by converting the process of data
+extraction to a predictable and human readable JSON file.</p>
+</div>
+<div id="why-json-is-popular" class="section level3">
+<h3>Why JSON is popular</h3>
+<p>JSON has gained momentum in API code programming and web services
+because it helps in faster data interchange and web service results.</p>
+<p>It is text-based, lightweight, and has an easy-to-parse data format
+requiring no additional code for parsing. For web services, the need to
+return and display a lot of data makes JSON the ideal choice.</p>
+</div>
+<div id="what-is-a-document-database" class="section level3">
+<h3>What is a document database?</h3>
+<p>A document database is a type of nonrelational database designed to
+store, retrieve, and manage document-oriented information. Rather than
+having a schema defined upfront, document databases allow for storing
+data in collections consisting of documents. NoSQL databases and JSON
+databases are types of document databases.</p>
+<p>Document databases are often popular among developers because they
+store data in a document-model format (semi-structured) rather than
+relational (structured).</p>
+<p>Document databases offer more flexibility, because developers do not
+have to plan out the schemas ahead of time and they can use the same
+format they are using in their application code. This means the careful
+planning of a SQL database is not as necessary, which makes document
+databases useful for rapidly evolving schemas, which can be common in
+software development. However, this can come at the cost of speed, size,
+and specificity.</p>
+</div>
+<div id="what-is-a-json-document-database" class="section level3">
+<h3>What is a JSON document database?</h3>
+<p>Applications that use different JSON data types and JSON-oriented
+query language can interact with data stored in a JSON document
+database. The JSON document database also provides native support for
+JSON.</p>
+<p>Characterisitics that define a JSON document database:</p>
+<ul>
+<li>Non-relational database designed to store and query as a JSON
+document.</li>
+<li>Data is in plain text but can be stored using the data types
+<code>BLOB</code>, <code>VARCHAR2</code>, <code>CLOB</code>, or binary
+JSON in 21c.</li>
+<li>Accessing JSON data stored in the database is similar to accessing
+other database data, including using OCI, .NET, and JDBC.</li>
+<li>A schema is not necessary</li>
+</ul>
+<p>Storing JSON data in a JSON document database makes use of columns
+whose data types are <code>VARCHAR2</code>, <code>CLOB</code>,
+<code>BLOB</code>, or binary JSON in 21c. The choice of which to use is
+usually determined by the size of the JSON documents. Storing JSON data
+in the database using standard SQL data types means that JSON data can
+be manipulated like any other data type.</p>
+<p>JSON data can be managed and manipulated with tables in a JSON
+document database, regardless of the data type. The choice of which
+table to use is typically motivated by the size of the JSON
+documents.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1224,6 +1404,7 @@ loaded via a namespace (and not attached):
 [37] vctrs_0.6.2      evaluate_0.20    glue_1.6.2       whisker_0.4.1   
 [41] fansi_1.0.4      purrr_1.0.1      rmarkdown_2.21   httr_1.4.5      
 [45] tools_4.3.0      pkgconfig_2.0.3  htmltools_0.5.5 </code></pre>
+</div>
 </div>
 </div>
 
