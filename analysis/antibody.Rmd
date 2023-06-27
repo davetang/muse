@@ -113,3 +113,62 @@ expression](https://www.genscript.com/gsfiles/techfiles/Analyzing_antibody_seque
 * CDR-H3 and L3 have a distinctive role in antigen recognition.
 
 ![](assets/ab_cdr.png)
+
+The [framework region](https://en.wikipedia.org/wiki/Framework_region) is a
+subdivision of the variable region (Fab) of the antibody. The variable region is
+composed of seven amino acid regions, four of which are framework regions
+(FR1-4) and three of which are hypervariable regions. The framework region makes
+up about 85% of the variable region. Located on the tips of the Y-shaped
+molecule, the framework regions are responsible for acting as a scaffold for the
+complementarity determining regions (CDR), also referred to as hypervariable
+regions, of the Fab. These CDRs are in direct contact with the antigen and are
+involved in binding antigen, while the framework regions support the binding of
+the CDR to the antigen and aid in maintaining the overall structure of the four
+variable domains on the antibody.
+
+![](assets/Antibody_Structure_and_Antigen_Binding_Regions.jpg)
+
+### Identifying CDRs by sequence
+
+CDR-L1
+
+* Start - approximately residue 24
+* Residue before - **always** a Cys
+* Residue after - **always** a Trp. Typically Trp-Tyr-Gln, but also Trp-Leu-Gln, Trp-Phe-Gln, Trp-Tyr-Leu
+* Length - 10 to 17 residues
+
+CDR-L2
+
+* Start - **always** 16 residues after the end of L1
+* Residue before - generally Ile-Tyr, but also, Val-Tyr, Ile-Lys, Ile-Phe
+* Length - **always** 7 residues (except NEW [7FAB], which has a deletion in this region.)
+
+CDR-L3
+
+* Start - **always** 33 residues after end of L2 (except NEW [7FAB], which has the deletion at the end of CDR-L2)
+* Residue before - **always** Cys
+* Residue after - **always** Phe-Gly-XXX-Gly
+* Length - 7 to 11 residues
+
+CDR-H1
+
+* Start - approximately residue 26 (**always** 4 after a Cys)
+* Residue before - **always** Cys-XXX-XXX-XXX
+* Residue after - **always** a Trp. Typically Trp-Val, but also, Trp-Ile, Trp-Ala
+* Length - 10 to 12 residues
+
+CDR-H2
+
+* Start - **always** 15 residues after the end of Kabat / AbM definition of CDR-H1
+* Residue before - typically Leu-Glu-Trp-Ile-Gly, but a number of variations
+* Residue after - Lys/Arg-Leu/Ile/Val/Phe/Thr/Ala-Thr/Ser/Ile/Ala
+* Length - Kabat definition 16 to 19 residues
+
+CDR-H3
+
+* Start - **always** 33 residues after end of CHR-H2 (**always** 2 after a Cys)
+* Residue before - **always** Cys-XXX-XXX (typically Cys-Ala-Arg)
+* Residue after - **always** Trp-Gly-XXX-Gly
+* Length - 3 to 25 residues
+
+Leader sequence-FR1-CDR1-FR2-CDR2-FR3-CDR3-FR4-Constant region-Stop codon
