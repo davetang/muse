@@ -171,11 +171,34 @@ M <- matrix(
 M
 ```
 
-Calculate the PWM using our function.
+The number of studies used for creating a PFM is simply the column sum of any
+column.
+
+```{r total_studies}
+sum(M[, 1])
+```
+
+Since we can get the total from the PFM, we do not need a `total` parameter.
+Calculate the PWM using our revised function.
 
 ```{r calculate_pwm}
-pwm <- calc_pwm(M, 8)
+calc_pwm <- function(freq, bg = 0.25){
+  total <- sum(freq[, 1])
+  p <- (freq + (sqrt(total) * 1/4)) / (total + (4 * (sqrt(total) * 1/4)))
+  log2(p/bg)
+}
+
+pwm <- calc_pwm(M)
 pwm
+```
+
+As an aside: imagine if instead of eight studies, we collected data from 800
+studies and created another PFM. We also found that the proportions are exactly
+the same. How does this affect the PWM?
+
+```{r pwm800}
+pwm800 <- calc_pwm(M * 100)
+pwm800
 ```
 
 Now that we have the PWM, we can generate a quantitative score for any DNA
