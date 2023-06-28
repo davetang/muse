@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree73543a8f83c53a0973d8904ac58a02a8579ba0e1targetblank73543a8a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2a84fb91f551aa40edc5e57c2eae924c1a49ab4ctargetblank2a84fb9a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/73543a8f83c53a0973d8904ac58a02a8579ba0e1" target="_blank">73543a8</a>
+<a href="https://github.com/davetang/muse/tree/2a84fb91f551aa40edc5e57c2eae924c1a49ab4c" target="_blank">2a84fb9</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree73543a8f83c53a0973d8904ac58a02a8579ba0e1targetblank73543a8a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2a84fb91f551aa40edc5e57c2eae924c1a49ab4ctargetblank2a84fb9a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/73543a8f83c53a0973d8904ac58a02a8579ba0e1" target="_blank">73543a8</a>.
+<a href="https://github.com/davetang/muse/tree/2a84fb91f551aa40edc5e57c2eae924c1a49ab4c" target="_blank">2a84fb9</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -616,6 +616,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/2a84fb91f551aa40edc5e57c2eae924c1a49ab4c/analysis/pwm.Rmd" target="_blank">2a84fb9</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-06-28
+</td>
+<td>
+Increase number of studies
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/e9773c1544c846b1a26c31910e9d96c0bb592bc9/docs/pwm.html" target="_blank">e9773c1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-06-28
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -933,8 +967,20 @@ A    0    4    4    0    3    7    4    3    5     4     2     0     0     4
 C    3    0    4    8    0    0    0    3    0     0     0     0     2     4
 G    2    3    0    0    0    0    0    0    1     0     6     8     5     0
 T    3    1    0    0    5    1    4    2    2     4     0     0     1     0</code></pre>
-<p>Calculate the PWM using our function.</p>
-<pre class="r"><code>pwm &lt;- calc_pwm(M, 8)
+<p>The number of studies used for creating a PFM is simply the column
+sum of any column.</p>
+<pre class="r"><code>sum(M[, 1])</code></pre>
+<pre><code>[1] 8</code></pre>
+<p>Since we can get the total from the PFM, we do not need a
+<code>total</code> parameter. Calculate the PWM using our revised
+function.</p>
+<pre class="r"><code>calc_pwm &lt;- function(freq, bg = 0.25){
+  total &lt;- sum(freq[, 1])
+  p &lt;- (freq + (sqrt(total) * 1/4)) / (total + (4 * (sqrt(total) * 1/4)))
+  log2(p/bg)
+}
+
+pwm &lt;- calc_pwm(M)
 pwm</code></pre>
 <pre><code>        [,1]       [,2]       [,3]      [,4]       [,5]       [,6]       [,7]
 A -1.9367518  0.7980888  0.7980888 -1.936752  0.4535419  1.5094376  0.7980888
@@ -946,6 +992,21 @@ A  0.4535419  1.0760078  0.7980888  0.000000 -1.936752 -1.9367518  0.7980888
 C  0.4535419 -1.9367518 -1.9367518 -1.936752 -1.936752  0.0000000  0.7980888
 G -1.9367518 -0.6651985 -1.9367518  1.308939  1.685442  1.0760078 -1.9367518
 T  0.0000000  0.0000000  0.7980888 -1.936752 -1.936752 -0.6651985 -1.9367518</code></pre>
+<p>As an aside: imagine if instead of eight studies, we collected data
+from 800 studies and created another PFM. We also found that the
+proportions are exactly the same. How does this affect the PWM?</p>
+<pre class="r"><code>pwm800 &lt;- calc_pwm(M * 100)
+pwm800</code></pre>
+<pre><code>        [,1]       [,2]       [,3]      [,4]       [,5]       [,6]       [,7]
+A -4.8720541  0.9751547  0.9751547 -4.872054  0.5684466  1.7717292  0.9751547
+C  0.5684466 -4.8720541  0.9751547  1.962570 -4.8720541 -4.8720541 -4.8720541
+G  0.0000000  0.5684466 -4.8720541 -4.872054 -4.8720541 -4.8720541 -4.8720541
+T  0.5684466 -0.9515573 -4.8720541 -4.872054  1.2920620 -0.9515573  0.9751547
+        [,8]       [,9]      [,10]     [,11]     [,12]      [,13]      [,14]
+A  0.5684466  1.2920620  0.9751547  0.000000 -4.872054 -4.8720541  0.9751547
+C  0.5684466 -4.8720541 -4.8720541 -4.872054 -4.872054  0.0000000  0.9751547
+G -4.8720541 -0.9515573 -4.8720541  1.551739  1.962570  1.2920620 -4.8720541
+T  0.0000000  0.0000000  0.9751547 -4.872054 -4.872054 -0.9515573 -4.8720541</code></pre>
 <p>Now that we have the PWM, we can generate a quantitative score for
 any DNA sequence (of the same length) by summing the values that
 correspond to the observed nucleotides at each position. Here we will
