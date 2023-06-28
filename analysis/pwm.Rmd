@@ -1,0 +1,253 @@
+---
+title: "Position weight matrix"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The process of transcription, is influenced by the interaction of proteins
+called [transcription
+factors](https://en.wikipedia.org/wiki/Transcription_factor) (TFs) that bind to
+specific sites called Transcription Factor Binding Sites (TFBSs), which are
+proximal or distal to a transcription starting site. TFs generally have
+distinct binding preferences towards specific TFBSs, however TFs can tolerate
+variations in the target TFBS. Thus to model a TFBS, the nucleotides are
+weighted accordingly, to the tolerance of the TF. One common way to represent
+this is by using a [Position Weight
+Matrix](https://en.wikipedia.org/wiki/Position_weight_matrix) (PWM), also
+called position-specific weight matrix (PSWM) or position-specific scoring
+matrix (PSSM), which is a commonly used representation of motifs (in our case
+TFBS) in biological sequences.
+
+How do we find TFBSs? DNA sequences that interact with TFs can be
+experimentally determined from
+[SELEX](https://en.wikipedia.org/wiki/Systematic_evolution_of_ligands_by_exponential_enrichment)
+experiments. Since this process involves synthesis of a large number of
+randomly generated oligonucleotides, DNA sequences that interact with TFs can
+be determined, as well as the tolerance at specific sites. From SELEX
+experiments, a position frequency matrix (PFM) can be constructed by recording
+the position-dependent frequency of each nucleotide in the DNA sequence that
+interacted with the TF. Here's an example of a PFM as shown in this review
+"[Applied bioinformatics for the identification of regulatory
+elements](https://www.nature.com/articles/nrg1315)" (sorry paywall!):
+
+| nuc  | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  | 10  | 11  | 12  | 13  | 14  |
+| :--- | :- | :- | :- | :- | :- | :- | :- | :- | :- | :-  | :-  | :-  | :-  | :-  |
+|  A   | 0  | 4  | 4  | 0  | 3  | 7  | 4  | 3  | 5  | 4   | 2   | 0   | 0   | 4   |
+|  C   | 3  | 0  | 4  | 8  | 0  | 0  | 0  | 3  | 0  | 0   | 0   | 0   | 2   | 2   |
+|  G   | 2  | 3  | 0  | 0  | 0  | 0  | 0  | 0  | 1  | 0   | 6   | 8   | 5   | 0   |
+|  T   | 3  | 1  | 0  | 0  | 5  | 1  | 4  | 2  | 2  | 4   | 0   | 0   | 1   | 0   |
+
+_The construction of this PFM was done by collecting experimentally validated
+binding sites from 8 published studies for MEF2._
+
+To convert a PFM to the corresponding PWM, the frequencies are converted to
+normalised frequency values on a log-scale. To perform this conversion we can
+use these formulae from the review paper:
+
+$$ W_{b,i} = log_{2}\frac{p(b,i)}{p(b)} $$
+
+where $W_{b,i}$ = PWM value of base _b_ in position _i_, $p(b)$ = background
+probability of base _b_ and $p(b,i)$:
+
+$$ p(b,i) = \frac{f_{b,i} + s(b)}{N + \sum s(b')} $$
+
+where $b' \in \{A, C, G, T\}$; $f_{b,i}$ = counts of base _b_ in position _i_;
+$N$ = number of sites; $p(b,i)$ = corrected probability of base _b_ in position
+_i_ and $s(b)$ = pseudocount function.
+
+The pseudocount is a sample correction that is added when assessing the
+probability to correct for small samples sizes and this calculation varies
+widely between applications. One approach is to take the square root of the
+number of sites that contribute to the model, which was apparently the approach
+used in the paper. However, when I used this as the pseudocount function, I
+could not replicate the numbers in the table of the review (Box 1, d). In fact,
+if you examine the PWM in the paper (Box 1, d), there's several typos. For
+example, in position 1, the frequency of C's and T's are identical, however the
+PWM values are different. Also the PWM for a frequency of 1 is different in
+position 13, T and all other positions with a frequency of 1. Most other values
+seem to be consistent though. So in order to find out the pseudocount function,
+I substituted some of the (consistent) PWM values back into the equation.
+
+Firstly recall the conversion between the logarithmic form to the exponential
+form:
+
+$$ y = log_{a}x \leftrightarrow a^{y} = x. $$
+
+Therefore:
+
+$$ W_{b,i} = log_{2}\frac{p(b,i)}{p(b)} \leftrightarrow 2^{W_{b,i}} = \frac{p(b,i)}{p(b)} $$
+
+and substituting $p(b,i)$ in:
+
+$$ 2^{W_{b,i}} \cdot p(b) = \frac{f_{b,i} + s(b)}{N + \sum s(b')} $$
+
+The PWM value for a frequency of 0 seems to be consistent, so let's take
+$W_{A,1}$ and substitute it into the equation:
+
+$$ 2^{-1.93} \cdot p(b) = \frac{0 + s_{A}}{8 + s_{A} + s_{C} + s_{G} + s_{T}}. $$
+
+The PWM value for a frequency of 3 seems to be 0.45, so let's take $W_{C,1}$
+and substitute it into the equation:
+
+$$ 2^{0.45} \cdot p(b) = \frac{3 + s_{C}}{8 + s_{A} + s_{C} + s_{G} + s_{T}}. $$
+
+We now have two simultaneous equations that we can divide together, i.e.
+dividing $W\_{A,1}$ by $W_{C,1}$ (the denominators cancel each other out), to
+work out the pseudocount:
+
+$$ \frac{2^{-1.93} \cdot p(b)}{2^{0.45} \cdot p(b)} = \frac{s_{A}}{3 + s_{C}}. $$
+
+The background probabilities cancel each other out and since the pseudocounts
+should be the same for the different nucleotides, we can refer to them as an
+_s_:
+
+$$ \frac{0.2624292}{1.36604} = \frac{s}{3 + s}. $$
+
+$$ 0.1921094 = \frac{s}{3 + s}. $$
+
+Invert the two sides:
+
+$$ 5.205367 = \frac{3 + s}{s} = \frac{3}{s} + \frac{s}{s}. $$
+
+Solving _s_, we get:
+
+$$ 5.205367 = \frac{3}{s} + 1 $$
+
+$$ 4.205367 = \frac{3}{s} $$
+
+$$ s = \frac{3}{4.205367} = 0.7133741 $$
+
+Perhaps I missed it, but it wasn't pointed out exactly how $p(b)$ or the
+background probability of base _b_ is defined. Since we worked out _s_, we can
+substitute it into the equation for $W_{A,1}$ and work out $p(b)$:
+
+$$ 2^{-1.93} \cdot p(b) = \frac{0 + 0.71}{8 + 0.71 + 0.71 + 0.71 + 0.71}. $$
+
+$$ p(b) = \frac{0.06572758}{2^{-1.93}} = 0.2504584. $$
+
+So the background probability of base _b_ is simply 0.25, i.e. base b divided
+by the total number of bases. But where did this 0.71 pseudocount come from? If
+we take the square root of the number of sites that contribute to the model,
+the square root of 8 is 2.828427. Perhaps the pseudocount needs to be scaled by
+base _b_, since the square root of 8 multiply by 1/4 is 0.7071068.
+
+Since some of the values in the PWM of the review paper is incorrect, let's
+calculate it again using the formulae above (since we now know the pseudocount
+function and the background probability) using R:
+
+```{r pwm}
+calc_pwm <- function(freq, total, bg=0.25){
+  p <- (freq + (sqrt(total) * 1/4)) / (total + (4 * (sqrt(total) * 1/4)))
+  log2(p/bg)
+}
+
+# work out all possible PWM values
+map_dbl(0:8, calc_pwm, total = 8)
+```
+
+Now let's calculate the PWM by first defining the matrix.
+
+```{r define_matrix}
+# define the frequencies of nucleotides
+A <- c(0, 4, 4, 0, 3, 7, 4, 3, 5, 4, 2, 0, 0, 4)
+C <- c(3, 0, 4, 8, 0, 0, 0, 3, 0, 0, 0, 0, 2, 4)
+G <- c(2, 3, 0, 0, 0, 0, 0, 0, 1, 0, 6, 8, 5, 0)
+T <- c(3, 1, 0, 0, 5, 1, 4, 2, 2, 4, 0, 0, 1, 0)
+
+M <- matrix(
+  data = c(A,C,G,T),
+  nrow = 4,
+  byrow = TRUE,
+  dimnames = list(c('A','C','G','T'))
+)
+
+M
+```
+
+Calculate the PWM using our function.
+
+```{r calculate_pwm}
+pwm <- calc_pwm(M, 8)
+pwm
+```
+
+Now that we have the PWM, we can generate a quantitative score for any DNA
+sequence (of the same length) by summing the values that correspond to the
+observed nucleotides at each position. Here we will use the same sequence as
+shown in the review.
+
+```{r example_seq}
+seq <- 'TTACATAAGTAGTC'
+seq <- unlist(strsplit(x = seq, split=''))
+seq
+```
+
+A quantitative score for any DNA sequence can be generated by summing the values
+that correspond to the observed nucleotide at each position.
+
+```{r seq_score}
+seq_score <- map_dbl(1:length(seq), function(x) pwm[seq[x], x])
+# slightly different to the review due to rounding
+sum(seq_score)
+```
+
+The maximum score can be calculated by summing all the maximum values of each column.
+
+```{r max_score}
+sum(apply(pwm, 2, max))
+```
+
+Lastly, we will generate a sequence logo from a PFM. We need the **seqLogo**
+package, so install it if you have not already.
+
+```{r install}
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+if (!require("seqLogo", quietly = TRUE))
+  BiocManager::install("seqLogo")
+```
+
+Create a data frame.
+
+```{r data_frame}
+library(seqLogo)
+
+A <- c(0, 4, 4, 0, 3, 7, 4, 3, 5, 4, 2, 0, 0, 4)
+C <- c(3, 0, 4, 8, 0, 0, 0, 3, 0, 0, 0, 0, 2, 4)
+G <- c(2, 3, 0, 0, 0, 0, 0, 0, 1, 0, 6, 8, 5, 0)
+T <- c(3, 1, 0, 0, 5, 1, 4, 2, 2, 4, 0, 0, 1, 0)
+
+my_df <- data.frame(A, C, G, T)
+my_df
+```
+
+First we divide the frequency by the row sum to get the proportions. We then
+construct a PWM and then plot a sequence logo. Note that this PWM is calculated
+in a different manner as our example above but they both show the same
+information.
+
+```{r seq_logo}
+mef2 <- apply(my_df, 1, function(x) x / sum(x))
+mef2 <- makePWM(mef2)
+seqLogo(mef2)
+```
+
+### Conclusions
+
+With respect to transcription factors (TFs), a position weight matrix (PWM) can
+be generated from a position frequency matrix (PFM), which is a collection of
+experimentally validated binding sites. Using this PWM, any given sequence can
+be quantitatively scored against the motif model. The PWM models appropriately
+the tolerance of TFs to binding sites and one can use sequence logos to
+visualise PFMs.
+
+I'd like to thank my colleague (if he ever comes across this page) for his
+help.
