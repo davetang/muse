@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2023-06-29" />
+
+<title>Hidden Markov Models</title>
+
+<script src="site_libs/header-attrs-2.21/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Hidden Markov Models</h1>
+<h4 class="date">2023-06-29</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2023-06-29
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea3c61e8ab2e00b74080b2df4f767544dd07a4d21targetblanka3c61e8a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/a3c61e8ab2e00b74080b2df4f767544dd07a4d21" target="_blank">a3c61e8</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea3c61e8ab2e00b74080b2df4f767544dd07a4d21targetblanka3c61e8a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/a3c61e8ab2e00b74080b2df4f767544dd07a4d21" target="_blank">a3c61e8</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    r_packages_4.3.0/
+
+Untracked files:
+    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  analysis/tss_xgboost.Rmd
+    Untracked:  code/multiz100way/
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
+    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
+    Untracked:  data/ncrna_noncode_v3.fa
+    Untracked:  data/netmhciipan.out.gz
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/graph.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/hmm.Rmd</code>) and HTML
+(<code>docs/hmm.html</code>) files. If you’ve configured a remote Git
+repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
+in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/a3c61e8ab2e00b74080b2df4f767544dd07a4d21/analysis/hmm.Rmd" target="_blank">a3c61e8</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-06-29
+</td>
+<td>
+Hidden Markov Models
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>Based on the brilliant tutorial: <a
+href="http://a-little-book-of-r-for-bioinformatics.readthedocs.io/en/latest/src/chapter10.html">Hidden
+Markov Models (HMMs) in R</a>.</p>
+<div id="a-multinomial-model-of-dna-sequence-evolution"
+class="section level2">
+<h2>A multinomial model of DNA sequence evolution</h2>
+<p>The simplest model of DNA sequence evolution assumes that the
+sequence has been produced by a random process that randomly chooses any
+of the four nucleotides at each position in the sequence and where the
+probability of choosing any one of the four nucleotides depends on a
+predetermined probability distribution; the four nucleotides are chosen
+with probabilities: <span class="math inline">\(P_A\)</span>, <span
+class="math inline">\(P_C\)</span>, <span
+class="math inline">\(P_G\)</span>, and <span
+class="math inline">\(P_T\)</span>. This is known as the <em>multinomial
+sequence model</em>.</p>
+<p>A multinomial model for DNA sequence evolution has four parameters:
+the probabilities of the four nucleotides: <span
+class="math inline">\(P_A\)</span>, <span
+class="math inline">\(P_C\)</span>, <span
+class="math inline">\(P_G\)</span>, and <span
+class="math inline">\(P_T\)</span>. For example, we may create a
+multinomial model where <span class="math inline">\(P_A = 0.2\)</span>,
+<span class="math inline">\(P_C = 0.3\)</span>, <span
+class="math inline">\(P_G = 0.3\)</span>, and <span
+class="math inline">\(P_T = 0.2\)</span>. Note that <span
+class="math inline">\(P_A + P_C + P_G + P_T = 1\)</span>, as the sum of
+probabilities must equal 1.</p>
+</div>
+<div id="creating-a-sequence-using-a-multinomial-model"
+class="section level2">
+<h2>Creating a sequence using a multinomial model</h2>
+<p>We can use the function <code>sample()</code> to generate a DNA
+sequence according to a probability distribution.</p>
+<pre class="r"><code>nucleotides &lt;- c(&quot;A&quot;, &quot;C&quot;, &quot;G&quot;, &quot;T&quot;)
+probs       &lt;- c(0.2, 0.3, 0.3, 0.2)
+seq_length  &lt;- 30
+set.seed(1984)
+sample(nucleotides, seq_length, replace = TRUE, prob = probs)</code></pre>
+<pre><code> [1] &quot;T&quot; &quot;G&quot; &quot;G&quot; &quot;G&quot; &quot;T&quot; &quot;A&quot; &quot;C&quot; &quot;G&quot; &quot;A&quot; &quot;C&quot; &quot;A&quot; &quot;C&quot; &quot;T&quot; &quot;T&quot; &quot;C&quot; &quot;C&quot; &quot;C&quot; &quot;T&quot; &quot;A&quot;
+[20] &quot;C&quot; &quot;T&quot; &quot;C&quot; &quot;T&quot; &quot;A&quot; &quot;T&quot; &quot;C&quot; &quot;A&quot; &quot;G&quot; &quot;G&quot; &quot;G&quot;</code></pre>
+</div>
+<div id="a-markov-model-of-dna-sequence-evolution"
+class="section level2">
+<h2>A Markov model of DNA sequence evolution</h2>
+<p>A multinomial model of DNA sequence evolution is a suitable model of
+the evolution of many DNA sequences. However, for some DNA sequences, a
+multinomial model is not an accurate representation of how the sequences
+have evolved. One reason is that a multinomial model assumes that each
+part of the sequence (e.g. the first 100 nucleotides of the sequence,
+the second 100 nucleotides, the third 100 nucleotides, etc.) all have
+the same frequency of each type of nucleotide (the same <span
+class="math inline">\(P_A\)</span>, <span
+class="math inline">\(P_C\)</span>, <span
+class="math inline">\(P_G\)</span>, and <span
+class="math inline">\(P_T\)</span>).</p>
+<p>Another assumption of a multinomial model of DNA sequence evolution
+is that the probability of choosing a particular nucleotide (e.g. “A”)
+at a particular position in the sequence <em>only</em> depends on the
+predetermined frequency of that nucleotide (<span
+class="math inline">\(P_A\)</span>), and does not depend at all on the
+nucleotides found at adjacent positions in the sequence. This assumption
+holds true for many DNA sequences but in some cases the probability of
+finding a particular nucleotide at a particular position in the sequence
+does depend on what nucleotides are found at adjacent positions in the
+sequence. In this case, a different type of DNA sequence model called a
+Markov sequence model is a more accurate representation of the evolution
+of the sequence.</p>
+<p>A Markov sequence model assumes that the sequence has been produced
+by a process that chose any of the four nucleotides in the sequence,
+where the probability of choosing any one of the four nucleotides at a
+particular position depends on the nucleotide chosen for the previous
+position. A Markov sequence model has four different probability
+distributions based on whether “A”, “C”, “G”, or “T” were chosen at the
+previous position.</p>
+<div id="transition-matrix" class="section level3">
+<h3>Transition matrix</h3>
+<p>A multinomial model of DNA sequence evolution has just four
+parameters: the probabilities of <span
+class="math inline">\(P_A\)</span>, <span
+class="math inline">\(P_C\)</span>, <span
+class="math inline">\(P_G\)</span>, and <span
+class="math inline">\(P_T\)</span>. In contrast, a Markov model has many
+more parameters has four sets of probabilities of <span
+class="math inline">\(P_A\)</span>, <span
+class="math inline">\(P_C\)</span>, <span
+class="math inline">\(P_G\)</span>, and <span
+class="math inline">\(P_T\)</span> that differ depending on the previous
+nucleotide. The symbols <span class="math inline">\(P_AA\)</span>, <span
+class="math inline">\(P_AC\)</span>, <span
+class="math inline">\(P_AG\)</span>, and <span
+class="math inline">\(P_AT\)</span> are usually used to represent the
+four probabilities for when the previous nucleotide as “A”.</p>
+<p>It is common to store the probability parameters for a Markov model
+in a square matrix, which is known as a <em>Markov transition
+matrix</em>. The rows of the transition matrix represent the nucleotides
+found at the previous position, while the columns represent the
+nucleotides that could be found at the current position.</p>
+<pre class="r"><code>nucleotides &lt;- c(&quot;A&quot;, &quot;C&quot;, &quot;G&quot;, &quot;T&quot;)
+afterAprobs &lt;- c(0.2, 0.3, 0.3, 0.2)
+afterCprobs &lt;- c(0.1, 0.41, 0.39, 0.1)
+afterGprobs &lt;- c(0.25, 0.25, 0.25, 0.25)
+afterTprobs &lt;- c(0.5, 0.17, 0.17, 0.17)
+my_transition_matrix &lt;- matrix(c(afterAprobs, afterCprobs, afterGprobs, afterTprobs), 4, 4, byrow = TRUE)
+rownames(my_transition_matrix) &lt;- nucleotides
+colnames(my_transition_matrix) &lt;- nucleotides
+my_transition_matrix</code></pre>
+<pre><code>     A    C    G    T
+A 0.20 0.30 0.30 0.20
+C 0.10 0.41 0.39 0.10
+G 0.25 0.25 0.25 0.25
+T 0.50 0.17 0.17 0.17</code></pre>
+</div>
+</div>
+<div id="creating-a-sequence-using-a-markov-model"
+class="section level2">
+<h2>Creating a sequence using a Markov model</h2>
+<p>The nucleotide chosen at each position at the sequence depends on the
+nucleotide chosen at the previous position. Since there are no previous
+nucleotides at the first position in the new sequence, we need to define
+the probabilities of choosing “A”, “C”, “G” or “T” for the first
+position. The symbols <span class="math inline">\(\Pi_A\)</span>, <span
+class="math inline">\(\Pi_C\)</span>, <span
+class="math inline">\(\Pi_G\)</span>, and <span
+class="math inline">\(\Pi_T\)</span> are used to represent the
+probabilities of choosing “A”, “C”, “G”, or “T” at the first
+position.</p>
+<pre class="r"><code>generate_markov_seq &lt;- function(transition_matrix, initial_probs, seq_length){
+  nucleotides      &lt;- c(&quot;A&quot;, &quot;C&quot;, &quot;G&quot;, &quot;T&quot;)
+  my_sequence      &lt;- character()
+  first_nucleotide &lt;- sample(nucleotides, 1, prob = initial_probs)
+  my_sequence[1]   &lt;- first_nucleotide
+  for (i in 2:seq_length){
+    prev_nucleotide &lt;- my_sequence[i-1]
+    probabilities   &lt;- transition_matrix[prev_nucleotide, ]
+    nucleotide      &lt;- sample(nucleotides, 1, replace = TRUE, prob = probabilities)
+    my_sequence[i]  &lt;- nucleotide
+  }
+  return(my_sequence)
+}
+
+set.seed(1984)
+generate_markov_seq(my_transition_matrix, rep(0.25, 4), 30)</code></pre>
+<pre><code> [1] &quot;T&quot; &quot;A&quot; &quot;G&quot; &quot;G&quot; &quot;T&quot; &quot;C&quot; &quot;C&quot; &quot;G&quot; &quot;A&quot; &quot;C&quot; &quot;T&quot; &quot;A&quot; &quot;T&quot; &quot;T&quot; &quot;A&quot; &quot;C&quot; &quot;C&quot; &quot;G&quot; &quot;A&quot;
+[20] &quot;C&quot; &quot;G&quot; &quot;C&quot; &quot;G&quot; &quot;A&quot; &quot;T&quot; &quot;A&quot; &quot;A&quot; &quot;G&quot; &quot;T&quot; &quot;G&quot;</code></pre>
+</div>
+<div id="a-hidden-markov-model-of-dna-sequence-evolution"
+class="section level2">
+<h2>A Hidden Markov Model of DNA sequence evolution</h2>
+<p>In a Markov model, the nucleotide at a particular position in a
+sequence depends on the nucleotide found at the previous position. In
+contrast, in a Hidden Markov model (HMM), the nucleotide found at a
+particular position in a sequence depends on the <em>state</em> at the
+previous nucleotide position in the sequence.</p>
+<p>The state at a sequence position is a property of that position of
+the sequence, for example, a particular HMM may model the positions
+along a sequence as belonging to either one of two states, “GC-rich” or
+“AT-rich”. A more complex HMM may model the positions along a sequence
+as belonging to many different possible states, such as “promoter”,
+“exon”, “intron”, and “intergenic DNA”.</p>
+<p>A HMM is like having several different roulette wheels, one roulette
+wheel for each state in the HMM, for example, a “GC-rich” and an
+“AT-rich” roulette wheel. Each of the roulette wheels has four slices
+labelled “A”, “T”, “G”, and “C”, and in each roulette wheel a different
+fraction of the wheel is taken up by the four slices. That is, the
+“GC-rich” and “AT-rich” roulette wheels have different <span
+class="math inline">\(P_A\)</span>, <span
+class="math inline">\(P_T\)</span>, <span
+class="math inline">\(P_G\)</span>, and <span
+class="math inline">\(P_C\)</span> values.</p>
+<p>If we are generating a new DNA sequence using a HMM, to decide what
+nucleotide to choose at a particular sequence position, we spin the
+arrow of a particular roulette wheel, and see in which slice it
+stops.</p>
+<p>How do we decide which roulette wheel to use? Well, if there are two
+roulette wheels, we tend to use the same roulette wheel that we used to
+choose the previous nucleotide in the sequence, but there is also a
+certain small probability of switching to the other roulette wheel. For
+example, if we used the “GC-rich” roulette wheel to choose the previous
+nucleotide in the sequence, there may be a 90% chance that we will use
+the “GC-rich” roulette wheel again to choose the nucleotide at the
+current position, but a 10% chance that we will switch to using the
+“AT-rich” roulette wheel to choose the nucleotide at the current
+position. Likewise, if we used the “AT-rich” roulette wheel to choose
+the nucleotide at the previous position, there may be 70% chance that we
+will use the “AT-rich” wheel again at this position, but a 30% chance
+that we will switch to using the “GC-rich” roulette wheel to choose the
+nucleotide at this position.</p>
+<div id="the-transition-matrix-and-emission-matrix"
+class="section level3">
+<h3>The transition matrix and emission matrix</h3>
+<p>A HMM has two important matrices that hold its parameters.</p>
+<p>The first is the <strong>HMM transition matrix</strong>, which
+contains the probabilities of switching from one state to another. For
+example, in a HMM with two states, an AT-rich state and a GC-rich state,
+the transition matrix will hold the probabilities of switching from the
+AT-rich state to the GC-rich state, and of switching from the GC-rich
+state to the AT-rich state. For example, if the previous nucleotide was
+in the AT-rich state there may be a probability of 0.3 that the current
+nucleotide will be in the GC-rich state, and if the previous nucleotide
+was in the GC-rich state there may be a probability of 0.1 that the
+current nucleotide will be in the AT-rich state:</p>
+<pre class="r"><code>my_state &lt;- c(&quot;AT-rich&quot;, &quot;GC-rich&quot;)
+at_tran_prob &lt;- c(0.7, 0.3)
+gc_tran_prob &lt;- c(0.1, 0.9)
+hmm_tran_matrix &lt;- matrix(c(at_tran_prob, gc_tran_prob), 2, 2, byrow = TRUE)
+rownames(hmm_tran_matrix) &lt;- my_state
+colnames(hmm_tran_matrix) &lt;- my_state
+hmm_tran_matrix</code></pre>
+<pre><code>        AT-rich GC-rich
+AT-rich     0.7     0.3
+GC-rich     0.1     0.9</code></pre>
+<p>The second important matrix is the <strong>HMM emission
+matrix</strong>, which holds the probabilities of choosing the four
+nucleotides “A”, “C”, “G”, and “T”, in each of the states. In a HMM with
+an AT-rich state and a GC-rich state, the emission matrix will hold the
+probabilities of choosing each of the four nucleotides “A”, “C”, “G” and
+“T” in the AT-rich state and the probabilities of choosing “A”, “C”,
+“G”, and “T” in the GC-rich state.</p>
+<pre class="r"><code>my_nuc &lt;- c(&quot;A&quot;, &quot;C&quot;, &quot;G&quot;, &quot;T&quot;)
+at_emi_prob &lt;- c(0.39, 0.1, 0.1, 0.41)
+gc_emi_prob &lt;- c(0.1, 0.41, 0.39, 0.1)
+hmm_emi_matrix &lt;- matrix(c(at_emi_prob, gc_emi_prob), 2, 4, byrow = TRUE)
+rownames(hmm_emi_matrix) &lt;- my_state
+colnames(hmm_emi_matrix) &lt;- my_nuc
+hmm_emi_matrix</code></pre>
+<pre><code>           A    C    G    T
+AT-rich 0.39 0.10 0.10 0.41
+GC-rich 0.10 0.41 0.39 0.10</code></pre>
+</div>
+</div>
+<div id="creating-a-sequence-using-a-hmm" class="section level2">
+<h2>Creating a sequence using a HMM</h2>
+<p>Generate a sequence based on state transition and state emission
+probabilities.</p>
+<pre class="r"><code>generate_hmm_seq &lt;- function(transition_matrix, emission_matrix, initial_probs, seq_length){
+  nucleotides &lt;- c(&quot;A&quot;, &quot;C&quot;, &quot;G&quot;, &quot;T&quot;)
+  states      &lt;- c(&quot;AT-rich&quot;, &quot;GC-rich&quot;)
+  my_sequence &lt;- character()
+  my_states   &lt;- character()
+  
+  first_state      &lt;- sample(states, 1, prob=initial_probs)
+  probabilities    &lt;- emission_matrix[first_state, ]
+  first_nucleotide &lt;- sample(nucleotides, 1, prob=probabilities)
+  my_sequence[1]   &lt;- first_nucleotide
+  my_states[1]     &lt;- first_state
+  
+  for (i in 2:seq_length){
+    prev_state    &lt;- my_states[i-1]
+    state_probs   &lt;- transition_matrix[prev_state,]
+    state         &lt;- sample(states, 1, prob=state_probs)
+    probabilities &lt;- emission_matrix[state,]
+    nucleotide   &lt;- sample(nucleotides, 1, prob=probabilities)
+    my_sequence[i] &lt;- nucleotide
+    my_states[i]  &lt;- state
+  }
+  
+  return(list(seq = my_sequence, states = my_states))
+}
+
+set.seed(1984)
+init_prob &lt;- c(0.5, 0.5)
+my_seq &lt;- generate_hmm_seq(hmm_tran_matrix, hmm_emi_matrix, init_prob, 30)
+my_seq</code></pre>
+<pre><code>$seq
+ [1] &quot;A&quot; &quot;T&quot; &quot;T&quot; &quot;G&quot; &quot;C&quot; &quot;C&quot; &quot;G&quot; &quot;C&quot; &quot;G&quot; &quot;T&quot; &quot;T&quot; &quot;G&quot; &quot;C&quot; &quot;G&quot; &quot;G&quot; &quot;T&quot; &quot;A&quot; &quot;A&quot; &quot;T&quot;
+[20] &quot;T&quot; &quot;C&quot; &quot;C&quot; &quot;G&quot; &quot;G&quot; &quot;G&quot; &quot;C&quot; &quot;C&quot; &quot;C&quot; &quot;C&quot; &quot;C&quot;
+
+$states
+ [1] &quot;AT-rich&quot; &quot;AT-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot;
+ [8] &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;AT-rich&quot; &quot;AT-rich&quot; &quot;AT-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot;
+[15] &quot;GC-rich&quot; &quot;AT-rich&quot; &quot;AT-rich&quot; &quot;AT-rich&quot; &quot;AT-rich&quot; &quot;AT-rich&quot; &quot;GC-rich&quot;
+[22] &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot;
+[29] &quot;GC-rich&quot; &quot;GC-rich&quot;</code></pre>
+</div>
+<div id="inferring-the-states-of-a-hmm-that-generated-a-sequence"
+class="section level2">
+<h2>Inferring the states of a HMM that generated a sequence</h2>
+<p>If we have a HMM with two states, “GC-rich” and “AT-rich”, and we
+know the transmission and emission matrices of the HMM, can we take some
+new DNA sequence, and figure out which state (GC-rich or AT-rich) is the
+most likely to have generated each nucleotide position in that DNA
+sequence? This is a common problem in bioinformatics. It is called the
+problem of finding the most probable state path, as it essentially
+consists of assigning the most likely state to each position in the DNA
+sequence. The problem of finding the most probable state path is also
+sometimes called segmentation. For example, given a DNA sequence of
+1,000 nucleotides, you may wish to use your HMM to segment the sequence
+into blocks that were probably generated by the “GC-rich” state or by
+the “AT-rich” state.</p>
+<p>The problem of finding the most probable state path given a HMM and a
+sequence (i.e. the problem of segmenting a sequence using a HMM), can be
+solved by an algorithm called the Viterbi algorithm. As its output, the
+Viterbi algorithm gives for each nucleotide position in a DNA sequence,
+the state of your HMM that most probably generated the nucleotide in
+that position. For example, if you segmented a particular DNA sequence
+of 1,000 nucleotides using a HMM with “AT-rich” and “GC-rich” states,
+the Viterbi algorithm may tell you that nucleotides 1-343 were most
+probably generated by the AT-rich state, nucleotides 344-900 were most
+probably generated by the GC-rich state, and 901-1000 were most probably
+generated by the AT-rich state.</p>
+<pre class="r"><code>most_probable_state &lt;- function(sequence, transition_matrix, emission_matrix){
+  states &lt;- rownames(emission_matrix)
+  sequence &lt;- toupper(sequence)
+  num_states &lt;- dim(transition_matrix)[1]
+  v &lt;- matrix(NA, nrow = length(sequence), ncol = dim(transition_matrix)[1])
+  v[1, ] &lt;- 0
+  v[1,1] &lt;- 1
+  for (i in 2:length(sequence)){
+    for (l in 1:num_states){
+      state_l_prob_nucleotide_i &lt;- emission_matrix[l,sequence[i]]
+      v[i,l] &lt;-  state_l_prob_nucleotide_i * max(v[(i-1),] * transition_matrix[,l])
+    }
+  }
+  most_probable_state_path &lt;- apply(v, 1, function(x) which.max(x))
+  print(states[most_probable_state_path])
+}
+
+inferred &lt;- most_probable_state(my_seq$seq, hmm_tran_matrix, hmm_emi_matrix)</code></pre>
+<pre><code> [1] &quot;AT-rich&quot; &quot;AT-rich&quot; &quot;AT-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot;
+ [8] &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;AT-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot;
+[15] &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;AT-rich&quot; &quot;AT-rich&quot; &quot;AT-rich&quot; &quot;AT-rich&quot; &quot;GC-rich&quot;
+[22] &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot; &quot;GC-rich&quot;
+[29] &quot;GC-rich&quot; &quot;GC-rich&quot;</code></pre>
+<pre class="r"><code>expected &lt;- my_seq$states
+
+tibble(
+  nucleotide = 1:length(expected),
+  actual = factor(expected),
+  inferred = factor(inferred)
+) |&gt;
+  pivot_longer(-nucleotide, names_to = &quot;property&quot;, values_to = &quot;state&quot;) -&gt; res
+
+res</code></pre>
+<pre><code># A tibble: 60 × 3
+   nucleotide property state  
+        &lt;int&gt; &lt;chr&gt;    &lt;fct&gt;  
+ 1          1 actual   AT-rich
+ 2          1 inferred AT-rich
+ 3          2 actual   AT-rich
+ 4          2 inferred AT-rich
+ 5          3 actual   GC-rich
+ 6          3 inferred AT-rich
+ 7          4 actual   GC-rich
+ 8          4 inferred GC-rich
+ 9          5 actual   GC-rich
+10          5 inferred GC-rich
+# ℹ 50 more rows</code></pre>
+<p>Plot inferred versus expected states.</p>
+<pre class="r"><code>ggplot(res, aes(nucleotide, property, fill = state)) +
+  geom_tile() +
+  scale_fill_manual(values = c(&quot;#CED46A&quot;, &quot;#07553B&quot;)) +
+  theme(axis.title.y = element_blank())</code></pre>
+<p><img src="figure/hmm.Rmd/plot_res-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="a-hmm-of-protein-sequence-evolution" class="section level2">
+<h2>A HMM of protein sequence evolution</h2>
+<p>It is possible to use HMMs to model protein sequence evolution. When
+using a HMM to model DNA sequence evolution, we may have states such as
+“AT-rich” and “GC-rich”. Similarly, when using a HMM to model protein
+sequence evolution, we may have states such as “hydrophobic” and
+“hydrophilic”. In a protein HMM with “hydrophilic” and “hydrophilic”
+states, the “hydrophilic” HMM will have probabilities <span
+class="math inline">\(P_A\)</span>, <span
+class="math inline">\(P_R\)</span>, <span
+class="math inline">\(P_C\)</span>, … of choosing each of the 20 amino
+acids alanine (A), arginine (R), cysteine (C), etc. when in that state.
+Similarly, the “hydrophilic” state will have different probabilities of
+choosing each of the 20 amino acids. The probability of choosing a
+hydrophobic amino acid such as alanine will be higher in the
+“hydrophobic” state than in the “hydrophilic” state. A HMM of protein
+sequence evolution also defines a certain probability of switching from
+the “hydrophilic” state to the “hydrophobic” state, and a certain
+probability of switching from the “hydrophobic” state to the
+“hydrophilic” state.</p>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>HMMs were used to assign the most probable states to nucleotides that
+we presumably didn’t know (they are hidden).</p>
+<p>A HMM can be defined by three parameters <span
+class="math inline">\((A, B, \pi)\)</span>, where:</p>
+<ol style="list-style-type: decimal">
+<li><span class="math inline">\(A\)</span> is a matrix of state
+transition probabilities (probability of switching states, given the
+current state),</li>
+<li><span class="math inline">\(B\)</span> is a vector of state emission
+probabilities (probabilities of a certain nucleotide for a given state),
+and</li>
+<li><span class="math inline">\(\pi\)</span> is a vector of initial
+state distributions (probability of the starting state).</li>
+</ol>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.3.0 (2023-04-21)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 22.04.2 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] lubridate_1.9.2 forcats_1.0.0   stringr_1.5.0   dplyr_1.1.2    
+ [5] purrr_1.0.1     readr_2.1.4     tidyr_1.3.0     tibble_3.2.1   
+ [9] ggplot2_3.4.2   tidyverse_2.0.0 workflowr_1.7.0
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.5       utf8_1.2.3       generics_0.1.3   stringi_1.7.12  
+ [5] hms_1.1.3        digest_0.6.31    magrittr_2.0.3   timechange_0.2.0
+ [9] evaluate_0.20    grid_4.3.0       fastmap_1.1.1    rprojroot_2.0.3 
+[13] jsonlite_1.8.5   processx_3.8.1   whisker_0.4.1    ps_1.7.5        
+[17] promises_1.2.0.1 httr_1.4.5       fansi_1.0.4      scales_1.2.1    
+[21] jquerylib_0.1.4  cli_3.6.1        rlang_1.1.0      munsell_0.5.0   
+[25] withr_2.5.0      cachem_1.0.7     yaml_2.3.7       tools_4.3.0     
+[29] tzdb_0.3.0       colorspace_2.1-0 httpuv_1.6.9     vctrs_0.6.2     
+[33] R6_2.5.1         lifecycle_1.0.3  git2r_0.32.0     fs_1.6.2        
+[37] pkgconfig_2.0.3  callr_3.7.3      pillar_1.9.0     bslib_0.4.2     
+[41] later_1.3.0      gtable_0.3.3     glue_1.6.2       Rcpp_1.0.10     
+[45] highr_0.10       xfun_0.39        tidyselect_1.2.0 rstudioapi_0.14 
+[49] knitr_1.42       farver_2.1.1     htmltools_0.5.5  labeling_0.4.2  
+[53] rmarkdown_2.21   compiler_4.3.0   getPass_0.2-2   </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
