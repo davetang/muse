@@ -1,0 +1,338 @@
+---
+title: "Hidden Markov Models"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+theme_set(theme_minimal())
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Based on the brilliant tutorial: [Hidden Markov Models (HMMs) in
+R](http://a-little-book-of-r-for-bioinformatics.readthedocs.io/en/latest/src/chapter10.html).
+
+## A multinomial model of DNA sequence evolution
+
+The simplest model of DNA sequence evolution assumes that the sequence has been
+produced by a random process that randomly chooses any of the four nucleotides
+at each position in the sequence and where the probability of choosing any one
+of the four nucleotides depends on a predetermined probability distribution; the
+four nucleotides are chosen with probabilities: $P_A$, $P_C$, $P_G$, and $P_T$.
+This is known as the _multinomial sequence model_.
+
+A multinomial model for DNA sequence evolution has four parameters: the
+probabilities of the four nucleotides: $P_A$, $P_C$, $P_G$, and $P_T$. For
+example, we may create a multinomial model where $P_A = 0.2$, $P_C = 0.3$, $P_G
+= 0.3$, and $P_T = 0.2$. Note that $P_A + P_C + P_G + P_T = 1$, as the sum of
+probabilities must equal 1.
+
+## Creating a sequence using a multinomial model
+
+We can use the function `sample()` to generate a DNA sequence according to a
+probability distribution.
+
+```{r sample_nuc}
+nucleotides <- c("A", "C", "G", "T")
+probs       <- c(0.2, 0.3, 0.3, 0.2)
+seq_length  <- 30
+set.seed(1984)
+sample(nucleotides, seq_length, replace = TRUE, prob = probs)
+```
+
+## A Markov model of DNA sequence evolution
+
+A multinomial model of DNA sequence evolution is a suitable model of the
+evolution of many DNA sequences. However, for some DNA sequences, a multinomial
+model is not an accurate representation of how the sequences have evolved. One
+reason is that a multinomial model assumes that each part of the sequence (e.g.
+the first 100 nucleotides of the sequence, the second 100 nucleotides, the third
+100 nucleotides, etc.) all have the same frequency of each type of nucleotide
+(the same $P_A$, $P_C$, $P_G$, and $P_T$).
+
+Another assumption of a multinomial model of DNA sequence evolution is that the
+probability of choosing a particular nucleotide (e.g. "A") at a particular
+position in the sequence _only_ depends on the predetermined frequency of that
+nucleotide ($P_A$), and does not depend at all on the nucleotides found at
+adjacent positions in the sequence. This assumption holds true for many DNA
+sequences but in some cases the probability of finding a particular nucleotide
+at a particular position in the sequence does depend on what nucleotides are
+found at adjacent positions in the sequence. In this case, a different type of
+DNA sequence model called a Markov sequence model is a more accurate
+representation of the evolution of the sequence.
+
+A Markov sequence model assumes that the sequence has been produced by a process
+that chose any of the four nucleotides in the sequence, where the probability of
+choosing any one of the four nucleotides at a particular position depends on the
+nucleotide chosen for the previous position. A Markov sequence model has four
+different probability distributions based on whether "A", "C", "G", or "T" were
+chosen at the previous position.
+
+### Transition matrix
+
+A multinomial model of DNA sequence evolution has just four parameters: the
+probabilities of $P_A$, $P_C$, $P_G$, and $P_T$. In contrast, a Markov model has
+many more parameters has four sets of probabilities of $P_A$, $P_C$, $P_G$, and
+$P_T$ that differ depending on the previous nucleotide. The symbols $P_AA$,
+$P_AC$, $P_AG$, and $P_AT$ are usually used to represent the four probabilities
+for when the previous nucleotide as "A".
+
+It is common to store the probability parameters for a Markov model in a square
+matrix, which is known as a _Markov transition matrix_. The rows of the
+transition matrix represent the nucleotides found at the previous position,
+while the columns represent the nucleotides that could be found at the current
+position.
+
+```{r transition_matrix}
+nucleotides <- c("A", "C", "G", "T")
+afterAprobs <- c(0.2, 0.3, 0.3, 0.2)
+afterCprobs <- c(0.1, 0.41, 0.39, 0.1)
+afterGprobs <- c(0.25, 0.25, 0.25, 0.25)
+afterTprobs <- c(0.5, 0.17, 0.17, 0.17)
+my_transition_matrix <- matrix(c(afterAprobs, afterCprobs, afterGprobs, afterTprobs), 4, 4, byrow = TRUE)
+rownames(my_transition_matrix) <- nucleotides
+colnames(my_transition_matrix) <- nucleotides
+my_transition_matrix
+```
+
+## Creating a sequence using a Markov model
+
+The nucleotide chosen at each position at the sequence depends on the nucleotide
+chosen at the previous position. Since there are no previous nucleotides at the
+first position in the new sequence, we need to define the probabilities of
+choosing "A", "C", "G" or "T" for the first position. The symbols $\Pi_A$,
+$\Pi_C$, $\Pi_G$, and $\Pi_T$ are used to represent the probabilities of
+choosing "A", "C", "G", or "T" at the first position.
+
+```{r generate_markov_seq}
+generate_markov_seq <- function(transition_matrix, initial_probs, seq_length){
+  nucleotides      <- c("A", "C", "G", "T")
+  my_sequence      <- character()
+  first_nucleotide <- sample(nucleotides, 1, prob = initial_probs)
+  my_sequence[1]   <- first_nucleotide
+  for (i in 2:seq_length){
+    prev_nucleotide <- my_sequence[i-1]
+    probabilities   <- transition_matrix[prev_nucleotide, ]
+    nucleotide      <- sample(nucleotides, 1, replace = TRUE, prob = probabilities)
+    my_sequence[i]  <- nucleotide
+  }
+  return(my_sequence)
+}
+
+set.seed(1984)
+generate_markov_seq(my_transition_matrix, rep(0.25, 4), 30)
+```
+
+## A Hidden Markov Model of DNA sequence evolution
+
+In a Markov model, the nucleotide at a particular position in a sequence depends
+on the nucleotide found at the previous position. In contrast, in a Hidden
+Markov model (HMM), the nucleotide found at a particular position in a sequence
+depends on the _state_ at the previous nucleotide position in the sequence.
+
+The state at a sequence position is a property of that position of the sequence,
+for example, a particular HMM may model the positions along a sequence as
+belonging to either one of two states, "GC-rich" or "AT-rich". A more complex
+HMM may model the positions along a sequence as belonging to many different
+possible states, such as "promoter", "exon", "intron", and "intergenic DNA".
+
+A HMM is like having several different roulette wheels, one roulette wheel for
+each state in the HMM, for example, a "GC-rich" and an "AT-rich" roulette wheel.
+Each of the roulette wheels has four slices labelled "A", "T", "G", and "C", and
+in each roulette wheel a different fraction of the wheel is taken up by the four
+slices. That is, the "GC-rich" and "AT-rich" roulette wheels have different
+$P_A$, $P_T$, $P_G$, and $P_C$ values.
+
+If we are generating a new DNA sequence using a HMM, to decide what nucleotide
+to choose at a particular sequence position, we spin the arrow of a particular
+roulette wheel, and see in which slice it stops.
+
+How do we decide which roulette wheel to use? Well, if there are two roulette
+wheels, we tend to use the same roulette wheel that we used to choose the
+previous nucleotide in the sequence, but there is also a certain small
+probability of switching to the other roulette wheel. For example, if we used
+the "GC-rich" roulette wheel to choose the previous nucleotide in the sequence,
+there may be a 90% chance that we will use the "GC-rich" roulette wheel again to
+choose the nucleotide at the current position, but a 10% chance that we will
+switch to using the "AT-rich" roulette wheel to choose the nucleotide at the
+current position. Likewise, if we used the "AT-rich" roulette wheel to choose
+the nucleotide at the previous position, there may be 70% chance that we will
+use the "AT-rich" wheel again at this position, but a 30% chance that we will
+switch to using the "GC-rich" roulette wheel to choose the nucleotide at this
+position.
+
+### The transition matrix and emission matrix
+
+A HMM has two important matrices that hold its parameters.
+
+The first is the **HMM transition matrix**, which contains the probabilities of
+switching from one state to another. For example, in a HMM with two states, an
+AT-rich state and a GC-rich state, the transition matrix will hold the
+probabilities of switching from the AT-rich state to the GC-rich state, and of
+switching from the GC-rich state to the AT-rich state. For example, if the
+previous nucleotide was in the AT-rich state there may be a probability of 0.3
+that the current nucleotide will be in the GC-rich state, and if the previous
+nucleotide was in the GC-rich state there may be a probability of 0.1 that the
+current nucleotide will be in the AT-rich state:
+
+```{r hmm_tran_matrix}
+my_state <- c("AT-rich", "GC-rich")
+at_tran_prob <- c(0.7, 0.3)
+gc_tran_prob <- c(0.1, 0.9)
+hmm_tran_matrix <- matrix(c(at_tran_prob, gc_tran_prob), 2, 2, byrow = TRUE)
+rownames(hmm_tran_matrix) <- my_state
+colnames(hmm_tran_matrix) <- my_state
+hmm_tran_matrix
+```
+
+The second important matrix is the **HMM emission matrix**, which holds the
+probabilities of choosing the four nucleotides "A", "C", "G", and "T", in each
+of the states. In a HMM with an AT-rich state and a GC-rich state, the emission
+matrix will hold the probabilities of choosing each of the four nucleotides "A",
+"C", "G" and "T" in the AT-rich state and the probabilities of choosing "A",
+"C", "G", and "T" in the GC-rich state.
+
+```{r hmm_emi_matrix}
+my_nuc <- c("A", "C", "G", "T")
+at_emi_prob <- c(0.39, 0.1, 0.1, 0.41)
+gc_emi_prob <- c(0.1, 0.41, 0.39, 0.1)
+hmm_emi_matrix <- matrix(c(at_emi_prob, gc_emi_prob), 2, 4, byrow = TRUE)
+rownames(hmm_emi_matrix) <- my_state
+colnames(hmm_emi_matrix) <- my_nuc
+hmm_emi_matrix
+```
+
+## Creating a sequence using a HMM
+
+Generate a sequence based on state transition and state emission probabilities.
+
+```{r generate_hmm_seq}
+generate_hmm_seq <- function(transition_matrix, emission_matrix, initial_probs, seq_length){
+  nucleotides <- c("A", "C", "G", "T")
+  states      <- c("AT-rich", "GC-rich")
+  my_sequence <- character()
+  my_states   <- character()
+  
+  first_state      <- sample(states, 1, prob=initial_probs)
+  probabilities    <- emission_matrix[first_state, ]
+  first_nucleotide <- sample(nucleotides, 1, prob=probabilities)
+  my_sequence[1]   <- first_nucleotide
+  my_states[1]     <- first_state
+  
+  for (i in 2:seq_length){
+    prev_state    <- my_states[i-1]
+    state_probs   <- transition_matrix[prev_state,]
+    state         <- sample(states, 1, prob=state_probs)
+    probabilities <- emission_matrix[state,]
+    nucleotide   <- sample(nucleotides, 1, prob=probabilities)
+    my_sequence[i] <- nucleotide
+    my_states[i]  <- state
+  }
+  
+  return(list(seq = my_sequence, states = my_states))
+}
+
+set.seed(1984)
+init_prob <- c(0.5, 0.5)
+my_seq <- generate_hmm_seq(hmm_tran_matrix, hmm_emi_matrix, init_prob, 30)
+my_seq
+```
+
+## Inferring the states of a HMM that generated a sequence
+
+If we have a HMM with two states, "GC-rich" and "AT-rich", and we know the
+transmission and emission matrices of the HMM, can we take some new DNA
+sequence, and figure out which state (GC-rich or AT-rich) is the most likely to
+have generated each nucleotide position in that DNA sequence? This is a common
+problem in bioinformatics. It is called the problem of finding the most probable
+state path, as it essentially consists of assigning the most likely state to
+each position in the DNA sequence. The problem of finding the most probable
+state path is also sometimes called segmentation. For example, given a DNA
+sequence of 1,000 nucleotides, you may wish to use your HMM to segment the
+sequence into blocks that were probably generated by the "GC-rich" state or by
+the "AT-rich" state.
+
+The problem of finding the most probable state path given a HMM and a sequence
+(i.e. the problem of segmenting a sequence using a HMM), can be solved by an
+algorithm called the Viterbi algorithm. As its output, the Viterbi algorithm
+gives for each nucleotide position in a DNA sequence, the state of your HMM that
+most probably generated the nucleotide in that position. For example, if you
+segmented a particular DNA sequence of 1,000 nucleotides using a HMM with
+"AT-rich" and "GC-rich" states, the Viterbi algorithm may tell you that
+nucleotides 1-343 were most probably generated by the AT-rich state, nucleotides
+344-900 were most probably generated by the GC-rich state, and 901-1000 were
+most probably generated by the AT-rich state.
+
+```{r viterbi}
+most_probable_state <- function(sequence, transition_matrix, emission_matrix){
+  states <- rownames(emission_matrix)
+  sequence <- toupper(sequence)
+  num_states <- dim(transition_matrix)[1]
+  v <- matrix(NA, nrow = length(sequence), ncol = dim(transition_matrix)[1])
+  v[1, ] <- 0
+  v[1,1] <- 1
+  for (i in 2:length(sequence)){
+    for (l in 1:num_states){
+      state_l_prob_nucleotide_i <- emission_matrix[l,sequence[i]]
+      v[i,l] <-  state_l_prob_nucleotide_i * max(v[(i-1),] * transition_matrix[,l])
+    }
+  }
+  most_probable_state_path <- apply(v, 1, function(x) which.max(x))
+  print(states[most_probable_state_path])
+}
+
+inferred <- most_probable_state(my_seq$seq, hmm_tran_matrix, hmm_emi_matrix)
+expected <- my_seq$states
+
+tibble(
+  nucleotide = 1:length(expected),
+  actual = factor(expected),
+  inferred = factor(inferred)
+) |>
+  pivot_longer(-nucleotide, names_to = "property", values_to = "state") -> res
+
+res
+```
+
+Plot inferred versus expected states.
+
+```{r plot_res}
+ggplot(res, aes(nucleotide, property, fill = state)) +
+  geom_tile() +
+  scale_fill_manual(values = c("#CED46A", "#07553B")) +
+  theme(axis.title.y = element_blank())
+```
+
+## A HMM of protein sequence evolution
+
+It is possible to use HMMs to model protein sequence evolution. When using a HMM
+to model DNA sequence evolution, we may have states such as "AT-rich" and
+"GC-rich". Similarly, when using a HMM to model protein sequence evolution, we
+may have states such as "hydrophobic" and "hydrophilic". In a protein HMM with
+"hydrophilic" and "hydrophilic" states, the "hydrophilic" HMM will have
+probabilities $P_A$, $P_R$, $P_C$, ... of choosing each of the 20 amino acids
+alanine (A), arginine (R), cysteine (C), etc. when in that state. Similarly, the
+"hydrophilic" state will have different probabilities of choosing each of the 20
+amino acids. The probability of choosing a hydrophobic amino acid such as
+alanine will be higher in the "hydrophobic" state than in the "hydrophilic"
+state. A HMM of protein sequence evolution also defines a certain probability of
+switching from the "hydrophilic" state to the "hydrophobic" state, and a certain
+probability of switching from the "hydrophobic" state to the "hydrophilic"
+state.
+
+## Summary
+
+HMMs were used to assign the most probable states to nucleotides that we
+presumably didn't know (they are hidden).
+
+A HMM can be defined by three parameters $(A, B, \pi)$, where:
+
+1. $A$ is a matrix of state transition probabilities (probability of switching
+   states, given the current state),
+2. $B$ is a vector of state emission probabilities (probabilities of a certain
+   nucleotide for a given state), and
+3. $\pi$ is a vector of initial state distributions (probability of the starting
+   state).
