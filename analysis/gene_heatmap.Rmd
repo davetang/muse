@@ -1,0 +1,87 @@
+---
+title: "Gene expression heatmap using ARCHS4 data"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pheatmap)
+```
+
+Prepare data using base R.
+
+```{r my_df}
+lapply(
+  list.files("data/archs4", pattern = ".csv$", full.names = TRUE),
+  function(x){
+    cbind(gene = sub("\\.\\w+$", "", basename(x)), read.csv(x))
+  }
+) |>
+  do.call("rbind", args = _) -> my_df
+
+# Split `id` column.
+do.call("rbind", strsplit(x = my_df$id, split = "\\.")) |>
+  as.data.frame() -> id_split
+
+colnames(id_split) <- c('root', 'system', 'organ', 'tissue')
+
+# Rename tissues.
+cap_first <- function(x){
+  s <- strsplit(x, "")[[1]][1]
+  return(sub(s, toupper(s), x))
+}
+
+id_split$tissue <- tolower(id_split$tissue)
+id_split$tissue <- sapply(id_split$tissue, cap_first)
+
+my_df <- cbind(my_df, id_split)
+
+# Order `my_df` by system.
+my_df <- my_df[order(my_df$gene, my_df$system), ]
+my_df$tissue <- factor(my_df$tissue, levels = unique(my_df$tissue))
+
+head(my_df)
+```
+
+Back to wide format.
+
+```{r pivot_wider}
+my_df |>
+  dplyr::select(gene, median, tissue) |>
+  tidyr::pivot_wider(names_from = tissue, values_from = median) -> my_df_wide
+```
+
+Convert to matrix and plot.
+
+```{r pheatmap}
+my_mat <- as.matrix(my_df_wide[, -1])
+row.names(my_mat) <- my_df_wide$gene
+
+pheatmap(my_mat)
+```
+
+Create sample annotation.
+
+```{r sample_anno}
+my_order <- colnames(my_mat)
+
+my_df |>
+  dplyr::select(system, tissue) |>
+  dplyr::distinct() |>
+  dplyr::arrange(match(tissue, my_order)) |>
+  dplyr::select(-tissue) -> sample_anno
+
+row.names(sample_anno) <- my_order
+head(sample_anno)
+```
+
+Heatmap with system annotation.
+
+```{r pheatmap_with_anno}
+pheatmap(my_mat, annotation_col = sample_anno)
+```
