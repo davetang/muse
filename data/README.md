@@ -14,4 +14,19 @@ for g in SLC5A1 CYP2C18 ADH1C SLC13A2 \
   SOWAHB CBLC RNF186; do
   gget archs4 -w tissue ${g} --csv > archs4/${g}.csv
 done
+
+genes=(
+TP53
+PIK3CA
+MYC
+PTEN
+CCND1
+ERBB2
+FGFR1
+GATA3
+)
+
+for g in ${genes[@]}; do
+  gget archs4 -w tissue ${g} --csv > archs4/cancer/${g}.csv
+done
 ```
