@@ -59,7 +59,7 @@ my_df |>
 
 Convert to matrix and plot.
 
-```{r pheatmap}
+```{r pheatmap, fig.width=12, fig.height=6}
 my_mat <- as.matrix(my_df_wide[, -1])
 row.names(my_mat) <- my_df_wide$gene
 
@@ -83,7 +83,7 @@ head(sample_anno)
 
 Heatmap with system annotation.
 
-```{r pheatmap_with_anno}
+```{r pheatmap_with_anno, fig.width=12, fig.height=6}
 pheatmap(my_mat, annotation_col = sample_anno)
 ```
 
