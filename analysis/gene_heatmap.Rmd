@@ -11,13 +11,14 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(pheatmap)
+library(plotly)
 ```
 
 Prepare data using base R.
 
 ```{r my_df}
 lapply(
-  list.files("data/archs4", pattern = ".csv$", full.names = TRUE),
+  list.files("data/archs4/cancer", pattern = ".csv$", full.names = TRUE),
   function(x){
     cbind(gene = sub("\\.\\w+$", "", basename(x)), read.csv(x))
   }
@@ -84,4 +85,16 @@ Heatmap with system annotation.
 
 ```{r pheatmap_with_anno}
 pheatmap(my_mat, annotation_col = sample_anno)
+```
+
+Interactive heatmap.
+
+```{r plotly_heatmap, fig.height=6, fig.width=12}
+plot_ly(
+  x=colnames(my_mat),
+  y=rownames(my_mat),
+  z = my_mat,
+  colors = colorRamp(c("green", "red")),
+  type = "heatmap"
+)
 ```
