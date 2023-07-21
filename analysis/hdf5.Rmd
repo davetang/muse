@@ -1,0 +1,178 @@
+---
+title: "Working with HDF5 data in R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(hdf5r)
+```
+
+# Introduction
+
+From [Wikipedia](https://en.wikipedia.org/wiki/Hierarchical_Data_Format):
+
+> Hierarchical Data Format (HDF) is a set of file formats (HDF4, HDF5) designed
+to store and organize large amounts of data. Originally developed at the U.S.
+National Center for Supercomputing Applications, it is supported by The HDF
+Group, a non-profit corporation whose mission is to ensure continued development
+of HDF5 technologies and the continued accessibility of data stored in HDF.
+>
+> In keeping with this goal, the HDF libraries and associated tools are
+available under a liberal, BSD-like license for general use. HDF is supported by
+many commercial and non-commercial software platforms and programming languages.
+The freely available HDF distribution consists of the library, command-line
+utilities, test suite source, Java interface, and the Java-based HDF Viewer
+(HDFView).
+>
+> The current version, HDF5, differs significantly in design and API from the
+major legacy version HDF4.
+
+## Data
+
+[Download ARCHS4 HDF5 data](https://maayanlab.cloud/archs4/download.html) and
+load using the [hdf5r](https://github.com/hhoeflin/hdf5r) package.
+
+```{r human}
+human <- H5File$new(filename = "/data/archs4/human_gene_v2.2.h5", mode = "r")
+human
+```
+
+Different groups.
+
+```{r groups}
+human[["data"]]
+human[["meta"]]
+```
+
+## Getting information about objects
+
+Use the `names()` function to get all names of objects.
+
+```{r names}
+names(human)
+```
+
+The `ls()` function provides more information.
+
+```{r ls}
+human$ls()
+```
+
+List functions.
+
+```{r list}
+hdf5r::list.attributes(human)
+hdf5r::list.datasets(human)
+hdf5r::list.groups(human)
+hdf5r::list.objects(human)
+```
+
+## Get data
+
+Function to get data.
+
+```{r get_data}
+wrap <- function(x){
+  x <- sub("^", "[['", x)
+  sub("$", "']]", x)
+}
+
+get_data <- function(obj, ds, ...){
+  s <- unlist(strsplit(x = ds, split = "/"))
+  txt <- paste0(obj, paste(sapply(s, wrap), collapse = "", sep = ""), ...)
+  eval(parse(text = txt))
+}
+```
+
+Check out some of the data.
+
+```{r check_out_data}
+get_data('human', 'meta/samples/title', '[1:5]')
+get_data('human', 'meta/samples/sample', '[1:5]')
+get_data('human', 'meta/samples/geo_accession', '[1:5]')
+get_data('human', 'meta/samples/series_id', '[1:5]')
+get_data('human', 'meta/samples/characteristics_ch1', '[1:5]')
+get_data('human', 'meta/samples/extract_protocol_ch1', '[1]')
+get_data('human', 'meta/samples/source_name_ch1', '[1:5]')
+```
+
+## Store gene symbols
+
+Gene symbols.
+
+```{r meta_genes_symbol}
+human[['meta']][['genes']][['symbol']]
+```
+
+Store gene symbols.
+
+```{r my_gene_sym}
+my_idx <- 1:human[['meta']][['genes']][['symbol']]$maxdims
+my_gene_sym <- human[['meta']][['genes']][['symbol']][my_idx]
+head(my_gene_sym)
+```
+
+## Source
+
+Check out some sources.
+
+```{r example_source}
+unique(get_data('human', 'meta/samples/source_name_ch1', '[1:100]'))
+```
+
+Store all sources.
+
+```{r store_source}
+my_idx <- 1:human[['meta']][['samples']][['source_name_ch1']]$maxdims
+my_source <- human[['meta']][['samples']][['source_name_ch1']][my_idx]
+head(my_source)
+```
+
+Search.
+
+```{r length_source}
+length(my_source[grepl("immune", my_source, ignore.case = TRUE)])
+length(my_source[grepl("dendritic", my_source, ignore.case = TRUE)])
+```
+
+## Expression
+
+Genes are columns and rows are samples.
+
+```{r data_expression}
+exp_data <- human[['data']][['expression']]
+exp_data
+```
+
+Sum across first ten samples.
+
+```{r sum_ten_samples}
+apply(exp_data[1:10, ], 1, sum)
+```
+
+TP53 position.
+
+```{r tp53}
+tp53_idx <- match("TP53", my_gene_sym)
+tp53_idx
+```
+
+## Clean up
+
+Close.
+
+```{r close_all}
+human$close_all()
+```
+
+## Related
+
+* [Official ARCHS4 companion package](https://github.com/MaayanLab/archs4py).
+* [ARCHS4 help page](https://maayanlab.cloud/archs4/help.html)
