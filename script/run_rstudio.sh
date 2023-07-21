@@ -18,6 +18,7 @@ docker run -d \
    -p ${port}:8787 \
    --name ${container_name} \
    -v ${package_dir}:/packages \
+   -v ${HOME}/data:/data \
    -v ${path}:/home/rstudio/muse \
    -e PASSWORD=password \
    -e USERID=$(id -u) \
