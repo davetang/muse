@@ -444,15 +444,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebd5654d69c94902263fe20a5df7a20c48f2e9326targetblankbd5654da">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree23b5720c4a5cce45604684333ba223642bac863ctargetblank23b5720a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/bd5654d69c94902263fe20a5df7a20c48f2e9326" target="_blank">bd5654d</a>
+<a href="https://github.com/davetang/muse/tree/23b5720c4a5cce45604684333ba223642bac863c" target="_blank">23b5720</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebd5654d69c94902263fe20a5df7a20c48f2e9326targetblankbd5654da"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree23b5720c4a5cce45604684333ba223642bac863ctargetblank23b5720a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -462,7 +462,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/bd5654d69c94902263fe20a5df7a20c48f2e9326" target="_blank">bd5654d</a>.
+<a href="https://github.com/davetang/muse/tree/23b5720c4a5cce45604684333ba223642bac863c" target="_blank">23b5720</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -547,6 +547,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/23b5720c4a5cce45604684333ba223642bac863c/analysis/reshape.Rmd" target="_blank">23b5720</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-07-26
+</td>
+<td>
+Elaboration
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/3e572d636a023a07e0dc3bdd4921d758ecd84afe/docs/reshape.html" target="_blank">3e572d6</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-07-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/bd5654d69c94902263fe20a5df7a20c48f2e9326/analysis/reshape.Rmd" target="_blank">bd5654d</a>
 </td>
 <td>
@@ -569,21 +603,25 @@ Convert wide and long data
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>I use <a href="https://www.tidyverse.org/">tidyverse packages</a> a
-lot and I prefer them over base R functions, especially when it comes to
-plotting. However, sometimes I want to write an R script with no
-dependencies. This is known as using base R functions, i.e. using
-functions that come with R. Theoretically this means that anyone with R
-can run the script, if I don’t use any features introduced in later
-versions of R, like the base R pipe.</p>
-<p>The <code>pivot_longer</code> and <code>pivot_wider</code> functions
-in the <a href="https://tidyr.tidyverse.org/">tidyr package</a> converts
-data into long and wide format, respectively. You may already be
-familiar with wide data; one example of wide data is a gene expression
-data, where gene expression for a gene is measured and stored in
-different tissues.</p>
+lot and most of the times I prefer them over base R functions,
+especially when it comes to plotting. However, sometimes I want to write
+an R script with no dependencies. This is typically referred to as using
+base R, i.e. using only functions that come with R. Theoretically this
+means that anyone with R installed can run the script. (This is not a
+guarantee though because people use different versions of R and if my
+script uses functionality introduced in a later version of R, like the
+base R pipe, users with outdated versions of R will not be able to run
+the script.)</p>
+<p>In one of my scripts, I need to convert data from long format to
+wide. The <code>pivot_longer</code> and <code>pivot_wider</code>
+functions in the <a href="https://tidyr.tidyverse.org/">tidyr
+package</a> can be used to convert data into long and wide format,
+respectively. You may already be familiar with data in wide format; one
+example of wide data is a gene expression data, where gene expression
+for a gene is measured in different tissues.</p>
 <pre class="r"><code>gene_exp &lt;- read.delim(
   file = &quot;https://davetang.org/file/TagSeqExample.tab&quot;,
-  header = TRUE 
+  header = TRUE
 )
 
 head(gene_exp)</code></pre>
@@ -594,7 +632,8 @@ head(gene_exp)</code></pre>
 4 Gene_00004  75  84 241 149 271 257
 5 Gene_00005  10  16   4   0   4  10
 6 Gene_00006 129 126 451 223 243 149</code></pre>
-<p>Long data looks like this.</p>
+<p>We can convert the wide gene expression data to long format using
+<code>pivot_longer</code>.</p>
 <pre class="r"><code>tidyr::pivot_longer(
   data = gene_exp,
   cols = -gene,
@@ -624,6 +663,43 @@ ggplot(gene_exp_long[1:(6*20), ], aes(gene, count, fill = sample)) +
   theme(axis.title.y = element_blank()) +
   NULL</code></pre>
 <p><img src="figure/reshape.Rmd/gene_exp_long_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-gene_exp_long_plot-1">
+Past versions of gene_exp_long_plot-1.png
+</button>
+</p>
+<div id="fig-gene_exp_long_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/3e572d636a023a07e0dc3bdd4921d758ecd84afe/docs/figure/reshape.Rmd/gene_exp_long_plot-1.png" target="_blank">3e572d6</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-07-26
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Converting long data back to wide data can be done using
 <code>pivot_wider</code>.</p>
 <pre class="r"><code>tidyr::pivot_wider(
@@ -646,12 +722,14 @@ ggplot(gene_exp_long[1:(6*20), ], aes(gene, count, fill = sample)) +
  9 Gene_00009   202   122   256    43   287   357
 10 Gene_00010    10     8    56   145    14    15
 # ℹ 18,750 more rows</code></pre>
-<p>How do we do this using base R?</p>
+<p>Now, how do we do this using base R?</p>
 </div>
 <div id="reshape" class="section level1">
 <h1>Reshape</h1>
-<p>The documentation for <code>reshape()</code> describes the function
-as:</p>
+<p>If you look online for how to mimic the <code>pivot_longer</code> and
+<code>pivot_wider</code> functions in base R, you will be introduced to
+the <code>reshape()</code> function. The documentation for
+<code>reshape()</code> describes the function as:</p>
 <blockquote>
 <p>This function reshapes a data frame between “wide” format (with
 repeated measurements in separate columns of the same row) and “long”
@@ -672,7 +750,8 @@ used:</p>
 <pre><code># reshape(data, direction = &quot;long&quot;,
 #         varying = c(___), # vector 
 #         sep)              # to help guess &#39;v.names&#39; and &#39;times&#39;</code></pre>
-<p>Wide to long using <code>reshape</code>.</p>
+<p>Here we convert the wide gene expression data to long format using
+<code>reshape</code>.</p>
 <pre class="r"><code>reshape(
   data = gene_exp,
   direction = &quot;long&quot;,
@@ -713,7 +792,8 @@ be the column names of the data frame minus the variable to keep
 constant. <code>v.names</code> corresponds to <code>values_to</code> and
 <code>timevar</code> corresponds to <code>names_to</code> in
 <code>pivot_longer</code>.</p>
-<p>Long to wide using <code>reshape</code>.</p>
+<p>The <code>reshape()</code> function can also be used to convert long
+format back to wide.</p>
 <pre class="r"><code>reshape(
   data = out,
   direction = &quot;wide&quot;,
@@ -739,18 +819,24 @@ head(gene_exp)</code></pre>
 19 Gene_00004  75  84 241 149 271 257
 25 Gene_00005  10  16   4   0   4  10
 31 Gene_00006 129 126 451 223 243 149</code></pre>
+<p>It wasn’t obvious to me how I could control the name of the columns
+(<code>count</code> is added to the start of the column name) so I
+simply added one more line of code to remove the variable name.</p>
 </div>
 <div id="conclusions" class="section level1">
 <h1>Conclusions</h1>
 <p>R is a statistical language and the design/implementation of
 functions, their arguments, and documentation reflect this. I’m not a
-statistician and reading the documentation for base R functions is
-difficult for me. This is one reason why I prefer the Tidyverse.</p>
+statistician and a lot of the times when I’m reading the documentation
+for base R functions, it is not immediately obvious to me how I should
+use it. Personally, Tidyverse packages are more intuitive and easier to
+use, which is probably the main reason why I prefer it.</p>
 <p>However, as I mentioned in the introduction, there are times when I
 want an R script to have little to no dependencies. In one of my
 scripts, I need to convert data back to wide format and used
 <code>pivot_wider</code>. But now I can use the base R function
-<code>reshape</code>.</p>
+<code>reshape</code> without having to install the <code>tidyr</code>
+package.</p>
 <div id="further-reading" class="section level2">
 <h2>Further reading</h2>
 <ul>
