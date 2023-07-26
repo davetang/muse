@@ -15,29 +15,34 @@ library(tidyr)
 
 # Introduction
 
-I use [tidyverse packages](https://www.tidyverse.org/) a lot and I prefer them
-over base R functions, especially when it comes to plotting. However, sometimes
-I want to write an R script with no dependencies. This is known as using base R
-functions, i.e. using functions that come with R. Theoretically this means that
-anyone with R can run the script, if I don't use any features introduced in
-later versions of R, like the base R pipe.
+I use [tidyverse packages](https://www.tidyverse.org/) a lot and most of the
+times I prefer them over base R functions, especially when it comes to
+plotting. However, sometimes I want to write an R script with no dependencies.
+This is typically referred to as using base R, i.e. using only functions that
+come with R. Theoretically this means that anyone with R installed can run the
+script. (This is not a guarantee though because people use different versions
+of R and if my script uses functionality introduced in a later version of R,
+like the base R pipe, users with outdated versions of R will not be able to run
+the script.)
 
-The `pivot_longer` and `pivot_wider` functions in the [tidyr
-package](https://tidyr.tidyverse.org/) converts data into long and wide format,
-respectively. You may already be familiar with wide data; one example of wide
-data is a gene expression data, where gene expression for a gene is measured and
-stored in different tissues.
+In one of my scripts, I need to convert data from long format to wide. The
+`pivot_longer` and `pivot_wider` functions in the [tidyr
+package](https://tidyr.tidyverse.org/) can be used to convert data into long
+and wide format, respectively. You may already be familiar with data in wide
+format; one example of wide data is a gene expression data, where gene
+expression for a gene is measured in different tissues.
 
 ```{r gene_exp}
 gene_exp <- read.delim(
   file = "https://davetang.org/file/TagSeqExample.tab",
-  header = TRUE 
+  header = TRUE
 )
 
 head(gene_exp)
 ```
 
-Long data looks like this.
+We can convert the wide gene expression data to long format using
+`pivot_longer`.
 
 ```{r gene_exp_long}
 tidyr::pivot_longer(
@@ -75,11 +80,13 @@ tidyr::pivot_wider(
 )
 ```
 
-How do we do this using base R?
+Now, how do we do this using base R?
 
 # Reshape
 
-The documentation for `reshape()` describes the function as:
+If you look online for how to mimic the `pivot_longer` and `pivot_wider`
+functions in base R, you will be introduced to the `reshape()` function. The
+documentation for `reshape()` describes the function as:
 
 > This function reshapes a data frame between "wide" format (with repeated
 > measurements in separate columns of the same row) and "long" format (with the
@@ -104,7 +111,7 @@ The documentation also shows how `reshape()` is typically used:
 #         sep)              # to help guess 'v.names' and 'times'
 ```
 
-Wide to long using `reshape`.
+Here we convert the wide gene expression data to long format using `reshape`.
 
 ```{r reshape_long}
 reshape(
@@ -139,7 +146,7 @@ The arguments for `varying` and `times` should be the column names of the data
 frame minus the variable to keep constant. `v.names` corresponds to `values_to`
 and `timevar` corresponds to `names_to` in `pivot_longer`.
 
-Long to wide using `reshape`.
+The `reshape()` function can also be used to convert long format back to wide.
 
 ```{r reshape_wide}
 reshape(
@@ -155,17 +162,23 @@ head(gene_exp)
 head(out2)
 ```
 
+It wasn't obvious to me how I could control the name of the columns (`count` is
+added to the start of the column name) so I simply added one more line of code
+to remove the variable name.
+
 # Conclusions
 
 R is a statistical language and the design/implementation of functions, their
-arguments, and documentation reflect this. I'm not a statistician and reading
-the documentation for base R functions is difficult for me. This is one reason
-why I prefer the Tidyverse.
+arguments, and documentation reflect this. I'm not a statistician and a lot of
+the times when I'm reading the documentation for base R functions, it is not
+immediately obvious to me how I should use it. Personally, Tidyverse packages
+are more intuitive and easier to use, which is probably the main reason why I
+prefer it.
 
 However, as I mentioned in the introduction, there are times when I want an R
 script to have little to no dependencies. In one of my scripts, I need to
 convert data back to wide format and used `pivot_wider`. But now I can use the
-base R function `reshape`.
+base R function `reshape` without having to install the `tidyr` package.
 
 ## Further reading
 
