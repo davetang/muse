@@ -1,0 +1,142 @@
+---
+title: "Reading a list of files into a single R data frame"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Introduction
+
+I had been using `map_dfr` from the [purrr package](https://purrr.tidyverse.org/) to load multiple files into one single data frame. But this function has been superseded with the following explanation:
+
+> The functions were superseded in purrr 1.0.0 because their names suggest they work like _lgl(), _int(), etc which require length 1 outputs, but actually they return results of any size because the results are combined without any size checks. Additionally, they use dplyr::bind_rows() and dplyr::bind_cols() which require dplyr to be installed and have confusing semantics with edge cases. Superseded functions will not go away, but will only receive critical bug fixes.
+
+I'll generate some random files to illustrate how `map_dfr` is used. I use several packages from the [Tidyverse](https://www.tidyverse.org/), so if you want to follow along, you can install them all at once by installing the **tidyverse** package.
+
+```{r tidyverse_install, eval=FALSE}
+install.packages("tidyverse")
+```
+
+Generate some random files.
+
+```{r random_files}
+random_df <- function(num_row = 100, num_col = 100, seed = 1984){
+  set.seed(seed)
+  matrix(
+    data = 
+      runif(
+        n = num_row * num_col,
+        min = 0,
+        max = 1
+      ),
+    nrow = num_row
+  ) |> as.data.frame()
+}
+
+outdir <- "/tmp/random1984"
+
+random_files <- function(nfiles, prefix = 'x', outdir = 'random', leading_zero = 6){
+  if(!dir.exists(outdir)){
+    dir.create(outdir)
+  }
+  purrr::map(1:nfiles, function(x){
+    write.csv(
+      x = random_df(seed = x),
+      file = paste0(outdir, '/', prefix, stringr::str_pad(x, leading_zero, pad = 0), ".csv"),
+      row.names = FALSE
+    )
+  }) -> dev_null
+}
+
+random_files(10, outdir = outdir)
+
+list.files(outdir)
+```
+
+We can easily load all the files into a single data frame using `map_dfr`.
+
+```{r map_dfr}
+my_df <- map_dfr(list.files(outdir, full.names = TRUE), readr::read_csv, show_col_types = FALSE)
+dim(my_df)
+```
+
+Here's how to do the same thing using `pmap` and `bind_rows`. (`pmap` comes with a basic progress bar, which is nice.) Note that I am using the base R pipe (`|>`), which requires R-4.1.0 or higher.
+
+```{r pmap}
+purrr::pmap(
+  list(list.files(outdir, full.names = TRUE)),
+  readr::read_csv, show_col_types = FALSE, .progress = FALSE
+) |>
+  dplyr::bind_rows() -> my_df2
+
+all.equal(my_df, my_df2)
+```
+
+One of the reasons `map_dfr` was superseded is because it requires `dplyr::bind_rows`, which adds a package dependency. We can use the base R functions `do.call` and `rbind()` instead. In addition, my code above uses `read_csv` from the [readr](https://readr.tidyverse.org/) package. We can also substitute that function using the base R `read.csv()` function too.
+
+```{r pmap_base_read_csv}
+purrr::pmap(
+  list(list.files(outdir, full.names = TRUE)),
+  read.csv, .progress = TRUE
+) |>
+  do.call("rbind", args = _) -> my_df3
+
+all.equal(my_df2, my_df3)
+```
+
+The message above from `all.equal` is saying that the object attributes are different. We can use the `attributes()` function to see the differences.
+
+```{r attributes_df2}
+names(attributes(my_df2))
+```
+
+```{r attributes_df3}
+names(attributes(my_df3))
+```
+
+Besides the object attributes, the values in the data frames are equal.
+
+We can go one more step in removing the purrr dependency by using `lapply` instead. The code below uses all base R functions to load a list of files.
+
+```{r lapply_base_read_csv}
+lapply(
+  list.files(outdir, full.names = TRUE),
+  read.csv
+) |>
+  do.call("rbind", args = _) -> my_df4
+
+all.equal(my_df3, my_df4)
+```
+
+At this point, you may be wondering whether we needed the Tidyverse packages in the first place. There has already been a lot of discussion on the topic of base R versus Tidyverse, so look it up if you are interested. The point of this post was to illustrate how to read a list of files into a single data frame.
+
+One nice thing about `map_dfr` is the `.id` parameter, which adds an id column that can be useful for distinguishing the data. The way to use it is to name the input vector.
+
+```{r map_dfr_with_id}
+my_files <- list.files(outdir, full.names = TRUE)
+names(my_files) <- sub("\\.\\w+$", "", basename(my_files))
+my_df <- map_dfr(my_files, readr::read_csv, show_col_types = FALSE, .id = "file")
+my_df[1:6, 1:6]
+```
+
+This can be achieved using base R as follows.
+
+```{r lapply_base_read_csv_with_id}
+lapply(
+  list.files(outdir, full.names = TRUE),
+  function(x){
+    cbind(file = sub("\\.\\w+$", "", basename(x)), read.csv(x))
+  }
+) |>
+  do.call("rbind", args = _) -> my_df5
+
+my_df5[1:6, 1:6]
+```
