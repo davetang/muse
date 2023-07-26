@@ -1,0 +1,172 @@
+---
+title: "The tidyr pivot_longer and pivot_wider functions using base R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyr)
+```
+
+# Introduction
+
+I use [tidyverse packages](https://www.tidyverse.org/) a lot and I prefer them
+over base R functions, especially when it comes to plotting. However, sometimes
+I want to write an R script with no dependencies. This is known as using base R
+functions, i.e. using functions that come with R. Theoretically this means that
+anyone with R can run the script, if I don't use any features introduced in
+later versions of R, like the base R pipe.
+
+The `pivot_longer` and `pivot_wider` functions in the [tidyr
+package](https://tidyr.tidyverse.org/) converts data into long and wide format,
+respectively. You may already be familiar with wide data; one example of wide
+data is a gene expression data, where gene expression for a gene is measured and
+stored in different tissues.
+
+```{r gene_exp}
+gene_exp <- read.delim(
+  file = "https://davetang.org/file/TagSeqExample.tab",
+  header = TRUE 
+)
+
+head(gene_exp)
+```
+
+Long data looks like this.
+
+```{r gene_exp_long}
+tidyr::pivot_longer(
+  data = gene_exp,
+  cols = -gene,
+  names_to = "sample",
+  values_to = "count"
+) -> gene_exp_long
+
+head(gene_exp_long)
+```
+
+There are advantages to using wide and long format but I typically convert my
+wide data to long format for use with [ggplot2](https://ggplot2.tidyverse.org/).
+
+```{r gene_exp_long_plot}
+library(ggplot2)
+
+ggplot(gene_exp_long[1:(6*20), ], aes(gene, count, fill = sample)) +
+  geom_col(position = position_dodge()) +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.title.y = element_blank()) +
+  NULL
+```
+
+Converting long data back to wide data can be done using `pivot_wider`.
+
+```{r pivot_wider}
+tidyr::pivot_wider(
+  data = gene_exp_long,
+  id_cols = gene,
+  names_from = sample,
+  values_from = count
+)
+```
+
+How do we do this using base R?
+
+# Reshape
+
+The documentation for `reshape()` describes the function as:
+
+> This function reshapes a data frame between "wide" format (with repeated
+> measurements in separate columns of the same row) and "long" format (with the
+> repeated measurements in separate rows).
+
+The documentation also shows how `reshape()` is typically used:
+
+* Typical usage for converting from long to wide format:
+
+```
+# reshape(data, direction = "wide",
+#         idvar = "___", timevar = "___", # mandatory
+#         v.names = c(___),    # time-varying variables
+#         varying = list(___)) # auto-generated if missing
+```
+
+* Typical usage for converting from wide to long format:
+
+```
+# reshape(data, direction = "long",
+#         varying = c(___), # vector 
+#         sep)              # to help guess 'v.names' and 'times'
+```
+
+Wide to long using `reshape`.
+
+```{r reshape_long}
+reshape(
+  data = gene_exp,
+  direction = "long",
+  varying = colnames(gene_exp)[-1],
+  v.names = "count",
+  times = colnames(gene_exp)[-1],
+  timevar = "sample"
+) -> out
+
+# order by gene like pivot_longer
+out <- out[order(out$gene), ]
+
+# remove row names
+row.names(out) <- NULL
+
+# remove id column
+out$id <- NULL
+
+head(out)
+
+table(out$count == gene_exp_long$count)
+```
+
+We achieved the same* result using `reshape` but with a bit more typing. (*I
+simply compared the count values above instead of using `identical` or
+`all.equal` because `reshape` adds attributes to the object that make it
+different to the `pivot_longer` object.)
+
+The arguments for `varying` and `times` should be the column names of the data
+frame minus the variable to keep constant. `v.names` corresponds to `values_to`
+and `timevar` corresponds to `names_to` in `pivot_longer`.
+
+Long to wide using `reshape`.
+
+```{r reshape_wide}
+reshape(
+  data = out,
+  direction = "wide",
+  idvar = "gene",
+  timevar = "sample",
+  v.names = "count"
+) -> out2
+
+colnames(out2) <- sub("^count\\.", "", colnames(out2))
+head(gene_exp)
+head(out2)
+```
+
+# Conclusions
+
+R is a statistical language and the design/implementation of functions, their
+arguments, and documentation reflect this. I'm not a statistician and reading
+the documentation for base R functions is difficult for me. This is one reason
+why I prefer the Tidyverse.
+
+However, as I mentioned in the introduction, there are times when I want an R
+script to have little to no dependencies. In one of my scripts, I need to
+convert data back to wide format and used `pivot_wider`. But now I can use the
+base R function `reshape`.
+
+## Further reading
+
+* [Tidy data](https://cran.r-project.org/web/packages/tidyr/vignettes/tidy-data.html)
