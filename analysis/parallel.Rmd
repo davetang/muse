@@ -24,6 +24,7 @@ There are several packages that make it easy to run tasks in parallel:
 * The [doParallel](https://cran.r-project.org/web/packages/doParallel/vignettes/gettingstartedParallel.pdf) package is a parallel backend for the `foreach` package and acts as an interface between `foreach` and the `parallel` package.
 * The [BiocParallel](https://bioconductor.org/packages/release/bioc/html/BiocParallel.html) package tailored for use with Bioconductor.
 * The [furrr](https://furrr.futureverse.org/) package parallelises mapping functions from the [purrr](https://purrr.tidyverse.org/) package.
+* The [pbapply](https://github.com/psolymos/pbapply#parallel-backends) package, which is a package for adding a progress bar, but supports parallel execution.
 
 ## `system.time`
 
@@ -107,6 +108,21 @@ system.time(
 stopCluster(cl)
 
 identical(my_sum_mc, my_sum_sock)
+```
+
+## `pbapply`
+
+Parallelisation with a progress bar!
+
+```{r pbapply}
+library(pbapply)
+cl <- makeCluster(params$threads)
+system.time(
+  my_sum_pb <- pblapply(my_list, summary, cl = cl)
+)
+stopCluster(cl)
+
+identical(my_sum_mc, my_sum_pb)
 ```
 
 ## `doParallel`
