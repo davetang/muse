@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2022-11-17" />
+<meta name="date" content="2023-07-26" />
 
 <title>Parallel computation in R</title>
 
-<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.22/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -30,14 +30,14 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Parallel computation in R</h1>
-<h4 class="date">2022-11-17</h4>
+<h4 class="date">2023-07-26</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2022-11-17
+<strong>Last updated:</strong> 2023-07-26
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb2043f3767f291d0bef5823529746cba28dcfd66targetblankb2043f3a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9367b80c3401f8a8aa5bcfe13df0dea59b101500targetblank9367b80a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/b2043f3767f291d0bef5823529746cba28dcfd66" target="_blank">b2043f3</a>
+<a href="https://github.com/davetang/muse/tree/9367b80c3401f8a8aa5bcfe13df0dea59b101500" target="_blank">9367b80</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb2043f3767f291d0bef5823529746cba28dcfd66targetblankb2043f3a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9367b80c3401f8a8aa5bcfe13df0dea59b101500targetblank9367b80a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/b2043f3767f291d0bef5823529746cba28dcfd66" target="_blank">b2043f3</a>.
+<a href="https://github.com/davetang/muse/tree/9367b80c3401f8a8aa5bcfe13df0dea59b101500" target="_blank">9367b80</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -554,13 +554,24 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    r_packages_4.1.2/
-    Ignored:    r_packages_4.2.0/
+    Ignored:    r_packages_4.3.0/
 
 Untracked files:
     Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  analysis/tss_xgboost.Rmd
+    Untracked:  code/multiz100way/
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
     Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
     Untracked:  data/ncrna_noncode_v3.fa
+    Untracked:  data/netmhciipan.out.gz
+    Untracked:  data/test
+    Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
+    Untracked:  export/output/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/graph.Rmd
 
 </code></pre>
 <p>
@@ -611,6 +622,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/9367b80c3401f8a8aa5bcfe13df0dea59b101500/analysis/parallel.Rmd" target="_blank">9367b80</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-07-26
+</td>
+<td>
+pbapply
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/130d11f665cdbb63ae7d8593619fb8b0f71268f3/docs/parallel.html" target="_blank">130d11f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-11-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/b2043f3767f291d0bef5823529746cba28dcfd66/analysis/parallel.Rmd" target="_blank">b2043f3</a>
 </td>
 <td>
@@ -655,6 +700,10 @@ package tailored for use with Bioconductor.</li>
 <li>The <a href="https://furrr.futureverse.org/">furrr</a> package
 parallelises mapping functions from the <a
 href="https://purrr.tidyverse.org/">purrr</a> package.</li>
+<li>The <a
+href="https://github.com/psolymos/pbapply#parallel-backends">pbapply</a>
+package, which is a package for adding a progress bar, but supports
+parallel execution.</li>
 </ul>
 <div id="system.time" class="section level2">
 <h2><code>system.time</code></h2>
@@ -715,7 +764,7 @@ parallelisation.</p>
   my_sum &lt;- lapply(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  4.192   0.020   4.223 </code></pre>
+  4.237   0.011   4.258 </code></pre>
 <p>The <code>mclapply</code> function can be used to process a list in
 parallel. Note that this function uses forking, which is not available
 on Windows.</p>
@@ -723,7 +772,7 @@ on Windows.</p>
   my_sum_mc &lt;- mclapply(my_list, summary, mc.cores = params$threads)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.548   0.224   0.737 </code></pre>
+  2.612   0.806   0.764 </code></pre>
 <p>Compare the two summaries.</p>
 <pre class="r"><code>identical(my_sum, my_sum_mc)</code></pre>
 <pre><code>[1] TRUE</code></pre>
@@ -736,10 +785,25 @@ system.time(
   my_sum_sock &lt;- parLapply(cl, my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.601   0.173   1.764 </code></pre>
+  0.745   0.375   2.112 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 identical(my_sum_mc, my_sum_sock)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div id="pbapply" class="section level2">
+<h2><code>pbapply</code></h2>
+<p>Parallelisation with a progress bar!</p>
+<pre class="r"><code>library(pbapply)
+cl &lt;- makeCluster(params$threads)
+system.time(
+  my_sum_pb &lt;- pblapply(my_list, summary, cl = cl)
+)</code></pre>
+<pre><code>   user  system elapsed 
+  0.614   0.322   2.097 </code></pre>
+<pre class="r"><code>stopCluster(cl)
+
+identical(my_sum_mc, my_sum_pb)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
 <div id="doparallel" class="section level2">
@@ -758,7 +822,7 @@ system.time(
   }
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.860   0.381   2.475 </code></pre>
+  0.897   0.406   2.478 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 identical(my_sum_mc, my_sum_dopar)</code></pre>
@@ -774,7 +838,7 @@ system.time(
   my_sum_bp &lt;- bplapply(my_list, summary, BPPARAM = param)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.767   0.370   7.686 </code></pre>
+  0.833   0.273   7.934 </code></pre>
 <pre class="r"><code>identical(my_sum_mc, my_sum_bp)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -794,7 +858,7 @@ Attaching package: &#39;purrr&#39;</code></pre>
   my_sum_pur &lt;- map(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  4.188   0.254   4.453 </code></pre>
+  4.170   0.427   4.608 </code></pre>
 <pre class="r"><code>identical(my_sum_mc, my_sum_pur)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <p>Map with parallelisation.</p>
@@ -803,7 +867,7 @@ system.time(
   my_sum_fur &lt;- future_map(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.289   0.495   2.352 </code></pre>
+  0.744   0.674   3.381 </code></pre>
 <pre class="r"><code>identical(my_sum_pur, my_sum_fur)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -825,13 +889,13 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.2.0 (2022-04-22)
+<pre><code>R version 4.3.0 (2023-04-21)
 Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 20.04.4 LTS
+Running under: Ubuntu 22.04.2 LTS
 
 Matrix products: default
-BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3
-LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
 
 locale:
  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -841,28 +905,31 @@ locale:
  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
 [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
 attached base packages:
 [1] parallel  stats     graphics  grDevices utils     datasets  methods  
 [8] base     
 
 other attached packages:
-[1] purrr_0.3.5         furrr_0.3.1         future_1.29.0      
-[4] BiocParallel_1.32.1 doParallel_1.0.17   iterators_1.0.14   
-[7] foreach_1.5.2       workflowr_1.7.0    
+[1] purrr_1.0.1         furrr_0.3.1         future_1.32.0      
+[4] BiocParallel_1.34.2 doParallel_1.0.17   iterators_1.0.14   
+[7] foreach_1.5.2       pbapply_1.7-0       workflowr_1.7.0    
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.9        compiler_4.2.0    pillar_1.8.1      bslib_0.4.1      
- [5] later_1.3.0       git2r_0.30.1      jquerylib_0.1.4   tools_4.2.0      
- [9] getPass_0.2-2     digest_0.6.30     jsonlite_1.8.3    evaluate_0.18    
-[13] tibble_3.1.8      lifecycle_1.0.3   pkgconfig_2.0.3   rlang_1.0.6      
-[17] cli_3.4.1         rstudioapi_0.14   yaml_2.3.6        xfun_0.34        
-[21] fastmap_1.1.0     httr_1.4.4        stringr_1.4.1     knitr_1.40       
-[25] globals_0.16.1    fs_1.5.2          vctrs_0.5.0       sass_0.4.2       
-[29] rprojroot_2.0.3   glue_1.6.2        listenv_0.8.0     R6_2.5.1         
-[33] snow_0.4-4        processx_3.8.0    parallelly_1.32.1 fansi_1.0.3      
-[37] rmarkdown_2.18    callr_3.7.3       magrittr_2.0.3    whisker_0.4      
-[41] codetools_0.2-18  ps_1.7.2          promises_1.2.0.1  htmltools_0.5.3  
-[45] httpuv_1.6.6      utf8_1.2.2        stringi_1.7.8     cachem_1.0.6     </code></pre>
+ [1] sass_0.4.6        utf8_1.2.3        stringi_1.7.12    listenv_0.9.0    
+ [5] digest_0.6.31     magrittr_2.0.3    evaluate_0.21     fastmap_1.1.1    
+ [9] rprojroot_2.0.3   jsonlite_1.8.5    processx_3.8.1    whisker_0.4.1    
+[13] ps_1.7.5          promises_1.2.0.1  httr_1.4.6        fansi_1.0.4      
+[17] codetools_0.2-19  jquerylib_0.1.4   cli_3.6.1         rlang_1.1.1      
+[21] parallelly_1.36.0 cachem_1.0.8      yaml_2.3.7        tools_4.3.0      
+[25] httpuv_1.6.11     globals_0.16.2    vctrs_0.6.2       R6_2.5.1         
+[29] lifecycle_1.0.3   git2r_0.32.0      stringr_1.5.0     fs_1.6.2         
+[33] pkgconfig_2.0.3   callr_3.7.3       pillar_1.9.0      bslib_0.5.0      
+[37] later_1.3.1       glue_1.6.2        Rcpp_1.0.10       xfun_0.39        
+[41] tibble_3.2.1      rstudioapi_0.14   knitr_1.43        htmltools_0.5.5  
+[45] snow_0.4-4        rmarkdown_2.22    compiler_4.3.0    getPass_0.2-2    </code></pre>
 </div>
 </div>
 
