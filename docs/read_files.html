@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-07-26" />
+<meta name="date" content="2023-07-27" />
 
 <title>Reading a list of files into a single R data frame</title>
 
@@ -284,7 +284,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Reading a list of files into a single R
 data frame</h1>
-<h4 class="date">2023-07-26</h4>
+<h4 class="date">2023-07-27</h4>
 
 </div>
 
@@ -313,7 +313,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-07-26
+<strong>Last updated:</strong> 2023-07-27
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -444,15 +444,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb5c3509e4367de3328755d386b8367b269e5a211targetblankb5c3509a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree78da4e19f8eda28310dd4036fef7425589c2f56ctargetblank78da4e1a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/b5c3509e4367de3328755d386b8367b269e5a211" target="_blank">b5c3509</a>
+<a href="https://github.com/davetang/muse/tree/78da4e19f8eda28310dd4036fef7425589c2f56c" target="_blank">78da4e1</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb5c3509e4367de3328755d386b8367b269e5a211targetblankb5c3509a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree78da4e19f8eda28310dd4036fef7425589c2f56ctargetblank78da4e1a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -462,7 +462,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/b5c3509e4367de3328755d386b8367b269e5a211" target="_blank">b5c3509</a>.
+<a href="https://github.com/davetang/muse/tree/78da4e19f8eda28310dd4036fef7425589c2f56c" target="_blank">78da4e1</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -547,6 +547,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/78da4e19f8eda28310dd4036fef7425589c2f56c/analysis/read_files.Rmd" target="_blank">78da4e1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-07-27
+</td>
+<td>
+Use pbapply
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/ccc5fa4a169ad693251df73247c706ad1c302326/docs/read_files.html" target="_blank">ccc5fa4</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-07-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/b5c3509e4367de3328755d386b8367b269e5a211/analysis/read_files.Rmd" target="_blank">b5c3509</a>
 </td>
 <td>
@@ -617,27 +651,42 @@ random_files &lt;- function(nfiles, prefix = &#39;x&#39;, outdir = &#39;random&#
   }) -&gt; dev_null
 }
 
-random_files(10, outdir = outdir)
+random_files(50, outdir = outdir)
 
 list.files(outdir)</code></pre>
 <pre><code> [1] &quot;x000001.csv&quot; &quot;x000002.csv&quot; &quot;x000003.csv&quot; &quot;x000004.csv&quot; &quot;x000005.csv&quot;
- [6] &quot;x000006.csv&quot; &quot;x000007.csv&quot; &quot;x000008.csv&quot; &quot;x000009.csv&quot; &quot;x000010.csv&quot;</code></pre>
+ [6] &quot;x000006.csv&quot; &quot;x000007.csv&quot; &quot;x000008.csv&quot; &quot;x000009.csv&quot; &quot;x000010.csv&quot;
+[11] &quot;x000011.csv&quot; &quot;x000012.csv&quot; &quot;x000013.csv&quot; &quot;x000014.csv&quot; &quot;x000015.csv&quot;
+[16] &quot;x000016.csv&quot; &quot;x000017.csv&quot; &quot;x000018.csv&quot; &quot;x000019.csv&quot; &quot;x000020.csv&quot;
+[21] &quot;x000021.csv&quot; &quot;x000022.csv&quot; &quot;x000023.csv&quot; &quot;x000024.csv&quot; &quot;x000025.csv&quot;
+[26] &quot;x000026.csv&quot; &quot;x000027.csv&quot; &quot;x000028.csv&quot; &quot;x000029.csv&quot; &quot;x000030.csv&quot;
+[31] &quot;x000031.csv&quot; &quot;x000032.csv&quot; &quot;x000033.csv&quot; &quot;x000034.csv&quot; &quot;x000035.csv&quot;
+[36] &quot;x000036.csv&quot; &quot;x000037.csv&quot; &quot;x000038.csv&quot; &quot;x000039.csv&quot; &quot;x000040.csv&quot;
+[41] &quot;x000041.csv&quot; &quot;x000042.csv&quot; &quot;x000043.csv&quot; &quot;x000044.csv&quot; &quot;x000045.csv&quot;
+[46] &quot;x000046.csv&quot; &quot;x000047.csv&quot; &quot;x000048.csv&quot; &quot;x000049.csv&quot; &quot;x000050.csv&quot;</code></pre>
 <p>We can easily load all the files into a single data frame using
 <code>map_dfr</code>.</p>
-<pre class="r"><code>my_df &lt;- map_dfr(list.files(outdir, full.names = TRUE), readr::read_csv, show_col_types = FALSE)
-dim(my_df)</code></pre>
-<pre><code>[1] 1000  100</code></pre>
+<pre class="r"><code>start_time &lt;- Sys.time()
+my_df &lt;- map_dfr(list.files(outdir, full.names = TRUE), readr::read_csv, show_col_types = FALSE)
+end_time &lt;- Sys.time()
+end_time - start_time</code></pre>
+<pre><code>Time difference of 31.85373 secs</code></pre>
+<pre class="r"><code>dim(my_df)</code></pre>
+<pre><code>[1] 5000  100</code></pre>
 <p>Here’s how to do the same thing using <code>pmap</code> and
 <code>bind_rows</code>. (<code>pmap</code> comes with a basic progress
 bar, which is nice.) Note that I am using the base R pipe
 (<code>|&gt;</code>), which requires R-4.1.0 or higher.</p>
-<pre class="r"><code>purrr::pmap(
+<pre class="r"><code>start_time &lt;- Sys.time()
+purrr::pmap(
   list(list.files(outdir, full.names = TRUE)),
   readr::read_csv, show_col_types = FALSE, .progress = FALSE
 ) |&gt;
   dplyr::bind_rows() -&gt; my_df2
-
-all.equal(my_df, my_df2)</code></pre>
+end_time &lt;- Sys.time()
+end_time - start_time</code></pre>
+<pre><code>Time difference of 32.07553 secs</code></pre>
+<pre class="r"><code>all.equal(my_df, my_df2)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <p>One of the reasons <code>map_dfr</code> was superseded is because it
 requires <code>dplyr::bind_rows</code>, which adds a package dependency.
@@ -647,13 +696,16 @@ We can use the base R functions <code>do.call</code> and
 href="https://readr.tidyverse.org/">readr</a> package. We can also
 substitute that function using the base R <code>read.csv()</code>
 function too.</p>
-<pre class="r"><code>purrr::pmap(
+<pre class="r"><code>start_time &lt;- Sys.time()
+purrr::pmap(
   list(list.files(outdir, full.names = TRUE)),
-  read.csv, .progress = TRUE
+  read.csv, .progress = FALSE
 ) |&gt;
   do.call(&quot;rbind&quot;, args = _) -&gt; my_df3
-
-all.equal(my_df2, my_df3)</code></pre>
+end_time &lt;- Sys.time()
+end_time - start_time</code></pre>
+<pre><code>Time difference of 1.201932 secs</code></pre>
+<pre class="r"><code>all.equal(my_df2, my_df3)</code></pre>
 <pre><code>[1] &quot;Attributes: &lt; Names: 1 string mismatch &gt;&quot;                                              
 [2] &quot;Attributes: &lt; Length mismatch: comparison on first 2 components &gt;&quot;                     
 [3] &quot;Attributes: &lt; Component \&quot;class\&quot;: Lengths (4, 1) differ (string compare on first 1) &gt;&quot;
@@ -671,13 +723,16 @@ equal.</p>
 <p>We can go one more step in removing the purrr dependency by using
 <code>lapply</code> instead. The code below uses all base R functions to
 load a list of files.</p>
-<pre class="r"><code>lapply(
+<pre class="r"><code>start_time &lt;- Sys.time()
+lapply(
   list.files(outdir, full.names = TRUE),
   read.csv
 ) |&gt;
   do.call(&quot;rbind&quot;, args = _) -&gt; my_df4
-
-all.equal(my_df3, my_df4)</code></pre>
+end_time &lt;- Sys.time()
+end_time - start_time</code></pre>
+<pre><code>Time difference of 0.7087708 secs</code></pre>
+<pre class="r"><code>all.equal(my_df3, my_df4)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <p>At this point, you may be wondering whether we needed the Tidyverse
 packages in the first place. There has already been a lot of discussion
@@ -689,8 +744,12 @@ parameter, which adds an id column that can be useful for distinguishing
 the data. The way to use it is to name the input vector.</p>
 <pre class="r"><code>my_files &lt;- list.files(outdir, full.names = TRUE)
 names(my_files) &lt;- sub(&quot;\\.\\w+$&quot;, &quot;&quot;, basename(my_files))
+start_time &lt;- Sys.time()
 my_df &lt;- map_dfr(my_files, readr::read_csv, show_col_types = FALSE, .id = &quot;file&quot;)
-my_df[1:6, 1:6]</code></pre>
+end_time &lt;- Sys.time()
+end_time - start_time</code></pre>
+<pre><code>Time difference of 32.29653 secs</code></pre>
+<pre class="r"><code>my_df[1:6, 1:6]</code></pre>
 <pre><code># A tibble: 6 × 6
   file       V1    V2    V3     V4    V5
   &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;
@@ -701,15 +760,18 @@ my_df[1:6, 1:6]</code></pre>
 5 x000001 0.202 0.633 0.181 0.375  0.944
 6 x000001 0.898 0.213 0.519 0.991  0.724</code></pre>
 <p>This can be achieved using base R as follows.</p>
-<pre class="r"><code>lapply(
+<pre class="r"><code>start_time &lt;- Sys.time()
+lapply(
   list.files(outdir, full.names = TRUE),
   function(x){
     cbind(file = sub(&quot;\\.\\w+$&quot;, &quot;&quot;, basename(x)), read.csv(x))
   }
 ) |&gt;
   do.call(&quot;rbind&quot;, args = _) -&gt; my_df5
-
-my_df5[1:6, 1:6]</code></pre>
+end_time &lt;- Sys.time()
+end_time - start_time</code></pre>
+<pre><code>Time difference of 0.9704466 secs</code></pre>
+<pre class="r"><code>my_df5[1:6, 1:6]</code></pre>
 <pre><code>     file        V1        V2        V3         V4        V5
 1 x000001 0.2655087 0.6547239 0.2675082 0.67371223 0.6588776
 2 x000001 0.3721239 0.3531973 0.2186453 0.09485786 0.1850700
@@ -717,6 +779,29 @@ my_df5[1:6, 1:6]</code></pre>
 4 x000001 0.9082078 0.9926841 0.2689506 0.46155184 0.8978485
 5 x000001 0.2016819 0.6334933 0.1811683 0.37521653 0.9436971
 6 x000001 0.8983897 0.2132081 0.5185761 0.99109922 0.7236908</code></pre>
+<p>We can add a progress bar using the <a
+href="https://github.com/psolymos/pbapply">pbapply</a> package. The nice
+thing about this package is that it supports parallelisation too. (Using
+parallel here actually slows it down but may be useful when you have a
+lot of large files.)</p>
+<pre class="r"><code>library(pbapply)
+library(parallel)
+cl &lt;- makeCluster(2)
+start_time &lt;- Sys.time()
+pblapply(
+  list.files(outdir, full.names = TRUE),
+  function(x){
+    cbind(file = sub(&quot;\\.\\w+$&quot;, &quot;&quot;, basename(x)), read.csv(x))
+  },
+  cl = cl
+) |&gt;
+  do.call(&quot;rbind&quot;, args = _) -&gt; my_df6
+end_time &lt;- Sys.time()
+stopCluster(cl)
+end_time - start_time</code></pre>
+<pre><code>Time difference of 0.8234155 secs</code></pre>
+<pre class="r"><code>all.equal(my_df5, my_df6)</code></pre>
+<pre><code>[1] TRUE</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -746,12 +831,13 @@ time zone: Etc/UTC
 tzcode source: system (glibc)
 
 attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
+[1] parallel  stats     graphics  grDevices utils     datasets  methods  
+[8] base     
 
 other attached packages:
- [1] lubridate_1.9.2 forcats_1.0.0   stringr_1.5.0   dplyr_1.1.2    
- [5] purrr_1.0.1     readr_2.1.4     tidyr_1.3.0     tibble_3.2.1   
- [9] ggplot2_3.4.2   tidyverse_2.0.0 workflowr_1.7.0
+ [1] pbapply_1.7-0   lubridate_1.9.2 forcats_1.0.0   stringr_1.5.0  
+ [5] dplyr_1.1.2     purrr_1.0.1     readr_2.1.4     tidyr_1.3.0    
+ [9] tibble_3.2.1    ggplot2_3.4.2   tidyverse_2.0.0 workflowr_1.7.0
 
 loaded via a namespace (and not attached):
  [1] sass_0.4.6       utf8_1.2.3       generics_0.1.3   stringi_1.7.12  
@@ -761,14 +847,13 @@ loaded via a namespace (and not attached):
 [17] promises_1.2.0.1 httr_1.4.6       fansi_1.0.4      scales_1.2.1    
 [21] jquerylib_0.1.4  cli_3.6.1        crayon_1.5.2     rlang_1.1.1     
 [25] bit64_4.0.5      munsell_0.5.0    withr_2.5.0      cachem_1.0.8    
-[29] yaml_2.3.7       parallel_4.3.0   tools_4.3.0      tzdb_0.4.0      
-[33] colorspace_2.1-0 httpuv_1.6.11    vctrs_0.6.2      R6_2.5.1        
-[37] lifecycle_1.0.3  git2r_0.32.0     bit_4.0.5        fs_1.6.2        
-[41] vroom_1.6.3      pkgconfig_2.0.3  callr_3.7.3      pillar_1.9.0    
-[45] bslib_0.5.0      later_1.3.1      gtable_0.3.3     glue_1.6.2      
-[49] Rcpp_1.0.10      xfun_0.39        tidyselect_1.2.0 rstudioapi_0.14 
-[53] knitr_1.43       htmltools_0.5.5  rmarkdown_2.22   compiler_4.3.0  
-[57] getPass_0.2-2   </code></pre>
+[29] yaml_2.3.7       tools_4.3.0      tzdb_0.4.0       colorspace_2.1-0
+[33] httpuv_1.6.11    vctrs_0.6.2      R6_2.5.1         lifecycle_1.0.3 
+[37] git2r_0.32.0     bit_4.0.5        fs_1.6.2         vroom_1.6.3     
+[41] pkgconfig_2.0.3  callr_3.7.3      pillar_1.9.0     bslib_0.5.0     
+[45] later_1.3.1      gtable_0.3.3     glue_1.6.2       Rcpp_1.0.10     
+[49] xfun_0.39        tidyselect_1.2.0 rstudioapi_0.14  knitr_1.43      
+[53] htmltools_0.5.5  rmarkdown_2.22   compiler_4.3.0   getPass_0.2-2   </code></pre>
 </div>
 </div>
 
