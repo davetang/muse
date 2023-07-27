@@ -56,7 +56,7 @@ random_files <- function(nfiles, prefix = 'x', outdir = 'random', leading_zero =
   }) -> dev_null
 }
 
-random_files(10, outdir = outdir)
+random_files(50, outdir = outdir)
 
 list.files(outdir)
 ```
@@ -64,18 +64,24 @@ list.files(outdir)
 We can easily load all the files into a single data frame using `map_dfr`.
 
 ```{r map_dfr}
+start_time <- Sys.time()
 my_df <- map_dfr(list.files(outdir, full.names = TRUE), readr::read_csv, show_col_types = FALSE)
+end_time <- Sys.time()
+end_time - start_time
 dim(my_df)
 ```
 
 Here's how to do the same thing using `pmap` and `bind_rows`. (`pmap` comes with a basic progress bar, which is nice.) Note that I am using the base R pipe (`|>`), which requires R-4.1.0 or higher.
 
 ```{r pmap}
+start_time <- Sys.time()
 purrr::pmap(
   list(list.files(outdir, full.names = TRUE)),
   readr::read_csv, show_col_types = FALSE, .progress = FALSE
 ) |>
   dplyr::bind_rows() -> my_df2
+end_time <- Sys.time()
+end_time - start_time
 
 all.equal(my_df, my_df2)
 ```
@@ -83,11 +89,14 @@ all.equal(my_df, my_df2)
 One of the reasons `map_dfr` was superseded is because it requires `dplyr::bind_rows`, which adds a package dependency. We can use the base R functions `do.call` and `rbind()` instead. In addition, my code above uses `read_csv` from the [readr](https://readr.tidyverse.org/) package. We can also substitute that function using the base R `read.csv()` function too.
 
 ```{r pmap_base_read_csv}
+start_time <- Sys.time()
 purrr::pmap(
   list(list.files(outdir, full.names = TRUE)),
-  read.csv, .progress = TRUE
+  read.csv, .progress = FALSE
 ) |>
   do.call("rbind", args = _) -> my_df3
+end_time <- Sys.time()
+end_time - start_time
 
 all.equal(my_df2, my_df3)
 ```
@@ -107,11 +116,14 @@ Besides the object attributes, the values in the data frames are equal.
 We can go one more step in removing the purrr dependency by using `lapply` instead. The code below uses all base R functions to load a list of files.
 
 ```{r lapply_base_read_csv}
+start_time <- Sys.time()
 lapply(
   list.files(outdir, full.names = TRUE),
   read.csv
 ) |>
   do.call("rbind", args = _) -> my_df4
+end_time <- Sys.time()
+end_time - start_time
 
 all.equal(my_df3, my_df4)
 ```
@@ -123,13 +135,17 @@ One nice thing about `map_dfr` is the `.id` parameter, which adds an id column t
 ```{r map_dfr_with_id}
 my_files <- list.files(outdir, full.names = TRUE)
 names(my_files) <- sub("\\.\\w+$", "", basename(my_files))
+start_time <- Sys.time()
 my_df <- map_dfr(my_files, readr::read_csv, show_col_types = FALSE, .id = "file")
+end_time <- Sys.time()
+end_time - start_time
 my_df[1:6, 1:6]
 ```
 
 This can be achieved using base R as follows.
 
 ```{r lapply_base_read_csv_with_id}
+start_time <- Sys.time()
 lapply(
   list.files(outdir, full.names = TRUE),
   function(x){
@@ -137,6 +153,32 @@ lapply(
   }
 ) |>
   do.call("rbind", args = _) -> my_df5
+end_time <- Sys.time()
+end_time - start_time
 
 my_df5[1:6, 1:6]
+```
+
+We can add a progress bar using the
+[pbapply](https://github.com/psolymos/pbapply) package. The nice thing about
+this package is that it supports parallelisation too. (Using parallel here
+actually slows it down but may be useful when you have a lot of large files.)
+
+```{r pbapply}
+library(pbapply)
+library(parallel)
+cl <- makeCluster(2)
+start_time <- Sys.time()
+pblapply(
+  list.files(outdir, full.names = TRUE),
+  function(x){
+    cbind(file = sub("\\.\\w+$", "", basename(x)), read.csv(x))
+  },
+  cl = cl
+) |>
+  do.call("rbind", args = _) -> my_df6
+end_time <- Sys.time()
+stopCluster(cl)
+end_time - start_time
+all.equal(my_df5, my_df6)
 ```
