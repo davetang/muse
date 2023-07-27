@@ -110,6 +110,42 @@ stopCluster(cl)
 identical(my_sum_mc, my_sum_sock)
 ```
 
+### Worker environment
+
+If you run the code below:
+
+```{r no_export, eval=FALSE}
+cl <- makeCluster(4)
+system.time(
+  test <- parLapply(cl, 1:4, function(x){
+    class(my_list)
+  })
+)
+stopCluster(cl)
+```
+
+you will get the following error:
+
+```
+Error in checkForRemoteErrors(val) : 
+  4 nodes produced errors; first error: object 'my_list' not found
+```
+
+This is because each worker is using a different environment. To make the `my_list` object available to each worker, we use the `clusterExport()` function.
+
+```{r cluster_export}
+cl <- makeCluster(4)
+clusterExport(cl, list("my_list"))
+system.time(
+  test2 <- parSapply(cl, 1:4, function(x){
+    class(my_list)
+  })
+)
+stopCluster(cl)
+
+test2
+```
+
 ## `pbapply`
 
 Parallelisation with a progress bar!
