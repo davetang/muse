@@ -1,0 +1,173 @@
+---
+title: "Object-Oriented Programming"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(reticulate)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+If there's one topic that has continually eluded me despite my efforts to
+understand it, it's Object-Oriented Programming (OOP). Well, I have finally had
+enough of not "getting it" and I'm going to, once and for all, understand
+enough to be able to write code under the OOP paradigm. I will use this document
+to keep the key ideas behind OOP.
+
+Most of the code I write ends up in scripts that perform a certain task. The
+code is interpreted starting from the first line until it reaches the last
+line. I believe this type of programming style is known as procedural
+programming, where the execution is like following a recipe from start to
+finish until a desired state is reached. Then there's functional programming,
+which is a style that focuses on the use of functions that have certain
+characteristics (that make it a pure function). OOP organises a program into
+objects, which are data structures consisting of **attributes** and **methods**,
+and these objects interact with each other to solve a problem.
+
+```{r include=FALSE, message=FALSE}
+if (!dir.exists(miniconda_path())){
+  reticulate::install_miniconda()
+}
+use_python(paste0(miniconda_path(), '/bin/python3'))
+```
+
+I will use Python to illustrate some OOP concepts. Python's main object-oriented
+programming tool comes via classes, which is used to implement class objects
+that support inheritance. A
+[class](https://docs.python.org/3/tutorial/classes.html) is like a blueprint or
+definition for creating an object. Python classes provide a means of bundling
+data and functionality together. Creating a new class creates a new type of
+object, allowing new instances of that type to be made.
+
+The simplest form of a class definition:
+
+```
+class ClassName:
+    <statement-1>
+    ...
+    <statement-N>
+```
+
+```{python}
+class MyClass:
+  x = 2
+  
+my_obj = MyClass()
+```
+
+When `MyClass` was called, a new object with a distinct namespace was generated
+or instantiated; `my_obj` is an instance of `MyClass`. Each object generated
+from a class has access to the class's attributes and methods, and gets a
+namespace. Class objects support two kinds of operations: attribute references
+and instantiation. Attribute references use the standard syntax used for all
+attribute references in Python: `obj.name`. Valid attribute names are all the
+names that were in the class's namespace when the class object was created. The
+only operations understood by instance objects are attribute references. There
+are two kinds of valid attribute names: data attributes and methods. A method is
+a function that belongs to an object.
+
+```{python}
+print(my_obj.x)
+```
+
+Let's create a class with a method.
+
+```{python}
+class MyClass2:
+    """A simple class with a method"""
+    i = 1984
+
+    def __init__(self, name):
+        self.name = name
+
+    def f(self):
+        print(self)
+        return 'Big Brother is watching you'
+ 
+x = MyClass2('Winston')
+```
+
+With the class definition above, `MyClass2.i` and `MyClass2.f` are valid
+attribute references, returning an integer and a function object, respectively.
+When a class defines the special method named `__init__()`, class instantiation
+automatically invokes `__init__()` for the newly created class instance. **This
+means that the `__init__()` function is always executed when the class is being
+initiated.** Use the `__init__()` function to assign values or to run operations
+that are necessary when the object is being created. This function is typically
+called the constructor.
+
+Another important note regarding methods is that **the instance object is
+automatically passed as the first argument**. The following are equivalent; self
+is the instance object which we assigned to x.
+
+```{python}
+x.f()
+MyClass2.f(x)
+```
+
+Use the `obj.name` syntax to add a new data attribute not defined in the class.
+Use the `dir()` function to return all functions and properties of a class.
+
+```{python}
+x.room_no = 101
+print("\n".join(dir(x)), "\n")
+```
+
+However, objects need to be part of an inheritance hierarchy for the code to
+qualify as being truly object-oriented. The syntax for a derived class
+definition is:
+
+```
+class DerivedClassName(BaseClassName):
+    <statement-1>
+    ...
+    <statement-N>
+```
+
+The syntax for multiple inheritance:
+
+```
+class DerivedClassName(Base1, Base2, Base3):
+    <statement-1>
+    ...
+    <statement-N>
+```
+
+The search for attributes occurs depth-first, left-to-right, and not searching
+twice in the same class when there is an overlap in the hierarchy. But it is
+slightly more complex with the method resolution order changing dynamically to
+support cooperative calls to super().
+
+TBC.
+
+# Key ideas
+
+* Object-Oriented Programming (OOP) is a programming paradigm that organises a
+  program into objects, which are data structures consisting of **attributes**
+  and **methods**.
+
+* Objects are instantiated from a class; you can think of a class as blueprints
+  or a factory.
+
+* Each instance generated from a class has access to the class's attributes and
+  methods.
+
+* Classes can be inherited into sub-classes and it is this inheritance hierarchy
+  that makes code object-oriented.
+
+Classes support code reuse in ways that other components cannot and this is the
+main purpose of OOP. With classes, we code by customising existing code, instead
+of either changing existing code in place or starting from scratch. Once you get
+used to programming by software customisation, writing a new program becomes a
+task of mixing together existing superclasses that already implement the
+behaviour required by your program. In many application domains, collections of
+superclasses are known as frameworks that implement common programming tasks as
+classes that are ready to be used in your programs. With frameworks, you often
+simply code a subclass that is specific to your purposes, and inherit from all
+class tree.
