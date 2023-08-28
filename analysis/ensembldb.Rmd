@@ -24,14 +24,15 @@ To begin, install the [ensembldb](https://bioconductor.org/packages/release/bioc
 if (!require("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
 
-if (!require("ensembldb", quietly = TRUE))
-  BiocManager::install("ensembldb")
-
-if (!require("AnnotationHub", quietly = TRUE))
-  BiocManager::install("AnnotationHub")
+deps <- c("ensembldb", "AnnotationHub", "Gviz")
+sapply(deps, function(x){
+  if (!require(x, quietly = TRUE, character.only = TRUE))
+    BiocManager::install(x)
+})
 
 library(ensembldb)
 library(AnnotationHub)
+library(Gviz)
 ```
 
 ## AnnotationHub
@@ -42,16 +43,16 @@ Create an `AnnotationHub` object.
 
 ```{r ah}
 ah <- AnnotationHub(ask = FALSE)
+ah
 ```
 
 Query.
 
 ```{r query}
 ensdb_homo <- query(ah, c("EnsDb", "Homo sapiens"))
-ensdb_homo
 ```
 
-Latest available Ensembl version.
+Latest available GENCODE version, which is quite old.
 
 ```{r latest_ensembl}
 latest <- nrow(mcols(ensdb_homo))
@@ -59,7 +60,39 @@ edb <- ensdb_homo[[latest]]
 edb
 ```
 
-## Mapping protein coordinates to the genome
+## Mapping genome coordinates to transcript coordinates
+
+> The `genomeToTranscript` function maps genomic coordinates to coordinates within the transcript(s) encoded at the specified coordinates. The function takes a GRanges as input and returns an IRangesList of length equal to the length of the input object. Each IRanges in the IRangesList provides the coordinates within the respective transcript.
+
+
+The genomic region 17:7687460-7687515 contains the start of the TP53 gene (ENST00000269305.9) with some coordinates beyond the start.
+
+```{r gnm}
+gnm <- GRanges("17:7687460-7687515")
+```
+
+Visualise using Gviz.
+
+```{r gviz}
+options(ucscChromosomeNames = FALSE)
+gat <- GenomeAxisTrack(range = gnm)
+
+gnm_gns <- getGeneRegionTrackForGviz(edb, filter = GRangesFilter(gnm))
+gtx <- GeneRegionTrack(gnm_gns, name = "tx", geneSymbol = TRUE,
+                       showId = TRUE)
+
+ht <- HighlightTrack(trackList = list(gat, gtx), range = gnm)
+plotTracks(list(ht))
+```
+
+This works but the Ensembl ID does not match the GENCODE ID (ENST00000269305.9).
+
+```{r genome_to_transcript}
+gnm_tx <- genomeToTranscript(gnm, edb)
+gnm_tx
+```
+
+## Mapping protein coordinates to the genome coordinates
 
 >The `proteinToGenome` function allows to map coordinates within the amino acid sequence of a protein to the corresponding DNA sequence on the genome. A protein identifier and the coordinates of the sequence within its amino acid sequence are required and have to be passed as an `IRanges` object to the function. The protein identifier can either be passed as names of this object, or provided in a metadata column (mcols).
 
