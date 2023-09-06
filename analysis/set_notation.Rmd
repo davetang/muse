@@ -1,0 +1,174 @@
+---
+title: "Set notation"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+The **sample space**, $\Omega$, is the collection of possible outcomes of an
+experiment, such as a die roll:
+
+$$ \Omega = \{1, 2, 3, 4, 5, 6\} $$
+
+An **event**, say $E$, is a subset of $\Omega$, such as the even dice rolls:
+
+$$ E = \{2, 4, 6\} $$
+
+An **elementary** or **simple** event is a particular result of an experiment,
+such as the roll of 4 and is represented as a lowercase omega.
+
+$$ \omega = 4 $$
+
+A **null event** or the **empty set** is represented as:
+
+$$ \emptyset $$.
+
+## Interpretations of set operations
+
+1. **Is an element of**
+
+$$ \omega \in E $$
+
+implies that $E$ occurs when $\omega$ occurs; for example if $\omega = 4$
+occurs, then the event $E$ (even number) occurs.
+
+2. **Not an element of**
+
+$$ \omega \not \in E $$
+
+implies that $E$ does not occur when $\omega$ occurs; for example if $\omega =
+5$, $E$ (even numbers) does not occur.
+
+3. **Subset**
+
+$$ E \subset F $$
+
+implies that the occurrence of $E$ implies the occurrence of $F$; for example if
+$E = \{2, 4, 5\}$ and $F = \{2, 4, 5, 6\}$.
+
+4. **Intersect**
+
+$$ E \cap F $$
+
+implies the event that both $E$ and $F$ occur; for example if $E = \{2, 4, 6\}$
+(even numbers) and $F = \{2, 3, 5\}$ (prime numbers), then $E \cap F = 2$.
+
+5. **Union**
+
+$$ E \cup F $$
+
+implies the event that at least one of $E$ or $F$ occur; for example if $E =
+\{2, 4, 6\}$ (even numbers) and $F = \{2, 3, 5\}$ (prime numbers), then $E \cup
+F = \{2, 3, 4, 5, 6\}$, which is that we get either an even number or a prime
+number or **both**.
+
+6. **If intersect == null event**
+
+$$ E \cap F = \emptyset $$
+
+implies that $E$ and $F$ are **mutually exclusive**, or cannot both
+simultaneously occur; for example if $E = \{2, 4, 6\}$ (even numbers) and $F =
+\{1, 3, 5\}$ (odd numbers).
+
+7. **Complement**
+
+$$ E^\complement $$
+
+is the event that $E$ does not occur; for example if $E$ are the even numbers
+then $E^\complement$ are the odd numbers.
+
+## Set theory facts
+
+**DeMorgan's laws**
+
+$$ (A \cap B)^\complement = A^\complement \cup B^\complement$$
+
+$$ (A \cup B)^\complement = A^\complement \cap B^\complement$$
+
+To remember these laws, think of distributing the complements to $A$ and $B$ and
+then inverting the cap into a cup or vice versa.
+
+$$ (A^\complement)^\complement = A $$
+
+The complement of $A$ complemented = $A$.
+
+And lastly:
+
+$$ (A \cup B) \cap C = (A \cap C) \cup (B \cap C) $$
+
+## Probability and set notation
+
+>Consider influenza epidemics for two parent heterosexual families. Suppose that
+the probability is 17% that at least one of the parents has contracted the
+disease. The probability that the father has contracted influenza is 12% while
+the probability that both the mother and father have contracted the disease is
+6%. What is the probability that the mother has contracted influenza?
+
+Let $M$ be the mother and $F$ be the father.
+
+Recall that the union ($\cup$) implies the event that at least one of $M$ or $F$
+occurred, therefore:
+
+$$ P(M \cup F) = 17\%. $$
+
+The probability that the father contracted influenza is 12%:
+
+$$ P(F) = 12\%. $$
+
+An intersection ($\cap$) implies the event that both M and F occur, i.e. the
+probability that both the mother and father have contracted the disease:
+
+$$ P(M \cap F) = 6\%. $$
+
+We know that:
+
+$$ P(M \cup F) = P(M) + P(F) - P(M \cap F).$$
+
+It is worth noting that if the events are mutually exclusive, $P(M \cap F) = 0$,
+since they both can't occur together, but in our case the events can occur
+together. From the above equation, we get:
+
+$$
+17 = P(M) + 12 - 6 \\
+P(M) = 17 - 12 + 6 \\
+P(M) = 11%.
+$$
+
+Therefore the probability of the mother contracting the disease is 11%.
+
+You may be more familiar with the addition rule in probability, which is:
+
+$$
+P(M\ or\ F) = P(M) + P(F) - P(M\ and\ F) \\
+17 = P(M) + 12 - 6 \\
+P(M) = 17 - 12 + 6 \\
+P(M) = 11
+$$
+
+## Conditional probability
+
+The probability of getting a 1 when rolling a fair die is $\frac{1}{6}$. If we
+are given the extra information that the die roll was an odd number (1, 3 or 5),
+conditional on this new information, the probability of a 1 is now
+$\frac{1}{3}$. Let's test this example out:
+
+Let $B$ be an event so that $P(B) > 0$, i.e. it's an event that actually occurs.
+Then the conditional probability of an event $A$ given that $B$ has occurred is:
+
+$$ P(A | B) = \frac{P(A \cap B)}{P(B)}. $$
+
+So using the example above:
+
+$$ B = \{1, 3, 5\}\ and\ A = \{1\} $$
+
+Therefore:
+
+$$ P(A | B) = \frac{P(A \cap B)}{P(B)} = \frac{P(A)}{P(B)} = \frac{\frac{1}{6}}{\frac{3}{6}} = \frac{1}{3} $$
