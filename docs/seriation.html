@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2023-10-05" />
+
+<title>Ordering Objects using Seriation in R</title>
+
+<script src="site_libs/header-attrs-2.22/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Ordering Objects using Seriation in R</h1>
+<h4 class="date">2023-10-05</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2023-10-05
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea63df8489851b58ac30a2659d22c44c2c1340fc4targetblanka63df84a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/a63df8489851b58ac30a2659d22c44c2c1340fc4" target="_blank">a63df84</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea63df8489851b58ac30a2659d22c44c2c1340fc4targetblanka63df84a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/a63df8489851b58ac30a2659d22c44c2c1340fc4" target="_blank">a63df84</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    r_packages_4.3.0/
+
+Untracked files:
+    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  analysis/complex_heatmap.Rmd
+    Untracked:  analysis/sleuth.Rmd
+    Untracked:  analysis/tss_xgboost.Rmd
+    Untracked:  code/multiz100way/
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
+    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
+    Untracked:  data/ncrna_noncode_v3.fa
+    Untracked:  data/netmhciipan.out.gz
+    Untracked:  data/test
+    Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
+    Untracked:  export/output/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/graph.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/seriation.Rmd</code>) and HTML
+(<code>docs/seriation.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/a63df8489851b58ac30a2659d22c44c2c1340fc4/analysis/seriation.Rmd" target="_blank">a63df84</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-05
+</td>
+<td>
+Ordering objects using seriation
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>Install stable CRAN version.</p>
+<pre class="r"><code>if(! &quot;seriation&quot; %in% installed.packages()[, 1]){
+  install.packages(&quot;seriation&quot;, repos = c(&quot;https://mhahsler.r-universe.dev&quot;, &quot;https://cloud.r-project.org/&quot;))
+}
+
+packageVersion(&quot;seriation&quot;)</code></pre>
+<pre><code>[1] &#39;1.5.1.1&#39;</code></pre>
+</div>
+<div id="getting-started" class="section level2">
+<h2>Getting started</h2>
+<p>Use the <a href="https://github.com/mhahsler/seriation#usage">example
+dataset</a> <code>SupremeCourt</code>, which:</p>
+<blockquote>
+<p>Contains a (a subset of the) decisions for the stable 8-yr period
+1995-2002 of the second Rehnquist Supreme Court. Decisions are
+aggregated to the joint probability for disagreement between judges.</p>
+</blockquote>
+<pre class="r"><code>library(seriation)
+data(&quot;SupremeCourt&quot;)
+SupremeCourt</code></pre>
+<pre><code>           Breyer Ginsburg Kennedy OConnor Rehnquist  Scalia  Souter Stevens
+Breyer    0.00000  0.11966 0.25000 0.20940   0.29915 0.35256 0.11752 0.16239
+Ginsburg  0.11966  0.00000 0.26790 0.25214   0.30769 0.36966 0.09615 0.14530
+Kennedy   0.25000  0.26709 0.00000 0.15598   0.12179 0.18803 0.24786 0.32692
+OConnor   0.20940  0.25214 0.15598 0.00000   0.16239 0.20726 0.22009 0.32906
+Rehnquist 0.29915  0.30769 0.12179 0.16239   0.00000 0.14316 0.29274 0.40171
+Scalia    0.35256  0.36966 0.18803 0.20726   0.14316 0.00000 0.33761 0.43803
+Souter    0.11752  0.09615 0.24790 0.22009   0.29274 0.33761 0.00000 0.16880
+Stevens   0.16239  0.14530 0.32692 0.32906   0.40171 0.43803 0.16880 0.00000
+Thomas    0.35897  0.36752 0.17735 0.20513   0.13675 0.06624 0.33120 0.43590
+           Thomas
+Breyer    0.35897
+Ginsburg  0.36752
+Kennedy   0.17735
+OConnor   0.20513
+Rehnquist 0.13675
+Scalia    0.06624
+Souter    0.33120
+Stevens   0.43590
+Thomas    0.00000</code></pre>
+<p>Convert to distance matrix.</p>
+<pre class="r"><code>d &lt;- as.dist(SupremeCourt)
+d</code></pre>
+<pre><code>           Breyer Ginsburg Kennedy OConnor Rehnquist  Scalia  Souter Stevens
+Ginsburg  0.11966                                                           
+Kennedy   0.25000  0.26709                                                  
+OConnor   0.20940  0.25214 0.15598                                          
+Rehnquist 0.29915  0.30769 0.12179 0.16239                                  
+Scalia    0.35256  0.36966 0.18803 0.20726   0.14316                        
+Souter    0.11752  0.09615 0.24790 0.22009   0.29274 0.33761                
+Stevens   0.16239  0.14530 0.32692 0.32906   0.40171 0.43803 0.16880        
+Thomas    0.35897  0.36752 0.17735 0.20513   0.13675 0.06624 0.33120 0.43590</code></pre>
+<p>Perform the default seriation method to reorder the objects.</p>
+<pre class="r"><code>my_order &lt;- seriate(d)
+get_order(my_order)</code></pre>
+<pre><code>   Scalia    Thomas Rehnquist   Kennedy   OConnor    Souter    Breyer  Ginsburg 
+        6         9         5         3         4         7         1         2 
+  Stevens 
+        8 </code></pre>
+<p>Plot heatmap.</p>
+<pre class="r"><code>p1 &lt;- ggpimage(d, upper_tri = TRUE) +
+  ggtitle(&quot;Judges (original alphabetical order)&quot;)
+
+p2 &lt;- ggpimage(d, my_order, upper_tri = TRUE) +
+  ggtitle(&quot;Judges (reordered by seriation)&quot;)
+
+p1 + p2 &amp; scale_fill_gradientn(colours = c(&quot;darkgrey&quot;, &quot;skyblue&quot;))</code></pre>
+<pre><code>Scale for fill is already present.
+Adding another scale for fill, which will replace the existing scale.
+Scale for fill is already present.
+Adding another scale for fill, which will replace the existing scale.</code></pre>
+<p><img src="figure/seriation.Rmd/heatmap-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Return linear configuration where more similar objects are located
+closer to each other.</p>
+<pre class="r"><code>get_config(my_order)</code></pre>
+<pre><code>    Breyer   Ginsburg    Kennedy    OConnor  Rehnquist     Scalia     Souter 
+ 0.2362454  0.2814388 -0.1501451 -0.1051162 -0.2656098 -0.4159504  0.2139295 
+   Stevens     Thomas 
+ 0.6129974 -0.4077896 </code></pre>
+<p>Plot linear configuration.</p>
+<pre class="r"><code>plot_config(my_order)</code></pre>
+<p><img src="figure/seriation.Rmd/plot_config-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="heatmaps-with-seriation" class="section level2">
+<h2>Heatmaps with seriation</h2>
+<p>The <code>Wood</code> dataset consists of:</p>
+<blockquote>
+<p>A data matrix containing a sample of the normalized gene expression
+data for 6 locations in the stem of Popla trees published in the study
+by Herzberg et al (2001). The sample of 136 genes selected by Caraux and
+Pinloche (2005).</p>
+</blockquote>
+<pre class="r"><code>data(&quot;Wood&quot;)
+dim(Wood)</code></pre>
+<pre><code>[1] 136   6</code></pre>
+<p>Methods of interest for heatmaps are dendrogram leaf order-based
+methods applied to rows and columns. This is done using
+<code>method = "heatmap"</code>. The actual seriation method can be
+passed on as parameter seriaton_method, but it has a suitable default if
+it is omitted.</p>
+<pre class="r"><code>wood_hc_complete &lt;- seriate(Wood, method = &quot;Heatmap&quot;, seriation_method = &quot;HC_complete&quot;)
+wood_olo_complete &lt;- seriate(Wood, method = &quot;Heatmap&quot;, seriation_method = &quot;OLO_complete&quot;)
+get_order(wood_hc_complete)</code></pre>
+<pre><code>AI162370 AI166095 AI164136 AI165011 AI165492 AI166057 AI162004 AI163151 
+      26      131       69       91      106      128       15       44 
+AI164970 AI166086 AI162593 AI163756 AI164684 AI164612 AI165835 AI163485 
+      88      130       32       59       80       78      119       51 
+AI163315 AI161513 AI162809 AI162561 AI162652 AI165426 AI162216 AI163303 
+      47        3       38       31       34      105       23       46 
+AI164585 AI164635 AI165041 AI163821 AI162521 AI163812 AI166111 AI161629 
+      76       79       93       62       30       61      133        6 
+AI164686 AI164884 AI165668 AI163528 AI165913 AI163131 AI166101 AI165006 
+      81       86      111       52      123       43      132       90 
+AI165990 AI163617 AI164793 AI163249 AI163994 AI162997 AI163650 AI163758 
+     126       56       85       45       66       41       58       60 
+AI161573 AI162600 AI165529 AI165730 AI162928 AI165868 AI162429 AI164730 
+       5       33      108      116       39      121       28       83 
+AI165247 AI165289 AI166182 AI163328 AI164060 AI165272 AI165803 AI165655 
+     101      103      136       48       67      102      117      110 
+AI162157 AI165826 AI161500 AI165575 AI163608 AI164450 AI162158 AI165175 
+      20      118        2      109       55       74       21       97 
+AI165687 AI166167 AI164370 AI162148 AI165162 AI163474 AI161694 AI161899 
+     113      135       72       19       96       50        9       14 
+AI165836 AI164101 AI166068 AI164435 AI164711 AI165215 AI161730 AI165062 
+     120       68      129       73       82      100       11       94 
+AI164964 AI162452 AI165206 AI163012 AI165107 AI162249 AI163991 AI163880 
+      87       29       99       42       95       24       65       63 
+AI165691 AI165189 AI161827 AI163941 AI165320 AI164753 AI163624 AI162402 
+     115       98       13       64      104       84       57       27 
+AI161452 AI165690 AI164359 AI165949 AI163594 AI166034 AI162710 AI162940 
+       1      114       71      124       54      127       36       40 
+AI162318 AI164979 AI164231 AI165974 AI163580 AI161823 AI165520 AI165903 
+      25       89       70      125       53       12      107      122 
+AI162684 AI161697 AI162729 AI161572 AI162094 AI163338 AI166128 AI162215 
+      35       10       37        4       18       49      134       22 
+AI165673 AI161638 AI161674 AI164604 AI165021 AI162092 AI162060 AI164546 
+     112        7        8       77       92       17       16       75 </code></pre>
+<p>Ordering.</p>
+<pre class="r"><code>get_order(wood_hc_complete, 2)</code></pre>
+<pre><code>P A B E C D 
+1 2 3 6 4 5 </code></pre>
+<pre class="r"><code>get_order(wood_olo_complete, 2)</code></pre>
+<pre><code>P A B C D E 
+1 2 3 4 5 6 </code></pre>
+<p>Heatmap.</p>
+<pre class="r"><code>p1 &lt;- ggpimage(Wood) +
+  ggtitle(&quot;Wood (no order)&quot;) +
+  theme(legend.position = &quot;none&quot;)
+  
+p2 &lt;- ggpimage(Wood, wood_hc_complete) +
+  ggtitle(&quot;Wood (HC complete)&quot;) +
+  theme(legend.position = &quot;none&quot;)
+
+p3 &lt;- ggpimage(Wood, wood_olo_complete) +
+  ggtitle(&quot;Wood (OLO complete)&quot;)
+
+p1 + p2 + p3 &amp; scale_fill_gradientn(colours = c(&quot;skyblue&quot;, &quot;red&quot;))</code></pre>
+<pre><code>Scale for fill is already present.
+Adding another scale for fill, which will replace the existing scale.
+Scale for fill is already present.
+Adding another scale for fill, which will replace the existing scale.
+Scale for fill is already present.
+Adding another scale for fill, which will replace the existing scale.</code></pre>
+<p><img src="figure/seriation.Rmd/wood_heatmap-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.3.0 (2023-04-21)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 22.04.2 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] seriation_1.5.1-1    patchwork_1.1.3.9000 lubridate_1.9.2     
+ [4] forcats_1.0.0        stringr_1.5.0        dplyr_1.1.2         
+ [7] purrr_1.0.1          readr_2.1.4          tidyr_1.3.0         
+[10] tibble_3.2.1         ggplot2_3.4.2        tidyverse_2.0.0     
+[13] workflowr_1.7.0     
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.3     xfun_0.39        bslib_0.5.0      processx_3.8.1  
+ [5] callr_3.7.3      tzdb_0.4.0       vctrs_0.6.2      tools_4.3.0     
+ [9] ps_1.7.5         generics_0.1.3   ca_0.71.1        fansi_1.0.4     
+[13] highr_0.10       pkgconfig_2.0.3  lifecycle_1.0.3  compiler_4.3.0  
+[17] farver_2.1.1     git2r_0.32.0     munsell_0.5.0    getPass_0.2-2   
+[21] codetools_0.2-19 httpuv_1.6.11    htmltools_0.5.5  sass_0.4.6      
+[25] yaml_2.3.7       later_1.3.1      pillar_1.9.0     jquerylib_0.1.4 
+[29] whisker_0.4.1    cachem_1.0.8     iterators_1.0.14 TSP_1.2-4       
+[33] foreach_1.5.2    tidyselect_1.2.0 digest_0.6.31    stringi_1.7.12  
+[37] labeling_0.4.2   rprojroot_2.0.3  fastmap_1.1.1    grid_4.3.0      
+[41] colorspace_2.1-0 cli_3.6.1        magrittr_2.0.3   utf8_1.2.3      
+[45] withr_2.5.0      scales_1.2.1     promises_1.2.0.1 registry_0.5-1  
+[49] timechange_0.2.0 rmarkdown_2.22   httr_1.4.6       hms_1.1.3       
+[53] evaluate_0.21    knitr_1.43       rlang_1.1.1      Rcpp_1.0.10     
+[57] glue_1.6.2       rstudioapi_0.14  jsonlite_1.8.5   R6_2.5.1        
+[61] fs_1.6.2        </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
