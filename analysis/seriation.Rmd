@@ -1,0 +1,120 @@
+---
+title: "Ordering Objects using Seriation in R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(patchwork)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+## Installation
+
+Install stable CRAN version.
+
+```{r install}
+if(! "seriation" %in% installed.packages()[, 1]){
+  install.packages("seriation", repos = c("https://mhahsler.r-universe.dev", "https://cloud.r-project.org/"))
+}
+
+packageVersion("seriation")
+```
+
+## Getting started
+
+Use the [example dataset](https://github.com/mhahsler/seriation#usage) `SupremeCourt`, which:
+
+>Contains a (a subset of the) decisions for the stable 8-yr period 1995-2002 of the second Rehnquist Supreme Court. Decisions are aggregated to the joint probability for disagreement between judges.
+
+```{r supreme_court}
+library(seriation)
+data("SupremeCourt")
+SupremeCourt
+```
+
+Convert to distance matrix.
+
+```{r distance_matrix}
+d <- as.dist(SupremeCourt)
+d
+```
+
+Perform the default seriation method to reorder the objects.
+
+```{r default_seriation}
+my_order <- seriate(d)
+get_order(my_order)
+```
+
+Plot heatmap.
+
+```{r heatmap}
+p1 <- ggpimage(d, upper_tri = TRUE) +
+  ggtitle("Judges (original alphabetical order)")
+
+p2 <- ggpimage(d, my_order, upper_tri = TRUE) +
+  ggtitle("Judges (reordered by seriation)")
+
+p1 + p2 & scale_fill_gradientn(colours = c("darkgrey", "skyblue"))
+```
+
+Return linear configuration where more similar objects are located closer to each other.
+
+```{r get_config}
+get_config(my_order)
+```
+
+Plot linear configuration.
+
+```{r plot_config}
+plot_config(my_order)
+```
+
+## Heatmaps with seriation
+
+The `Wood` dataset consists of:
+
+>A data matrix containing a sample of the normalized gene expression data for 6 locations in the stem of Popla trees published in the study by Herzberg et al (2001). The sample of 136 genes selected by Caraux and Pinloche (2005).
+
+```{r wood}
+data("Wood")
+dim(Wood)
+```
+
+Methods of interest for heatmaps are dendrogram leaf order-based methods applied to rows and columns. This is done using `method = "heatmap"`. The actual seriation method can be passed on as parameter seriaton_method, but it has a suitable default if it is omitted.
+
+```{r wood_order}
+wood_hc_complete <- seriate(Wood, method = "Heatmap", seriation_method = "HC_complete")
+wood_olo_complete <- seriate(Wood, method = "Heatmap", seriation_method = "OLO_complete")
+get_order(wood_hc_complete)
+```
+
+Ordering.
+
+```{r comp_order}
+get_order(wood_hc_complete, 2)
+get_order(wood_olo_complete, 2)
+```
+
+Heatmap.
+
+```{r wood_heatmap}
+p1 <- ggpimage(Wood) +
+  ggtitle("Wood (no order)") +
+  theme(legend.position = "none")
+  
+p2 <- ggpimage(Wood, wood_hc_complete) +
+  ggtitle("Wood (HC complete)") +
+  theme(legend.position = "none")
+
+p3 <- ggpimage(Wood, wood_olo_complete) +
+  ggtitle("Wood (OLO complete)")
+
+p1 + p2 + p3 & scale_fill_gradientn(colours = c("skyblue", "red"))
+```
