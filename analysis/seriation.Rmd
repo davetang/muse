@@ -9,6 +9,7 @@ output:
 ```{r setup, include=FALSE}
 library(tidyverse)
 library(patchwork)
+library(dendextend)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -87,15 +88,48 @@ data("Wood")
 dim(Wood)
 ```
 
+Check out `Wood`.
+
+```{r wood_glimpse}
+head(Wood)
+```
+
 Methods of interest for heatmaps are dendrogram leaf order-based methods applied to rows and columns. This is done using `method = "heatmap"`. The actual seriation method can be passed on as parameter seriaton_method, but it has a suitable default if it is omitted.
 
 ```{r wood_order}
 wood_hc_complete <- seriate(Wood, method = "Heatmap", seriation_method = "HC_complete")
 wood_olo_complete <- seriate(Wood, method = "Heatmap", seriation_method = "OLO_complete")
-get_order(wood_hc_complete)
+get_order(wood_olo_complete)
 ```
 
-Ordering.
+Ignore the numbers of the order above; they indicate the index of the gene in `Wood`. `AI165492` and `AI166057` are the most similar to each other. If I use those values in `Wood`, I get their expression data.
+
+```{r index_wood}
+Wood[c(106, 128), ]
+```
+
+`wood_olo_complete` is also a `hclust`.
+
+```{r wood_olo_class}
+class(wood_olo_complete[[1]])
+```
+
+Plot hierarchical clustering result.
+
+```{r fig.height=20, fig.width=14}
+as.dendrogram(wood_olo_complete[[1]]) %>%
+  plot(horiz = TRUE)
+```
+
+
+Gene order of the dendrogram matches the order produced by seriation using OLO complete.
+
+```{r gene_order}
+o <- wood_olo_complete[[1]]$order
+identical(wood_olo_complete[[1]]$labels[o], names(get_order(wood_olo_complete)))
+```
+
+Location ordering.
 
 ```{r comp_order}
 get_order(wood_hc_complete, 2)
