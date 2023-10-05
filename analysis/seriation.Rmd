@@ -54,7 +54,7 @@ get_order(my_order)
 
 Plot heatmap.
 
-```{r heatmap}
+```{r heatmap, message=FALSE, warning=FALSE}
 p1 <- ggpimage(d, upper_tri = TRUE) +
   ggtitle("Judges (original alphabetical order)")
 
@@ -104,7 +104,7 @@ get_order(wood_olo_complete, 2)
 
 Heatmap.
 
-```{r wood_heatmap}
+```{r wood_heatmap, message=FALSE, warning=FALSE}
 p1 <- ggpimage(Wood) +
   ggtitle("Wood (no order)") +
   theme(legend.position = "none")
