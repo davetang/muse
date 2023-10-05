@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8f6754a14a63230ddac3d64b5535ae3fbe800746targetblank8f6754aa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1e94d2f0b0043b4646604cea852012311e3c68e8targetblank1e94d2fa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/8f6754a14a63230ddac3d64b5535ae3fbe800746" target="_blank">8f6754a</a>
+<a href="https://github.com/davetang/muse/tree/1e94d2f0b0043b4646604cea852012311e3c68e8" target="_blank">1e94d2f</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8f6754a14a63230ddac3d64b5535ae3fbe800746targetblank8f6754aa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1e94d2f0b0043b4646604cea852012311e3c68e8targetblank1e94d2fa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/8f6754a14a63230ddac3d64b5535ae3fbe800746" target="_blank">8f6754a</a>.
+<a href="https://github.com/davetang/muse/tree/1e94d2f0b0043b4646604cea852012311e3c68e8" target="_blank">1e94d2f</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -619,6 +619,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/1e94d2f0b0043b4646604cea852012311e3c68e8/analysis/seriation.Rmd" target="_blank">1e94d2f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-05
+</td>
+<td>
+Dendrogram
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/b57aaff1869ffc34270f5ab7b0f3d7dda1cde678/docs/seriation.html" target="_blank">b57aaff</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -847,6 +881,15 @@ Pinloche (2005).</p>
 <pre class="r"><code>data(&quot;Wood&quot;)
 dim(Wood)</code></pre>
 <pre><code>[1] 136   6</code></pre>
+<p>Check out <code>Wood</code>.</p>
+<pre class="r"><code>head(Wood)</code></pre>
+<pre><code>                  P          A          B          C          D          E
+AI161452 -0.7546223 -2.2447910 -2.4157241 -0.8181829  1.0121892  0.8839819
+AI161500 -2.0621934  0.2127532  0.3556842  0.2219739 -0.6714808  0.3477471
+AI161513  0.1708342  1.3265617  0.4093247 -1.2003526 -3.3316990 -2.0194944
+AI161572 -1.1837279 -1.5292043 -2.1512254 -1.0145349  1.1844282 -0.4033869
+AI161573 -1.8637857 -2.1495779 -2.5108412 -0.8444706  1.4952223 -1.7662259
+AI161629  1.5917360  1.0212036 -0.1519370 -1.3543136 -2.7099315 -1.3129411</code></pre>
 <p>Methods of interest for heatmaps are dendrogram leaf order-based
 methods applied to rows and columns. This is done using
 <code>method = "heatmap"</code>. The actual seriation method can be
@@ -854,42 +897,62 @@ passed on as parameter seriaton_method, but it has a suitable default if
 it is omitted.</p>
 <pre class="r"><code>wood_hc_complete &lt;- seriate(Wood, method = &quot;Heatmap&quot;, seriation_method = &quot;HC_complete&quot;)
 wood_olo_complete &lt;- seriate(Wood, method = &quot;Heatmap&quot;, seriation_method = &quot;OLO_complete&quot;)
-get_order(wood_hc_complete)</code></pre>
-<pre><code>AI162370 AI166095 AI164136 AI165011 AI165492 AI166057 AI162004 AI163151 
-      26      131       69       91      106      128       15       44 
-AI164970 AI166086 AI162593 AI163756 AI164684 AI164612 AI165835 AI163485 
-      88      130       32       59       80       78      119       51 
-AI163315 AI161513 AI162809 AI162561 AI162652 AI165426 AI162216 AI163303 
-      47        3       38       31       34      105       23       46 
-AI164585 AI164635 AI165041 AI163821 AI162521 AI163812 AI166111 AI161629 
-      76       79       93       62       30       61      133        6 
-AI164686 AI164884 AI165668 AI163528 AI165913 AI163131 AI166101 AI165006 
-      81       86      111       52      123       43      132       90 
-AI165990 AI163617 AI164793 AI163249 AI163994 AI162997 AI163650 AI163758 
-     126       56       85       45       66       41       58       60 
-AI161573 AI162600 AI165529 AI165730 AI162928 AI165868 AI162429 AI164730 
-       5       33      108      116       39      121       28       83 
-AI165247 AI165289 AI166182 AI163328 AI164060 AI165272 AI165803 AI165655 
-     101      103      136       48       67      102      117      110 
-AI162157 AI165826 AI161500 AI165575 AI163608 AI164450 AI162158 AI165175 
-      20      118        2      109       55       74       21       97 
-AI165687 AI166167 AI164370 AI162148 AI165162 AI163474 AI161694 AI161899 
-     113      135       72       19       96       50        9       14 
-AI165836 AI164101 AI166068 AI164435 AI164711 AI165215 AI161730 AI165062 
-     120       68      129       73       82      100       11       94 
-AI164964 AI162452 AI165206 AI163012 AI165107 AI162249 AI163991 AI163880 
-      87       29       99       42       95       24       65       63 
-AI165691 AI165189 AI161827 AI163941 AI165320 AI164753 AI163624 AI162402 
-     115       98       13       64      104       84       57       27 
-AI161452 AI165690 AI164359 AI165949 AI163594 AI166034 AI162710 AI162940 
-       1      114       71      124       54      127       36       40 
-AI162318 AI164979 AI164231 AI165974 AI163580 AI161823 AI165520 AI165903 
-      25       89       70      125       53       12      107      122 
-AI162684 AI161697 AI162729 AI161572 AI162094 AI163338 AI166128 AI162215 
-      35       10       37        4       18       49      134       22 
-AI165673 AI161638 AI161674 AI164604 AI165021 AI162092 AI162060 AI164546 
-     112        7        8       77       92       17       16       75 </code></pre>
-<p>Ordering.</p>
+get_order(wood_olo_complete)</code></pre>
+<pre><code>AI165492 AI166057 AI162004 AI164970 AI163151 AI166086 AI163756 AI162593 
+     106      128       15       88       44      130       59       32 
+AI165011 AI164136 AI166095 AI162370 AI165426 AI162652 AI162561 AI164684 
+      91       69      131       26      105       34       31       80 
+AI164612 AI165835 AI163485 AI162809 AI161513 AI163315 AI163528 AI166101 
+      78      119       51       38        3       47       52      132 
+AI163131 AI165913 AI166111 AI161629 AI164686 AI164884 AI165668 AI164585 
+      43      123      133        6       81       86      111       76 
+AI165041 AI164635 AI163821 AI162521 AI163812 AI163303 AI162216 AI163994 
+      93       79       62       30       61       46       23       66 
+AI163249 AI163617 AI164793 AI165990 AI165006 AI162997 AI163650 AI166068 
+      45       56       85      126       90       41       58      129 
+AI164101 AI165836 AI163012 AI165107 AI162249 AI163991 AI165062 AI161730 
+      68      120       42       95       24       65       94       11 
+AI164964 AI162452 AI165206 AI164435 AI165215 AI164711 AI161827 AI163941 
+      87       29       99       73      100       82       13       64 
+AI165320 AI165189 AI165691 AI163880 AI165690 AI161452 AI162402 AI163624 
+     104       98      115       63      114        1       27       57 
+AI164753 AI165949 AI164359 AI163594 AI166034 AI162940 AI162710 AI162318 
+      84      124       71       54      127       40       36       25 
+AI164979 AI164231 AI165974 AI161823 AI165520 AI162684 AI161697 AI162729 
+      89       70      125       12      107       35       10       37 
+AI165903 AI163580 AI164546 AI162060 AI162092 AI161674 AI161638 AI164604 
+     122       53       75       16       17        8        7       77 
+AI165021 AI163338 AI162215 AI165673 AI166128 AI161572 AI162094 AI162600 
+      92       49       22      112      134        4       18       33 
+AI161573 AI165868 AI162928 AI165529 AI165730 AI163758 AI164060 AI163328 
+       5      121       39      108      116       60       67       48 
+AI165803 AI165272 AI166182 AI165289 AI165247 AI162157 AI165826 AI165655 
+     117      102      136      103      101       20      118      110 
+AI162429 AI164730 AI165162 AI163474 AI161899 AI161694 AI162148 AI164370 
+      28       83       96       50       14        9       19       72 
+AI166167 AI165687 AI165175 AI162158 AI164450 AI163608 AI161500 AI165575 
+     135      113       97       21       74       55        2      109 </code></pre>
+<p>Ignore the numbers of the order above; they indicate the index of the
+gene in <code>Wood</code>. <code>AI165492</code> and
+<code>AI166057</code> are the most similar to each other. If I use those
+values in <code>Wood</code>, I get their expression data.</p>
+<pre class="r"><code>Wood[c(106, 128), ]</code></pre>
+<pre><code>                 P         A         B         C          D         E
+AI165492 -0.825104 0.1972707 0.4277217 0.7228185 -0.8326557 -2.503835
+AI166057 -1.005708 0.5118941 0.7032220 0.6993795 -1.1373152 -2.562734</code></pre>
+<p><code>wood_olo_complete</code> is also a <code>hclust</code>.</p>
+<pre class="r"><code>class(wood_olo_complete[[1]])</code></pre>
+<pre><code>[1] &quot;ser_permutation_vector&quot; &quot;hclust&quot;                </code></pre>
+<p>Plot hierarchical clustering result.</p>
+<pre class="r"><code>as.dendrogram(wood_olo_complete[[1]]) %&gt;%
+  plot(horiz = TRUE)</code></pre>
+<p><img src="figure/seriation.Rmd/unnamed-chunk-1-1.png" width="1344" style="display: block; margin: auto;" /></p>
+<p>Gene order of the dendrogram matches the order produced by seriation
+using OLO complete.</p>
+<pre class="r"><code>o &lt;- wood_olo_complete[[1]]$order
+identical(wood_olo_complete[[1]]$labels[o], names(get_order(wood_olo_complete)))</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<p>Location ordering.</p>
 <pre class="r"><code>get_order(wood_hc_complete, 2)</code></pre>
 <pre><code>P A B E C D 
 1 2 3 6 4 5 </code></pre>
@@ -979,29 +1042,29 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] seriation_1.5.1-1    patchwork_1.1.3.9000 lubridate_1.9.2     
- [4] forcats_1.0.0        stringr_1.5.0        dplyr_1.1.2         
- [7] purrr_1.0.1          readr_2.1.4          tidyr_1.3.0         
-[10] tibble_3.2.1         ggplot2_3.4.2        tidyverse_2.0.0     
-[13] workflowr_1.7.0     
+ [1] seriation_1.5.1-1    dendextend_1.17.1    patchwork_1.1.3.9000
+ [4] lubridate_1.9.2      forcats_1.0.0        stringr_1.5.0       
+ [7] dplyr_1.1.2          purrr_1.0.1          readr_2.1.4         
+[10] tidyr_1.3.0          tibble_3.2.1         ggplot2_3.4.2       
+[13] tidyverse_2.0.0      workflowr_1.7.0     
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.3     xfun_0.39        bslib_0.5.0      processx_3.8.1  
- [5] callr_3.7.3      tzdb_0.4.0       vctrs_0.6.2      tools_4.3.0     
- [9] ps_1.7.5         generics_0.1.3   ca_0.71.1        fansi_1.0.4     
-[13] highr_0.10       pkgconfig_2.0.3  lifecycle_1.0.3  compiler_4.3.0  
-[17] farver_2.1.1     git2r_0.32.0     munsell_0.5.0    getPass_0.2-2   
-[21] codetools_0.2-19 httpuv_1.6.11    htmltools_0.5.5  sass_0.4.6      
-[25] yaml_2.3.7       later_1.3.1      pillar_1.9.0     jquerylib_0.1.4 
-[29] whisker_0.4.1    cachem_1.0.8     iterators_1.0.14 TSP_1.2-4       
-[33] foreach_1.5.2    tidyselect_1.2.0 digest_0.6.31    stringi_1.7.12  
-[37] labeling_0.4.2   rprojroot_2.0.3  fastmap_1.1.1    grid_4.3.0      
-[41] colorspace_2.1-0 cli_3.6.1        magrittr_2.0.3   utf8_1.2.3      
-[45] withr_2.5.0      scales_1.2.1     promises_1.2.0.1 registry_0.5-1  
-[49] timechange_0.2.0 rmarkdown_2.22   httr_1.4.6       hms_1.1.3       
-[53] evaluate_0.21    knitr_1.43       rlang_1.1.1      Rcpp_1.0.10     
-[57] glue_1.6.2       rstudioapi_0.14  jsonlite_1.8.5   R6_2.5.1        
-[61] fs_1.6.2        </code></pre>
+ [1] gtable_0.3.3      xfun_0.39         bslib_0.5.0       processx_3.8.1   
+ [5] callr_3.7.3       tzdb_0.4.0        vctrs_0.6.2       tools_4.3.0      
+ [9] ps_1.7.5          generics_0.1.3    ca_0.71.1         fansi_1.0.4      
+[13] highr_0.10        pkgconfig_2.0.3   lifecycle_1.0.3   farver_2.1.1     
+[17] compiler_4.3.0    git2r_0.32.0      munsell_0.5.0     getPass_0.2-2    
+[21] codetools_0.2-19  httpuv_1.6.11     htmltools_0.5.5   sass_0.4.6       
+[25] yaml_2.3.7        later_1.3.1       pillar_1.9.0      jquerylib_0.1.4  
+[29] whisker_0.4.1     cachem_1.0.8      iterators_1.0.14  viridis_0.6.3    
+[33] TSP_1.2-4         foreach_1.5.2     tidyselect_1.2.0  digest_0.6.31    
+[37] stringi_1.7.12    labeling_0.4.2    rprojroot_2.0.3   fastmap_1.1.1    
+[41] grid_4.3.0        colorspace_2.1-0  cli_3.6.1         magrittr_2.0.3   
+[45] utf8_1.2.3        withr_2.5.0       scales_1.2.1      promises_1.2.0.1 
+[49] registry_0.5-1    timechange_0.2.0  rmarkdown_2.22    httr_1.4.6       
+[53] gridExtra_2.3     hms_1.1.3         evaluate_0.21     knitr_1.43       
+[57] viridisLite_0.4.2 rlang_1.1.1       Rcpp_1.0.10       glue_1.6.2       
+[61] rstudioapi_0.14   jsonlite_1.8.5    R6_2.5.1          fs_1.6.2         </code></pre>
 </div>
 </div>
 
