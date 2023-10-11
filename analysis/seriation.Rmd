@@ -241,3 +241,55 @@ ggdissplot(d_ruspini) + ggtitle("Dissimilarity plot without clustering")
 ```
 
 Dissimilarity plots scale well with the dimensionality of the data and by reordering clusters and objects within clusters, we can get a very concise structural representation of the clustering. Dissimiarlity plots are also helpful in spotting the mis-specification of the number of clusters used for partitioning.
+
+## Correlation matrix visualisation
+
+>A [correlation matrix](https://mhahsler.github.io/seriation/correlation_matrix.html) is a square, symmetric matrix showing the pairwise correlation coefficients between two sets of variables. Reordering the variables and plotting the matrix can help to find hidden patterns among the variables.
+
+Use the `mtcars` dataset that contains data about fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973-74 models).
+
+```{r mtcars}
+data("mtcars")
+head(mtcars)
+```
+
+Calculate a correlation matrix.
+
+```{r mtcars_cor}
+m <- cor(mtcars)
+round(m, 2)
+```
+
+Visualise the matrix without reordering and ordering by Angle Of Eigenvectors (AOE), which was proposed for correlation matrices by Friendly (2002).
+
+```{r cor_pimage, fig.show="hold", out.width="50%", fig.asp=1, fig.align="default"}
+pimage(m)
+pimage(m, order = "AOE")
+```
+
+The reordering clearly shows that there are two groups of highly correlated variables and these two groups have a strong negative correlation with each other.
+
+Some options.
+
+```{r cor_pimage_colours, fig.show="hold", out.width="50%", fig.asp=1, fig.align="default"}
+pimage(m, order = "AOE", col = rev(bluered()), diag = FALSE, upper_tri = FALSE)
+pimage(m, order = "AOE", col = colorRampPalette(c("red", "white", "darkgreen"))(100))
+```
+
+We can apply any seriation method for distances to create an order. First, we convert the correlation matrix into a distance matrix using $d_{ij} = \sqrt{1 - m_{ij}}$. Then we can use the distances for seriation and use the resulting order to rearrange the rows and columns of the correlation matrix.
+
+```{r cor_seriation, fig.show="hold", out.width="50%", fig.asp=1, fig.align="default"}
+d <- as.dist(sqrt(1 - m))
+
+o <- seriate(d, "MDS")
+pimage(m , order = c(o, o), main = "MDS", col = rev(bluered()))
+
+o <- seriate(d, "ARSA")
+pimage(m , order = c(o, o), main = "ARSA", col = rev(bluered()))
+
+o <- seriate(d, "OLO")
+pimage(m , order = c(o, o), main = "OLO", col = rev(bluered()))
+
+o <- seriate(d, "R2E")
+pimage(m , order = c(o, o), main = "R2E", col = rev(bluered()))
+```
