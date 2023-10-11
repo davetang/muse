@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7c1bdcd79df157fbc7640d4c24290e36228c07fftargetblank7c1bdcda">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree803f3bab86028ee56611b7104c099bb17be2f12etargetblank803f3baa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/7c1bdcd79df157fbc7640d4c24290e36228c07ff" target="_blank">7c1bdcd</a>
+<a href="https://github.com/davetang/muse/tree/803f3bab86028ee56611b7104c099bb17be2f12e" target="_blank">803f3ba</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7c1bdcd79df157fbc7640d4c24290e36228c07fftargetblank7c1bdcda"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree803f3bab86028ee56611b7104c099bb17be2f12etargetblank803f3baa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/7c1bdcd79df157fbc7640d4c24290e36228c07ff" target="_blank">7c1bdcd</a>.
+<a href="https://github.com/davetang/muse/tree/803f3bab86028ee56611b7104c099bb17be2f12e" target="_blank">803f3ba</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -618,6 +618,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/803f3bab86028ee56611b7104c099bb17be2f12e/analysis/tissue.Rmd" target="_blank">803f3ba</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-11
+</td>
+<td>
+Other metrics
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/d5f2d490f8d598717b2e60eeed624ee4c923b6cd/docs/tissue.html" target="_blank">d5f2d49</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -716,6 +750,43 @@ axis(side=1, at=x)
 abline(v = 0.5, lty = 3)
 abline(h = 1, lty = 3)</code></pre>
 <p><img src="figure/tissue.Rmd/coin_highest_entropy-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-coin_highest_entropy-1">
+Past versions of coin_highest_entropy-1.png
+</button>
+</p>
+<div id="fig-coin_highest_entropy-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/d5f2d490f8d598717b2e60eeed624ee4c923b6cd/docs/figure/tissue.Rmd/coin_highest_entropy-1.png" target="_blank">d5f2d49</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <div id="tissue-specificity" class="section level2">
 <h2>Tissue specificity</h2>
 <p>What does all this have to do with measuring tissue specificity? I
@@ -762,6 +833,11 @@ shannon.entropy(half_gene)</code></pre>
 one_gene[30] &lt;- 50
 shannon.entropy(one_gene)</code></pre>
 <pre><code>[1] 0</code></pre>
+<p>Expression much higher in one sample.</p>
+<pre class="r"><code>one_gene_with_bg &lt;- rep(1, 29)
+one_gene_with_bg[30] &lt;- 50
+shannon.entropy(one_gene_with_bg)</code></pre>
+<pre><code>[1] 2.73172</code></pre>
 <p>Expression only in three samples.</p>
 <pre class="r"><code>three_gene &lt;- c(rep(1,27), 25, 65, 100)
 shannon.entropy(three_gene)</code></pre>
@@ -779,6 +855,43 @@ shannon.entropy(all_gene_equal)</code></pre>
 par(mfrow=c(2,3))
 sapply(list(all_gene, all_gene_one_higher, half_gene, one_gene, three_gene, all_gene_equal), plot_entropy)</code></pre>
 <p><img src="figure/tissue.Rmd/plot_entropy-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_entropy-1">
+Past versions of plot_entropy-1.png
+</button>
+</p>
+<div id="fig-plot_entropy-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/d5f2d490f8d598717b2e60eeed624ee4c923b6cd/docs/figure/tissue.Rmd/plot_entropy-1.png" target="_blank">d5f2d49</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre><code>      [,1] [,2] [,3] [,4] [,5] [,6]
  [1,]  0.7  0.7  0.7  0.7  0.7  0.7
  [2,]  1.9  1.9  1.9  1.9  1.9  1.9
@@ -810,6 +923,47 @@ sapply(list(all_gene, all_gene_one_higher, half_gene, one_gene, three_gene, all_
 [28,] 33.1 33.1 33.1 33.1 33.1 33.1
 [29,] 34.3 34.3 34.3 34.3 34.3 34.3
 [30,] 35.5 35.5 35.5 35.5 35.5 35.5</code></pre>
+</div>
+<div id="other-tissue-specificity-metrics" class="section level2">
+<h2>Other tissue specificity metrics</h2>
+<p><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5444245/">A
+benchmark of gene expression tissue-specificity metrics</a>.</p>
+<p>Tau:</p>
+<p><span class="math display">\[ \tau = \frac{\sum_{i=1}^n (1 - \widehat
+x_i)}{n-1}; \widehat x_i = \frac{x_i}{\max_{1\le i \le n}
+(x_i)}\]</span></p>
+<p>EE score (summary of the expression of all genes in tissue <span
+class="math inline">\(i\)</span>):</p>
+<p><span class="math display">\[ EE = \frac{x_i}{\sum^n_{i=1}x_i \times
+\frac{s_i}{\sum^n_{i=1} s_i}} = \frac{\sum^n_{i=1} s_i}{s_i} \times
+\frac{x_i}{\sum^n_{i=1}x_i}s_i \]</span></p>
+<p>TSI:</p>
+<p><span class="math display">\[ TSI = \frac{\max_{1 \le i \le
+n}(x_i)}{\sum^n_{i=1}x_i} \]</span></p>
+<p>Gini coefficient, where <span class="math inline">\(x_i\)</span> has
+to be ordered from least to greatest:</p>
+<p><span class="math display">\[ Gini = \frac{n + 1}{n} - \frac{2
+\sum^n_{i=1} (n + 1 - i) x_i}{n \sum^n_{i=1}x_i} \]</span></p>
+<p>Shannon entropy:</p>
+<p><span class="math display">\[ H_g = - \sum^n_{i=1} p_i \times
+log_2(p_i); p_i = \frac{x_i}{\sum^n_{i=1}x_i} \]</span></p>
+<p>The z-score can be implemented in two ways: either only
+over-expressed genes are defined as tissue specific or the absolute
+distance from the mean is used, so that under-expressed genes are also
+defined as tissue specific.</p>
+<p><span class="math display">\[ \zeta = \frac{x_i - \mu}{\sigma}
+\]</span></p>
+<p>SPM:</p>
+<p><span class="math display">\[ SPM = \frac{x_i^2}{\sum^n_{i=1}x^2_i}
+\]</span></p>
+<p>PEM estimates how different the expression of the gene is relative to
+an expected expression, under the assumption of uniform expression in
+all tissues. <span class="math inline">\(s_i\)</span> is the summary of
+the expression of all genes in tissue <span
+class="math inline">\(i\)</span>.</p>
+<p><span class="math display">\[ PEM = log_{10} \left(
+\frac{\sum^n_{i=1}}{s_i} \times \frac{x_i}{\sum^n_{i=1} x_i} \right)
+\]</span></p>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
