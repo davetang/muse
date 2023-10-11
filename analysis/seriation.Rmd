@@ -15,6 +15,10 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
+From the [seriation R package](https://github.com/mhahsler/seriation).
+
+>Seriation arranges a set of objects into a linear order given available data with the goal of revealing structural information. This package provides the infrastructure for ordering objects with an implementation of many seriation/sequencing/ordination techniques to reorder data matrices, dissimilarity matrices, correlation matrices, and dendrograms (see below for a complete list). The package provides several visualizations (grid and ggplot2) to reveal structural information, including permuted image plots, reordered heatmaps, Bertin plots, clustering visualizations like dissimilarity plots, and visual assessment of cluster tendency plots (VAT and iVAT).
+
 ## Installation
 
 Install stable CRAN version.
@@ -24,6 +28,7 @@ if(! "seriation" %in% installed.packages()[, 1]){
   install.packages("seriation", repos = c("https://mhahsler.r-universe.dev", "https://cloud.r-project.org/"))
 }
 
+library(seriation)
 packageVersion("seriation")
 ```
 
@@ -34,7 +39,6 @@ Use the [example dataset](https://github.com/mhahsler/seriation#usage) `SupremeC
 >Contains a (a subset of the) decisions for the stable 8-yr period 1995-2002 of the second Rehnquist Supreme Court. Decisions are aggregated to the joint probability for disagreement between judges.
 
 ```{r supreme_court}
-library(seriation)
 data("SupremeCourt")
 SupremeCourt
 ```
@@ -57,10 +61,10 @@ Plot heatmap.
 
 ```{r heatmap, message=FALSE, warning=FALSE}
 p1 <- ggpimage(d, upper_tri = TRUE) +
-  ggtitle("Judges (original alphabetical order)")
+  ggtitle("Judges (original order)")
 
 p2 <- ggpimage(d, my_order, upper_tri = TRUE) +
-  ggtitle("Judges (reordered by seriation)")
+  ggtitle("Judges (seriation order)")
 
 p1 + p2 & scale_fill_gradientn(colours = c("darkgrey", "skyblue"))
 ```
@@ -68,13 +72,19 @@ p1 + p2 & scale_fill_gradientn(colours = c("darkgrey", "skyblue"))
 Return linear configuration where more similar objects are located closer to each other.
 
 ```{r get_config}
-get_config(my_order)
+sort(get_config(my_order))
 ```
 
 Plot linear configuration.
 
 ```{r plot_config}
 plot_config(my_order)
+```
+
+Hierarchical cluster with average linkage.
+
+```{r hclust}
+plot(hclust(d, method = "average"))
 ```
 
 ## Heatmaps with seriation
@@ -94,7 +104,7 @@ Check out `Wood`.
 head(Wood)
 ```
 
-Methods of interest for heatmaps are dendrogram leaf order-based methods applied to rows and columns. This is done using `method = "heatmap"`. The actual seriation method can be passed on as parameter seriaton_method, but it has a suitable default if it is omitted.
+Methods of interest for heatmaps are dendrogram leaf order-based methods applied to rows and columns. This is done using `method = "heatmap"`. The actual seriation method can be passed on as parameter seriation_method, but it has a suitable default if it is omitted.
 
 ```{r wood_order}
 wood_hc_complete <- seriate(Wood, method = "Heatmap", seriation_method = "HC_complete")
@@ -106,6 +116,20 @@ Ignore the numbers of the order above; they indicate the index of the gene in `W
 
 ```{r index_wood}
 Wood[c(106, 128), ]
+```
+
+We can clearly see the similar expression patterns for these subset of genes.
+
+```{r plot_eg}
+Wood[get_order(wood_olo_complete)[1:6], ] |>
+  as.data.frame() |>
+  tibble::rownames_to_column('gene') |>
+  tidyr::pivot_longer(-gene) |>
+  ggplot(data = _, aes(name, value, group = gene, colour = gene)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = "Genes with similar expression patterns", y = "Normalised expression", x = "location")
 ```
 
 `wood_olo_complete` is also a `hclust`.
@@ -120,7 +144,6 @@ Plot hierarchical clustering result.
 as.dendrogram(wood_olo_complete[[1]]) %>%
   plot(horiz = TRUE)
 ```
-
 
 Gene order of the dendrogram matches the order produced by seriation using OLO complete.
 
