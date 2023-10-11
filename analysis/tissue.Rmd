@@ -130,6 +130,14 @@ one_gene[30] <- 50
 shannon.entropy(one_gene)
 ```
 
+Expression much higher in one sample.
+
+```{r one_gene_with_bg}
+one_gene_with_bg <- rep(1, 29)
+one_gene_with_bg[30] <- 50
+shannon.entropy(one_gene_with_bg)
+```
+
 Expression only in three samples.
 
 ```{r three_gene}
@@ -154,6 +162,42 @@ plot_entropy <- function(x){
 par(mfrow=c(2,3))
 sapply(list(all_gene, all_gene_one_higher, half_gene, one_gene, three_gene, all_gene_equal), plot_entropy)
 ```
+
+## Other tissue specificity metrics
+
+[A benchmark of gene expression tissue-specificity metrics](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5444245/).
+
+Tau:
+
+$$ \tau = \frac{\sum_{i=1}^n (1 - \widehat x_i)}{n-1}; \widehat x_i = \frac{x_i}{\max_{1\le i \le n} (x_i)}$$
+
+EE score (summary of the expression of all genes in tissue $i$):
+
+$$ EE = \frac{x_i}{\sum^n_{i=1}x_i \times \frac{s_i}{\sum^n_{i=1} s_i}} = \frac{\sum^n_{i=1} s_i}{s_i} \times \frac{x_i}{\sum^n_{i=1}x_i}s_i $$
+
+TSI:
+
+$$ TSI = \frac{\max_{1 \le i \le n}(x_i)}{\sum^n_{i=1}x_i} $$
+
+Gini coefficient, where $x_i$ has to be ordered from least to greatest:
+
+$$ Gini = \frac{n + 1}{n} - \frac{2 \sum^n_{i=1} (n + 1 - i) x_i}{n \sum^n_{i=1}x_i} $$
+
+Shannon entropy:
+
+$$ H_g = - \sum^n_{i=1} p_i \times log_2(p_i); p_i = \frac{x_i}{\sum^n_{i=1}x_i} $$
+
+The z-score can be implemented in two ways: either only over-expressed genes are defined as tissue specific or the absolute distance from the mean is used, so that under-expressed genes are also defined as tissue specific.
+
+$$ \zeta = \frac{x_i - \mu}{\sigma} $$
+
+SPM:
+
+$$ SPM = \frac{x_i^2}{\sum^n_{i=1}x^2_i} $$
+
+PEM estimates how different the expression of the gene is relative to an expected expression, under the assumption of uniform expression in all tissues. $s_i$ is the summary of the expression of all genes in tissue $i$.
+
+$$ PEM = log_{10} \left( \frac{\sum^n_{i=1}}{s_i} \times \frac{x_i}{\sum^n_{i=1} x_i} \right) $$
 
 ## Summary
 
