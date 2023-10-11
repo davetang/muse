@@ -140,7 +140,7 @@ class(wood_olo_complete[[1]])
 
 Plot hierarchical clustering result.
 
-```{r fig.height=20, fig.width=14}
+```{r plot_dendrogram, fig.height=20, fig.width=14}
 as.dendrogram(wood_olo_complete[[1]]) %>%
   plot(horiz = TRUE)
 ```
@@ -198,7 +198,7 @@ plot(ruspini, pch = 16)
 
 Cluster with _k_-means and produce a dissimilarity plot.
 
-```{r four_clusters, fig.show="hold", out.width="50%", fig.asp=1, fig.align="default"}
+```{r four_clusters, fig.show="hold", out.width="50%", fig.asp=1, fig.align='default'}
 set.seed(1234)
 cl_ruspini <- kmeans(ruspini, centers=4, nstart=5)
 d_ruspini  <- dist(ruspini)
