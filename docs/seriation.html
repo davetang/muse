@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-10-05" />
+<meta name="date" content="2023-10-11" />
 
 <title>Ordering Objects using Seriation in R</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Ordering Objects using Seriation in R</h1>
-<h4 class="date">2023-10-05</h4>
+<h4 class="date">2023-10-11</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-10-05
+<strong>Last updated:</strong> 2023-10-11
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1e94d2f0b0043b4646604cea852012311e3c68e8targetblank1e94d2fa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree06c679a737a37590b2d925ecb680bdae444895ddtargetblank06c679aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/1e94d2f0b0043b4646604cea852012311e3c68e8" target="_blank">1e94d2f</a>
+<a href="https://github.com/davetang/muse/tree/06c679a737a37590b2d925ecb680bdae444895dd" target="_blank">06c679a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1e94d2f0b0043b4646604cea852012311e3c68e8targetblank1e94d2fa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree06c679a737a37590b2d925ecb680bdae444895ddtargetblank06c679aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/1e94d2f0b0043b4646604cea852012311e3c68e8" target="_blank">1e94d2f</a>.
+<a href="https://github.com/davetang/muse/tree/06c679a737a37590b2d925ecb680bdae444895dd" target="_blank">06c679a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -619,6 +619,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/06c679a737a37590b2d925ecb680bdae444895dd/analysis/seriation.Rmd" target="_blank">06c679a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-11
+</td>
+<td>
+Additional plots
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/f8124bcc174e677d55681c6cc5db28f281786a0a/docs/seriation.html" target="_blank">f8124bc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -713,6 +747,20 @@ Ordering objects using seriation
 </div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
+<p>From the <a href="https://github.com/mhahsler/seriation">seriation R
+package</a>.</p>
+<blockquote>
+<p>Seriation arranges a set of objects into a linear order given
+available data with the goal of revealing structural information. This
+package provides the infrastructure for ordering objects with an
+implementation of many seriation/sequencing/ordination techniques to
+reorder data matrices, dissimilarity matrices, correlation matrices, and
+dendrograms (see below for a complete list). The package provides
+several visualizations (grid and ggplot2) to reveal structural
+information, including permuted image plots, reordered heatmaps, Bertin
+plots, clustering visualizations like dissimilarity plots, and visual
+assessment of cluster tendency plots (VAT and iVAT).</p>
+</blockquote>
 </div>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
@@ -721,6 +769,7 @@ Ordering objects using seriation
   install.packages(&quot;seriation&quot;, repos = c(&quot;https://mhahsler.r-universe.dev&quot;, &quot;https://cloud.r-project.org/&quot;))
 }
 
+library(seriation)
 packageVersion(&quot;seriation&quot;)</code></pre>
 <pre><code>[1] &#39;1.5.1.1&#39;</code></pre>
 </div>
@@ -733,8 +782,7 @@ dataset</a> <code>SupremeCourt</code>, which:</p>
 1995-2002 of the second Rehnquist Supreme Court. Decisions are
 aggregated to the joint probability for disagreement between judges.</p>
 </blockquote>
-<pre class="r"><code>library(seriation)
-data(&quot;SupremeCourt&quot;)
+<pre class="r"><code>data(&quot;SupremeCourt&quot;)
 SupremeCourt</code></pre>
 <pre><code>           Breyer Ginsburg Kennedy OConnor Rehnquist  Scalia  Souter Stevens
 Breyer    0.00000  0.11966 0.25000 0.20940   0.29915 0.35256 0.11752 0.16239
@@ -777,10 +825,10 @@ get_order(my_order)</code></pre>
         8 </code></pre>
 <p>Plot heatmap.</p>
 <pre class="r"><code>p1 &lt;- ggpimage(d, upper_tri = TRUE) +
-  ggtitle(&quot;Judges (original alphabetical order)&quot;)
+  ggtitle(&quot;Judges (original order)&quot;)
 
 p2 &lt;- ggpimage(d, my_order, upper_tri = TRUE) +
-  ggtitle(&quot;Judges (reordered by seriation)&quot;)
+  ggtitle(&quot;Judges (seriation order)&quot;)
 
 p1 + p2 &amp; scale_fill_gradientn(colours = c(&quot;darkgrey&quot;, &quot;skyblue&quot;))</code></pre>
 <p><img src="figure/seriation.Rmd/heatmap-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -823,11 +871,11 @@ Dave Tang
 </div>
 <p>Return linear configuration where more similar objects are located
 closer to each other.</p>
-<pre class="r"><code>get_config(my_order)</code></pre>
-<pre><code>    Breyer   Ginsburg    Kennedy    OConnor  Rehnquist     Scalia     Souter 
- 0.2362454  0.2814388 -0.1501451 -0.1051162 -0.2656098 -0.4159504  0.2139295 
-   Stevens     Thomas 
- 0.6129974 -0.4077896 </code></pre>
+<pre class="r"><code>sort(get_config(my_order))</code></pre>
+<pre><code>    Scalia     Thomas  Rehnquist    Kennedy    OConnor     Souter     Breyer 
+-0.4159504 -0.4077896 -0.2656098 -0.1501451 -0.1051162  0.2139295  0.2362454 
+  Ginsburg    Stevens 
+ 0.2814388  0.6129974 </code></pre>
 <p>Plot linear configuration.</p>
 <pre class="r"><code>plot_config(my_order)</code></pre>
 <p><img src="figure/seriation.Rmd/plot_config-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -868,6 +916,9 @@ Dave Tang
 </table>
 </div>
 </div>
+<p>Hierarchical cluster with average linkage.</p>
+<pre class="r"><code>plot(hclust(d, method = &quot;average&quot;))</code></pre>
+<p><img src="figure/seriation.Rmd/hclust-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="heatmaps-with-seriation" class="section level2">
 <h2>Heatmaps with seriation</h2>
@@ -893,8 +944,8 @@ AI161629  1.5917360  1.0212036 -0.1519370 -1.3543136 -2.7099315 -1.3129411</code
 <p>Methods of interest for heatmaps are dendrogram leaf order-based
 methods applied to rows and columns. This is done using
 <code>method = "heatmap"</code>. The actual seriation method can be
-passed on as parameter seriaton_method, but it has a suitable default if
-it is omitted.</p>
+passed on as parameter seriation_method, but it has a suitable default
+if it is omitted.</p>
 <pre class="r"><code>wood_hc_complete &lt;- seriate(Wood, method = &quot;Heatmap&quot;, seriation_method = &quot;HC_complete&quot;)
 wood_olo_complete &lt;- seriate(Wood, method = &quot;Heatmap&quot;, seriation_method = &quot;OLO_complete&quot;)
 get_order(wood_olo_complete)</code></pre>
@@ -940,6 +991,18 @@ values in <code>Wood</code>, I get their expression data.</p>
 <pre><code>                 P         A         B         C          D         E
 AI165492 -0.825104 0.1972707 0.4277217 0.7228185 -0.8326557 -2.503835
 AI166057 -1.005708 0.5118941 0.7032220 0.6993795 -1.1373152 -2.562734</code></pre>
+<p>We can clearly see the similar expression patterns for these subset
+of genes.</p>
+<pre class="r"><code>Wood[get_order(wood_olo_complete)[1:6], ] |&gt;
+  as.data.frame() |&gt;
+  tibble::rownames_to_column(&#39;gene&#39;) |&gt;
+  tidyr::pivot_longer(-gene) |&gt;
+  ggplot(data = _, aes(name, value, group = gene, colour = gene)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(title = &quot;Genes with similar expression patterns&quot;, y = &quot;Normalised expression&quot;, x = &quot;location&quot;)</code></pre>
+<p><img src="figure/seriation.Rmd/plot_eg-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p><code>wood_olo_complete</code> is also a <code>hclust</code>.</p>
 <pre class="r"><code>class(wood_olo_complete[[1]])</code></pre>
 <pre><code>[1] &quot;ser_permutation_vector&quot; &quot;hclust&quot;                </code></pre>
@@ -947,6 +1010,43 @@ AI166057 -1.005708 0.5118941 0.7032220 0.6993795 -1.1373152 -2.562734</code></pr
 <pre class="r"><code>as.dendrogram(wood_olo_complete[[1]]) %&gt;%
   plot(horiz = TRUE)</code></pre>
 <p><img src="figure/seriation.Rmd/unnamed-chunk-1-1.png" width="1344" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-1-1">
+Past versions of unnamed-chunk-1-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-1-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/f8124bcc174e677d55681c6cc5db28f281786a0a/docs/figure/seriation.Rmd/unnamed-chunk-1-1.png" target="_blank">f8124bc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Gene order of the dendrogram matches the order produced by seriation
 using OLO complete.</p>
 <pre class="r"><code>o &lt;- wood_olo_complete[[1]]$order
