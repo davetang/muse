@@ -1,0 +1,160 @@
+---
+title: "Tissue specificity"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+A key measure in [information theory](https://en.wikipedia.org/wiki/Entropy_(information_theory)) is entropy, which is:
+
+>"The amount of uncertainty involved in a random process; the lower the uncertainty, the lower the entropy."
+
+For example, there is lower entropy in a fair coin flip versus a fair die roll since there are more possible outcomes with a die roll ${1, 2, 3, 4, 5, 6}$ compared to a coin flip ${H, T}$.
+
+Entropy is measured in bits, which has a single binary value of either 1 or 0. Since a coin toss has only two outcomes, each toss has one bit of information. However, if the coin is not fair, meaning that it is biased towards either heads or tails, there is less uncertainty, i.e. lower entropy; if a die lands on heads 60% of the time, we are more certain of heads than in a fair die (50% heads).
+
+There is a nice example on the [Information Content Wikipedia page](https://en.wikipedia.org/wiki/Information_content#Derivation) explaining the relationship between entropy (uncertainty) and information content.
+
+>For example, quoting a character (the Hippy Dippy Weatherman) of comedian George Carlin, "Weather forecast for tonight: dark. Continued dark overnight, with widely scattered light by morning." Assuming one not residing near the Earth's poles or polar circles, the amount of information conveyed in that forecast is zero because it is known, in advance of receiving the forecast, that darkness always comes with the night.
+
+There is no uncertainty in the above statement hence that piece of information has 0 bits.
+
+Mathematically, the Shannon entropy is defined as:
+
+$$ -\sum_{i=1}^n p(x_i) log_{b}p(x_i) $$
+
+Let's test this out in R using the coin flip example above.
+
+Firstly let's define the `entropy` function according to the formula above.
+
+```{r entropy}
+entropy <- function(x){
+  -sum(log2(x)*x)
+}
+```
+
+Generate 100 fair coin tosses.
+
+```{r fair_res}
+set.seed(1984)
+fair_res <- rbinom(n = 100, size = 1, prob = 0.5)
+prop.table(table(fair_res))
+```
+
+Calculate Shannon entropy of fair coin tosses.
+
+```{r entropy_fair_res}
+entropy(as.vector(prop.table(table(fair_res))))
+```
+
+Generate 100 biased coin tosses.
+
+```{r unfair_res}
+set.seed(1984)
+unfair_res <- rbinom(n = 100, size = 1, prob = 0.2)
+prop.table(table(unfair_res))
+```
+
+Calculate Shannon entropy of biased coin tosses.
+
+```{r entropy_unfair_res}
+entropy(as.vector(prop.table(table(unfair_res))))
+```
+
+A biased coin will is more predicable, i.e. has less uncertainty, and therefore has less entropy than a fair coin.
+
+In fact a fair coin has the highest entropy. This makes sense because when it's 50/50, it is the most uncertain!
+
+```{r coin_highest_entropy}
+x <- seq(0.05, 0.95, 0.05)
+y <- 1 - x
+e <- sapply(seq_along(x), function(i) entropy(c(x[i], y[i])))
+
+plot(x, e, xlab = "Probability of heads", ylab = "Entropy", pch = 16, xaxt = 'n')
+axis(side=1, at=x)
+abline(v = 0.5, lty = 3)
+abline(h = 1, lty = 3)
+```
+
+## Tissue specificity
+
+What does all this have to do with measuring tissue specificity? I came across this paper: [Promoter features related to tissue specificity as measured by Shannon entropy](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2005-6-4-r33) and it spurred me to learn about entropy. Basically, if a gene is expressed in a tissue specific manner, we are more certain of its expression and hence there is lower entropy.
+
+Let's begin by defining a Shannon entropy function for use with tissue expression. The code is from the [R help mail](https://stat.ethz.ch/pipermail/r-help/2008-July/167112.html). This function includes a simple normalisation method of normalising each value by the sum. In addition, if any value is less than 0 or if the sum of all values is less than or equal to zero, the function will return an `NA`.
+
+```{r shannon_entropy}
+shannon.entropy <- function(p){
+   if (min(p) < 0 || sum(p) <= 0) return(NA)
+   p.norm <- p[p>0]/sum(p)
+   -sum(log2(p.norm)*p.norm)
+}
+```
+
+Let's imagine we have 30 samples and we have a gene that is ubiquitously expressed.
+
+```{r all_gene}
+set.seed(1984)
+all_gene <- rnorm(n = 30, mean = 50, sd = 15)
+shannon.entropy(all_gene)
+```
+
+A ubiquitously expressed gene that is highly expressed in one sample.
+
+```{r all_gene_one_higher}
+all_gene_one_higher <- all_gene
+all_gene_one_higher[30] <- 100
+shannon.entropy(all_gene_one_higher)
+```
+
+Higher expression in half of the samples.
+
+```{r half_gene}
+set.seed(1984)
+half_gene <- c(
+  rnorm(n = 15, mean = 50, sd = 10),
+  rnorm(n = 15, mean = 5, sd = 1)
+)
+shannon.entropy(half_gene)
+```
+
+Expression only in one sample.
+
+```{r one_gene}
+one_gene <- rep(0, 29)
+one_gene[30] <- 50
+shannon.entropy(one_gene)
+```
+
+Expression only in three samples.
+
+```{r three_gene}
+three_gene <- c(rep(1,27), 25, 65, 100)
+shannon.entropy(three_gene)
+```
+
+Equal expression in all samples; note that the Shannon entropy will be the same regardless of the expression strength.
+
+```{r all_gene_equal}
+all_gene_equal <- rep(50, 30)
+shannon.entropy(all_gene_equal)
+```
+
+Plot the expression patterns for the 6 scenarios.
+
+```{r plot_entropy}
+plot_entropy <- function(x){
+  barplot(x, main = round(shannon.entropy(x), 3), xlab = 'Samples', ylab = 'Expression')
+}
+
+par(mfrow=c(2,3))
+sapply(list(all_gene, all_gene_one_higher, half_gene, one_gene, three_gene, all_gene_equal), plot_entropy)
+```
+
+## Summary
+
+Equal expression amongst the 30 libraries resulted in a Shannon entropy of ~4.91 bits; this is similar to an even coin toss. This is close to 5 bits because we need 5 bits to transfer information on 30 samples. The more specific a gene is expressed, the less uncertainty, and therefore the lower the entropy.
