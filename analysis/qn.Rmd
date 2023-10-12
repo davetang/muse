@@ -78,7 +78,7 @@ quantile_normalisation <- function(x, ties = "min"){
       my_max <- rank(v, ties.method = "max")
       sapply(seq_along(my_min), function(i){
         m <- my_list$mean[my_min[i]:my_max[i]]
-        sum(m) / length(m)
+        median(m)
       })
     })
   } else {
@@ -200,7 +200,7 @@ The `normalize.quantiles` function uses the average method for ties, which we ca
 quantile_normalisation(eg2$raw, ties = "average")$norm
 ```
 
-When there are more ties, `normalize.quantiles` is implemented differently than my (most likely mis-)implementation.
+In this example, I have genes tied by different number of times.
 
 ```{r eg3}
 eg3 <- matrix(
@@ -215,14 +215,14 @@ eg3 <- matrix(
   dimnames = list(toupper(LETTERS[1:5]), letters[23:26])
 )
 
-normalize.quantiles(eg3)
-quantile_normalisation(eg3, ties = "average")$norm
+eg3
 ```
 
-I am not quite sure what `normalize.quantiles` is doing and probably need to inspect the [source](https://github.com/bmbolstad/preprocessCore). I thought the averaging approach was to average the means but this does not seem to be the case.
+Again, we can reproduce the values with our function.
 
-```{r mean_of_mean}
-sum(quantile_normalisation(eg3, ties = "average")$mean) / 5
+```{r eg3_norm}
+normalize.quantiles(eg3)
+quantile_normalisation(eg3, ties = "average")$norm
 ```
 
 ## Summary
