@@ -12,7 +12,7 @@
 
 <meta name="date" content="2023-10-12" />
 
-<title>Tissue specificity</title>
+<title>Quantile normalisation in R</title>
 
 <script src="site_libs/header-attrs-2.23/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -358,7 +358,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Tissue specificity</h1>
+<h1 class="title toc-ignore">Quantile normalisation in R</h1>
 <h4 class="date">2023-10-12</h4>
 
 </div>
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1ede47871fa5e42ae02e543b73d9794ac02dae84targetblank1ede478a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreedc2b9705645e8555a9e498883254aeb5253b8847targetblankdc2b970a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/1ede47871fa5e42ae02e543b73d9794ac02dae84" target="_blank">1ede478</a>
+<a href="https://github.com/davetang/muse/tree/dc2b9705645e8555a9e498883254aeb5253b8847" target="_blank">dc2b970</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1ede47871fa5e42ae02e543b73d9794ac02dae84targetblank1ede478a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreedc2b9705645e8555a9e498883254aeb5253b8847targetblankdc2b970a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/1ede47871fa5e42ae02e543b73d9794ac02dae84" target="_blank">1ede478</a>.
+<a href="https://github.com/davetang/muse/tree/dc2b9705645e8555a9e498883254aeb5253b8847" target="_blank">dc2b970</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -620,6 +620,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/dc2b9705645e8555a9e498883254aeb5253b8847/analysis/qn.Rmd" target="_blank">dc2b970</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-12
+</td>
+<td>
+Fix title and summary
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/f715b16647c922077baef8405507ea2e069a2ad2/docs/qn.html" target="_blank">f715b16</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -912,29 +946,36 @@ E 5.25 6.50 3.50 4.25</code></pre>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
-<p>Quantile normalisation uses the ranked expression values, so it’s
-robust to outliers. The ranked expression values are used to calculate a
-set of expression values (the means) that can be used in every sample,
-which are then substituted back based on the ranking, thus making every
-sample have the same statistical properties.</p>
-<p>The normalisation method is easy to implement (without optimisation).
-However, there are many different implementations. The Wikipedia example
-uses a minimum approach; the example by Rafael Irizarry uses a first
-approach; and the <code>preprocessCore</code> package uses an average
-approach.</p>
-<p>I don’t think changing the manner that ties are treated will
-significantly impact the results, especially when there are over 60,000
-genes. To me, the average approach seems like the best way to deal with
-ties.</p>
+<p>Quantile normalisation was a normalisation method developed for
+microarrays but is commonly used in RNA-seq as well. It uses ranked
+expression values, so it is robust against outliers. In order to make
+every sample have the same statistical properties, mean expression
+values are calculated using the ranked expression values from every
+sample. This calculation will result in a (ranked) mean expression value
+for every gene. These mean expression values are then used in every
+sample based on the ranking of the raw values. Therefore, the
+statistical properties, such as the mean and variance, of every sample
+is the same (and just the ordering is different).</p>
+<p>The normalisation method is easy to implement but requires more work
+if you want to optimise the code for better performance. There are many
+different implementations of the method because there are different ways
+to rank items that are tied. The Wikipedia example uses a minimum
+approach; the example by Rafael Irizarry uses a first approach; and the
+<code>preprocessCore</code> package uses an average approach. I don’t
+think changing the way for how ties are treated will significantly
+impact the results. To me, the average approach seems like a very
+reasonable way to deal with ties.</p>
 <p>If you want to perform quantile normalisation, I suggest that you use
 the <code>normalize.quantiles</code> function from the
 <code>preprocessCore</code> package. If you use it for your work, you
 should cite:</p>
+<blockquote>
 <p><a href="https://pubmed.ncbi.nlm.nih.gov/12538238/">A comparison of
 normalization methods for high density oligonucleotide array data based
 on variance and bias</a>.</p>
-<p>Do not use my <code>quantile_normalisation</code> function except for
-learning how the method works.</p>
+</blockquote>
+<p>I do not suggest using my <code>quantile_normalisation</code>
+function except for learning purposes.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
