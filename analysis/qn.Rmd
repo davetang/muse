@@ -1,0 +1,215 @@
+---
+title: "Tissue specificity"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+From [Wikipedia](https://en.wikipedia.org/wiki/Quantile_normalization):
+
+>In statistics, quantile normalization is a technique for making two distributions identical in statistical properties. To quantile normalize two or more distributions to each other, without a reference distribution, sort as before, then set to the average (usually, arithmetical mean) of the distributions. So the highest value in all cases becomes the mean of the highest values, the second highest value becomes the mean of the second highest values, and so on.
+
+## Wikipedia example
+
+In this section, we will follow the [Wikipedia example](https://en.wikipedia.org/wiki/Quantile_normalization#Example). First we will create the data set; we will use a list to store everything. The raw data contains four genes (A to D) and three samples (x to z).
+
+```{r wiki_eg}
+eg1 <- list()
+
+eg1$raw <- data.frame(
+  x=c(5,2,3,4),
+  y=c(4,1,4,2),
+  z=c(3,4,6,8)
+)
+
+rownames(eg1$raw) <- toupper(letters[1:4])
+
+eg1$raw
+```
+
+The first step is to determine the gene ranks per sample; the lowest expressed gene will be the smallest number and the highest expressed gene will be largest number. This could be from 1 to 4 but if two genes have the same expression, i.e., tied, then the largest number won't be 4.
+
+```{r wiki_rank}
+eg1$rank <- apply(eg1$raw, 2, rank, ties.method="min")
+eg1$rank
+```
+Next, we sort the genes by their expression per sample. The lowest expressed gene will be on the top and the highest expressed gene will be on the bottom.
+
+```{r wiki_sorted}
+eg1$sorted <- data.frame(apply(eg1$raw, 2, sort))
+eg1$sorted
+```
+
+We will use the sorted gene expression matrix to calculate row means.
+
+```{r wiki_row_mean}
+eg1$mean <- rowMeans(eg1$sorted)
+eg1$mean
+```
+
+Finally, we will use the row means as the normalised values for each gene. Since every sample now uses the same set of means for the expression values, every sample will have the same statistical properties.
+
+We will use the raw ranking to determine which mean value to use. For example, if gene A was the most highly expressed gene in sample x, then it will get the highest mean value. The code above simply uses the gene ranks as the index to the means.
+
+```{r use_means_to_normalise}
+eg1$norm <- apply(eg1$rank, 2, function(x) eg1$mean[x])
+rownames(eg1$norm) <- toupper(letters[1:4])
+eg1$norm
+```
+
+We can combine all the code above (with some additional code for normalising with an average rank method) and save it into a `quantile_normalisation` function.
+
+```{r quantile_normalisation}
+quantile_normalisation <- function(x, ties = "min"){
+  my_list <- list()
+  my_list$raw <- x
+  my_list$rank <- apply(my_list$raw, 2, rank, ties.method=ties)
+  my_list$sorted <- data.frame(apply(my_list$raw, 2, sort))
+  my_list$mean <- rowMeans(my_list$sorted)
+  if(ties == "average"){
+    my_list$norm <- apply(my_list$rank, 2, function(i){
+      sapply(i, function(j){
+        if(j %% 1 == 0){
+          my_list$mean[j]
+        } else {
+          (my_list$mean[floor(j)] + my_list$mean[ceiling(j)]) / 2
+        }
+      })
+    })
+  } else{
+    my_list$norm <- apply(my_list$rank, 2, function(i) my_list$mean[i])
+  }
+  rownames(my_list$norm) <- rownames(my_list$raw)
+  return(my_list)
+}
+
+my_df <- data.frame(
+  one=c(5,2,3,4),
+  two=c(4,1,4,2),
+  three=c(3,4,6,8)
+)
+rownames(my_df) <- toupper(letters[1:4])
+
+quantile_normalisation(my_df)$norm
+```
+
+## PH525x example
+
+The data used for this example was from edX course called PH525x but it does not seem to be available anymore; it is probably called something else now. I'll use this example because the process of quantile normalisation is nicely summarised in the figure below (the figure was from the bird app but I don't want to link to it):
+
+![](assets/quantile_normalisation_irizarry.png)
+
+```{r eg2}
+eg2 <- list()
+eg2$raw <- matrix(
+  data = c(2,4,4,5,5,14,4,7,4,8,6,9,3,8,5,8,3,9,3,5),
+  nrow = 5,
+  byrow = TRUE,
+  dimnames = list(toupper(LETTERS[1:5]), letters[23:26])
+)
+
+eg2$raw
+```
+
+_Order_ values within each sample (or column).
+
+```{r eg2_order}
+eg2$rank <- apply(eg2$raw, 2, rank, ties.method="min")
+eg2$sorted <- apply(eg2$raw, 2, sort)
+eg2$sorted
+```
+
+_Average_ across rows.
+
+```{r eg2_mean}
+eg2$mean <- rowMeans(eg2$sorted)
+eg2$mean
+```
+
+_Re-order_ averaged values in original order.
+
+```{r eg2_norm}
+eg2$norm <- apply(eg2$rank, 2, function(i) eg2$mean[i])
+eg2$norm
+```
+
+Notice that my values are slightly different from those in the figure; this is because I used the minimum value for `rank()` when there is a tie.
+
+In the `rank()` function, there are several methods for dealing with ties:
+
+1. "average"
+2. "first"
+3. "last"
+4. "random"
+5. "max"
+6. "min"
+
+Here's the documentation for the different methods.
+
+>If all components are different (and no NAs), the ranks are well defined, with values in seq_along(x). With some values equal (called "ties"), the argument ties.method determines the result at the corresponding indices. The "first" method results in a permutation with increasing values at each index set of ties, and analogously "last" with decreasing values. The "random" method puts these in random order whereas the default, "average", replaces them by their mean, and "max" and "min" replaces them by their maximum and minimum respectively, the latter being the typical sports ranking.
+
+The values in the PH525x example were calculated using a "first" approach. We can specify this in our `quantile_normalisation` function, and now we have the same normalised values.
+
+```{r eg2_quantile_norm}
+quantile_normalisation(eg2$raw, ties = "first")$norm
+```
+
+But those with a keen eye will notice that this is also different from the figure. This is to do with the ordering for the expression values that are tied and this is not consistent in the figure. If we go with a "first" approach then the ordering should be from gene A to E. If gene A and E are tied, then gene A will be ranked ahead of E because it comes first. If gene C and D are tied, then gene C is ranked ahead of D. This is what is performed with the `rank` function.
+
+```{r tied_first}
+eg2$raw
+quantile_normalisation(eg2$raw, ties = "first")$rank
+```
+
+In the figure, gene D and E in sample w are ranked in a first manner and get the mean values in this order; so is gene C and D in sample x, and gene B and C in sample y. But this is not the case for gene A and E in sample z; gene A should get the 3.5 value and gene E should get the 5.0 value, if we want to be consistent.
+
+## Bioconductor
+
+The `preprocessCore` package on Bioconductor already has a function for quantile normalisation called `normalize.quantiles`. Install the package, if necessary. Note that if I try to install the package the [usual way](https://bioconductor.org/packages/release/bioc/html/preprocessCore.html), I get the following error:
+
+```
+Error in normalize.quantiles(mat) : 
+  ERROR; return code from pthread_create() is 22
+```
+
+This is a known [issue](https://github.com/Bioconductor/bioconductor_docker/issues/22) and I can use the function if I install `preprocessCore` as per [these instructions](https://github.com/Bioconductor/bioconductor_docker/issues/22#issuecomment-1698169974).
+
+```{r install_preprocess_core, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("preprocessCore", configure.args = c(preprocessCore = "--disable-threading"), force= TRUE, update=TRUE, type = "source")
+```
+
+The `normalize.quantiles` function takes a matrix as input.
+
+```{r preprocess_core}
+library(preprocessCore)
+
+normalize.quantiles(eg2$raw)
+```
+
+The `normalize.quantiles` function uses the average method for ties, which we can reproduce with our function.
+
+```{r quantile_normalisation_average}
+quantile_normalisation(eg2$raw, ties = "average")$norm
+```
+
+## Summary
+
+Quantile normalisation uses the ranked expression values, so it's robust to outliers. The ranked expression values are used to calculate a set of expression values (the means) that can be used in every sample, which are then substituted back based on the ranking, thus making every sample have the same statistical properties.
+
+The normalisation method is easy to implement (without optimisation). However, there are many different implementations. The Wikipedia example uses a minimum approach; the example by Rafael Irizarry uses a first approach; and the `preprocessCore` package uses an average approach.
+
+I don't think changing the manner that ties are treated will significantly impact the results, especially when there are over 60,000 genes. To me, the average approach seems like the best way to deal with ties.
+
+If you want to perform quantile normalisation, I suggest that you use the `normalize.quantiles` function from the `preprocessCore` package. If you use it for your work, you should cite:
+
+[A comparison of normalization methods for high density oligonucleotide array data based on variance and bias](https://pubmed.ncbi.nlm.nih.gov/12538238/).
+
+Do not use my `quantile_normalisation` function except for learning how the method works.
