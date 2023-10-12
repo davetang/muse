@@ -1,5 +1,5 @@
 ---
-title: "Tissue specificity"
+title: "Quantile normalisation in R"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
@@ -202,14 +202,12 @@ quantile_normalisation(eg2$raw, ties = "average")$norm
 
 ## Summary
 
-Quantile normalisation uses the ranked expression values, so it's robust to outliers. The ranked expression values are used to calculate a set of expression values (the means) that can be used in every sample, which are then substituted back based on the ranking, thus making every sample have the same statistical properties.
+Quantile normalisation was a normalisation method developed for microarrays but is commonly used in RNA-seq as well. It uses ranked expression values, so it is robust against outliers. In order to make every sample have the same statistical properties, mean expression values are calculated using the ranked expression values from every sample. This calculation will result in a (ranked) mean expression value for every gene. These mean expression values are then used in every sample based on the ranking of the raw values. Therefore, the statistical properties, such as the mean and variance, of every sample is the same (and just the ordering is different).
 
-The normalisation method is easy to implement (without optimisation). However, there are many different implementations. The Wikipedia example uses a minimum approach; the example by Rafael Irizarry uses a first approach; and the `preprocessCore` package uses an average approach.
-
-I don't think changing the manner that ties are treated will significantly impact the results, especially when there are over 60,000 genes. To me, the average approach seems like the best way to deal with ties.
+The normalisation method is easy to implement but requires more work if you want to optimise the code for better performance. There are many different implementations of the method because there are different ways to rank items that are tied. The Wikipedia example uses a minimum approach; the example by Rafael Irizarry uses a first approach; and the `preprocessCore` package uses an average approach. I don't think changing the way for how ties are treated will significantly impact the results. To me, the average approach seems like a very reasonable way to deal with ties.
 
 If you want to perform quantile normalisation, I suggest that you use the `normalize.quantiles` function from the `preprocessCore` package. If you use it for your work, you should cite:
 
-[A comparison of normalization methods for high density oligonucleotide array data based on variance and bias](https://pubmed.ncbi.nlm.nih.gov/12538238/).
+>[A comparison of normalization methods for high density oligonucleotide array data based on variance and bias](https://pubmed.ncbi.nlm.nih.gov/12538238/).
 
-Do not use my `quantile_normalisation` function except for learning how the method works.
+I do not suggest using my `quantile_normalisation` function except for learning purposes.
