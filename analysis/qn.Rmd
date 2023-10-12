@@ -71,17 +71,17 @@ quantile_normalisation <- function(x, ties = "min"){
   my_list$rank <- apply(my_list$raw, 2, rank, ties.method=ties)
   my_list$sorted <- data.frame(apply(my_list$raw, 2, sort))
   my_list$mean <- rowMeans(my_list$sorted)
+  # my dumb implementation of using average
   if(ties == "average"){
-    my_list$norm <- apply(my_list$rank, 2, function(i){
-      sapply(i, function(j){
-        if(j %% 1 == 0){
-          my_list$mean[j]
-        } else {
-          (my_list$mean[floor(j)] + my_list$mean[ceiling(j)]) / 2
-        }
+     my_list$norm <- apply(my_list$raw, 2, function(v){
+      my_min <- rank(v, ties.method = "min")
+      my_max <- rank(v, ties.method = "max")
+      sapply(seq_along(my_min), function(i){
+        m <- my_list$mean[my_min[i]:my_max[i]]
+        sum(m) / length(m)
       })
     })
-  } else{
+  } else {
     my_list$norm <- apply(my_list$rank, 2, function(i) my_list$mean[i])
   }
   rownames(my_list$norm) <- rownames(my_list$raw)
@@ -198,6 +198,31 @@ The `normalize.quantiles` function uses the average method for ties, which we ca
 
 ```{r quantile_normalisation_average}
 quantile_normalisation(eg2$raw, ties = "average")$norm
+```
+
+When there are more ties, `normalize.quantiles` is implemented differently than my (most likely mis-)implementation.
+
+```{r eg3}
+eg3 <- matrix(
+  data = c(
+    2,4,4,9,
+    5,14,4,9,
+    2,8,4,9,
+    3,8,4,9,
+    3,8,3,9),
+  nrow = 5,
+  byrow = TRUE,
+  dimnames = list(toupper(LETTERS[1:5]), letters[23:26])
+)
+
+normalize.quantiles(eg3)
+quantile_normalisation(eg3, ties = "average")$norm
+```
+
+I am not quite sure what `normalize.quantiles` is doing and probably need to inspect the [source](https://github.com/bmbolstad/preprocessCore). I thought the averaging approach was to average the means but this does not seem to be the case.
+
+```{r mean_of_mean}
+sum(quantile_normalisation(eg3, ties = "average")$mean) / 5
 ```
 
 ## Summary
