@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreedc2b9705645e8555a9e498883254aeb5253b8847targetblankdc2b970a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4a7d5e8e8070cacd7c98f05ce11567f36dc7e00ftargetblank4a7d5e8a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/dc2b9705645e8555a9e498883254aeb5253b8847" target="_blank">dc2b970</a>
+<a href="https://github.com/davetang/muse/tree/4a7d5e8e8070cacd7c98f05ce11567f36dc7e00f" target="_blank">4a7d5e8</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreedc2b9705645e8555a9e498883254aeb5253b8847targetblankdc2b970a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4a7d5e8e8070cacd7c98f05ce11567f36dc7e00ftargetblank4a7d5e8a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/dc2b9705645e8555a9e498883254aeb5253b8847" target="_blank">dc2b970</a>.
+<a href="https://github.com/davetang/muse/tree/4a7d5e8e8070cacd7c98f05ce11567f36dc7e00f" target="_blank">4a7d5e8</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -575,7 +575,7 @@ Untracked files:
 
 Unstaged changes:
     Modified:   analysis/graph.Rmd
-    Modified:   script/run_rstudio.sh
+    Modified:   analysis/tissue.Rmd
 
 </code></pre>
 <p>
@@ -620,6 +620,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/4a7d5e8e8070cacd7c98f05ce11567f36dc7e00f/analysis/qn.Rmd" target="_blank">4a7d5e8</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-12
+</td>
+<td>
+One more example
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/2e70b5bc62d79af3a9aa5f235f18c3b423a36973/docs/qn.html" target="_blank">2e70b5b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -764,17 +798,17 @@ normalising with an average rank method) and save it into a
   my_list$rank &lt;- apply(my_list$raw, 2, rank, ties.method=ties)
   my_list$sorted &lt;- data.frame(apply(my_list$raw, 2, sort))
   my_list$mean &lt;- rowMeans(my_list$sorted)
+  # my dumb implementation of using average
   if(ties == &quot;average&quot;){
-    my_list$norm &lt;- apply(my_list$rank, 2, function(i){
-      sapply(i, function(j){
-        if(j %% 1 == 0){
-          my_list$mean[j]
-        } else {
-          (my_list$mean[floor(j)] + my_list$mean[ceiling(j)]) / 2
-        }
+     my_list$norm &lt;- apply(my_list$raw, 2, function(v){
+      my_min &lt;- rank(v, ties.method = &quot;min&quot;)
+      my_max &lt;- rank(v, ties.method = &quot;max&quot;)
+      sapply(seq_along(my_min), function(i){
+        m &lt;- my_list$mean[my_min[i]:my_max[i]]
+        sum(m) / length(m)
       })
     })
-  } else{
+  } else {
     my_list$norm &lt;- apply(my_list$rank, 2, function(i) my_list$mean[i])
   }
   rownames(my_list$norm) &lt;- rownames(my_list$raw)
@@ -943,6 +977,41 @@ B 8.50 8.50 5.25 5.50
 C 6.50 5.25 8.50 8.50
 D 5.25 5.25 6.50 6.50
 E 5.25 6.50 3.50 4.25</code></pre>
+<p>When there are more ties, <code>normalize.quantiles</code> is
+implemented differently than my (most likely mis-)implementation.</p>
+<pre class="r"><code>eg3 &lt;- matrix(
+  data = c(
+    2,4,4,9,
+    5,14,4,9,
+    2,8,4,9,
+    3,8,4,9,
+    3,8,3,9),
+  nrow = 5,
+  byrow = TRUE,
+  dimnames = list(toupper(LETTERS[1:5]), letters[23:26])
+)
+
+normalize.quantiles(eg3)</code></pre>
+<pre><code>      [,1] [,2] [,3] [,4]
+[1,] 5.125  4.5  6.0    6
+[2,] 8.000  8.0  6.0    6
+[3,] 5.125  6.0  6.0    6
+[4,] 6.000  6.0  6.0    6
+[5,] 6.000  6.0  4.5    6</code></pre>
+<pre class="r"><code>quantile_normalisation(eg3, ties = &quot;average&quot;)$norm</code></pre>
+<pre><code>      w        x      y    z
+A 5.125 4.500000 6.4375 6.05
+B 8.000 8.000000 6.4375 6.05
+C 5.125 5.916667 6.4375 6.05
+D 6.000 5.916667 6.4375 6.05
+E 6.000 5.916667 4.5000 6.05</code></pre>
+<p>I am not quite sure what <code>normalize.quantiles</code> is doing
+and probably need to inspect the <a
+href="https://github.com/bmbolstad/preprocessCore">source</a>. I thought
+the averaging approach was to average the means but this does not seem
+to be the case.</p>
+<pre class="r"><code>sum(quantile_normalisation(eg3, ties = &quot;average&quot;)$mean) / 5</code></pre>
+<pre><code>[1] 6.05</code></pre>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
