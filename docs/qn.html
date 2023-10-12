@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2023-10-12" />
+
+<title>Tissue specificity</title>
+
+<script src="site_libs/header-attrs-2.23/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.0/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Tissue specificity</h1>
+<h4 class="date">2023-10-12</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2023-10-12
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1ede47871fa5e42ae02e543b73d9794ac02dae84targetblank1ede478a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/1ede47871fa5e42ae02e543b73d9794ac02dae84" target="_blank">1ede478</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1ede47871fa5e42ae02e543b73d9794ac02dae84targetblank1ede478a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/1ede47871fa5e42ae02e543b73d9794ac02dae84" target="_blank">1ede478</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    r_packages_4.3.0/
+    Ignored:    r_packages_4.3.1/
+
+Untracked files:
+    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  analysis/complex_heatmap.Rmd
+    Untracked:  analysis/sleuth.Rmd
+    Untracked:  analysis/tss_xgboost.Rmd
+    Untracked:  code/multiz100way/
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
+    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
+    Untracked:  data/ncrna_noncode_v3.fa
+    Untracked:  data/netmhciipan.out.gz
+    Untracked:  data/test
+    Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
+    Untracked:  export/output/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/graph.Rmd
+    Modified:   script/run_rstudio.sh
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/qn.Rmd</code>) and HTML
+(<code>docs/qn.html</code>) files. If you’ve configured a remote Git
+repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
+in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/1ede47871fa5e42ae02e543b73d9794ac02dae84/analysis/qn.Rmd" target="_blank">1ede478</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-12
+</td>
+<td>
+Quantile normalisation
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>From <a
+href="https://en.wikipedia.org/wiki/Quantile_normalization">Wikipedia</a>:</p>
+<blockquote>
+<p>In statistics, quantile normalization is a technique for making two
+distributions identical in statistical properties. To quantile normalize
+two or more distributions to each other, without a reference
+distribution, sort as before, then set to the average (usually,
+arithmetical mean) of the distributions. So the highest value in all
+cases becomes the mean of the highest values, the second highest value
+becomes the mean of the second highest values, and so on.</p>
+</blockquote>
+<div id="wikipedia-example" class="section level2">
+<h2>Wikipedia example</h2>
+<p>In this section, we will follow the <a
+href="https://en.wikipedia.org/wiki/Quantile_normalization#Example">Wikipedia
+example</a>. First we will create the data set; we will use a list to
+store everything. The raw data contains four genes (A to D) and three
+samples (x to z).</p>
+<pre class="r"><code>eg1 &lt;- list()
+
+eg1$raw &lt;- data.frame(
+  x=c(5,2,3,4),
+  y=c(4,1,4,2),
+  z=c(3,4,6,8)
+)
+
+rownames(eg1$raw) &lt;- toupper(letters[1:4])
+
+eg1$raw</code></pre>
+<pre><code>  x y z
+A 5 4 3
+B 2 1 4
+C 3 4 6
+D 4 2 8</code></pre>
+<p>The first step is to determine the gene ranks per sample; the lowest
+expressed gene will be the smallest number and the highest expressed
+gene will be largest number. This could be from 1 to 4 but if two genes
+have the same expression, i.e., tied, then the largest number won’t be
+4.</p>
+<pre class="r"><code>eg1$rank &lt;- apply(eg1$raw, 2, rank, ties.method=&quot;min&quot;)
+eg1$rank</code></pre>
+<pre><code>  x y z
+A 4 3 1
+B 1 1 2
+C 2 3 3
+D 3 2 4</code></pre>
+<p>Next, we sort the genes by their expression per sample. The lowest
+expressed gene will be on the top and the highest expressed gene will be
+on the bottom.</p>
+<pre class="r"><code>eg1$sorted &lt;- data.frame(apply(eg1$raw, 2, sort))
+eg1$sorted</code></pre>
+<pre><code>  x y z
+1 2 1 3
+2 3 2 4
+3 4 4 6
+4 5 4 8</code></pre>
+<p>We will use the sorted gene expression matrix to calculate row
+means.</p>
+<pre class="r"><code>eg1$mean &lt;- rowMeans(eg1$sorted)
+eg1$mean</code></pre>
+<pre><code>[1] 2.000000 3.000000 4.666667 5.666667</code></pre>
+<p>Finally, we will use the row means as the normalised values for each
+gene. Since every sample now uses the same set of means for the
+expression values, every sample will have the same statistical
+properties.</p>
+<p>We will use the raw ranking to determine which mean value to use. For
+example, if gene A was the most highly expressed gene in sample x, then
+it will get the highest mean value. The code above simply uses the gene
+ranks as the index to the means.</p>
+<pre class="r"><code>eg1$norm &lt;- apply(eg1$rank, 2, function(x) eg1$mean[x])
+rownames(eg1$norm) &lt;- toupper(letters[1:4])
+eg1$norm</code></pre>
+<pre><code>         x        y        z
+A 5.666667 4.666667 2.000000
+B 2.000000 2.000000 3.000000
+C 3.000000 4.666667 4.666667
+D 4.666667 3.000000 5.666667</code></pre>
+<p>We can combine all the code above (with some additional code for
+normalising with an average rank method) and save it into a
+<code>quantile_normalisation</code> function.</p>
+<pre class="r"><code>quantile_normalisation &lt;- function(x, ties = &quot;min&quot;){
+  my_list &lt;- list()
+  my_list$raw &lt;- x
+  my_list$rank &lt;- apply(my_list$raw, 2, rank, ties.method=ties)
+  my_list$sorted &lt;- data.frame(apply(my_list$raw, 2, sort))
+  my_list$mean &lt;- rowMeans(my_list$sorted)
+  if(ties == &quot;average&quot;){
+    my_list$norm &lt;- apply(my_list$rank, 2, function(i){
+      sapply(i, function(j){
+        if(j %% 1 == 0){
+          my_list$mean[j]
+        } else {
+          (my_list$mean[floor(j)] + my_list$mean[ceiling(j)]) / 2
+        }
+      })
+    })
+  } else{
+    my_list$norm &lt;- apply(my_list$rank, 2, function(i) my_list$mean[i])
+  }
+  rownames(my_list$norm) &lt;- rownames(my_list$raw)
+  return(my_list)
+}
+
+my_df &lt;- data.frame(
+  one=c(5,2,3,4),
+  two=c(4,1,4,2),
+  three=c(3,4,6,8)
+)
+rownames(my_df) &lt;- toupper(letters[1:4])
+
+quantile_normalisation(my_df)$norm</code></pre>
+<pre><code>       one      two    three
+A 5.666667 4.666667 2.000000
+B 2.000000 2.000000 3.000000
+C 3.000000 4.666667 4.666667
+D 4.666667 3.000000 5.666667</code></pre>
+</div>
+<div id="ph525x-example" class="section level2">
+<h2>PH525x example</h2>
+<p>The data used for this example was from edX course called PH525x but
+it does not seem to be available anymore; it is probably called
+something else now. I’ll use this example because the process of
+quantile normalisation is nicely summarised in the figure below (the
+figure was from the bird app but I don’t want to link to it):</p>
+<p><img src="assets/quantile_normalisation_irizarry.png" /></p>
+<pre class="r"><code>eg2 &lt;- list()
+eg2$raw &lt;- matrix(
+  data = c(2,4,4,5,5,14,4,7,4,8,6,9,3,8,5,8,3,9,3,5),
+  nrow = 5,
+  byrow = TRUE,
+  dimnames = list(toupper(LETTERS[1:5]), letters[23:26])
+)
+
+eg2$raw</code></pre>
+<pre><code>  w  x y z
+A 2  4 4 5
+B 5 14 4 7
+C 4  8 6 9
+D 3  8 5 8
+E 3  9 3 5</code></pre>
+<p><em>Order</em> values within each sample (or column).</p>
+<pre class="r"><code>eg2$rank &lt;- apply(eg2$raw, 2, rank, ties.method=&quot;min&quot;)
+eg2$sorted &lt;- apply(eg2$raw, 2, sort)
+eg2$sorted</code></pre>
+<pre><code>     w  x y z
+[1,] 2  4 3 5
+[2,] 3  8 4 5
+[3,] 3  8 4 7
+[4,] 4  9 5 8
+[5,] 5 14 6 9</code></pre>
+<p><em>Average</em> across rows.</p>
+<pre class="r"><code>eg2$mean &lt;- rowMeans(eg2$sorted)
+eg2$mean</code></pre>
+<pre><code>[1] 3.5 5.0 5.5 6.5 8.5</code></pre>
+<p><em>Re-order</em> averaged values in original order.</p>
+<pre class="r"><code>eg2$norm &lt;- apply(eg2$rank, 2, function(i) eg2$mean[i])
+eg2$norm</code></pre>
+<pre><code>       w   x   y   z
+[1,] 3.5 3.5 5.0 3.5
+[2,] 8.5 8.5 5.0 5.5
+[3,] 6.5 5.0 8.5 8.5
+[4,] 5.0 5.0 6.5 6.5
+[5,] 5.0 6.5 3.5 3.5</code></pre>
+<p>Notice that my values are slightly different from those in the
+figure; this is because I used the minimum value for <code>rank()</code>
+when there is a tie.</p>
+<p>In the <code>rank()</code> function, there are several methods for
+dealing with ties:</p>
+<ol style="list-style-type: decimal">
+<li>“average”</li>
+<li>“first”</li>
+<li>“last”</li>
+<li>“random”</li>
+<li>“max”</li>
+<li>“min”</li>
+</ol>
+<p>Here’s the documentation for the different methods.</p>
+<blockquote>
+<p>If all components are different (and no NAs), the ranks are well
+defined, with values in seq_along(x). With some values equal (called
+“ties”), the argument ties.method determines the result at the
+corresponding indices. The “first” method results in a permutation with
+increasing values at each index set of ties, and analogously “last” with
+decreasing values. The “random” method puts these in random order
+whereas the default, “average”, replaces them by their mean, and “max”
+and “min” replaces them by their maximum and minimum respectively, the
+latter being the typical sports ranking.</p>
+</blockquote>
+<p>The values in the PH525x example were calculated using a “first”
+approach. We can specify this in our <code>quantile_normalisation</code>
+function, and now we have the same normalised values.</p>
+<pre class="r"><code>quantile_normalisation(eg2$raw, ties = &quot;first&quot;)$norm</code></pre>
+<pre><code>    w   x   y   z
+A 3.5 3.5 5.0 3.5
+B 8.5 8.5 5.5 5.5
+C 6.5 5.0 8.5 8.5
+D 5.0 5.5 6.5 6.5
+E 5.5 6.5 3.5 5.0</code></pre>
+<p>But those with a keen eye will notice that this is also different
+from the figure. This is to do with the ordering for the expression
+values that are tied and this is not consistent in the figure. If we go
+with a “first” approach then the ordering should be from gene A to E. If
+gene A and E are tied, then gene A will be ranked ahead of E because it
+comes first. If gene C and D are tied, then gene C is ranked ahead of D.
+This is what is performed with the <code>rank</code> function.</p>
+<pre class="r"><code>eg2$raw</code></pre>
+<pre><code>  w  x y z
+A 2  4 4 5
+B 5 14 4 7
+C 4  8 6 9
+D 3  8 5 8
+E 3  9 3 5</code></pre>
+<pre class="r"><code>quantile_normalisation(eg2$raw, ties = &quot;first&quot;)$rank</code></pre>
+<pre><code>  w x y z
+A 1 1 2 1
+B 5 5 3 3
+C 4 2 5 5
+D 2 3 4 4
+E 3 4 1 2</code></pre>
+<p>In the figure, gene D and E in sample w are ranked in a first manner
+and get the mean values in this order; so is gene C and D in sample x,
+and gene B and C in sample y. But this is not the case for gene A and E
+in sample z; gene A should get the 3.5 value and gene E should get the
+5.0 value, if we want to be consistent.</p>
+</div>
+<div id="bioconductor" class="section level2">
+<h2>Bioconductor</h2>
+<p>The <code>preprocessCore</code> package on Bioconductor already has a
+function for quantile normalisation called
+<code>normalize.quantiles</code>. Install the package, if necessary.
+Note that if I try to install the package the <a
+href="https://bioconductor.org/packages/release/bioc/html/preprocessCore.html">usual
+way</a>, I get the following error:</p>
+<pre><code>Error in normalize.quantiles(mat) : 
+  ERROR; return code from pthread_create() is 22</code></pre>
+<p>This is a known <a
+href="https://github.com/Bioconductor/bioconductor_docker/issues/22">issue</a>
+and I can use the function if I install <code>preprocessCore</code> as
+per <a
+href="https://github.com/Bioconductor/bioconductor_docker/issues/22#issuecomment-1698169974">these
+instructions</a>.</p>
+<pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+
+BiocManager::install(&quot;preprocessCore&quot;, configure.args = c(preprocessCore = &quot;--disable-threading&quot;), force= TRUE, update=TRUE, type = &quot;source&quot;)</code></pre>
+<p>The <code>normalize.quantiles</code> function takes a matrix as
+input.</p>
+<pre class="r"><code>library(preprocessCore)
+
+normalize.quantiles(eg2$raw)</code></pre>
+<pre><code>     [,1] [,2] [,3] [,4]
+[1,] 3.50 3.50 5.25 4.25
+[2,] 8.50 8.50 5.25 5.50
+[3,] 6.50 5.25 8.50 8.50
+[4,] 5.25 5.25 6.50 6.50
+[5,] 5.25 6.50 3.50 4.25</code></pre>
+<p>The <code>normalize.quantiles</code> function uses the average method
+for ties, which we can reproduce with our function.</p>
+<pre class="r"><code>quantile_normalisation(eg2$raw, ties = &quot;average&quot;)$norm</code></pre>
+<pre><code>     w    x    y    z
+A 3.50 3.50 5.25 4.25
+B 8.50 8.50 5.25 5.50
+C 6.50 5.25 8.50 8.50
+D 5.25 5.25 6.50 6.50
+E 5.25 6.50 3.50 4.25</code></pre>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>Quantile normalisation uses the ranked expression values, so it’s
+robust to outliers. The ranked expression values are used to calculate a
+set of expression values (the means) that can be used in every sample,
+which are then substituted back based on the ranking, thus making every
+sample have the same statistical properties.</p>
+<p>The normalisation method is easy to implement (without optimisation).
+However, there are many different implementations. The Wikipedia example
+uses a minimum approach; the example by Rafael Irizarry uses a first
+approach; and the <code>preprocessCore</code> package uses an average
+approach.</p>
+<p>I don’t think changing the manner that ties are treated will
+significantly impact the results, especially when there are over 60,000
+genes. To me, the average approach seems like the best way to deal with
+ties.</p>
+<p>If you want to perform quantile normalisation, I suggest that you use
+the <code>normalize.quantiles</code> function from the
+<code>preprocessCore</code> package. If you use it for your work, you
+should cite:</p>
+<p><a href="https://pubmed.ncbi.nlm.nih.gov/12538238/">A comparison of
+normalization methods for high density oligonucleotide array data based
+on variance and bias</a>.</p>
+<p>Do not use my <code>quantile_normalisation</code> function except for
+learning how the method works.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.3.1 (2023-06-16)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 22.04.3 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] preprocessCore_1.62.1 workflowr_1.7.0      
+
+loaded via a namespace (and not attached):
+ [1] jsonlite_1.8.7    compiler_4.3.1    promises_1.2.1    Rcpp_1.0.11      
+ [5] stringr_1.5.0     git2r_0.32.0      callr_3.7.3       later_1.3.1      
+ [9] jquerylib_0.1.4   yaml_2.3.7        fastmap_1.1.1     R6_2.5.1         
+[13] knitr_1.43        tibble_3.2.1      rprojroot_2.0.3   bslib_0.5.0      
+[17] pillar_1.9.0      rlang_1.1.1       utf8_1.2.3        cachem_1.0.8     
+[21] stringi_1.7.12    httpuv_1.6.11     xfun_0.40         getPass_0.2-2    
+[25] fs_1.6.3          sass_0.4.7        cli_3.6.1         magrittr_2.0.3   
+[29] ps_1.7.5          digest_0.6.33     processx_3.8.2    rstudioapi_0.15.0
+[33] lifecycle_1.0.3   vctrs_0.6.3       evaluate_0.21     glue_1.6.2       
+[37] whisker_0.4.1     fansi_1.0.4       rmarkdown_2.23    httr_1.4.6       
+[41] tools_4.3.1       pkgconfig_2.0.3   htmltools_0.5.6  </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
