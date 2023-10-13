@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2023-10-13" />
+
+<title>Normalisation methods implemented in edgeR</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Normalisation methods implemented in
+edgeR</h1>
+<h4 class="date">2023-10-13</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2023-10-13
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4bc5f6a79b1ce56dc34cd125f914593fb25af065targetblank4bc5f6aa">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/4bc5f6a79b1ce56dc34cd125f914593fb25af065" target="_blank">4bc5f6a</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4bc5f6a79b1ce56dc34cd125f914593fb25af065targetblank4bc5f6aa"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/4bc5f6a79b1ce56dc34cd125f914593fb25af065" target="_blank">4bc5f6a</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    r_packages_4.3.0/
+    Ignored:    r_packages_4.3.1/
+
+Untracked files:
+    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  analysis/complex_heatmap.Rmd
+    Untracked:  analysis/sleuth.Rmd
+    Untracked:  analysis/tss_xgboost.Rmd
+    Untracked:  code/multiz100way/
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
+    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
+    Untracked:  data/ncrna_noncode_v3.fa
+    Untracked:  data/netmhciipan.out.gz
+    Untracked:  data/test
+    Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
+    Untracked:  export/output/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/graph.Rmd
+    Modified:   analysis/tissue.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/edger.Rmd</code>) and HTML
+(<code>docs/edger.html</code>) files. If you’ve configured a remote Git
+repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
+in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/4bc5f6a79b1ce56dc34cd125f914593fb25af065/analysis/edger.Rmd" target="_blank">4bc5f6a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-13
+</td>
+<td>
+edgeR normalisation
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>A short post on comparing the different normalisation methods
+implemented in <code>edgeR</code> and their downstream effects on
+differential expression calling.</p>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>Install using <code>BiocManager</code>.</p>
+<pre class="r"><code>if (!requireNamespace(&quot;BiocManager&quot;, quietly = TRUE))
+       install.packages(&quot;BiocManager&quot;)
+
+BiocManager::install(&quot;edgeR&quot;)</code></pre>
+</div>
+<div id="normalisation-methods" class="section level2">
+<h2>Normalisation methods</h2>
+<p>Load package.</p>
+<pre class="r"><code>library(&quot;edgeR&quot;)
+packageVersion(&quot;edgeR&quot;)</code></pre>
+<pre><code>[1] &#39;3.42.4&#39;</code></pre>
+<p>Historically, <code>calcNormFactors</code> was the function used for
+normalisation but <code>normLibSizes</code> is the new name. The help
+page on <code>normLibSizes</code> provides some details on the
+normalisation methods.</p>
+<blockquote>
+<p>Calculate scaling factors to convert the raw library sizes for a set
+of sequenced samples into normalized effective library sizes.</p>
+<p>This function computes scaling factors to convert observed library
+sizes into normalized library sizes, also called “effective library
+sizes”. The effective library sizes for use in downstream analysis are
+lib.size * norm.factors where lib.size contains the original library
+sizes and norm.factors is the vector of scaling factors computed by this
+function.</p>
+<p>The TMM method implements the trimmed mean of M-values method
+proposed by Robinson and Oshlack (2010). By default, the M-values are
+weighted according to inverse variances, as computed by the delta method
+for logarithms of binomial random variables. If refColumn is
+unspecified, then the column whose count-per-million upper quartile is
+closest to the mean upper quartile is set as the reference library.</p>
+<p>The TMMwsp method stands for “TMM with singleton pairing”. This is a
+variant of TMM that is intended to perform better for data with a high
+proportion of zeros. In the TMM method, genes that have zero count in
+either library are ignored when comparing pairs of libraries. In the
+TMMwsp method, the positive counts from such genes are reused to
+increase the number of features by which the libraries are compared. The
+singleton positive counts are paired up between the libraries in
+decreasing order of size and then a slightly modified TMM method is
+applied to the re-ordered libraries. If refColumn is unspecified, then
+the column with largest sum of square-root counts is used as the
+reference library.</p>
+<p>RLE is the scaling factor method proposed by Anders and Huber (2010).
+We call it “relative log expression”, as median library is calculated
+from the geometric mean of all columns and the median ratio of each
+sample to the median library is taken as the scale factor.</p>
+<p>The upperquartile method is the upper-quartile normalization method
+of Bullard et al (2010), in which the scale factors are calculated from
+the 75% quantile of the counts for each library, after removing genes
+that are zero in all libraries. The idea is generalized here to allow
+normalization by any quantile of the count distributions.</p>
+<p>If method=“none”, then the normalization factors are set to 1.</p>
+<p>For symmetry, normalization factors are adjusted to multiply to 1.
+Rows of object that have zero counts for all columns are removed before
+normalization factors are computed. The number of such rows does not
+affect the estimated normalization factors.</p>
+</blockquote>
+</div>
+<div id="a-test-dataset" class="section level2">
+<h2>A test dataset</h2>
+<p>I created a dataset to test the different normalisation methods; this
+was based on the hypothetical situation described in <a
+href="https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25">Robinson
+and Oshlack</a>.</p>
+<p>There are four samples; column one and two are the controls
+(<code>c1</code> and <code>c2</code>) and column three and four are the
+patients (<code>p1</code> and <code>p2</code>).</p>
+<pre class="r"><code>eg1 &lt;- data.frame(
+  c1 = rep(10, 50),
+  c2 = rep(10, 50),
+  p1 = c(rep(20, 25),rep(0,25)),
+  p2 = c(rep(20, 25),rep(0,25))
+)
+
+colnames(eg1)</code></pre>
+<pre><code>[1] &quot;c1&quot; &quot;c2&quot; &quot;p1&quot; &quot;p2&quot;</code></pre>
+<p>25 transcripts are in all four samples in equal amount. (They are
+equal because they are sequenced at twice the depth in the patient
+samples, i.e., the patient samples have half the number of transcripts
+than the controls (25 versus 50) so they are sequenced at twice the
+depth.)</p>
+<pre class="r"><code>eg1[c(1:3, 23:25), ]</code></pre>
+<pre><code>   c1 c2 p1 p2
+1  10 10 20 20
+2  10 10 20 20
+3  10 10 20 20
+23 10 10 20 20
+24 10 10 20 20
+25 10 10 20 20</code></pre>
+<p>Another 25 transcripts are only present in the controls and their
+expression is the same as the first 25 transcripts in the controls.</p>
+<pre class="r"><code>eg1[c(26:28, 48:50), ]</code></pre>
+<pre><code>   c1 c2 p1 p2
+26 10 10  0  0
+27 10 10  0  0
+28 10 10  0  0
+48 10 10  0  0
+49 10 10  0  0
+50 10 10  0  0</code></pre>
+<p>The four samples have exactly the same depth (500 counts).</p>
+<pre class="r"><code>colSums(eg1)</code></pre>
+<pre><code> c1  c2  p1  p2 
+500 500 500 500 </code></pre>
+</div>
+<div id="differential-gene-expression" class="section level2">
+<h2>Differential gene expression</h2>
+<p>From the Quick start section in the
+<code>edgeRUsersGuide.pdf</code>:</p>
+<blockquote>
+<p>edgeR offers many variants on analyses. The glm approach is more
+popular than the classic approach as it offers great flexibilities.
+There are two testing methods under the glm framework: likelihood ratio
+tests and quasi-likelihood F-tests. The quasi-likelihood method is
+highly recommended for differential expression analyses of bulk RNA-seq
+data as it gives stricter error rate control by accounting for the
+uncertainty in dispersion estimation. The likelihood ratio test can be
+useful in some special cases such as single cell RNA-seq and datasets
+with no replicates.</p>
+<p>A typical edgeR analysis might look like the following.</p>
+</blockquote>
+<pre class="r"><code>group &lt;- factor(c(1,1,2,2))
+y &lt;- DGEList(counts=eg1, group=group)
+keep &lt;- filterByExpr(y)
+y &lt;- y[keep,,keep.lib.sizes=FALSE]
+y &lt;- normLibSizes(y)
+design &lt;- model.matrix(~group)
+y &lt;- estimateDisp(y, design)</code></pre>
+<pre><code>Warning: Zero sample variances detected, have been offset away from zero</code></pre>
+<pre class="r"><code>fit &lt;- glmQLFit(y, design)</code></pre>
+<pre><code>Warning: Zero sample variances detected, have been offset away from zero</code></pre>
+<pre class="r"><code>qlf &lt;- glmQLFTest(fit, coef=2)
+topTags(qlf)</code></pre>
+<pre><code>Coefficient:  group2 
+       logFC   logCPM            F       PValue          FDR
+26 -6.918863 13.67765 2.776842e+21 3.378219e-11 6.756438e-11
+27 -6.918863 13.67765 2.776842e+21 3.378219e-11 6.756438e-11
+28 -6.918863 13.67765 2.776842e+21 3.378219e-11 6.756438e-11
+29 -6.918863 13.67765 2.776842e+21 3.378219e-11 6.756438e-11
+30 -6.918863 13.67765 2.776842e+21 3.378219e-11 6.756438e-11
+31 -6.918863 13.67765 2.776842e+21 3.378219e-11 6.756438e-11
+32 -6.918863 13.67765 2.776842e+21 3.378219e-11 6.756438e-11
+33 -6.918863 13.67765 2.776842e+21 3.378219e-11 6.756438e-11
+34 -6.918863 13.67765 2.776842e+21 3.378219e-11 6.756438e-11
+35 -6.918863 13.67765 2.776842e+21 3.378219e-11 6.756438e-11</code></pre>
+<p>Number of differentially expressed genes.</p>
+<pre class="r"><code>table(p.adjust(qlf$table$PValue, method=&quot;fdr&quot;) &lt; 0.01)</code></pre>
+<pre><code>
+FALSE  TRUE 
+   25    25 </code></pre>
+<div id="no-normalisation" class="section level3">
+<h3>No normalisation</h3>
+<p>Function for <code>edgeR</code> workflow.</p>
+<pre class="r"><code>run_edger &lt;- function(norm_method){
+  group &lt;- factor(c(1,1,2,2))
+  y &lt;- DGEList(counts=eg1, group=group)
+  keep &lt;- filterByExpr(y)
+  y &lt;- y[keep,,keep.lib.sizes=FALSE]
+  y &lt;- normLibSizes(y, method=norm_method)
+  design &lt;- model.matrix(~group)
+  y &lt;- estimateDisp(y, design)
+  fit &lt;- glmQLFit(y, design)
+  qlf &lt;- glmQLFTest(fit, coef=2)
+  qlf$table$FDR &lt;- p.adjust(qlf$table$PValue, method=&quot;fdr&quot;)
+  qlf
+}</code></pre>
+<p>Run differential expression without any normalisation step.</p>
+<pre class="r"><code>norm_none &lt;- run_edger(&quot;none&quot;)
+table(norm_none$table$FDR &lt; 0.01)</code></pre>
+<pre><code>
+TRUE 
+  50 </code></pre>
+<p>Without normalisation, every transcript is differentially
+expressed.</p>
+</div>
+<div id="tmm" class="section level3">
+<h3>TMM</h3>
+<p>Normalise using the weighted trimmed mean of M-values method.</p>
+<pre class="r"><code>norm_tmm &lt;- run_edger(&quot;TMM&quot;)
+norm_tmm$samples</code></pre>
+<pre><code>   group lib.size norm.factors
+c1     1      500    0.7071068
+c2     1      500    0.7071068
+p1     2      500    1.4142136
+p2     2      500    1.4142136</code></pre>
+<p>The <code>norm.factors</code> is used to normalise the library size.
+Using the normalised library size, transcript one is equally expressed
+in all four samples, i.e., not differentially expressed.</p>
+<pre class="r"><code>norm_lib_size &lt;- norm_tmm$samples$lib.size * norm_tmm$samples$norm.factors
+
+rbind(
+  raw = eg1[1, ],
+  normalised = eg1[1, ] / norm_lib_size
+)</code></pre>
+<pre><code>                    c1          c2          p1          p2
+raw        10.00000000 10.00000000 20.00000000 20.00000000
+normalised  0.02828427  0.02828427  0.02828427  0.02828427</code></pre>
+<p>With TMM normalisation, only half of the transcripts are
+differentially expressed (the last 25 transcripts in the control
+samples).</p>
+<pre class="r"><code>table(norm_tmm$table$FDR &lt; 0.01)</code></pre>
+<pre><code>
+FALSE  TRUE 
+   25    25 </code></pre>
+</div>
+<div id="tmmwsp" class="section level3">
+<h3>TMMwsp</h3>
+<p>The TMMwsp method stands for “TMM with singleton pairing”. This is a
+variant of TMM that is intended to perform better for data with a high
+proportion of zeros.</p>
+<pre class="r"><code>norm_tmm_wsp &lt;- run_edger(&quot;TMMwsp&quot;)
+table(norm_tmm_wsp$table$FDR &lt; 0.01)</code></pre>
+<pre><code>
+FALSE  TRUE 
+   25    25 </code></pre>
+</div>
+<div id="rle-normalisation" class="section level3">
+<h3>RLE normalisation</h3>
+<p>RLE is the scaling factor method proposed by Anders and Huber (2010).
+We call it “relative log expression”, as median library is calculated
+from the geometric mean of all columns and the median ratio of each
+sample to the median library is taken as the scale factor.</p>
+<pre class="r"><code>norm_rle &lt;- run_edger(&quot;RLE&quot;)
+table(norm_rle$table$FDR &lt; 0.01)</code></pre>
+<pre><code>
+FALSE  TRUE 
+   25    25 </code></pre>
+</div>
+<div id="upper-quartile-normalisation" class="section level3">
+<h3>Upper-quartile normalisation</h3>
+<p>The upperquartile method is the upper-quartile normalization method
+of Bullard et al (2010), in which the scale factors are calculated from
+the 75% quantile of the counts for each library, after removing genes
+that are zero in all libraries. The idea is generalized here to allow
+normalization by any quantile of the count distributions.</p>
+<pre class="r"><code>norm_uq &lt;- run_edger(&quot;upperquartile&quot;)
+table(norm_uq$table$FDR &lt; 0.01)</code></pre>
+<pre><code>
+FALSE  TRUE 
+   25    25 </code></pre>
+</div>
+</div>
+<div id="using-a-real-dataset" class="section level2">
+<h2>Using a real dataset</h2>
+<p>Perform differential gene expression analysis using various
+normalisation methods on the <code>pnas_expression.txt</code> dataset,
+which is from <a href="https://pubmed.ncbi.nlm.nih.gov/19088194/">Li et
+al.</a>.</p>
+<pre class="r"><code>my_url &lt;- &quot;https://davetang.org/file/pnas_expression.txt&quot;
+eg2 &lt;- read.table(my_url, header=TRUE, sep=&quot;\t&quot;)
+rownames(eg2) &lt;- eg2[,1]
+eg2 &lt;- eg2[,2:8]
+head(eg2)</code></pre>
+<pre><code>                lane1 lane2 lane3 lane4 lane5 lane6 lane8
+ENSG00000215696     0     0     0     0     0     0     0
+ENSG00000215700     0     0     0     0     0     0     0
+ENSG00000215699     0     0     0     0     0     0     0
+ENSG00000215784     0     0     0     0     0     0     0
+ENSG00000212914     0     0     0     0     0     0     0
+ENSG00000212042     0     0     0     0     0     0     0</code></pre>
+<p>Create <code>run_edger_pnas</code> to run the edgeR workflow on the
+real dataset.</p>
+<pre class="r"><code>run_edger_pnas &lt;- function(norm_method){
+  group &lt;- c(rep(&quot;Control&quot;,4),rep(&quot;DHT&quot;,3))
+  y &lt;- DGEList(counts=eg2, group=group)
+  keep &lt;- filterByExpr(y)
+  y &lt;- y[keep,,keep.lib.sizes=FALSE]
+  y &lt;- normLibSizes(y, method=norm_method)
+  design &lt;- model.matrix(~group)
+  y &lt;- estimateDisp(y, design)
+  fit &lt;- glmQLFit(y, design)
+  qlf &lt;- glmQLFTest(fit, coef=2)
+  qlf$table$FDR &lt;- p.adjust(qlf$table$PValue, method=&quot;fdr&quot;)
+  qlf
+}</code></pre>
+<p>Carry out differential gene expression analysis with no
+normalisation.</p>
+<pre class="r"><code>norm_none_eg2 &lt;- run_edger_pnas(&quot;none&quot;)
+norm_none_eg2$samples</code></pre>
+<pre><code>        group lib.size norm.factors
+lane1 Control   962533            1
+lane2 Control  1137493            1
+lane3 Control  1417119            1
+lane4 Control  1460128            1
+lane5     DHT  1797445            1
+lane6     DHT  1808440            1
+lane8     DHT   672880            1</code></pre>
+<p>Number of differentially expressed genes.</p>
+<pre class="r"><code>table(norm_none_eg2$table$FDR &lt; 0.01)</code></pre>
+<pre><code>
+FALSE  TRUE 
+ 8695  2539 </code></pre>
+<p>TMM normalisation.</p>
+<pre class="r"><code>norm_tmm_eg2 &lt;- run_edger_pnas(&quot;TMM&quot;)
+table(norm_tmm_eg2$table$FDR &lt; 0.01)</code></pre>
+<pre><code>
+FALSE  TRUE 
+ 8753  2481 </code></pre>
+<p>TMMwsp normalisation.</p>
+<pre class="r"><code>norm_tmm_wsp_eg2 &lt;- run_edger_pnas(&quot;TMMwsp&quot;)
+table(norm_tmm_wsp_eg2$table$FDR &lt; 0.01)</code></pre>
+<pre><code>
+FALSE  TRUE 
+ 8752  2482 </code></pre>
+<p>RLE.</p>
+<pre class="r"><code>norm_rle_eg2 &lt;- run_edger_pnas(&quot;RLE&quot;)
+table(norm_rle_eg2$table$FDR &lt; 0.01)</code></pre>
+<pre><code>
+FALSE  TRUE 
+ 8740  2494 </code></pre>
+<p>Upper quartile normalisation.</p>
+<pre class="r"><code>norm_uq_eg2 &lt;- run_edger_pnas(&quot;upperquartile&quot;)
+table(norm_uq_eg2$table$FDR &lt; 0.01)</code></pre>
+<pre><code>
+FALSE  TRUE 
+ 8730  2504 </code></pre>
+<p>Plot the overlaps between the different normalisation methods.</p>
+<pre class="r"><code>library(UpSetR)
+get_de &lt;- function(x, thres = 0.01){
+  i &lt;- x$table$FDR &lt; thres
+  row.names(x$table)[i]
+}
+
+my_list &lt;- list(
+  none = get_de(norm_none_eg2),
+  TMM = get_de(norm_tmm_eg2),
+  TMMwsp = get_de(norm_tmm_wsp_eg2),
+  RLE = get_de(norm_rle_eg2),
+  UQ = get_de(norm_uq_eg2)
+)
+
+upset(fromList(my_list), order.by = &quot;freq&quot;)</code></pre>
+<p><img src="figure/edger.Rmd/de_overlap-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The scaling factors are not too different hence the majority of the
+differentially expressed genes overlap. The upper quartile method’s
+scaling factor is the most similar to having no normalisation at all,
+and hence they have an exclusive set of genes (154) that only they call
+as differentially expressed.</p>
+<pre class="r"><code>library(tidyr)
+library(ggplot2)
+norm_factors &lt;- data.frame(
+  Lane = colnames(eg2),
+  none = norm_none_eg2$samples$norm.factors,
+  TMM = norm_tmm_eg2$samples$norm.factors,
+  TMMwsp = norm_tmm_wsp_eg2$samples$norm.factors,
+  RLE = norm_rle_eg2$samples$norm.factors,
+  upperquartile = norm_uq_eg2$samples$norm.factors
+)
+
+pivot_longer(data = norm_factors, -Lane, names_to = &quot;Normalisation&quot;, values_to = &quot;Scaling&quot;) |&gt;
+  ggplot(data = _, aes(Lane, Scaling, group = Normalisation, colour = Normalisation)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal()</code></pre>
+<p><img src="figure/edger.Rmd/compare_norm_factors-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.3.1 (2023-06-16)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 22.04.3 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggplot2_3.4.3   tidyr_1.3.0     UpSetR_1.4.0    edgeR_3.42.4   
+[5] limma_3.56.2    workflowr_1.7.1
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.7        utf8_1.2.3        generics_0.1.3    stringi_1.7.12   
+ [5] lattice_0.21-8    digest_0.6.33     magrittr_2.0.3    evaluate_0.22    
+ [9] grid_4.3.1        fastmap_1.1.1     plyr_1.8.9        rprojroot_2.0.3  
+[13] jsonlite_1.8.7    processx_3.8.2    whisker_0.4.1     gridExtra_2.3    
+[17] ps_1.7.5          promises_1.2.1    httr_1.4.7        purrr_1.0.2      
+[21] fansi_1.0.5       scales_1.2.1      jquerylib_0.1.4   cli_3.6.1        
+[25] rlang_1.1.1       munsell_0.5.0     splines_4.3.1     withr_2.5.1      
+[29] cachem_1.0.8      yaml_2.3.7        tools_4.3.1       dplyr_1.1.3      
+[33] colorspace_2.1-0  locfit_1.5-9.8    httpuv_1.6.11     vctrs_0.6.3      
+[37] R6_2.5.1          lifecycle_1.0.3   git2r_0.32.0      stringr_1.5.0    
+[41] fs_1.6.3          pkgconfig_2.0.3   callr_3.7.3       pillar_1.9.0     
+[45] bslib_0.5.1       later_1.3.1       gtable_0.3.4      glue_1.6.2       
+[49] Rcpp_1.0.11       tidyselect_1.2.0  xfun_0.40         tibble_3.2.1     
+[53] rstudioapi_0.15.0 knitr_1.44        farver_2.1.1      htmltools_0.5.6.1
+[57] labeling_0.4.3    rmarkdown_2.25    compiler_4.3.1    getPass_0.2-2    </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
