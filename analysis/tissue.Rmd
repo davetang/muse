@@ -8,6 +8,7 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
 ```
 
 A key measure in [information theory](https://en.wikipedia.org/wiki/Entropy_(information_theory)) is entropy, which is:
@@ -160,32 +161,98 @@ plot_entropy <- function(x){
 }
 
 par(mfrow=c(2,3))
-sapply(list(all_gene, all_gene_one_higher, half_gene, one_gene, three_gene, all_gene_equal), plot_entropy)
+examples <- list(all_gene_equal, all_gene, all_gene_one_higher, half_gene, three_gene, one_gene)
+invisible(sapply(examples, plot_entropy))
 ```
 
 ## Other tissue specificity metrics
 
-[A benchmark of gene expression tissue-specificity metrics](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5444245/).
+Metrics and code from [A benchmark of gene expression tissue-specificity metrics](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5444245/).
 
 Tau:
 
 $$ \tau = \frac{\sum_{i=1}^n (1 - \widehat x_i)}{n-1}; \widehat x_i = \frac{x_i}{\max_{1\le i \le n} (x_i)}$$
 
+Implementation in R.
+
+```{r tau}
+tau <- function(x){
+  x <- (1-(x/max(x)))
+  res <- sum(x, na.rm=TRUE)
+  res/(length(x)-1)
+}
+
+sapply(examples, tau)
+```
+
 EE score (summary of the expression of all genes in tissue $i$):
 
 $$ EE = \frac{x_i}{\sum^n_{i=1}x_i \times \frac{s_i}{\sum^n_{i=1} s_i}} = \frac{\sum^n_{i=1} s_i}{s_i} \times \frac{x_i}{\sum^n_{i=1}x_i}s_i $$
+
+No implementation yet as this metric requires expression data.
 
 TSI:
 
 $$ TSI = \frac{\max_{1 \le i \le n}(x_i)}{\sum^n_{i=1}x_i} $$
 
+Implementation in R.
+
+```{r tsi}
+tsi <- function(x){
+  max(x) / sum(x)
+}
+
+sapply(examples, tsi)
+```
+
 Gini coefficient, where $x_i$ has to be ordered from least to greatest:
 
 $$ Gini = \frac{n + 1}{n} - \frac{2 \sum^n_{i=1} (n + 1 - i) x_i}{n \sum^n_{i=1}x_i} $$
 
+Implementation in R (the `gini` function is missing in the supplementary data of the paper and the loaded packages do not have this function, so it is unclear where `gini` is from.). There is a `gini` function in the [reldist](https://cran.r-project.org/web/packages/reldist/index.html) package, which computes the Gini coefficient.
+
+```{r reldist_gini}
+reldist::gini
+```
+
+Calculate Gini coefficients (using the `reldist` code) for the examples. (To save you from installing `reldist`, I've copied the code.)
+
+```{r gini}
+gini <- function (x, weights = rep(1, length = length(x))) {
+  # code is from the reldist package by Mark S. Handcock
+  # https://cran.r-project.org/web/packages/reldist/index.html
+  ox <- order(x)
+  x <- x[ox]
+  weights <- weights[ox]/sum(weights)
+  p <- cumsum(weights)
+  nu <- cumsum(weights * x)
+  n <- length(nu)
+  nu <- nu/nu[n]
+  sum(nu[-1] * p[-n]) - sum(nu[-n] * p[-1])
+}
+
+sapply(examples, gini)
+```
+
 Shannon entropy:
 
 $$ H_g = - \sum^n_{i=1} p_i \times log_2(p_i); p_i = \frac{x_i}{\sum^n_{i=1}x_i} $$
+
+Implementation in R.
+
+```{r hg}
+hg <- function(x, norm = FALSE){
+  p <- x / sum(x)
+  res <- -sum(p*log2(p), na.rm=TRUE)
+  if(norm){
+    res <- 1 - (res/log2(length(p)))
+  }
+  res
+}
+
+sapply(examples, hg)
+sapply(examples, hg, norm = TRUE)
+```
 
 The z-score can be implemented in two ways: either only over-expressed genes are defined as tissue specific or the absolute distance from the mean is used, so that under-expressed genes are also defined as tissue specific.
 
@@ -195,9 +262,61 @@ SPM:
 
 $$ SPM = \frac{x_i^2}{\sum^n_{i=1}x^2_i} $$
 
+Implementation in R.
+
+```{r spm}
+spm <- function(x, norm=TRUE){
+  res <- x^2/sum(x^2)
+  if (norm){
+    res <- max(res)
+  }
+  res
+}
+
+sapply(examples, spm)
+```
+
 PEM estimates how different the expression of the gene is relative to an expected expression, under the assumption of uniform expression in all tissues. $s_i$ is the summary of the expression of all genes in tissue $i$.
 
 $$ PEM = log_{10} \left( \frac{\sum^n_{i=1}}{s_i} \times \frac{x_i}{\sum^n_{i=1} x_i} \right) $$
+
+No implementation yet as this metric requires expression data.
+
+### Comparing metrics
+
+Compare the metrics.
+
+```{r compare_metrics}
+my_metrics <- data.frame(
+  eg = c('identical', 'all_exp', 'all_exp_one_higher', 'half_exp', 'three_exp', 'one_exp'),
+  tau = sapply(examples, tau),
+  tsi = sapply(examples, tsi),
+  gini = sapply(examples, gini),
+  hg = sapply(examples, hg, norm=TRUE),
+  spm = sapply(examples, spm)
+)
+
+pivot_longer(my_metrics, -eg, names_to = "metrics") |>
+  mutate(eg = factor(eg, levels = unique(eg))) |>
+  ggplot(data = _, aes(eg, value, group = metrics, colour = metrics)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal()
+```
+
+Taking the average of all metrics.
+
+```{r consensus}
+my_metrics$mean <- apply(my_metrics[, -1], 1, mean)
+my_metrics$median <- apply(my_metrics[, -1], 1, median)
+
+pivot_longer(my_metrics, -eg, names_to = "metrics") |>
+  mutate(eg = factor(eg, levels = unique(eg))) |>
+  ggplot(data = _, aes(eg, value, group = metrics, colour = metrics)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal()
+```
 
 ## Summary
 
