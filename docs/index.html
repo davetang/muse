@@ -29,6 +29,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -231,6 +234,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -238,6 +304,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -357,15 +433,15 @@ results.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4bc5f6a79b1ce56dc34cd125f914593fb25af065targetblank4bc5f6aa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed6a644aea0c7b107d0a2bf1b788b75d56c131f77targetblankd6a644aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/4bc5f6a79b1ce56dc34cd125f914593fb25af065" target="_blank">4bc5f6a</a>
+<a href="https://github.com/davetang/muse/tree/d6a644aea0c7b107d0a2bf1b788b75d56c131f77" target="_blank">d6a644a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4bc5f6a79b1ce56dc34cd125f914593fb25af065targetblank4bc5f6aa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed6a644aea0c7b107d0a2bf1b788b75d56c131f77targetblankd6a644aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -375,7 +451,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/4bc5f6a79b1ce56dc34cd125f914593fb25af065" target="_blank">4bc5f6a</a>.
+<a href="https://github.com/davetang/muse/tree/d6a644aea0c7b107d0a2bf1b788b75d56c131f77" target="_blank">d6a644a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -413,7 +489,6 @@ Untracked files:
 
 Unstaged changes:
     Modified:   analysis/graph.Rmd
-    Modified:   analysis/tissue.Rmd
 
 </code></pre>
 <p>
@@ -458,6 +533,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/d6a644aea0c7b107d0a2bf1b788b75d56c131f77/analysis/index.Rmd" target="_blank">d6a644a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-13
+</td>
+<td>
+Organise posts
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/67bf9ca3cd1817402b882925d69927057915442f/docs/index.html" target="_blank">67bf9ca</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1896,100 +2005,50 @@ Start workflowr project.
 </div>
 <p>I refer to <a href="https://davetang.org/muse/">my blog</a> often to
 look up notes and code I have written. I will recreate my blog posts
-here, to make it easier to reuse and also maintain my code. Some posts
-only exist here and not on my blog, so there is no <code>original</code>
+here, to make it easier to reuse and maintain my code. Some posts only
+exist here and not on my blog, so there is no <code>original</code>
 hyperlink back to my blog.</p>
-<div id="blog-posts" class="section level3">
-<h3>Blog posts</h3>
+<div id="blog-posts" class="section level2">
+<h2>Blog posts</h2>
+<div id="visualisation" class="section level3">
+<h3>Visualisation</h3>
 <ul>
 <li>Making a heatmap in R with the pheatmap package - <a
 href="https://davetang.org/muse/2018/05/15/making-a-heatmap-in-r-with-the-pheatmap-package/">original</a>
 / <a href="pheatmap.html">updated</a></li>
-<li>Markov chain - <a
-href="https://davetang.org/muse/2014/01/23/markov-chain/">original</a> /
-<a href="markov_chain.html">updated</a></li>
 <li>Visualising Google Trends results with R - <a
 href="https://davetang.org/muse/2018/12/31/visualising-google-trends-results-with-r/">original</a>
 / <a href="google_trends.html">updated</a></li>
 <li>Complex UpSet plots - original / <a
 href="complex_upset.html">updated</a></li>
+<li>Gene expression heatmap using ARCHS4 data - original / <a
+href="gene_heatmap.html">updated</a></li>
+</ul>
+</div>
+<div id="bioinformatics" class="section level3">
+<h3>Bioinformatics</h3>
+<ul>
 <li>Read GTF file into R - <a
 href="https://davetang.org/muse/2017/08/04/read-gtf-file-r/">original</a>
 / <a href="read_gtf.html">updated</a></li>
 <li>Gene Ontology Enrichment Analysis - <a
 href="https://davetang.org/muse/2010/11/10/gene-ontology-enrichment-analysis/">original</a>
 / <a href="go_enrichment.html">updated</a></li>
-<li>Split single column of annotations into multiple columns - original
-/ <a href="split_column.html">updated</a></li>
-<li>Distance Matrix Computation - <a
-href="https://davetang.org/muse/2013/08/15/distance-matrix-computation/">original</a>
-/ <a href="distance.html">updated</a></li>
-<li>Sequence composition and random forests - <a
-href="https://davetang.org/muse/2013/09/14/sequence-composition-random-forests/">original</a>
-/ <a href="tss_predict.html">updated</a></li>
-<li>Using dplyr to aggregate in R - <a
-href="https://davetang.org/muse/2016/10/13/using-dplyr-aggregate-r/">original</a>
-/ <a href="dplyr_agg.html">updated</a></li>
 <li>Using the R <code>seqinr</code> package - <a
 href="https://davetang.org/muse/2013/05/09/using-the-r-seqinr-package/">original</a>
 / <a href="seqinr.html">updated</a></li>
-<li>Backticks in R - <a
-href="https://davetang.org/muse/2022/09/07/backticks-in-r/">original</a>
-/ <a href="r_backticks.html">updated</a></li>
-<li>Step by step Principal Component Analysis using R <a
-href="https://davetang.org/muse/2012/02/01/step-by-step-principal-components-analysis-using-r/">original</a>
-/ <a href="pca.html">updated</a></li>
-<li>Matrix to adjacency list in R - <a
-href="https://davetang.org/muse/2017/03/16/matrix-to-adjacency-list-in-r/">original</a>
-/ <a href="adj_list.html">updated</a></li>
-<li>Parallel computation in R - <a
-href="https://davetang.org/muse/2016/11/04/parallel-distance-calculation/">original</a>
-/ <a href="parallel.html">updated</a></li>
-<li>Getting started with tidymodels - original / <a
-href="tidymodels.html">updated</a></li>
+<li>Using the Bioconductor ensembldb package - original / <a
+href="ensembldb.html">updated</a></li>
 <li>Using the fast preranked gene set enrichment analysis (fgsea)
 package - <a
 href="https://davetang.org/muse/2018/01/10/using-fast-preranked-gene-set-enrichment-analysis-fgsea-package/">original</a>
 / <a href="fgsea.html">updated</a></li>
-<li>Solving problems with graphs - <a
-href="https://davetang.org/muse/2016/10/16/solving-problems-graphs/">original</a>
-/ <a href="graph.html">updated</a></li>
 <li>Using the Bioconductor GenomicRanges package - <a
 href="https://davetang.org/muse/2013/01/02/iranges-and-genomicranges/">original</a>
 / <a href="genomic_ranges.html">updated</a></li>
-<li>Using the Bioconductor ensembldb package - original / <a
-href="ensembldb.html">updated</a></li>
-<li>Performance of binary classifiers - original / <a
-href="bin_class.html">updated</a></li>
-<li>JSON versus YAML - original / <a
-href="json_vs_yaml.html">updated</a></li>
-<li>Reading irregular data into R - <a
-href="https://davetang.org/muse/2023/06/02/reading-irregular-data-into-r/">original</a>
-/ <a href="r_parsing.html">updated</a></li>
-<li>Learning about antibodies - original / <a
-href="antibody.html">updated</a></li>
 <li>Position weight matrix - <a
 href="https://davetang.org/muse/2013/10/01/position-weight-matrix/">original</a>
 / <a href="pwm.html">updated</a></li>
-<li>Hidden Markov Models - original / <a
-href="hmm.html">updated</a></li>
-<li>Gene expression heatmap using ARCHS4 data - original / <a
-href="gene_heatmap.html">updated</a></li>
-<li>Working with HDF5 data in R - original / <a
-href="hdf5.html">updated</a></li>
-<li>The tidyr pivot_longer and pivot_wider functions using base R - <a
-href="https://davetang.org/muse/2023/07/26/the-tidyr-pivot_longer-and-pivot_wider-functions-using-base-r/">original</a>
-/ <a href="reshape.html">updated</a></li>
-<li>Reading a list of files into a single R data frame - <a
-href="https://davetang.org/muse/2023/06/23/reading-list-of-files-into-single-r-data-frame/">original</a>
-/ <a href="read_files.html">updated</a></li>
-<li>Object-Oriented Programming - original / <a
-href="oo.html">updated</a></li>
-<li>Set notation - <a
-href="https://davetang.org/muse/2013/08/04/set-notation/">original</a> /
-<a href="set_notation.html">updated</a></li>
-<li>Ordering Objects using Seriation in R - original / <a
-href="seriation.html">updated</a></li>
 <li>Tissue specificity - <a
 href="https://davetang.org/muse/2013/08/28/tissue-specificity/">original</a>
 / <a href="tissue.html">updated</a></li>
@@ -2000,6 +2059,84 @@ href="https://davetang.org/muse/2014/07/07/quantile-normalisation-in-r/">origina
 href="https://davetang.org/muse/2011/01/24/normalisation-methods-for-dge-data/">original</a>
 / <a href="edger.html">updated</a></li>
 </ul>
+</div>
+<div id="machine-learning" class="section level3">
+<h3>Machine learning</h3>
+<ul>
+<li>Getting started with tidymodels - original / <a
+href="tidymodels.html">updated</a></li>
+<li>Sequence composition and random forests - <a
+href="https://davetang.org/muse/2013/09/14/sequence-composition-random-forests/">original</a>
+/ <a href="tss_predict.html">updated</a></li>
+<li>Performance of binary classifiers - original / <a
+href="bin_class.html">updated</a></li>
+<li>Ordering Objects using Seriation in R - original / <a
+href="seriation.html">updated</a></li>
+</ul>
+</div>
+<div id="programming" class="section level3">
+<h3>Programming</h3>
+<ul>
+<li>Object-Oriented Programming - original / <a
+href="oo.html">updated</a></li>
+<li>Backticks in R - <a
+href="https://davetang.org/muse/2022/09/07/backticks-in-r/">original</a>
+/ <a href="r_backticks.html">updated</a></li>
+<li>Split single column of annotations into multiple columns - original
+/ <a href="split_column.html">updated</a></li>
+<li>Matrix to adjacency list in R - <a
+href="https://davetang.org/muse/2017/03/16/matrix-to-adjacency-list-in-r/">original</a>
+/ <a href="adj_list.html">updated</a></li>
+<li>Using dplyr to aggregate in R - <a
+href="https://davetang.org/muse/2016/10/13/using-dplyr-aggregate-r/">original</a>
+/ <a href="dplyr_agg.html">updated</a></li>
+<li>Parallel computation in R - <a
+href="https://davetang.org/muse/2016/11/04/parallel-distance-calculation/">original</a>
+/ <a href="parallel.html">updated</a></li>
+<li>Reading irregular data into R - <a
+href="https://davetang.org/muse/2023/06/02/reading-irregular-data-into-r/">original</a>
+/ <a href="r_parsing.html">updated</a></li>
+<li>The tidyr pivot_longer and pivot_wider functions using base R - <a
+href="https://davetang.org/muse/2023/07/26/the-tidyr-pivot_longer-and-pivot_wider-functions-using-base-r/">original</a>
+/ <a href="reshape.html">updated</a></li>
+<li>Reading a list of files into a single R data frame - <a
+href="https://davetang.org/muse/2023/06/23/reading-list-of-files-into-single-r-data-frame/">original</a>
+/ <a href="read_files.html">updated</a></li>
+</ul>
+</div>
+<div id="mathsstats" class="section level3">
+<h3>Maths/Stats</h3>
+<ul>
+<li>Set notation - <a
+href="https://davetang.org/muse/2013/08/04/set-notation/">original</a> /
+<a href="set_notation.html">updated</a></li>
+<li>Step by step Principal Component Analysis using R <a
+href="https://davetang.org/muse/2012/02/01/step-by-step-principal-components-analysis-using-r/">original</a>
+/ <a href="pca.html">updated</a></li>
+<li>Distance Matrix Computation - <a
+href="https://davetang.org/muse/2013/08/15/distance-matrix-computation/">original</a>
+/ <a href="distance.html">updated</a></li>
+<li>Solving problems with graphs - <a
+href="https://davetang.org/muse/2016/10/16/solving-problems-graphs/">original</a>
+/ <a href="graph.html">updated</a></li>
+<li>Markov chain - <a
+href="https://davetang.org/muse/2014/01/23/markov-chain/">original</a> /
+<a href="markov_chain.html">updated</a></li>
+<li>Hidden Markov Models - original / <a
+href="hmm.html">updated</a></li>
+</ul>
+</div>
+<div id="misc" class="section level3">
+<h3>Misc</h3>
+<ul>
+<li>Learning about antibodies - original / <a
+href="antibody.html">updated</a></li>
+<li>JSON versus YAML - original / <a
+href="json_vs_yaml.html">updated</a></li>
+<li>Working with HDF5 data in R - original / <a
+href="hdf5.html">updated</a></li>
+</ul>
+</div>
 </div>
 
 
@@ -2018,6 +2155,8 @@ footer is added to webpages before the MathJax javascript. -->
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -2050,6 +2189,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
