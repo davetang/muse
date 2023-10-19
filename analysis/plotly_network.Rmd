@@ -15,7 +15,7 @@ Plotly can be used to plot a [Network Graph in R](https://plotly.com/r/network-g
 
 ## Dependencies
 
-```{r install_packages}
+```{r install_packages, message=FALSE, warning=FALSE}
 packages <- c('plotly', 'igraph', 'igraphdata')
 
 sapply(packages, function(x){
@@ -79,7 +79,7 @@ The edge list shows the connections.
 
 ```{r edge_list}
 el <- as.data.frame(get.edgelist(G))
-el
+head(el)
 ```
 
 Create the network with just the nodes using our layout `L`.
