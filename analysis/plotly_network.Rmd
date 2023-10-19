@@ -16,7 +16,7 @@ Plotly can be used to plot a [Network Graph in R](https://plotly.com/r/network-g
 ## Dependencies
 
 ```{r install_packages, message=FALSE, warning=FALSE}
-packages <- c('plotly', 'igraph', 'igraphdata')
+packages <- c('plotly', 'igraph', 'igraphdata', 'sna')
 
 sapply(packages, function(x){
   y <- require(x, character.only = TRUE)
@@ -24,7 +24,7 @@ sapply(packages, function(x){
     install.packages(x, quiet = TRUE)
     library(x, character.only = TRUE)
   }
-  ver <- as.character(packageVersion(x))
+  as.character(packageVersion(x))
 })
 ```
 
@@ -62,7 +62,7 @@ vertex_attr(G, 'color')
 
 The function `layout_nicely`:
 
->This function tries to choose an appropriate graph layout algorithm for the graph, automatically, based on a simple algorithm. See details below.
+>This function tries to choose an appropriate graph layout algorithm for the graph, automatically, based on a simple algorithm.
 
 ```{r check_out_layout}
 head(L)
@@ -151,16 +151,16 @@ head(xy1)
 Build the list of lines that will be used to connect the nodes.
 
 ```{r build_lines}
-line <- list(
+my_line <- list(
   type = "line",
   line = list(color = "#030303", width = 0.3),
   xref = "x",
   yref = "y"
 )
 
-lines <- lapply(seq_along(xy1[, 1]), function(x){
+my_lines <- lapply(seq_along(xy1[, 1]), function(x){
   c(
-    line,
+    my_line,
     x0 = xy1[x, 1],
     y0 = xy1[x, 2],
     x1 = xy2[x, 1],
@@ -177,8 +177,117 @@ axis <- list(title = "", showgrid = FALSE, showticklabels = FALSE, zeroline = FA
 layout(
   network,
   title = "Zachary's karate club Network",
-  shapes = lines,
+  shapes = my_lines,
   xaxis = axis,
   yaxis = axis
 )
+```
+
+## Plot igraph with Plotly
+
+Incorporate all the steps above into one function but without colours.
+
+```{r plotly_igraph}
+plotly_igraph <- function(G, L = layout_nicely(G), my_title = NULL){
+  vs <- V(G)
+  el <- as.data.frame(get.edgelist(G))
+  network <- plot_ly(
+    x = ~L[, 1],
+    y = ~L[, 2],
+    mode = "markers",
+    text = names(vs),
+    hoverinfo = "text",
+    type = "scatter",
+    size = I(42),
+    showlegend=FALSE
+  )
+  row.names(L) <- names(vs)
+  get_xy <- function(x){
+    L[x, ]
+  }
+  xy1 <- t(
+    apply(el, 1, function(x){
+      get_xy(x[1])
+    })
+  )
+  
+  xy2 <- t(
+    apply(el, 1, function(x){
+      get_xy(x[2])
+    })
+  )
+  
+  my_line <- list(
+    type = "line",
+    line = list(color = "#030303", width = 0.3),
+    xref = "x",
+    yref = "y"
+  )
+  
+  my_lines <- lapply(seq_along(xy1[, 1]), function(x){
+    c(
+      my_line,
+      x0 = xy1[x, 1],
+      y0 = xy1[x, 2],
+      x1 = xy2[x, 1],
+      y1 = xy2[x, 2]
+    )
+  })
+  
+  axis <- list(title = "", showgrid = FALSE, showticklabels = FALSE, zeroline = FALSE)
+
+  layout(
+    network,
+    title = my_title,
+    shapes = my_lines,
+    xaxis = axis,
+    yaxis = axis
+  )
+  
+}
+
+set.seed(1984)
+plotly_igraph(G, my_title = "Zachary's karate club Network")
+```
+
+## Graphviz dot file
+
+The [read.dot](https://search.r-project.org/CRAN/refmans/sna/html/read.dot.html) function can read network information from a Graphviz's DOT format file, returning an adjacency matrix.
+
+```{r read_dot}
+adj_mat <- read.dot("data/rnaseq_variant_calling.dot")
+dim(adj_mat)
+```
+
+The adjacency matrix is directional. `CALL_markduplicates` -> `CALL_split_n_cigar_reads` and not the other way around.
+
+```{r check_adj_mat}
+adj_mat[1:2, 1:2]
+```
+
+[Convert matrix to adjacency list](adj_list.html).
+
+```{r adj_list}
+as_tibble(adj_mat, rownames = "parent") |>
+  pivot_longer(-parent, names_to='child') |>
+  filter(value == 1) |>
+  select(-value) |>
+  mutate(parent = str_trim(parent, 'both'), child = str_trim(child, 'both')) -> adj_list
+
+head(adj_list)
+```
+
+Create network.
+
+```{r plot_net}
+net <- graph.data.frame(adj_list, directed = TRUE)
+set.seed(1984)
+plot(net, layout = layout_nicely)
+```
+
+Need to make the lines into arrows.
+
+```{r plotly_igraph_net}
+set.seed(1984)
+plotly_igraph(net, L = layout_nicely(net))
 ```
