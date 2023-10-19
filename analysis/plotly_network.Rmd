@@ -1,0 +1,184 @@
+---
+title: "Network graph using R Plotly"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Plotly can be used to plot a [Network Graph in R](https://plotly.com/r/network-graphs/). The documentation does not work, so here's my implementation.
+
+## Dependencies
+
+```{r install_packages}
+packages <- c('plotly', 'igraph', 'igraphdata')
+
+sapply(packages, function(x){
+  y <- require(x, character.only = TRUE)
+  if(y == FALSE){
+    install.packages(x, quiet = TRUE)
+    library(x, character.only = TRUE)
+  }
+  ver <- as.character(packageVersion(x))
+})
+```
+
+## Example
+
+Load [Zachary's karate club](https://en.wikipedia.org/wiki/Zachary%27s_karate_club). Network description from Wikipedia:
+
+>A social network of a karate club was studied by Wayne W. Zachary for a period of three years from 1970 to 1972. The network captures 34 members of a karate club, documenting links between pairs of members who interacted outside the club. During the study a conflict arose between the administrator "John A" and instructor "Mr. Hi" (pseudonyms), which led to the split of the club into two. Half of the members formed a new club around Mr. Hi; members from the other part found a new instructor or gave up karate. Based on collected data Zachary correctly assigned all but one member of the club to the groups they actually joined after the split.
+
+```{r karate}
+data(karate, package="igraphdata")
+karate
+```
+
+Upgrade graph.
+
+```{r upgrade_karate}
+G <- upgrade_graph(karate)
+str(G)
+```
+
+This is how the graph is supposed to look, plotted using `igraph`.
+
+```{r plot_igraph}
+set.seed(1984)
+L <- layout_nicely(G)
+plot.igraph(G, layout = L)
+```
+
+The colour can be obtained from `vertex_attr`, which can query vertex attributes of a graph.
+
+```{r vertex_attr}
+vertex_attr(G, 'color')
+```
+
+The function `layout_nicely`:
+
+>This function tries to choose an appropriate graph layout algorithm for the graph, automatically, based on a simple algorithm. See details below.
+
+```{r check_out_layout}
+head(L)
+```
+
+We can get the name of the vertices using `V`.
+
+```{r vertices}
+vs <- V(G)
+vs
+```
+
+The edge list shows the connections.
+
+```{r edge_list}
+el <- as.data.frame(get.edgelist(G))
+el
+```
+
+Create the network with just the nodes using our layout `L`.
+
+```{r nodes}
+network <- plot_ly(
+  x = ~L[, 1],
+  y = ~L[, 2],
+  mode = "markers",
+  text = vs$label,
+  hoverinfo = "text",
+  type = "scatter",
+  size = I(42),
+  color = as.character(vertex_attr(G, 'color')),
+  colors = c('orange', 'skyblue'),
+  showlegend=FALSE
+)
+network
+```
+
+The graph above lacks the edges, which we will manually create. For example, these two nodes need to connect.
+
+```{r eg1}
+el[1, ]
+```
+
+The layout contains the coordinates of the nodes but is not named.
+
+```{r tail_layout}
+tail(L)
+```
+
+We can get the names using `names`.
+
+```{r vertice_names}
+my_layout <- L
+row.names(my_layout) <- names(V(G))
+tail(my_layout)
+```
+
+To get the (x, y) coordinates, we just subset `my_layout`.
+
+```{r get_xy}
+get_xy <- function(x){
+  my_layout[x, ]
+}
+
+get_xy('Mr Hi')
+```
+
+Get the (x, y) coordinates of every node in the edge list.
+
+```{r get_xy_el}
+xy1 <- t(
+  apply(el, 1, function(x){
+    get_xy(x[1])
+  })
+)
+
+xy2 <- t(
+  apply(el, 1, function(x){
+    get_xy(x[2])
+  })
+)
+
+head(xy1)
+```
+
+Build the list of lines that will be used to connect the nodes.
+
+```{r build_lines}
+line <- list(
+  type = "line",
+  line = list(color = "#030303", width = 0.3),
+  xref = "x",
+  yref = "y"
+)
+
+lines <- lapply(seq_along(xy1[, 1]), function(x){
+  c(
+    line,
+    x0 = xy1[x, 1],
+    y0 = xy1[x, 2],
+    x1 = xy2[x, 1],
+    y1 = xy2[x, 2]
+  )
+})
+```
+
+Plot the graph using `layout` to modify the default layout.
+
+```{r layout_graph}
+axis <- list(title = "", showgrid = FALSE, showticklabels = FALSE, zeroline = FALSE)
+
+layout(
+  network,
+  title = "Zachary's karate club Network",
+  shapes = lines,
+  xaxis = axis,
+  yaxis = axis
+)
+```
