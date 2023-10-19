@@ -1,0 +1,38 @@
+digraph rnaseq_variant_sub {
+  #rankdir=LR;
+  compound=true;
+
+  # Links
+  CALL_markduplicates -> CALL_split_n_cigar_reads
+  CALL_merge_vcfs -> CALL_variant_filtration
+  CALL_haplotype_caller -> CALL_merge_bams
+  CALL_split_n_cigar_reads -> CALL_applybqsr
+  SCATTER_0_VARIABLE_interval -> CALL_haplotype_caller
+  CALL_haplotype_caller -> CALL_merge_vcfs
+  CALL_gtf_to_interval_list -> CALL_baserecalibrator
+  CALL_split_n_cigar_reads -> CALL_baserecalibrator
+  CALL_applybqsr -> CALL_haplotype_caller
+  CALL_baserecalibrator -> CALL_applybqsr
+  CALL_gtf_to_interval_list -> CALL_applybqsr
+  CALL_scatter_interval_list -> SCATTER_0_VARIABLE_interval
+  CALL_gtf_to_interval_list -> CALL_scatter_interval_list
+  CALL_star_align -> CALL_markduplicates
+
+  # Nodes
+  CALL_merge_vcfs [label="call merge_vcfs"]
+  CALL_scatter_interval_list [label="call scatter_interval_list"]
+  CALL_variant_filtration [label="call variant_filtration"]
+  CALL_split_n_cigar_reads [label="call split_n_cigar_reads"]
+  CALL_star_align [label="call star_align"]
+  subgraph cluster_0 {
+    style="filled,solid";
+    fillcolor=white;
+    CALL_haplotype_caller [label="call haplotype_caller"]
+    SCATTER_0_VARIABLE_interval [shape="hexagon" label="scatter over File as interval"]
+  }
+  CALL_applybqsr [label="call applybqsr"]
+  CALL_gtf_to_interval_list [label="call gtf_to_interval_list"]
+  CALL_merge_bams [label="call merge_bams"]
+  CALL_markduplicates [label="call markduplicates"]
+  CALL_baserecalibrator [label="call baserecalibrator"]
+}
