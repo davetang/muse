@@ -1,0 +1,85 @@
+---
+title: "GSVA: gene set variation analysis"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Following the [vignette](https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html).
+
+>Gene set variation analysis (GSVA) is a particular type of gene set enrichment method that works on single samples and enables pathway-centric analyses of molecular data by performing a conceptually simple but powerful change in the functional unit of analysis, from genes to gene sets. The GSVA package provides the implementation of four single-sample gene set enrichment methods, concretely zscore, plage, ssGSEA and its own called GSVA. While this methodology was initially developed for gene expression data, it can be applied to other types of molecular profiling data. In this vignette we illustrate how to use the GSVA package with bulk microarray and RNA-seq expression data.
+
+## Package
+
+Install GSVA. (Dependencies are listed in the Imports section in the [DESCRIPTION](https://github.com/rcastelo/GSVA/blob/devel/DESCRIPTION) file.)
+
+```{r install_fgsea, message=FALSE, warning=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+if (!require("GSVA", quietly = TRUE))
+  BiocManager::install("GSVA")
+```
+
+Load package.
+
+```{r load_gsva, message=FALSE, warning=FALSE}
+library(GSVA)
+```
+
+## Quick start
+
+Generate example expression matrix.
+
+```{r eg_mat}
+p <- 10000
+n <- 30
+set.seed(1984)
+X <- matrix(
+  rnorm(p*n),
+  nrow=p,
+  dimnames=list(paste0("g", 1:p), paste0("s", 1:n))
+)
+X[1:5, 1:5]
+```
+
+Generate 100 gene sets that are contain from 10 to up to 100 genes sampled from `1:p`.
+
+```{r eg_gs}
+set.seed(1984)
+gs <- as.list(sample(10:100, size=100, replace=TRUE))
+
+gs <- lapply(gs, function(n, p){
+  paste0("g", sample(1:p, size=n, replace=FALSE))
+}, p)
+names(gs) <- paste0("gs", 1:length(gs))
+
+sapply(gs, length)
+```
+
+Calculate GSVA enrichment scores.
+
+>The first argument to the `gsva()` function is the gene expression data matrix and the second the collection of gene sets. The `gsva()` function can take the input expression data and gene sets using different specialized containers that facilitate the access and manipulation of molecular and phenotype data, as well as their associated metadata. Another advanced features include the use of on-disk and parallel backends to enable, respectively, using GSVA on large molecular data sets and speed up computing time.
+
+```{r eg_gsva}
+es_gsva <- gsva(X, gs)
+dim(es_gsva)
+```
+
+Median enrichment scores.
+
+```{r eg_median_es}
+apply(es_gsva, 2, median)
+```
+
+>ssgsea (Barbie et al. 2009). Single sample GSEA (ssGSEA) is a non-parametric method that calculates a gene set enrichment score per sample as the normalized difference in empirical cumulative distribution functions (CDFs) of gene expression ranks inside and outside the gene set. By default, the implementation in the GSVA package follows the last step described in (Barbie et al. 2009, online methods, pg. 2) by which pathway scores are normalized, dividing them by the range of calculated values. This normalization step may be switched off using the argument ssgsea.norm in the call to the gsva() function; see below.
+
+```{r eg_ssgsea}
+es_ssgsea <- gsva(X, gs, method = "ssgsea")
+apply(es_ssgsea, 2, median)
+```
