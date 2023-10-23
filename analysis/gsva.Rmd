@@ -67,7 +67,7 @@ Calculate GSVA enrichment scores.
 >The first argument to the `gsva()` function is the gene expression data matrix and the second the collection of gene sets. The `gsva()` function can take the input expression data and gene sets using different specialized containers that facilitate the access and manipulation of molecular and phenotype data, as well as their associated metadata. Another advanced features include the use of on-disk and parallel backends to enable, respectively, using GSVA on large molecular data sets and speed up computing time.
 
 ```{r eg_gsva}
-es_gsva <- gsva(X, gs)
+es_gsva <- gsva(X, gs, verbose=FALSE)
 dim(es_gsva)
 ```
 
@@ -80,6 +80,6 @@ apply(es_gsva, 2, median)
 >ssgsea (Barbie et al. 2009). Single sample GSEA (ssGSEA) is a non-parametric method that calculates a gene set enrichment score per sample as the normalized difference in empirical cumulative distribution functions (CDFs) of gene expression ranks inside and outside the gene set. By default, the implementation in the GSVA package follows the last step described in (Barbie et al. 2009, online methods, pg. 2) by which pathway scores are normalized, dividing them by the range of calculated values. This normalization step may be switched off using the argument ssgsea.norm in the call to the gsva() function; see below.
 
 ```{r eg_ssgsea}
-es_ssgsea <- gsva(X, gs, method = "ssgsea")
+es_ssgsea <- gsva(X, gs, method = "ssgsea", verbose=FALSE)
 apply(es_ssgsea, 2, median)
 ```
