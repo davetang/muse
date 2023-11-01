@@ -1,0 +1,379 @@
+---
+title: "Using the GenomicDataCommons package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+theme_set(theme_bw())
+```
+
+## Introduction
+
+[About the GDC](https://gdc.cancer.gov/about-gdc):
+
+>The National Cancer Institute's (NCI's) Genomic Data Commons (GDC) is a data sharing platform that promotes precision medicine in oncology. It is not just a database or a tool; it is an expandable knowledge network supporting the import and standardisation of genomic and clinical data from cancer research programs. The GDC contains NCI-generated data from some of the largest and most comprehensive cancer genomic datasets, including The Cancer Genome Atlas (TCGA) and Therapeutically Applicable Research to Generate Effective Therapies (TARGET). For the first time, these datasets have been harmonised using a common set of bioinformatics pipelines, so that the data can be directly compared. As a growing knowledge system for cancer, the GDC also enables researchers to submit data, and harmonises these data for import into the GDC. As more researchers add clinical and genomic data to the GDC, it will become an even more powerful tool for making discoveries about the molecular basis of cancer that may lead to better care for patients.
+
+The [GenomicDataCommons Bioconductor package](https://www.bioconductor.org/packages/release/bioc/vignettes/GenomicDataCommons/inst/doc/overview.html) provides basic infrastructure for querying, accessing, and mining genomic datasets available from the GDC.
+
+See [The GDC API page](https://docs.gdc.cancer.gov/API/Users_Guide/Getting_Started/).
+
+## Installation
+
+Install the [GenomicDataCommons](https://bioconductor.org/packages/release/bioc/html/GenomicDataCommons.html) package using `BiocManager`.
+
+```{r install, message=FALSE, warning=FALSE}
+if (! "GenomicDataCommons" %in% installed.packages()[, 1]){
+  BiocManager::install("GenomicDataCommons")
+}
+library(GenomicDataCommons)
+packageVersion("GenomicDataCommons")
+```
+
+## Getting started
+
+Check status to see if we can query the GDC.
+
+```{r check_status}
+GenomicDataCommons::status()
+stopifnot(GenomicDataCommons::status()$status=="OK")
+```
+
+The following code builds a `manifest` that can be used to guide the download of raw data. Here, filtering finds open gene expression files quantified as raw counts using STAR from TCGA ovarian cancer patients.
+
+```{r tcga_ov_star}
+ge_manifest <- files() %>%
+  filter(cases.project.project_id == 'TCGA-OV') %>% 
+  filter(type == 'gene_expression' ) %>%
+  filter(access == 'open') %>%
+  filter(analysis.workflow_type == 'STAR - Counts')  %>%
+  manifest()
+
+DT::datatable(ge_manifest)
+```
+
+The `gdcdata` function is used to download GDC files.
+
+```{r gdcdata}
+fnames <- lapply(ge_manifest$id[1:3], gdcdata)
+fnames
+```
+
+Files are downloaded and stored in the directory specified by `gdc_cache()`.
+
+```{r gdc_cache}
+gdc_cache()
+```
+
+Tally the total number of available STAR gene counts that are open for download.
+
+```{r star_counts}
+open_star_manifest <- files() %>%
+    filter(analysis.workflow_type == 'STAR - Counts') %>%
+    filter(access == 'open') %>%
+    manifest()
+
+dim(open_star_manifest)
+```
+
+## Metadata queries
+
+Queries in the `GenomicDataCommons` package follow the four metadata endpoints available at the GDC; there are four convenience functions that each create `GDCQuery` objects:
+
+1. `projects()`
+2. `cases()`
+3. `files()`
+4. `annotations()`
+
+Four endpoints: projects, cases, files, and annotations that have various associated fields. These are the default fields.
+
+```{r endpoints_default_fields}
+endpoints <- c("projects", "cases", "files", "annotations")
+sapply(endpoints, default_fields)
+```
+
+Available fields for each endpoint.
+
+```{r endpoints_available_fields}
+all_fields <- sapply(endpoints, available_fields)
+names(all_fields) <- endpoints
+
+sapply(all_fields, length)
+```
+
+These fields can be used for filtering purposes.
+
+```{r head_all_fields_files}
+head(all_fields$files)
+```
+
+Use the `facet` function to aggregate on values used for a particular field.
+
+```{r facet_access}
+files() %>% facet("access") %>% aggregations()
+```
+
+Use `grep` to search for fields of interest, for example "project".
+
+```{r grep_project}
+grep("project", all_fields$files, ignore.case = TRUE, value = TRUE)
+```
+
+Look for "days_to_collection".
+
+```{r grep_collection}
+grep("collection", all_fields$cases, ignore.case = TRUE, value = TRUE)
+```
+
+Look for "workflow_type".
+
+```{r grep_workflow_type}
+grep("workflow_type", all_fields$cases, ignore.case = TRUE, value = TRUE)
+```
+
+Look for "treatment".
+
+```{r grep_treatment}
+grep("treatment", all_fields$cases, ignore.case = TRUE, value = TRUE)
+```
+
+Note that each entry above is separated by a period (`.`); this indicates the hierarchical structure. Summarise the top level fields by using `sub`.
+
+```{r top_level_file_fields}
+unique(sub("^(\\w+)\\..*", "\\1", all_fields$cases))
+```
+
+All aggregations are only on one field at a time.
+
+```{r facet_type_data_format}
+files() %>% facet(c("type", "data_format")) %>% aggregations()
+```
+
+Aggregate on a sub-field.
+
+```{r treatment_type}
+cases() %>% facet("diagnoses.treatments.treatment_type") %>% aggregations()
+```
+
+Facet on open `analysis.workflow_type`.
+
+```{r analysis_workflow_type}
+files() %>%
+  filter(access == 'open') %>%
+  facet("analysis.workflow_type") %>%
+  aggregations()
+```
+
+Facet on open `experimental_strategy`.
+
+```{r experimental_strategy}
+files() %>%
+  filter(access == 'open') %>%
+  facet("experimental_strategy") %>%
+  aggregations()
+```
+
+### Files
+
+All BAM files are under controlled access.
+
+```{r open_bam}
+files() %>%
+  filter(data_format == 'bam') %>%
+  facet("access") %>%
+  aggregations()
+```
+
+All VCF files are also under controlled access.
+
+```{r open_vcf}
+files() %>%
+  filter(data_format == 'vcf') %>%
+  facet("access") %>%
+  aggregations()
+```
+
+[Mutation Annotation Format](https://docs.gdc.cancer.gov/Data/File_Formats/MAF_Format/) (MAF) are openly available. These files are tab-delimited text files with aggregated mutation information from VCF files.
+
+```{r open_wxs_data}
+files() %>%
+  filter(access == 'open') %>%
+  filter(experimental_strategy == 'WXS') %>%
+  facet("data_format") %>%
+  aggregations()
+```
+
+### Project
+
+Project fields.
+
+```{r project_fields}
+all_fields$projects
+```
+
+Use `projects` to fetch project information and `ids` to list all available projects.
+
+```{r project_info}
+projects() %>% results_all() -> project_info
+
+sort(ids(project_info))
+```
+
+The `results()` method will fetch actual results.
+
+```{r fetch_projects}
+projects() %>% results(size = 10) -> my_proj
+
+str(my_proj, max.level = 1)
+
+my_proj$project_id
+```
+
+### Clinical data
+
+Accessing clinical data.
+
+```{r gdc_clinical}
+case_ids <- cases() %>% results(size=10) %>% ids()
+clindat <- gdc_clinical(case_ids)
+names(clindat)
+```
+
+View available clinical data.
+
+```{r clindat_diagnoses}
+idx <- apply(clindat$diagnoses, 2, function(x) all(is.na(x)))
+DT::datatable(clindat$diagnoses[, !idx])
+```
+
+### Cases
+
+Find all files related to a specific case, or sample donor.
+
+```{r case1}
+case1 <- cases() %>% results(size=1)
+str(case1, max.level = 1)
+```
+
+Sample IDs.
+
+```{r case1_sample_ids}
+case1$sample_ids
+```
+
+All case fields.
+
+```{r all_case_fields}
+case_fields <- available_fields("cases")
+```
+
+Grep `case_fields`.
+
+```{r grep_case_fields}
+grep("sample_ids", case_fields, value = TRUE)
+grep("sample_type", case_fields, value = TRUE)
+grep("workflow_type", case_fields, value = TRUE)
+```
+
+Get case data.
+
+```{r n_star_cases}
+n_star_cases <- cases() %>%
+  filter(files.analysis.workflow_type == 'STAR - Counts') %>%
+  filter(files.access == 'open') %>%
+  count()
+
+star_cases <- cases() %>%
+  filter(files.analysis.workflow_type == 'STAR - Counts') %>%
+  filter(files.access == 'open') %>%
+  results(size = n_star_cases)
+
+sapply(star_cases, length)
+```
+
+`case_id` is the same as `id`.
+
+```{r compare_case_id_with_id}
+table(star_cases$case_id == star_cases$id)
+```
+
+One case ID to multiple sample IDs.
+
+```{r check_out_sample_ids}
+head(star_cases$sample_ids, 3)
+```
+
+Sample IDs to case IDs.
+
+```{r sample_id_lookup}
+sample_id_len <- sapply(star_cases$sample_ids, length)
+my_ids <- rep(names(sample_id_len), sample_id_len)
+sample_id_lookup <- data.frame(
+  sample_ids = unlist(star_cases$sample_ids),
+  case_id = my_ids,
+  row.names = NULL
+)
+
+head(sample_id_lookup)
+```
+
+## TCGA
+
+[The Cancer Genome Atlas](https://www.cancer.gov/about-nci/organization/ccg/research/structural-genomics/tcga) (TCGA), a landmark cancer genomics program, molecularly characterized over 20,000 primary cancer and matched normal samples spanning 33 cancer types. This joint effort between NCI and the National Human Genome Research Institute began in 2006, bringing together researchers from diverse disciplines and multiple institutions.
+
+### TCGA nomenclature
+
+Acronyms for TCGA cancer types:
+
+* ACC: adrenocortical
+* BRCA: breast
+* BLCA: bladder
+* COAD: colon
+* ESCA: esophageal
+* GBM: glioblastoma
+* HNSC: head and neck squamous cell
+* KICH: kidney chromophobe
+* KIRC: kidney clear cell
+* KIRP: kidney papillary
+* LGG: low grade glioma
+* LIHC: liver
+* LUAD:lung adenocarcinoma
+* PAAD: pancreatic
+* PRAD: prostate
+* STAD: stomach
+* THCA: thyroid
+* UCEC: endometrial
+
+From https://www.bioconductor.org/packages/release/bioc/vignettes/TCGAbiolinks/inst/doc/query.html
+
+A [TCGA barcode](https://docs.gdc.cancer.gov/Encyclopedia/pages/TCGA_Barcode/) is composed of a collection of identifiers. Each specifically identifies a TCGA data element. Refer to the following figure for an illustration of how metadata identifiers comprise a barcode. An aliquot barcode contains the highest number of identifiers. For example:
+
+Aliquot barcode: TCGA-G4-6317-02A-11D-2064-05
+Participant: TCGA-G4-6317
+Sample: TCGA-G4-6317-02
+
+Fetch projects.
+
+```{r fetch_projects_all}
+projects() %>% results(size=100) -> my_projects
+str(my_projects, max.level = 1)
+```
+
+Project IDs.
+
+```{r project_ids}
+my_projects$id
+```
+
+Treatment type.
+
+```{r tcga_ov_treatment_type}
+cases() %>%
+  filter(project.project_id == 'TCGA-OV') %>% 
+  facet("diagnoses.treatments.treatment_type") %>%
+  aggregations()
+```
