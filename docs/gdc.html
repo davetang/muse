@@ -527,15 +527,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree75030f19cbc4e69bee7422182cad2352ebc25d3atargetblank75030f1a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree705fefae29023509fb067f1889b9e25dc9b0c662targetblank705fefaa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/75030f19cbc4e69bee7422182cad2352ebc25d3a" target="_blank">75030f1</a>
+<a href="https://github.com/davetang/muse/tree/705fefae29023509fb067f1889b9e25dc9b0c662" target="_blank">705fefa</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree75030f19cbc4e69bee7422182cad2352ebc25d3atargetblank75030f1a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree705fefae29023509fb067f1889b9e25dc9b0c662targetblank705fefaa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -545,7 +545,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/75030f19cbc4e69bee7422182cad2352ebc25d3a" target="_blank">75030f1</a>.
+<a href="https://github.com/davetang/muse/tree/705fefae29023509fb067f1889b9e25dc9b0c662" target="_blank">705fefa</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -627,6 +627,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/705fefae29023509fb067f1889b9e25dc9b0c662/analysis/gdc.Rmd" target="_blank">705fefa</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-01
+</td>
+<td>
+Treatments
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/2f8ef495451448ddcb907379cb63da1d15f1df3f/docs/gdc.html" target="_blank">2f8ef49</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1472,12 +1506,14 @@ str(tcga_ov, max.level = 1)</code></pre>
  - attr(*, &quot;row.names&quot;)= int [1:608] 1 2 3 4 5 6 7 8 9 10 ...
  - attr(*, &quot;class&quot;)= chr [1:3] &quot;GDCcasesResults&quot; &quot;GDCResults&quot; &quot;list&quot;</code></pre>
 <p>Select an additional field.</p>
-<pre class="r"><code>tcga_ov_extra &lt;- cases() %&gt;%
+<pre class="r"><code>treatment_fields &lt;- grep(&quot;treatment&quot;, all_fields$cases, ignore.case = TRUE, value = TRUE)
+
+tcga_ov_extra &lt;- cases() %&gt;%
   filter(project.project_id == &#39;TCGA-OV&#39;) %&gt;% 
   GenomicDataCommons::select(
     c(
       default_fields(&#39;cases&#39;),
-      &quot;diagnoses.treatments.treatment_type&quot;
+      treatment_fields
     )
   ) %&gt;%
   results_all()
@@ -1508,11 +1544,29 @@ str(tcga_ov_extra, max.level = 1)</code></pre>
  - attr(*, &quot;row.names&quot;)= int [1:608] 1 2 3 4 5 6 7 8 9 10 ...
  - attr(*, &quot;class&quot;)= chr [1:3] &quot;GDCcasesResults&quot; &quot;GDCResults&quot; &quot;list&quot;</code></pre>
 <p>Check out the treatments.</p>
-<pre class="r"><code>tcga_ov_extra$diagnoses$`cce34351-1700-405b-818f-a598f63a33e8`$treatments</code></pre>
-<pre><code>[[1]]
-               treatment_type
-1      Radiation Therapy, NOS
-2 Pharmaceutical Therapy, NOS</code></pre>
+<pre class="r"><code>str(tcga_ov_extra$diagnoses$`cce34351-1700-405b-818f-a598f63a33e8`$treatments)</code></pre>
+<pre><code>List of 1
+ $ :&#39;data.frame&#39;:   2 obs. of  16 variables:
+  ..$ treatment_intent_type     : logi [1:2] NA NA
+  ..$ updated_datetime          : chr [1:2] &quot;2019-07-31T16:17:41.335989-05:00&quot; &quot;2019-07-31T16:17:41.335989-05:00&quot;
+  ..$ treatment_id              : chr [1:2] &quot;93662700-6cf0-567b-af2e-8289a49e319a&quot; &quot;dafb6206-fade-54bb-a976-97758882f343&quot;
+  ..$ submitter_id              : chr [1:2] &quot;TCGA-31-1955_treatment&quot; &quot;TCGA-31-1955_treatment_1&quot;
+  ..$ treatment_type            : chr [1:2] &quot;Radiation Therapy, NOS&quot; &quot;Pharmaceutical Therapy, NOS&quot;
+  ..$ state                     : chr [1:2] &quot;released&quot; &quot;released&quot;
+  ..$ therapeutic_agents        : logi [1:2] NA NA
+  ..$ treatment_or_therapy      : chr [1:2] &quot;yes&quot; &quot;yes&quot;
+  ..$ created_datetime          : chr [1:2] NA &quot;2019-04-28T09:28:03.174985-05:00&quot;
+  ..$ days_to_treatment_end     : logi [1:2] NA NA
+  ..$ days_to_treatment_start   : logi [1:2] NA NA
+  ..$ regimen_or_line_of_therapy: logi [1:2] NA NA
+  ..$ treatment_effect          : logi [1:2] NA NA
+  ..$ initial_disease_status    : logi [1:2] NA NA
+  ..$ treatment_anatomic_site   : logi [1:2] NA NA
+  ..$ treatment_outcome         : logi [1:2] NA NA</code></pre>
+<p>There is no information on <a
+href="https://www.cancerresearchuk.org/about-cancer/treatment/drugs/carboplatin">carboplatin</a>
+or <a
+href="https://www.cancerresearchuk.org/about-cancer/treatment/drugs/paclitaxel">paclitaxel</a>.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
