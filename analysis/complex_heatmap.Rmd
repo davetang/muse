@@ -1,0 +1,95 @@
+---
+title: "Making a heatmap in R with the ComplexHeatmap package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(pheatmap)
+library(dendextend)
+library(grid)
+library(gridExtra)
+```
+
+Install latest version from GitHub.
+
+```{r install, eval=FALSE}
+remotes::install_github("jokergoo/ComplexHeatmap")
+```
+
+Load library.
+
+```{r load_complex_heatmap, message=FALSE, message=FALSE}
+library(ComplexHeatmap)
+```
+
+Download example data.
+
+```{r example_data}
+example_file <- "https://davetang.org/file/TagSeqExample.tab"
+data <- read.delim(example_file, header = TRUE, row.names = "gene")
+data_subset <- as.matrix(data[rowSums(data)>50000,])
+dim(data_subset)
+```
+
+Default heatmap for ComplexHeatmap.
+
+```{r default_heatmap, fig.width=7, fig.height=8}
+Heatmap(data_subset)
+```
+
+Normalise using z-score.
+
+```{r default_heatmap_norm, fig.width=7, fig.height=8}
+cal_z_score <- function(x){
+  (x - mean(x)) / sd(x)
+}
+
+data_subset_norm <- t(apply(data_subset, 1, cal_z_score))
+Heatmap(data_subset_norm)
+```
+
+Add a title using `column_title`; the `name` parameter puts a title of the heatmap legend.
+
+```{r pheatmap_title_main, fig.width=7, fig.height=8}
+Heatmap(data_subset_norm, column_title = "My title", name = "Legend")
+```
+
+Two heatmaps.
+
+```{r two_heatmaps, fig.width=7, fig.height=8}
+one <- Heatmap(data_subset, column_title = "Raw", name = "Raw")
+two <- Heatmap(data_subset_norm, column_title = "Scaled", name = "Scaled")
+
+one + two
+```
+
+Add [annotations](https://jokergoo.github.io/ComplexHeatmap-reference/book/heatmap-annotations.html).
+
+```{r annotation, fig.height=7, fig.width=8}
+set.seed(123)
+mat <- matrix(rnorm(100), 10)
+rownames(mat) = paste0("R", 1:10)
+colnames(mat) = paste0("C", 1:10)
+
+column_ha = HeatmapAnnotation(
+  foo1 = rep(c('N', 'T'), 5),
+  bar1 = anno_barplot(colMeans(mat))
+)
+
+row_ha = rowAnnotation(
+  foo2 = runif(10),
+  bar2 = anno_barplot(rowMeans(mat))
+)
+
+Heatmap(mat, name = "mat", top_annotation = column_ha, right_annotation = row_ha)
+```
+
+[Heatmap split](https://jokergoo.github.io/ComplexHeatmap-reference/book/a-single-heatmap.html#heatmap-split).
+
+```{r break, fig.height=7, fig.width=8}
+Heatmap(mat, name = "mat", row_km = 3, column_km = 3)
+```
