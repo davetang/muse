@@ -391,12 +391,14 @@ str(tcga_ov, max.level = 1)
 Select an additional field.
 
 ```{r tcga_ov_extra}
+treatment_fields <- grep("treatment", all_fields$cases, ignore.case = TRUE, value = TRUE)
+
 tcga_ov_extra <- cases() %>%
   filter(project.project_id == 'TCGA-OV') %>% 
   GenomicDataCommons::select(
     c(
       default_fields('cases'),
-      "diagnoses.treatments.treatment_type"
+      treatment_fields
     )
   ) %>%
   results_all()
@@ -407,5 +409,7 @@ str(tcga_ov_extra, max.level = 1)
 Check out the treatments.
 
 ```{r tcga_ov_treatments}
-tcga_ov_extra$diagnoses$`cce34351-1700-405b-818f-a598f63a33e8`$treatments
+str(tcga_ov_extra$diagnoses$`cce34351-1700-405b-818f-a598f63a33e8`$treatments)
 ```
+
+There is no information on [carboplatin](https://www.cancerresearchuk.org/about-cancer/treatment/drugs/carboplatin) or [paclitaxel](https://www.cancerresearchuk.org/about-cancer/treatment/drugs/paclitaxel).
