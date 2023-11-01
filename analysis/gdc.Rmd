@@ -377,3 +377,35 @@ cases() %>%
   facet("diagnoses.treatments.treatment_type") %>%
   aggregations()
 ```
+
+Fetch the TCGA-OV cases.
+
+```{r tcga_ov_results_all}
+cases() %>%
+  filter(project.project_id == 'TCGA-OV') %>% 
+  results_all() -> tcga_ov
+
+str(tcga_ov, max.level = 1)
+```
+
+Select an additional field.
+
+```{r tcga_ov_extra}
+tcga_ov_extra <- cases() %>%
+  filter(project.project_id == 'TCGA-OV') %>% 
+  GenomicDataCommons::select(
+    c(
+      default_fields('cases'),
+      "diagnoses.treatments.treatment_type"
+    )
+  ) %>%
+  results_all()
+
+str(tcga_ov_extra, max.level = 1)
+```
+
+Check out the treatments.
+
+```{r tcga_ov_treatments}
+tcga_ov_extra$diagnoses$`cce34351-1700-405b-818f-a598f63a33e8`$treatments
+```
