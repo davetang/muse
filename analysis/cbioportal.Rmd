@@ -1,0 +1,172 @@
+---
+title: "Using the cBioPortalData R package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Following the [vignette](https://bioconductor.org/packages/release/bioc/vignettes/cBioPortalData/inst/doc/cBioPortalData.html).
+
+>The cBioPortalData package was developed to allow programmatical access to the data resources available on the cBioPortal using R.
+
+>The MultiAssayExperiment package is used to integrate, represent, and coordinate multiple experiments for the studies availble in the cBioPortal. This package in conjunction with curatedTCGAData give access to a large trove of publicly available bioinformatic data.
+
+>The AnVIL is a cloud computing resource developed in part by the National Human Genome Research Institute. The AnVIL package provides end-user and developer functionality. For the end-user, AnVIL provides fast binary package installation, utitlities for working with Terra / AnVIL table and data resources, and convenient functions for file movement to and from Google cloud storage. For developers, AnVIL provides programatic access to the Terra, Leonardo, Rawls, and Dockstore RESTful programming interface, including helper functions to transform JSON responses to formats more amenable to manipulation in R.
+
+## Packages
+
+```{r install_packages, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("AnVIL")
+BiocManager::install("cBioPortalData")
+```
+
+Load packages.
+
+```{r load_packages, message=FALSE, warning=FALSE}
+library("AnVIL")
+library("cBioPortalData")
+
+packageVersion("AnVIL")
+packageVersion("cBioPortalData")
+```
+
+## Available studies
+
+Identifying available studies.
+
+```{r get_studies}
+cbio <- cBioPortal()
+studies <- getStudies(cbio, buildReport = TRUE)
+dim(studies)
+```
+
+The `api_build` and `pack_build` columns will show the availability of each `studyId` for either download method: `cBioPortalData` and `cBioDataPack`, respectively.
+
+```{r check_out_studies}
+studies |>
+  dplyr::select(studyId, allSampleCount, api_build, pack_build) |>
+  head()
+```
+
+## Downloading
+
+There are two main user-facing functions for downloading data from the cBioPortal API.
+
+* `cBioDataPack` makes use of the tarball distribution of study data. This is useful when the user wants to download and analyze the entirety of the data as available from the cBioPortal.org website.
+
+* `cBioPortalData` allows a more flexible approach to obtaining study data based on the available parameters such as molecular profile identifiers. This option is useful for users who have a set of gene symbols or identifiers and would like to get a smaller subset of the data that correspond to a particular molecular profile.
+
+```{r ovarian_cancer}
+idx <- grep("ovarian", studies$name, ignore.case = TRUE)
+studies[idx, ] |>
+  dplyr::select(studyId, allSampleCount, api_build, pack_build) |>
+  head()
+```
+
+Download `ov_tcga` study.
+
+```{r ov_tcga, message=FALSE, cache=TRUE}
+ov_tcga <- cBioDataPack("ov_tcga", ask = FALSE)
+ov_tcga
+```
+
+Info on ov_tcga_pan_can_atlas_2018.
+
+```{r ov_tcga_pan_can_atlas_2018}
+studies |>
+  dplyr::filter(studyId == "ov_tcga_pan_can_atlas_2018") |>
+  t()
+```
+
+## Metadata
+
+Using `colData`.
+
+```{r coldata}
+colnames(colData(ov_tcga))
+```
+
+Check out the data.
+
+```{r check_out_ov_tcga}
+colData(ov_tcga)[1:6, 1:6]
+```
+
+Check what metadata is available.
+
+```{r check_metadata_available}
+apply(colData(ov_tcga), 2, function(x){
+  y = factor(x != "[Not Available]" & x != "[Not Applicable]", levels = c(TRUE, FALSE))
+  table(y)
+}) |>
+  rbind.data.frame() |>
+  t()
+```
+
+Other metadata.
+
+```{r metadata}
+metadata(ov_tcga)
+```
+
+## Kaplan-Meier Plot
+
+Install packages.
+
+```{r install_sur_packages, eval=FALSE}
+install.packages("survival")
+install.packages("survminer")
+```
+
+Load packages.
+
+```{r load_sur_packages, message=FALSE, warning=FALSE}
+library("survival")
+library("survminer")
+```
+
+Check status.
+
+```{r os_status}
+table(colData(ov_tcga)$OS_STATUS)
+```
+
+Check months.
+
+```{r}
+class(colData(ov_tcga)$OS_MONTHS)
+```
+
+Prepare data.
+
+```{r prepare_data}
+col_dat <- colData(ov_tcga)
+wanted_grade <- col_dat$GRADE == "G2" | col_dat$GRADE == "G3"
+col_dat$GRADE[!wanted_grade] <- NA
+col_dat$OS_MONTHS <- as.numeric(col_dat$OS_MONTHS)
+colData(ov_tcga) <- col_dat
+```
+
+We specify a simple survival model using tumour grade as a covariate and we draw the K-M plot.
+
+```{r survfit_grade, fig.width=8, fig.height=6}
+fit <- survfit(
+    Surv(OS_MONTHS, as.numeric(substr(OS_STATUS, 1, 1))) ~ GRADE,
+    data = colData(ov_tcga)
+)
+ggsurvplot(fit, data = colData(ov_tcga), risk.table = TRUE)
+```
+
+## Useful links
+
+* [Multi-omic Integration of cBioPortal and TCGA data with MultiAssayExperiment](https://waldronlab.io/MultiAssayWorkshop/)
+The last two columns will show the availability of each studyId for either download method (pack_build for cBioDataPack and api_build for cBioPortalData).
+
