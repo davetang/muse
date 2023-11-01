@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2023-11-01" />
+
+<title>Using the cBioPortalData R package</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Using the cBioPortalData R package</h1>
+<h4 class="date">2023-11-01</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> </a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2023-11-01
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 6
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 1
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongdetected">
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> <strong>Cache:</strong> detected </a>
+</p>
+</div>
+<div id="strongCachestrongdetected" class="panel-collapse collapse">
+<div class="panel-body">
+The following chunks had caches available:
+<ul>
+<li>
+ov_tcga
+</li>
+</ul>
+<p>To ensure reproducibility of the results, delete the cache directory
+<code>cbioportal_cache</code> and re-run the analysis. To have workflowr
+automatically delete the cache directory prior to building the file, set
+<code>delete_cache = TRUE</code> when running <code>wflow_build()</code>
+or <code>wflow_publish()</code>.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9bf5d395dd6a12ec001437e1bd6f705538b0751dtargetblank9bf5d39a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/9bf5d395dd6a12ec001437e1bd6f705538b0751d" target="_blank">9bf5d39</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9bf5d395dd6a12ec001437e1bd6f705538b0751dtargetblank9bf5d39a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/9bf5d395dd6a12ec001437e1bd6f705538b0751d" target="_blank">9bf5d39</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    analysis/cbioportal_cache/
+    Ignored:    r_packages_4.3.1/
+    Ignored:    r_packages_4.3.2/
+
+Untracked files:
+    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  analysis/complex_heatmap.Rmd
+    Untracked:  analysis/sleuth.Rmd
+    Untracked:  analysis/tss_xgboost.Rmd
+    Untracked:  code/multiz100way/
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
+    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
+    Untracked:  data/ncrna_noncode_v3.fa
+    Untracked:  data/netmhciipan.out.gz
+    Untracked:  data/test
+    Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
+    Untracked:  export/output/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/graph.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/cbioportal.Rmd</code>) and HTML
+(<code>docs/cbioportal.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/9bf5d395dd6a12ec001437e1bd6f705538b0751d/analysis/cbioportal.Rmd" target="_blank">9bf5d39</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-01
+</td>
+<td>
+cBioPortal
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>Following the <a
+href="https://bioconductor.org/packages/release/bioc/vignettes/cBioPortalData/inst/doc/cBioPortalData.html">vignette</a>.</p>
+<blockquote>
+<p>The cBioPortalData package was developed to allow programmatical
+access to the data resources available on the cBioPortal using R.</p>
+</blockquote>
+<blockquote>
+<p>The MultiAssayExperiment package is used to integrate, represent, and
+coordinate multiple experiments for the studies availble in the
+cBioPortal. This package in conjunction with curatedTCGAData give access
+to a large trove of publicly available bioinformatic data.</p>
+</blockquote>
+<blockquote>
+<p>The AnVIL is a cloud computing resource developed in part by the
+National Human Genome Research Institute. The AnVIL package provides
+end-user and developer functionality. For the end-user, AnVIL provides
+fast binary package installation, utitlities for working with Terra /
+AnVIL table and data resources, and convenient functions for file
+movement to and from Google cloud storage. For developers, AnVIL
+provides programatic access to the Terra, Leonardo, Rawls, and Dockstore
+RESTful programming interface, including helper functions to transform
+JSON responses to formats more amenable to manipulation in R.</p>
+</blockquote>
+<div id="packages" class="section level2">
+<h2>Packages</h2>
+<pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+
+BiocManager::install(&quot;AnVIL&quot;)
+BiocManager::install(&quot;cBioPortalData&quot;)</code></pre>
+<p>Load packages.</p>
+<pre class="r"><code>library(&quot;AnVIL&quot;)
+library(&quot;cBioPortalData&quot;)
+
+packageVersion(&quot;AnVIL&quot;)</code></pre>
+<pre><code>[1] &#39;1.14.0&#39;</code></pre>
+<pre class="r"><code>packageVersion(&quot;cBioPortalData&quot;)</code></pre>
+<pre><code>[1] &#39;2.14.0&#39;</code></pre>
+</div>
+<div id="available-studies" class="section level2">
+<h2>Available studies</h2>
+<p>Identifying available studies.</p>
+<pre class="r"><code>cbio &lt;- cBioPortal()
+studies &lt;- getStudies(cbio, buildReport = TRUE)
+dim(studies)</code></pre>
+<pre><code>[1] 393  15</code></pre>
+<p>The <code>api_build</code> and <code>pack_build</code> columns will
+show the availability of each <code>studyId</code> for either download
+method: <code>cBioPortalData</code> and <code>cBioDataPack</code>,
+respectively.</p>
+<pre class="r"><code>studies |&gt;
+  dplyr::select(studyId, allSampleCount, api_build, pack_build) |&gt;
+  head()</code></pre>
+<pre><code># A tibble: 6 × 4
+  studyId   allSampleCount api_build pack_build
+  &lt;chr&gt;              &lt;int&gt; &lt;lgl&gt;     &lt;lgl&gt;     
+1 acc_tcga              92 TRUE      TRUE      
+2 laml_tcga            200 TRUE      TRUE      
+3 blca_tcga            413 TRUE      TRUE      
+4 brca_tcga           1108 TRUE      TRUE      
+5 kirc_tcga            538 TRUE      TRUE      
+6 cesc_tcga            310 TRUE      TRUE      </code></pre>
+</div>
+<div id="downloading" class="section level2">
+<h2>Downloading</h2>
+<p>There are two main user-facing functions for downloading data from
+the cBioPortal API.</p>
+<ul>
+<li><p><code>cBioDataPack</code> makes use of the tarball distribution
+of study data. This is useful when the user wants to download and
+analyze the entirety of the data as available from the cBioPortal.org
+website.</p></li>
+<li><p><code>cBioPortalData</code> allows a more flexible approach to
+obtaining study data based on the available parameters such as molecular
+profile identifiers. This option is useful for users who have a set of
+gene symbols or identifiers and would like to get a smaller subset of
+the data that correspond to a particular molecular profile.</p></li>
+</ul>
+<pre class="r"><code>idx &lt;- grep(&quot;ovarian&quot;, studies$name, ignore.case = TRUE)
+studies[idx, ] |&gt;
+  dplyr::select(studyId, allSampleCount, api_build, pack_build) |&gt;
+  head()</code></pre>
+<pre><code># A tibble: 6 × 4
+  studyId                    allSampleCount api_build pack_build
+  &lt;chr&gt;                               &lt;int&gt; &lt;lgl&gt;     &lt;lgl&gt;     
+1 ov_tcga                               617 TRUE      TRUE      
+2 lgsoc_mapk_msk_2022                   119 TRUE      TRUE      
+3 ov_tcga_pub                           489 TRUE      TRUE      
+4 hgsoc_msk_2021                         45 TRUE      TRUE      
+5 msk_spectrum_tme_2022                  82 FALSE     TRUE      
+6 ov_tcga_pan_can_atlas_2018            585 TRUE      FALSE     </code></pre>
+<p>Download <code>ov_tcga</code> study.</p>
+<pre class="r"><code>ov_tcga &lt;- cBioDataPack(&quot;ov_tcga&quot;, ask = FALSE)</code></pre>
+<pre><code>Warning in .find_seqnames_col(df_colnames0, seqnames.field0, xfix): cannnot
+determine seqnames column unambiguously
+
+Warning in .find_seqnames_col(df_colnames0, seqnames.field0, xfix): cannnot
+determine seqnames column unambiguously
+
+Warning in .find_seqnames_col(df_colnames0, seqnames.field0, xfix): cannnot
+determine seqnames column unambiguously
+
+Warning in .find_seqnames_col(df_colnames0, seqnames.field0, xfix): cannnot
+determine seqnames column unambiguously
+
+Warning in .find_seqnames_col(df_colnames0, seqnames.field0, xfix): cannnot
+determine seqnames column unambiguously
+
+Warning in .find_seqnames_col(df_colnames0, seqnames.field0, xfix): cannnot
+determine seqnames column unambiguously</code></pre>
+<pre><code>Warning in .find_with_xfix(df_colnames, get(paste0(fix, 1)), get(paste0(fix, :
+Multiple prefixes found, using keyword &#39;region&#39; or taking first one
+
+Warning in .find_with_xfix(df_colnames, get(paste0(fix, 1)), get(paste0(fix, :
+Multiple prefixes found, using keyword &#39;region&#39; or taking first one</code></pre>
+<pre class="r"><code>ov_tcga</code></pre>
+<pre><code>A MultiAssayExperiment object of 18 listed
+ experiments with user-defined names and respective classes.
+ Containing an ExperimentList class object of length 18:
+ [1] cna_hg19.seg: RaggedExperiment with 211614 rows and 597 columns
+ [2] cna: SummarizedExperiment with 24776 rows and 579 columns
+ [3] linear_cna: SummarizedExperiment with 24776 rows and 579 columns
+ [4] methylation_hm27: SummarizedExperiment with 14874 rows and 592 columns
+ [5] mrna_affymetrix_microarray_zscores_ref_all_samples: SummarizedExperiment with 12042 rows and 535 columns
+ [6] mrna_affymetrix_microarray_zscores_ref_diploid_samples: SummarizedExperiment with 11884 rows and 535 columns
+ [7] mrna_affymetrix_microarray: SummarizedExperiment with 12042 rows and 535 columns
+ [8] mrna_agilent_microarray_zscores_ref_all_samples: SummarizedExperiment with 17814 rows and 558 columns
+ [9] mrna_agilent_microarray_zscores_ref_diploid_samples: SummarizedExperiment with 16617 rows and 558 columns
+ [10] mrna_agilent_microarray: SummarizedExperiment with 17814 rows and 558 columns
+ [11] mrna_seq_v2_rsem_zscores_ref_all_samples: SummarizedExperiment with 20531 rows and 307 columns
+ [12] mrna_seq_v2_rsem_zscores_ref_diploid_samples: SummarizedExperiment with 20440 rows and 307 columns
+ [13] mrna_seq_v2_rsem: SummarizedExperiment with 20531 rows and 307 columns
+ [14] mutations: RaggedExperiment with 20215 rows and 316 columns
+ [15] protein_quantification_zscores: SummarizedExperiment with 8896 rows and 174 columns
+ [16] protein_quantification: SummarizedExperiment with 8935 rows and 174 columns
+ [17] rppa_zscores: SummarizedExperiment with 207 rows and 436 columns
+ [18] rppa: SummarizedExperiment with 208 rows and 436 columns
+Functionality:
+ experiments() - obtain the ExperimentList instance
+ colData() - the primary/phenotype DataFrame
+ sampleMap() - the sample coordination DataFrame
+ `$`, `[`, `[[` - extract colData columns, subset, or experiment
+ *Format() - convert into a long or wide DataFrame
+ assays() - convert ExperimentList to a SimpleList of matrices
+ exportClass() - save data to flat files</code></pre>
+<div class="alert alert-warning">
+<p>
+<strong>Warning:</strong> The above code chunk cached its results, but
+it won’t be re-run if previous chunks it depends on are updated. If you
+need to use caching, it is highly recommended to also set
+<code>knitr::opts_chunk$set(autodep = TRUE)</code> at the top of the
+file (in a chunk that is not cached). Alternatively, you can customize
+the option <code>dependson</code> for each individual chunk that is
+cached. Using either <code>autodep</code> or <code>dependson</code> will
+remove this warning. See the
+<a href="https://yihui.name/knitr/options/#cache"
+>knitr cache options</a> for more details.
+</p>
+</div>
+<p>Info on ov_tcga_pan_can_atlas_2018.</p>
+<pre class="r"><code>studies |&gt;
+  dplyr::filter(studyId == &quot;ov_tcga_pan_can_atlas_2018&quot;) |&gt;
+  t()</code></pre>
+<pre><code>                [,1]                                                                                                                                                                                                                                                                                  
+name            &quot;Ovarian Serous Cystadenocarcinoma (TCGA, PanCancer Atlas)&quot;                                                                                                                                                                                                                           
+description     &quot;Ovarian Serous Cystadenocarcinoma TCGA PanCancer data. The original data is &lt;a href=\&quot;https://gdc.cancer.gov/about-data/publications/pancanatlas\&quot;&gt;here&lt;/a&gt;. The publications are &lt;a href=\&quot;https://www.cell.com/pb-assets/consortium/pancanceratlas/pancani3/index.html\&quot;&gt;here&lt;/a&gt;.&quot;
+publicStudy     &quot;TRUE&quot;                                                                                                                                                                                                                                                                                
+groups          &quot;PUBLIC;PANCAN&quot;                                                                                                                                                                                                                                                                       
+status          &quot;0&quot;                                                                                                                                                                                                                                                                                   
+importDate      &quot;2023-08-14 23:04:37&quot;                                                                                                                                                                                                                                                                 
+allSampleCount  &quot;585&quot;                                                                                                                                                                                                                                                                                 
+readPermission  &quot;TRUE&quot;                                                                                                                                                                                                                                                                                
+studyId         &quot;ov_tcga_pan_can_atlas_2018&quot;                                                                                                                                                                                                                                                          
+cancerTypeId    &quot;hgsoc&quot;                                                                                                                                                                                                                                                                               
+referenceGenome &quot;hg19&quot;                                                                                                                                                                                                                                                                                
+pmid            &quot;29625048,29596782,29622463,29617662,29625055,29625050,29617662,30643250,32214244,29625049,29850653&quot;                                                                                                                                                                                  
+citation        &quot;TCGA, Cell 2018&quot;                                                                                                                                                                                                                                                                     
+api_build       &quot;TRUE&quot;                                                                                                                                                                                                                                                                                
+pack_build      &quot;FALSE&quot;                                                                                                                                                                                                                                                                               </code></pre>
+</div>
+<div id="metadata" class="section level2">
+<h2>Metadata</h2>
+<p>Using <code>colData</code>.</p>
+<pre class="r"><code>colnames(colData(ov_tcga))</code></pre>
+<pre><code> [1] &quot;PATIENT_ID&quot;                                
+ [2] &quot;SAMPLE_ID&quot;                                 
+ [3] &quot;OTHER_SAMPLE_ID&quot;                           
+ [4] &quot;SPECIMEN_CURRENT_WEIGHT&quot;                   
+ [5] &quot;DAYS_TO_COLLECTION&quot;                        
+ [6] &quot;DAYS_TO_SPECIMEN_COLLECTION&quot;               
+ [7] &quot;SPECIMEN_FREEZING_METHOD&quot;                  
+ [8] &quot;SAMPLE_INITIAL_WEIGHT&quot;                     
+ [9] &quot;SPECIMEN_SECOND_LONGEST_DIMENSION&quot;         
+[10] &quot;IS_FFPE&quot;                                   
+[11] &quot;LONGEST_DIMENSION&quot;                         
+[12] &quot;METHOD_OF_SAMPLE_PROCUREMENT&quot;              
+[13] &quot;OCT_EMBEDDED&quot;                              
+[14] &quot;OTHER_METHOD_OF_SAMPLE_PROCUREMENT&quot;        
+[15] &quot;PATHOLOGY_REPORT_FILE_NAME&quot;                
+[16] &quot;PATHOLOGY_REPORT_UUID&quot;                     
+[17] &quot;SAMPLE_TYPE&quot;                               
+[18] &quot;SAMPLE_TYPE_ID&quot;                            
+[19] &quot;SHORTEST_DIMENSION&quot;                        
+[20] &quot;TIME_BETWEEN_CLAMPING_AND_FREEZING&quot;        
+[21] &quot;TIME_BETWEEN_EXCISION_AND_FREEZING&quot;        
+[22] &quot;VIAL_NUMBER&quot;                               
+[23] &quot;ONCOTREE_CODE&quot;                             
+[24] &quot;CANCER_TYPE&quot;                               
+[25] &quot;CANCER_TYPE_DETAILED&quot;                      
+[26] &quot;PRIMARY_SITE&quot;                              
+[27] &quot;TUMOR_TISSUE_SITE&quot;                         
+[28] &quot;SOMATIC_STATUS&quot;                            
+[29] &quot;TMB_NONSYNONYMOUS&quot;                         
+[30] &quot;OTHER_PATIENT_ID&quot;                          
+[31] &quot;FORM_COMPLETION_DATE&quot;                      
+[32] &quot;PROSPECTIVE_COLLECTION&quot;                    
+[33] &quot;RETROSPECTIVE_COLLECTION&quot;                  
+[34] &quot;SEX&quot;                                       
+[35] &quot;RACE&quot;                                      
+[36] &quot;ETHNICITY&quot;                                 
+[37] &quot;JEWISH_RELIGION_HERITAGE_INDICATOR&quot;        
+[38] &quot;HISTORY_OTHER_MALIGNANCY&quot;                  
+[39] &quot;HISTORY_NEOADJUVANT_TRTYN&quot;                 
+[40] &quot;INITIAL_PATHOLOGIC_DX_YEAR&quot;                
+[41] &quot;METHOD_OF_INITIAL_SAMPLE_PROCUREMENT&quot;      
+[42] &quot;METHOD_OF_INITIAL_SAMPLE_PROCUREMENT_OTHER&quot;
+[43] &quot;TUMOR_STATUS&quot;                              
+[44] &quot;GRADE&quot;                                     
+[45] &quot;RESIDUAL_TUMOR&quot;                            
+[46] &quot;VASCULAR_INVASION_INDICATOR&quot;               
+[47] &quot;LYMPHOVASCULAR_INVASION_INDICATOR&quot;         
+[48] &quot;KARNOFSKY_PERFORMANCE_SCORE&quot;               
+[49] &quot;ECOG_SCORE&quot;                                
+[50] &quot;PERFORMANCE_STATUS_TIMING&quot;                 
+[51] &quot;RADIATION_TREATMENT_ADJUVANT&quot;              
+[52] &quot;PHARMACEUTICAL_TX_ADJUVANT&quot;                
+[53] &quot;TREATMENT_OUTCOME_FIRST_COURSE&quot;            
+[54] &quot;DAYS_TO_TUMOR_PROGRESSION&quot;                 
+[55] &quot;NEW_TUMOR_EVENT_AFTER_INITIAL_TREATMENT&quot;   
+[56] &quot;AGE&quot;                                       
+[57] &quot;CLIN_M_STAGE&quot;                              
+[58] &quot;CLIN_N_STAGE&quot;                              
+[59] &quot;CLIN_T_STAGE&quot;                              
+[60] &quot;CLINICAL_STAGE&quot;                            
+[61] &quot;DAYS_TO_INITIAL_PATHOLOGIC_DIAGNOSIS&quot;      
+[62] &quot;DAYS_TO_PATIENT_PROGRESSION_FREE&quot;          
+[63] &quot;DISEASE_CODE&quot;                              
+[64] &quot;EXTRANODAL_INVOLVEMENT&quot;                    
+[65] &quot;HISTOLOGICAL_DIAGNOSIS&quot;                    
+[66] &quot;ICD_10&quot;                                    
+[67] &quot;ICD_O_3_HISTOLOGY&quot;                         
+[68] &quot;ICD_O_3_SITE&quot;                              
+[69] &quot;INFORMED_CONSENT_VERIFIED&quot;                 
+[70] &quot;PATH_M_STAGE&quot;                              
+[71] &quot;PATH_N_STAGE&quot;                              
+[72] &quot;PATH_T_STAGE&quot;                              
+[73] &quot;AJCC_PATHOLOGIC_TUMOR_STAGE&quot;               
+[74] &quot;PROJECT_CODE&quot;                              
+[75] &quot;STAGE_OTHER&quot;                               
+[76] &quot;AJCC_STAGING_EDITION&quot;                      
+[77] &quot;TISSUE_SOURCE_SITE&quot;                        
+[78] &quot;OS_STATUS&quot;                                 
+[79] &quot;OS_MONTHS&quot;                                 
+[80] &quot;DFS_STATUS&quot;                                
+[81] &quot;DFS_MONTHS&quot;                                </code></pre>
+<p>Check out the data.</p>
+<pre class="r"><code>colData(ov_tcga)[1:6, 1:6]</code></pre>
+<pre><code>DataFrame with 6 rows and 6 columns
+               PATIENT_ID       SAMPLE_ID        OTHER_SAMPLE_ID
+              &lt;character&gt;     &lt;character&gt;            &lt;character&gt;
+TCGA-04-1331 TCGA-04-1331 TCGA-04-1331-01 a1ec9279-c1a6-4e58-9..
+TCGA-04-1332 TCGA-04-1332 TCGA-04-1332-01 b8243412-b7b4-4a7b-b..
+TCGA-04-1335 TCGA-04-1335 TCGA-04-1335-01 b7f485a3-5ef3-4f76-9..
+TCGA-04-1336 TCGA-04-1336 TCGA-04-1336-01 28428f8d-2361-410d-9..
+TCGA-04-1337 TCGA-04-1337 TCGA-04-1337-01 d8ab03a2-3dc9-433f-b..
+TCGA-04-1338 TCGA-04-1338 TCGA-04-1338-01 7b90d4ab-6c0a-4428-9..
+             SPECIMEN_CURRENT_WEIGHT DAYS_TO_COLLECTION
+                         &lt;character&gt;        &lt;character&gt;
+TCGA-04-1331         [Not Available]    [Not Available]
+TCGA-04-1332         [Not Available]    [Not Available]
+TCGA-04-1335         [Not Available]    [Not Available]
+TCGA-04-1336         [Not Available]    [Not Available]
+TCGA-04-1337         [Not Available]    [Not Available]
+TCGA-04-1338         [Not Available]    [Not Available]
+             DAYS_TO_SPECIMEN_COLLECTION
+                             &lt;character&gt;
+TCGA-04-1331             [Not Available]
+TCGA-04-1332             [Not Available]
+TCGA-04-1335             [Not Available]
+TCGA-04-1336             [Not Available]
+TCGA-04-1337             [Not Available]
+TCGA-04-1338             [Not Available]</code></pre>
+<p>Check what metadata is available.</p>
+<pre class="r"><code>apply(colData(ov_tcga), 2, function(x){
+  y = factor(x != &quot;[Not Available]&quot; &amp; x != &quot;[Not Applicable]&quot;, levels = c(TRUE, FALSE))
+  table(y)
+}) |&gt;
+  rbind.data.frame() |&gt;
+  t()</code></pre>
+<pre><code>                                           TRUE FALSE
+PATIENT_ID                                  614     0
+SAMPLE_ID                                   614     0
+OTHER_SAMPLE_ID                             596    12
+SPECIMEN_CURRENT_WEIGHT                       0   608
+DAYS_TO_COLLECTION                           10   598
+DAYS_TO_SPECIMEN_COLLECTION                   0   608
+SPECIMEN_FREEZING_METHOD                      0   608
+SAMPLE_INITIAL_WEIGHT                        10   598
+SPECIMEN_SECOND_LONGEST_DIMENSION           576    32
+IS_FFPE                                     596    12
+LONGEST_DIMENSION                           576    32
+METHOD_OF_SAMPLE_PROCUREMENT                  0   608
+OCT_EMBEDDED                                 10   598
+OTHER_METHOD_OF_SAMPLE_PROCUREMENT            0   608
+PATHOLOGY_REPORT_FILE_NAME                  586    22
+PATHOLOGY_REPORT_UUID                       586    22
+SAMPLE_TYPE                                 614     0
+SAMPLE_TYPE_ID                              614     0
+SHORTEST_DIMENSION                          576    32
+TIME_BETWEEN_CLAMPING_AND_FREEZING            0   608
+TIME_BETWEEN_EXCISION_AND_FREEZING            0   608
+VIAL_NUMBER                                 596    12
+ONCOTREE_CODE                               614     0
+CANCER_TYPE                                 614     0
+CANCER_TYPE_DETAILED                        614     0
+PRIMARY_SITE                                569    34
+TUMOR_TISSUE_SITE                           603     0
+SOMATIC_STATUS                              614     0
+TMB_NONSYNONYMOUS                           316     0
+OTHER_PATIENT_ID                            603     0
+FORM_COMPLETION_DATE                        603     0
+PROSPECTIVE_COLLECTION                       17   586
+RETROSPECTIVE_COLLECTION                     17   586
+SEX                                         603     0
+RACE                                        572    31
+ETHNICITY                                   356   247
+JEWISH_RELIGION_HERITAGE_INDICATOR           24   579
+HISTORY_OTHER_MALIGNANCY                     11   592
+HISTORY_NEOADJUVANT_TRTYN                   603     0
+INITIAL_PATHOLOGIC_DX_YEAR                  603     0
+METHOD_OF_INITIAL_SAMPLE_PROCUREMENT        594     9
+METHOD_OF_INITIAL_SAMPLE_PROCUREMENT_OTHER    0   603
+TUMOR_STATUS                                530    73
+GRADE                                       599     4
+RESIDUAL_TUMOR                               62   541
+VASCULAR_INVASION_INDICATOR                 168   435
+LYMPHOVASCULAR_INVASION_INDICATOR           224   379
+KARNOFSKY_PERFORMANCE_SCORE                  87   516
+ECOG_SCORE                                  132   471
+PERFORMANCE_STATUS_TIMING                   205   398
+RADIATION_TREATMENT_ADJUVANT                  9   594
+PHARMACEUTICAL_TX_ADJUVANT                   10   593
+TREATMENT_OUTCOME_FIRST_COURSE                9   594
+DAYS_TO_TUMOR_PROGRESSION                     0   603
+NEW_TUMOR_EVENT_AFTER_INITIAL_TREATMENT       8   595
+AGE                                         603     0
+CLIN_M_STAGE                                  0   603
+CLIN_N_STAGE                                  0   603
+CLIN_T_STAGE                                  0   603
+CLINICAL_STAGE                              598     5
+DAYS_TO_INITIAL_PATHOLOGIC_DIAGNOSIS        603     0
+DAYS_TO_PATIENT_PROGRESSION_FREE              0   603
+DISEASE_CODE                                  0   603
+EXTRANODAL_INVOLVEMENT                        0   603
+HISTOLOGICAL_DIAGNOSIS                      603     0
+ICD_10                                      603     0
+ICD_O_3_HISTOLOGY                           603     0
+ICD_O_3_SITE                                603     0
+INFORMED_CONSENT_VERIFIED                   603     0
+PATH_M_STAGE                                  0   603
+PATH_N_STAGE                                  0   603
+PATH_T_STAGE                                  0   603
+AJCC_PATHOLOGIC_TUMOR_STAGE                   0   603
+PROJECT_CODE                                  0   603
+STAGE_OTHER                                   0   603
+AJCC_STAGING_EDITION                          0   603
+TISSUE_SOURCE_SITE                          603     0
+OS_STATUS                                   601     2
+OS_MONTHS                                   598     5
+DFS_STATUS                                  515    88
+DFS_MONTHS                                  513    90</code></pre>
+<p>Other metadata.</p>
+<pre class="r"><code>metadata(ov_tcga)</code></pre>
+<pre><code>$type_of_cancer
+[1] &quot;hgsoc&quot;
+
+$cancer_study_identifier
+[1] &quot;ov_tcga&quot;
+
+$name
+[1] &quot;Ovarian Serous Cystadenocarcinoma (TCGA, Firehose Legacy)&quot;
+
+$short_name
+[1] &quot;Ovarian (TCGA)&quot;
+
+$description
+[1] &quot;TCGA Ovarian Serous Cystadenocarcinoma. Source data from &lt;A HREF=\&quot;http://gdac.broadinstitute.org/runs/stddata__2016_01_28/data/OV/20160128/\&quot;&gt;GDAC Firehose&lt;/A&gt;. Previously known as TCGA Provisional.&quot;
+
+$groups
+[1] &quot;PUBLIC&quot;
+
+$LICENSE
+[1] &quot;TCGA data are available under Broad Institute GDAC TCGA Analysis Pipeline License. The Cancer Genome Atlas Consortium is pleased to provide the research community with preliminary data prior to publication. Users are requested to carefully consider that these data are preliminary and have yet to be validated. Researchers are warned that the preliminary data have a significant uncertainty, are likely to change, and should be used with caution.&quot;
+
+$phosphoprotein_quantification
+DataFrame with 17298 rows and 72 columns
+        ENTITY_STABLE_ID GENE_SYMBOL  PHOSPHOSITE TCGA-13-1484-01
+             &lt;character&gt; &lt;character&gt;  &lt;character&gt;       &lt;numeric&gt;
+1         A2M_pT118_T119         A2M   pT118_T119              NA
+2             AAAS_pS462        AAAS        pS462        0.656282
+3              AAK1_pS14        AAK1         pS14              NA
+4              AAK1_pS18        AAK1         pS18              NA
+5              AAK1_pS21        AAK1         pS21              NA
+...                  ...         ...          ...             ...
+17294        ZZEF1_pS240       ZZEF1        pS240              NA
+17295 ZZEF1_pY1358_S1361       ZZEF1 pY1358_S1361              NA
+17296          ZZZ3_pS89        ZZZ3         pS89      -0.8374170
+17297         ZZZ3_pS113        ZZZ3        pS113       0.0555584
+17298         ZZZ3_pS606        ZZZ3        pS606              NA
+      TCGA-13-1489-01 TCGA-13-1494-01 TCGA-13-1499-01 TCGA-13-2071-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2           -0.161262       -0.548392              NA         0.12526
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA              NA              NA              NA
+17296              NA              NA       -0.987601              NA
+17297         -2.6773       -0.851763       -1.660487       -0.444616
+17298              NA              NA              NA              NA
+      TCGA-23-1123-01 TCGA-23-1124-01 TCGA-24-1103-01 TCGA-24-1104-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2            0.595251      0.00740225        0.954774       -0.530232
+3                  NA              NA              NA              NA
+4                  NA      1.53167399              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294        0.896654              NA              NA              NA
+17295              NA              NA              NA              NA
+17296              NA              NA       0.0520518              NA
+17297        1.100200        1.063379       0.6522534        0.641384
+17298              NA        0.772578              NA              NA
+      TCGA-24-1428-01 TCGA-24-1430-01 TCGA-24-1435-01 TCGA-24-1466-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA        0.591738              NA        0.528696
+2             1.18232        0.167959        0.403907        0.746070
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA              NA              NA              NA
+17296       -0.377246              NA        0.605491              NA
+17297        0.347842      -0.0190307        0.198260        0.592919
+17298              NA              NA              NA              NA
+      TCGA-24-1467-01 TCGA-24-1545-01 TCGA-24-1550-01 TCGA-24-1551-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2             1.09202       -0.685343              NA        -1.19004
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA       -0.187857              NA              NA
+17296              NA              NA              NA       -0.287681
+17297        0.977295              NA       -0.403332       -0.723855
+17298              NA              NA              NA              NA
+      TCGA-24-1552-01 TCGA-24-1553-01 TCGA-24-1555-01 TCGA-24-1556-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1            0.038756              NA              NA              NA
+2            0.758834         0.73522              NA              NA
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA      -0.1532049              NA              NA
+17295              NA              NA              NA              NA
+17296              NA              NA              NA              NA
+17297       -0.402299       0.0192374        0.372348              NA
+17298              NA              NA              NA              NA
+      TCGA-24-1562-01 TCGA-24-1563-01 TCGA-24-1603-01 TCGA-24-1604-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2            0.654638        -0.69073              NA      -0.0694959
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA              NA              NA              NA
+17296        1.591936       -0.414516              NA              NA
+17297        0.534881       -0.377965        0.835599       -0.434167
+17298              NA              NA              NA              NA
+      TCGA-24-1923-01 TCGA-24-2020-01 TCGA-24-2023-01 TCGA-24-2024-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2           -0.145764        0.344364              NA        0.113435
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA              NA              NA              NA
+17296         1.25122              NA              NA              NA
+17297         1.24512         0.32257        0.649997      -0.0603376
+17298              NA              NA              NA              NA
+      TCGA-24-2030-01 TCGA-24-2260-01 TCGA-24-2267-01 TCGA-24-2288-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2             0.97305              NA              NA       -0.767781
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA              NA              NA       -0.268827
+17296              NA              NA              NA              NA
+17297        0.953468              NA              NA              NA
+17298              NA              NA              NA              NA
+      TCGA-24-2289-01 TCGA-25-1316-01 TCGA-25-1319-01 TCGA-25-1320-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2            -1.18065              NA       -0.514529        0.150659
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA              NA              NA              NA
+17296              NA              NA              NA              NA
+17297       -0.733278        0.646214       -0.273141       -0.328474
+17298              NA              NA              NA              NA
+      TCGA-25-1321-01 TCGA-25-1628-01 TCGA-25-1630-01 TCGA-25-1635-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2            0.920739        0.215113              NA        0.982438
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA              NA              NA              NA
+17296              NA              NA      -0.2197828              NA
+17297        0.706303        0.678733      -0.0294928        0.279755
+17298              NA              NA              NA        0.833453
+      TCGA-25-2400-01 TCGA-25-2404-01 TCGA-25-2409-01 TCGA-29-1688-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2             1.17532       -0.183044        0.529527          1.1672
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5             1.20195              NA        2.122755              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA              NA              NA              NA
+17296        0.477500              NA        1.248140       -0.194494
+17297        0.423570       -0.141639        0.405294        0.887746
+17298        0.330199              NA        0.956339              NA
+      TCGA-29-1693-01 TCGA-29-1762-01 TCGA-29-1763-01 TCGA-29-1774-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2           -0.450492        0.393116         1.38442      -0.0349079
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295       -0.197024              NA              NA              NA
+17296              NA              NA              NA              NA
+17297              NA        0.963318        0.443578        0.199078
+17298              NA              NA              NA              NA
+      TCGA-29-1775-01 TCGA-29-1776-01 TCGA-29-1777-01 TCGA-29-2414-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2                  NA        -0.12606        -0.76785      -0.0616305
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA              NA              NA              NA
+17296        0.801626       0.0852126       0.2152399       -0.169122
+17297        0.910467      -0.1869118      -0.0157217       -0.371031
+17298              NA              NA              NA              NA
+      TCGA-29-2432-01 TCGA-30-1866-01 TCGA-36-1576-01 TCGA-36-1581-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2          -0.0833078        0.324019       0.0340875        0.292088
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA        2.004179              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA        0.928193
+17295              NA              NA              NA              NA
+17296              NA        0.726803              NA              NA
+17297        0.661042        1.048370       -0.140494       -0.407089
+17298              NA        0.696386              NA              NA
+      TCGA-36-2529-01 TCGA-36-2530-01 TCGA-36-2543-01 TCGA-42-2588-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2             1.11116        1.212605        0.245928       -0.378921
+3             1.40503              NA              NA              NA
+4             1.40503              NA              NA              NA
+5                  NA        0.237485              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA              NA              NA              NA
+17296              NA       0.0274117              NA              NA
+17297        0.403777       1.2203824        0.343532        -0.11901
+17298              NA              NA              NA              NA
+      TCGA-42-2590-01 TCGA-61-1741-01 TCGA-61-1907-01 TCGA-61-1919-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2            0.149968        0.724946        0.348663        0.765012
+3            0.110142              NA              NA              NA
+4            0.110142              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA              NA              NA              NA
+17296              NA              NA              NA              NA
+17297        0.103413      -0.0357064        0.405252        0.299033
+17298              NA              NA        0.349702              NA
+      TCGA-61-1995-01 TCGA-61-2008-01 TCGA-61-2095-01 TCGA-61-2612-01
+            &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;       &lt;numeric&gt;
+1                  NA              NA              NA              NA
+2            0.682223      -0.0858494        0.306452              NA
+3                  NA              NA              NA              NA
+4                  NA              NA              NA              NA
+5                  NA              NA              NA              NA
+...               ...             ...             ...             ...
+17294              NA              NA              NA              NA
+17295              NA              NA              NA              NA
+17296       0.0628499       -0.256756              NA              NA
+17297       0.2295492        0.354115       -0.428166         0.65481
+17298              NA              NA              NA              NA
+
+$data_gistic_genes_amp.txt
+GRanges object with 33 ranges and 15 metadata columns:
+       seqnames              ranges strand |     index peak_start  peak_end
+          &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;numeric&gt;  &lt;numeric&gt; &lt;numeric&gt;
+   [1]        1 149879545-187230132      * |         1  150647155 150647987
+   [2]        1   34902439-48048106      * |         2   39940035  39953945
+   [3]        1 222335377-247812431      * |         3  234491703 234493015
+   [4]        2 170911427-185010857      * |         4  178522011 178530799
+   [5]        2   28683174-29230395      * |         5   28851445  28860856
+   ...      ...                 ...    ... .       ...        ...       ...
+  [29]       20      456452-1195665      * |        29     539018    540188
+  [30]       20   30022925-30360762      * |        30   30246540  30250340
+  [31]       22   30155113-30374328      * |        31   30200200  30244963
+  [32]        X   46250374-51198707      * |        32   49370374  49370374
+  [33]        X 145879006-154905589      * |        33  153242564 153282677
+       enlarged_peak_start enlarged_peak_end n_genes_in_region
+                 &lt;numeric&gt;         &lt;numeric&gt;         &lt;numeric&gt;
+   [1]           150493147         150738699                13
+   [2]            39898644          40168674                 8
+   [3]           234417531         235727816                18
+   [4]           178467257         178609136                 2
+   [5]            28811131          28960178                 2
+   ...                 ...               ...               ...
+  [29]              456452           4104510                88
+  [30]            30062456          30330306                 9
+  [31]            30113960          30692313                11
+  [32]            48682582          49573489                44
+  [33]           152900090         154883396                72
+              genes_in_region n_genes_in_peak  genes_in_peak n_genes_on_chip
+                  &lt;character&gt;       &lt;numeric&gt;    &lt;character&gt;     &lt;character&gt;
+   [1] SNORA40|ENSG00000253..               1       GOLPH3L, [Not Available]
+   [2] SNORA55,BMP8A,PABPC4..               2   BMP8A,MACF1, [Not Available]
+   [3] MIR4753,SNORA14B,RN7..               0         [COA6] [Not Available]
+   [4]         TTC30A,PDE11A,               1        PDE11A, [Not Available]
+   [5]         RNA5SP89,PLB1,               1          PLB1, [Not Available]
+   ...                    ...             ...            ...             ...
+  [29] MIR103A2,MAVS,U3|ENS..               0      [CSNK2A1] [Not Available]
+  [30] LINC00028,BCL2L1,ID1..               0       [BCL2L1] [Not Available]
+  [31] MGC20647,LIF,OSM,MTM..               1         ASCC2, [Not Available]
+  [32] GAGE1,MAGIX,RN7SL262..               2  GAGE1,GAGE2A, [Not Available]
+  [33] F8A3,F8A2,FUNDC2,SNO..               2 IRAK1,TMEM187, [Not Available]
+         genes_on_chip           top 3       amp    cytoband    q_value
+           &lt;character&gt;     &lt;character&gt; &lt;numeric&gt; &lt;character&gt;  &lt;numeric&gt;
+   [1] [Not Available] [Not Available]         1      1q21.3 6.2239e-29
+   [2] [Not Available] [Not Available]         1      1p34.3 7.4284e-27
+   [3] [Not Available] [Not Available]         1      1q42.2 7.0072e-14
+   [4] [Not Available] [Not Available]         1      2q31.2 4.0401e-07
+   [5] [Not Available] [Not Available]         1      2p23.2 2.0798e-02
+   ...             ...             ...       ...         ...        ...
+  [29] [Not Available] [Not Available]         1       20p13 5.9168e-02
+  [30] [Not Available] [Not Available]         1    20q11.21 2.7181e-02
+  [31] [Not Available] [Not Available]         1     22q12.2 9.2987e-02
+  [32] [Not Available] [Not Available]         1     Xp11.23 8.1018e-09
+  [33] [Not Available] [Not Available]         1        Xq28 2.1760e-06
+  -------
+  seqinfo: 19 sequences from an unspecified genome; no seqlengths
+
+$data_gistic_genes_del.txt
+GRanges object with 40 ranges and 15 metadata columns:
+       seqnames              ranges strand |     index peak_start  peak_end
+          &lt;Rle&gt;           &lt;IRanges&gt;  &lt;Rle&gt; | &lt;numeric&gt;  &lt;numeric&gt; &lt;numeric&gt;
+   [1]        1    3218610-34877819      * |         1   27089566  27093657
+   [2]        1 214563653-214700671      * |         2  214518638 214726843
+   [3]        2 141734918-142126389      * |         3  140981064 142891872
+   [4]        2 221159964-242476062      * |         4  241391025 242434726
+   [5]        2      484222-1917729      * |         5     484222    484222
+   ...      ...                 ...    ... .       ...        ...       ...
+  [36]       19   40552390-58878226      * |        36   58580277  58581977
+  [37]       19   40552390-58878226      * |        37   48471109  48497199
+  [38]       21   44884252-47678295      * |        38   46254611  46297668
+  [39]       22   40736472-49331012      * |        39   49331012  49331012
+  [40]        X   31553891-32237711      * |        40   30873422  34033463
+       enlarged_peak_start enlarged_peak_end n_genes_in_region
+                 &lt;numeric&gt;         &lt;numeric&gt;         &lt;numeric&gt;
+   [1]            26984229          27556457                15
+   [2]           207319570         220698097                80
+   [3]           140782681         143627097                 2
+   [4]           234986392         242476062                73
+   [5]              484222          24661362               132
+   ...                 ...               ...               ...
+  [36]            58121209          58878226                46
+  [37]            46378174          49463131               100
+  [38]            42520646          47678295                94
+  [39]            48670715          49331012                42
+  [40]            30870232          34034134                 7
+              genes_in_region n_genes_in_peak          genes_in_peak
+                  &lt;character&gt;       &lt;numeric&gt;            &lt;character&gt;
+   [1] GPN2,ZDHHC18,RN7SL16..               1             RN7SL501P,
+   [2] SNORA36B,snoU13|ENSG..               1                PTPN14,
+   [3]       RN7SL283P,LRP1B,               1                 LRP1B,
+   [4] CXXC11,RNA5SP122,MIR..              20 MIR3133,RNPEPL1,MIR1..
+   [5] SCARNA21|ENSG0000025..               4 FAM110C,ACP1,SH3YL1,..
+   ...                    ...             ...                    ...
+  [36] RN7SL525P,RN7SL693P,..               1             RN7SL526P,
+  [37] RN7SL345P,SEC1P,DBP,..               1                 BSPH1,
+  [38] S100B,PRED62,PRED60,..               1               PTTG1IP,
+  [39] ARSA,RN7SL500P,DENND..              39 ARSA,RN7SL500P,DENND..
+  [40] snoU13|ENSG000002389..               6 snoU13|ENSG000002389..
+       n_genes_on_chip   genes_on_chip           top 3       amp    cytoband
+           &lt;character&gt;     &lt;character&gt;     &lt;character&gt; &lt;numeric&gt; &lt;character&gt;
+   [1] [Not Available] [Not Available] [Not Available]         0     1p36.11
+   [2] [Not Available] [Not Available] [Not Available]         0        1q41
+   [3] [Not Available] [Not Available] [Not Available]         0      2q22.1
+   [4] [Not Available] [Not Available] [Not Available]         0      2q37.3
+   [5] [Not Available] [Not Available] [Not Available]         0      2p25.3
+   ...             ...             ...             ...       ...         ...
+  [36] [Not Available] [Not Available] [Not Available]         0    19q13.43
+  [37] [Not Available] [Not Available] [Not Available]         0    19q13.33
+  [38] [Not Available] [Not Available] [Not Available]         0     21q22.3
+  [39] [Not Available] [Not Available] [Not Available]         0    22q13.32
+  [40] [Not Available] [Not Available] [Not Available]         0      Xp21.1
+          q_value
+        &lt;numeric&gt;
+   [1] 3.6326e-35
+   [2] 1.8187e-01
+   [3] 2.2138e-11
+   [4] 7.0161e-09
+   [5] 8.7942e-02
+   ...        ...
+  [36] 8.1256e-19
+  [37] 2.4410e-17
+  [38] 2.2578e-02
+  [39] 2.4599e-67
+  [40] 1.1581e-15
+  -------
+  seqinfo: 22 sequences from an unspecified genome; no seqlengths
+
+$unmapped
+ExperimentList class object of length 0:
+ </code></pre>
+</div>
+<div id="kaplan-meier-plot" class="section level2">
+<h2>Kaplan-Meier Plot</h2>
+<p>Install packages.</p>
+<pre class="r"><code>install.packages(&quot;survival&quot;)
+install.packages(&quot;survminer&quot;)</code></pre>
+<p>Load packages.</p>
+<pre class="r"><code>library(&quot;survival&quot;)
+library(&quot;survminer&quot;)</code></pre>
+<p>Check status.</p>
+<pre class="r"><code>table(colData(ov_tcga)$OS_STATUS)</code></pre>
+<pre><code>
+[Not Available]        0:LIVING      1:DECEASED 
+              2             240             361 </code></pre>
+<p>Check months.</p>
+<pre class="r"><code>class(colData(ov_tcga)$OS_MONTHS)</code></pre>
+<pre><code>[1] &quot;character&quot;</code></pre>
+<p>Prepare data.</p>
+<pre class="r"><code>col_dat &lt;- colData(ov_tcga)
+wanted_grade &lt;- col_dat$GRADE == &quot;G2&quot; | col_dat$GRADE == &quot;G3&quot;
+col_dat$GRADE[!wanted_grade] &lt;- NA
+col_dat$OS_MONTHS &lt;- as.numeric(col_dat$OS_MONTHS)</code></pre>
+<pre><code>Warning: NAs introduced by coercion</code></pre>
+<pre class="r"><code>colData(ov_tcga) &lt;- col_dat</code></pre>
+<p>We specify a simple survival model using tumour grade as a covariate
+and we draw the K-M plot.</p>
+<pre class="r"><code>fit &lt;- survfit(
+    Surv(OS_MONTHS, as.numeric(substr(OS_STATUS, 1, 1))) ~ GRADE,
+    data = colData(ov_tcga)
+)</code></pre>
+<pre><code>Warning in Surv(OS_MONTHS, as.numeric(substr(OS_STATUS, 1, 1))): NAs introduced
+by coercion</code></pre>
+<pre class="r"><code>ggsurvplot(fit, data = colData(ov_tcga), risk.table = TRUE)</code></pre>
+<p><img src="figure/cbioportal.Rmd/survfit_grade-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="useful-links" class="section level2">
+<h2>Useful links</h2>
+<ul>
+<li><a href="https://waldronlab.io/MultiAssayWorkshop/">Multi-omic
+Integration of cBioPortal and TCGA data with MultiAssayExperiment</a>
+The last two columns will show the availability of each studyId for
+either download method (pack_build for cBioDataPack and api_build for
+cBioPortalData).</li>
+</ul>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.3.2 (2023-10-31)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 22.04.3 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] survminer_0.4.9             ggpubr_0.6.0               
+ [3] ggplot2_3.4.4               survival_3.5-7             
+ [5] cBioPortalData_2.14.0       MultiAssayExperiment_1.28.0
+ [7] SummarizedExperiment_1.32.0 Biobase_2.62.0             
+ [9] GenomicRanges_1.54.1        GenomeInfoDb_1.38.0        
+[11] IRanges_2.36.0              S4Vectors_0.40.1           
+[13] BiocGenerics_0.48.0         MatrixGenerics_1.14.0      
+[15] matrixStats_1.0.0           AnVIL_1.14.0               
+[17] dplyr_1.1.3                 workflowr_1.7.1            
+
+loaded via a namespace (and not attached):
+  [1] splines_4.3.2             later_1.3.1              
+  [3] BiocIO_1.12.0             bitops_1.0-7             
+  [5] filelock_1.0.2            tibble_3.2.1             
+  [7] RaggedExperiment_1.26.0   XML_3.99-0.14            
+  [9] lifecycle_1.0.3           rstatix_0.7.2            
+ [11] rprojroot_2.0.3           processx_3.8.2           
+ [13] lattice_0.21-9            backports_1.4.1          
+ [15] magrittr_2.0.3            sass_0.4.7               
+ [17] rmarkdown_2.25            jquerylib_0.1.4          
+ [19] yaml_2.3.7                httpuv_1.6.12            
+ [21] DBI_1.1.3                 abind_1.4-5              
+ [23] zlibbioc_1.48.0           rvest_1.0.3              
+ [25] purrr_1.0.2               RCurl_1.98-1.12          
+ [27] rappdirs_0.3.3            RTCGAToolbox_2.32.1      
+ [29] git2r_0.32.0              GenomeInfoDbData_1.2.11  
+ [31] KMsurv_0.1-5              commonmark_1.9.0         
+ [33] codetools_0.2-19          DelayedArray_0.28.0      
+ [35] DT_0.30                   ggtext_0.1.2             
+ [37] xml2_1.3.5                tidyselect_1.2.0         
+ [39] futile.logger_1.4.3       farver_2.1.1             
+ [41] BiocFileCache_2.10.1      GenomicAlignments_1.38.0 
+ [43] jsonlite_1.8.7            ellipsis_0.3.2           
+ [45] tools_4.3.2               progress_1.2.2           
+ [47] Rcpp_1.0.11               glue_1.6.2               
+ [49] GenomicDataCommons_1.26.0 gridExtra_2.3            
+ [51] SparseArray_1.2.0         BiocBaseUtils_1.4.0      
+ [53] xfun_0.40                 withr_2.5.1              
+ [55] formatR_1.14              fastmap_1.1.1            
+ [57] fansi_1.0.5               callr_3.7.3              
+ [59] digest_0.6.33             R6_2.5.1                 
+ [61] mime_0.12                 colorspace_2.1-0         
+ [63] markdown_1.11             biomaRt_2.58.0           
+ [65] RSQLite_2.3.2             utf8_1.2.4               
+ [67] tidyr_1.3.0               generics_0.1.3           
+ [69] data.table_1.14.8         rtracklayer_1.62.0       
+ [71] prettyunits_1.2.0         httr_1.4.7               
+ [73] htmlwidgets_1.6.2         S4Arrays_1.2.0           
+ [75] RJSONIO_1.3-1.8           whisker_0.4.1            
+ [77] pkgconfig_2.0.3           gtable_0.3.4             
+ [79] blob_1.2.4                XVector_0.42.0           
+ [81] survMisc_0.5.6            htmltools_0.5.6.1        
+ [83] carData_3.0-5             scales_1.2.1             
+ [85] rapiclient_0.1.3          png_0.1-8                
+ [87] knitr_1.44                km.ci_0.5-6              
+ [89] lambda.r_1.2.4            rstudioapi_0.15.0        
+ [91] tzdb_0.4.0                rjson_0.2.21             
+ [93] curl_5.1.0                cachem_1.0.8             
+ [95] zoo_1.8-12                stringr_1.5.0            
+ [97] parallel_4.3.2            miniUI_0.1.1.1           
+ [99] AnnotationDbi_1.64.0      restfulr_0.0.15          
+[101] pillar_1.9.0              grid_4.3.2               
+[103] vctrs_0.6.4               promises_1.2.1           
+[105] car_3.1-2                 dbplyr_2.4.0             
+[107] xtable_1.8-4              evaluate_0.22            
+[109] readr_2.1.4               GenomicFeatures_1.54.1   
+[111] cli_3.6.1                 compiler_4.3.2           
+[113] futile.options_1.0.1      Rsamtools_2.18.0         
+[115] rlang_1.1.1               crayon_1.5.2             
+[117] ggsignif_0.6.4            labeling_0.4.3           
+[119] ps_1.7.5                  getPass_0.2-2            
+[121] fs_1.6.3                  stringi_1.7.12           
+[123] BiocParallel_1.36.0       munsell_0.5.0            
+[125] Biostrings_2.70.1         Matrix_1.6-1.1           
+[127] hms_1.1.3                 bit64_4.0.5              
+[129] KEGGREST_1.42.0           shiny_1.7.5.1            
+[131] gridtext_0.1.5            broom_1.0.5              
+[133] memoise_2.0.1             bslib_0.5.1              
+[135] bit_4.0.5                 TCGAutils_1.22.0         </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
