@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5acae29d30e5f8f1d38c57f4d7b6d700ec45115ftargetblank5acae29a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee8b8d76f2a37d76edfaccdf55faf62ac98905f81targetblanke8b8d76a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/5acae29d30e5f8f1d38c57f4d7b6d700ec45115f" target="_blank">5acae29</a>
+<a href="https://github.com/davetang/muse/tree/e8b8d76f2a37d76edfaccdf55faf62ac98905f81" target="_blank">e8b8d76</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5acae29d30e5f8f1d38c57f4d7b6d700ec45115ftargetblank5acae29a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee8b8d76f2a37d76edfaccdf55faf62ac98905f81targetblanke8b8d76a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/5acae29d30e5f8f1d38c57f4d7b6d700ec45115f" target="_blank">5acae29</a>.
+<a href="https://github.com/davetang/muse/tree/e8b8d76f2a37d76edfaccdf55faf62ac98905f81" target="_blank">e8b8d76</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -618,6 +618,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/e8b8d76f2a37d76edfaccdf55faf62ac98905f81/analysis/tm.Rmd" target="_blank">e8b8d76</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-02
+</td>
+<td>
+Vignette
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4011b467b9bdc40e50781c87de80e76074e04113/docs/tm.html" target="_blank">4011b46</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -810,6 +844,260 @@ $`248`
 
 $`273`
 [1] &quot;SAUDI FEBRUARY CRUDE OUTPUT PUT AT 3.5 MLN BPD&quot;</code></pre>
+</div>
+<div id="vignette" class="section level2">
+<h2>Vignette</h2>
+<p>Following the <a
+href="https://cran.r-project.org/web/packages/tm/vignettes/tm.pdf">vignette</a>.</p>
+<p>The main structure for managing documents in the <code>tm</code>
+package is a <code>Corpus</code>, which represents a collection of text
+documents. A corpus is an abstract concept and there can exist several
+implementations in parallel. The default implementation is the
+<code>VCorpus</code>, which is short for Volatile Corpus. The
+<code>PCorpus</code> implements a Permanent Corpus and the documents are
+physically stored outside of R.</p>
+<p>Within the corpus constructor, x must be a Source object which
+abstracts the input location. <code>tm</code> provides a set of
+predefined sources, e.g., <code>DirSource</code>,
+<code>VectorSource</code>, or <code>DataframeSource</code>, which handle
+a directory, a vector interpreting each component as document, or data
+frame like structures (like CSV files), respectively.</p>
+<p>Below is an example of reading in a plain text file in the directory
+<code>txt</code> containing Latin (lat) texts by the Roman poet
+Ovid.</p>
+<pre class="r"><code>txt &lt;- system.file(&quot;texts&quot;, &quot;txt&quot;, package = &quot;tm&quot;)
+(ovid &lt;- VCorpus(DirSource(txt, encoding = &quot;UTF-8&quot;), readerControl = list(language = &quot;lat&quot;)))</code></pre>
+<pre><code>&lt;&lt;VCorpus&gt;&gt;
+Metadata:  corpus specific: 0, document level (indexed): 0
+Content:  documents: 5</code></pre>
+<p>For simple examples <code>VectorSource</code> is quite useful, as it
+can create a corpus from character vectors.</p>
+<pre class="r"><code>docs &lt;- c(&quot;This is a text.&quot;, &quot;This another one.&quot;)
+VCorpus(VectorSource(docs))</code></pre>
+<pre><code>&lt;&lt;VCorpus&gt;&gt;
+Metadata:  corpus specific: 0, document level (indexed): 0
+Content:  documents: 2</code></pre>
+<p>The <code>tm</code> package ships with several readers (e.g.,
+<code>readPlain()</code>, <code>readPDF()</code>, and
+<code>readDOC()</code>). See <code>?getReaders()</code> for an
+up-to-date list of available readers.</p>
+<p>Create a data frame for creating a corpus.</p>
+<pre class="r"><code>my_df &lt;- data.frame(
+  doc_id = c(&quot;doc 1&quot; , &quot;doc 2&quot; , &quot;doc 3&quot; ),
+  text = c(&quot;this is a sentence&quot;, &quot;this is another sentence&quot;, &quot;who what how&quot;),
+  title = c(&quot;title 1&quot; , &quot;title 2&quot; , &quot;title 3&quot; ),
+  authors = c(&quot;author 1&quot; , &quot;author 2&quot; , &quot;author 3&quot; ),
+  topics = c(&quot;topic 1&quot; , &quot;topic 2&quot; , &quot;topic 3&quot; ),
+  stringsAsFactors = FALSE
+)
+
+my_df</code></pre>
+<pre><code>  doc_id                     text   title  authors  topics
+1  doc 1       this is a sentence title 1 author 1 topic 1
+2  doc 2 this is another sentence title 2 author 2 topic 2
+3  doc 3             who what how title 3 author 3 topic 3</code></pre>
+<p>A data frame source interprets each row of the data frame as a
+document. The first column must be named <code>doc_id</code> and contain
+a unique string identifier for each document. The second column must be
+named <code>text</code> and contain a UTF-8 encoded string representing
+the document’s content. Optional additional columns are used as document
+level metadata.</p>
+<pre class="r"><code>(my_corpus &lt;- Corpus(DataframeSource(my_df)))</code></pre>
+<pre><code>&lt;&lt;SimpleCorpus&gt;&gt;
+Metadata:  corpus specific: 1, document level (indexed): 3
+Content:  documents: 3</code></pre>
+<p>Create a <code>TermDocumentMatrix</code>.</p>
+<pre class="r"><code>my_tdm &lt;- TermDocumentMatrix(my_corpus)
+my_tdm</code></pre>
+<pre><code>&lt;&lt;TermDocumentMatrix (terms: 6, documents: 3)&gt;&gt;
+Non-/sparse entries: 8/10
+Sparsity           : 56%
+Maximal term length: 8
+Weighting          : term frequency (tf)</code></pre>
+<p>Check out the matrix.</p>
+<pre class="r"><code>as.matrix(my_tdm)</code></pre>
+<pre><code>          Docs
+Terms      doc 1 doc 2 doc 3
+  sentence     1     1     0
+  this         1     1     0
+  another      0     1     0
+  how          0     0     1
+  what         0     0     1
+  who          0     0     1</code></pre>
+<div id="transformations" class="section level3">
+<h3>Transformations</h3>
+<p>Once we have a corpus we typically want to modify the documents in
+it, e.g., stemming, stop word removal, etc. In <code>tm</code>, all this
+functionality is performed via the <code>tm_map()</code> function which
+applies (maps) a function to all elements of the corpus; this is called
+a transformation. All transformations work on single text documents and
+<code>tm_map()</code> just applies them to all documents in a
+corpus.</p>
+<pre class="r"><code>reut21578 &lt;- system.file(&quot;texts&quot;, &quot;crude&quot;, package = &quot;tm&quot;)
+reuters &lt;- VCorpus(DirSource(reut21578, mode = &quot;binary&quot;), readerControl = list(reader = readReut21578XMLasPlain))
+reuters</code></pre>
+<pre><code>&lt;&lt;VCorpus&gt;&gt;
+Metadata:  corpus specific: 0, document level (indexed): 0
+Content:  documents: 20</code></pre>
+<p>Remove whitespace.</p>
+<pre class="r"><code>reuters &lt;- tm_map(reuters, stripWhitespace)</code></pre>
+<p>We can use arbitrary character processing functions as
+transformations as long as the function returns a text document. In this
+case we use <code>content_transformer()</code> which provides a
+convenience wrapper to access and set the content of a document.
+Consequently most text manipulation functions from base R can directly
+be used with this wrapper. This works for <code>tolower()</code> as used
+here but also with <code>gsub()</code> which comes quite handy for a
+broad range of text manipulation tasks.</p>
+<pre class="r"><code>reuters &lt;- tm_map(reuters, content_transformer(tolower))</code></pre>
+<p>Remove stopwords.</p>
+<pre class="r"><code>reuters &lt;- tm_map(reuters, removeWords, stopwords(&quot;english&quot;))</code></pre>
+<p>From <a
+href="https://www.geeksforgeeks.org/introduction-to-stemming/"
+class="uri">https://www.geeksforgeeks.org/introduction-to-stemming/</a>:</p>
+<blockquote>
+<p>Stemming is the process of producing morphological variants of a
+root/base word. Stemming programs are commonly referred to as stemming
+algorithms or stemmers. A stemming algorithm reduces the words
+“chocolates”, “chocolatey”, “choco” to the root word, “chocolate” and
+“retrieval”, “retrieved”, “retrieves” reduce to the stem “retrieve”.
+Stemming is an important part of the pipelining process in Natural
+language processing. The input to the stemmer is tokenized words. How do
+we get these tokenized words? Well, tokenization involves breaking down
+the document into different words.</p>
+</blockquote>
+<p>This requires the <code>SnowballC</code> package.</p>
+<pre class="r"><code>library(SnowballC)
+tm_map(reuters, stemDocument)</code></pre>
+<pre><code>&lt;&lt;VCorpus&gt;&gt;
+Metadata:  corpus specific: 0, document level (indexed): 0
+Content:  documents: 20</code></pre>
+<p>Often it is of special interest to filter out documents satisfying
+given properties. For this purpose the function <code>tm_filter</code>
+is designed. It is possible to write custom filter functions which get
+applied to each document in the corpus. Alternatively, we can create
+indices based on selections and subset the corpus with them. E.g., the
+following statement filters out those documents having an ID equal to
+“237” and the string “INDONESIA SEEN AT CROSSROADS OVER ECONOMIC CHANGE”
+as their heading.</p>
+<pre class="r"><code>idx &lt;- meta(reuters, &quot;id&quot;) == &#39;237&#39; &amp; meta(reuters, &quot;heading&quot;) == &#39;INDONESIA SEEN AT CROSSROADS OVER ECONOMIC CHANGE&#39;
+reuters[idx]</code></pre>
+<pre><code>&lt;&lt;VCorpus&gt;&gt;
+Metadata:  corpus specific: 0, document level (indexed): 0
+Content:  documents: 1</code></pre>
+</div>
+<div id="term-document-matrices" class="section level3">
+<h3>Term-Document Matrices</h3>
+<p>A common approach in text mining is to create a term-document matrix
+from a corpus. In the <code>tm</code> package the classes
+<code>TermDocumentMatrix</code> and <code>DocumentTermMatrix</code>
+(depending on whether you want terms as rows and documents as columns,
+or vice versa) employ sparse matrices for corpora. Inspecting a
+term-document matrix displays a sample, whereas <code>as.matrix()</code>
+yields the full matrix in dense format (which can be very memory
+consuming for large matrices).</p>
+<pre class="r"><code>dtm &lt;- DocumentTermMatrix(reuters)
+inspect(dtm)</code></pre>
+<pre><code>&lt;&lt;DocumentTermMatrix (documents: 20, terms: 1183)&gt;&gt;
+Non-/sparse entries: 1908/21752
+Sparsity           : 92%
+Maximal term length: 17
+Weighting          : term frequency (tf)
+Sample             :
+     Terms
+Docs  crude dlrs last mln oil opec prices reuter said saudi
+  144     0    0    1   4  11   10      3      1    9     0
+  236     1    2    4   4   7    6      2      1    6     0
+  237     0    1    3   1   3    1      0      1    0     0
+  242     0    0    0   0   3    2      1      1    3     1
+  246     0    0    2   0   4    1      0      1    4     0
+  248     0    3    1   3   9    6      7      1    5     5
+  273     5    2    7   9   5    5      4      1    5     7
+  489     0    1    0   2   4    0      2      1    2     0
+  502     0    1    0   2   4    0      2      1    2     0
+  704     0    0    0   0   3    0      2      1    3     0</code></pre>
+<p>Find terms that occur at least five times using the
+<code>findFreqTerms()</code> function.</p>
+<pre class="r"><code>findFreqTerms(dtm, 5)</code></pre>
+<pre><code> [1] &quot;15.8&quot;          &quot;abdul-aziz&quot;    &quot;ability&quot;       &quot;accord&quot;       
+ [5] &quot;agency&quot;        &quot;agreement&quot;     &quot;ali&quot;           &quot;also&quot;         
+ [9] &quot;analysts&quot;      &quot;arab&quot;          &quot;arabia&quot;        &quot;barrel.&quot;      
+[13] &quot;barrels&quot;       &quot;billion&quot;       &quot;bpd&quot;           &quot;budget&quot;       
+[17] &quot;company&quot;       &quot;crude&quot;         &quot;daily&quot;         &quot;demand&quot;       
+[21] &quot;dlrs&quot;          &quot;economic&quot;      &quot;emergency&quot;     &quot;energy&quot;       
+[25] &quot;exchange&quot;      &quot;expected&quot;      &quot;exports&quot;       &quot;futures&quot;      
+[29] &quot;government&quot;    &quot;group&quot;         &quot;gulf&quot;          &quot;help&quot;         
+[33] &quot;hold&quot;          &quot;industry&quot;      &quot;international&quot; &quot;january&quot;      
+[37] &quot;kuwait&quot;        &quot;last&quot;          &quot;market&quot;        &quot;may&quot;          
+[41] &quot;meeting&quot;       &quot;minister&quot;      &quot;mln&quot;           &quot;month&quot;        
+[45] &quot;nazer&quot;         &quot;new&quot;           &quot;now&quot;           &quot;nymex&quot;        
+[49] &quot;official&quot;      &quot;oil&quot;           &quot;one&quot;           &quot;opec&quot;         
+[53] &quot;output&quot;        &quot;pct&quot;           &quot;petroleum&quot;     &quot;plans&quot;        
+[57] &quot;posted&quot;        &quot;present&quot;       &quot;price&quot;         &quot;prices&quot;       
+[61] &quot;prices,&quot;       &quot;prices.&quot;       &quot;production&quot;    &quot;quota&quot;        
+[65] &quot;quoted&quot;        &quot;recent&quot;        &quot;report&quot;        &quot;research&quot;     
+[69] &quot;reserve&quot;       &quot;reuter&quot;        &quot;said&quot;          &quot;said.&quot;        
+[73] &quot;saudi&quot;         &quot;sell&quot;          &quot;sheikh&quot;        &quot;sources&quot;      
+[77] &quot;study&quot;         &quot;traders&quot;       &quot;u.s.&quot;          &quot;united&quot;       
+[81] &quot;west&quot;          &quot;will&quot;          &quot;world&quot;        </code></pre>
+<p>Find associations (i.e., terms which correlate) with at least 0.8
+correlation for the term “opec” using the <code>findAssocs()</code>
+function.</p>
+<pre class="r"><code>findAssocs(dtm, &quot;opec&quot;, 0.8)</code></pre>
+<pre><code>$opec
+  meeting emergency       oil      15.8  analysts    buyers      said   ability 
+     0.88      0.87      0.87      0.85      0.85      0.83      0.82      0.80 </code></pre>
+<p>Term-document matrices tend to get very big already for normal sized
+data sets. Therefore we provide a method to remove sparse terms, i.e.,
+terms occurring only in very few documents. Normally, this reduces the
+matrix dramatically without losing significant relations inherent to the
+matrix:</p>
+<pre class="r"><code>inspect(removeSparseTerms(dtm, 0.4))</code></pre>
+<pre><code>&lt;&lt;DocumentTermMatrix (documents: 20, terms: 3)&gt;&gt;
+Non-/sparse entries: 58/2
+Sparsity           : 3%
+Maximal term length: 6
+Weighting          : term frequency (tf)
+Sample             :
+     Terms
+Docs  oil reuter said
+  127   5      1    1
+  144  11      1    9
+  236   7      1    6
+  242   3      1    3
+  246   4      1    4
+  248   9      1    5
+  273   5      1    5
+  352   5      1    1
+  489   4      1    2
+  502   4      1    2</code></pre>
+<p>A dictionary is a (multi-)set of strings. It is often used to denote
+relevant terms in text mining. We represent a dictionary with a
+character vector which may be passed to the
+<code>DocumentTermMatrix()</code> constructor as a control argument.
+Then the created matrix is tabulated against the dictionary, i.e., only
+terms from the dictionary appear in the matrix. This allows to restrict
+the dimension of the matrix <em>a priori</em> and to focus on specific
+terms for distinct text mining contexts.</p>
+<pre class="r"><code>inspect(DocumentTermMatrix(reuters, list(dictionary = c(&quot;prices&quot;, &quot;crude&quot;, &quot;oil&quot;))))</code></pre>
+<pre><code>&lt;&lt;DocumentTermMatrix (documents: 20, terms: 3)&gt;&gt;
+Non-/sparse entries: 41/19
+Sparsity           : 32%
+Maximal term length: 6
+Weighting          : term frequency (tf)
+Sample             :
+     Terms
+Docs  crude oil prices
+  127     2   5      3
+  144     0  11      3
+  236     1   7      2
+  248     0   9      7
+  273     5   5      4
+  352     0   5      4
+  353     2   4      1
+  489     0   4      2
+  502     0   4      2
+  543     2   2      2</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -842,7 +1130,7 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] tm_0.7-11       NLP_0.2-1       workflowr_1.7.1
+[1] SnowballC_0.7.1 tm_0.7-11       NLP_0.2-1       workflowr_1.7.1
 
 loaded via a namespace (and not attached):
  [1] jsonlite_1.8.7    compiler_4.3.2    promises_1.2.1    Rcpp_1.0.11      
@@ -857,6 +1145,7 @@ loaded via a namespace (and not attached):
 [37] vctrs_0.6.4       evaluate_0.22     glue_1.6.2        whisker_0.4.1    
 [41] fansi_1.0.5       rmarkdown_2.25    httr_1.4.7        tools_4.3.2      
 [45] pkgconfig_2.0.3   htmltools_0.5.6.1</code></pre>
+</div>
 </div>
 </div>
 
