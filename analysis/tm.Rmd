@@ -1,0 +1,139 @@
+---
+title: "Text mining using the tm package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The [tm](https://cran.r-project.org/web/packages/tm/index.html) package is a framework for text mining applications within R.
+
+```{r load_package}
+library(tm)
+packageVersion("tm")
+```
+
+## Getting started
+
+The `crude` corpus:
+
+>This data set holds 20 news articles with additional meta information from the Reuters-21578 data set. All documents belong to the topic crude dealing with crude oil.
+
+```{r crude}
+data(crude)
+class(crude)
+```
+
+`inspect` can be used to display detailed information on a corpus, a term-document matrix, or a text document.
+
+```{r inspect_crude}
+inspect(crude[1:3])
+```
+
+Create a Term Document Matrix.
+
+```{r term_document_matrix}
+tdm <- TermDocumentMatrix(crude)
+tdm
+```
+
+Convert to matrix.
+
+```{r term_document_matrix_to_matrix}
+crude_matrix <- as.matrix(tdm)
+dim(crude_matrix)
+```
+
+Check out the matrix. We need to remove the symbols!
+
+```{r check_out_matrix}
+crude_matrix[1:6, 1:6]
+```
+
+Sparsity is the number of zeros, i.e., words that are not present in documents.
+
+```{r calc_sparsity}
+prop.table(table(crude_matrix == 0))
+```
+
+Functions that can be used on a `TermDocumentMatrix`.
+
+```{r methods_term_document_matrix}
+methods(class = "TermDocumentMatrix")
+```
+
+Clean corpus.
+
+```{r clean_corpus}
+clean_corpus <- function(x){
+  x |>
+    tm_map(removePunctuation) |>
+    tm_map(stripWhitespace) |>
+    tm_map(content_transformer(function(x) iconv(x, to='UTF-8', sub='byte'))) |>
+    tm_map(removeNumbers) |>
+    tm_map(removeWords, stopwords("en")) |>
+    tm_map(content_transformer(tolower)) |>
+    tm_map(removeWords, c("etc","ie", "eg", stopwords("english")))
+}
+
+tdm <- TermDocumentMatrix(clean_corpus(crude))
+
+crude_matrix <- as.matrix(tdm)
+crude_matrix[1:6, 1:6]
+```
+
+`findFreqTerms` finds frequent terms in a document-term or term-document matrix.
+
+```{r find_freq_terms}
+findFreqTerms(x = tdm, lowfreq = 10)
+```
+
+Limit matrix to specific words.
+
+```{r limit_matrix}
+inspect(
+  x = DocumentTermMatrix(
+    x = crude,
+    list(dictionary = c("government", "market", "official")
+    )
+  )
+)
+```
+
+`findAssocs` finds associations in a document-term or term-document matrix.
+
+```{r find_assocs}
+findAssocs(x = tdm, terms = 'government', corlimit = 0.8)
+```
+
+Simple analysis on the matrix.
+
+Most common words.
+
+```{r most_common_words}
+head(sort(rowSums(crude_matrix), decreasing = TRUE))
+```
+
+Correlation.
+
+```{r correlation}
+cor(crude_matrix[,1], crude_matrix[,2])
+```
+
+Clustering.
+
+```{r clustering}
+set.seed(31)
+my_cluster <- kmeans(x = t(crude_matrix), centers = 4)
+my_cluster$cluster
+```
+
+Check headings of cluster 3.
+
+```{r check_clustering}
+meta(crude, 'heading')[my_cluster$cluster == 3]
+```
