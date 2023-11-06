@@ -73,7 +73,7 @@ studies[idx, ] |>
 
 Download `ov_tcga` study.
 
-```{r ov_tcga, message=FALSE, cache=TRUE}
+```{r ov_tcga, message=FALSE}
 ov_tcga <- cBioDataPack("ov_tcga", ask = FALSE)
 ov_tcga
 ```
@@ -136,13 +136,20 @@ library("survminer")
 Check status.
 
 ```{r os_status}
+head(colData(ov_tcga)$OS_STATUS)
 table(colData(ov_tcga)$OS_STATUS)
 ```
 
 Check months.
 
-```{r}
+```{r class_os_months}
 class(colData(ov_tcga)$OS_MONTHS)
+```
+
+Check out the data.
+
+```{r check_data}
+colData(ov_tcga)[1, ] |> t()
 ```
 
 Prepare data.
@@ -152,10 +159,11 @@ col_dat <- colData(ov_tcga)
 wanted_grade <- col_dat$GRADE == "G2" | col_dat$GRADE == "G3"
 col_dat$GRADE[!wanted_grade] <- NA
 col_dat$OS_MONTHS <- as.numeric(col_dat$OS_MONTHS)
+col_dat$OS_YEARS <- as.numeric(col_dat$OS_MONTHS) / 12
 colData(ov_tcga) <- col_dat
 ```
 
-We specify a simple survival model using tumour grade as a covariate and we draw the K-M plot.
+We specify a simple survival model using tumour grade as a covariate and we draw the K-M plot. (The `substr` function creates a vector where 1 = deceased and 0 = living.)
 
 ```{r survfit_grade, fig.width=8, fig.height=6}
 fit <- survfit(
@@ -163,6 +171,16 @@ fit <- survfit(
     data = colData(ov_tcga)
 )
 ggsurvplot(fit, data = colData(ov_tcga), risk.table = TRUE)
+```
+
+Using years.
+
+```{r survfit_grade_years, fig.width=8, fig.height=6}
+fit2 <- survfit(
+    Surv(OS_YEARS, as.numeric(substr(OS_STATUS, 1, 1))) ~ GRADE,
+    data = colData(ov_tcga)
+)
+ggsurvplot(fit2, data = colData(ov_tcga), risk.table = TRUE)
 ```
 
 ## Useful links
