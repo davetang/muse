@@ -452,7 +452,7 @@ dim(ov_star_cases)
 Sample types.
 
 ```{r ov_sample_types}
-mosaicplot(table(ov_star_cases$sample_type), main = "Sample types")
+table(ov_star_cases$sample_type)
 ```
 
 Get additional case data for OV.
@@ -495,3 +495,115 @@ str(ov_cases$diagnoses$`cce34351-1700-405b-818f-a598f63a33e8`$treatments)
 ```
 
 There is no information on [carboplatin](https://www.cancerresearchuk.org/about-cancer/treatment/drugs/carboplatin) or [paclitaxel](https://www.cancerresearchuk.org/about-cancer/treatment/drugs/paclitaxel).
+
+### Pancreatic adenocarcinoma
+
+Meta data for pancreatic adenocarcinoma.
+
+```{r paad}
+paad_star <- get_star_metadata("TCGA-PAAD")
+
+sapply(paad_star$cases, function(x) x$samples) |>
+  do.call(rbind.data.frame, args = _) -> paad_star_cases
+
+dim(paad_star_cases)
+```
+
+Sample types.
+
+```{r paad_sample_types}
+table(paad_star_cases$sample_type)
+```
+
+Treatment type.
+
+```{r tcga_paad_treatment_type}
+cases() %>%
+  filter(project.project_id == 'TCGA-PAAD') %>% 
+  facet("diagnoses.treatments.treatment_type") %>%
+  aggregations()
+```
+
+### Esophageal carcinoma
+
+Meta data for esophageal carcinoma.
+
+```{r esca}
+esca_star <- get_star_metadata("TCGA-ESCA")
+
+sapply(esca_star$cases, function(x) x$samples) |>
+  do.call(rbind.data.frame, args = _) -> esca_star_cases
+
+dim(esca_star_cases)
+```
+
+Sample types.
+
+```{r esca_sample_types}
+table(esca_star_cases$sample_type)
+```
+
+Treatment type.
+
+```{r tcga_esca_treatment_type}
+cases() %>%
+  filter(project.project_id == 'TCGA-ESCA') %>% 
+  facet("diagnoses.treatments.treatment_type") %>%
+  aggregations()
+```
+
+### Head and Neck squamous cell carcinoma
+
+Meta data for head and neck squamous cell carcinoma.
+
+```{r hnsc}
+hnsc_star <- get_star_metadata("TCGA-HNSC")
+
+sapply(hnsc_star$cases, function(x) x$samples) |>
+  do.call(rbind.data.frame, args = _) -> hnsc_star_cases
+
+dim(hnsc_star_cases)
+```
+
+Sample types.
+
+```{r hnsc_sample_types}
+table(hnsc_star_cases$sample_type)
+```
+
+Treatment type.
+
+```{r tcga_hnsc_treatment_type}
+cases() %>%
+  filter(project.project_id == 'TCGA-HNSC') %>% 
+  facet("diagnoses.treatments.treatment_type") %>%
+  aggregations()
+```
+
+### Kidney renal clear cell carcinoma
+
+Meta data for kidney renal clear cell carcinoma.
+
+```{r kirc}
+kirc_star <- get_star_metadata("TCGA-KIRC")
+
+sapply(kirc_star$cases, function(x) x$samples) |>
+  do.call(rbind.data.frame, args = _) -> kirc_star_cases
+
+dim(kirc_star_cases)
+```
+
+Sample types.
+
+```{r kirc_sample_types}
+table(kirc_star_cases$sample_type)
+```
+
+Treatment type.
+
+```{r tcga_kirc_treatment_type}
+cases() %>%
+  filter(project.project_id == 'TCGA-KIRC') %>% 
+  facet("diagnoses.treatments.treatment_type") %>%
+  aggregations()
+```
