@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed211058bc7f1041e7865b43689596fd9ab66cfe5targetblankd211058a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeda8916d730cb3c9a2e214a93b0083d40ac783bc8targetblankda8916da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/d211058bc7f1041e7865b43689596fd9ab66cfe5" target="_blank">d211058</a>
+<a href="https://github.com/davetang/muse/tree/da8916d730cb3c9a2e214a93b0083d40ac783bc8" target="_blank">da8916d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed211058bc7f1041e7865b43689596fd9ab66cfe5targetblankd211058a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeda8916d730cb3c9a2e214a93b0083d40ac783bc8targetblankda8916da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/d211058bc7f1041e7865b43689596fd9ab66cfe5" target="_blank">d211058</a>.
+<a href="https://github.com/davetang/muse/tree/da8916d730cb3c9a2e214a93b0083d40ac783bc8" target="_blank">da8916d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -618,6 +618,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/da8916d730cb3c9a2e214a93b0083d40ac783bc8/analysis/cbioportal.Rmd" target="_blank">da8916d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-06
+</td>
+<td>
+Survival data for living patients
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/0ccd84b2e0af470bddc9a900ea9749604e6bbf02/docs/cbioportal.html" target="_blank">0ccd84b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 html
@@ -1470,6 +1504,252 @@ library(&quot;survminer&quot;)</code></pre>
 <p>Check months.</p>
 <pre class="r"><code>class(colData(ov_tcga)$OS_MONTHS)</code></pre>
 <pre><code>[1] &quot;character&quot;</code></pre>
+<p>Data for living patients.</p>
+<pre class="r"><code>colData(ov_tcga) |&gt;
+  as.data.frame() |&gt;
+  dplyr::filter(OS_STATUS == &quot;0:LIVING&quot;) |&gt;
+  dplyr::select(DFS_STATUS, DFS_MONTHS, OS_STATUS, OS_MONTHS)</code></pre>
+<pre><code>                          DFS_STATUS      DFS_MONTHS OS_STATUS       OS_MONTHS
+TCGA-04-1336           0:DiseaseFree           49.11  0:LIVING           49.11
+TCGA-04-1338   1:Recurred/Progressed           12.48  0:LIVING           46.58
+TCGA-04-1341           0:DiseaseFree            1.08  0:LIVING            1.08
+TCGA-04-1346           0:DiseaseFree           65.47  0:LIVING           65.47
+TCGA-04-1347           0:DiseaseFree           63.04  0:LIVING           63.04
+TCGA-04-1351   1:Recurred/Progressed           54.47  0:LIVING           65.41
+TCGA-04-1353           0:DiseaseFree            0.53  0:LIVING            0.53
+TCGA-04-1357           0:DiseaseFree [Not Available]  0:LIVING [Not Available]
+TCGA-04-1360           0:DiseaseFree [Not Available]  0:LIVING [Not Available]
+TCGA-04-1361   1:Recurred/Progressed           30.45  0:LIVING           32.49
+TCGA-04-1365   1:Recurred/Progressed           43.63  0:LIVING           76.51
+TCGA-04-1367   1:Recurred/Progressed           98.46  0:LIVING          103.32
+TCGA-04-1370           0:DiseaseFree           59.92  0:LIVING           59.92
+TCGA-04-1371           0:DiseaseFree           82.33  0:LIVING           82.33
+TCGA-04-1516           0:DiseaseFree           41.56  0:LIVING           41.56
+TCGA-04-1519           0:DiseaseFree            0.79  0:LIVING            0.79
+TCGA-04-1649   1:Recurred/Progressed           54.93  0:LIVING           64.59
+TCGA-09-1666   1:Recurred/Progressed           15.77  0:LIVING           57.56
+TCGA-09-1667   1:Recurred/Progressed           15.11  0:LIVING           61.83
+TCGA-09-1668           0:DiseaseFree           55.32  0:LIVING           55.32
+TCGA-09-1669           0:DiseaseFree           30.49  0:LIVING           30.49
+TCGA-09-1670   1:Recurred/Progressed           17.97  0:LIVING           17.97
+TCGA-09-1672           0:DiseaseFree            5.85  0:LIVING            5.85
+TCGA-09-1673           0:DiseaseFree            3.02  0:LIVING            3.02
+TCGA-09-1674           0:DiseaseFree            8.54  0:LIVING            8.54
+TCGA-09-1675           0:DiseaseFree           97.47  0:LIVING           97.47
+TCGA-09-2043           0:DiseaseFree            6.18  0:LIVING            6.18
+TCGA-09-2044           0:DiseaseFree            6.11  0:LIVING            6.11
+TCGA-09-2049   1:Recurred/Progressed           31.31  0:LIVING          112.32
+TCGA-09-2050           0:DiseaseFree           71.06  0:LIVING           71.06
+TCGA-09-2051   1:Recurred/Progressed           19.15  0:LIVING           63.04
+TCGA-09-2053           0:DiseaseFree           39.72  0:LIVING           39.72
+TCGA-09-2055           0:DiseaseFree           26.91  0:LIVING           26.91
+TCGA-09-2056           0:DiseaseFree           12.45  0:LIVING           12.45
+TCGA-13-0762   1:Recurred/Progressed           32.95  0:LIVING           111.7
+TCGA-13-0792   1:Recurred/Progressed           26.81  0:LIVING          118.33
+TCGA-13-0793   1:Recurred/Progressed           11.53  0:LIVING          107.19
+TCGA-13-0797   1:Recurred/Progressed           17.25  0:LIVING           69.68
+TCGA-13-0799   1:Recurred/Progressed           41.46  0:LIVING           83.28
+TCGA-13-0800   1:Recurred/Progressed           45.86  0:LIVING           87.42
+TCGA-13-0885           0:DiseaseFree           111.3  0:LIVING           111.3
+TCGA-13-0886           0:DiseaseFree          153.25  0:LIVING          153.25
+TCGA-13-0890           0:DiseaseFree          145.34  0:LIVING          145.34
+TCGA-13-0900           0:DiseaseFree          133.94  0:LIVING          133.94
+TCGA-13-0901   1:Recurred/Progressed           12.81  0:LIVING           19.35
+TCGA-13-0903           0:DiseaseFree          127.69  0:LIVING          127.69
+TCGA-13-0905   1:Recurred/Progressed           50.43  0:LIVING          123.06
+TCGA-13-0906           0:DiseaseFree          118.89  0:LIVING          118.89
+TCGA-13-0910   1:Recurred/Progressed           39.82  0:LIVING          116.56
+TCGA-13-0913   1:Recurred/Progressed           28.61  0:LIVING          109.23
+TCGA-13-0913.1 1:Recurred/Progressed           28.61  0:LIVING          109.23
+TCGA-13-0916           0:DiseaseFree           58.64  0:LIVING           58.64
+TCGA-13-0919           0:DiseaseFree           84.46  0:LIVING           84.46
+TCGA-13-0923   1:Recurred/Progressed           56.47  0:LIVING           83.67
+TCGA-13-0924   1:Recurred/Progressed            31.6  0:LIVING           85.87
+TCGA-13-1404   1:Recurred/Progressed           51.94  0:LIVING           81.11
+TCGA-13-1407   1:Recurred/Progressed           43.79  0:LIVING           83.25
+TCGA-13-1410   1:Recurred/Progressed           10.48  0:LIVING           80.95
+TCGA-13-1497   1:Recurred/Progressed           26.71  0:LIVING          127.17
+TCGA-13-1499   1:Recurred/Progressed           19.15  0:LIVING          114.98
+TCGA-13-1505   1:Recurred/Progressed           51.28  0:LIVING           65.64
+TCGA-13-1509   1:Recurred/Progressed           18.99  0:LIVING           80.09
+TCGA-13-1512   1:Recurred/Progressed           14.03  0:LIVING           14.52
+TCGA-13-2057   1:Recurred/Progressed           29.47  0:LIVING           79.96
+TCGA-13-2059   1:Recurred/Progressed           33.02  0:LIVING           78.42
+TCGA-13-2060   1:Recurred/Progressed           48.46  0:LIVING           77.83
+TCGA-13-2061           0:DiseaseFree           76.84  0:LIVING           76.84
+TCGA-13-2065   1:Recurred/Progressed           31.08  0:LIVING           65.47
+TCGA-13-A5FT           0:DiseaseFree            70.4  0:LIVING            70.4
+TCGA-20-0990   1:Recurred/Progressed           28.61  0:LIVING           25.92
+TCGA-20-0991           0:DiseaseFree           26.18  0:LIVING           26.18
+TCGA-20-0996           0:DiseaseFree           72.14  0:LIVING           72.14
+TCGA-20-1682           0:DiseaseFree            27.5  0:LIVING            27.5
+TCGA-20-1683   1:Recurred/Progressed            20.3  0:LIVING           25.36
+TCGA-20-1684           0:DiseaseFree           19.09  0:LIVING           19.09
+TCGA-20-1685           0:DiseaseFree           16.69  0:LIVING           16.69
+TCGA-20-1686           0:DiseaseFree            2.92  0:LIVING            2.92
+TCGA-20-1687           0:DiseaseFree            2.66  0:LIVING            2.66
+TCGA-23-1023   1:Recurred/Progressed            16.1  0:LIVING           40.51
+TCGA-23-1024           0:DiseaseFree           15.37  0:LIVING           15.37
+TCGA-23-1026   1:Recurred/Progressed           26.18  0:LIVING           26.81
+TCGA-23-1028   1:Recurred/Progressed            4.37  0:LIVING           49.38
+TCGA-23-1029           0:DiseaseFree             8.8  0:LIVING             8.8
+TCGA-23-1030   1:Recurred/Progressed           17.87  0:LIVING           29.11
+TCGA-23-1110   1:Recurred/Progressed           10.71  0:LIVING           54.47
+TCGA-23-1111           0:DiseaseFree            3.22  0:LIVING            3.22
+TCGA-23-1118           0:DiseaseFree           85.94  0:LIVING           85.94
+TCGA-23-1119   1:Recurred/Progressed          110.97  0:LIVING          129.86
+TCGA-23-1120           0:DiseaseFree            4.27  0:LIVING            4.27
+TCGA-23-1121           0:DiseaseFree            6.37  0:LIVING            6.37
+TCGA-23-1809           0:DiseaseFree            0.53  0:LIVING            0.53
+TCGA-23-2077   1:Recurred/Progressed           40.47  0:LIVING           115.8
+TCGA-23-2078           0:DiseaseFree           87.42  0:LIVING           87.42
+TCGA-23-2079   1:Recurred/Progressed             9.3  0:LIVING           91.59
+TCGA-23-2641           0:DiseaseFree            2.76  0:LIVING            2.76
+TCGA-23-2643           0:DiseaseFree             4.7  0:LIVING             4.7
+TCGA-23-2645           0:DiseaseFree             4.5  0:LIVING             4.5
+TCGA-23-2647           0:DiseaseFree            4.43  0:LIVING            4.43
+TCGA-23-2649           0:DiseaseFree            3.81  0:LIVING            3.81
+TCGA-24-0966           0:DiseaseFree            7.62  0:LIVING            7.62
+TCGA-24-1413           0:DiseaseFree            6.31  0:LIVING            6.31
+TCGA-24-1416           0:DiseaseFree            6.37  0:LIVING            6.37
+TCGA-24-1417           0:DiseaseFree            7.82  0:LIVING            7.82
+TCGA-24-1418           0:DiseaseFree            7.98  0:LIVING            7.98
+TCGA-24-1419           0:DiseaseFree            7.85  0:LIVING            7.85
+TCGA-24-1423           0:DiseaseFree            6.24  0:LIVING            6.24
+TCGA-24-1424           0:DiseaseFree            6.01  0:LIVING            6.01
+TCGA-24-1425           0:DiseaseFree            5.95  0:LIVING            5.95
+TCGA-24-1426           0:DiseaseFree            5.35  0:LIVING            5.35
+TCGA-24-1427           0:DiseaseFree            4.83  0:LIVING            4.83
+TCGA-24-1428   1:Recurred/Progressed           14.72  0:LIVING           17.38
+TCGA-24-1469           0:DiseaseFree             9.1  0:LIVING             9.1
+TCGA-24-1470           0:DiseaseFree            3.45  0:LIVING            3.45
+TCGA-24-1471           0:DiseaseFree            1.18  0:LIVING            1.18
+TCGA-24-1842           0:DiseaseFree            8.31  0:LIVING            8.31
+TCGA-24-1843           0:DiseaseFree            3.48  0:LIVING            3.48
+TCGA-24-1844           0:DiseaseFree            3.71  0:LIVING            3.71
+TCGA-24-1845           0:DiseaseFree            3.81  0:LIVING            3.81
+TCGA-24-1846           0:DiseaseFree            4.37  0:LIVING            4.37
+TCGA-24-1847           0:DiseaseFree           11.27  0:LIVING           11.27
+TCGA-24-1849           0:DiseaseFree            5.78  0:LIVING            5.78
+TCGA-24-1850           0:DiseaseFree            5.52  0:LIVING            5.52
+TCGA-24-1920           0:DiseaseFree            9.79  0:LIVING            9.79
+TCGA-24-2019           0:DiseaseFree            4.86  0:LIVING            4.86
+TCGA-24-2280   1:Recurred/Progressed           17.58  0:LIVING            70.4
+TCGA-24-2281           0:DiseaseFree           44.58  0:LIVING           44.58
+TCGA-29-1693   1:Recurred/Progressed            22.8  0:LIVING          101.71
+TCGA-29-1698   1:Recurred/Progressed            5.95  0:LIVING           68.27
+TCGA-29-1704   1:Recurred/Progressed           18.66  0:LIVING           52.14
+TCGA-29-1704.1 1:Recurred/Progressed           18.66  0:LIVING           52.14
+TCGA-29-1707   1:Recurred/Progressed           39.45  0:LIVING           41.95
+TCGA-29-1707.1 1:Recurred/Progressed           39.45  0:LIVING           41.95
+TCGA-29-1711           0:DiseaseFree           34.59  0:LIVING           34.59
+TCGA-29-1763   1:Recurred/Progressed           14.06  0:LIVING           66.75
+TCGA-29-1764   1:Recurred/Progressed           26.02  0:LIVING           62.88
+TCGA-29-1769           0:DiseaseFree           22.96  0:LIVING           22.96
+TCGA-29-1770   1:Recurred/Progressed           12.39  0:LIVING           24.34
+TCGA-29-1770.1 1:Recurred/Progressed           12.39  0:LIVING           24.34
+TCGA-29-1771   1:Recurred/Progressed           19.55  0:LIVING           22.54
+TCGA-29-1774   1:Recurred/Progressed            7.69  0:LIVING           17.31
+TCGA-29-1775   1:Recurred/Progressed            11.2  0:LIVING           12.35
+TCGA-29-1776           0:DiseaseFree           11.83  0:LIVING           11.83
+TCGA-29-1777           0:DiseaseFree           12.29  0:LIVING           12.29
+TCGA-29-1778           0:DiseaseFree           14.91  0:LIVING           14.91
+TCGA-29-1781           0:DiseaseFree            8.38  0:LIVING            8.38
+TCGA-29-1783           0:DiseaseFree            7.23  0:LIVING            7.23
+TCGA-29-1784           0:DiseaseFree            5.35  0:LIVING            5.35
+TCGA-29-2425   1:Recurred/Progressed           51.81  0:LIVING           64.95
+TCGA-29-2427   1:Recurred/Progressed           51.97  0:LIVING           62.42
+TCGA-29-2428           0:DiseaseFree           45.07  0:LIVING           45.07
+TCGA-29-2431   1:Recurred/Progressed           31.54  0:LIVING           42.21
+TCGA-29-2434           0:DiseaseFree           11.47  0:LIVING           11.47
+TCGA-29-2435           0:DiseaseFree            1.12  0:LIVING            1.12
+TCGA-29-2436           0:DiseaseFree            9.76  0:LIVING            9.76
+TCGA-31-1944   1:Recurred/Progressed           22.27  0:LIVING           45.53
+TCGA-31-1946   1:Recurred/Progressed           21.81  0:LIVING           30.16
+TCGA-31-1950   1:Recurred/Progressed           11.47  0:LIVING           18.76
+TCGA-31-1951   1:Recurred/Progressed           21.65  0:LIVING           22.47
+TCGA-31-1953   1:Recurred/Progressed             2.3  0:LIVING             6.7
+TCGA-31-1955   1:Recurred/Progressed           30.16  0:LIVING           42.48
+TCGA-31-1956           0:DiseaseFree           44.09  0:LIVING           44.09
+TCGA-31-1959           0:DiseaseFree             2.2  0:LIVING             2.2
+TCGA-36-1568   1:Recurred/Progressed              18  0:LIVING           28.75
+TCGA-36-1569           0:DiseaseFree           29.07  0:LIVING           29.07
+TCGA-36-1570   1:Recurred/Progressed           12.32  0:LIVING           21.52
+TCGA-36-1574   1:Recurred/Progressed           21.29  0:LIVING           22.54
+TCGA-36-1575           0:DiseaseFree            8.54  0:LIVING            8.54
+TCGA-36-1576   1:Recurred/Progressed           26.84  0:LIVING           30.06
+TCGA-36-1577           0:DiseaseFree           25.72  0:LIVING           25.72
+TCGA-36-1578   1:Recurred/Progressed           10.18  0:LIVING           27.83
+TCGA-36-1581   1:Recurred/Progressed           23.06  0:LIVING           24.67
+TCGA-36-2529   1:Recurred/Progressed           18.63  0:LIVING           35.02
+TCGA-36-2530   1:Recurred/Progressed            20.7  0:LIVING           32.98
+TCGA-36-2532           0:DiseaseFree           29.47  0:LIVING           29.47
+TCGA-36-2534   1:Recurred/Progressed           12.58  0:LIVING            29.8
+TCGA-36-2537   1:Recurred/Progressed           14.16  0:LIVING           25.89
+TCGA-36-2538   1:Recurred/Progressed           17.18  0:LIVING           25.07
+TCGA-36-2540   1:Recurred/Progressed           21.85  0:LIVING           23.78
+TCGA-36-2542           0:DiseaseFree           21.58  0:LIVING           21.58
+TCGA-36-2544   1:Recurred/Progressed           10.68  0:LIVING           20.96
+TCGA-36-2545           0:DiseaseFree            18.3  0:LIVING            18.3
+TCGA-36-2547           0:DiseaseFree            20.5  0:LIVING            20.5
+TCGA-36-2548   1:Recurred/Progressed           12.98  0:LIVING           14.16
+TCGA-36-2549           0:DiseaseFree            6.04  0:LIVING            6.04
+TCGA-36-2551   1:Recurred/Progressed            11.1  0:LIVING           16.16
+TCGA-36-2552           0:DiseaseFree           11.47  0:LIVING           11.47
+TCGA-3P-A9WA           0:DiseaseFree            13.8  0:LIVING            13.8
+TCGA-42-2587           0:DiseaseFree           23.72  0:LIVING           23.72
+TCGA-42-2589   1:Recurred/Progressed           41.85  0:LIVING           41.98
+TCGA-42-2591           0:DiseaseFree           40.74  0:LIVING           40.74
+TCGA-57-1584   1:Recurred/Progressed           17.41  0:LIVING           21.12
+TCGA-57-1586   1:Recurred/Progressed            8.51  0:LIVING           22.31
+TCGA-57-1992           0:DiseaseFree           28.98  0:LIVING           28.98
+TCGA-57-1993           0:DiseaseFree           25.07  0:LIVING           25.07
+TCGA-57-1994           0:DiseaseFree              25  0:LIVING              25
+TCGA-59-2348           0:DiseaseFree          180.06  0:LIVING          180.06
+TCGA-59-2351   1:Recurred/Progressed           70.27  0:LIVING          116.03
+TCGA-59-2363           0:DiseaseFree            5.42  0:LIVING            5.42
+TCGA-5X-AA5U           0:DiseaseFree           11.86  0:LIVING           11.86
+TCGA-61-1721           0:DiseaseFree            11.1  0:LIVING            11.1
+TCGA-61-1722           0:DiseaseFree            8.08  0:LIVING            8.08
+TCGA-61-1725   1:Recurred/Progressed           27.73  0:LIVING           31.41
+TCGA-61-1727           0:DiseaseFree           18.53  0:LIVING           18.53
+TCGA-61-1728   1:Recurred/Progressed           17.51  0:LIVING           27.86
+TCGA-61-1733   1:Recurred/Progressed            5.75  0:LIVING           31.77
+TCGA-61-1734           0:DiseaseFree           28.45  0:LIVING           28.45
+TCGA-61-1737           0:DiseaseFree           44.81  0:LIVING           44.81
+TCGA-61-1895           0:DiseaseFree            1.45  0:LIVING            1.45
+TCGA-61-1899           0:DiseaseFree            8.41  0:LIVING            8.41
+TCGA-61-1900           0:DiseaseFree            5.78  0:LIVING            5.78
+TCGA-61-1903           0:DiseaseFree           13.01  0:LIVING           13.01
+TCGA-61-1904           0:DiseaseFree            9.07  0:LIVING            9.07
+TCGA-61-1907   1:Recurred/Progressed           24.41  0:LIVING           31.27
+TCGA-61-1910           0:DiseaseFree           37.02  0:LIVING           37.02
+TCGA-61-1911   1:Recurred/Progressed           27.73  0:LIVING           42.48
+TCGA-61-1913           0:DiseaseFree           48.88  0:LIVING           48.88
+TCGA-61-1914   1:Recurred/Progressed           54.99  0:LIVING           56.57
+TCGA-61-1915           0:DiseaseFree           67.71  0:LIVING           67.71
+TCGA-61-1995           0:DiseaseFree               2  0:LIVING               2
+TCGA-61-1998           0:DiseaseFree            5.52  0:LIVING            5.52
+TCGA-61-2000   1:Recurred/Progressed           11.14  0:LIVING           14.49
+TCGA-61-2002           0:DiseaseFree           17.97  0:LIVING           17.97
+TCGA-61-2003           0:DiseaseFree            4.01  0:LIVING            4.01
+TCGA-61-2008   1:Recurred/Progressed           26.87  0:LIVING           30.62
+TCGA-61-2008.1 1:Recurred/Progressed           26.87  0:LIVING           30.62
+TCGA-61-2009   1:Recurred/Progressed            3.32  0:LIVING           39.82
+TCGA-61-2012           0:DiseaseFree           30.62  0:LIVING           30.62
+TCGA-61-2017   1:Recurred/Progressed           33.05  0:LIVING           45.93
+TCGA-61-2018           0:DiseaseFree           45.37  0:LIVING           45.37
+TCGA-61-2087           0:DiseaseFree             4.8  0:LIVING             4.8
+TCGA-61-2088           0:DiseaseFree            4.76  0:LIVING            4.76
+TCGA-61-2092           0:DiseaseFree           51.68  0:LIVING           51.68
+TCGA-61-2094           0:DiseaseFree           71.68  0:LIVING           71.68
+TCGA-61-2096   1:Recurred/Progressed           13.83  0:LIVING           58.34
+TCGA-61-2097           0:DiseaseFree           60.58  0:LIVING           60.58
+TCGA-61-2098           0:DiseaseFree           65.47  0:LIVING           65.47
+TCGA-61-2104   1:Recurred/Progressed           55.19  0:LIVING           76.81
+TCGA-61-2111   1:Recurred/Progressed           72.44  0:LIVING          125.66
+TCGA-OY-A56P   1:Recurred/Progressed           26.08  0:LIVING           39.65
+TCGA-OY-A56Q           0:DiseaseFree           18.92  0:LIVING           18.92</code></pre>
 <p>Check out the data.</p>
 <pre class="r"><code>colData(ov_tcga)[1, ] |&gt; t()</code></pre>
 <pre><code>TransposedDataFrame with 81 rows and 1 column
