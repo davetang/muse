@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-11-01" />
+<meta name="date" content="2023-11-06" />
 
 <title>Using the GenomicDataCommons package</title>
 
@@ -367,7 +367,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Using the GenomicDataCommons package</h1>
-<h4 class="date">2023-11-01</h4>
+<h4 class="date">2023-11-06</h4>
 
 </div>
 
@@ -396,7 +396,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-11-01
+<strong>Last updated:</strong> 2023-11-06
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -527,15 +527,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree705fefae29023509fb067f1889b9e25dc9b0c662targetblank705fefaa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef22f94c99c37cf71b420331641291b75275f6f5ctargetblankf22f94ca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/705fefae29023509fb067f1889b9e25dc9b0c662" target="_blank">705fefa</a>
+<a href="https://github.com/davetang/muse/tree/f22f94c99c37cf71b420331641291b75275f6f5c" target="_blank">f22f94c</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree705fefae29023509fb067f1889b9e25dc9b0c662targetblank705fefaa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef22f94c99c37cf71b420331641291b75275f6f5ctargetblankf22f94ca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -545,7 +545,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/705fefae29023509fb067f1889b9e25dc9b0c662" target="_blank">705fefa</a>.
+<a href="https://github.com/davetang/muse/tree/f22f94c99c37cf71b420331641291b75275f6f5c" target="_blank">f22f94c</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -567,7 +567,6 @@ Ignored files:
 
 Untracked files:
     Untracked:  analysis/cell_ranger.Rmd
-    Untracked:  analysis/complex_heatmap.Rmd
     Untracked:  analysis/sleuth.Rmd
     Untracked:  analysis/tss_xgboost.Rmd
     Untracked:  code/multiz100way/
@@ -576,13 +575,13 @@ Untracked files:
     Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
     Untracked:  data/ncrna_noncode_v3.fa
     Untracked:  data/netmhciipan.out.gz
-    Untracked:  data/test
     Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
     Untracked:  export/output/
     Untracked:  women.json
 
 Unstaged changes:
     Modified:   analysis/graph.Rmd
+    Modified:   analysis/gsva.Rmd
 
 </code></pre>
 <p>
@@ -627,6 +626,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/f22f94c99c37cf71b420331641291b75275f6f5c/analysis/gdc.Rmd" target="_blank">f22f94c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-06
+</td>
+<td>
+Link to cases
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/131a3493ed215800d055bd41f48929bdb755b9bf/docs/gdc.html" target="_blank">131a349</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1375,27 +1408,178 @@ together researchers from diverse disciplines and multiple
 institutions.</p>
 <div id="tcga-nomenclature" class="section level3">
 <h3>TCGA nomenclature</h3>
-<p>Acronyms for TCGA cancer types:</p>
-<ul>
-<li>ACC: adrenocortical</li>
-<li>BRCA: breast</li>
-<li>BLCA: bladder</li>
-<li>COAD: colon</li>
-<li>ESCA: esophageal</li>
-<li>GBM: glioblastoma</li>
-<li>HNSC: head and neck squamous cell</li>
-<li>KICH: kidney chromophobe</li>
-<li>KIRC: kidney clear cell</li>
-<li>KIRP: kidney papillary</li>
-<li>LGG: low grade glioma</li>
-<li>LIHC: liver</li>
-<li>LUAD:lung adenocarcinoma</li>
-<li>PAAD: pancreatic</li>
-<li>PRAD: prostate</li>
-<li>STAD: stomach</li>
-<li>THCA: thyroid</li>
-<li>UCEC: endometrial</li>
-</ul>
+<p>Data from TCGA (gene expression, copy number variation, clinical
+information, etc.) are available via the Genomic Data Commons (GDC).
+Primary sequence data (stored in BAM files) are under controlled
+accession and data access should be requested via <a
+href="https://dbgap.ncbi.nlm.nih.gov/aa/wga.cgi?page=login">dbGaP</a>
+and should be done by the PI.</p>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Study Abbreviation</th>
+<th>Study Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>LAML</td>
+<td>Acute Myeloid Leukemia</td>
+</tr>
+<tr class="even">
+<td>ACC</td>
+<td>Adrenocortical carcinoma</td>
+</tr>
+<tr class="odd">
+<td>BLCA</td>
+<td>Bladder Urothelial Carcinoma</td>
+</tr>
+<tr class="even">
+<td>LGG</td>
+<td>Brain Lower Grade Glioma</td>
+</tr>
+<tr class="odd">
+<td>BRCA</td>
+<td>Breast invasive carcinoma</td>
+</tr>
+<tr class="even">
+<td>CESC</td>
+<td>Cervical squamous cell carcinoma and endocervical
+adenocarcinoma</td>
+</tr>
+<tr class="odd">
+<td>CHOL</td>
+<td>Cholangiocarcinoma</td>
+</tr>
+<tr class="even">
+<td>LCML</td>
+<td>Chronic Myelogenous Leukemia</td>
+</tr>
+<tr class="odd">
+<td>COAD</td>
+<td>Colon adenocarcinoma</td>
+</tr>
+<tr class="even">
+<td>CNTL</td>
+<td>Controls</td>
+</tr>
+<tr class="odd">
+<td>ESCA</td>
+<td>Esophageal carcinoma</td>
+</tr>
+<tr class="even">
+<td>FPPP</td>
+<td>FFPE Pilot Phase II</td>
+</tr>
+<tr class="odd">
+<td>GBM</td>
+<td>Glioblastoma multiforme</td>
+</tr>
+<tr class="even">
+<td>HNSC</td>
+<td>Head and Neck squamous cell carcinoma</td>
+</tr>
+<tr class="odd">
+<td>KICH</td>
+<td>Kidney Chromophobe</td>
+</tr>
+<tr class="even">
+<td>KIRC</td>
+<td>Kidney renal clear cell carcinoma</td>
+</tr>
+<tr class="odd">
+<td>KIRP</td>
+<td>Kidney renal papillary cell carcinoma</td>
+</tr>
+<tr class="even">
+<td>LIHC</td>
+<td>Liver hepatocellular carcinoma</td>
+</tr>
+<tr class="odd">
+<td>LUAD</td>
+<td>Lung adenocarcinoma</td>
+</tr>
+<tr class="even">
+<td>LUSC</td>
+<td>Lung squamous cell carcinoma</td>
+</tr>
+<tr class="odd">
+<td>DLBC</td>
+<td>Lymphoid Neoplasm Diffuse Large B-cell Lymphoma</td>
+</tr>
+<tr class="even">
+<td>MESO</td>
+<td>Mesothelioma</td>
+</tr>
+<tr class="odd">
+<td>MISC</td>
+<td>Miscellaneous</td>
+</tr>
+<tr class="even">
+<td>OV</td>
+<td>Ovarian serous cystadenocarcinoma</td>
+</tr>
+<tr class="odd">
+<td>PAAD</td>
+<td>Pancreatic adenocarcinoma</td>
+</tr>
+<tr class="even">
+<td>PCPG</td>
+<td>Pheochromocytoma and Paraganglioma</td>
+</tr>
+<tr class="odd">
+<td>PRAD</td>
+<td>Prostate adenocarcinoma</td>
+</tr>
+<tr class="even">
+<td>READ</td>
+<td>Rectum adenocarcinoma</td>
+</tr>
+<tr class="odd">
+<td>SARC</td>
+<td>Sarcoma</td>
+</tr>
+<tr class="even">
+<td>SKCM</td>
+<td>Skin Cutaneous Melanoma</td>
+</tr>
+<tr class="odd">
+<td>STAD</td>
+<td>Stomach adenocarcinoma</td>
+</tr>
+<tr class="even">
+<td>TGCT</td>
+<td>Testicular Germ Cell Tumors</td>
+</tr>
+<tr class="odd">
+<td>THYM</td>
+<td>Thymoma</td>
+</tr>
+<tr class="even">
+<td>THCA</td>
+<td>Thyroid carcinoma</td>
+</tr>
+<tr class="odd">
+<td>UCS</td>
+<td>Uterine Carcinosarcoma</td>
+</tr>
+<tr class="even">
+<td>UCEC</td>
+<td>Uterine Corpus Endometrial Carcinoma</td>
+</tr>
+<tr class="odd">
+<td>UVM</td>
+<td>Uveal Melanoma</td>
+</tr>
+</tbody>
+</table>
+<p><a
+href="https://gdc.cancer.gov/resources-tcga-users/tcga-code-tables/tcga-study-abbreviations">Table
+source</a>.</p>
 <p>From <a
 href="https://www.bioconductor.org/packages/release/bioc/vignettes/TCGAbiolinks/inst/doc/query.html"
 class="uri">https://www.bioconductor.org/packages/release/bioc/vignettes/TCGAbiolinks/inst/doc/query.html</a></p>
@@ -1466,60 +1650,94 @@ str(my_projects, max.level = 1)</code></pre>
 [77] &quot;CGCI-BLGSP&quot;                &quot;TARGET-ALL-P2&quot;            
 [79] &quot;TCGA-STAD&quot;                 &quot;REBC-THYR&quot;                
 [81] &quot;TCGA-KIRP&quot;                 &quot;TCGA-THYM&quot;                </code></pre>
-<p>Treatment type.</p>
-<pre class="r"><code>cases() %&gt;%
-  filter(project.project_id == &#39;TCGA-OV&#39;) %&gt;% 
-  facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;%
-  aggregations()</code></pre>
-<pre><code>$diagnoses.treatments.treatment_type
-  doc_count                         key
-1       587 pharmaceutical therapy, nos
-2       587      radiation therapy, nos
-3        21                    _missing</code></pre>
-<p>Fetch the TCGA-OV cases.</p>
-<pre class="r"><code>cases() %&gt;%
-  filter(project.project_id == &#39;TCGA-OV&#39;) %&gt;% 
-  results_all() -&gt; tcga_ov
+</div>
+<div id="ovarian-serous-cystadenocarcinoma" class="section level3">
+<h3>Ovarian serous cystadenocarcinoma</h3>
+<p>Available (i.e. open) STAR metadata.</p>
+<pre class="r"><code>get_star_metadata &lt;- function(proj){
+  files() %&gt;%
+    filter(cases.project.project_id == proj) %&gt;% 
+    filter(analysis.workflow_type == &#39;STAR - Counts&#39;) %&gt;%
+    filter(access == &#39;open&#39;) %&gt;%
+    GenomicDataCommons::select(
+      c(
+        default_fields(&#39;files&#39;),
+        &quot;cases.case_id&quot;,
+        &quot;cases.samples.sample_type&quot;,
+        &quot;cases.samples.sample_id&quot;
+      )
+    ) %&gt;%
+    results_all()
+}
 
-str(tcga_ov, max.level = 1)</code></pre>
-<pre><code>List of 20
- $ id                     : chr [1:608] &quot;cce34351-1700-405b-818f-a598f63a33e8&quot; &quot;cd49126a-ec15-43fa-9e43-3f7460d43f2b&quot; &quot;cd6e5d3d-1c86-40dd-9cb3-b2e2075dec56&quot; &quot;cddbac56-2861-46a5-98a3-df32ab69d5da&quot; ...
- $ slide_ids              :List of 608
- $ submitter_slide_ids    :List of 608
- $ disease_type           : chr [1:608] &quot;Cystic, Mucinous and Serous Neoplasms&quot; &quot;Cystic, Mucinous and Serous Neoplasms&quot; &quot;Cystic, Mucinous and Serous Neoplasms&quot; &quot;Cystic, Mucinous and Serous Neoplasms&quot; ...
- $ analyte_ids            :List of 608
- $ submitter_id           : chr [1:608] &quot;TCGA-31-1955&quot; &quot;TCGA-13-1504&quot; &quot;TCGA-24-1469&quot; &quot;TCGA-04-1353&quot; ...
- $ submitter_analyte_ids  :List of 608
- $ aliquot_ids            :List of 608
- $ submitter_aliquot_ids  :List of 608
- $ created_datetime       : logi [1:608] NA NA NA NA NA NA ...
- $ diagnosis_ids          :List of 608
- $ sample_ids             :List of 608
- $ submitter_sample_ids   :List of 608
- $ primary_site           : chr [1:608] &quot;Ovary&quot; &quot;Ovary&quot; &quot;Ovary&quot; &quot;Ovary&quot; ...
- $ submitter_diagnosis_ids:List of 608
- $ updated_datetime       : chr [1:608] &quot;2019-08-16T15:20:09.988356-05:00&quot; &quot;2019-08-06T14:40:41.923992-05:00&quot; &quot;2019-08-06T14:41:05.270815-05:00&quot; &quot;2019-08-06T14:40:06.221317-05:00&quot; ...
- $ case_id                : chr [1:608] &quot;cce34351-1700-405b-818f-a598f63a33e8&quot; &quot;cd49126a-ec15-43fa-9e43-3f7460d43f2b&quot; &quot;cd6e5d3d-1c86-40dd-9cb3-b2e2075dec56&quot; &quot;cddbac56-2861-46a5-98a3-df32ab69d5da&quot; ...
- $ state                  : chr [1:608] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
- $ portion_ids            :List of 608
- $ submitter_portion_ids  :List of 608
- - attr(*, &quot;row.names&quot;)= int [1:608] 1 2 3 4 5 6 7 8 9 10 ...
- - attr(*, &quot;class&quot;)= chr [1:3] &quot;GDCcasesResults&quot; &quot;GDCResults&quot; &quot;list&quot;</code></pre>
-<p>Select an additional field.</p>
-<pre class="r"><code>treatment_fields &lt;- grep(&quot;treatment&quot;, all_fields$cases, ignore.case = TRUE, value = TRUE)
+ov_star &lt;- get_star_metadata(&quot;TCGA-OV&quot;)
 
-tcga_ov_extra &lt;- cases() %&gt;%
-  filter(project.project_id == &#39;TCGA-OV&#39;) %&gt;% 
-  GenomicDataCommons::select(
-    c(
-      default_fields(&#39;cases&#39;),
-      treatment_fields
-    )
-  ) %&gt;%
-  results_all()
+str(ov_star, max.level = 1)</code></pre>
+<pre><code>List of 17
+ $ id                   : chr [1:429] &quot;96aca0af-a776-460d-95ff-87e364e4ac99&quot; &quot;b668c86b-fa56-4d39-9529-5b47081a3faa&quot; &quot;60678f17-e3d7-40cd-99ff-73706497968a&quot; &quot;38fb3b15-f838-4d5b-a830-6051067d8e2e&quot; ...
+ $ data_format          : chr [1:429] &quot;TSV&quot; &quot;TSV&quot; &quot;TSV&quot; &quot;TSV&quot; ...
+ $ cases                :List of 429
+ $ access               : chr [1:429] &quot;open&quot; &quot;open&quot; &quot;open&quot; &quot;open&quot; ...
+ $ file_name            : chr [1:429] &quot;21ff9928-00f0-4b96-8d70-35e9bfad5d40.rna_seq.augmented_star_gene_counts.tsv&quot; &quot;41bdbd88-b4b2-4884-8a44-b34656ae4156.rna_seq.augmented_star_gene_counts.tsv&quot; &quot;03c8e4fe-1e07-4ea3-a154-c17c2e8af508.rna_seq.augmented_star_gene_counts.tsv&quot; &quot;7d14ddef-7a1b-4515-9536-3fc4a9b85702.rna_seq.augmented_star_gene_counts.tsv&quot; ...
+ $ submitter_id         : chr [1:429] &quot;41b13518-8f35-4369-8ff2-2b694d3e0091&quot; &quot;a542eb04-0978-42b1-b5e6-8473ddf04526&quot; &quot;57c246c4-1c0c-470e-8914-696bb7815c02&quot; &quot;d13d4d38-b242-4308-90d7-43aa485abcb5&quot; ...
+ $ data_category        : chr [1:429] &quot;Transcriptome Profiling&quot; &quot;Transcriptome Profiling&quot; &quot;Transcriptome Profiling&quot; &quot;Transcriptome Profiling&quot; ...
+ $ acl                  :List of 429
+ $ type                 : chr [1:429] &quot;gene_expression&quot; &quot;gene_expression&quot; &quot;gene_expression&quot; &quot;gene_expression&quot; ...
+ $ file_size            : int [1:429] 4240026 4259621 4244112 4241087 4251142 4252582 4257244 4272506 4236251 4250530 ...
+ $ created_datetime     : chr [1:429] &quot;2021-12-13T20:45:56.142462-06:00&quot; &quot;2021-12-13T20:47:21.099504-06:00&quot; &quot;2021-12-13T20:44:24.979694-06:00&quot; &quot;2021-12-13T20:49:39.972683-06:00&quot; ...
+ $ md5sum               : chr [1:429] &quot;c8b0b56114b382ae7855c47092aaf391&quot; &quot;9fe002d9d9512b99ad44edfa0c0bcd37&quot; &quot;625d9b63d9a37c3a80afd29db8ea6641&quot; &quot;f0c4926d57469765026470b21876a8bd&quot; ...
+ $ updated_datetime     : chr [1:429] &quot;2022-01-19T14:47:35.686434-06:00&quot; &quot;2022-01-19T14:47:42.525493-06:00&quot; &quot;2022-01-19T14:47:22.611372-06:00&quot; &quot;2022-01-19T14:47:15.461468-06:00&quot; ...
+ $ file_id              : chr [1:429] &quot;96aca0af-a776-460d-95ff-87e364e4ac99&quot; &quot;b668c86b-fa56-4d39-9529-5b47081a3faa&quot; &quot;60678f17-e3d7-40cd-99ff-73706497968a&quot; &quot;38fb3b15-f838-4d5b-a830-6051067d8e2e&quot; ...
+ $ data_type            : chr [1:429] &quot;Gene Expression Quantification&quot; &quot;Gene Expression Quantification&quot; &quot;Gene Expression Quantification&quot; &quot;Gene Expression Quantification&quot; ...
+ $ state                : chr [1:429] &quot;released&quot; &quot;released&quot; &quot;released&quot; &quot;released&quot; ...
+ $ experimental_strategy: chr [1:429] &quot;RNA-Seq&quot; &quot;RNA-Seq&quot; &quot;RNA-Seq&quot; &quot;RNA-Seq&quot; ...
+ - attr(*, &quot;row.names&quot;)= int [1:429] 1 2 3 4 5 6 7 8 9 10 ...
+ - attr(*, &quot;class&quot;)= chr [1:3] &quot;GDCfilesResults&quot; &quot;GDCResults&quot; &quot;list&quot;</code></pre>
+<p>Examine a single case.</p>
+<pre class="r"><code>str(ov_star$cases$`96aca0af-a776-460d-95ff-87e364e4ac99`)</code></pre>
+<pre><code>&#39;data.frame&#39;:   1 obs. of  2 variables:
+ $ case_id: chr &quot;9446e349-71e6-455a-aa8f-53ec96597146&quot;
+ $ samples:List of 1
+  ..$ :&#39;data.frame&#39;:    1 obs. of  2 variables:
+  .. ..$ sample_id  : chr &quot;1d568bd2-d658-40fa-a341-daa4d2a5bb22&quot;
+  .. ..$ sample_type: chr &quot;Primary Tumor&quot;</code></pre>
+<p>Case IDs are unique.</p>
+<pre class="r"><code>length(unique(ov_star$id)) == length(ov_star$id)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<p>Each case ID contains samples.</p>
+<pre class="r"><code>ov_star$cases$`96aca0af-a776-460d-95ff-87e364e4ac99`</code></pre>
+<pre><code>                               case_id      samples
+1 9446e349-71e6-455a-aa8f-53ec96597146 1d568bd2....</code></pre>
+<p>Build data frame.</p>
+<pre class="r"><code>sapply(ov_star$cases, function(x) x$samples) |&gt;
+  do.call(rbind.data.frame, args = _) -&gt; ov_star_cases
 
-str(tcga_ov_extra, max.level = 1)</code></pre>
-<pre><code>List of 21
+dim(ov_star_cases)</code></pre>
+<pre><code>[1] 429   2</code></pre>
+<p>Sample types.</p>
+<pre class="r"><code>mosaicplot(table(ov_star_cases$sample_type), main = &quot;Sample types&quot;)</code></pre>
+<p><img src="figure/gdc.Rmd/ov_sample_types-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Get additional case data for OV.</p>
+<pre class="r"><code>get_case_metadata &lt;- function(proj){
+  treatment_fields &lt;- grep(&quot;treatment&quot;, available_fields(&quot;cases&quot;), ignore.case = TRUE, value = TRUE)
+  sample_fields &lt;-  grep(&quot;samples.sample_&quot;, available_fields(&quot;cases&quot;), ignore.case = TRUE, value = TRUE)
+  
+  cases() %&gt;%
+    filter(project.project_id == proj) %&gt;% 
+    GenomicDataCommons::select(
+      c(
+        default_fields(&#39;cases&#39;),
+        sample_fields,
+        treatment_fields
+      )
+    ) %&gt;%
+    results_all()
+}
+
+ov_cases &lt;- get_case_metadata(&quot;TCGA-OV&quot;)
+
+str(ov_cases, max.level = 1)</code></pre>
+<pre><code>List of 22
  $ id                     : chr [1:608] &quot;cce34351-1700-405b-818f-a598f63a33e8&quot; &quot;cd49126a-ec15-43fa-9e43-3f7460d43f2b&quot; &quot;cd6e5d3d-1c86-40dd-9cb3-b2e2075dec56&quot; &quot;cddbac56-2861-46a5-98a3-df32ab69d5da&quot; ...
  $ slide_ids              :List of 608
  $ submitter_slide_ids    :List of 608
@@ -1532,6 +1750,7 @@ str(tcga_ov_extra, max.level = 1)</code></pre>
  $ diagnoses              :List of 608
  $ created_datetime       : logi [1:608] NA NA NA NA NA NA ...
  $ diagnosis_ids          :List of 608
+ $ samples                :List of 608
  $ sample_ids             :List of 608
  $ submitter_sample_ids   :List of 608
  $ primary_site           : chr [1:608] &quot;Ovary&quot; &quot;Ovary&quot; &quot;Ovary&quot; &quot;Ovary&quot; ...
@@ -1543,8 +1762,18 @@ str(tcga_ov_extra, max.level = 1)</code></pre>
  $ submitter_portion_ids  :List of 608
  - attr(*, &quot;row.names&quot;)= int [1:608] 1 2 3 4 5 6 7 8 9 10 ...
  - attr(*, &quot;class&quot;)= chr [1:3] &quot;GDCcasesResults&quot; &quot;GDCResults&quot; &quot;list&quot;</code></pre>
+<p>Treatment type.</p>
+<pre class="r"><code>cases() %&gt;%
+  filter(project.project_id == &#39;TCGA-OV&#39;) %&gt;% 
+  facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;%
+  aggregations()</code></pre>
+<pre><code>$diagnoses.treatments.treatment_type
+  doc_count                         key
+1       587 pharmaceutical therapy, nos
+2       587      radiation therapy, nos
+3        21                    _missing</code></pre>
 <p>Check out the treatments.</p>
-<pre class="r"><code>str(tcga_ov_extra$diagnoses$`cce34351-1700-405b-818f-a598f63a33e8`$treatments)</code></pre>
+<pre class="r"><code>str(ov_cases$diagnoses$`cce34351-1700-405b-818f-a598f63a33e8`$treatments)</code></pre>
 <pre><code>List of 1
  $ :&#39;data.frame&#39;:   2 obs. of  16 variables:
   ..$ treatment_intent_type     : logi [1:2] NA NA
@@ -1613,25 +1842,25 @@ loaded via a namespace (and not attached):
  [7] tzdb_0.4.0              crosstalk_1.2.0         vctrs_0.6.4            
 [10] tools_4.3.2             ps_1.7.5                bitops_1.0-7           
 [13] generics_0.1.3          curl_5.1.0              stats4_4.3.2           
-[16] fansi_1.0.5             pkgconfig_2.0.3         S4Vectors_0.40.1       
-[19] lifecycle_1.0.3         GenomeInfoDbData_1.2.11 compiler_4.3.2         
-[22] git2r_0.32.0            munsell_0.5.0           getPass_0.2-2          
-[25] httpuv_1.6.12           GenomeInfoDb_1.38.0     htmltools_0.5.6.1      
-[28] sass_0.4.7              RCurl_1.98-1.12         yaml_2.3.7             
-[31] crayon_1.5.2            later_1.3.1             pillar_1.9.0           
-[34] jquerylib_0.1.4         whisker_0.4.1           ellipsis_0.3.2         
-[37] DT_0.30                 cachem_1.0.8            tidyselect_1.2.0       
-[40] digest_0.6.33           stringi_1.7.12          rprojroot_2.0.3        
-[43] fastmap_1.1.1           grid_4.3.2              colorspace_2.1-0       
-[46] cli_3.6.1               utf8_1.2.4              withr_2.5.1            
-[49] rappdirs_0.3.3          scales_1.2.1            promises_1.2.1         
-[52] timechange_0.2.0        XVector_0.42.0          rmarkdown_2.25         
-[55] httr_1.4.7              hms_1.1.3               evaluate_0.22          
-[58] knitr_1.44              GenomicRanges_1.54.1    IRanges_2.36.0         
-[61] rlang_1.1.1             Rcpp_1.0.11             glue_1.6.2             
-[64] xml2_1.3.5              BiocGenerics_0.48.0     rstudioapi_0.15.0      
-[67] jsonlite_1.8.7          R6_2.5.1                zlibbioc_1.48.0        
-[70] fs_1.6.3               </code></pre>
+[16] fansi_1.0.5             highr_0.10              pkgconfig_2.0.3        
+[19] S4Vectors_0.40.1        lifecycle_1.0.3         GenomeInfoDbData_1.2.11
+[22] compiler_4.3.2          git2r_0.32.0            munsell_0.5.0          
+[25] getPass_0.2-2           httpuv_1.6.12           GenomeInfoDb_1.38.0    
+[28] htmltools_0.5.6.1       sass_0.4.7              RCurl_1.98-1.12        
+[31] yaml_2.3.7              crayon_1.5.2            later_1.3.1            
+[34] pillar_1.9.0            jquerylib_0.1.4         whisker_0.4.1          
+[37] ellipsis_0.3.2          DT_0.30                 cachem_1.0.8           
+[40] tidyselect_1.2.0        digest_0.6.33           stringi_1.7.12         
+[43] rprojroot_2.0.3         fastmap_1.1.1           grid_4.3.2             
+[46] colorspace_2.1-0        cli_3.6.1               utf8_1.2.4             
+[49] withr_2.5.2             rappdirs_0.3.3          scales_1.2.1           
+[52] promises_1.2.1          timechange_0.2.0        XVector_0.42.0         
+[55] rmarkdown_2.25          httr_1.4.7              hms_1.1.3              
+[58] evaluate_0.22           knitr_1.45              GenomicRanges_1.54.1   
+[61] IRanges_2.36.0          rlang_1.1.1             Rcpp_1.0.11            
+[64] glue_1.6.2              xml2_1.3.5              BiocGenerics_0.48.0    
+[67] rstudioapi_0.15.0       jsonlite_1.8.7          R6_2.5.1               
+[70] zlibbioc_1.48.0         fs_1.6.3               </code></pre>
 </div>
 </div>
 </div>
