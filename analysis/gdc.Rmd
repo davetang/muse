@@ -235,6 +235,10 @@ my_proj$project_id
 
 ### Clinical data
 
+The `gdc_clinical` function:
+
+>The NCI GDC has a complex data model that allows various studies to supply numerous clinical and demographic data elements. However, across all projects that enter the GDC, there are similarities. This function returns four data.frames associated with case_ids from the GDC.
+
 Accessing clinical data.
 
 ```{r gdc_clinical}
@@ -243,11 +247,32 @@ clindat <- gdc_clinical(case_ids)
 names(clindat)
 ```
 
-View available clinical data.
+Demographic.
+
+```{r clindat_demographic}
+idx <- apply(clindat$demographic, 2, function(x) all(is.na(x)))
+DT::datatable(clindat$demographic[, !idx])
+```
+
+Diagnoses data.
 
 ```{r clindat_diagnoses}
 idx <- apply(clindat$diagnoses, 2, function(x) all(is.na(x)))
 DT::datatable(clindat$diagnoses[, !idx])
+```
+
+Exposures data.
+
+```{r clindat_exposures}
+idx <- apply(clindat$exposures, 2, function(x) all(is.na(x)))
+DT::datatable(clindat$exposures[, !idx])
+```
+
+Main data.
+
+```{r clindat_main}
+idx <- apply(clindat$main, 2, function(x) all(is.na(x)))
+DT::datatable(clindat$main[, !idx])
 ```
 
 ### Cases
