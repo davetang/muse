@@ -146,6 +146,15 @@ Check months.
 class(colData(ov_tcga)$OS_MONTHS)
 ```
 
+Data for living patients.
+
+```{r os_months_living}
+colData(ov_tcga) |>
+  as.data.frame() |>
+  dplyr::filter(OS_STATUS == "0:LIVING") |>
+  dplyr::select(DFS_STATUS, DFS_MONTHS, OS_STATUS, OS_MONTHS)
+```
+
 Check out the data.
 
 ```{r check_data}
