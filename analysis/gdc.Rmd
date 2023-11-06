@@ -327,26 +327,53 @@ head(sample_id_lookup)
 
 ### TCGA nomenclature
 
-Acronyms for TCGA cancer types:
+Data from TCGA (gene expression, copy number variation, clinical information,
+etc.) are available via the Genomic Data Commons (GDC). Primary sequence data
+(stored in BAM files) are under controlled accession and data access should be
+requested via [dbGaP](https://dbgap.ncbi.nlm.nih.gov/aa/wga.cgi?page=login) and
+should be done by the PI.
 
-* ACC: adrenocortical
-* BRCA: breast
-* BLCA: bladder
-* COAD: colon
-* ESCA: esophageal
-* GBM: glioblastoma
-* HNSC: head and neck squamous cell
-* KICH: kidney chromophobe
-* KIRC: kidney clear cell
-* KIRP: kidney papillary
-* LGG: low grade glioma
-* LIHC: liver
-* LUAD:lung adenocarcinoma
-* PAAD: pancreatic
-* PRAD: prostate
-* STAD: stomach
-* THCA: thyroid
-* UCEC: endometrial
+| Study Abbreviation | Study Name                                                       |
+| --                 | --                                                               |
+| LAML               | Acute Myeloid Leukemia                                           |
+| ACC                | Adrenocortical carcinoma                                         |
+| BLCA               | Bladder Urothelial Carcinoma                                     |
+| LGG                | Brain Lower Grade Glioma                                         |
+| BRCA               | Breast invasive carcinoma                                        |
+| CESC               | Cervical squamous cell carcinoma and endocervical adenocarcinoma |
+| CHOL               | Cholangiocarcinoma                                               |
+| LCML               | Chronic Myelogenous Leukemia                                     |
+| COAD               | Colon adenocarcinoma                                             |
+| CNTL               | Controls                                                         |
+| ESCA               | Esophageal carcinoma                                             |
+| FPPP               | FFPE Pilot Phase II                                              |
+| GBM                | Glioblastoma multiforme                                          |
+| HNSC               | Head and Neck squamous cell carcinoma                            |
+| KICH               | Kidney Chromophobe                                               |
+| KIRC               | Kidney renal clear cell carcinoma                                |
+| KIRP               | Kidney renal papillary cell carcinoma                            |
+| LIHC               | Liver hepatocellular carcinoma                                   |
+| LUAD               | Lung adenocarcinoma                                              |
+| LUSC               | Lung squamous cell carcinoma                                     |
+| DLBC               | Lymphoid Neoplasm Diffuse Large B-cell Lymphoma                  |
+| MESO               | Mesothelioma                                                     |
+| MISC               | Miscellaneous                                                    |
+| OV                 | Ovarian serous cystadenocarcinoma                                |
+| PAAD               | Pancreatic adenocarcinoma                                        |
+| PCPG               | Pheochromocytoma and Paraganglioma                               |
+| PRAD               | Prostate adenocarcinoma                                          |
+| READ               | Rectum adenocarcinoma                                            |
+| SARC               | Sarcoma                                                          |
+| SKCM               | Skin Cutaneous Melanoma                                          |
+| STAD               | Stomach adenocarcinoma                                           |
+| TGCT               | Testicular Germ Cell Tumors                                      |
+| THYM               | Thymoma                                                          |
+| THCA               | Thyroid carcinoma                                                |
+| UCS                | Uterine Carcinosarcoma                                           |
+| UCEC               | Uterine Corpus Endometrial Carcinoma                             |
+| UVM                | Uveal Melanoma                                                   |
+
+[Table source](https://gdc.cancer.gov/resources-tcga-users/tcga-code-tables/tcga-study-abbreviations).
 
 From https://www.bioconductor.org/packages/release/bioc/vignettes/TCGAbiolinks/inst/doc/query.html
 
@@ -369,6 +396,89 @@ Project IDs.
 my_projects$id
 ```
 
+### Ovarian serous cystadenocarcinoma
+
+Available (i.e. open) STAR metadata.
+
+```{r ov_star}
+get_star_metadata <- function(proj){
+  files() %>%
+    filter(cases.project.project_id == proj) %>% 
+    filter(analysis.workflow_type == 'STAR - Counts') %>%
+    filter(access == 'open') %>%
+    GenomicDataCommons::select(
+      c(
+        default_fields('files'),
+        "cases.case_id",
+        "cases.samples.sample_type",
+        "cases.samples.sample_id"
+      )
+    ) %>%
+    results_all()
+}
+
+ov_star <- get_star_metadata("TCGA-OV")
+
+str(ov_star, max.level = 1)
+```
+
+Examine a single case.
+
+```{r check_case}
+str(ov_star$cases$`96aca0af-a776-460d-95ff-87e364e4ac99`)
+```
+
+Case IDs are unique.
+
+```{r check_case_id}
+length(unique(ov_star$id)) == length(ov_star$id)
+```
+
+Each case ID contains samples.
+
+```{r check_one_case}
+ov_star$cases$`96aca0af-a776-460d-95ff-87e364e4ac99`
+```
+
+Build data frame.
+
+```{r ov_star_cases}
+sapply(ov_star$cases, function(x) x$samples) |>
+  do.call(rbind.data.frame, args = _) -> ov_star_cases
+
+dim(ov_star_cases)
+```
+
+Sample types.
+
+```{r ov_sample_types}
+mosaicplot(table(ov_star_cases$sample_type), main = "Sample types")
+```
+
+Get additional case data for OV.
+
+```{r tcga_ov_cases}
+get_case_metadata <- function(proj){
+  treatment_fields <- grep("treatment", available_fields("cases"), ignore.case = TRUE, value = TRUE)
+  sample_fields <-  grep("samples.sample_", available_fields("cases"), ignore.case = TRUE, value = TRUE)
+  
+  cases() %>%
+    filter(project.project_id == proj) %>% 
+    GenomicDataCommons::select(
+      c(
+        default_fields('cases'),
+        sample_fields,
+        treatment_fields
+      )
+    ) %>%
+    results_all()
+}
+
+ov_cases <- get_case_metadata("TCGA-OV")
+
+str(ov_cases, max.level = 1)
+```
+
 Treatment type.
 
 ```{r tcga_ov_treatment_type}
@@ -378,38 +488,10 @@ cases() %>%
   aggregations()
 ```
 
-Fetch the TCGA-OV cases.
-
-```{r tcga_ov_results_all}
-cases() %>%
-  filter(project.project_id == 'TCGA-OV') %>% 
-  results_all() -> tcga_ov
-
-str(tcga_ov, max.level = 1)
-```
-
-Select an additional field.
-
-```{r tcga_ov_extra}
-treatment_fields <- grep("treatment", all_fields$cases, ignore.case = TRUE, value = TRUE)
-
-tcga_ov_extra <- cases() %>%
-  filter(project.project_id == 'TCGA-OV') %>% 
-  GenomicDataCommons::select(
-    c(
-      default_fields('cases'),
-      treatment_fields
-    )
-  ) %>%
-  results_all()
-
-str(tcga_ov_extra, max.level = 1)
-```
-
 Check out the treatments.
 
 ```{r tcga_ov_treatments}
-str(tcga_ov_extra$diagnoses$`cce34351-1700-405b-818f-a598f63a33e8`$treatments)
+str(ov_cases$diagnoses$`cce34351-1700-405b-818f-a598f63a33e8`$treatments)
 ```
 
 There is no information on [carboplatin](https://www.cancerresearchuk.org/about-cancer/treatment/drugs/carboplatin) or [paclitaxel](https://www.cancerresearchuk.org/about-cancer/treatment/drugs/paclitaxel).
