@@ -527,15 +527,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef22f94c99c37cf71b420331641291b75275f6f5ctargetblankf22f94ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea9ee937238887051ddde090a2ee76254515b0177targetblanka9ee937a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/f22f94c99c37cf71b420331641291b75275f6f5c" target="_blank">f22f94c</a>
+<a href="https://github.com/davetang/muse/tree/a9ee937238887051ddde090a2ee76254515b0177" target="_blank">a9ee937</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef22f94c99c37cf71b420331641291b75275f6f5ctargetblankf22f94ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea9ee937238887051ddde090a2ee76254515b0177targetblanka9ee937a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -545,7 +545,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/f22f94c99c37cf71b420331641291b75275f6f5c" target="_blank">f22f94c</a>.
+<a href="https://github.com/davetang/muse/tree/a9ee937238887051ddde090a2ee76254515b0177" target="_blank">a9ee937</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -626,6 +626,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/a9ee937238887051ddde090a2ee76254515b0177/analysis/gdc.Rmd" target="_blank">a9ee937</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-06
+</td>
+<td>
+Additional cancers
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/87ee57ed14960b5730f38f6a3babc209beff35a9/docs/gdc.html" target="_blank">87ee57e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1715,8 +1749,10 @@ str(ov_star, max.level = 1)</code></pre>
 dim(ov_star_cases)</code></pre>
 <pre><code>[1] 429   2</code></pre>
 <p>Sample types.</p>
-<pre class="r"><code>mosaicplot(table(ov_star_cases$sample_type), main = &quot;Sample types&quot;)</code></pre>
-<p><img src="figure/gdc.Rmd/ov_sample_types-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>table(ov_star_cases$sample_type)</code></pre>
+<pre><code>
+  Primary Tumor Recurrent Tumor 
+            421               8 </code></pre>
 <p>Get additional case data for OV.</p>
 <pre class="r"><code>get_case_metadata &lt;- function(proj){
   treatment_fields &lt;- grep(&quot;treatment&quot;, available_fields(&quot;cases&quot;), ignore.case = TRUE, value = TRUE)
@@ -1796,6 +1832,106 @@ str(ov_cases, max.level = 1)</code></pre>
 href="https://www.cancerresearchuk.org/about-cancer/treatment/drugs/carboplatin">carboplatin</a>
 or <a
 href="https://www.cancerresearchuk.org/about-cancer/treatment/drugs/paclitaxel">paclitaxel</a>.</p>
+</div>
+<div id="pancreatic-adenocarcinoma" class="section level3">
+<h3>Pancreatic adenocarcinoma</h3>
+<p>Meta data for pancreatic adenocarcinoma.</p>
+<pre class="r"><code>paad_star &lt;- get_star_metadata(&quot;TCGA-PAAD&quot;)
+
+sapply(paad_star$cases, function(x) x$samples) |&gt;
+  do.call(rbind.data.frame, args = _) -&gt; paad_star_cases
+
+dim(paad_star_cases)</code></pre>
+<pre><code>[1] 183   2</code></pre>
+<p>Sample types.</p>
+<pre class="r"><code>table(paad_star_cases$sample_type)</code></pre>
+<pre><code>
+         Metastatic       Primary Tumor Solid Tissue Normal 
+                  1                 178                   4 </code></pre>
+<p>Treatment type.</p>
+<pre class="r"><code>cases() %&gt;%
+  filter(project.project_id == &#39;TCGA-PAAD&#39;) %&gt;% 
+  facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;%
+  aggregations()</code></pre>
+<pre><code>$diagnoses.treatments.treatment_type
+  doc_count                         key
+1       185 pharmaceutical therapy, nos
+2       185      radiation therapy, nos</code></pre>
+</div>
+<div id="esophageal-carcinoma" class="section level3">
+<h3>Esophageal carcinoma</h3>
+<p>Meta data for esophageal carcinoma.</p>
+<pre class="r"><code>esca_star &lt;- get_star_metadata(&quot;TCGA-ESCA&quot;)
+
+sapply(esca_star$cases, function(x) x$samples) |&gt;
+  do.call(rbind.data.frame, args = _) -&gt; esca_star_cases
+
+dim(esca_star_cases)</code></pre>
+<pre><code>[1] 198   2</code></pre>
+<p>Sample types.</p>
+<pre class="r"><code>table(esca_star_cases$sample_type)</code></pre>
+<pre><code>
+         Metastatic       Primary Tumor Solid Tissue Normal 
+                  1                 184                  13 </code></pre>
+<p>Treatment type.</p>
+<pre class="r"><code>cases() %&gt;%
+  filter(project.project_id == &#39;TCGA-ESCA&#39;) %&gt;% 
+  facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;%
+  aggregations()</code></pre>
+<pre><code>$diagnoses.treatments.treatment_type
+  doc_count                         key
+1       185 pharmaceutical therapy, nos
+2       185      radiation therapy, nos</code></pre>
+</div>
+<div id="head-and-neck-squamous-cell-carcinoma" class="section level3">
+<h3>Head and Neck squamous cell carcinoma</h3>
+<p>Meta data for head and neck squamous cell carcinoma.</p>
+<pre class="r"><code>hnsc_star &lt;- get_star_metadata(&quot;TCGA-HNSC&quot;)
+
+sapply(hnsc_star$cases, function(x) x$samples) |&gt;
+  do.call(rbind.data.frame, args = _) -&gt; hnsc_star_cases
+
+dim(hnsc_star_cases)</code></pre>
+<pre><code>[1] 566   2</code></pre>
+<p>Sample types.</p>
+<pre class="r"><code>table(hnsc_star_cases$sample_type)</code></pre>
+<pre><code>
+         Metastatic       Primary Tumor Solid Tissue Normal 
+                  2                 520                  44 </code></pre>
+<p>Treatment type.</p>
+<pre class="r"><code>cases() %&gt;%
+  filter(project.project_id == &#39;TCGA-HNSC&#39;) %&gt;% 
+  facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;%
+  aggregations()</code></pre>
+<pre><code>$diagnoses.treatments.treatment_type
+  doc_count                         key
+1       528 pharmaceutical therapy, nos
+2       528      radiation therapy, nos</code></pre>
+</div>
+<div id="kidney-renal-clear-cell-carcinoma" class="section level3">
+<h3>Kidney renal clear cell carcinoma</h3>
+<p>Meta data for kidney renal clear cell carcinoma.</p>
+<pre class="r"><code>kirc_star &lt;- get_star_metadata(&quot;TCGA-KIRC&quot;)
+
+sapply(kirc_star$cases, function(x) x$samples) |&gt;
+  do.call(rbind.data.frame, args = _) -&gt; kirc_star_cases
+
+dim(kirc_star_cases)</code></pre>
+<pre><code>[1] 614   2</code></pre>
+<p>Sample types.</p>
+<pre class="r"><code>table(kirc_star_cases$sample_type)</code></pre>
+<pre><code>
+Additional - New Primary            Primary Tumor      Solid Tissue Normal 
+                       1                      541                       72 </code></pre>
+<p>Treatment type.</p>
+<pre class="r"><code>cases() %&gt;%
+  filter(project.project_id == &#39;TCGA-KIRC&#39;) %&gt;% 
+  facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;%
+  aggregations()</code></pre>
+<pre><code>$diagnoses.treatments.treatment_type
+  doc_count                         key
+1       537 pharmaceutical therapy, nos
+2       537      radiation therapy, nos</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1842,25 +1978,25 @@ loaded via a namespace (and not attached):
  [7] tzdb_0.4.0              crosstalk_1.2.0         vctrs_0.6.4            
 [10] tools_4.3.2             ps_1.7.5                bitops_1.0-7           
 [13] generics_0.1.3          curl_5.1.0              stats4_4.3.2           
-[16] fansi_1.0.5             highr_0.10              pkgconfig_2.0.3        
-[19] S4Vectors_0.40.1        lifecycle_1.0.3         GenomeInfoDbData_1.2.11
-[22] compiler_4.3.2          git2r_0.32.0            munsell_0.5.0          
-[25] getPass_0.2-2           httpuv_1.6.12           GenomeInfoDb_1.38.0    
-[28] htmltools_0.5.6.1       sass_0.4.7              RCurl_1.98-1.12        
-[31] yaml_2.3.7              crayon_1.5.2            later_1.3.1            
-[34] pillar_1.9.0            jquerylib_0.1.4         whisker_0.4.1          
-[37] ellipsis_0.3.2          DT_0.30                 cachem_1.0.8           
-[40] tidyselect_1.2.0        digest_0.6.33           stringi_1.7.12         
-[43] rprojroot_2.0.3         fastmap_1.1.1           grid_4.3.2             
-[46] colorspace_2.1-0        cli_3.6.1               utf8_1.2.4             
-[49] withr_2.5.2             rappdirs_0.3.3          scales_1.2.1           
-[52] promises_1.2.1          timechange_0.2.0        XVector_0.42.0         
-[55] rmarkdown_2.25          httr_1.4.7              hms_1.1.3              
-[58] evaluate_0.22           knitr_1.45              GenomicRanges_1.54.1   
-[61] IRanges_2.36.0          rlang_1.1.1             Rcpp_1.0.11            
-[64] glue_1.6.2              xml2_1.3.5              BiocGenerics_0.48.0    
-[67] rstudioapi_0.15.0       jsonlite_1.8.7          R6_2.5.1               
-[70] zlibbioc_1.48.0         fs_1.6.3               </code></pre>
+[16] fansi_1.0.5             pkgconfig_2.0.3         S4Vectors_0.40.1       
+[19] lifecycle_1.0.3         GenomeInfoDbData_1.2.11 compiler_4.3.2         
+[22] git2r_0.32.0            munsell_0.5.0           getPass_0.2-2          
+[25] httpuv_1.6.12           GenomeInfoDb_1.38.0     htmltools_0.5.6.1      
+[28] sass_0.4.7              RCurl_1.98-1.12         yaml_2.3.7             
+[31] crayon_1.5.2            later_1.3.1             pillar_1.9.0           
+[34] jquerylib_0.1.4         whisker_0.4.1           ellipsis_0.3.2         
+[37] DT_0.30                 cachem_1.0.8            tidyselect_1.2.0       
+[40] digest_0.6.33           stringi_1.7.12          rprojroot_2.0.3        
+[43] fastmap_1.1.1           grid_4.3.2              colorspace_2.1-0       
+[46] cli_3.6.1               utf8_1.2.4              withr_2.5.2            
+[49] rappdirs_0.3.3          scales_1.2.1            promises_1.2.1         
+[52] timechange_0.2.0        XVector_0.42.0          rmarkdown_2.25         
+[55] httr_1.4.7              hms_1.1.3               evaluate_0.22          
+[58] knitr_1.45              GenomicRanges_1.54.1    IRanges_2.36.0         
+[61] rlang_1.1.1             Rcpp_1.0.11             glue_1.6.2             
+[64] xml2_1.3.5              BiocGenerics_0.48.0     rstudioapi_0.15.0      
+[67] jsonlite_1.8.7          R6_2.5.1                zlibbioc_1.48.0        
+[70] fs_1.6.3               </code></pre>
 </div>
 </div>
 </div>
