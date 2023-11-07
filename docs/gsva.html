@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2ed827f2bb76b88c5bd8387b3a775e660928bedctargetblank2ed827fa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree794b249308bc7b07ee1b28ff563d04720fbc4f21targetblank794b249a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/2ed827f2bb76b88c5bd8387b3a775e660928bedc" target="_blank">2ed827f</a>
+<a href="https://github.com/davetang/muse/tree/794b249308bc7b07ee1b28ff563d04720fbc4f21" target="_blank">794b249</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2ed827f2bb76b88c5bd8387b3a775e660928bedctargetblank2ed827fa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree794b249308bc7b07ee1b28ff563d04720fbc4f21targetblank794b249a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/2ed827f2bb76b88c5bd8387b3a775e660928bedc" target="_blank">2ed827f</a>.
+<a href="https://github.com/davetang/muse/tree/794b249308bc7b07ee1b28ff563d04720fbc4f21" target="_blank">794b249</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -603,6 +603,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/794b249308bc7b07ee1b28ff563d04720fbc4f21/analysis/gsva.Rmd" target="_blank">794b249</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-07
+</td>
+<td>
+All available methods
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/00b6361fe633d6d102358ca912fbe321528695f6/docs/gsva.html" target="_blank">00b6361</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1032,6 +1066,20 @@ test_gsva</code></pre>
 gs1 0.9771127 0.9994906
 gs2 0.9869514 0.9896900
 gs3 0.9716955 0.9815203</code></pre>
+<p>Z-score method.</p>
+<pre class="r"><code>test_zscore &lt;- gsva(zscoreParam(X, gene_set), verbose=FALSE)
+test_zscore</code></pre>
+<pre><code>      s1   s2
+gs1 -2.8  2.8
+gs2  0.4 -0.4
+gs3 -0.4  0.4</code></pre>
+<p>PLAGE method.</p>
+<pre class="r"><code>test_plage &lt;- gsva(plageParam(X, gene_set), verbose=FALSE)
+test_plage</code></pre>
+<pre><code>            s1         s2
+gs1  0.7071068 -0.7071068
+gs2 -0.7071068  0.7071068
+gs3  0.7071068 -0.7071068</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
