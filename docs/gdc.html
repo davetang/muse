@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-11-06" />
+<meta name="date" content="2023-11-07" />
 
 <title>Using the GenomicDataCommons package</title>
 
@@ -367,7 +367,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Using the GenomicDataCommons package</h1>
-<h4 class="date">2023-11-06</h4>
+<h4 class="date">2023-11-07</h4>
 
 </div>
 
@@ -396,7 +396,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-11-06
+<strong>Last updated:</strong> 2023-11-07
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -527,15 +527,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec759821926d8613454601d3d00955ef93861f316targetblankc759821a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4434f01eca4c7a12dbaff309bc5df3d750e92d76targetblank4434f01a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/c759821926d8613454601d3d00955ef93861f316" target="_blank">c759821</a>
+<a href="https://github.com/davetang/muse/tree/4434f01eca4c7a12dbaff309bc5df3d750e92d76" target="_blank">4434f01</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec759821926d8613454601d3d00955ef93861f316targetblankc759821a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4434f01eca4c7a12dbaff309bc5df3d750e92d76targetblank4434f01a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -545,7 +545,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/c759821926d8613454601d3d00955ef93861f316" target="_blank">c759821</a>.
+<a href="https://github.com/davetang/muse/tree/4434f01eca4c7a12dbaff309bc5df3d750e92d76" target="_blank">4434f01</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -562,7 +562,6 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/cbioportal_cache/
     Ignored:    r_packages_4.3.2/
 
 Untracked files:
@@ -626,6 +625,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/4434f01eca4c7a12dbaff309bc5df3d750e92d76/analysis/gdc.Rmd" target="_blank">4434f01</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-07
+</td>
+<td>
+Filter for open access
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/fb015629e88acc56ce08987d049a1a8017f4593b/docs/gdc.html" target="_blank">fb01562</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1142,14 +1175,17 @@ $type
 19      7906            protein_expression
 20       108 secondary_expression_analysis</code></pre>
 <p>Aggregate on a sub-field.</p>
-<pre class="r"><code>cases() %&gt;% facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;% aggregations()</code></pre>
+<pre class="r"><code>cases() %&gt;%
+  filter(files.access == &#39;open&#39;) %&gt;%
+  facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;%
+  aggregations()</code></pre>
 <pre><code>$diagnoses.treatments.treatment_type
    doc_count                                          key
 1      12170                       radiation therapy, nos
 2      11994                  pharmaceutical therapy, nos
-3        470                                 chemotherapy
+3        465                                 chemotherapy
 4        520        stem cell transplantation, autologous
-5        299                                 surgery, nos
+5        296                                 surgery, nos
 6        171                   targeted molecular therapy
 7        168           immunotherapy (including vaccines)
 8         96                     radiation, external beam
@@ -1166,7 +1202,7 @@ $type
 19         1                      external beam radiation
 20         1 peptide receptor radionuclide therapy (prrt)
 21         1                       radiation, proton beam
-22     76248                                     _missing</code></pre>
+22     30737                                     _missing</code></pre>
 <p>Facet on open <code>analysis.workflow_type</code>.</p>
 <pre class="r"><code>files() %&gt;%
   filter(access == &#39;open&#39;) %&gt;%
@@ -1857,6 +1893,7 @@ str(ov_cases, max.level = 1)</code></pre>
 <p>Treatment type.</p>
 <pre class="r"><code>cases() %&gt;%
   filter(project.project_id == &#39;TCGA-OV&#39;) %&gt;% 
+  filter(files.access == &#39;open&#39;) %&gt;%
   facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;%
   aggregations()</code></pre>
 <pre><code>$diagnoses.treatments.treatment_type
@@ -1907,6 +1944,7 @@ dim(paad_star_cases)</code></pre>
 <p>Treatment type.</p>
 <pre class="r"><code>cases() %&gt;%
   filter(project.project_id == &#39;TCGA-PAAD&#39;) %&gt;% 
+  filter(files.access == &#39;open&#39;) %&gt;%
   facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;%
   aggregations()</code></pre>
 <pre><code>$diagnoses.treatments.treatment_type
@@ -1932,6 +1970,7 @@ dim(esca_star_cases)</code></pre>
 <p>Treatment type.</p>
 <pre class="r"><code>cases() %&gt;%
   filter(project.project_id == &#39;TCGA-ESCA&#39;) %&gt;% 
+  filter(files.access == &#39;open&#39;) %&gt;%
   facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;%
   aggregations()</code></pre>
 <pre><code>$diagnoses.treatments.treatment_type
@@ -1957,6 +1996,7 @@ dim(hnsc_star_cases)</code></pre>
 <p>Treatment type.</p>
 <pre class="r"><code>cases() %&gt;%
   filter(project.project_id == &#39;TCGA-HNSC&#39;) %&gt;% 
+  filter(files.access == &#39;open&#39;) %&gt;%
   facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;%
   aggregations()</code></pre>
 <pre><code>$diagnoses.treatments.treatment_type
@@ -1982,6 +2022,7 @@ Additional - New Primary            Primary Tumor      Solid Tissue Normal
 <p>Treatment type.</p>
 <pre class="r"><code>cases() %&gt;%
   filter(project.project_id == &#39;TCGA-KIRC&#39;) %&gt;% 
+  filter(files.access == &#39;open&#39;) %&gt;%
   facet(&quot;diagnoses.treatments.treatment_type&quot;) %&gt;%
   aggregations()</code></pre>
 <pre><code>$diagnoses.treatments.treatment_type
