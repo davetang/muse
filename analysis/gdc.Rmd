@@ -156,7 +156,10 @@ files() %>% facet(c("type", "data_format")) %>% aggregations()
 Aggregate on a sub-field.
 
 ```{r treatment_type}
-cases() %>% facet("diagnoses.treatments.treatment_type") %>% aggregations()
+cases() %>%
+  filter(files.access == 'open') %>%
+  facet("diagnoses.treatments.treatment_type") %>%
+  aggregations()
 ```
 
 Facet on open `analysis.workflow_type`.
@@ -509,6 +512,7 @@ Treatment type.
 ```{r tcga_ov_treatment_type}
 cases() %>%
   filter(project.project_id == 'TCGA-OV') %>% 
+  filter(files.access == 'open') %>%
   facet("diagnoses.treatments.treatment_type") %>%
   aggregations()
 ```
@@ -545,6 +549,7 @@ Treatment type.
 ```{r tcga_paad_treatment_type}
 cases() %>%
   filter(project.project_id == 'TCGA-PAAD') %>% 
+  filter(files.access == 'open') %>%
   facet("diagnoses.treatments.treatment_type") %>%
   aggregations()
 ```
@@ -573,6 +578,7 @@ Treatment type.
 ```{r tcga_esca_treatment_type}
 cases() %>%
   filter(project.project_id == 'TCGA-ESCA') %>% 
+  filter(files.access == 'open') %>%
   facet("diagnoses.treatments.treatment_type") %>%
   aggregations()
 ```
@@ -601,6 +607,7 @@ Treatment type.
 ```{r tcga_hnsc_treatment_type}
 cases() %>%
   filter(project.project_id == 'TCGA-HNSC') %>% 
+  filter(files.access == 'open') %>%
   facet("diagnoses.treatments.treatment_type") %>%
   aggregations()
 ```
@@ -629,6 +636,7 @@ Treatment type.
 ```{r tcga_kirc_treatment_type}
 cases() %>%
   filter(project.project_id == 'TCGA-KIRC') %>% 
+  filter(files.access == 'open') %>%
   facet("diagnoses.treatments.treatment_type") %>%
   aggregations()
 ```
