@@ -106,7 +106,7 @@ When `method="gsva"` is used (the default), the following parameters can be tune
 In general, the default values for the previous parameters are suitable for most analysis settings, which usually consist of some kind of normalized continuous expression values.
 
 ```{r eg_gsva}
-es_gsva <- gsva(X, gs, verbose=FALSE)
+es_gsva <- gsva(gsvaParam(X, gs), verbose=FALSE)
 dim(es_gsva)
 ```
 
@@ -119,7 +119,7 @@ apply(es_gsva, 2, median)
 >ssgsea (Barbie et al. 2009). Single sample GSEA (ssGSEA) is a non-parametric method that calculates a gene set enrichment score per sample as the normalized difference in empirical cumulative distribution functions (CDFs) of gene expression ranks inside and outside the gene set. By default, the implementation in the GSVA package follows the last step described in (Barbie et al. 2009, online methods, pg. 2) by which pathway scores are normalized, dividing them by the range of calculated values. This normalization step may be switched off using the argument ssgsea.norm in the call to the gsva() function; see below.
 
 ```{r eg_ssgsea}
-es_ssgsea <- gsva(X, gs, method = "ssgsea", verbose=FALSE)
+es_ssgsea <- gsva(ssgseaParam(X, gs), verbose=FALSE)
 apply(es_ssgsea, 2, median)
 ```
 
@@ -155,7 +155,14 @@ gene_set <- list(
   gs3 = paste0("g", 101:150)
 )
 
-test_ssgsea <- gsva(X, gene_set, method = "ssgsea", verbose=FALSE)
+test_ssgsea <- gsva(ssgseaParam(X, gene_set), verbose=FALSE)
 
 test_ssgsea
+```
+
+GSVA method.
+
+```{r gsva_test_matrix}
+test_gsva <- gsva(gsvaParam(X, gene_set), verbose=FALSE)
+test_gsva
 ```
