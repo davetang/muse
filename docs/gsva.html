@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-10-23" />
+<meta name="date" content="2023-11-07" />
 
 <title>GSVA: gene set variation analysis</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">GSVA: gene set variation analysis</h1>
-<h4 class="date">2023-10-23</h4>
+<h4 class="date">2023-11-07</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-10-23
+<strong>Last updated:</strong> 2023-11-07
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree115752b21e76786cb7afc584780d9dc116e36894targetblank115752ba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree748c6d10d0afa3a1675fb15027bfd1be03335a70targetblank748c6d1a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/115752b21e76786cb7afc584780d9dc116e36894" target="_blank">115752b</a>
+<a href="https://github.com/davetang/muse/tree/748c6d10d0afa3a1675fb15027bfd1be03335a70" target="_blank">748c6d1</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree115752b21e76786cb7afc584780d9dc116e36894targetblank115752ba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree748c6d10d0afa3a1675fb15027bfd1be03335a70targetblank748c6d1a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/115752b21e76786cb7afc584780d9dc116e36894" target="_blank">115752b</a>.
+<a href="https://github.com/davetang/muse/tree/748c6d10d0afa3a1675fb15027bfd1be03335a70" target="_blank">748c6d1</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -554,12 +554,10 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    r_packages_4.3.0/
-    Ignored:    r_packages_4.3.1/
+    Ignored:    r_packages_4.3.2/
 
 Untracked files:
     Untracked:  analysis/cell_ranger.Rmd
-    Untracked:  analysis/complex_heatmap.Rmd
     Untracked:  analysis/sleuth.Rmd
     Untracked:  analysis/tss_xgboost.Rmd
     Untracked:  code/multiz100way/
@@ -568,7 +566,6 @@ Untracked files:
     Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
     Untracked:  data/ncrna_noncode_v3.fa
     Untracked:  data/netmhciipan.out.gz
-    Untracked:  data/test
     Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
     Untracked:  export/output/
     Untracked:  women.json
@@ -619,6 +616,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/748c6d10d0afa3a1675fb15027bfd1be03335a70/analysis/gsva.Rmd" target="_blank">748c6d1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-07
+</td>
+<td>
+Enrichment scores
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/a077e6c5785b83059ae9a1440c749c6b90e14046/docs/gsva.html" target="_blank">a077e6c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-10-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -724,12 +755,10 @@ ssGSEA and its own called GSVA. While this methodology was initially
 developed for gene expression data, it can be applied to other types of
 molecular profiling data. In this vignette we illustrate how to use the
 GSVA package with bulk microarray and RNA-seq expression data.</p>
-</blockquote>
-<blockquote>
 <p>Gene set variation analysis (GSVA) provides an estimate of pathway
 activity by transforming an input gene-by-sample expression data matrix
-into a corresponding gene-set-by-sample expression data matrix. This
-resulting expression data matrix can be then used with classical
+into a corresponding gene-set-by-sample expression data matrix.</p>
+<p>This resulting expression data matrix can be then used with classical
 analytical methods such as differential expression, classification,
 survival analysis, clustering or correlation analysis in a
 pathway-centric manner. One can also perform sample-wise comparisons
@@ -749,7 +778,9 @@ file.)</p>
 if (!require(&quot;GSVA&quot;, quietly = TRUE))
   BiocManager::install(&quot;GSVA&quot;)</code></pre>
 <p>Load package.</p>
-<pre class="r"><code>library(GSVA)</code></pre>
+<pre class="r"><code>library(GSVA)
+packageVersion(&quot;GSVA&quot;)</code></pre>
+<pre><code>[1] &#39;1.50.0&#39;</code></pre>
 </div>
 <div id="quick-start" class="section level2">
 <h2>Quick start</h2>
@@ -891,8 +922,10 @@ methodology described in (Barbie et al. 2009).</p></li>
 <p>In general, the default values for the previous parameters are
 suitable for most analysis settings, which usually consist of some kind
 of normalized continuous expression values.</p>
-<pre class="r"><code>es_gsva &lt;- gsva(X, gs, verbose=FALSE)
-dim(es_gsva)</code></pre>
+<pre class="r"><code>es_gsva &lt;- gsva(X, gs, verbose=FALSE)</code></pre>
+<pre><code>Warning: Calling gsva(expr=., gset.idx.list=., method=., ...) is deprecated;
+use a method-specific parameter object (see &#39;?gsva&#39;).</code></pre>
+<pre class="r"><code>dim(es_gsva)</code></pre>
 <pre><code>[1] 100  30</code></pre>
 <p>Median enrichment scores.</p>
 <pre class="r"><code>apply(es_gsva, 2, median)</code></pre>
@@ -918,6 +951,8 @@ values. This normalization step may be switched off using the argument
 ssgsea.norm in the call to the gsva() function; see below.</p>
 </blockquote>
 <pre class="r"><code>es_ssgsea &lt;- gsva(X, gs, method = &quot;ssgsea&quot;, verbose=FALSE)</code></pre>
+<pre><code>Warning: Calling gsva(expr=., gset.idx.list=., method=., ...) is deprecated;
+use a method-specific parameter object (see &#39;?gsva&#39;).</code></pre>
 <pre><code>[1] &quot;Calculating ranks...&quot;
 [1] &quot;Calculating absolute values from ranks...&quot;
 [1] &quot;Normalizing...&quot;</code></pre>
@@ -930,6 +965,51 @@ ssgsea.norm in the call to the gsva() function; see below.</p>
 0.1103184 0.1112410 0.1164373 0.1126160 0.1212393 0.1067666 0.1167117 0.1418775 
       s25       s26       s27       s28       s29       s30 
 0.1221909 0.1235449 0.1112199 0.1012381 0.1254514 0.1210392 </code></pre>
+</div>
+<div id="investigating-the-scores" class="section level2">
+<h2>Investigating the scores</h2>
+<p>Create another test matrix.</p>
+<pre class="r"><code>p &lt;- 10000
+n &lt;- 2
+set.seed(1984)
+X &lt;- matrix(
+  rnorm(n = p*n, mean = 10, sd = 10),
+  nrow=p,
+  dimnames=list(paste0(&quot;g&quot;, 1:p), paste0(&quot;s&quot;, 1:n))
+)
+
+X[1:50, &#39;s1&#39;] &lt;- rnorm(n = 50, mean = 50, sd = 55)
+X[51:100, &#39;s1&#39;] &lt;- rnorm(n = 50, mean = 2, sd = 2)
+
+X[1:50, &#39;s2&#39;] &lt;- rnorm(n = 50, mean = 100, sd = 5)
+X[51:100, &#39;s2&#39;] &lt;- rnorm(n = 50, mean = 2, sd = 0.5)
+
+X[1:5, ]</code></pre>
+<pre><code>            s1        s2
+g1  69.3328103  96.46911
+g2  -0.5925752  96.19110
+g3 140.0917737 102.47525
+g4  75.5836499 103.64442
+g5  59.9430328  99.50861</code></pre>
+<p>Create testing gene lists with higher and lower expression patterns
+and check their enrichment scores.</p>
+<pre class="r"><code>gene_set &lt;- list(
+  gs1 = paste0(&quot;g&quot;, 1:50),
+  gs2 = paste0(&quot;g&quot;, 51:100),
+  gs3 = paste0(&quot;g&quot;, 101:150)
+)
+
+test_ssgsea &lt;- gsva(X, gene_set, method = &quot;ssgsea&quot;, verbose=FALSE)</code></pre>
+<pre><code>Warning: Calling gsva(expr=., gset.idx.list=., method=., ...) is deprecated;
+use a method-specific parameter object (see &#39;?gsva&#39;).</code></pre>
+<pre><code>[1] &quot;Calculating ranks...&quot;
+[1] &quot;Calculating absolute values from ranks...&quot;
+[1] &quot;Normalizing...&quot;</code></pre>
+<pre class="r"><code>test_ssgsea</code></pre>
+<pre><code>             s1          s2
+gs1  0.50202664  0.62745511
+gs2 -0.35383441 -0.37254489
+gs3  0.01605471  0.08617871</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -939,7 +1019,7 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.3.1 (2023-06-16)
+<pre><code>R version 4.3.2 (2023-10-31)
 Platform: x86_64-pc-linux-gnu (64-bit)
 Running under: Ubuntu 22.04.3 LTS
 
@@ -962,56 +1042,57 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] GSVA_1.48.3         BiocManager_1.30.22 workflowr_1.7.1    
+[1] IRanges_2.36.0      GSVA_1.50.0         BiocManager_1.30.22
+[4] workflowr_1.7.1    
 
 loaded via a namespace (and not attached):
- [1] blob_1.2.4                  Biostrings_2.68.1          
+ [1] blob_1.2.4                  Biostrings_2.70.1          
  [3] bitops_1.0-7                fastmap_1.1.1              
- [5] SingleCellExperiment_1.22.0 RCurl_1.98-1.12            
+ [5] SingleCellExperiment_1.24.0 RCurl_1.98-1.12            
  [7] promises_1.2.1              rsvd_1.0.5                 
  [9] XML_3.99-0.14               digest_0.6.33              
 [11] lifecycle_1.0.3             processx_3.8.2             
-[13] KEGGREST_1.40.1             RSQLite_2.3.1              
-[15] magrittr_2.0.3              compiler_4.3.1             
+[13] KEGGREST_1.42.0             RSQLite_2.3.2              
+[15] magrittr_2.0.3              compiler_4.3.2             
 [17] rlang_1.1.1                 sass_0.4.7                 
-[19] tools_4.3.1                 utf8_1.2.3                 
-[21] yaml_2.3.7                  knitr_1.44                 
-[23] S4Arrays_1.0.6              bit_4.0.5                  
-[25] DelayedArray_0.26.7         abind_1.4-5                
-[27] BiocParallel_1.34.2         HDF5Array_1.28.1           
-[29] BiocGenerics_0.46.0         grid_4.3.1                 
-[31] stats4_4.3.1                fansi_1.0.5                
-[33] git2r_0.32.0                beachmat_2.16.0            
-[35] xtable_1.8-4                Rhdf5lib_1.22.1            
-[37] SummarizedExperiment_1.30.2 cli_3.6.1                  
+[19] tools_4.3.2                 utf8_1.2.4                 
+[21] yaml_2.3.7                  knitr_1.45                 
+[23] S4Arrays_1.2.0              bit_4.0.5                  
+[25] DelayedArray_0.28.0         abind_1.4-5                
+[27] BiocParallel_1.36.0         HDF5Array_1.30.0           
+[29] BiocGenerics_0.48.0         grid_4.3.2                 
+[31] stats4_4.3.2                fansi_1.0.5                
+[33] git2r_0.32.0                beachmat_2.18.0            
+[35] xtable_1.8-4                Rhdf5lib_1.24.0            
+[37] SummarizedExperiment_1.32.0 cli_3.6.1                  
 [39] rmarkdown_2.25              crayon_1.5.2               
 [41] rstudioapi_0.15.0           httr_1.4.7                 
-[43] DelayedMatrixStats_1.22.6   DBI_1.1.3                  
-[45] cachem_1.0.8                rhdf5_2.44.0               
-[47] stringr_1.5.0               zlibbioc_1.46.0            
-[49] parallel_4.3.1              AnnotationDbi_1.62.2       
-[51] XVector_0.40.0              matrixStats_1.0.0          
-[53] vctrs_0.6.4                 Matrix_1.5-4.1             
-[55] jsonlite_1.8.7              BiocSingular_1.16.0        
-[57] callr_3.7.3                 IRanges_2.34.1             
-[59] S4Vectors_0.38.2            bit64_4.0.5                
-[61] irlba_2.3.5.1               GSEABase_1.62.0            
-[63] jquerylib_0.1.4             annotate_1.78.0            
-[65] glue_1.6.2                  codetools_0.2-19           
-[67] ps_1.7.5                    stringi_1.7.12             
-[69] later_1.3.1                 GenomeInfoDb_1.36.4        
-[71] GenomicRanges_1.52.1        ScaledMatrix_1.8.1         
-[73] tibble_3.2.1                pillar_1.9.0               
-[75] htmltools_0.5.6.1           rhdf5filters_1.12.1        
-[77] graph_1.78.0                GenomeInfoDbData_1.2.10    
-[79] R6_2.5.1                    sparseMatrixStats_1.12.2   
-[81] rprojroot_2.0.3             evaluate_0.22              
-[83] Biobase_2.60.0              lattice_0.21-8             
-[85] png_0.1-8                   memoise_2.0.1              
-[87] httpuv_1.6.11               bslib_0.5.1                
-[89] Rcpp_1.0.11                 whisker_0.4.1              
+[43] DelayedMatrixStats_1.24.0   DBI_1.1.3                  
+[45] cachem_1.0.8                rhdf5_2.46.0               
+[47] stringr_1.5.0               zlibbioc_1.48.0            
+[49] parallel_4.3.2              AnnotationDbi_1.64.0       
+[51] XVector_0.42.0              matrixStats_1.0.0          
+[53] vctrs_0.6.4                 Matrix_1.6-1.1             
+[55] jsonlite_1.8.7              BiocSingular_1.18.0        
+[57] callr_3.7.3                 S4Vectors_0.40.1           
+[59] bit64_4.0.5                 irlba_2.3.5.1              
+[61] GSEABase_1.64.0             jquerylib_0.1.4            
+[63] annotate_1.80.0             glue_1.6.2                 
+[65] codetools_0.2-19            ps_1.7.5                   
+[67] stringi_1.7.12              later_1.3.1                
+[69] GenomeInfoDb_1.38.0         GenomicRanges_1.54.1       
+[71] ScaledMatrix_1.10.0         tibble_3.2.1               
+[73] pillar_1.9.0                htmltools_0.5.6.1          
+[75] rhdf5filters_1.14.0         graph_1.80.0               
+[77] GenomeInfoDbData_1.2.11     R6_2.5.1                   
+[79] sparseMatrixStats_1.14.0    rprojroot_2.0.3            
+[81] evaluate_0.22               Biobase_2.62.0             
+[83] lattice_0.21-9              png_0.1-8                  
+[85] memoise_2.0.1               httpuv_1.6.12              
+[87] bslib_0.5.1                 Rcpp_1.0.11                
+[89] SparseArray_1.2.0           whisker_0.4.1              
 [91] xfun_0.40                   fs_1.6.3                   
-[93] MatrixGenerics_1.12.3       getPass_0.2-2              
+[93] MatrixGenerics_1.14.0       getPass_0.2-2              
 [95] pkgconfig_2.0.3            </code></pre>
 </div>
 </div>
