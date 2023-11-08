@@ -148,33 +148,45 @@ X[1:5, ]
 
 Create testing gene lists with higher and lower expression patterns and check their enrichment scores.
 
-```{r ssgsea_test_matrix}
+```{r test_gene_set}
 gene_set <- list(
   gs1 = paste0("g", 1:50),
   gs2 = paste0("g", 51:100),
   gs3 = paste0("g", 101:150)
 )
+```
 
+_ssgsea_ (Barbie et al. 2009). Single sample GSEA (ssGSEA) is a non-parametric method that calculates a gene set enrichment score per sample as the normalized difference in empirical cumulative distribution functions (CDFs) of gene expression ranks inside and outside the gene set. By default, the implementation in the GSVA package follows the last step described in (Barbie et al. 2009, online methods, pg. 2) by which pathway scores are normalized, dividing them by the range of calculated values. This normalization step may be switched off using the argument `ssgsea.norm` in the call to the `gsva()` function.
+
+```{r ssgsea_test_matrix}
 test_ssgsea <- gsva(ssgseaParam(X, gene_set), verbose=FALSE)
-
 test_ssgsea
 ```
 
-GSVA method.
+No normalisation.
+
+```{r ssgsea_no_norm_test_matrix}
+test_ssgsea <- gsva(ssgseaParam(X, gene_set, normalize = FALSE), verbose=FALSE)
+test_ssgsea
+```
+
+gsva (Hanzelmann, Castelo, and Guinney 2013). This is the default method of the package and similarly to ssGSEA, is a non-parametric method that uses the empirical CDFs of gene expression ranks inside and outside the gene set, but it starts by calculating an expression-level statistic that brings gene expression profiles with different dynamic ranges to a common scale.
 
 ```{r gsva_test_matrix}
 test_gsva <- gsva(gsvaParam(X, gene_set), verbose=FALSE)
 test_gsva
 ```
 
-Z-score method.
+_zscore_ (Lee et al. 2008). The z-score method standardizes expression profiles over the samples and then, for each gene set, combines the standardized values as follows. Given a gene set $\gamma = \{1, \ldots ,k\}$ with standardized values $\{z_1,\ldots,z_k\}$ for each gene in a specific sample, the combined z-score $Z_\gamma$ for the gene set $\gamma$ is defined as:
+
+$$ Z_\gamma = \frac{\sum^k_{i=1} z_i}{\sqrt{k}}.$$
 
 ```{r zscore_test_matrix}
 test_zscore <- gsva(zscoreParam(X, gene_set), verbose=FALSE)
 test_zscore
 ```
 
-PLAGE method.
+_plage_ (Tomfohr, Lu, and Kepler 2005). Pathway level analysis of gene expression (PLAGE) standardizes expression profiles over the samples and then, for each gene set, it performs a singular value decomposition (SVD) over its genes. The coefficients of the first right-singular vector are returned as the estimates of pathway activity over the samples. Note that, because of how SVD is calculated, the sign of its singular vectors is arbitrary.
 
 ```{r plage_test_matrix}
 test_plage <- gsva(plageParam(X, gene_set), verbose=FALSE)
