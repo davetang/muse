@@ -28,6 +28,9 @@ if (!require("BiocManager", quietly = TRUE))
 
 if (!require("GSVA", quietly = TRUE))
   BiocManager::install("GSVA")
+
+if (!require("GSVAdata", quietly = TRUE))
+  BiocManager::install("GSVAdata")
 ```
 
 Load package.
@@ -191,4 +194,91 @@ _plage_ (Tomfohr, Lu, and Kepler 2005). Pathway level analysis of gene expressio
 ```{r plage_test_matrix}
 test_plage <- gsva(plageParam(X, gene_set), verbose=FALSE)
 test_plage
+```
+
+## Enrichment scores on microarray and RNA-seq data
+
+Gene expression data of lymphoblastoid cell lines (LCL) from HapMap individuals that have been profiled using microarray and RNA-seq.
+
+```{r c2_broad_sets, message=FALSE, warning=FALSE}
+library(Biobase)
+library(GSVAdata)
+data(c2BroadSets)
+data(commonPickrellHuang)
+
+stopifnot(
+  identical(
+    featureNames(huangArrayRMAnoBatchCommon_eset),
+    featureNames(pickrellCountsArgonneCQNcommon_eset)
+  )
+)
+
+stopifnot(
+  identical(
+    sampleNames(huangArrayRMAnoBatchCommon_eset),
+    sampleNames(pickrellCountsArgonneCQNcommon_eset)
+  )
+)
+
+pickrellCountsArgonneCQNcommon_eset
+```
+
+For the current analysis we use the subset of canonical pathways from the C2 collection of MSigDB Gene Sets. These correspond to the following pathways from KEGG, REACTOME and BIOCARTA.
+
+```{r canonical_c2_broad_sets}
+canonicalC2BroadSets <- c2BroadSets[
+  c(
+    grep("^KEGG", names(c2BroadSets)),
+    grep("^REACTOME", names(c2BroadSets)),
+    grep("^BIOCARTA", names(c2BroadSets))
+  )
+]
+
+canonicalC2BroadSets
+```
+
+We calculate the GSVA enrichment scores for these gene sets using first the normalized microarray data and then the normalized RNA-seq integer count data. Note that the only requirement to do the latter is to set the argument `kcdf="Poisson"`, which is `"Gaussian"` by default. However, if the RNA-seq normalized expression levels is continuous, such as log-CPMs, log-RPKMs or log-TPMs, use `"Gaussian"`.
+
+Microarray.
+
+```{r esmicro}
+huangPar <- gsvaParam(
+  exprData = huangArrayRMAnoBatchCommon_eset,
+  geneSets = canonicalC2BroadSets,
+  minSize=5,
+  maxSize=500
+)
+
+esmicro <- gsva(huangPar, verbose=FALSE)
+
+exprs(esmicro)[1:6, 1:6]
+```
+
+RNA-seq.
+
+```{r esrnaseq}
+pickrellPar <- gsvaParam(
+  exprData = pickrellCountsArgonneCQNcommon_eset,
+  geneSets = canonicalC2BroadSets,
+  minSize=5,
+  maxSize=500,
+  kcdf="Poisson"
+)
+
+esrnaseq <- gsva(pickrellPar, verbose=FALSE)
+
+exprs(esrnaseq)[1:6, 1:6]
+```
+
+Correlation of enrichment scores between the two technologies.
+
+```{r correlation_enrichment_scores, fig.width=12, fig.height=12}
+library(corrplot)
+corrplot(cor(exprs(esrnaseq), exprs(esmicro)), type="lower")
+```
+
+Correlation of enrichment scores between just the RNA-seq samples ordered using hierarchical clustering.
+
+```{r correlation_enrichment_scores_rnaseq, fig.width=12, fig.height=12}
+corrplot(cor(exprs(esrnaseq), exprs(esrnaseq)), type="lower", diag = FALSE, order = "hclust")
 ```
