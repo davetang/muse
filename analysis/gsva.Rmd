@@ -282,3 +282,119 @@ Correlation of enrichment scores between just the RNA-seq samples ordered using 
 ```{r correlation_enrichment_scores_rnaseq, fig.width=12, fig.height=12}
 corrplot(cor(exprs(esrnaseq), exprs(esrnaseq)), type="lower", diag = FALSE, order = "hclust")
 ```
+
+## Molecular signature identification
+
+Verhaak et al. 2010 identified four subtypes of glioblastoma multiforme (GBM) using gene expression patterns:
+
+1. Proneural
+2. Classical
+3. Neural
+4. Mesenchymal
+
+Here we will try to replicate the study using four gene set signatures specific to brain cell types that were derived using mouse models by Cahoy et al. 2008:
+
+1. Astrocytes
+2. Oligodendrocytes
+3. Neurons
+4. Cultured astroglial cells
+
+```{r gbm_eset}
+data(gbm_VerhaakEtAl)
+gbm_eset
+```
+
+Feature names are gene symbols.
+
+```{r gbm_eset_feature_names}
+head(featureNames(gbm_eset))
+```
+
+Subtypes.
+
+```{r gbm_eset_subtypes}
+table(gbm_eset$subtype)
+```
+
+Length of the signatures.
+
+```{r brain_tx_db_sets}
+data(brainTxDbSets)
+lengths(brainTxDbSets)
+```
+
+Check out the signatures.
+
+```{r brain_tx_db_sets_head}
+lapply(brainTxDbSets, head)
+```
+
+GSVA enrichment scores are calculated using the gene sets contained in `brainTxDbSets`; `maxDiff` is set to `FALSE`. Here's a reminder of what this parameter does:
+
+`max.diff`: The last step of the GSVA algorithm calculates the gene set enrichment score from two Kolmogorov-Smirnov random walk statistics. This parameter is a logical flag that allows the user to specify two possible ways to do such calculation:
+
+1. `TRUE`, the default value, where the enrichment score is calculated as the magnitude difference between the largest positive and negative random walk deviations;
+2. `FALSE`, where the enrichment score is calculated as the maximum distance of the random walk from zero.
+
+```{r gbm_es}
+gbmPar <- gsvaParam(gbm_eset, brainTxDbSets, maxDiff=FALSE)
+gbm_es <- gsva(gbmPar, verbose=FALSE)
+```
+
+Prepare data frame for plotting.
+
+```{r my_df}
+my_df <- data.frame(
+  sample = colnames(gbm_eset),
+  subtype = gbm_eset$subtype
+)
+
+t(exprs(gbm_es)) |>
+  as.data.frame() |>
+  tibble::rownames_to_column('sample') |>
+  dplyr::inner_join(my_df, by = "sample") |>
+  dplyr::mutate(sample = factor(sample, levels = sample)) |>
+  tidyr::pivot_longer(cols = c(-sample, -subtype), names_to = "signature", values_to = "enrichment") -> my_df
+
+head(my_df)
+```
+
+Plot.
+
+```{r plot_gbm}
+library(ggplot2)
+ggplot(my_df, aes(sample, signature, fill = enrichment)) +
+  geom_tile() +
+  facet_grid(~subtype, scales = "free") +
+  theme(
+    axis.text.x = element_blank(), axis.ticks.x = element_blank()
+  ) +
+  scale_fill_gradient(low = "skyblue", high = "red")
+```
+
+Results using `maxDiff=TRUE`.
+
+```{r gbm_es_max_diff_true}
+gbmPar <- gsvaParam(gbm_eset, brainTxDbSets, maxDiff=TRUE)
+gbm_es <- gsva(gbmPar, verbose=FALSE)
+
+my_df <- data.frame(
+  sample = colnames(gbm_eset),
+  subtype = gbm_eset$subtype
+)
+
+t(exprs(gbm_es)) |>
+  as.data.frame() |>
+  tibble::rownames_to_column('sample') |>
+  dplyr::inner_join(my_df, by = "sample") |>
+  dplyr::mutate(sample = factor(sample, levels = sample)) |>
+  tidyr::pivot_longer(cols = c(-sample, -subtype), names_to = "signature", values_to = "enrichment") -> my_df
+
+ggplot(my_df, aes(sample, signature, fill = enrichment)) +
+  geom_tile() +
+  facet_grid(~subtype, scales = "free") +
+  theme(
+    axis.text.x = element_blank(), axis.ticks.x = element_blank()
+  ) +
+  scale_fill_gradient(low = "skyblue", high = "red")
+```
