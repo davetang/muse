@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed80c8a13a2c9f3452608b54215ec498fa254b161targetblankd80c8a1a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb7743820f7c1a0add25b4a7cd0ffae584b5bee20targetblankb774382a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/d80c8a13a2c9f3452608b54215ec498fa254b161" target="_blank">d80c8a1</a>
+<a href="https://github.com/davetang/muse/tree/b7743820f7c1a0add25b4a7cd0ffae584b5bee20" target="_blank">b774382</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed80c8a13a2c9f3452608b54215ec498fa254b161targetblankd80c8a1a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb7743820f7c1a0add25b4a7cd0ffae584b5bee20targetblankb774382a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/d80c8a13a2c9f3452608b54215ec498fa254b161" target="_blank">d80c8a1</a>.
+<a href="https://github.com/davetang/muse/tree/b7743820f7c1a0add25b4a7cd0ffae584b5bee20" target="_blank">b774382</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -616,6 +616,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/b7743820f7c1a0add25b4a7cd0ffae584b5bee20/analysis/gsva.Rmd" target="_blank">b774382</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-08
+</td>
+<td>
+ssGSEA molecular signature
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/38ae3bcd38eb6e9d3310ce5136a37f805681165f/docs/gsva.html" target="_blank">38ae3bc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1553,23 +1587,60 @@ ggplot(my_df, aes(sample, signature, fill = enrichment)) +
   ) +
   scale_fill_gradient(low = &quot;skyblue&quot;, high = &quot;red&quot;)</code></pre>
 <p><img src="figure/gsva.Rmd/plot_gbm-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_gbm-1">
+Past versions of plot_gbm-1.png
+</button>
+</p>
+<div id="fig-plot_gbm-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/38ae3bcd38eb6e9d3310ce5136a37f805681165f/docs/figure/gsva.Rmd/plot_gbm-1.png" target="_blank">38ae3bc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Results using <code>maxDiff=TRUE</code>.</p>
 <pre class="r"><code>gbmPar &lt;- gsvaParam(gbm_eset, brainTxDbSets, maxDiff=TRUE)
-gbm_es &lt;- gsva(gbmPar, verbose=FALSE)
+gbm_es_max &lt;- gsva(gbmPar, verbose=FALSE)
 
 my_df &lt;- data.frame(
   sample = colnames(gbm_eset),
   subtype = gbm_eset$subtype
 )
 
-t(exprs(gbm_es)) |&gt;
+t(exprs(gbm_es_max)) |&gt;
   as.data.frame() |&gt;
   tibble::rownames_to_column(&#39;sample&#39;) |&gt;
   dplyr::inner_join(my_df, by = &quot;sample&quot;) |&gt;
   dplyr::mutate(sample = factor(sample, levels = sample)) |&gt;
-  tidyr::pivot_longer(cols = c(-sample, -subtype), names_to = &quot;signature&quot;, values_to = &quot;enrichment&quot;) -&gt; my_df
+  tidyr::pivot_longer(cols = c(-sample, -subtype), names_to = &quot;signature&quot;, values_to = &quot;enrichment&quot;) -&gt; my_df2
 
-ggplot(my_df, aes(sample, signature, fill = enrichment)) +
+ggplot(my_df2, aes(sample, signature, fill = enrichment)) +
   geom_tile() +
   facet_grid(~subtype, scales = &quot;free&quot;) +
   theme(
@@ -1577,6 +1648,68 @@ ggplot(my_df, aes(sample, signature, fill = enrichment)) +
   ) +
   scale_fill_gradient(low = &quot;skyblue&quot;, high = &quot;red&quot;)</code></pre>
 <p><img src="figure/gsva.Rmd/gbm_es_max_diff_true-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-gbm_es_max_diff_true-1">
+Past versions of gbm_es_max_diff_true-1.png
+</button>
+</p>
+<div id="fig-gbm_es_max_diff_true-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/38ae3bcd38eb6e9d3310ce5136a37f805681165f/docs/figure/gsva.Rmd/gbm_es_max_diff_true-1.png" target="_blank">38ae3bc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Results using ssgsea.</p>
+<pre class="r"><code>gbm_ssgsea &lt;- gsva(ssgseaParam(gbm_eset, brainTxDbSets), verbose=FALSE)</code></pre>
+<pre><code>[1] &quot;Calculating ranks...&quot;
+[1] &quot;Calculating absolute values from ranks...&quot;
+[1] &quot;Normalizing...&quot;</code></pre>
+<pre class="r"><code>my_df &lt;- data.frame(
+  sample = colnames(gbm_eset),
+  subtype = gbm_eset$subtype
+)
+
+t(exprs(gbm_ssgsea)) |&gt;
+  as.data.frame() |&gt;
+  tibble::rownames_to_column(&#39;sample&#39;) |&gt;
+  dplyr::inner_join(my_df, by = &quot;sample&quot;) |&gt;
+  dplyr::mutate(sample = factor(sample, levels = sample)) |&gt;
+  tidyr::pivot_longer(cols = c(-sample, -subtype), names_to = &quot;signature&quot;, values_to = &quot;enrichment&quot;) -&gt; my_df3
+
+ggplot(my_df3, aes(sample, signature, fill = enrichment)) +
+  geom_tile() +
+  facet_grid(~subtype, scales = &quot;free&quot;) +
+  theme(
+    axis.text.x = element_blank(), axis.ticks.x = element_blank()
+  ) +
+  scale_fill_gradient(low = &quot;skyblue&quot;, high = &quot;red&quot;)</code></pre>
+<p><img src="figure/gsva.Rmd/gbm_es_ssgsea-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
