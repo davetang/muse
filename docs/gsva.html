@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3f1aa75e60129caa43ae39d1c5e7cc4b9a130be6targetblank3f1aa75a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree525a52a7a6d48f1344232944c366905544ce4748targetblank525a52aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/3f1aa75e60129caa43ae39d1c5e7cc4b9a130be6" target="_blank">3f1aa75</a>
+<a href="https://github.com/davetang/muse/tree/525a52a7a6d48f1344232944c366905544ce4748" target="_blank">525a52a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3f1aa75e60129caa43ae39d1c5e7cc4b9a130be6targetblank3f1aa75a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree525a52a7a6d48f1344232944c366905544ce4748targetblank525a52aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/3f1aa75e60129caa43ae39d1c5e7cc4b9a130be6" target="_blank">3f1aa75</a>.
+<a href="https://github.com/davetang/muse/tree/525a52a7a6d48f1344232944c366905544ce4748" target="_blank">525a52a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -616,6 +616,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/525a52a7a6d48f1344232944c366905544ce4748/analysis/gsva.Rmd" target="_blank">525a52a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-08
+</td>
+<td>
+GSVA on microarray and RNA-seq data
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/3f0f517e06093e49b3202dabfb1045ef61519a1b/docs/gsva.html" target="_blank">3f0f517</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -878,7 +912,10 @@ file.)</p>
   install.packages(&quot;BiocManager&quot;)
 
 if (!require(&quot;GSVA&quot;, quietly = TRUE))
-  BiocManager::install(&quot;GSVA&quot;)</code></pre>
+  BiocManager::install(&quot;GSVA&quot;)
+
+if (!require(&quot;GSVAdata&quot;, quietly = TRUE))
+  BiocManager::install(&quot;GSVAdata&quot;)</code></pre>
 <p>Load package.</p>
 <pre class="r"><code>library(GSVA)
 packageVersion(&quot;GSVA&quot;)</code></pre>
@@ -1166,6 +1203,139 @@ test_plage</code></pre>
 gs1  0.7071068 -0.7071068
 gs2 -0.7071068  0.7071068
 gs3  0.7071068 -0.7071068</code></pre>
+</div>
+<div id="enrichment-scores-on-microarray-and-rna-seq-data"
+class="section level2">
+<h2>Enrichment scores on microarray and RNA-seq data</h2>
+<p>Gene expression data of lymphoblastoid cell lines (LCL) from HapMap
+individuals that have been profiled using microarray and RNA-seq.</p>
+<pre class="r"><code>library(Biobase)
+library(GSVAdata)
+data(c2BroadSets)
+data(commonPickrellHuang)
+
+stopifnot(
+  identical(
+    featureNames(huangArrayRMAnoBatchCommon_eset),
+    featureNames(pickrellCountsArgonneCQNcommon_eset)
+  )
+)
+
+stopifnot(
+  identical(
+    sampleNames(huangArrayRMAnoBatchCommon_eset),
+    sampleNames(pickrellCountsArgonneCQNcommon_eset)
+  )
+)
+
+pickrellCountsArgonneCQNcommon_eset</code></pre>
+<pre><code>ExpressionSet (storageMode: lockedEnvironment)
+assayData: 11508 features, 36 samples 
+  element names: exprs 
+protocolData
+  rowNames: NA19099 NA18523 ... NA19171 (36 total)
+  varLabels: exprs dates
+  varMetadata: labelDescription channel
+phenoData
+  rowNames: NA19099 NA18523 ... NA19171 (36 total)
+  varLabels: CoriellCellLineID Population ... FamilyRelationship (5
+    total)
+  varMetadata: channel labelDescription
+featureData: none
+experimentData: use &#39;experimentData(object)&#39;
+Annotation: org.Hs.eg.db </code></pre>
+<p>For the current analysis we use the subset of canonical pathways from
+the C2 collection of MSigDB Gene Sets. These correspond to the following
+pathways from KEGG, REACTOME and BIOCARTA.</p>
+<pre class="r"><code>canonicalC2BroadSets &lt;- c2BroadSets[
+  c(
+    grep(&quot;^KEGG&quot;, names(c2BroadSets)),
+    grep(&quot;^REACTOME&quot;, names(c2BroadSets)),
+    grep(&quot;^BIOCARTA&quot;, names(c2BroadSets))
+  )
+]
+
+canonicalC2BroadSets</code></pre>
+<pre><code>GeneSetCollection
+  names: KEGG_GLYCOLYSIS_GLUCONEOGENESIS, KEGG_CITRATE_CYCLE_TCA_CYCLE, ..., BIOCARTA_ACTINY_PATHWAY (833 total)
+  unique identifiers: 55902, 2645, ..., 8544 (6744 total)
+  types in collection:
+    geneIdType: EntrezIdentifier (1 total)
+    collectionType: BroadCollection (1 total)</code></pre>
+<p>We calculate the GSVA enrichment scores for these gene sets using
+first the normalized microarray data and then the normalized RNA-seq
+integer count data. Note that the only requirement to do the latter is
+to set the argument <code>kcdf="Poisson"</code>, which is
+<code>"Gaussian"</code> by default. However, if the RNA-seq normalized
+expression levels is continuous, such as log-CPMs, log-RPKMs or
+log-TPMs, use <code>"Gaussian"</code>.</p>
+<p>Microarray.</p>
+<pre class="r"><code>huangPar &lt;- gsvaParam(
+  exprData = huangArrayRMAnoBatchCommon_eset,
+  geneSets = canonicalC2BroadSets,
+  minSize=5,
+  maxSize=500
+)
+
+esmicro &lt;- gsva(huangPar, verbose=FALSE)</code></pre>
+<pre><code>Mapping identifiers between gene sets and feature names</code></pre>
+<pre class="r"><code>exprs(esmicro)[1:6, 1:6]</code></pre>
+<pre><code>                                                  NA19099    NA18523
+KEGG_GLYCOLYSIS_GLUCONEOGENESIS               -0.14418012 -0.3133817
+KEGG_CITRATE_CYCLE_TCA_CYCLE                  -0.20263269  0.2546732
+KEGG_PENTOSE_PHOSPHATE_PATHWAY                 0.13384996 -0.3426199
+KEGG_PENTOSE_AND_GLUCURONATE_INTERCONVERSIONS -0.04814412  0.2649390
+KEGG_FRUCTOSE_AND_MANNOSE_METABOLISM          -0.05277464 -0.2559473
+KEGG_GALACTOSE_METABOLISM                     -0.51060398 -0.3263793
+                                                  NA19144     NA19137
+KEGG_GLYCOLYSIS_GLUCONEOGENESIS               -0.39117167  0.21340339
+KEGG_CITRATE_CYCLE_TCA_CYCLE                   0.01268519 -0.23423639
+KEGG_PENTOSE_PHOSPHATE_PATHWAY                 0.01105565  0.10473591
+KEGG_PENTOSE_AND_GLUCURONATE_INTERCONVERSIONS -0.24778162 -0.57051071
+KEGG_FRUCTOSE_AND_MANNOSE_METABOLISM          -0.27260660  0.02654463
+KEGG_GALACTOSE_METABOLISM                     -0.33944553  0.18058711
+                                                 NA18861     NA19116
+KEGG_GLYCOLYSIS_GLUCONEOGENESIS                0.3989804 -0.03179434
+KEGG_CITRATE_CYCLE_TCA_CYCLE                   0.1669631 -0.19060735
+KEGG_PENTOSE_PHOSPHATE_PATHWAY                 0.5331964  0.08319882
+KEGG_PENTOSE_AND_GLUCURONATE_INTERCONVERSIONS -0.1518934 -0.12257602
+KEGG_FRUCTOSE_AND_MANNOSE_METABOLISM           0.4662563 -0.07516578
+KEGG_GALACTOSE_METABOLISM                      0.5901477 -0.05433206</code></pre>
+<p>RNA-seq.</p>
+<pre class="r"><code>pickrellPar &lt;- gsvaParam(
+  exprData = pickrellCountsArgonneCQNcommon_eset,
+  geneSets = canonicalC2BroadSets,
+  minSize=5,
+  maxSize=500,
+  kcdf=&quot;Poisson&quot;
+)
+
+esrnaseq &lt;- gsva(pickrellPar, verbose=FALSE)</code></pre>
+<pre><code>Mapping identifiers between gene sets and feature names</code></pre>
+<pre class="r"><code>exprs(esrnaseq)[1:6, 1:6]</code></pre>
+<pre><code>                                                NA19099     NA18523     NA19144
+KEGG_GLYCOLYSIS_GLUCONEOGENESIS               0.2292013 -0.26418772 -0.37401687
+KEGG_CITRATE_CYCLE_TCA_CYCLE                  0.1953447 -0.20215701 -0.31886736
+KEGG_PENTOSE_PHOSPHATE_PATHWAY                0.3957182 -0.35222123 -0.14016244
+KEGG_PENTOSE_AND_GLUCURONATE_INTERCONVERSIONS 0.3043138 -0.23429588 -0.27059673
+KEGG_FRUCTOSE_AND_MANNOSE_METABOLISM          0.1123176 -0.06274804 -0.04494400
+KEGG_GALACTOSE_METABOLISM                     0.0606202 -0.42485552 -0.03930301
+                                                 NA19137     NA18861    NA19116
+KEGG_GLYCOLYSIS_GLUCONEOGENESIS                0.2913508  0.17081880 -0.4570259
+KEGG_CITRATE_CYCLE_TCA_CYCLE                   0.2573530  0.09452472 -0.1433765
+KEGG_PENTOSE_PHOSPHATE_PATHWAY                 0.3585130  0.16414025 -0.2658944
+KEGG_PENTOSE_AND_GLUCURONATE_INTERCONVERSIONS -0.2453460 -0.06027442  0.0470686
+KEGG_FRUCTOSE_AND_MANNOSE_METABOLISM           0.4431209 -0.43879510 -0.2629824
+KEGG_GALACTOSE_METABOLISM                      0.3496528 -0.12188569 -0.4629607</code></pre>
+<p>Correlation of enrichment scores between the two technologies.</p>
+<pre class="r"><code>library(corrplot)</code></pre>
+<pre><code>corrplot 0.92 loaded</code></pre>
+<pre class="r"><code>corrplot(cor(exprs(esrnaseq), exprs(esmicro)), type=&quot;lower&quot;)</code></pre>
+<p><img src="figure/gsva.Rmd/correlation_enrichment_scores-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>Correlation of enrichment scores between just the RNA-seq samples
+ordered using hierarchical clustering.</p>
+<pre class="r"><code>corrplot(cor(exprs(esrnaseq), exprs(esrnaseq)), type=&quot;lower&quot;, diag = FALSE, order = &quot;hclust&quot;)</code></pre>
+<p><img src="figure/gsva.Rmd/correlation_enrichment_scores_rnaseq-1.png" width="1152" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1195,61 +1365,62 @@ time zone: Etc/UTC
 tzcode source: system (glibc)
 
 attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
 
 other attached packages:
-[1] IRanges_2.36.0      GSVA_1.50.0         BiocManager_1.30.22
-[4] workflowr_1.7.1    
+ [1] corrplot_0.92        GSVAdata_1.38.0      hgu95a.db_3.13.0    
+ [4] org.Hs.eg.db_3.18.0  GSEABase_1.64.0      graph_1.80.0        
+ [7] annotate_1.80.0      XML_3.99-0.15        AnnotationDbi_1.64.1
+[10] IRanges_2.36.0       S4Vectors_0.40.1     Biobase_2.62.0      
+[13] BiocGenerics_0.48.1  GSVA_1.50.0          BiocManager_1.30.22 
+[16] workflowr_1.7.1     
 
 loaded via a namespace (and not attached):
- [1] blob_1.2.4                  Biostrings_2.70.1          
- [3] bitops_1.0-7                fastmap_1.1.1              
- [5] SingleCellExperiment_1.24.0 RCurl_1.98-1.12            
- [7] promises_1.2.1              rsvd_1.0.5                 
- [9] XML_3.99-0.14               digest_0.6.33              
-[11] lifecycle_1.0.3             processx_3.8.2             
-[13] KEGGREST_1.42.0             RSQLite_2.3.2              
-[15] magrittr_2.0.3              compiler_4.3.2             
-[17] rlang_1.1.1                 sass_0.4.7                 
-[19] tools_4.3.2                 utf8_1.2.4                 
-[21] yaml_2.3.7                  knitr_1.45                 
-[23] S4Arrays_1.2.0              bit_4.0.5                  
-[25] DelayedArray_0.28.0         abind_1.4-5                
-[27] BiocParallel_1.36.0         HDF5Array_1.30.0           
-[29] BiocGenerics_0.48.0         grid_4.3.2                 
-[31] stats4_4.3.2                fansi_1.0.5                
-[33] git2r_0.32.0                beachmat_2.18.0            
-[35] xtable_1.8-4                Rhdf5lib_1.24.0            
-[37] SummarizedExperiment_1.32.0 cli_3.6.1                  
-[39] rmarkdown_2.25              crayon_1.5.2               
-[41] rstudioapi_0.15.0           httr_1.4.7                 
-[43] DelayedMatrixStats_1.24.0   DBI_1.1.3                  
-[45] cachem_1.0.8                rhdf5_2.46.0               
-[47] stringr_1.5.0               zlibbioc_1.48.0            
-[49] parallel_4.3.2              AnnotationDbi_1.64.0       
-[51] XVector_0.42.0              matrixStats_1.0.0          
-[53] vctrs_0.6.4                 Matrix_1.6-1.1             
-[55] jsonlite_1.8.7              BiocSingular_1.18.0        
-[57] callr_3.7.3                 S4Vectors_0.40.1           
-[59] bit64_4.0.5                 irlba_2.3.5.1              
-[61] GSEABase_1.64.0             jquerylib_0.1.4            
-[63] annotate_1.80.0             glue_1.6.2                 
-[65] codetools_0.2-19            ps_1.7.5                   
-[67] stringi_1.7.12              later_1.3.1                
-[69] GenomeInfoDb_1.38.0         GenomicRanges_1.54.1       
-[71] ScaledMatrix_1.10.0         tibble_3.2.1               
-[73] pillar_1.9.0                htmltools_0.5.6.1          
-[75] rhdf5filters_1.14.0         graph_1.80.0               
-[77] GenomeInfoDbData_1.2.11     R6_2.5.1                   
-[79] sparseMatrixStats_1.14.0    rprojroot_2.0.3            
-[81] evaluate_0.22               Biobase_2.62.0             
-[83] lattice_0.21-9              png_0.1-8                  
-[85] memoise_2.0.1               httpuv_1.6.12              
-[87] bslib_0.5.1                 Rcpp_1.0.11                
-[89] SparseArray_1.2.0           whisker_0.4.1              
-[91] xfun_0.40                   fs_1.6.3                   
-[93] MatrixGenerics_1.14.0       getPass_0.2-2              
-[95] pkgconfig_2.0.3            </code></pre>
+ [1] DBI_1.1.3                   bitops_1.0-7               
+ [3] rlang_1.1.2                 magrittr_2.0.3             
+ [5] git2r_0.32.0                matrixStats_1.0.0          
+ [7] compiler_4.3.2              RSQLite_2.3.3              
+ [9] getPass_0.2-2               DelayedMatrixStats_1.24.0  
+[11] png_0.1-8                   callr_3.7.3                
+[13] vctrs_0.6.4                 stringr_1.5.0              
+[15] pkgconfig_2.0.3             crayon_1.5.2               
+[17] fastmap_1.1.1               XVector_0.42.0             
+[19] utf8_1.2.4                  promises_1.2.1             
+[21] rmarkdown_2.25              ps_1.7.5                   
+[23] bit_4.0.5                   xfun_0.41                  
+[25] zlibbioc_1.48.0             cachem_1.0.8               
+[27] beachmat_2.18.0             GenomeInfoDb_1.38.0        
+[29] jsonlite_1.8.7              blob_1.2.4                 
+[31] highr_0.10                  later_1.3.1                
+[33] rhdf5filters_1.14.1         DelayedArray_0.28.0        
+[35] Rhdf5lib_1.24.0             BiocParallel_1.36.0        
+[37] irlba_2.3.5.1               parallel_4.3.2             
+[39] R6_2.5.1                    bslib_0.5.1                
+[41] stringi_1.7.12              GenomicRanges_1.54.1       
+[43] jquerylib_0.1.4             Rcpp_1.0.11                
+[45] SummarizedExperiment_1.32.0 knitr_1.45                 
+[47] httpuv_1.6.12               Matrix_1.6-1.1             
+[49] rstudioapi_0.15.0           abind_1.4-5                
+[51] yaml_2.3.7                  codetools_0.2-19           
+[53] processx_3.8.2              lattice_0.21-9             
+[55] tibble_3.2.1                KEGGREST_1.42.0            
+[57] evaluate_0.23               Biostrings_2.70.1          
+[59] pillar_1.9.0                MatrixGenerics_1.14.0      
+[61] whisker_0.4.1               rprojroot_2.0.4            
+[63] RCurl_1.98-1.13             sparseMatrixStats_1.14.0   
+[65] xtable_1.8-4                glue_1.6.2                 
+[67] tools_4.3.2                 ScaledMatrix_1.10.0        
+[69] fs_1.6.3                    rhdf5_2.46.0               
+[71] grid_4.3.2                  SingleCellExperiment_1.24.0
+[73] GenomeInfoDbData_1.2.11     BiocSingular_1.18.0        
+[75] HDF5Array_1.30.0            cli_3.6.1                  
+[77] rsvd_1.0.5                  fansi_1.0.5                
+[79] S4Arrays_1.2.0              sass_0.4.7                 
+[81] digest_0.6.33               SparseArray_1.2.1          
+[83] memoise_2.0.1               htmltools_0.5.7            
+[85] lifecycle_1.0.3             httr_1.4.7                 
+[87] bit64_4.0.5                </code></pre>
 </div>
 </div>
 
