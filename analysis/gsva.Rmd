@@ -376,21 +376,47 @@ Results using `maxDiff=TRUE`.
 
 ```{r gbm_es_max_diff_true}
 gbmPar <- gsvaParam(gbm_eset, brainTxDbSets, maxDiff=TRUE)
-gbm_es <- gsva(gbmPar, verbose=FALSE)
+gbm_es_max <- gsva(gbmPar, verbose=FALSE)
 
 my_df <- data.frame(
   sample = colnames(gbm_eset),
   subtype = gbm_eset$subtype
 )
 
-t(exprs(gbm_es)) |>
+t(exprs(gbm_es_max)) |>
   as.data.frame() |>
   tibble::rownames_to_column('sample') |>
   dplyr::inner_join(my_df, by = "sample") |>
   dplyr::mutate(sample = factor(sample, levels = sample)) |>
-  tidyr::pivot_longer(cols = c(-sample, -subtype), names_to = "signature", values_to = "enrichment") -> my_df
+  tidyr::pivot_longer(cols = c(-sample, -subtype), names_to = "signature", values_to = "enrichment") -> my_df2
 
-ggplot(my_df, aes(sample, signature, fill = enrichment)) +
+ggplot(my_df2, aes(sample, signature, fill = enrichment)) +
+  geom_tile() +
+  facet_grid(~subtype, scales = "free") +
+  theme(
+    axis.text.x = element_blank(), axis.ticks.x = element_blank()
+  ) +
+  scale_fill_gradient(low = "skyblue", high = "red")
+```
+
+Results using ssgsea.
+
+```{r gbm_es_ssgsea}
+gbm_ssgsea <- gsva(ssgseaParam(gbm_eset, brainTxDbSets), verbose=FALSE)
+
+my_df <- data.frame(
+  sample = colnames(gbm_eset),
+  subtype = gbm_eset$subtype
+)
+
+t(exprs(gbm_ssgsea)) |>
+  as.data.frame() |>
+  tibble::rownames_to_column('sample') |>
+  dplyr::inner_join(my_df, by = "sample") |>
+  dplyr::mutate(sample = factor(sample, levels = sample)) |>
+  tidyr::pivot_longer(cols = c(-sample, -subtype), names_to = "signature", values_to = "enrichment") -> my_df3
+
+ggplot(my_df3, aes(sample, signature, fill = enrichment)) +
   geom_tile() +
   facet_grid(~subtype, scales = "free") +
   theme(
