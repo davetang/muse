@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-11-07" />
+<meta name="date" content="2023-11-08" />
 
 <title>GSVA: gene set variation analysis</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">GSVA: gene set variation analysis</h1>
-<h4 class="date">2023-11-07</h4>
+<h4 class="date">2023-11-08</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-11-07
+<strong>Last updated:</strong> 2023-11-08
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree794b249308bc7b07ee1b28ff563d04720fbc4f21targetblank794b249a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3f1aa75e60129caa43ae39d1c5e7cc4b9a130be6targetblank3f1aa75a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/794b249308bc7b07ee1b28ff563d04720fbc4f21" target="_blank">794b249</a>
+<a href="https://github.com/davetang/muse/tree/3f1aa75e60129caa43ae39d1c5e7cc4b9a130be6" target="_blank">3f1aa75</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree794b249308bc7b07ee1b28ff563d04720fbc4f21targetblank794b249a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3f1aa75e60129caa43ae39d1c5e7cc4b9a130be6targetblank3f1aa75a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/794b249308bc7b07ee1b28ff563d04720fbc4f21" target="_blank">794b249</a>.
+<a href="https://github.com/davetang/muse/tree/3f1aa75e60129caa43ae39d1c5e7cc4b9a130be6" target="_blank">3f1aa75</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -552,13 +552,26 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
+    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    r_packages_4.3.0/
     Ignored:    r_packages_4.3.2/
 
 Untracked files:
-    Untracked:  analysis/breast_cancer.Rmd
+    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  analysis/sleuth.Rmd
+    Untracked:  analysis/tss_xgboost.Rmd
     Untracked:  code/multiz100way/
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
+    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
+    Untracked:  data/ncrna_noncode_v3.fa
+    Untracked:  data/netmhciipan.out.gz
+    Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
+    Untracked:  export/output/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/graph.Rmd
 
 </code></pre>
 <p>
@@ -603,6 +616,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/3f1aa75e60129caa43ae39d1c5e7cc4b9a130be6/analysis/gsva.Rmd" target="_blank">3f1aa75</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-08
+</td>
+<td>
+Elaborate on the different methods
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/d6d78a04e1394f876c86361b02f558aa50ea3805/docs/gsva.html" target="_blank">d6d78a0</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1048,9 +1095,18 @@ and check their enrichment scores.</p>
   gs1 = paste0(&quot;g&quot;, 1:50),
   gs2 = paste0(&quot;g&quot;, 51:100),
   gs3 = paste0(&quot;g&quot;, 101:150)
-)
-
-test_ssgsea &lt;- gsva(ssgseaParam(X, gene_set), verbose=FALSE)</code></pre>
+)</code></pre>
+<p><em>ssgsea</em> (Barbie et al. 2009). Single sample GSEA (ssGSEA) is
+a non-parametric method that calculates a gene set enrichment score per
+sample as the normalized difference in empirical cumulative distribution
+functions (CDFs) of gene expression ranks inside and outside the gene
+set. By default, the implementation in the GSVA package follows the last
+step described in (Barbie et al. 2009, online methods, pg. 2) by which
+pathway scores are normalized, dividing them by the range of calculated
+values. This normalization step may be switched off using the argument
+<code>ssgsea.norm</code> in the call to the <code>gsva()</code>
+function.</p>
+<pre class="r"><code>test_ssgsea &lt;- gsva(ssgseaParam(X, gene_set), verbose=FALSE)</code></pre>
 <pre><code>[1] &quot;Calculating ranks...&quot;
 [1] &quot;Calculating absolute values from ranks...&quot;
 [1] &quot;Normalizing...&quot;</code></pre>
@@ -1059,21 +1115,51 @@ test_ssgsea &lt;- gsva(ssgseaParam(X, gene_set), verbose=FALSE)</code></pre>
 gs1  0.50202664  0.62745511
 gs2 -0.35383441 -0.37254489
 gs3  0.01605471  0.08617871</code></pre>
-<p>GSVA method.</p>
+<p>No normalisation.</p>
+<pre class="r"><code>test_ssgsea &lt;- gsva(ssgseaParam(X, gene_set, normalize = FALSE), verbose=FALSE)</code></pre>
+<pre><code>[1] &quot;Calculating ranks...&quot;
+[1] &quot;Calculating absolute values from ranks...&quot;</code></pre>
+<pre class="r"><code>test_ssgsea</code></pre>
+<pre><code>            s1         s2
+gs1  4000.5026  5000.0052
+gs2 -2819.6024 -2968.7007
+gs3   127.9353   686.7328</code></pre>
+<p>gsva (Hanzelmann, Castelo, and Guinney 2013). This is the default
+method of the package and similarly to ssGSEA, is a non-parametric
+method that uses the empirical CDFs of gene expression ranks inside and
+outside the gene set, but it starts by calculating an expression-level
+statistic that brings gene expression profiles with different dynamic
+ranges to a common scale.</p>
 <pre class="r"><code>test_gsva &lt;- gsva(gsvaParam(X, gene_set), verbose=FALSE)
 test_gsva</code></pre>
 <pre><code>           s1        s2
 gs1 0.9771127 0.9994906
 gs2 0.9869514 0.9896900
 gs3 0.9716955 0.9815203</code></pre>
-<p>Z-score method.</p>
+<p><em>zscore</em> (Lee et al. 2008). The z-score method standardizes
+expression profiles over the samples and then, for each gene set,
+combines the standardized values as follows. Given a gene set <span
+class="math inline">\(\gamma = \{1, \ldots ,k\}\)</span> with
+standardized values <span
+class="math inline">\(\{z_1,\ldots,z_k\}\)</span> for each gene in a
+specific sample, the combined z-score <span
+class="math inline">\(Z_\gamma\)</span> for the gene set <span
+class="math inline">\(\gamma\)</span> is defined as:</p>
+<p><span class="math display">\[ Z_\gamma = \frac{\sum^k_{i=1}
+z_i}{\sqrt{k}}.\]</span></p>
 <pre class="r"><code>test_zscore &lt;- gsva(zscoreParam(X, gene_set), verbose=FALSE)
 test_zscore</code></pre>
 <pre><code>      s1   s2
 gs1 -2.8  2.8
 gs2  0.4 -0.4
 gs3 -0.4  0.4</code></pre>
-<p>PLAGE method.</p>
+<p><em>plage</em> (Tomfohr, Lu, and Kepler 2005). Pathway level analysis
+of gene expression (PLAGE) standardizes expression profiles over the
+samples and then, for each gene set, it performs a singular value
+decomposition (SVD) over its genes. The coefficients of the first
+right-singular vector are returned as the estimates of pathway activity
+over the samples. Note that, because of how SVD is calculated, the sign
+of its singular vectors is arbitrary.</p>
 <pre class="r"><code>test_plage &lt;- gsva(plageParam(X, gene_set), verbose=FALSE)
 test_plage</code></pre>
 <pre><code>            s1         s2
@@ -1112,24 +1198,25 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] GSVA_1.50.0         BiocManager_1.30.22 workflowr_1.7.1    
+[1] IRanges_2.36.0      GSVA_1.50.0         BiocManager_1.30.22
+[4] workflowr_1.7.1    
 
 loaded via a namespace (and not attached):
  [1] blob_1.2.4                  Biostrings_2.70.1          
  [3] bitops_1.0-7                fastmap_1.1.1              
- [5] SingleCellExperiment_1.24.0 RCurl_1.98-1.13            
+ [5] SingleCellExperiment_1.24.0 RCurl_1.98-1.12            
  [7] promises_1.2.1              rsvd_1.0.5                 
- [9] XML_3.99-0.15               digest_0.6.33              
+ [9] XML_3.99-0.14               digest_0.6.33              
 [11] lifecycle_1.0.3             processx_3.8.2             
 [13] KEGGREST_1.42.0             RSQLite_2.3.2              
 [15] magrittr_2.0.3              compiler_4.3.2             
 [17] rlang_1.1.1                 sass_0.4.7                 
 [19] tools_4.3.2                 utf8_1.2.4                 
-[21] yaml_2.3.7                  knitr_1.44                 
+[21] yaml_2.3.7                  knitr_1.45                 
 [23] S4Arrays_1.2.0              bit_4.0.5                  
 [25] DelayedArray_0.28.0         abind_1.4-5                
 [27] BiocParallel_1.36.0         HDF5Array_1.30.0           
-[29] BiocGenerics_0.48.1         grid_4.3.2                 
+[29] BiocGenerics_0.48.0         grid_4.3.2                 
 [31] stats4_4.3.2                fansi_1.0.5                
 [33] git2r_0.32.0                beachmat_2.18.0            
 [35] xtable_1.8-4                Rhdf5lib_1.24.0            
@@ -1139,30 +1226,30 @@ loaded via a namespace (and not attached):
 [43] DelayedMatrixStats_1.24.0   DBI_1.1.3                  
 [45] cachem_1.0.8                rhdf5_2.46.0               
 [47] stringr_1.5.0               zlibbioc_1.48.0            
-[49] parallel_4.3.2              AnnotationDbi_1.64.1       
+[49] parallel_4.3.2              AnnotationDbi_1.64.0       
 [51] XVector_0.42.0              matrixStats_1.0.0          
 [53] vctrs_0.6.4                 Matrix_1.6-1.1             
 [55] jsonlite_1.8.7              BiocSingular_1.18.0        
-[57] callr_3.7.3                 IRanges_2.36.0             
-[59] S4Vectors_0.40.1            bit64_4.0.5                
-[61] irlba_2.3.5.1               GSEABase_1.64.0            
-[63] jquerylib_0.1.4             annotate_1.80.0            
-[65] glue_1.6.2                  codetools_0.2-19           
-[67] ps_1.7.5                    stringi_1.7.12             
-[69] later_1.3.1                 GenomeInfoDb_1.38.0        
-[71] GenomicRanges_1.54.1        ScaledMatrix_1.10.0        
-[73] tibble_3.2.1                pillar_1.9.0               
-[75] htmltools_0.5.6.1           rhdf5filters_1.14.0        
-[77] graph_1.80.0                GenomeInfoDbData_1.2.11    
-[79] R6_2.5.1                    sparseMatrixStats_1.14.0   
-[81] rprojroot_2.0.3             evaluate_0.22              
-[83] Biobase_2.62.0              lattice_0.21-9             
-[85] png_0.1-8                   memoise_2.0.1              
-[87] httpuv_1.6.12               bslib_0.5.1                
-[89] Rcpp_1.0.11                 SparseArray_1.2.1          
-[91] whisker_0.4.1               xfun_0.40                  
-[93] fs_1.6.3                    MatrixGenerics_1.14.0      
-[95] getPass_0.2-2               pkgconfig_2.0.3            </code></pre>
+[57] callr_3.7.3                 S4Vectors_0.40.1           
+[59] bit64_4.0.5                 irlba_2.3.5.1              
+[61] GSEABase_1.64.0             jquerylib_0.1.4            
+[63] annotate_1.80.0             glue_1.6.2                 
+[65] codetools_0.2-19            ps_1.7.5                   
+[67] stringi_1.7.12              later_1.3.1                
+[69] GenomeInfoDb_1.38.0         GenomicRanges_1.54.1       
+[71] ScaledMatrix_1.10.0         tibble_3.2.1               
+[73] pillar_1.9.0                htmltools_0.5.6.1          
+[75] rhdf5filters_1.14.0         graph_1.80.0               
+[77] GenomeInfoDbData_1.2.11     R6_2.5.1                   
+[79] sparseMatrixStats_1.14.0    rprojroot_2.0.3            
+[81] evaluate_0.22               Biobase_2.62.0             
+[83] lattice_0.21-9              png_0.1-8                  
+[85] memoise_2.0.1               httpuv_1.6.12              
+[87] bslib_0.5.1                 Rcpp_1.0.11                
+[89] SparseArray_1.2.0           whisker_0.4.1              
+[91] xfun_0.40                   fs_1.6.3                   
+[93] MatrixGenerics_1.14.0       getPass_0.2-2              
+[95] pkgconfig_2.0.3            </code></pre>
 </div>
 </div>
 
