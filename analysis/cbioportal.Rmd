@@ -73,7 +73,7 @@ studies[idx, ] |>
 
 Download `ov_tcga` study.
 
-```{r ov_tcga, message=FALSE}
+```{r ov_tcga, message=FALSE, warning=FALSE}
 ov_tcga <- cBioDataPack("ov_tcga", ask = FALSE)
 ov_tcga
 ```
@@ -117,9 +117,11 @@ Other metadata.
 metadata(ov_tcga)
 ```
 
-## Kaplan-Meier Plot
+## Survival analysis
 
-Install packages.
+### Packages
+
+Install packages for performing and visualising the survival analysis.
 
 ```{r install_sur_packages, eval=FALSE}
 install.packages("survival")
@@ -133,63 +135,115 @@ library("survival")
 library("survminer")
 ```
 
-Check status.
+### Prepare data
+
+Disease free status.
+
+```{r dfs_status}
+table(colData(ov_tcga)$DFS_STATUS)
+```
+
+Disease free months.
+
+```{r dfs_months}
+head(colData(ov_tcga)$DFS_MONTHS)
+```
+
+Survival status.
 
 ```{r os_status}
-head(colData(ov_tcga)$OS_STATUS)
 table(colData(ov_tcga)$OS_STATUS)
 ```
 
-Check months.
+Survival months.
 
 ```{r class_os_months}
 class(colData(ov_tcga)$OS_MONTHS)
 ```
 
-Data for living patients.
+View data.
 
-```{r os_months_living}
+```{r col_data_ov_tcga}
 colData(ov_tcga) |>
   as.data.frame() |>
-  dplyr::filter(OS_STATUS == "0:LIVING") |>
-  dplyr::select(DFS_STATUS, DFS_MONTHS, OS_STATUS, OS_MONTHS)
-```
-
-Check out the data.
-
-```{r check_data}
-colData(ov_tcga)[1, ] |> t()
+  dplyr::select(DFS_STATUS, DFS_MONTHS, OS_STATUS, OS_MONTHS) |>
+  head()
 ```
 
 Prepare data.
 
-```{r prepare_data}
-col_dat <- colData(ov_tcga)
-wanted_grade <- col_dat$GRADE == "G2" | col_dat$GRADE == "G3"
-col_dat$GRADE[!wanted_grade] <- NA
-col_dat$OS_MONTHS <- as.numeric(col_dat$OS_MONTHS)
-col_dat$OS_YEARS <- as.numeric(col_dat$OS_MONTHS) / 12
-colData(ov_tcga) <- col_dat
+```{r ov_surv, warning=FALSE, message=FALSE}
+colData(ov_tcga) |>
+  as.data.frame() |>
+  dplyr::select(DFS_STATUS, DFS_MONTHS, OS_STATUS, OS_MONTHS, GRADE) |>
+  dplyr::mutate(DFS_STATUS = ifelse(DFS_STATUS == "[Not Available]", NA, as.numeric(substr(DFS_STATUS, 1, 1)))) |>
+  dplyr::mutate(DFS_MONTHS = ifelse(DFS_MONTHS == "[Not Available]", NA, as.numeric(DFS_MONTHS))) |>
+  dplyr::mutate(OS_STATUS = ifelse(OS_STATUS == "[Not Available]", NA, as.numeric(substr(OS_STATUS, 1, 1)))) |>
+  dplyr::mutate(OS_MONTHS = ifelse(OS_MONTHS == "[Not Available]", NA, as.numeric(OS_MONTHS))) |>
+  dplyr::mutate(GRADE = ifelse(GRADE == "[Not Available]", NA, GRADE)) |>
+  dplyr::mutate(GRADE = ifelse(GRADE == "G2" | GRADE == "G3", GRADE, NA)) -> ov_surv
 ```
 
 We specify a simple survival model using tumour grade as a covariate and we draw the K-M plot. (The `substr` function creates a vector where 1 = deceased and 0 = living.)
 
-```{r survfit_grade, fig.width=8, fig.height=6}
+```{r os_grade, fig.width=8, fig.height=8}
 fit <- survfit(
     Surv(OS_MONTHS, as.numeric(substr(OS_STATUS, 1, 1))) ~ GRADE,
-    data = colData(ov_tcga)
+    data = ov_surv
 )
-ggsurvplot(fit, data = colData(ov_tcga), risk.table = TRUE)
+
+ggsurvplot(
+  fit,
+  data = ov_surv,
+  pval = TRUE,
+  pval.method = TRUE,
+  conf.int = TRUE,
+  risk.table = TRUE,
+  risk.table.col = "strata",
+  linetype = "strata",
+  surv.median.line = "hv",
+  ggtheme = theme_bw(),
+  ncensor.plot = TRUE
+)
 ```
 
-Using years.
+Disease free status.
 
-```{r survfit_grade_years, fig.width=8, fig.height=6}
+```{r dfs_grade, fig.width=8, fig.height=8}
 fit2 <- survfit(
-    Surv(OS_YEARS, as.numeric(substr(OS_STATUS, 1, 1))) ~ GRADE,
-    data = colData(ov_tcga)
+    Surv(DFS_MONTHS, as.numeric(substr(DFS_STATUS, 1, 1))) ~ GRADE,
+    data = ov_surv
 )
-ggsurvplot(fit2, data = colData(ov_tcga), risk.table = TRUE)
+
+ggsurvplot(
+  fit2,
+  data = ov_surv,
+  pval = TRUE,
+  pval.method = TRUE,
+  conf.int = TRUE,
+  risk.table = TRUE,
+  risk.table.col = "strata",
+  linetype = "strata",
+  surv.median.line = "hv",
+  ggtheme = theme_bw(),
+  ncensor.plot = TRUE
+)
+```
+
+Cox Proportional-Hazards Model.
+
+```{r cox_os_survival}
+grade_os_cox <- coxph(Surv(OS_MONTHS, OS_STATUS) ~ GRADE, data = ov_surv)
+summary(grade_os_cox)
+```
+
+Having grade G3 has a hazard ratio of 1.17 but is not significant.
+
+Repeat analysis using disease free survival.
+
+```{r cox_dfs_survival}
+grade_dfs_cox <- coxph(Surv(DFS_MONTHS, DFS_STATUS) ~ GRADE, data = ov_surv)
+summary(grade_dfs_cox)
 ```
 
 ## Useful links
