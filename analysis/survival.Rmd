@@ -1,0 +1,293 @@
+---
+title: "Survival analysis using the survival and survminer R packages"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+[Survival analysis](http://www.sthda.com/english/wiki/survival-analysis-basics) corresponds to a set of statistical approaches used to investigate the time it takes for an event of interest to occur. It is used in:
+
+* Cancer studies for patient's survival time analysis
+* Sociology for event-history analysis
+* Engineering for failure-time analysis
+
+In cancer studies, typical research questions include:
+
+* What is the impact of certain clinical characteristics on patient's survival?
+* What is the probability that an individual survives 3 years?
+* Are there differences in survival between groups of patients?
+
+Most survival analyses in cancer studies use the following methods:
+
+* Kaplan-Meier plots to visualise survival curves
+* Log-rank test to compare the survival curves of two or more groups
+* Cox proportional hazards regression to describe the effect of variables on survival
+
+## Basic concepts
+
+### Survival time and type of events in cancer studies
+
+There are different types of events in cancer studies, including:
+
+* Relapse
+* Progression
+* Death
+
+The time from "response to treatment" (complete remission) to the occurrence of the event of interest is commonly called survival time (or time to event).
+
+The two most important measures in cancer studies include:
+
+1. The time to death
+2. The relapse-free survival time, which corresponds to the time between response to treatment and recurrence of the disease. It is also known as disease-free survival time and event-free survival time.
+
+### Censoring
+
+Survival analysis focuses on the expected duration of time until occurrence of an event of interest (relapse or death). However, the event may not be observed for some individuals within the study time period, producing the so-called censored observations.
+
+Censoring may arise in the following ways:
+
+1. A patient has not (yet) experienced the event of interest, such as relapse or death, within the study time period;
+2. A patient is lost to follow-up during the study period;
+3. A patient experiences a different event that makes further follow-up impossible.
+
+### Survival and hazard functions
+
+Two related probabilities are used to describe survival data:
+
+1. The survival probability
+2. The hazard probability
+
+The survival probability, also known as the survivor function $S(t)$, is the probability that an individual survives from the time origin (e.g. diagnosis of cancer) to a specified future time $t$.
+
+The hazard, denoted by $h(t)$, is the probability that an individual who is under observation at a time $t$ has an event at that time.
+
+**The survivor function focuses on not having an event and the hazard function focuses on the event occurring**.
+
+### Kaplan-Meier survival estimate
+
+The Kaplan-Meier (KM) method is a non-parametric method used to estimate the survival probability from observed survival times (Kaplan and Meier, 1958).
+
+The survival probability at time $t_i$, $S(t_i)$ is calculated as follows:
+
+$$ S(t_i) = S(t_{i-1})(1 - \frac{d_i}{n_i}) $$
+
+Where:
+
+* $S(t_i-1)$ = the probability of being alive at $t_{i-1}$
+* $n_i$ = the number of patients alive just before $t_i$
+* $d_i$ = the number of events at $t_i$
+* $t_0 = 0$ and $S(0) = 1$
+
+The estimated probability $S(t)$ is a step function that changes value only at the time of each event. It is also possible to compute confidence intervals for the survival probability.
+
+The KM survival curve, a plot of the KM survival probability against time, provides a useful summary of the data that can be used to estimate measures such as median survival time.
+
+## Survival analysis in R
+
+The commonly used packages for survival analysis are
+
+* {survival} for computing survival analyses
+* {survminer} for summarising and visualising the results of survival analysis
+
+Install the packages, if they are not already installed, and load them
+
+```{r load_packages, message=FALSE, warning=FALSE}
+my_packages <- c('survival', 'survminer')
+
+sapply(my_packages, function(p){
+  if(!require(p, character.only = TRUE)){
+    install.packages(p)
+    library(p, character.only = TRUE)
+  }
+  as.character(packageVersion(p))
+})
+```
+
+### Lung cancer data
+
+The survival package comes with lung cancer data.
+
+```{r lung}
+data(cancer, package="survival")
+str(lung)
+```
+
+The format of the `lung` data is as follows:
+
+| Column    | Details                                                         |
+| :-------- | :-------------------------------------------------------------- |
+| inst      | Institution code                                                |
+| time      | Survival time in days                                           |
+| status    | censoring status 1=censored, 2=dead                             |
+| age       | Age in years                                                    |
+| sex       | Male=1 Female=2                                                 |
+| ph.ecog   | ECOG performance score                                          |
+| ph.karno  | Karnofsky performance score (bad=0-good=100) rated by physician |
+| pat.karno | Karnofsky performance score as rated by patient                 |
+| meal.cal  | Calories consumed at meals                                      |
+| wt.loss   | Weight loss in last six months (pounds)                         |
+
+ECOG performance score is as rated by the physician.
+
+* 0 = asymptomatic
+* 1 = symptomatic but completely ambulatory
+* 2 = in bed <50% of the day
+* 3 = in bed > 50% of the day but not bedbound,
+* 4 = bedbound
+
+### Compute survival curves
+
+The function `survfit()` can be used to compute Kaplan-Meier survival estimates. Its main arguments include:
+
+* A survival object created using the function `Surv()`
+* The data set containing the variables
+
+Compute the survival probability by gender.
+
+```{r survfit_lung}
+fit <- survfit(Surv(time, status) ~ sex, data = lung)
+fit
+```
+
+Use `summary(fit)` to get a complete summary of the survival curves.
+
+```{r names_fit}
+names(fit)
+```
+
+The `surv_summary()` function can also be used to get a summary of survival curves.
+
+```{r fit_sum}
+fit_sum <- surv_summary(fit)
+head(fit_sum)
+```
+
+| Name        | Details                                                                             |
+| :---------- | :---------------------------------------------------------------------------------- |
+| time        | the time points at which the curve has a step                                       |
+| n.risk      | the number of subjects at risk at time t                                            |
+| n.event     | the number of events that occurred at time t                                        |
+| n.censor    | the number of censored subjects, who exit the risk set, without an event, at time t |
+| surv        | estimate of survival probability                                                    |
+| std.err     | standard error of survival                                                          |
+| lower,upper | lower and upper confidence limits for the curve, respectively                       |
+| strata      | indicates stratification of curve estimation                                        |
+
+If strata is not NULL, there are multiple curves in the result. The levels of strata (a factor) are the labels for the curves.
+ 
+### Visualise survival curves
+
+The `ggsurvplot()` function can be used to produce the survival curves for the two groups of subjects.
+
+It is possible to show:
+
+* The 95% confidence limits of the survivor function using the argument `conf.int = TRUE`
+* The number and/or the percentage of individuals at risk by time using the option `risk.table`. Allowed values for `risk.table` include:
+    * `TRUE` or `FALSE` specifying whether to show or not the risk table. Default is `FALSE`
+    * `absolute` or `percentage` to show the absolute number and the percentage of subjects at risk by time, respectively. Use `abs_pct` to show both absolute number and percentage.
+* The _p_-value of the Log-Rank test comparing the groups using `pval = TRUE`
+* Horizontal/vertical line at median survival using the argument `surv.median.line`. Allowed values include: `none`, `hv`, `h`, and `v`
+
+We will plot the survival plot with the following options:
+
+* Add risk table
+* Change risk table color by groups
+* Change line type by groups
+* Specify median survival
+* Use the `theme_bw()` ggplot2 theme
+* Plot the number of censored subjects at time t
+
+```{r fit_survplot, fig.height=8, fig.width=7}
+ggsurvplot(
+  fit,
+  pval = TRUE,
+  pval.method = TRUE,
+  conf.int = TRUE,
+  risk.table = TRUE,
+  risk.table.col = "strata",
+  linetype = "strata",
+  surv.median.line = "hv",
+  ggtheme = theme_bw(),
+  ncensor.plot = TRUE,
+  palette = c("#E7B800", "#2E9FDF")
+)
+```
+
+The x-axis represents time in days, and the y-axis shows the probability of surviving or the proportion of people surviving. The lines represent survival curves of the two groups. A vertical drop in the curves indicates an event, which in this case is the `status` (1 = censored and 2 = dead). The vertical tick mark on the curves means that a patient was censored at this time.
+
+At time zero, the survival probability is 1.0. At time 250, the probability of survival is approximately 0.55 (or 55%) for sex=1 and 0.75 (or 75%) for sex=2. The median survival is approximately 270 days for sex=1 and 426 days for sex=2, suggesting a good survival for sex=2 compared to sex=1.
+
+```{r median_survival}
+summary(fit)$table
+```
+
+There appears to be a survival advantage for female with lung cancer compare to male. However, to evaluate whether this difference is statistically significant requires a formal statistical test.
+
+Three often used transformations for `ggsurvplot` can be specified using the argument fun:
+
+* `log`: log transformation of the survivor function
+* `event`: plots cumulative events $f(y) = 1-y$. It is also known as the cumulative incidence
+* `cumhaz` plots the cumulative hazard function $f(y) = -log(y)$
+
+Plot cumulative events.
+
+```{r fit_survplot_event, fig.height=5, fig.width=5}
+ggsurvplot(
+  fit,
+  conf.int = TRUE,
+  risk.table.col = "strata",
+  ggtheme = theme_bw(),
+  palette = c("#E7B800", "#2E9FDF"),
+  fun = "event"
+)
+```
+
+The cumulative hazard is commonly used to estimate the hazard probability. It is defined as $H(t) = −log(S(t))$. The cumulative hazard $H(t)$ can be interpreted as the cumulative force of mortality. In other words, it corresponds to the number of events that would be expected for each individual by time $t$ if the event were a repeatable process.
+
+```{r fit_survplot_cumhaz, fig.height=5, fig.width=5}
+ggsurvplot(
+  fit,
+  conf.int = TRUE,
+  risk.table.col = "strata",
+  ggtheme = theme_bw(),
+  palette = c("#E7B800", "#2E9FDF"),
+  fun = "cumhaz"
+)
+```
+
+### Log-Rank test comparing survival curves
+
+The log-rank test is the most widely used method of comparing two or more survival curves. The null hypothesis is that there is no difference in survival between the two groups. The log rank test is a non-parametric test, which makes no assumptions about the survival distributions.
+
+Essentially, the log rank test compares the observed number of events in each group to what would be expected if the null hypothesis were true (i.e., if the survival curves were identical). The log rank statistic is approximately distributed as a chi-square test statistic.
+
+The `survdiff()` function can be used to compute log-rank test comparing two or more survival curves.
+
+```{r sex_survdiff}
+sex_survdiff <- survdiff(Surv(time, status) ~ sex, data = lung)
+sex_survdiff
+```
+
+The log rank test for difference in survival gives a p-value of `r sex_survdiff$pvalue`, indicating that the sex groups differ significantly in survival.
+
+### Summary
+
+Survival analysis is a set of statistical approaches for data analysis where the outcome variable of interest is **time until an event occurs**.
+
+Survival data are generally described and modeled in terms of two related functions:
+
+* The survivor function representing the probability that an individual survives from the time of origin to some time beyond time $t$. It is usually estimated by the Kaplan-Meier method. The logrank test may be used to test for differences between survival curves for groups, such as treatments or gender as per this post.
+* The hazard function gives the instantaneous potential of having an event at a time, given survival up to that time. It is used primarily as a diagnostic tool or for specifying a mathematical model for survival analysis.
+
+Take home message: **The survivor function focuses on not having an event and the hazard function focuses on the event occurring**.
+
+### References
+
+* [Survival Analysis Basics](http://www.sthda.com/english/wiki/survival-analysis-basics)
