@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2023-11-09" />
+
+<title>Survival analysis using the survival and survminer R packages</title>
+
+<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Survival analysis using the survival and
+survminer R packages</h1>
+<h4 class="date">2023-11-09</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2023-11-09
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree16f2e4c5cfd6ce8a84ba303709d7cad18e1e1a87targetblank16f2e4ca">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/16f2e4c5cfd6ce8a84ba303709d7cad18e1e1a87" target="_blank">16f2e4c</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree16f2e4c5cfd6ce8a84ba303709d7cad18e1e1a87targetblank16f2e4ca"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/16f2e4c5cfd6ce8a84ba303709d7cad18e1e1a87" target="_blank">16f2e4c</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    r_packages_4.3.2/
+
+Untracked files:
+    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  analysis/sleuth.Rmd
+    Untracked:  analysis/tss_xgboost.Rmd
+    Untracked:  code/multiz100way/
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
+    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
+    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
+    Untracked:  data/ncrna_noncode_v3.fa
+    Untracked:  data/netmhciipan.out.gz
+    Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
+    Untracked:  export/output/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/graph.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/survival.Rmd</code>) and HTML
+(<code>docs/survival.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/16f2e4c5cfd6ce8a84ba303709d7cad18e1e1a87/analysis/survival.Rmd" target="_blank">16f2e4c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-09
+</td>
+<td>
+Survival analysis
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p><a
+href="http://www.sthda.com/english/wiki/survival-analysis-basics">Survival
+analysis</a> corresponds to a set of statistical approaches used to
+investigate the time it takes for an event of interest to occur. It is
+used in:</p>
+<ul>
+<li>Cancer studies for patient’s survival time analysis</li>
+<li>Sociology for event-history analysis</li>
+<li>Engineering for failure-time analysis</li>
+</ul>
+<p>In cancer studies, typical research questions include:</p>
+<ul>
+<li>What is the impact of certain clinical characteristics on patient’s
+survival?</li>
+<li>What is the probability that an individual survives 3 years?</li>
+<li>Are there differences in survival between groups of patients?</li>
+</ul>
+<p>Most survival analyses in cancer studies use the following
+methods:</p>
+<ul>
+<li>Kaplan-Meier plots to visualise survival curves</li>
+<li>Log-rank test to compare the survival curves of two or more
+groups</li>
+<li>Cox proportional hazards regression to describe the effect of
+variables on survival</li>
+</ul>
+</div>
+<div id="basic-concepts" class="section level2">
+<h2>Basic concepts</h2>
+<div id="survival-time-and-type-of-events-in-cancer-studies"
+class="section level3">
+<h3>Survival time and type of events in cancer studies</h3>
+<p>There are different types of events in cancer studies, including:</p>
+<ul>
+<li>Relapse</li>
+<li>Progression</li>
+<li>Death</li>
+</ul>
+<p>The time from “response to treatment” (complete remission) to the
+occurrence of the event of interest is commonly called survival time (or
+time to event).</p>
+<p>The two most important measures in cancer studies include:</p>
+<ol style="list-style-type: decimal">
+<li>The time to death</li>
+<li>The relapse-free survival time, which corresponds to the time
+between response to treatment and recurrence of the disease. It is also
+known as disease-free survival time and event-free survival time.</li>
+</ol>
+</div>
+<div id="censoring" class="section level3">
+<h3>Censoring</h3>
+<p>Survival analysis focuses on the expected duration of time until
+occurrence of an event of interest (relapse or death). However, the
+event may not be observed for some individuals within the study time
+period, producing the so-called censored observations.</p>
+<p>Censoring may arise in the following ways:</p>
+<ol style="list-style-type: decimal">
+<li>A patient has not (yet) experienced the event of interest, such as
+relapse or death, within the study time period;</li>
+<li>A patient is lost to follow-up during the study period;</li>
+<li>A patient experiences a different event that makes further follow-up
+impossible.</li>
+</ol>
+</div>
+<div id="survival-and-hazard-functions" class="section level3">
+<h3>Survival and hazard functions</h3>
+<p>Two related probabilities are used to describe survival data:</p>
+<ol style="list-style-type: decimal">
+<li>The survival probability</li>
+<li>The hazard probability</li>
+</ol>
+<p>The survival probability, also known as the survivor function <span
+class="math inline">\(S(t)\)</span>, is the probability that an
+individual survives from the time origin (e.g. diagnosis of cancer) to a
+specified future time <span class="math inline">\(t\)</span>.</p>
+<p>The hazard, denoted by <span class="math inline">\(h(t)\)</span>, is
+the probability that an individual who is under observation at a time
+<span class="math inline">\(t\)</span> has an event at that time.</p>
+<p><strong>The survivor function focuses on not having an event and the
+hazard function focuses on the event occurring</strong>.</p>
+</div>
+<div id="kaplan-meier-survival-estimate" class="section level3">
+<h3>Kaplan-Meier survival estimate</h3>
+<p>The Kaplan-Meier (KM) method is a non-parametric method used to
+estimate the survival probability from observed survival times (Kaplan
+and Meier, 1958).</p>
+<p>The survival probability at time <span
+class="math inline">\(t_i\)</span>, <span
+class="math inline">\(S(t_i)\)</span> is calculated as follows:</p>
+<p><span class="math display">\[ S(t_i) = S(t_{i-1})(1 -
+\frac{d_i}{n_i}) \]</span></p>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(S(t_i-1)\)</span> = the probability of
+being alive at <span class="math inline">\(t_{i-1}\)</span></li>
+<li><span class="math inline">\(n_i\)</span> = the number of patients
+alive just before <span class="math inline">\(t_i\)</span></li>
+<li><span class="math inline">\(d_i\)</span> = the number of events at
+<span class="math inline">\(t_i\)</span></li>
+<li><span class="math inline">\(t_0 = 0\)</span> and <span
+class="math inline">\(S(0) = 1\)</span></li>
+</ul>
+<p>The estimated probability <span class="math inline">\(S(t)\)</span>
+is a step function that changes value only at the time of each event. It
+is also possible to compute confidence intervals for the survival
+probability.</p>
+<p>The KM survival curve, a plot of the KM survival probability against
+time, provides a useful summary of the data that can be used to estimate
+measures such as median survival time.</p>
+</div>
+</div>
+<div id="survival-analysis-in-r" class="section level2">
+<h2>Survival analysis in R</h2>
+<p>The commonly used packages for survival analysis are</p>
+<ul>
+<li>{survival} for computing survival analyses</li>
+<li>{survminer} for summarising and visualising the results of survival
+analysis</li>
+</ul>
+<p>Install the packages, if they are not already installed, and load
+them</p>
+<pre class="r"><code>my_packages &lt;- c(&#39;survival&#39;, &#39;survminer&#39;)
+
+sapply(my_packages, function(p){
+  if(!require(p, character.only = TRUE)){
+    install.packages(p)
+    library(p, character.only = TRUE)
+  }
+  as.character(packageVersion(p))
+})</code></pre>
+<pre><code> survival survminer 
+  &quot;3.5.7&quot;   &quot;0.4.9&quot; </code></pre>
+<div id="lung-cancer-data" class="section level3">
+<h3>Lung cancer data</h3>
+<p>The survival package comes with lung cancer data.</p>
+<pre class="r"><code>data(cancer, package=&quot;survival&quot;)
+str(lung)</code></pre>
+<pre><code>&#39;data.frame&#39;:   228 obs. of  10 variables:
+ $ inst     : num  3 3 3 5 1 12 7 11 1 7 ...
+ $ time     : num  306 455 1010 210 883 ...
+ $ status   : num  2 2 1 2 2 1 2 2 2 2 ...
+ $ age      : num  74 68 56 57 60 74 68 71 53 61 ...
+ $ sex      : num  1 1 1 1 1 1 2 2 1 1 ...
+ $ ph.ecog  : num  1 0 0 1 0 1 2 2 1 2 ...
+ $ ph.karno : num  90 90 90 90 100 50 70 60 70 70 ...
+ $ pat.karno: num  100 90 90 60 90 80 60 80 80 70 ...
+ $ meal.cal : num  1175 1225 NA 1150 NA ...
+ $ wt.loss  : num  NA 15 15 11 0 0 10 1 16 34 ...</code></pre>
+<p>The format of the <code>lung</code> data is as follows:</p>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="87%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Column</th>
+<th align="left">Details</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">inst</td>
+<td align="left">Institution code</td>
+</tr>
+<tr class="even">
+<td align="left">time</td>
+<td align="left">Survival time in days</td>
+</tr>
+<tr class="odd">
+<td align="left">status</td>
+<td align="left">censoring status 1=censored, 2=dead</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="left">Age in years</td>
+</tr>
+<tr class="odd">
+<td align="left">sex</td>
+<td align="left">Male=1 Female=2</td>
+</tr>
+<tr class="even">
+<td align="left">ph.ecog</td>
+<td align="left">ECOG performance score</td>
+</tr>
+<tr class="odd">
+<td align="left">ph.karno</td>
+<td align="left">Karnofsky performance score (bad=0-good=100) rated by
+physician</td>
+</tr>
+<tr class="even">
+<td align="left">pat.karno</td>
+<td align="left">Karnofsky performance score as rated by patient</td>
+</tr>
+<tr class="odd">
+<td align="left">meal.cal</td>
+<td align="left">Calories consumed at meals</td>
+</tr>
+<tr class="even">
+<td align="left">wt.loss</td>
+<td align="left">Weight loss in last six months (pounds)</td>
+</tr>
+</tbody>
+</table>
+<p>ECOG performance score is as rated by the physician.</p>
+<ul>
+<li>0 = asymptomatic</li>
+<li>1 = symptomatic but completely ambulatory</li>
+<li>2 = in bed &lt;50% of the day</li>
+<li>3 = in bed &gt; 50% of the day but not bedbound,</li>
+<li>4 = bedbound</li>
+</ul>
+</div>
+<div id="compute-survival-curves" class="section level3">
+<h3>Compute survival curves</h3>
+<p>The function <code>survfit()</code> can be used to compute
+Kaplan-Meier survival estimates. Its main arguments include:</p>
+<ul>
+<li>A survival object created using the function
+<code>Surv()</code></li>
+<li>The data set containing the variables</li>
+</ul>
+<p>Compute the survival probability by gender.</p>
+<pre class="r"><code>fit &lt;- survfit(Surv(time, status) ~ sex, data = lung)
+fit</code></pre>
+<pre><code>Call: survfit(formula = Surv(time, status) ~ sex, data = lung)
+
+        n events median 0.95LCL 0.95UCL
+sex=1 138    112    270     212     310
+sex=2  90     53    426     348     550</code></pre>
+<p>Use <code>summary(fit)</code> to get a complete summary of the
+survival curves.</p>
+<pre class="r"><code>names(fit)</code></pre>
+<pre><code> [1] &quot;n&quot;         &quot;time&quot;      &quot;n.risk&quot;    &quot;n.event&quot;   &quot;n.censor&quot;  &quot;surv&quot;     
+ [7] &quot;std.err&quot;   &quot;cumhaz&quot;    &quot;std.chaz&quot;  &quot;strata&quot;    &quot;type&quot;      &quot;logse&quot;    
+[13] &quot;conf.int&quot;  &quot;conf.type&quot; &quot;lower&quot;     &quot;upper&quot;     &quot;call&quot;     </code></pre>
+<p>The <code>surv_summary()</code> function can also be used to get a
+summary of survival curves.</p>
+<pre class="r"><code>fit_sum &lt;- surv_summary(fit)</code></pre>
+<pre><code>Warning in .get_data(x, data = data): The `data` argument is not provided. Data
+will be extracted from model fit.</code></pre>
+<pre class="r"><code>head(fit_sum)</code></pre>
+<pre><code>  time n.risk n.event n.censor      surv    std.err     upper     lower strata
+1   11    138       3        0 0.9782609 0.01268978 1.0000000 0.9542301  sex=1
+2   12    135       1        0 0.9710145 0.01470747 0.9994124 0.9434235  sex=1
+3   13    134       2        0 0.9565217 0.01814885 0.9911586 0.9230952  sex=1
+4   15    132       1        0 0.9492754 0.01967768 0.9866017 0.9133612  sex=1
+5   26    131       1        0 0.9420290 0.02111708 0.9818365 0.9038355  sex=1
+6   30    130       1        0 0.9347826 0.02248469 0.9768989 0.8944820  sex=1
+  sex
+1   1
+2   1
+3   1
+4   1
+5   1
+6   1</code></pre>
+<table>
+<colgroup>
+<col width="11%" />
+<col width="88%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Details</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">time</td>
+<td align="left">the time points at which the curve has a step</td>
+</tr>
+<tr class="even">
+<td align="left">n.risk</td>
+<td align="left">the number of subjects at risk at time t</td>
+</tr>
+<tr class="odd">
+<td align="left">n.event</td>
+<td align="left">the number of events that occurred at time t</td>
+</tr>
+<tr class="even">
+<td align="left">n.censor</td>
+<td align="left">the number of censored subjects, who exit the risk set,
+without an event, at time t</td>
+</tr>
+<tr class="odd">
+<td align="left">surv</td>
+<td align="left">estimate of survival probability</td>
+</tr>
+<tr class="even">
+<td align="left">std.err</td>
+<td align="left">standard error of survival</td>
+</tr>
+<tr class="odd">
+<td align="left">lower,upper</td>
+<td align="left">lower and upper confidence limits for the curve,
+respectively</td>
+</tr>
+<tr class="even">
+<td align="left">strata</td>
+<td align="left">indicates stratification of curve estimation</td>
+</tr>
+</tbody>
+</table>
+<p>If strata is not NULL, there are multiple curves in the result. The
+levels of strata (a factor) are the labels for the curves.</p>
+</div>
+<div id="visualise-survival-curves" class="section level3">
+<h3>Visualise survival curves</h3>
+<p>The <code>ggsurvplot()</code> function can be used to produce the
+survival curves for the two groups of subjects.</p>
+<p>It is possible to show:</p>
+<ul>
+<li>The 95% confidence limits of the survivor function using the
+argument <code>conf.int = TRUE</code></li>
+<li>The number and/or the percentage of individuals at risk by time
+using the option <code>risk.table</code>. Allowed values for
+<code>risk.table</code> include:
+<ul>
+<li><code>TRUE</code> or <code>FALSE</code> specifying whether to show
+or not the risk table. Default is <code>FALSE</code></li>
+<li><code>absolute</code> or <code>percentage</code> to show the
+absolute number and the percentage of subjects at risk by time,
+respectively. Use <code>abs_pct</code> to show both absolute number and
+percentage.</li>
+</ul></li>
+<li>The <em>p</em>-value of the Log-Rank test comparing the groups using
+<code>pval = TRUE</code></li>
+<li>Horizontal/vertical line at median survival using the argument
+<code>surv.median.line</code>. Allowed values include:
+<code>none</code>, <code>hv</code>, <code>h</code>, and
+<code>v</code></li>
+</ul>
+<p>We will plot the survival plot with the following options:</p>
+<ul>
+<li>Add risk table</li>
+<li>Change risk table color by groups</li>
+<li>Change line type by groups</li>
+<li>Specify median survival</li>
+<li>Use the <code>theme_bw()</code> ggplot2 theme</li>
+<li>Plot the number of censored subjects at time t</li>
+</ul>
+<pre class="r"><code>ggsurvplot(
+  fit,
+  pval = TRUE,
+  pval.method = TRUE,
+  conf.int = TRUE,
+  risk.table = TRUE,
+  risk.table.col = &quot;strata&quot;,
+  linetype = &quot;strata&quot;,
+  surv.median.line = &quot;hv&quot;,
+  ggtheme = theme_bw(),
+  ncensor.plot = TRUE,
+  palette = c(&quot;#E7B800&quot;, &quot;#2E9FDF&quot;)
+)</code></pre>
+<p><img src="figure/survival.Rmd/fit_survplot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The x-axis represents time in days, and the y-axis shows the
+probability of surviving or the proportion of people surviving. The
+lines represent survival curves of the two groups. A vertical drop in
+the curves indicates an event, which in this case is the
+<code>status</code> (1 = censored and 2 = dead). The vertical tick mark
+on the curves means that a patient was censored at this time.</p>
+<p>At time zero, the survival probability is 1.0. At time 250, the
+probability of survival is approximately 0.55 (or 55%) for sex=1 and
+0.75 (or 75%) for sex=2. The median survival is approximately 270 days
+for sex=1 and 426 days for sex=2, suggesting a good survival for sex=2
+compared to sex=1.</p>
+<pre class="r"><code>summary(fit)$table</code></pre>
+<pre><code>      records n.max n.start events    rmean se(rmean) median 0.95LCL 0.95UCL
+sex=1     138   138     138    112 326.0841  22.91156    270     212     310
+sex=2      90    90      90     53 460.6473  34.68985    426     348     550</code></pre>
+<p>There appears to be a survival advantage for female with lung cancer
+compare to male. However, to evaluate whether this difference is
+statistically significant requires a formal statistical test.</p>
+<p>Three often used transformations for <code>ggsurvplot</code> can be
+specified using the argument fun:</p>
+<ul>
+<li><code>log</code>: log transformation of the survivor function</li>
+<li><code>event</code>: plots cumulative events <span
+class="math inline">\(f(y) = 1-y\)</span>. It is also known as the
+cumulative incidence</li>
+<li><code>cumhaz</code> plots the cumulative hazard function <span
+class="math inline">\(f(y) = -log(y)\)</span></li>
+</ul>
+<p>Plot cumulative events.</p>
+<pre class="r"><code>ggsurvplot(
+  fit,
+  conf.int = TRUE,
+  risk.table.col = &quot;strata&quot;,
+  ggtheme = theme_bw(),
+  palette = c(&quot;#E7B800&quot;, &quot;#2E9FDF&quot;),
+  fun = &quot;event&quot;
+)</code></pre>
+<p><img src="figure/survival.Rmd/fit_survplot_event-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>The cumulative hazard is commonly used to estimate the hazard
+probability. It is defined as <span class="math inline">\(H(t) =
+−log(S(t))\)</span>. The cumulative hazard <span
+class="math inline">\(H(t)\)</span> can be interpreted as the cumulative
+force of mortality. In other words, it corresponds to the number of
+events that would be expected for each individual by time <span
+class="math inline">\(t\)</span> if the event were a repeatable
+process.</p>
+<pre class="r"><code>ggsurvplot(
+  fit,
+  conf.int = TRUE,
+  risk.table.col = &quot;strata&quot;,
+  ggtheme = theme_bw(),
+  palette = c(&quot;#E7B800&quot;, &quot;#2E9FDF&quot;),
+  fun = &quot;cumhaz&quot;
+)</code></pre>
+<p><img src="figure/survival.Rmd/fit_survplot_cumhaz-1.png" width="480" style="display: block; margin: auto;" /></p>
+</div>
+<div id="log-rank-test-comparing-survival-curves"
+class="section level3">
+<h3>Log-Rank test comparing survival curves</h3>
+<p>The log-rank test is the most widely used method of comparing two or
+more survival curves. The null hypothesis is that there is no difference
+in survival between the two groups. The log rank test is a
+non-parametric test, which makes no assumptions about the survival
+distributions.</p>
+<p>Essentially, the log rank test compares the observed number of events
+in each group to what would be expected if the null hypothesis were true
+(i.e., if the survival curves were identical). The log rank statistic is
+approximately distributed as a chi-square test statistic.</p>
+<p>The <code>survdiff()</code> function can be used to compute log-rank
+test comparing two or more survival curves.</p>
+<pre class="r"><code>sex_survdiff &lt;- survdiff(Surv(time, status) ~ sex, data = lung)
+sex_survdiff</code></pre>
+<pre><code>Call:
+survdiff(formula = Surv(time, status) ~ sex, data = lung)
+
+        N Observed Expected (O-E)^2/E (O-E)^2/V
+sex=1 138      112     91.6      4.55      10.3
+sex=2  90       53     73.4      5.68      10.3
+
+ Chisq= 10.3  on 1 degrees of freedom, p= 0.001 </code></pre>
+<p>The log rank test for difference in survival gives a p-value of
+0.0013112, indicating that the sex groups differ significantly in
+survival.</p>
+</div>
+<div id="summary" class="section level3">
+<h3>Summary</h3>
+<p>Survival analysis is a set of statistical approaches for data
+analysis where the outcome variable of interest is <strong>time until an
+event occurs</strong>.</p>
+<p>Survival data are generally described and modeled in terms of two
+related functions:</p>
+<ul>
+<li>The survivor function representing the probability that an
+individual survives from the time of origin to some time beyond time
+<span class="math inline">\(t\)</span>. It is usually estimated by the
+Kaplan-Meier method. The logrank test may be used to test for
+differences between survival curves for groups, such as treatments or
+gender as per this post.</li>
+<li>The hazard function gives the instantaneous potential of having an
+event at a time, given survival up to that time. It is used primarily as
+a diagnostic tool or for specifying a mathematical model for survival
+analysis.</li>
+</ul>
+<p>Take home message: <strong>The survivor function focuses on not
+having an event and the hazard function focuses on the event
+occurring</strong>.</p>
+</div>
+<div id="references" class="section level3">
+<h3>References</h3>
+<ul>
+<li><a
+href="http://www.sthda.com/english/wiki/survival-analysis-basics">Survival
+Analysis Basics</a></li>
+</ul>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.3.2 (2023-10-31)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 22.04.3 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] survminer_0.4.9 ggpubr_0.6.0    ggplot2_3.4.4   survival_3.5-7 
+[5] workflowr_1.7.1
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.4      xfun_0.41         bslib_0.5.1       processx_3.8.2   
+ [5] rstatix_0.7.2     lattice_0.21-9    callr_3.7.3       vctrs_0.6.4      
+ [9] tools_4.3.2       ps_1.7.5          generics_0.1.3    tibble_3.2.1     
+[13] fansi_1.0.5       highr_0.10        pkgconfig_2.0.3   Matrix_1.6-1.1   
+[17] data.table_1.14.8 lifecycle_1.0.3   farver_2.1.1      compiler_4.3.2   
+[21] stringr_1.5.0     git2r_0.32.0      munsell_0.5.0     getPass_0.2-2    
+[25] carData_3.0-5     httpuv_1.6.12     htmltools_0.5.7   sass_0.4.7       
+[29] yaml_2.3.7        later_1.3.1       pillar_1.9.0      car_3.1-2        
+[33] jquerylib_0.1.4   whisker_0.4.1     tidyr_1.3.0       cachem_1.0.8     
+[37] abind_1.4-5       km.ci_0.5-6       commonmark_1.9.0  tidyselect_1.2.0 
+[41] digest_0.6.33     stringi_1.7.12    dplyr_1.1.3       purrr_1.0.2      
+[45] labeling_0.4.3    splines_4.3.2     rprojroot_2.0.4   fastmap_1.1.1    
+[49] grid_4.3.2        colorspace_2.1-0  cli_3.6.1         magrittr_2.0.3   
+[53] utf8_1.2.4        broom_1.0.5       withr_2.5.2       scales_1.2.1     
+[57] promises_1.2.1    backports_1.4.1   rmarkdown_2.25    httr_1.4.7       
+[61] ggtext_0.1.2      gridExtra_2.3     ggsignif_0.6.4    zoo_1.8-12       
+[65] evaluate_0.23     knitr_1.45        KMsurv_0.1-5      markdown_1.11    
+[69] survMisc_0.5.6    rlang_1.1.2       gridtext_0.1.5    Rcpp_1.0.11      
+[73] xtable_1.8-4      glue_1.6.2        xml2_1.3.5        rstudioapi_0.15.0
+[77] jsonlite_1.8.7    R6_2.5.1          fs_1.6.3         </code></pre>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
