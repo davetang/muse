@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree078c04a2b4c82ba9efc98fa534a6ad9c42857967targetblank078c04aa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4cfa454ded317e0faf5cab8400d239a4361d9c44targetblank4cfa454a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/078c04a2b4c82ba9efc98fa534a6ad9c42857967" target="_blank">078c04a</a>
+<a href="https://github.com/davetang/muse/tree/4cfa454ded317e0faf5cab8400d239a4361d9c44" target="_blank">4cfa454</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree078c04a2b4c82ba9efc98fa534a6ad9c42857967targetblank078c04aa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4cfa454ded317e0faf5cab8400d239a4361d9c44targetblank4cfa454a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/078c04a2b4c82ba9efc98fa534a6ad9c42857967" target="_blank">078c04a</a>.
+<a href="https://github.com/davetang/muse/tree/4cfa454ded317e0faf5cab8400d239a4361d9c44" target="_blank">4cfa454</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -605,6 +605,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/4cfa454ded317e0faf5cab8400d239a4361d9c44/analysis/survival.Rmd" target="_blank">4cfa454</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-09
+</td>
+<td>
+Switch status
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/1d0acd64d69f5dfa3aeef670b8f4f796e27e37b7/docs/survival.html" target="_blank">1d0acd6</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1524,6 +1558,31 @@ Concordance= 0.579  (se = 0.021 )
 Likelihood ratio test= 10.63  on 1 df,   p=0.001
 Wald test            = 10.09  on 1 df,   p=0.001
 Score (logrank) test = 10.33  on 1 df,   p=0.001</code></pre>
+<p>In addition the status is coded as 1=censored and 2=dead. If we
+convert the status into a factor we will get the following error:</p>
+<pre><code>  an id statement is required for multi-state models</code></pre>
+<p>If I switch the status around, the results are reversed.</p>
+<pre class="r"><code>lung3 &lt;- lung
+lung3$status &lt;- ifelse(lung3$status == 2, 1, 2)
+sex_cox3 &lt;- coxph(Surv(time, status) ~ sex, data = lung3)
+summary(sex_cox3)</code></pre>
+<pre><code>Call:
+coxph(formula = Surv(time, status) ~ sex, data = lung3)
+
+  n= 228, number of events= 63 
+
+      coef exp(coef) se(coef)     z Pr(&gt;|z|)  
+sex 0.6476    1.9109   0.2638 2.454   0.0141 *
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+    exp(coef) exp(-coef) lower .95 upper .95
+sex     1.911     0.5233     1.139     3.205
+
+Concordance= 0.563  (se = 0.036 )
+Likelihood ratio test= 6.21  on 1 df,   p=0.01
+Wald test            = 6.02  on 1 df,   p=0.01
+Score (logrank) test = 6.23  on 1 df,   p=0.01</code></pre>
 <p>Perform the univariate Cox analysis on other covariates.</p>
 <pre class="r"><code>covariates &lt;- c(&quot;age&quot;, &quot;sex&quot;,  &quot;ph.karno&quot;, &quot;pat.karno&quot;, &quot;ph.ecog&quot;, &quot;wt.loss&quot;)
 univ_formulas &lt;- sapply(
