@@ -359,7 +359,7 @@ summary(sex_cox)
 
 The Cox regression results can be interpreted as follow:
 
-1. **Statistical significance**. The column marked `z` gives the Wald statistic value. It corresponds to the ratio of each regression coefficient to its standard error ($z = coef/se(coef)$). The Wald statistic evaluates, whether the beta ($\beta$) coefficient of a given variable is statistically significantly different from 0. From the output above, we can conclude that the variable sex have highly statistically significant coefficients.
+1. **Statistical significance**. The column marked `z` gives the Wald statistic value. It corresponds to the ratio of each regression coefficient to its standard error (z = coef/se(coef)). The Wald statistic evaluates, whether the beta ($\beta$) coefficient of a given variable is statistically significantly different from 0. From the output above, we can conclude that the variable sex have highly statistically significant coefficients.
 
 2. **The regression coefficients**. The second feature to note in the Cox model results is the the sign of the regression coefficients (`coef`). A positive sign means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The variable sex is encoded as a numeric vector; 1: male, 2: female. The R summary for the Cox model gives the hazard ratio (HR) for the second group relative to the first group, that is, female versus male. The beta coefficient for sex = -0.53 indicates that females have lower risk of death (lower survival rates) than males, in the `lung` dataset.
 
@@ -372,7 +372,7 @@ The Cox regression results can be interpreted as follow:
 Perform the univariate Cox analysis on other covariates.
 
 ```{r uni_cox}
-covariates <- c("age", "sex",  "ph.karno", "ph.ecog", "wt.loss")
+covariates <- c("age", "sex",  "ph.karno", "pat.karno", "ph.ecog", "wt.loss")
 univ_formulas <- sapply(
   covariates,
   function(x) as.formula(paste('Surv(time, status)~', x))
@@ -405,18 +405,18 @@ res <- t(as.data.frame(univ_results, check.names = FALSE))
 as.data.frame(res)
 ```
 
-The variables `age`, `sex`, and `ph.ecog` have highly statistically significant coefficients. `age` and `ph.ecog` have positive beta coefficients, while sex has a negative coefficient. Thus, older age and higher `ph.ecog` are associated with poorer survival, whereas being female (sex=2) is associated with better survival.
+The variables `age`, `sex`, `ph.karno`, `pat.karno`, and `ph.ecog` have statistically significant coefficients. `age` and `ph.ecog` have positive beta coefficients, while sex has a negative coefficient. Thus, older age and higher `ph.ecog` are associated with poorer survival, whereas being female (sex=2) is associated with better survival.
 
 To perform a multivariate Cox regression analysis, include the additional covariates in the formula.
 
 ```{r multivariate_cox}
-res_cox <- coxph(Surv(time, status) ~ age + sex + ph.ecog, data =  lung)
+res_cox <- coxph(Surv(time, status) ~ age + sex + ph.karno + pat.karno + ph.ecog + wt.loss, data =  lung)
 summary(res_cox)
 ```
 
 The p-value for all three overall tests (likelihood, Wald, and score) are significant, indicating that the model is significant. These tests evaluate the omnibus null hypothesis that all of the betas are 0. In the above example, the test statistics are in close agreement, and the omnibus null hypothesis is soundly rejected.
 
-In the multivariate Cox analysis, the covariates `sex` and `ph.ecog` remain significant (p < 0.05) and the covariate `age` is not significant.
+In the multivariate Cox analysis, the covariates `sex`, `ph.karno`, `pat.karno`, and `ph.ecog` remain significant (p < 0.05) and the covariate `age` is no longer significant.
 
 The p-value for `sex` is 0.000986, with a hazard ratio HR = exp(coef) = 0.58, indicating a strong relationship between the patients' sex and decreased risk of death. The hazard ratios of covariates are interpretable as multiplicative effects on the hazard. For example, holding the other covariates constant, being female (sex=2) reduces the hazard by a factor of 0.58, or 42%. We conclude that, being female is associated with good prognostic.
 
@@ -443,7 +443,10 @@ sex_df <- with(
   data.frame(
     sex = c(1, 2), 
     age = rep(mean(age, na.rm = TRUE), 2),
-    ph.ecog = c(1, 1)
+    ph.ecog = c(1, 1),
+    ph.karno = rep(mean(ph.karno, na.rm=TRUE), 2),
+    pat.karno = rep(mean(pat.karno, na.rm=TRUE), 2),
+    wt.loss = rep(mean(wt.loss, na.rm=TRUE), 2)
   )
 )
 sex_df
