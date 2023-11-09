@@ -291,3 +291,175 @@ Take home message: **The survivor function focuses on not having an event and th
 ### References
 
 * [Survival Analysis Basics](http://www.sthda.com/english/wiki/survival-analysis-basics)
+
+## Cox Proportional-Hazards Model
+
+The [Cox proportional-hazards model](http://www.sthda.com/english/wiki/cox-proportional-hazards-model) (Cox, 1972) is essentially a regression model commonly used in medical research for investigating the association between the survival time of patients and one or more predictor variables.
+
+In the [Survival analysis in R](#survival-analysis-in-r) section, we looked at Kaplan-Meier curves and logrank tests, which are examples of univariate analysis. They describe the survival according to one factor under investigation, but ignore the impact of any others. Additionally, Kaplan-Meier curves and logrank tests are useful only when the predictor variable is categorical and do not work easily for quantitative predictors such as gene expression, weight, or age.
+
+An alternative method is the Cox proportional hazards regression analysis, which works for both quantitative predictor variables and for categorical variables. Furthermore, the Cox regression model extends survival analysis methods to assess simultaneously the effect of several risk factors on survival time.
+
+The Cox proportional-hazards model is one of the most important methods used for modelling survival analysis data.
+
+### The need for multivariate statistical modeling
+
+In clinical investigations, there are many situations, where several known quantities (known as covariates), potentially affecting patient prognosis; for example, comparing two groups of patients where one group has a specific genotype against those without. Furthermore, if one of the groups also contains older individuals, any difference in survival may be attributable to genotype or age (confounding) or indeed both. Hence, when investigating survival in relation to any one factor, it is often desirable to adjust for the impact of others. A statistical model can provide the effect size for each factor.
+
+### Basics of the Cox proportional hazards model
+
+The purpose of the model is to evaluate **simultaneously** the effect of several factors on survival. In other words, it allows us to examine how specified factors influence the rate of a particular event happening (e.g., infection, death) at a particular point in time. This rate is commonly referred as the **hazard rate**. Predictor variables (or factors) are usually termed covariates in the survival-analysis literature.
+
+The Cox model is expressed by the hazard function denoted by $h(t)$. Briefly, the hazard function can be interpreted as the risk of dying at time $t$. It can be estimated as follow:
+
+$$ h(t) = h_0(t) \times exp(b_1x_1 + b_2x_2 + \ldots + b_px_p) $$
+
+where:
+
+* $t$ represents the survival time
+* $h(t)$ is the hazard function determined by a set of $p$ covariates $(x_1, x_2, \ldots, x_p)$
+* the coefficients $(b_1, b_2, \ldots, b_p)$ measure the impact (i.e., the effect size) of covariates
+* the term $h_0$ is called the baseline hazard. It corresponds to the value of the hazard if all the $x_i$ are equal to zero (the quantity $exp(0)$ equals 1). The $t$ in $h(t)$ reminds us that the hazard may vary over time.
+
+The Cox model can be written as a multiple linear regression of the logarithm of the hazard on the variables $x_i$, with the baseline hazard being an intercept term that varies with time.
+
+The quantities $exp(b_i)$ are called hazard ratios (HR). A value of $b_i$ greater than zero, or equivalently a hazard ratio greater than one, indicates that as the value of the $i^{th}$ covariate increases, the event hazard increases and thus the length of survival decreases.
+
+**A hazard ratio above 1 indicates a covariate that is positively associated with the event probability, and thus negatively associated with the length of survival**.
+
+In summary:
+
+* HR = 1: No effect
+* HR < 1: Reduction in the hazard
+* HR > 1: Increase in hazard
+
+In cancer studies:
+
+* A covariate with hazard ratio > 1 (i.e.: $b > 0$) is called bad prognostic factor
+* A covariate with hazard ratio < 1 (i.e.: $b < 0$) is called good prognostic factor
+
+A key assumption of the Cox model is that the hazard curves for the groups of observations (or patients) should be proportional and cannot cross. In other words, if an individual has a risk of death at some initial time point that is twice as high as that of another individual, then at all later times the risk of death remains twice as high.
+
+### Computing the Cox model
+
+The `coxph` function can be used to compute the Cox proportional hazards regression model in R. The simplified format is:
+
+    coxph(formula, data, method)
+    
+* `formula` specifies a linear model with a survival object as the response variable. The survival object is created using the `Surv()` function `Surv(time, event)`.
+* `data` is a data frame that contains the variables.
+* `method` is used to specify how to handle ties. The default is `efron`. Other options are `breslow` and `exact`. The default `efron` is generally preferred to the once-popular `breslow` method and the `exact` method is much more computationally intensive.
+
+We will compute a univariate Cox analysis.
+
+```{r sex_cox}
+sex_cox <- coxph(Surv(time, status) ~ sex, data = lung)
+summary(sex_cox)
+```
+
+The Cox regression results can be interpreted as follow:
+
+1. **Statistical significance**. The column marked `z` gives the Wald statistic value. It corresponds to the ratio of each regression coefficient to its standard error ($z = coef/se(coef)$). The Wald statistic evaluates, whether the beta ($\beta$) coefficient of a given variable is statistically significantly different from 0. From the output above, we can conclude that the variable sex have highly statistically significant coefficients.
+
+2. **The regression coefficients**. The second feature to note in the Cox model results is the the sign of the regression coefficients (`coef`). A positive sign means that the hazard (risk of death) is higher, and thus the prognosis worse, for subjects with higher values of that variable. The variable sex is encoded as a numeric vector; 1: male, 2: female. The R summary for the Cox model gives the hazard ratio (HR) for the second group relative to the first group, that is, female versus male. The beta coefficient for sex = -0.53 indicates that females have lower risk of death (lower survival rates) than males, in the `lung` dataset.
+
+3. **Hazard ratios**. The exponentiated coefficients (exp(coef) = exp(-0.53) = 0.59), also known as hazard ratios, give the effect size of covariates. For example, being female (sex=2) reduces the hazard by a factor of 0.59, or 41%. Being female is associated with good prognostic.
+
+4. **Confidence intervals of the hazard ratios**. The summary output also gives upper and lower 95% confidence intervals for the hazard ratio (exp(coef)), lower 95% bound = 0.4237, upper 95% bound = 0.816.
+
+5. **Global statistical significance of the model**. Finally, the output gives _p_-values for three alternative tests for overall significance of the model: The likelihood-ratio test, Wald test, and score logrank statistics. These three methods are asymptotically equivalent. For large enough N, they will give similar results. For small N, they may differ somewhat. The Likelihood ratio test has better behavior for small sample sizes, so it is generally preferred.
+
+Perform the univariate Cox analysis on other covariates.
+
+```{r uni_cox}
+covariates <- c("age", "sex",  "ph.karno", "ph.ecog", "wt.loss")
+univ_formulas <- sapply(
+  covariates,
+  function(x) as.formula(paste('Surv(time, status)~', x))
+)
+
+univ_models <- lapply(univ_formulas, function(x){
+  coxph(x, data = lung)}
+)
+
+univ_results <- lapply(
+  univ_models,
+  function(x){ 
+    x <- summary(x)
+    p.value<-signif(x$wald["pvalue"], digits=2)
+    wald.test<-signif(x$wald["test"], digits=2)
+    beta<-signif(x$coef[1], digits=2)
+    HR <-signif(x$coef[2], digits=2)
+    HR.confint.lower <- signif(x$conf.int[,"lower .95"], 2)
+    HR.confint.upper <- signif(x$conf.int[,"upper .95"],2)
+    HR <- paste0(
+      HR, " (", 
+      HR.confint.lower, "-", HR.confint.upper, ")"
+    )
+    res<-c(beta, HR, wald.test, p.value)
+    names(res)<-c("beta", "HR (95% CI for HR)", "wald.test", "p.value")
+    return(res)
+  }
+)
+res <- t(as.data.frame(univ_results, check.names = FALSE))
+as.data.frame(res)
+```
+
+The variables `age`, `sex`, and `ph.ecog` have highly statistically significant coefficients. `age` and `ph.ecog` have positive beta coefficients, while sex has a negative coefficient. Thus, older age and higher `ph.ecog` are associated with poorer survival, whereas being female (sex=2) is associated with better survival.
+
+To perform a multivariate Cox regression analysis, include the additional covariates in the formula.
+
+```{r multivariate_cox}
+res_cox <- coxph(Surv(time, status) ~ age + sex + ph.ecog, data =  lung)
+summary(res_cox)
+```
+
+The p-value for all three overall tests (likelihood, Wald, and score) are significant, indicating that the model is significant. These tests evaluate the omnibus null hypothesis that all of the betas are 0. In the above example, the test statistics are in close agreement, and the omnibus null hypothesis is soundly rejected.
+
+In the multivariate Cox analysis, the covariates `sex` and `ph.ecog` remain significant (p < 0.05) and the covariate `age` is not significant.
+
+The p-value for `sex` is 0.000986, with a hazard ratio HR = exp(coef) = 0.58, indicating a strong relationship between the patients' sex and decreased risk of death. The hazard ratios of covariates are interpretable as multiplicative effects on the hazard. For example, holding the other covariates constant, being female (sex=2) reduces the hazard by a factor of 0.58, or 42%. We conclude that, being female is associated with good prognostic.
+
+Similarly, the p-value for `ph.ecog` is 4.45e-05, with a hazard ratio HR = 1.59, indicating a strong relationship between the `ph.ecog` value and increased risk of death. Holding the other covariates constant, a higher value of `ph.ecog` is associated with a poor survival.
+
+By contrast, the p-value for `age` is now p=0.23, compared to the univariate Cox analysis. The hazard ratio HR = exp(coef) = 1.01, with a 95% confidence interval of 0.99 to 1.03. Because the confidence interval for HR includes 1, these results indicate that age makes a smaller contribution to the difference in the HR after adjusting for the `ph.ecog` values and patient's `sex`, and only trend toward significance. For example, holding the other covariates constant, an additional year of age induce daily hazard of death by a factor of exp(beta) = 1.01, or 1%, which is not a significant contribution.
+
+We can visualise the predicted survival proportion at any given point in time for a particular risk group. The `survfit()` function estimates the survival proportion, by default at the mean values of covariates.
+
+```{r plot_baseline_survival, fig.height=5, fig.width=5}
+ggsurvplot(
+  survfit(res_cox),
+  ggtheme = theme_minimal(),
+  color = "#2E9FDF",
+  data = lung
+)
+```
+
+Consider that, we want to assess the impact of the sex on the estimated survival probability. In this case, we construct a new data frame with two rows, one for each value of sex; the other covariates are fixed to their average values (if they are continuous variables) or to their lowest level (if they are discrete variables). For a dummy covariate, the average value is the proportion coded 1 in the data set. This data frame is passed to survfit() via the newdata argument.
+
+```{r sex_df}
+sex_df <- with(
+  lung,
+  data.frame(
+    sex = c(1, 2), 
+    age = rep(mean(age, na.rm = TRUE), 2),
+    ph.ecog = c(1, 1)
+  )
+)
+sex_df
+```
+
+```{r fit_new_data}
+fit <- survfit(res_cox, newdata = sex_df)
+ggsurvplot(
+  fit,
+  conf.int = TRUE,
+  legend.labs=c("Sex=1", "Sex=2"),
+  ggtheme = theme_minimal(),
+  data = lung
+)
+```
+
+### References
+
+* [Cox Proportional-Hazards Model](http://www.sthda.com/english/wiki/cox-proportional-hazards-model)
