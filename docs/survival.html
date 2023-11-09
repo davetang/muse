@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree37e1a562e56fa058a90c2ce91cd9383ca425dfb6targetblank37e1a56a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb4509a9d4759595b31410c63598282ad1ac59667targetblankb4509a9a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/37e1a562e56fa058a90c2ce91cd9383ca425dfb6" target="_blank">37e1a56</a>
+<a href="https://github.com/davetang/muse/tree/b4509a9d4759595b31410c63598282ad1ac59667" target="_blank">b4509a9</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree37e1a562e56fa058a90c2ce91cd9383ca425dfb6targetblank37e1a56a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb4509a9d4759595b31410c63598282ad1ac59667targetblankb4509a9a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/37e1a562e56fa058a90c2ce91cd9383ca425dfb6" target="_blank">37e1a56</a>.
+<a href="https://github.com/davetang/muse/tree/b4509a9d4759595b31410c63598282ad1ac59667" target="_blank">b4509a9</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -555,6 +555,7 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    r_packages_4.3.2/
 
 Untracked files:
@@ -618,6 +619,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/b4509a9d4759595b31410c63598282ad1ac59667/analysis/survival.Rmd" target="_blank">b4509a9</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-09
+</td>
+<td>
+Include additional covariates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/797564fcf92f753e704d97c71c38bed15b07a0ed/docs/survival.html" target="_blank">797564f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1405,12 +1440,12 @@ Score (logrank) test = 10.33  on 1 df,   p=0.001</code></pre>
 <ol style="list-style-type: decimal">
 <li><p><strong>Statistical significance</strong>. The column marked
 <code>z</code> gives the Wald statistic value. It corresponds to the
-ratio of each regression coefficient to its standard error (<span
-class="math inline">\(z = coef/se(coef)\)</span>). The Wald statistic
-evaluates, whether the beta (<span class="math inline">\(\beta\)</span>)
-coefficient of a given variable is statistically significantly different
-from 0. From the output above, we can conclude that the variable sex
-have highly statistically significant coefficients.</p></li>
+ratio of each regression coefficient to its standard error (z =
+coef/se(coef)). The Wald statistic evaluates, whether the beta (<span
+class="math inline">\(\beta\)</span>) coefficient of a given variable is
+statistically significantly different from 0. From the output above, we
+can conclude that the variable sex have highly statistically significant
+coefficients.</p></li>
 <li><p><strong>The regression coefficients</strong>. The second feature
 to note in the Cox model results is the the sign of the regression
 coefficients (<code>coef</code>). A positive sign means that the hazard
@@ -1440,7 +1475,7 @@ test has better behavior for small sample sizes, so it is generally
 preferred.</p></li>
 </ol>
 <p>Perform the univariate Cox analysis on other covariates.</p>
-<pre class="r"><code>covariates &lt;- c(&quot;age&quot;, &quot;sex&quot;,  &quot;ph.karno&quot;, &quot;ph.ecog&quot;, &quot;wt.loss&quot;)
+<pre class="r"><code>covariates &lt;- c(&quot;age&quot;, &quot;sex&quot;,  &quot;ph.karno&quot;, &quot;pat.karno&quot;, &quot;ph.ecog&quot;, &quot;wt.loss&quot;)
 univ_formulas &lt;- sapply(
   covariates,
   function(x) as.formula(paste(&#39;Surv(time, status)~&#39;, x))
@@ -1471,52 +1506,62 @@ univ_results &lt;- lapply(
 )
 res &lt;- t(as.data.frame(univ_results, check.names = FALSE))
 as.data.frame(res)</code></pre>
-<pre><code>           beta HR (95% CI for HR) wald.test p.value
-age       0.019            1 (1-1)       4.1   0.042
-sex       -0.53   0.59 (0.42-0.82)        10  0.0015
-ph.karno -0.016      0.98 (0.97-1)       7.9   0.005
-ph.ecog    0.48        1.6 (1.3-2)        18 2.7e-05
-wt.loss  0.0013         1 (0.99-1)      0.05    0.83</code></pre>
-<p>The variables <code>age</code>, <code>sex</code>, and
-<code>ph.ecog</code> have highly statistically significant coefficients.
-<code>age</code> and <code>ph.ecog</code> have positive beta
-coefficients, while sex has a negative coefficient. Thus, older age and
-higher <code>ph.ecog</code> are associated with poorer survival, whereas
-being female (sex=2) is associated with better survival.</p>
+<pre><code>            beta HR (95% CI for HR) wald.test p.value
+age        0.019            1 (1-1)       4.1   0.042
+sex        -0.53   0.59 (0.42-0.82)        10  0.0015
+ph.karno  -0.016      0.98 (0.97-1)       7.9   0.005
+pat.karno  -0.02   0.98 (0.97-0.99)        13 0.00028
+ph.ecog     0.48        1.6 (1.3-2)        18 2.7e-05
+wt.loss   0.0013         1 (0.99-1)      0.05    0.83</code></pre>
+<p>The variables <code>age</code>, <code>sex</code>,
+<code>ph.karno</code>, <code>pat.karno</code>, and <code>ph.ecog</code>
+have statistically significant coefficients. <code>age</code> and
+<code>ph.ecog</code> have positive beta coefficients, while sex has a
+negative coefficient. Thus, older age and higher <code>ph.ecog</code>
+are associated with poorer survival, whereas being female (sex=2) is
+associated with better survival.</p>
 <p>To perform a multivariate Cox regression analysis, include the
 additional covariates in the formula.</p>
-<pre class="r"><code>res_cox &lt;- coxph(Surv(time, status) ~ age + sex + ph.ecog, data =  lung)
+<pre class="r"><code>res_cox &lt;- coxph(Surv(time, status) ~ age + sex + ph.karno + pat.karno + ph.ecog + wt.loss, data =  lung)
 summary(res_cox)</code></pre>
 <pre><code>Call:
-coxph(formula = Surv(time, status) ~ age + sex + ph.ecog, data = lung)
+coxph(formula = Surv(time, status) ~ age + sex + ph.karno + pat.karno + 
+    ph.ecog + wt.loss, data = lung)
 
-  n= 227, number of events= 164 
-   (1 observation deleted due to missingness)
+  n= 210, number of events= 148 
+   (18 observations deleted due to missingness)
 
-             coef exp(coef)  se(coef)      z Pr(&gt;|z|)    
-age      0.011067  1.011128  0.009267  1.194 0.232416    
-sex     -0.552612  0.575445  0.167739 -3.294 0.000986 ***
-ph.ecog  0.463728  1.589991  0.113577  4.083 4.45e-05 ***
+               coef exp(coef)  se(coef)      z Pr(&gt;|z|)    
+age        0.013058  1.013144  0.009866  1.324 0.185639    
+sex       -0.625167  0.535172  0.178703 -3.498 0.000468 ***
+ph.karno   0.020116  1.020320  0.010178  1.976 0.048111 *  
+pat.karno -0.014743  0.985365  0.007300 -2.019 0.043440 *  
+ph.ecog    0.675227  1.964479  0.198735  3.398 0.000680 ***
+wt.loss   -0.013243  0.986844  0.007009 -1.889 0.058836 .  
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 
-        exp(coef) exp(-coef) lower .95 upper .95
-age        1.0111     0.9890    0.9929    1.0297
-sex        0.5754     1.7378    0.4142    0.7994
-ph.ecog    1.5900     0.6289    1.2727    1.9864
+          exp(coef) exp(-coef) lower .95 upper .95
+age          1.0131     0.9870    0.9937    1.0329
+sex          0.5352     1.8686    0.3770    0.7596
+ph.karno     1.0203     0.9801    1.0002    1.0409
+pat.karno    0.9854     1.0149    0.9714    0.9996
+ph.ecog      1.9645     0.5090    1.3307    2.9001
+wt.loss      0.9868     1.0133    0.9734    1.0005
 
-Concordance= 0.637  (se = 0.025 )
-Likelihood ratio test= 30.5  on 3 df,   p=1e-06
-Wald test            = 29.93  on 3 df,   p=1e-06
-Score (logrank) test = 30.5  on 3 df,   p=1e-06</code></pre>
+Concordance= 0.656  (se = 0.025 )
+Likelihood ratio test= 37.2  on 6 df,   p=2e-06
+Wald test            = 36.49  on 6 df,   p=2e-06
+Score (logrank) test = 37.59  on 6 df,   p=1e-06</code></pre>
 <p>The p-value for all three overall tests (likelihood, Wald, and score)
 are significant, indicating that the model is significant. These tests
 evaluate the omnibus null hypothesis that all of the betas are 0. In the
 above example, the test statistics are in close agreement, and the
 omnibus null hypothesis is soundly rejected.</p>
-<p>In the multivariate Cox analysis, the covariates <code>sex</code> and
-<code>ph.ecog</code> remain significant (p &lt; 0.05) and the covariate
-<code>age</code> is not significant.</p>
+<p>In the multivariate Cox analysis, the covariates <code>sex</code>,
+<code>ph.karno</code>, <code>pat.karno</code>, and <code>ph.ecog</code>
+remain significant (p &lt; 0.05) and the covariate <code>age</code> is
+no longer significant.</p>
 <p>The p-value for <code>sex</code> is 0.000986, with a hazard ratio HR
 = exp(coef) = 0.58, indicating a strong relationship between the
 patients’ sex and decreased risk of death. The hazard ratios of
@@ -1552,6 +1597,43 @@ covariates.</p>
 <pre><code>Warning: Now, to change color palette, use the argument palette= &#39;#2E9FDF&#39;
 instead of color = &#39;#2E9FDF&#39;</code></pre>
 <p><img src="figure/survival.Rmd/plot_baseline_survival-1.png" width="480" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_baseline_survival-1">
+Past versions of plot_baseline_survival-1.png
+</button>
+</p>
+<div id="fig-plot_baseline_survival-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/797564fcf92f753e704d97c71c38bed15b07a0ed/docs/figure/survival.Rmd/plot_baseline_survival-1.png" target="_blank">797564f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-09
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Consider that, we want to assess the impact of the sex on the
 estimated survival probability. In this case, we construct a new data
 frame with two rows, one for each value of sex; the other covariates are
@@ -1564,13 +1646,16 @@ This data frame is passed to survfit() via the newdata argument.</p>
   data.frame(
     sex = c(1, 2), 
     age = rep(mean(age, na.rm = TRUE), 2),
-    ph.ecog = c(1, 1)
+    ph.ecog = c(1, 1),
+    ph.karno = rep(mean(ph.karno, na.rm=TRUE), 2),
+    pat.karno = rep(mean(pat.karno, na.rm=TRUE), 2),
+    wt.loss = rep(mean(wt.loss, na.rm=TRUE), 2)
   )
 )
 sex_df</code></pre>
-<pre><code>  sex      age ph.ecog
-1   1 62.44737       1
-2   2 62.44737       1</code></pre>
+<pre><code>  sex      age ph.ecog ph.karno pat.karno  wt.loss
+1   1 62.44737       1 81.93833  79.95556 9.831776
+2   2 62.44737       1 81.93833  79.95556 9.831776</code></pre>
 <pre class="r"><code>fit &lt;- survfit(res_cox, newdata = sex_df)
 ggsurvplot(
   fit,
@@ -1587,6 +1672,43 @@ This warning is displayed once every 8 hours.
 Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 generated.</code></pre>
 <p><img src="figure/survival.Rmd/fit_new_data-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-fit_new_data-1">
+Past versions of fit_new_data-1.png
+</button>
+</p>
+<div id="fig-fit_new_data-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/797564fcf92f753e704d97c71c38bed15b07a0ed/docs/figure/survival.Rmd/fit_new_data-1.png" target="_blank">797564f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-09
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="references-1" class="section level3">
 <h3>References</h3>
