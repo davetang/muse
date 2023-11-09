@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb4509a9d4759595b31410c63598282ad1ac59667targetblankb4509a9a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree078c04a2b4c82ba9efc98fa534a6ad9c42857967targetblank078c04aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/b4509a9d4759595b31410c63598282ad1ac59667" target="_blank">b4509a9</a>
+<a href="https://github.com/davetang/muse/tree/078c04a2b4c82ba9efc98fa534a6ad9c42857967" target="_blank">078c04a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb4509a9d4759595b31410c63598282ad1ac59667targetblankb4509a9a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree078c04a2b4c82ba9efc98fa534a6ad9c42857967targetblank078c04aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/b4509a9d4759595b31410c63598282ad1ac59667" target="_blank">b4509a9</a>.
+<a href="https://github.com/davetang/muse/tree/078c04a2b4c82ba9efc98fa534a6ad9c42857967" target="_blank">078c04a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -553,27 +553,13 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
-    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
+    Ignored:    r_packages_4.3.0/
     Ignored:    r_packages_4.3.2/
 
 Untracked files:
-    Untracked:  analysis/cell_ranger.Rmd
-    Untracked:  analysis/sleuth.Rmd
-    Untracked:  analysis/tss_xgboost.Rmd
+    Untracked:  analysis/breast_cancer.Rmd
     Untracked:  code/multiz100way/
-    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
-    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
-    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
-    Untracked:  data/ncrna_noncode_v3.fa
-    Untracked:  data/netmhciipan.out.gz
-    Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
-    Untracked:  export/output/
-    Untracked:  women.json
-
-Unstaged changes:
-    Modified:   analysis/graph.Rmd
 
 </code></pre>
 <p>
@@ -619,6 +605,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/078c04a2b4c82ba9efc98fa534a6ad9c42857967/analysis/survival.Rmd" target="_blank">078c04a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-09
+</td>
+<td>
+Use factors for covariates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/24d29bbfcca63fdeb7332760e091df1ed28fb30c/docs/survival.html" target="_blank">24d29bb</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -951,10 +971,8 @@ survival curves.</p>
 [13] &quot;conf.int&quot;  &quot;conf.type&quot; &quot;lower&quot;     &quot;upper&quot;     &quot;call&quot;     </code></pre>
 <p>The <code>surv_summary()</code> function can also be used to get a
 summary of survival curves.</p>
-<pre class="r"><code>fit_sum &lt;- surv_summary(fit)</code></pre>
-<pre><code>Warning in .get_data(x, data = data): The `data` argument is not provided. Data
-will be extracted from model fit.</code></pre>
-<pre class="r"><code>head(fit_sum)</code></pre>
+<pre class="r"><code>fit_sum &lt;- surv_summary(fit, data = lung)
+head(fit_sum)</code></pre>
 <pre><code>  time n.risk n.event n.censor      surv    std.err     upper     lower strata
 1   11    138       3        0 0.9782609 0.01268978 1.0000000 0.9542301  sex=1
 2   12    135       1        0 0.9710145 0.01470747 0.9994124 0.9434235  sex=1
@@ -1474,6 +1492,38 @@ results. For small N, they may differ somewhat. The Likelihood ratio
 test has better behavior for small sample sizes, so it is generally
 preferred.</p></li>
 </ol>
+<p>In <code>lung</code> male=1 and female=2. Since the sign of the
+coefficients is meaningful, it is important to figure out how the groups
+are compared. As noted above, the hazard ratio is for the second group
+relative to the first group. But <code>lung$sex</code> is a numeric and
+not a factor, so it is unclear, which group is the first and which is
+the second.</p>
+<p>The <code>coxph</code> function works with factors and we can
+explicitly state the first and second groups using the
+<code>levels</code> option. The results are now switched around!</p>
+<pre class="r"><code>lung2 &lt;- lung
+lung2$sex &lt;- factor(lung2$sex, levels = c(2, 1))
+levels(lung2$sex)</code></pre>
+<pre><code>[1] &quot;2&quot; &quot;1&quot;</code></pre>
+<pre class="r"><code>sex_cox2 &lt;- coxph(Surv(time, status) ~ sex, data = lung2)
+summary(sex_cox2)</code></pre>
+<pre><code>Call:
+coxph(formula = Surv(time, status) ~ sex, data = lung2)
+
+  n= 228, number of events= 165 
+
+       coef exp(coef) se(coef)     z Pr(&gt;|z|)   
+sex1 0.5310    1.7007   0.1672 3.176  0.00149 **
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+     exp(coef) exp(-coef) lower .95 upper .95
+sex1     1.701      0.588     1.226      2.36
+
+Concordance= 0.579  (se = 0.021 )
+Likelihood ratio test= 10.63  on 1 df,   p=0.001
+Wald test            = 10.09  on 1 df,   p=0.001
+Score (logrank) test = 10.33  on 1 df,   p=0.001</code></pre>
 <p>Perform the univariate Cox analysis on other covariates.</p>
 <pre class="r"><code>covariates &lt;- c(&quot;age&quot;, &quot;sex&quot;,  &quot;ph.karno&quot;, &quot;pat.karno&quot;, &quot;ph.ecog&quot;, &quot;wt.loss&quot;)
 univ_formulas &lt;- sapply(
@@ -1621,6 +1671,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/24d29bbfcca63fdeb7332760e091df1ed28fb30c/docs/figure/survival.Rmd/plot_baseline_survival-1.png" target="_blank">24d29bb</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-09
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/797564fcf92f753e704d97c71c38bed15b07a0ed/docs/figure/survival.Rmd/plot_baseline_survival-1.png" target="_blank">797564f</a>
 </td>
 <td>
@@ -1696,6 +1757,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/24d29bbfcca63fdeb7332760e091df1ed28fb30c/docs/figure/survival.Rmd/fit_new_data-1.png" target="_blank">24d29bb</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-09
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/797564fcf92f753e704d97c71c38bed15b07a0ed/docs/figure/survival.Rmd/fit_new_data-1.png" target="_blank">797564f</a>
 </td>
 <td>
@@ -1753,26 +1825,26 @@ other attached packages:
 [5] workflowr_1.7.1
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.4      xfun_0.41         bslib_0.5.1       processx_3.8.2   
+ [1] gtable_0.3.4      xfun_0.40         bslib_0.5.1       processx_3.8.2   
  [5] rstatix_0.7.2     lattice_0.21-9    callr_3.7.3       vctrs_0.6.4      
  [9] tools_4.3.2       ps_1.7.5          generics_0.1.3    tibble_3.2.1     
-[13] fansi_1.0.5       highr_0.10        pkgconfig_2.0.3   Matrix_1.6-1.1   
-[17] data.table_1.14.8 lifecycle_1.0.3   farver_2.1.1      compiler_4.3.2   
-[21] stringr_1.5.0     git2r_0.32.0      munsell_0.5.0     getPass_0.2-2    
-[25] carData_3.0-5     httpuv_1.6.12     htmltools_0.5.7   sass_0.4.7       
-[29] yaml_2.3.7        crayon_1.5.2      later_1.3.1       pillar_1.9.0     
-[33] car_3.1-2         jquerylib_0.1.4   whisker_0.4.1     tidyr_1.3.0      
-[37] cachem_1.0.8      abind_1.4-5       km.ci_0.5-6       commonmark_1.9.0 
-[41] tidyselect_1.2.0  digest_0.6.33     stringi_1.7.12    dplyr_1.1.3      
-[45] purrr_1.0.2       labeling_0.4.3    splines_4.3.2     rprojroot_2.0.4  
-[49] fastmap_1.1.1     grid_4.3.2        colorspace_2.1-0  cli_3.6.1        
-[53] magrittr_2.0.3    utf8_1.2.4        broom_1.0.5       withr_2.5.2      
-[57] scales_1.2.1      promises_1.2.1    backports_1.4.1   rmarkdown_2.25   
-[61] httr_1.4.7        ggtext_0.1.2      gridExtra_2.3     ggsignif_0.6.4   
-[65] zoo_1.8-12        evaluate_0.23     knitr_1.45        KMsurv_0.1-5     
-[69] markdown_1.11     survMisc_0.5.6    rlang_1.1.2       gridtext_0.1.5   
-[73] Rcpp_1.0.11       xtable_1.8-4      glue_1.6.2        xml2_1.3.5       
-[77] rstudioapi_0.15.0 jsonlite_1.8.7    R6_2.5.1          fs_1.6.3         </code></pre>
+[13] fansi_1.0.5       pkgconfig_2.0.3   Matrix_1.6-1.1    data.table_1.14.8
+[17] lifecycle_1.0.3   farver_2.1.1      compiler_4.3.2    stringr_1.5.0    
+[21] git2r_0.32.0      munsell_0.5.0     getPass_0.2-2     carData_3.0-5    
+[25] httpuv_1.6.12     htmltools_0.5.6.1 sass_0.4.7        yaml_2.3.7       
+[29] crayon_1.5.2      later_1.3.1       pillar_1.9.0      car_3.1-2        
+[33] jquerylib_0.1.4   whisker_0.4.1     tidyr_1.3.0       cachem_1.0.8     
+[37] abind_1.4-5       km.ci_0.5-6       commonmark_1.9.0  tidyselect_1.2.0 
+[41] digest_0.6.33     stringi_1.7.12    dplyr_1.1.3       purrr_1.0.2      
+[45] labeling_0.4.3    splines_4.3.2     rprojroot_2.0.3   fastmap_1.1.1    
+[49] grid_4.3.2        colorspace_2.1-0  cli_3.6.1         magrittr_2.0.3   
+[53] utf8_1.2.4        broom_1.0.5       withr_2.5.1       scales_1.2.1     
+[57] promises_1.2.1    backports_1.4.1   rmarkdown_2.25    httr_1.4.7       
+[61] ggtext_0.1.2      gridExtra_2.3     ggsignif_0.6.4    zoo_1.8-12       
+[65] evaluate_0.22     knitr_1.44        KMsurv_0.1-5      markdown_1.11    
+[69] survMisc_0.5.6    rlang_1.1.1       gridtext_0.1.5    Rcpp_1.0.11      
+[73] xtable_1.8-4      glue_1.6.2        xml2_1.3.5        rstudioapi_0.15.0
+[77] jsonlite_1.8.7    R6_2.5.1          fs_1.6.3         </code></pre>
 </div>
 </div>
 </div>
