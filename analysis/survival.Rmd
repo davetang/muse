@@ -381,6 +381,19 @@ sex_cox2 <- coxph(Surv(time, status) ~ sex, data = lung2)
 summary(sex_cox2)
 ```
 
+In addition the status is coded as 1=censored and 2=dead. If we convert the status into a factor we will get the following error:
+
+      an id statement is required for multi-state models
+ 
+If I switch the status around, the results are reversed.
+
+```{r lung3_status_factor}
+lung3 <- lung
+lung3$status <- ifelse(lung3$status == 2, 1, 2)
+sex_cox3 <- coxph(Surv(time, status) ~ sex, data = lung3)
+summary(sex_cox3)
+```
+
 Perform the univariate Cox analysis on other covariates.
 
 ```{r uni_cox}
