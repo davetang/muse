@@ -165,7 +165,7 @@ names(fit)
 The `surv_summary()` function can also be used to get a summary of survival curves.
 
 ```{r fit_sum}
-fit_sum <- surv_summary(fit)
+fit_sum <- surv_summary(fit, data = lung)
 head(fit_sum)
 ```
 
@@ -368,6 +368,18 @@ The Cox regression results can be interpreted as follow:
 4. **Confidence intervals of the hazard ratios**. The summary output also gives upper and lower 95% confidence intervals for the hazard ratio (exp(coef)), lower 95% bound = 0.4237, upper 95% bound = 0.816.
 
 5. **Global statistical significance of the model**. Finally, the output gives _p_-values for three alternative tests for overall significance of the model: The likelihood-ratio test, Wald test, and score logrank statistics. These three methods are asymptotically equivalent. For large enough N, they will give similar results. For small N, they may differ somewhat. The Likelihood ratio test has better behavior for small sample sizes, so it is generally preferred.
+
+In `lung` male=1 and female=2. Since the sign of the coefficients is meaningful, it is important to figure out how the groups are compared. As noted above, the hazard ratio is for the second group relative to the first group. But `lung$sex` is a numeric and not a factor, so it is unclear, which group is the first and which is the second.
+
+The `coxph` function works with factors and we can explicitly state the first and second groups using the `levels` option. The results are now switched around!
+
+```{r lung2_sex_factor}
+lung2 <- lung
+lung2$sex <- factor(lung2$sex, levels = c(2, 1))
+levels(lung2$sex)
+sex_cox2 <- coxph(Surv(time, status) ~ sex, data = lung2)
+summary(sex_cox2)
+```
 
 Perform the univariate Cox analysis on other covariates.
 
