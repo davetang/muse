@@ -1,0 +1,53 @@
+---
+title: "Getting started with Cell Ranger"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[Cell Ranger](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/what-is-cell-ranger) is a set of analysis pipelines that process Chromium single cell 3' and 5' scRNA-seq data. The pipelines process raw sequencing output, performs read alignment, generate gene-cell matrices, and can perform downstream analyses such as clustering and gene expression analysis. Cell Ranger includes the following pipelines:
+
+* cellranger mkfastq
+* cellranger count
+* cellranger aggr
+* cellranger reanalyze
+* cellranger multi
+
+You can download Cell Ranger from their [software download page](https://support.10xgenomics.com/single-cell-gene-expression/software/downloads/latest). Conveniently, Cell Ranger is provided as a single self-contained file that bundles all its own software dependencies. You can view the source at their [GitHub repository](https://github.com/10XGenomics/cellranger), which does not look like it is being actively maintained anymore.
+
+## Data
+
+First, start downloading some input data that we will use later in the post; they are quite large and depending on your Internet speed, may take a long time.
+
+```
+wget -c https://s3-us-west-2.amazonaws.com/10x.files/samples/cell-exp/6.1.0/40k_NSCLC_DTC_3p_HT_nextgem_Multiplex/40k_NSCLC_DTC_3p_HT_nextgem_Multiplex_fastqs.tar
+wget -c https://cf.10xgenomics.com/samples/cell-exp/6.1.0/40k_NSCLC_DTC_3p_HT_nextgem_Multiplex/40k_NSCLC_DTC_3p_HT_nextgem_Multiplex_config.csv
+wget -c https://cf.10xgenomics.com/samples/cell-exp/6.1.0/40k_NSCLC_DTC_3p_HT_nextgem_Multiplex/40k_NSCLC_DTC_3p_HT_nextgem_Multiplex_count_feature_reference.csv
+```
+
+Next, visit the [download page](https://support.10xgenomics.com/single-cell-gene-expression/software/downloads/latest) to generate your own download link for the Cell Ranger tarball.
+
+```
+wget -O cellranger-6.1.2.tar.gz "https://cf.10xgenomics.com/releases/cell-exp/cellranger-6.1.2.tar.gz?Expires=1648564870&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZi4xMHhnZW5vbWljcy5jb20vcmVsZWFzZXMvY2VsbC1leHAvY2VsbHJhbmdlci02LjEuMi50YXIuZ3oiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE2NDg1NjQ4NzB9fX1dfQ__&Signature=LeJDJcPn5URO~zx20buwkpJ6TD9rf5UkQCFpUP5Ji~d--kauzGCDj1arQqkuM16M1QAFudP-iNb4fr1pE6nqKr12Onj7mFzZwxWvfDsqK8IuUYj0YN6jQ1nBHeu~D6-UjNHDkLTVtrC-dqxq-faUfjNUbkPJwFUSgiP1VBMiTFnGXxM8EcIOMDCvCXrhzjrbRle94O4OcUAK~Go40oyQLbHLyHOB29IhhUE1C5fRSFQ9rMB88fbxzl5IPmKAg~7TM1jH3rbz9u9HuEgdV1tL1mR9vmSfIzKep~6M-cyGKkVAdPoCdgeuZf8UihRdIhnNZH3ukIy969AorVtLYjWXWg__&Key-Pair-Id=APKAI7S6A5RYOXBWRPDA"
+```
+
+Download the hg38 reference tarball.
+
+```
+wget https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2020-A.tar.gz
+```
+
+## Cell Ranger installation
+
+The [official Cell Ranger install page](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/installation) for more information has more detailed information for setting up Cell Ranger.
+
+```
+tar xzf cellranger-6.1.2.tar.gz
+tar xzf refdata-gex-GRCh38-2020-A.tar.gz
+```
+
