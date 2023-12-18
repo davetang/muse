@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-11-08" />
+<meta name="date" content="2023-12-18" />
 
 <title>GSVA: gene set variation analysis</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">GSVA: gene set variation analysis</h1>
-<h4 class="date">2023-11-08</h4>
+<h4 class="date">2023-12-18</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-11-08
+<strong>Last updated:</strong> 2023-12-18
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb7743820f7c1a0add25b4a7cd0ffae584b5bee20targetblankb774382a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7a818f50f0ac62260c3890bad4a400fd91ff2c66targetblank7a818f5a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/b7743820f7c1a0add25b4a7cd0ffae584b5bee20" target="_blank">b774382</a>
+<a href="https://github.com/davetang/muse/tree/7a818f50f0ac62260c3890bad4a400fd91ff2c66" target="_blank">7a818f5</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb7743820f7c1a0add25b4a7cd0ffae584b5bee20targetblankb774382a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7a818f50f0ac62260c3890bad4a400fd91ff2c66targetblank7a818f5a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/b7743820f7c1a0add25b4a7cd0ffae584b5bee20" target="_blank">b774382</a>.
+<a href="https://github.com/davetang/muse/tree/7a818f50f0ac62260c3890bad4a400fd91ff2c66" target="_blank">7a818f5</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -552,26 +552,8 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
-    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
     Ignored:    r_packages_4.3.2/
-
-Untracked files:
-    Untracked:  analysis/cell_ranger.Rmd
-    Untracked:  analysis/sleuth.Rmd
-    Untracked:  analysis/tss_xgboost.Rmd
-    Untracked:  code/multiz100way/
-    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
-    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
-    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
-    Untracked:  data/ncrna_noncode_v3.fa
-    Untracked:  data/netmhciipan.out.gz
-    Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
-    Untracked:  export/output/
-    Untracked:  women.json
-
-Unstaged changes:
-    Modified:   analysis/graph.Rmd
 
 </code></pre>
 <p>
@@ -616,6 +598,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/7a818f50f0ac62260c3890bad4a400fd91ff2c66/analysis/gsva.Rmd" target="_blank">7a818f5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-12-18
+</td>
+<td>
+Include background from paper
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/39a8474514a19001bd7e60a1cb633ac24f4d4457/docs/gsva.html" target="_blank">39a8474</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -946,6 +962,66 @@ GSVA
 </div>
 </div>
 </div>
+<div id="background" class="section level2">
+<h2>Background</h2>
+<p>Notes from the paper <a
+href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-14-7">GSVA:
+gene set variation analysis for microarray and RNA-Seq data</a>.</p>
+<blockquote>
+<p>Gene Set Enrichment (GSE) analyses begin by obtaining a ranked gene
+list, typically derived from a microarray experiment that studies gene
+expression changes between two groups.</p>
+<p>The genes are then mapped into predefined gene sets and their gene
+expression statistic is summarized into a single enrichment score for
+each gene set.</p>
+<p>Many methodological variations of GSE methods have been proposed,
+including non-parametric enrichment statistics, battery testing, and
+focused gene set testing.</p>
+<p>Battery testing methods aim at identifying gene sets standing out
+from a large collection of annotated pathways and gene signatures.</p>
+<p>Focused gene set testing methods try to carefully evaluate a few gene
+sets that are relevant to the experiment being analyzed.</p>
+<p>An important distinction among many of the GSE methods is the
+definition of the null hypothesis that is tested. The null hypothesis of
+a competitive test declares that there are no differences between genes
+inside and outside the gene set.</p>
+<p>A self-contained test defines its null hypothesis only in terms of
+the genes inside the gene set being tested. More concretely, for a
+self-contained test on a gene set, the differential expression of just
+one of its genes allows one to reject the null hypothesis of no
+differential expression for that gene set. It follows, that
+self-contained tests provide higher power than competitive tests to
+detect subtle changes of expression in a gene set. But they may not be
+useful to single out a few gene sets in a battery testing setting
+because of the potentially large number of reported results.</p>
+<p>Finally, many GSE methods assume two classes (e.g. case/control) and
+evaluate enrichment within this context.</p>
+<p>The limits imposed by this assumption become evident with the rise of
+large genomic studies, such as The Cancer Genome Atlas project (TCGA -
+<a href="http://cancergenome.nih.gov"
+class="uri">http://cancergenome.nih.gov</a>), an ambitious project with
+the goal to identify the molecular determinants of multiple cancer
+types. In contrast to case-control studies with small sample sizes, the
+TCGA project has large patient cohorts with multiple phenotypes,
+structured with hierarchical, multi-class, and censored data. Hence, GSE
+methods are needed that can assess pathway variation across large,
+heterogeneous populations with complex phenotypic traits.</p>
+<p>To address these challenges, we present a non-parametric,
+unsupervised method called Gene Set Variation Analysis (GSVA).</p>
+<p>GSVA calculates sample-wise gene set enrichment scores as a function
+of genes inside and outside the gene set, analogously to a competitive
+gene set test. Further, it estimates variation of gene set enrichment
+over the samples independently of any class label.</p>
+<p>Conceptually, this methodology can be understood as a change in
+coordinate systems for gene expression data, from genes to gene sets.
+This transformation facilitates post-hoc construction of pathway-centric
+models, such as differential pathway activity identification or survival
+prediction. Further, we demonstrate the flexibility of GSVA by applying
+it to RNA-seq data.</p>
+</blockquote>
+</div>
+<div id="vignette" class="section level2">
+<h2>Vignette</h2>
 <p>Following the <a
 href="https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html">vignette</a>.</p>
 <blockquote>
@@ -970,6 +1046,7 @@ between pathways and other molecular data types such as microRNA
 expression or binding data, copy-number variation (CNV) data or single
 nucleotide polymorphisms (SNPs).</p>
 </blockquote>
+</div>
 <div id="package" class="section level2">
 <h2>Package</h2>
 <p>Install GSVA. (Dependencies are listed in the Imports section in the
@@ -991,7 +1068,8 @@ packageVersion(&quot;GSVA&quot;)</code></pre>
 </div>
 <div id="quick-start" class="section level2">
 <h2>Quick start</h2>
-<p>Generate example expression matrix.</p>
+<p>Generate example expression matrix with 10,000 genes across 30
+samples.</p>
 <pre class="r"><code>p &lt;- 10000
 n &lt;- 30
 set.seed(1984)
@@ -1710,6 +1788,43 @@ ggplot(my_df3, aes(sample, signature, fill = enrichment)) +
   ) +
   scale_fill_gradient(low = &quot;skyblue&quot;, high = &quot;red&quot;)</code></pre>
 <p><img src="figure/gsva.Rmd/gbm_es_ssgsea-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-gbm_es_ssgsea-1">
+Past versions of gbm_es_ssgsea-1.png
+</button>
+</p>
+<div id="fig-gbm_es_ssgsea-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/39a8474514a19001bd7e60a1cb633ac24f4d4457/docs/figure/gsva.Rmd/gbm_es_ssgsea-1.png" target="_blank">39a8474</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-08
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1745,19 +1860,19 @@ attached base packages:
 other attached packages:
  [1] ggplot2_3.4.4        corrplot_0.92        GSVAdata_1.38.0     
  [4] hgu95a.db_3.13.0     org.Hs.eg.db_3.18.0  GSEABase_1.64.0     
- [7] graph_1.80.0         annotate_1.80.0      XML_3.99-0.15       
-[10] AnnotationDbi_1.64.1 IRanges_2.36.0       S4Vectors_0.40.1    
+ [7] graph_1.80.0         annotate_1.80.0      XML_3.99-0.16       
+[10] AnnotationDbi_1.64.1 IRanges_2.36.0       S4Vectors_0.40.2    
 [13] Biobase_2.62.0       BiocGenerics_0.48.1  GSVA_1.50.0         
 [16] BiocManager_1.30.22  workflowr_1.7.1     
 
 loaded via a namespace (and not attached):
  [1] DBI_1.1.3                   bitops_1.0-7               
  [3] rlang_1.1.2                 magrittr_2.0.3             
- [5] git2r_0.32.0                matrixStats_1.0.0          
- [7] compiler_4.3.2              RSQLite_2.3.3              
- [9] getPass_0.2-2               DelayedMatrixStats_1.24.0  
+ [5] git2r_0.33.0                matrixStats_1.2.0          
+ [7] compiler_4.3.2              RSQLite_2.3.4              
+ [9] getPass_0.2-4               DelayedMatrixStats_1.24.0  
 [11] png_0.1-8                   callr_3.7.3                
-[13] vctrs_0.6.4                 stringr_1.5.0              
+[13] vctrs_0.6.5                 stringr_1.5.1              
 [15] pkgconfig_2.0.3             crayon_1.5.2               
 [17] fastmap_1.1.1               XVector_0.42.0             
 [19] labeling_0.4.3              utf8_1.2.4                 
@@ -1765,41 +1880,41 @@ loaded via a namespace (and not attached):
 [23] ps_1.7.5                    purrr_1.0.2                
 [25] bit_4.0.5                   xfun_0.41                  
 [27] zlibbioc_1.48.0             cachem_1.0.8               
-[29] beachmat_2.18.0             GenomeInfoDb_1.38.0        
-[31] jsonlite_1.8.7              blob_1.2.4                 
-[33] highr_0.10                  later_1.3.1                
+[29] beachmat_2.18.0             GenomeInfoDb_1.38.2        
+[31] jsonlite_1.8.8              blob_1.2.4                 
+[33] highr_0.10                  later_1.3.2                
 [35] rhdf5filters_1.14.1         DelayedArray_0.28.0        
-[37] Rhdf5lib_1.24.0             BiocParallel_1.36.0        
+[37] Rhdf5lib_1.24.1             BiocParallel_1.36.0        
 [39] irlba_2.3.5.1               parallel_4.3.2             
-[41] R6_2.5.1                    bslib_0.5.1                
-[43] stringi_1.7.12              GenomicRanges_1.54.1       
+[41] R6_2.5.1                    bslib_0.6.1                
+[43] stringi_1.8.3               GenomicRanges_1.54.1       
 [45] jquerylib_0.1.4             Rcpp_1.0.11                
 [47] SummarizedExperiment_1.32.0 knitr_1.45                 
-[49] tidyselect_1.2.0            httpuv_1.6.12              
+[49] tidyselect_1.2.0            httpuv_1.6.13              
 [51] Matrix_1.6-1.1              rstudioapi_0.15.0          
-[53] abind_1.4-5                 yaml_2.3.7                 
-[55] codetools_0.2-19            processx_3.8.2             
+[53] abind_1.4-5                 yaml_2.3.8                 
+[55] codetools_0.2-19            processx_3.8.3             
 [57] lattice_0.21-9              tibble_3.2.1               
 [59] withr_2.5.2                 KEGGREST_1.42.0            
 [61] evaluate_0.23               Biostrings_2.70.1          
 [63] pillar_1.9.0                MatrixGenerics_1.14.0      
 [65] whisker_0.4.1               generics_0.1.3             
 [67] rprojroot_2.0.4             RCurl_1.98-1.13            
-[69] munsell_0.5.0               scales_1.2.1               
+[69] munsell_0.5.0               scales_1.3.0               
 [71] sparseMatrixStats_1.14.0    xtable_1.8-4               
 [73] glue_1.6.2                  tools_4.3.2                
 [75] ScaledMatrix_1.10.0         fs_1.6.3                   
-[77] rhdf5_2.46.0                grid_4.3.2                 
+[77] rhdf5_2.46.1                grid_4.3.2                 
 [79] tidyr_1.3.0                 colorspace_2.1-0           
 [81] SingleCellExperiment_1.24.0 GenomeInfoDbData_1.2.11    
 [83] BiocSingular_1.18.0         HDF5Array_1.30.0           
-[85] cli_3.6.1                   rsvd_1.0.5                 
-[87] fansi_1.0.5                 S4Arrays_1.2.0             
-[89] dplyr_1.1.3                 gtable_0.3.4               
-[91] sass_0.4.7                  digest_0.6.33              
-[93] SparseArray_1.2.1           farver_2.1.1               
+[85] cli_3.6.2                   rsvd_1.0.5                 
+[87] fansi_1.0.6                 S4Arrays_1.2.0             
+[89] dplyr_1.1.4                 gtable_0.3.4               
+[91] sass_0.4.8                  digest_0.6.33              
+[93] SparseArray_1.2.2           farver_2.1.1               
 [95] memoise_2.0.1               htmltools_0.5.7            
-[97] lifecycle_1.0.3             httr_1.4.7                 
+[97] lifecycle_1.0.4             httr_1.4.7                 
 [99] bit64_4.0.5                </code></pre>
 </div>
 </div>
