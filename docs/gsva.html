@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7a818f50f0ac62260c3890bad4a400fd91ff2c66targetblank7a818f5a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeaf7bbbeac9df854632b65fbaacdc898be249cf9ftargetblankaf7bbbea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/7a818f50f0ac62260c3890bad4a400fd91ff2c66" target="_blank">7a818f5</a>
+<a href="https://github.com/davetang/muse/tree/af7bbbeac9df854632b65fbaacdc898be249cf9f" target="_blank">af7bbbe</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7a818f50f0ac62260c3890bad4a400fd91ff2c66targetblank7a818f5a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeaf7bbbeac9df854632b65fbaacdc898be249cf9ftargetblankaf7bbbea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/7a818f50f0ac62260c3890bad4a400fd91ff2c66" target="_blank">7a818f5</a>.
+<a href="https://github.com/davetang/muse/tree/af7bbbeac9df854632b65fbaacdc898be249cf9f" target="_blank">af7bbbe</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -598,6 +598,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/af7bbbeac9df854632b65fbaacdc898be249cf9f/analysis/gsva.Rmd" target="_blank">af7bbbe</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-12-18
+</td>
+<td>
+Implementation
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/0851e8af09f617d650bf30204aaba291a1df056c/docs/gsva.html" target="_blank">0851e8a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-12-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1019,6 +1053,49 @@ models, such as differential pathway activity identification or survival
 prediction. Further, we demonstrate the flexibility of GSVA by applying
 it to RNA-seq data.</p>
 </blockquote>
+</div>
+<div id="implementation" class="section level2">
+<h2>Implementation</h2>
+<p>The GSVA method requires two main inputs:</p>
+<ol style="list-style-type: decimal">
+<li>A matrix <span class="math inline">\(X = {\{x_{ij}\}}_{p \times
+n}\)</span> of normalised expression values for <span
+class="math inline">\(p\)</span> genes and <span
+class="math inline">\(n\)</span> samples and</li>
+<li>A collection of gene sets <span class="math inline">\(\Gamma =
+\{\gamma_1,\ldots,\gamma_m\}\)</span>.</li>
+</ol>
+<div class="float">
+<img src="assets/gsva.jpg" alt="Figure 1" />
+<div class="figcaption">Figure 1</div>
+</div>
+<p>Step 1. Kernel estimation of the cumulative density function (kcdf).
+The two plots show two simulated expression profiles mimicking 6 samples
+from microarray and RNA-seq data. The x-axis corresponds to expression
+values where each gene is lowly expressed in the four samples with lower
+values and highly expressed in the other two. The scale of the kcdf is
+on the left y-axis and the scale of the Gaussian and Poisson kernels is
+on the right y-axis.</p>
+<blockquote>
+<p><a href="https://en.wikipedia.org/wiki/Kernel_density_estimation">In
+statistics</a>, kernel density estimation (KDE) is the application of
+kernel smoothing for probability density estimation, i.e., a
+non-parametric method to estimate the probability density function of a
+random variable based on kernels as weights.</p>
+</blockquote>
+<p>Step 2. The expression-level statistic is rank ordered for each
+sample. This is to bring distinct expression profiles to a common
+scale.</p>
+<p>Step 3. For every gene set, the Kolmogorov-Smirnov-like rank
+statistic is calculated. The plot illustrates a gene set consisting of 3
+genes out of a total number of 10 with the sample-wise calculation of
+genes inside and outside of the gene set.</p>
+<p>Step 4. The GSVA enrichment score is either the maximum deviation
+from zero (top) or the difference between the two sums (bottom). The two
+plots show two simulations of the resulting scores under the null
+hypothesis of no gene expression change. The output of the algorithm is
+a matrix containing pathway enrichment scores for each gene set and
+sample.</p>
 </div>
 <div id="vignette" class="section level2">
 <h2>Vignette</h2>
