@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeaf7bbbeac9df854632b65fbaacdc898be249cf9ftargetblankaf7bbbea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeda6c38c16ad70285c343ddcddd8047b9d0c3a567targetblankda6c38ca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/af7bbbeac9df854632b65fbaacdc898be249cf9f" target="_blank">af7bbbe</a>
+<a href="https://github.com/davetang/muse/tree/da6c38c16ad70285c343ddcddd8047b9d0c3a567" target="_blank">da6c38c</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeaf7bbbeac9df854632b65fbaacdc898be249cf9ftargetblankaf7bbbea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeda6c38c16ad70285c343ddcddd8047b9d0c3a567targetblankda6c38ca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/af7bbbeac9df854632b65fbaacdc898be249cf9f" target="_blank">af7bbbe</a>.
+<a href="https://github.com/davetang/muse/tree/da6c38c16ad70285c343ddcddd8047b9d0c3a567" target="_blank">da6c38c</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -598,6 +598,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/da6c38c16ad70285c343ddcddd8047b9d0c3a567/analysis/gsva.Rmd" target="_blank">da6c38c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-12-18
+</td>
+<td>
+Scores depend on samples included
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4d5eb2429e15512b1a79cc73eeb02087d9a2058e/docs/gsva.html" target="_blank">4d5eb24</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-12-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1326,15 +1360,109 @@ ssgsea.norm in the call to the gsva() function; see below.</p>
 </div>
 <div id="investigating-the-scores" class="section level2">
 <h2>Investigating the scores</h2>
+<p>Function to create testing matrix.</p>
+<pre class="r"><code>create_mat &lt;- function(n_genes, n_samples, my_seed = 1984, mean = 10, sd = 10){
+  set.seed(my_seed)
+  matrix(
+    rnorm(n = n_genes*n_samples, mean = mean, sd = sd),
+    nrow=n_genes,
+    dimnames=list(paste0(&quot;g&quot;, 1:n_genes), paste0(&quot;s&quot;, 1:n_samples))
+  )
+}
+
+create_mat(10, 3)</code></pre>
+<pre><code>           s1        s2        s3
+g1  14.092032 12.820110 22.419566
+g2   6.769750 12.879337 14.297406
+g3  16.358523 18.370483  3.513841
+g4  -8.461288 20.239345 19.033940
+g5  19.536474 10.177451  9.867819
+g6  21.884898 27.239940 12.475177
+g7  15.424544 11.207418 10.917182
+g8   1.672746 -7.755605 18.222846
+g9   4.737921 11.261455  4.136914
+g10 24.159828 -7.137579 20.079885</code></pre>
+<div id="matrix-subset." class="section level3">
+<h3>Matrix subset.</h3>
+<p>Subset and full matrix.</p>
+<pre class="r"><code>subset_mat &lt;- create_mat(10, 5)
+full_mat &lt;- create_mat(10, 10)
+subset_mat</code></pre>
+<pre><code>           s1        s2        s3        s4        s5
+g1  14.092032 12.820110 22.419566 -1.075869 10.494763
+g2   6.769750 12.879337 14.297406 -4.704242 18.009867
+g3  16.358523 18.370483  3.513841 16.058373  8.903882
+g4  -8.461288 20.239345 19.033940 19.562989 -3.391922
+g5  19.536474 10.177451  9.867819 12.976660 22.413409
+g6  21.884898 27.239940 12.475177  1.459716 21.844164
+g7  15.424544 11.207418 10.917182 35.043537  5.432249
+g8   1.672746 -7.755605 18.222846  7.114889 21.488720
+g9   4.737921 11.261455  4.136914  6.585828  3.334786
+g10 24.159828 -7.137579 20.079885 12.433055 21.086567</code></pre>
+<pre class="r"><code>full_mat</code></pre>
+<pre><code>           s1        s2        s3        s4        s5         s6        s7
+g1  14.092032 12.820110 22.419566 -1.075869 10.494763 22.4335516  2.626998
+g2   6.769750 12.879337 14.297406 -4.704242 18.009867  3.6997919 16.535526
+g3  16.358523 18.370483  3.513841 16.058373  8.903882  0.2574238 26.659050
+g4  -8.461288 20.239345 19.033940 19.562989 -3.391922 -1.7680728  6.678695
+g5  19.536474 10.177451  9.867819 12.976660 22.413409  6.1972216 26.165061
+g6  21.884898 27.239940 12.475177  1.459716 21.844164 -5.6580380  7.172533
+g7  15.424544 11.207418 10.917182 35.043537  5.432249  3.5174044  4.599715
+g8   1.672746 -7.755605 18.222846  7.114889 21.488720  1.7583120  3.704803
+g9   4.737921 11.261455  4.136914  6.585828  3.334786  3.1053800 11.141508
+g10 24.159828 -7.137579 20.079885 12.433055 21.086567  9.8342391 18.995697
+            s8        s9       s10
+g1   4.9163060 11.950954  9.219348
+g2  -0.7493701 15.617369  4.168967
+g3  12.9982061  5.432690 -8.406455
+g4   4.4780805 -4.493760 21.695409
+g5   5.7870310 11.589063 22.435150
+g6   7.3019278 21.713361 17.368436
+g7  14.9503293  5.279279  5.641194
+g8   6.1140713  1.168808  2.407495
+g9   2.3503234 32.241013 24.049569
+g10  5.1379627  8.911552 -3.172188</code></pre>
+<p>Single gene set with three genes.</p>
+<pre class="r"><code>gene_set &lt;- list(
+  gs1 = paste0(&quot;g&quot;, 1:3)
+)</code></pre>
+<p>The samples including in the analysis affect the ssGSEA enrichment
+calculations slightly.</p>
+<pre class="r"><code>x &lt;- gsva(ssgseaParam(subset_mat, gene_set), verbose=FALSE)</code></pre>
+<pre><code>[1] &quot;Calculating ranks...&quot;
+[1] &quot;Calculating absolute values from ranks...&quot;
+[1] &quot;Normalizing...&quot;</code></pre>
+<pre class="r"><code>y &lt;- gsva(ssgseaParam(full_mat, gene_set), verbose=FALSE)</code></pre>
+<pre><code>[1] &quot;Calculating ranks...&quot;
+[1] &quot;Calculating absolute values from ranks...&quot;
+[1] &quot;Normalizing...&quot;</code></pre>
+<pre class="r"><code>x</code></pre>
+<pre><code>             s1        s2       s3         s4         s5
+gs1 -0.04045499 0.5279619 0.257778 -0.4720381 -0.1658269</code></pre>
+<pre class="r"><code>y</code></pre>
+<pre><code>             s1        s2        s3         s4         s5        s6        s7
+gs1 -0.03756522 0.4902487 0.2393645 -0.4383196 -0.1539816 0.4558892 0.3536985
+            s8        s9        s10
+gs1 -0.1113165 0.2974987 -0.5097513</code></pre>
+<p>The initial expression estimation for each gene is carried out across
+all samples for GSVA, so it is expected that different samples will
+result in different enrichment scores.</p>
+<pre class="r"><code>x &lt;- gsva(gsvaParam(subset_mat, gene_set), verbose=FALSE)
+y &lt;- gsva(gsvaParam(full_mat, gene_set), verbose=FALSE)
+
+x</code></pre>
+<pre><code>            s1        s2         s3         s4        s5
+gs1 -0.2857143 0.2857143 0.09090909 -0.7777778 0.5142857</code></pre>
+<pre class="r"><code>y</code></pre>
+<pre><code>              s1        s2  s3         s4        s5        s6        s7
+gs1 5.551115e-17 0.3809524 0.1 -0.7777778 0.5142857 0.7142857 0.1904762
+            s8        s9        s10
+gs1 -0.1428571 0.4285714 -0.6666667</code></pre>
+</div>
+<div id="normalisation" class="section level3">
+<h3>Normalisation</h3>
 <p>Create another test matrix.</p>
-<pre class="r"><code>p &lt;- 10000
-n &lt;- 2
-set.seed(1984)
-X &lt;- matrix(
-  rnorm(n = p*n, mean = 10, sd = 10),
-  nrow=p,
-  dimnames=list(paste0(&quot;g&quot;, 1:p), paste0(&quot;s&quot;, 1:n))
-)
+<pre class="r"><code>X &lt;- create_mat(10000, 2)
 
 X[1:50, &#39;s1&#39;] &lt;- rnorm(n = 50, mean = 50, sd = 55)
 X[51:100, &#39;s1&#39;] &lt;- rnorm(n = 50, mean = 2, sd = 2)
@@ -1426,6 +1554,7 @@ test_plage</code></pre>
 gs1  0.7071068 -0.7071068
 gs2 -0.7071068  0.7071068
 gs3  0.7071068 -0.7071068</code></pre>
+</div>
 </div>
 <div id="enrichment-scores-on-microarray-and-rna-seq-data"
 class="section level2">
