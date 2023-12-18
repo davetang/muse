@@ -10,6 +10,36 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Background
+
+Notes from the paper [GSVA: gene set variation analysis for microarray and RNA-Seq data](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-14-7).
+
+> Gene Set Enrichment (GSE) analyses begin by obtaining a ranked gene list, typically derived from a microarray experiment that studies gene expression changes between two groups.
+>
+> The genes are then mapped into predefined gene sets and their gene expression statistic is summarized into a single enrichment score for each gene set.
+>
+> Many methodological variations of GSE methods have been proposed, including non-parametric enrichment statistics, battery testing, and focused gene set testing.
+>
+> Battery testing methods aim at identifying gene sets standing out from a large collection of annotated pathways and gene signatures.
+>
+> Focused gene set testing methods try to carefully evaluate a few gene sets that are relevant to the experiment being analyzed.
+> 
+> An important distinction among many of the GSE methods is the definition of the null hypothesis that is tested. The null hypothesis of a competitive test declares that there are no differences between genes inside and outside the gene set.
+>
+> A self-contained test defines its null hypothesis only in terms of the genes inside the gene set being tested. More concretely, for a self-contained test on a gene set, the differential expression of just one of its genes allows one to reject the null hypothesis of no differential expression for that gene set. It follows, that self-contained tests provide higher power than competitive tests to detect subtle changes of expression in a gene set. But they may not be useful to single out a few gene sets in a battery testing setting because of the potentially large number of reported results.
+>
+> Finally, many GSE methods assume two classes (e.g. case/control) and evaluate enrichment within this context.
+>
+> The limits imposed by this assumption become evident with the rise of large genomic studies, such as The Cancer Genome Atlas project (TCGA - http://cancergenome.nih.gov), an ambitious project with the goal to identify the molecular determinants of multiple cancer types. In contrast to case-control studies with small sample sizes, the TCGA project has large patient cohorts with multiple phenotypes, structured with hierarchical, multi-class, and censored data. Hence, GSE methods are needed that can assess pathway variation across large, heterogeneous populations with complex phenotypic traits.
+> 
+> To address these challenges, we present a non-parametric, unsupervised method called Gene Set Variation Analysis (GSVA).
+>
+> GSVA calculates sample-wise gene set enrichment scores as a function of genes inside and outside the gene set, analogously to a competitive gene set test. Further, it estimates variation of gene set enrichment over the samples independently of any class label.
+>
+> Conceptually, this methodology can be understood as a change in coordinate systems for gene expression data, from genes to gene sets. This transformation facilitates post-hoc construction of pathway-centric models, such as differential pathway activity identification or survival prediction. Further, we demonstrate the flexibility of GSVA by applying it to RNA-seq data.
+
+## Vignette
+
 Following the [vignette](https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html).
 
 >Gene set variation analysis (GSVA) is a particular type of gene set enrichment method that works on single samples and enables pathway-centric analyses of molecular data by performing a conceptually simple but powerful change in the functional unit of analysis, from genes to gene sets. The GSVA package provides the implementation of four single-sample gene set enrichment methods, concretely zscore, plage, ssGSEA and its own called GSVA. While this methodology was initially developed for gene expression data, it can be applied to other types of molecular profiling data. In this vignette we illustrate how to use the GSVA package with bulk microarray and RNA-seq expression data.
@@ -42,7 +72,7 @@ packageVersion("GSVA")
 
 ## Quick start
 
-Generate example expression matrix.
+Generate example expression matrix with 10,000 genes across 30 samples.
 
 ```{r eg_mat}
 p <- 10000
