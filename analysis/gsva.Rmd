@@ -38,6 +38,25 @@ Notes from the paper [GSVA: gene set variation analysis for microarray and RNA-S
 >
 > Conceptually, this methodology can be understood as a change in coordinate systems for gene expression data, from genes to gene sets. This transformation facilitates post-hoc construction of pathway-centric models, such as differential pathway activity identification or survival prediction. Further, we demonstrate the flexibility of GSVA by applying it to RNA-seq data.
 
+## Implementation
+
+The GSVA method requires two main inputs:
+
+1. A matrix $X = {\{x_{ij}\}}_{p \times n}$ of normalised expression values for $p$ genes and $n$ samples and
+2. A collection of gene sets $\Gamma = \{\gamma_1,\ldots,\gamma_m\}$.
+
+![Figure 1](assets/gsva.jpg)
+
+Step 1. Kernel estimation of the cumulative density function (kcdf). The two plots show two simulated expression profiles mimicking 6 samples from microarray and RNA-seq data. The x-axis corresponds to expression values where each gene is lowly expressed in the four samples with lower values and highly expressed in the other two. The scale of the kcdf is on the left y-axis and the scale of the Gaussian and Poisson kernels is on the right y-axis.
+
+> [In statistics](https://en.wikipedia.org/wiki/Kernel_density_estimation), kernel density estimation (KDE) is the application of kernel smoothing for probability density estimation, i.e., a non-parametric method to estimate the probability density function of a random variable based on kernels as weights. 
+
+Step 2. The expression-level statistic is rank ordered for each sample. This is to bring distinct expression profiles to a common scale.
+
+Step 3. For every gene set, the Kolmogorov-Smirnov-like rank statistic is calculated. The plot illustrates a gene set consisting of 3 genes out of a total number of 10 with the sample-wise calculation of genes inside and outside of the gene set.
+
+Step 4. The GSVA enrichment score is either the maximum deviation from zero (top) or the difference between the two sums (bottom). The two plots show two simulations of the resulting scores under the null hypothesis of no gene expression change. The output of the algorithm is a matrix containing pathway enrichment scores for each gene set and sample.
+
 ## Vignette
 
 Following the [vignette](https://bioconductor.org/packages/release/bioc/vignettes/GSVA/inst/doc/GSVA.html).
