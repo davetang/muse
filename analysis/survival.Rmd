@@ -142,6 +142,39 @@ ECOG performance score is as rated by the physician.
 * 3 = in bed > 50% of the day but not bedbound,
 * 4 = bedbound
 
+Create a new variable, where a higher value is associated with better survival.
+
+```{r control}
+set.seed(1984)
+lung$control <- sapply(lung$status, function(x){
+  if(x == 2){
+    rbinom(1, 1, 0.20)
+  } else {
+    rbinom(1, 1, 0.85)
+  }
+})
+```
+
+#### Visualise
+
+Higher ratio of deaths (status = 2) in males (sex = 1).
+
+```{r sex_status}
+mosaicplot(sex ~ status, data = lung)
+```
+
+Higher ECOG has a higher ratio of deaths.
+
+```{r ecog_status}
+mosaicplot(ph.ecog ~ status, data = lung)
+```
+
+Plot control data, where a higher value is associated with better survival (status = 1).
+
+```{r plot_control}
+mosaicplot(control ~ status, data = lung)
+```
+
 ### Compute survival curves
 
 The function `survfit()` can be used to compute Kaplan-Meier survival estimates. Its main arguments include:
@@ -394,10 +427,17 @@ sex_cox3 <- coxph(Surv(time, status) ~ sex, data = lung3)
 summary(sex_cox3)
 ```
 
+Perform the univariate Cox analysis on the control data, where a higher value is associated with better survival.
+
+```{r control_cox}
+control_cox <- coxph(Surv(time, status) ~ control, data = lung)
+summary(control_cox)
+```
+
 Perform the univariate Cox analysis on other covariates.
 
 ```{r uni_cox}
-covariates <- c("age", "sex",  "ph.karno", "pat.karno", "ph.ecog", "wt.loss")
+covariates <- c("age", "sex",  "ph.karno", "pat.karno", "ph.ecog", "wt.loss", "control")
 univ_formulas <- sapply(
   covariates,
   function(x) as.formula(paste('Surv(time, status)~', x))
