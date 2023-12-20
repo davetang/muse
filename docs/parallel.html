@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree16e8bbf75408a7409f6d6f437125a85fe05e8922targetblank16e8bbfa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7df7cc713434bb24a2b0f3cd5b7d3d407a21a050targetblank7df7cc7a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/16e8bbf75408a7409f6d6f437125a85fe05e8922" target="_blank">16e8bbf</a>
+<a href="https://github.com/davetang/muse/tree/7df7cc713434bb24a2b0f3cd5b7d3d407a21a050" target="_blank">7df7cc7</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree16e8bbf75408a7409f6d6f437125a85fe05e8922targetblank16e8bbfa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7df7cc713434bb24a2b0f3cd5b7d3d407a21a050targetblank7df7cc7a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/16e8bbf75408a7409f6d6f437125a85fe05e8922" target="_blank">16e8bbf</a>.
+<a href="https://github.com/davetang/muse/tree/7df7cc713434bb24a2b0f3cd5b7d3d407a21a050" target="_blank">7df7cc7</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -554,9 +554,6 @@ were generated:
 Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    r_packages_4.3.2/
-
-Untracked files:
-    Untracked:  script/fresh.sh
 
 </code></pre>
 <p>
@@ -602,6 +599,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/7df7cc713434bb24a2b0f3cd5b7d3d407a21a050/analysis/parallel.Rmd" target="_blank">7df7cc7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-12-20
+</td>
+<td>
+MulticoreParam
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/c9ebb81ba88fcae298e4cdfab492b8851aa03f04/docs/parallel.html" target="_blank">c9ebb81</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-12-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -861,7 +892,7 @@ parallelisation.</p>
   my_sum &lt;- lapply(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  3.799   0.018   3.826 </code></pre>
+  3.988   0.078   4.075 </code></pre>
 <p>The <code>mclapply</code> function can be used to process a list in
 parallel. Note that this function uses forking, which is not available
 on Windows.</p>
@@ -869,7 +900,7 @@ on Windows.</p>
   my_sum_mc &lt;- mclapply(my_list, summary, mc.cores = params$threads)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  1.006   0.374   0.688 </code></pre>
+  0.040   0.119   0.681 </code></pre>
 <p>Compare the two summaries.</p>
 <pre class="r"><code>identical(my_sum, my_sum_mc)</code></pre>
 <pre><code>[1] TRUE</code></pre>
@@ -882,7 +913,7 @@ system.time(
   my_sum_sock &lt;- parLapply(cl, my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.606   0.278   1.929 </code></pre>
+  0.622   0.268   1.874 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 identical(my_sum_mc, my_sum_sock)</code></pre>
@@ -912,7 +943,7 @@ system.time(
   })
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.001   0.001   0.041 </code></pre>
+  0.002   0.000   0.042 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 test2</code></pre>
@@ -940,7 +971,7 @@ system.time(
   my_sum_pb &lt;- pblapply(my_list, summary, cl = cl)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.657   0.301   2.001 </code></pre>
+  0.681   0.345   1.967 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 identical(my_sum_mc, my_sum_pb)</code></pre>
@@ -950,7 +981,7 @@ identical(my_sum_mc, my_sum_pb)</code></pre>
   my_sum_pb_fork &lt;- pblapply(my_list, summary, cl = params$threads)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.527   0.208   0.702 </code></pre>
+  0.512   0.199   0.675 </code></pre>
 <pre class="r"><code>identical(my_sum_pb, my_sum_pb_fork)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -970,7 +1001,7 @@ system.time(
   }
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.860   0.354   2.378 </code></pre>
+  0.851   0.386   2.282 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 identical(my_sum_mc, my_sum_dopar)</code></pre>
@@ -986,7 +1017,7 @@ system.time(
   my_sum_bp &lt;- bplapply(my_list, summary, BPPARAM = param)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.850   0.324   8.024 </code></pre>
+  0.679   0.517   8.055 </code></pre>
 <pre class="r"><code>identical(my_sum_mc, my_sum_bp)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <p>Forking.</p>
@@ -995,8 +1026,17 @@ system.time(
   my_sum_bp_fork &lt;- bplapply(my_list, summary, BPPARAM = param)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.246   0.704   1.861 </code></pre>
+  0.286   0.712   1.957 </code></pre>
 <pre class="r"><code>identical(my_sum_bp, my_sum_bp_fork)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<p>Using <code>MulticoreParam</code>.</p>
+<pre class="r"><code>param &lt;- MulticoreParam(workers = params$threads, progressbar = FALSE)
+system.time(
+  my_sum_bp_mc &lt;- bplapply(my_list, summary, BPPARAM = param)
+)</code></pre>
+<pre><code>   user  system elapsed 
+  0.949   0.353   0.734 </code></pre>
+<pre class="r"><code>identical(my_sum_bp_fork, my_sum_bp_mc)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
 <div id="furrr" class="section level2">
@@ -1015,7 +1055,7 @@ Attaching package: &#39;purrr&#39;</code></pre>
   my_sum_pur &lt;- map(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  4.099   0.034   4.142 </code></pre>
+  3.810   0.225   4.043 </code></pre>
 <pre class="r"><code>identical(my_sum_mc, my_sum_pur)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <p>Map with parallelisation.</p>
@@ -1024,7 +1064,7 @@ system.time(
   my_sum_fur &lt;- future_map(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.773   0.536   3.149 </code></pre>
+  0.750   0.632   3.138 </code></pre>
 <pre class="r"><code>identical(my_sum_pur, my_sum_fur)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
