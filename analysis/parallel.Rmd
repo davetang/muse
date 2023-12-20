@@ -228,6 +228,17 @@ system.time(
 identical(my_sum_mc, my_sum_bp)
 ```
 
+Forking.
+
+```{r bplapply_fork}
+param <- SnowParam(workers = params$threads, type = "FORK")
+system.time(
+  my_sum_bp_fork <- bplapply(my_list, summary, BPPARAM = param)
+)
+
+identical(my_sum_bp, my_sum_bp_fork)
+```
+
 ## `furrr`
 
 Load required libraries.
@@ -263,3 +274,5 @@ identical(my_sum_pur, my_sum_fur)
 So, which package should you use? `BiocParallel` and `furrr` are tailored for use with Bioconductor and `purrr`, so use those packages accordingly.
 
 For parallelisation over a list, use `parallel`. The [foreach](https://cran.r-project.org/web/packages/foreach/vignettes/foreach.html) function provides more flexibility when parallelising, so use the `doParallel` package if you have a more complicated task.
+
+Lastly, forking is faster than using sockets. If you're not using Windows, consider using forking over sockets.
