@@ -14,6 +14,8 @@ params:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Introduction
+
 As stated in the [foreach vignette](https://cran.r-project.org/web/packages/foreach/vignettes/foreach.html#conclusion):
 
 >Much of parallel computing comes to doing three things: splitting the problem into pieces, executing the pieces in parallel, and combining the results back together.
@@ -26,7 +28,7 @@ There are several packages that make it easy to run tasks in parallel:
 * The [furrr](https://furrr.futureverse.org/) package parallelises mapping functions from the [purrr](https://purrr.tidyverse.org/) package.
 * The [pbapply](https://github.com/psolymos/pbapply#parallel-backends) package, which is a package for adding a progress bar, but supports parallel execution.
 
-## `system.time`
+## Timing processes with `system.time`
 
 From `?proc.time`:
 
@@ -48,7 +50,7 @@ More information is provided on [Stack Overflow](https://stackoverflow.com/quest
 >
 >"System CPU time" gives the CPU time spent by the kernel (the operating system) on behalf of the current process. The operating system is used for things like opening files, doing input or output, starting other processes, and looking at the system clock: operations that involve resources that many processes must share.
 
-## Data
+## Testing data
 
 Create a list of 100 data frames each with 5,000 observations across 100 variables.
 
@@ -66,6 +68,14 @@ create_df <- function(n, m, seed = 1984){
 
 my_list <- lapply(1:100, function(x) create_df(5000, 100, x))
 length(my_list)
+```
+
+## Number of threads used
+
+This is a parameterised notebook; the number of threads used for the code examples is `r params$threads`.
+
+```{r num_threads}
+params$threads
 ```
 
 ## `parallel`
@@ -110,6 +120,8 @@ stopCluster(cl)
 identical(my_sum_mc, my_sum_sock)
 ```
 
+Note that forking is faster.
+
 ### Worker environment
 
 If you run the code below:
@@ -148,9 +160,11 @@ test2
 
 ## `pbapply`
 
-Parallelisation with a progress bar!
+Parallelisation with a progress bar! From the help page of `pblapply`:
 
-```{r pbapply}
+>Parallel processing can be enabled through the cl argument. parLapply is called when cl is a 'cluster' object, mclapply is called when cl is an integer. Showing the progress bar increases the communication overhead between the main process and nodes / child processes compared to the parallel equivalents of the functions without the progress bar. The functions fall back to their original equivalents when the progress bar is disabled (i.e. getOption("pboptions")$type == "none" or dopb() is FALSE). This is the default when interactive() if FALSE (i.e. called from command line R script).
+
+```{r pbapply_socket}
 library(pbapply)
 cl <- makeCluster(params$threads)
 system.time(
@@ -159,6 +173,16 @@ system.time(
 stopCluster(cl)
 
 identical(my_sum_mc, my_sum_pb)
+```
+
+Use `mclapply`.
+
+```{r pbapply_forking}
+system.time(
+  my_sum_pb_fork <- pblapply(my_list, summary, cl = params$threads)
+)
+
+identical(my_sum_pb, my_sum_pb_fork)
 ```
 
 ## `doParallel`
