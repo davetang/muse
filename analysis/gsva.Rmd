@@ -363,9 +363,23 @@ pickrellPar <- gsvaParam(
   kcdf="Poisson"
 )
 
-esrnaseq <- gsva(pickrellPar, verbose=FALSE)
+system.time(
+  esrnaseq <- gsva(pickrellPar, verbose=FALSE)
+)
 
 exprs(esrnaseq)[1:6, 1:6]
+```
+
+In parallel.
+
+```{r esrnaseq_par, warning=FALSE, message=FALSE}
+library(BiocParallel)
+param <- MulticoreParam(workers = 4L, progressbar = FALSE)
+system.time(
+  esrnaseq_par <- gsva(pickrellPar, verbose=FALSE, BPPARAM = param)
+)
+
+identical(exprs(esrnaseq), exprs(esrnaseq_par))
 ```
 
 Correlation of enrichment scores between the two technologies.
