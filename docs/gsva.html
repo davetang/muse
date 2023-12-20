@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2023-12-18" />
+<meta name="date" content="2023-12-20" />
 
 <title>GSVA: gene set variation analysis</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">GSVA: gene set variation analysis</h1>
-<h4 class="date">2023-12-18</h4>
+<h4 class="date">2023-12-20</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-12-18
+<strong>Last updated:</strong> 2023-12-20
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeda6c38c16ad70285c343ddcddd8047b9d0c3a567targetblankda6c38ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef45a23650f8dbe5da65bb7b395fc0908846c8419targetblankf45a236a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/da6c38c16ad70285c343ddcddd8047b9d0c3a567" target="_blank">da6c38c</a>
+<a href="https://github.com/davetang/muse/tree/f45a23650f8dbe5da65bb7b395fc0908846c8419" target="_blank">f45a236</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeda6c38c16ad70285c343ddcddd8047b9d0c3a567targetblankda6c38ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef45a23650f8dbe5da65bb7b395fc0908846c8419targetblankf45a236a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/da6c38c16ad70285c343ddcddd8047b9d0c3a567" target="_blank">da6c38c</a>.
+<a href="https://github.com/davetang/muse/tree/f45a23650f8dbe5da65bb7b395fc0908846c8419" target="_blank">f45a236</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -598,6 +598,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/f45a23650f8dbe5da65bb7b395fc0908846c8419/analysis/gsva.Rmd" target="_blank">f45a236</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-12-20
+</td>
+<td>
+Run gsva in parallel
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/20975fc8611ae1362e7efe1f075c54b862875085/docs/gsva.html" target="_blank">20975fc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-12-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1662,8 +1696,12 @@ KEGG_GALACTOSE_METABOLISM                      0.5901477 -0.05433206</code></pre
   kcdf=&quot;Poisson&quot;
 )
 
-esrnaseq &lt;- gsva(pickrellPar, verbose=FALSE)</code></pre>
+system.time(
+  esrnaseq &lt;- gsva(pickrellPar, verbose=FALSE)
+)</code></pre>
 <pre><code>Mapping identifiers between gene sets and feature names</code></pre>
+<pre><code>   user  system elapsed 
+  5.600   0.102   5.716 </code></pre>
 <pre class="r"><code>exprs(esrnaseq)[1:6, 1:6]</code></pre>
 <pre><code>                                                NA19099     NA18523     NA19144
 KEGG_GLYCOLYSIS_GLUCONEOGENESIS               0.2292013 -0.26418772 -0.37401687
@@ -1679,6 +1717,17 @@ KEGG_PENTOSE_PHOSPHATE_PATHWAY                 0.3585130  0.16414025 -0.2658944
 KEGG_PENTOSE_AND_GLUCURONATE_INTERCONVERSIONS -0.2453460 -0.06027442  0.0470686
 KEGG_FRUCTOSE_AND_MANNOSE_METABOLISM           0.4431209 -0.43879510 -0.2629824
 KEGG_GALACTOSE_METABOLISM                      0.3496528 -0.12188569 -0.4629607</code></pre>
+<p>In parallel.</p>
+<pre class="r"><code>library(BiocParallel)
+param &lt;- MulticoreParam(workers = 4L, progressbar = FALSE)
+system.time(
+  esrnaseq_par &lt;- gsva(pickrellPar, verbose=FALSE, BPPARAM = param)
+)</code></pre>
+<pre><code>Mapping identifiers between gene sets and feature names</code></pre>
+<pre><code>   user  system elapsed 
+  7.364   7.973   4.227 </code></pre>
+<pre class="r"><code>identical(exprs(esrnaseq), exprs(esrnaseq_par))</code></pre>
+<pre><code>[1] TRUE</code></pre>
 <p>Correlation of enrichment scores between the two technologies.</p>
 <pre class="r"><code>library(corrplot)</code></pre>
 <pre><code>corrplot 0.92 loaded</code></pre>
@@ -2064,12 +2113,12 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] ggplot2_3.4.4        corrplot_0.92        GSVAdata_1.38.0     
- [4] hgu95a.db_3.13.0     org.Hs.eg.db_3.18.0  GSEABase_1.64.0     
- [7] graph_1.80.0         annotate_1.80.0      XML_3.99-0.16       
-[10] AnnotationDbi_1.64.1 IRanges_2.36.0       S4Vectors_0.40.2    
-[13] Biobase_2.62.0       BiocGenerics_0.48.1  GSVA_1.50.0         
-[16] BiocManager_1.30.22  workflowr_1.7.1     
+ [1] ggplot2_3.4.4        corrplot_0.92        BiocParallel_1.36.0 
+ [4] GSVAdata_1.38.0      hgu95a.db_3.13.0     org.Hs.eg.db_3.18.0 
+ [7] GSEABase_1.64.0      graph_1.80.0         annotate_1.80.0     
+[10] XML_3.99-0.16        AnnotationDbi_1.64.1 IRanges_2.36.0      
+[13] S4Vectors_0.40.2     Biobase_2.62.0       BiocGenerics_0.48.1 
+[16] GSVA_1.50.0          BiocManager_1.30.22  workflowr_1.7.1     
 
 loaded via a namespace (and not attached):
  [1] DBI_1.1.3                   bitops_1.0-7               
@@ -2090,38 +2139,37 @@ loaded via a namespace (and not attached):
 [31] jsonlite_1.8.8              blob_1.2.4                 
 [33] highr_0.10                  later_1.3.2                
 [35] rhdf5filters_1.14.1         DelayedArray_0.28.0        
-[37] Rhdf5lib_1.24.1             BiocParallel_1.36.0        
-[39] irlba_2.3.5.1               parallel_4.3.2             
-[41] R6_2.5.1                    bslib_0.6.1                
-[43] stringi_1.8.3               GenomicRanges_1.54.1       
-[45] jquerylib_0.1.4             Rcpp_1.0.11                
-[47] SummarizedExperiment_1.32.0 knitr_1.45                 
-[49] tidyselect_1.2.0            httpuv_1.6.13              
-[51] Matrix_1.6-1.1              rstudioapi_0.15.0          
-[53] abind_1.4-5                 yaml_2.3.8                 
-[55] codetools_0.2-19            processx_3.8.3             
-[57] lattice_0.21-9              tibble_3.2.1               
-[59] withr_2.5.2                 KEGGREST_1.42.0            
-[61] evaluate_0.23               Biostrings_2.70.1          
-[63] pillar_1.9.0                MatrixGenerics_1.14.0      
-[65] whisker_0.4.1               generics_0.1.3             
-[67] rprojroot_2.0.4             RCurl_1.98-1.13            
-[69] munsell_0.5.0               scales_1.3.0               
-[71] sparseMatrixStats_1.14.0    xtable_1.8-4               
-[73] glue_1.6.2                  tools_4.3.2                
-[75] ScaledMatrix_1.10.0         fs_1.6.3                   
-[77] rhdf5_2.46.1                grid_4.3.2                 
-[79] tidyr_1.3.0                 colorspace_2.1-0           
-[81] SingleCellExperiment_1.24.0 GenomeInfoDbData_1.2.11    
-[83] BiocSingular_1.18.0         HDF5Array_1.30.0           
-[85] cli_3.6.2                   rsvd_1.0.5                 
-[87] fansi_1.0.6                 S4Arrays_1.2.0             
-[89] dplyr_1.1.4                 gtable_0.3.4               
-[91] sass_0.4.8                  digest_0.6.33              
-[93] SparseArray_1.2.2           farver_2.1.1               
-[95] memoise_2.0.1               htmltools_0.5.7            
-[97] lifecycle_1.0.4             httr_1.4.7                 
-[99] bit64_4.0.5                </code></pre>
+[37] Rhdf5lib_1.24.1             irlba_2.3.5.1              
+[39] parallel_4.3.2              R6_2.5.1                   
+[41] bslib_0.6.1                 stringi_1.8.3              
+[43] GenomicRanges_1.54.1        jquerylib_0.1.4            
+[45] Rcpp_1.0.11                 SummarizedExperiment_1.32.0
+[47] knitr_1.45                  tidyselect_1.2.0           
+[49] httpuv_1.6.13               Matrix_1.6-1.1             
+[51] rstudioapi_0.15.0           abind_1.4-5                
+[53] yaml_2.3.8                  codetools_0.2-19           
+[55] processx_3.8.3              lattice_0.21-9             
+[57] tibble_3.2.1                withr_2.5.2                
+[59] KEGGREST_1.42.0             evaluate_0.23              
+[61] Biostrings_2.70.1           pillar_1.9.0               
+[63] MatrixGenerics_1.14.0       whisker_0.4.1              
+[65] generics_0.1.3              rprojroot_2.0.4            
+[67] RCurl_1.98-1.13             munsell_0.5.0              
+[69] scales_1.3.0                sparseMatrixStats_1.14.0   
+[71] xtable_1.8-4                glue_1.6.2                 
+[73] tools_4.3.2                 ScaledMatrix_1.10.0        
+[75] fs_1.6.3                    rhdf5_2.46.1               
+[77] grid_4.3.2                  tidyr_1.3.0                
+[79] colorspace_2.1-0            SingleCellExperiment_1.24.0
+[81] GenomeInfoDbData_1.2.11     BiocSingular_1.18.0        
+[83] HDF5Array_1.30.0            cli_3.6.2                  
+[85] rsvd_1.0.5                  fansi_1.0.6                
+[87] S4Arrays_1.2.0              dplyr_1.1.4                
+[89] gtable_0.3.4                sass_0.4.8                 
+[91] digest_0.6.33               SparseArray_1.2.2          
+[93] farver_2.1.1                memoise_2.0.1              
+[95] htmltools_0.5.7             lifecycle_1.0.4            
+[97] httr_1.4.7                  bit64_4.0.5                </code></pre>
 </div>
 </div>
 
