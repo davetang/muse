@@ -239,6 +239,17 @@ system.time(
 identical(my_sum_bp, my_sum_bp_fork)
 ```
 
+Using `MulticoreParam`.
+
+```{r bplapply_multicore}
+param <- MulticoreParam(workers = params$threads, progressbar = FALSE)
+system.time(
+  my_sum_bp_mc <- bplapply(my_list, summary, BPPARAM = param)
+)
+
+identical(my_sum_bp_fork, my_sum_bp_mc)
+```
+
 ## `furrr`
 
 Load required libraries.
