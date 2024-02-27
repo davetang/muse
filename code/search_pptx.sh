@@ -26,9 +26,9 @@ check_depend (){
 }
 
 check_file (){
-   infile=$1
-   if [[ ! -e ${infile} ]]; then
-     >&2 echo ${infile} does not exist
+   infile="$1"
+   if [[ ! -e "${infile}" ]]; then
+     >&2 echo "${infile}" does not exist
      exit 1
    fi
 }
@@ -45,11 +45,11 @@ fi
 eval set -- ${args}
 while :
 do
-  case $1 in
+  case "$1" in
     -i | --ignore-case) ignorecase=1 ; shift   ;;
     -v | --verbose)     verbose=1    ; shift   ;;
     -h | --help)        usage        ; shift   ;;
-    -t | --tmp)         tmp=$2       ; shift 2 ;;
+    -t | --tmp)         tmp="$2"       ; shift 2 ;;
     # -- means the end of the arguments; drop this, and break out of the while loop
     --) shift; break ;;
     *) >&2 echo Unsupported option: $1
@@ -60,32 +60,32 @@ done
 if [[ $# -ne 2 ]]; then
   usage
 fi
-pptx=$1
-word=$2
+pptx="$1"
+word="$2"
 
 dependencies=(unzip)
 for tool in ${dependencies[@]}; do
    check_depend ${tool}
 done
 
-check_file ${pptx}
+check_file "${pptx}"
 
 SECONDS=0
 [[ ${verbose} -gt 0 ]] && >&2 printf "[ %s %s ] Searching $(basename ${pptx})\n" $(now)
 
 duration=$SECONDS
 rand=$$$RANDOM
-tmpdir=${tmp}/${rand}
+tmpdir="${tmp}/${rand}"
 
-if [[ -d ${tmpdir} ]]; then
-   >&2 echo ${tmpdir} already exists!
+if [[ -d "${tmpdir}" ]]; then
+   >&2 echo "${tmpdir}" already exists!
    exit 1
 else
-   mkdir ${tmpdir}
+   mkdir "${tmpdir}"
 fi
 
-cp ${pptx} ${tmpdir}
-cd ${tmpdir} && unzip -q $(basename ${pptx})
+cp "${pptx}" "${tmpdir}"
+cd "${tmpdir}" && unzip -q "$(basename "${pptx}")"
 
 if [[ ! -d ppt/slides/ ]]; then
    >&2 echo No slides found
@@ -108,7 +108,7 @@ else
    done
 fi
 
-cd /tmp && rm -rf ${tmpdir}
+cd /tmp && rm -rf "${tmpdir}"
 
 [[ ${verbose} -gt 0 ]] && >&2 printf "[ %s %s ] Completed.\n" $(now)
 [[ ${verbose} -gt 0 ]] && >&2 echo -e "$(($duration / 60)) minutes and $(($duration % 60)) seconds elapsed.\n"
