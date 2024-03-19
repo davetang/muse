@@ -3,11 +3,13 @@ title: "Getting started with Seurat"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
-    toc: false
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
 This post follows the Peripheral Blood Mononuclear Cells (PBMCs) [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial) for 2,700 single cells. It was written while I was going through the tutorial and contains my notes. The dataset for this tutorial can be downloaded from the [10X Genomics dataset page](https://support.10xgenomics.com/single-cell-gene-expression/datasets/1.1.0/pbmc3k) but it is also hosted on Amazon (see below). The PBMCs, which are primary cells with relatively small amounts of RNA (around 1pg RNA/cell), come from a healthy donor. There were 2,700 cells detected and sequencing was performed on an Illumina NextSeq 500 with around 69,000 reads per cell. To get started [install Seurat](https://satijalab.org/seurat/articles/install.html) by using install.packages().
@@ -65,3 +67,56 @@ head data/pbmc3k/filtered_gene_bc_matrices/hg19/matrix.mtx
 ```
 
 ## Seurat
+
+Load 10x data into a matrix.
+
+```{r}
+pbmc.data <- Read10X(data.dir = "data/pbmc3k/filtered_gene_bc_matrices/hg19/")
+```
+
+[dgTMatrix-class](https://stat.ethz.ch/R-manual/R-devel/library/Matrix/html/dgTMatrix-class.html).
+
+```{r}
+class(pbmc.data)
+```
+
+32,738 genes and 2,700 cells.
+
+```{r}
+dim(pbmc.data)
+```
+
+Check out the first six genes and cells
+
+```{r}
+pbmc.data[1:6, 1:6]
+```
+
+Summary of total expression per single cell.
+
+```{r}
+summary(colSums(pbmc.data))
+```
+
+Check how many genes have at least one transcript in each cell.
+
+```{r}
+at_least_one <- apply(pbmc.data, 2, function(x) sum(x>0))
+hist(
+  at_least_one,
+  breaks = 100,
+  main = "Distribution of detected genes",
+  xlab = "Genes with at least one tag"
+)
+```
+
+Total expression per cell.
+
+```{r}
+hist(
+  colSums(pbmc.data),
+  breaks = 100,
+  main = "Expression sum per cell",
+  xlab = "Sum expression"
+)
+```
