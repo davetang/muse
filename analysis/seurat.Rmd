@@ -1,0 +1,67 @@
+---
+title: "Getting started with Seurat"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This post follows the Peripheral Blood Mononuclear Cells (PBMCs) [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial) for 2,700 single cells. It was written while I was going through the tutorial and contains my notes. The dataset for this tutorial can be downloaded from the [10X Genomics dataset page](https://support.10xgenomics.com/single-cell-gene-expression/datasets/1.1.0/pbmc3k) but it is also hosted on Amazon (see below). The PBMCs, which are primary cells with relatively small amounts of RNA (around 1pg RNA/cell), come from a healthy donor. There were 2,700 cells detected and sequencing was performed on an Illumina NextSeq 500 with around 69,000 reads per cell. To get started [install Seurat](https://satijalab.org/seurat/articles/install.html) by using install.packages().
+
+```{r install_seurat, eval=FALSE}
+install.packages("Seurat")
+```
+
+If you get the warning:
+
+>‘SeuratObject’ was built under R 4.3.0 but the current version is 4.3.2; it is recomended that you
+reinstall ‘SeuratObject’ as the ABI for R may have changed
+
+re-install the `SeuratObject` package using a repository that has an updated copy. The same goes for the `htmltools` package.
+
+```{r install_seurat_obj, eval=FALSE}
+install.packages("SeuratObject", repos = "https://cran.ism.ac.jp/")
+install.packages("htmltools", repos = "https://cran.ism.ac.jp/")
+packageVersion("SeuratObject")
+packageVersion("htmltools")
+```
+
+Load `Seurat`.
+
+```{r load_seurat}
+library("Seurat")
+packageVersion("Seurat")
+```
+
+## Data
+
+To follow the tutorial, you need the 10X data.
+
+```{bash, eval=FALSE}
+mkdir -p data/pbmc3k && cd data/pbmc3k
+wget -c https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz
+tar -xzf pbmc3k_filtered_gene_bc_matrices.tar.gz
+```
+
+The extracted files.
+
+```{bash}
+ls -1 data/pbmc3k/filtered_gene_bc_matrices/hg19
+```
+
+`matrix.mtx` is a [MatrixMarket](https://math.nist.gov/MatrixMarket/formats.html) file. It has the following properties:
+
+* Only non-zero entries are stored in the file
+* Comments start with a `%`, like LaTeX
+* The first line indicates the total number of rows, columns, and entries
+* The following lines after the first provide a row and column number and the value at that coordinate
+
+```{bash}
+head data/pbmc3k/filtered_gene_bc_matrices/hg19/matrix.mtx
+```
+
+## Seurat
