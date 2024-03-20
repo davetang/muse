@@ -247,3 +247,105 @@ pbmc <- subset(pbmc, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent
 pbmc
 ```
 
+## Normalisation
+
+The next step is to normalise the data, so that each cell can be compared against each other. At the time of writing, the only normalisation method implemented in Seurat is by log normalisation. Gene expression measurements for each cell are normalised by its total expression, scaled by 10,000, and log-transformed.
+
+```{r}
+hist(
+  colSums(pbmc[['RNA']]$counts),
+  breaks = 100,
+  main = "Total expression before normalisation",
+  xlab = "Sum of expression"
+)
+```
+
+After removing unwanted cells from the dataset, the next step is to normalise the data. By default, we employ a global-scaling normalization method "LogNormalize" that normalises the feature expression measurements for each cell by the total expression, multiplies this by a scale factor (10,000 by default), and log-transforms the result. In Seurat v5, Normalized values are stored in pbmc[["RNA"]]$data.
+
+```{r}
+pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
+```
+
+For clarity, in this previous line of code (and in future commands), we provide the default values for certain parameters in the function call. However, this isn’t required and the same behavior can be achieved with:
+
+```{r}
+pbmc <- NormalizeData(pbmc)
+```
+
+While this method of normalization is standard and widely used in scRNA-seq analysis, global-scaling relies on an assumption that each cell originally contains the same number of RNA molecules. We and others have developed alternative workflows for the single cell preprocessing that do not make these assumptions. For users who are interested, please check out our SCTransform() normalization workflow. The method is described in ourpaper, with a separate vignette using Seurat here. The use of SCTransform replaces the need to run NormalizeData, FindVariableFeatures, or ScaleData (described below.)
+
+```{r}
+hist(
+  colSums(pbmc[['RNA']]$data),
+  breaks = 100,
+  main = "Total expression after normalisation",
+  xlab = "Sum of expression"
+)
+```
+
+## Identification of highly variable features (feature selection)
+
+Once the data is normalised, the next step is to find genes are vary between single cells; genes that are constant among all cells have no distinguishing power. The `FindVariableFeatures()` function calculates the average expression and dispersion for each gene, places these genes into bins, and then calculates a z-score for dispersion within each bin. I interpret that as take each gene, get the average expression and variance of the gene across the 2,638 cells, categorise genes into bins (default is 20) based on their expression and variance, and finally normalise the variance in each bin. This was the same approach in [Macosko et al.](https://www.ncbi.nlm.nih.gov/pubmed/26000488) and new methods for detecting genes with variable expression patterns will be implemented in Seurat soon (according to the tutorial). The parameters used below are typical settings for UMI data that is normalised to a total of 10,000 molecules and will identify around 2,000 variable genes. The tutorial recommends that users should explore the parameters themselves since each dataset is different.
+
+We next calculate a subset of features that exhibit high cell-to-cell variation in the dataset (i.e, they are highly expressed in some cells, and lowly expressed in others). We and others have found that focusing on these genes in downstream analysis helps to highlight biological signal in single-cell datasets.
+
+Our procedure in Seurat is described in detail here, and improves on previous versions by directly modeling the mean-variance relationship inherent in single-cell data, and is implemented in the FindVariableFeatures() function. By default, we return 2,000 features per dataset. These will be used in downstream analysis, like PCA.
+
+```{r}
+pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000)
+```
+
+```{r}
+length(VariableFeatures(pbmc))
+```
+
+Identify the 10 most highly variable genes
+
+```{r}
+top10 <- head(VariableFeatures(pbmc), 10)
+top10
+```
+
+Plot variable features with and without labels
+
+```{r, fig.width=10, fig.height=6}
+plot1 <- VariableFeaturePlot(pbmc)
+plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
+plot1 + plot2
+```
+
+## Scaling the data
+
+Next, we apply a linear transformation ("scaling") that is a standard pre-processing step prior to dimensional reduction techniques like PCA. The `ScaleData()` function:
+
+* Shifts the expression of each gene, so that the mean expression across cells is 0
+* Scales the expression of each gene, so that the variance across cells is 1
+    * This step gives equal weight in downstream analyses, so that highly-expressed genes do not dominate
+* The results of this are stored in pbmc[["RNA"]]$scale.data
+* By default, only variable features are scaled.
+* You can specify the features argument to scale additional features
+
+```{r}
+all.genes <- rownames(pbmc)
+pbmc <- ScaleData(pbmc, features = all.genes)
+dim(pbmc[["RNA"]]$scale.data)
+```
+
+```{r}
+hist(
+  colSums(pbmc[['RNA']]$scale.data),
+  breaks = 100,
+  main = "Total expression after scaling",
+  xlab = "Sum of expression"
+)
+```
+
+How can I remove unwanted sources of variation?
+
+In Seurat, we also use the `ScaleData()` function to remove unwanted sources of variation from a single-cell dataset. For example, we could "regress out" heterogeneity associated with (for example) cell cycle stage, or mitochondrial contamination i.e.:
+
+```{r, eval=FALSE}
+pbmc <- ScaleData(pbmc, features = all.genes, vars.to.regress = "percent.mito")
+```
+
+However, particularly for advanced users who would like to use this functionality, we strongly recommend the use of our new normalization workflow, `SCTransform()`. The method is described in [this paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-021-02584-9), with a separate [vignette using Seurat](https://satijalab.org/seurat/articles/sctransform_vignette). As with `ScaleData()`, the function `SCTransform()` also includes a `vars.to.regress` parameter. 
