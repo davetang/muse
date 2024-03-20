@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree088718440c6b969bff3e4c7980f98fc533117206targetblank0887184a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreede7593195062d3844a6de1b0f46c9657d6c10a5atargetblankde75931a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/088718440c6b969bff3e4c7980f98fc533117206" target="_blank">0887184</a>
+<a href="https://github.com/davetang/muse/tree/de7593195062d3844a6de1b0f46c9657d6c10a5a" target="_blank">de75931</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree088718440c6b969bff3e4c7980f98fc533117206targetblank0887184a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreede7593195062d3844a6de1b0f46c9657d6c10a5atargetblankde75931a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/088718440c6b969bff3e4c7980f98fc533117206" target="_blank">0887184</a>.
+<a href="https://github.com/davetang/muse/tree/de7593195062d3844a6de1b0f46c9657d6c10a5a" target="_blank">de75931</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -604,6 +604,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/de7593195062d3844a6de1b0f46c9657d6c10a5a/analysis/seurat.Rmd" target="_blank">de75931</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+<td>
+Filtering on mitochondrial percent
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/seurat.html" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1048,10 +1082,11 @@ class</a> in the Advanced R book.</p>
 <h2>Basic filtering</h2>
 <p>The tutorial states that “The number of genes and UMIs (nGene and
 nUMI) are automatically calculated for every object by Seurat.” The nUMI
-is calculated as num.mol &lt;- colSums(object.raw.data), i.e. each
-transcript is a unique molecule. The number of genes is simply the tally
-of genes with at least 1 transcript; num.genes &lt;-
-colSums(object.raw.data &gt; is.expr) where is.expr is zero.</p>
+is calculated as <code>num.mol &lt;- colSums(object.raw.data)</code>,
+i.e. each transcript is a unique molecule. The number of genes is simply
+the tally of genes with at least 1 transcript;
+<code>num.genes &lt;- colSums(object.raw.data &gt; is.expr</code>) where
+<code>is.expr</code> is zero.</p>
 <p>A common quality control metric is the percentage of transcripts from
 the mitochondrial genome. According to the paper <a
 href="https://pubmed.ncbi.nlm.nih.gov/26887813/">Classification of low
@@ -1059,17 +1094,17 @@ quality cells from single-cell RNA-seq data</a> the reason this is a
 quality control metric is because if a single cell is lysed, cytoplasmic
 RNA will be lost apart from the RNA that is enclosed in the
 mitochondria, which will be retained and sequenced.</p>
-<p>Mitochondria genes conveniently start with MT</p>
+<p>Human mitochondria genes conveniently start with MT.</p>
 <pre class="r"><code>mito.genes &lt;- grep(pattern = &quot;^MT-&quot;, x = rownames(x = pbmc@assays$RNA), value = TRUE)
 length(mito.genes)</code></pre>
 <pre><code>[1] 13</code></pre>
-<pre class="r"><code>percent.mito &lt;- Matrix::colSums(pbmc[[&#39;RNA&#39;]]$counts[mito.genes, ]) / Matrix::colSums(pbmc[[&#39;RNA&#39;]]$counts)
+<pre class="r"><code>percent.mito &lt;- Matrix::colSums(pbmc[[&#39;RNA&#39;]]$counts[mito.genes, ]) / Matrix::colSums(pbmc[[&#39;RNA&#39;]]$counts) * 100
 head(percent.mito)</code></pre>
 <pre><code>AAACATACAACCAC-1 AAACATTGAGCTAC-1 AAACATTGATCAGC-1 AAACCGTGCTTCCG-1 
-     0.030177759      0.037935958      0.008897363      0.017430845 
+       3.0177759        3.7935958        0.8897363        1.7430845 
 AAACCGTGTATGCG-1 AAACGCACTGGTAC-1 
-     0.012244898      0.016643551 </code></pre>
-<p>Check out the meta data</p>
+       1.2244898        1.6643551 </code></pre>
+<p>Check out the meta data.</p>
 <pre class="r"><code>head(pbmc@meta.data)</code></pre>
 <pre><code>                 orig.ident nCount_RNA nFeature_RNA
 AAACATACAACCAC-1     pbmc3k       2419          779
@@ -1078,21 +1113,45 @@ AAACATTGATCAGC-1     pbmc3k       3147         1129
 AAACCGTGCTTCCG-1     pbmc3k       2639          960
 AAACCGTGTATGCG-1     pbmc3k        980          521
 AAACGCACTGGTAC-1     pbmc3k       2163          781</code></pre>
-<p>add some more meta data</p>
-<pre class="r"><code>pbmc &lt;- AddMetaData(object = pbmc,
-                    metadata = percent.mito,
-                    col.name = &quot;percent.mito&quot;)
+<p>Add mitochondrial percent to the meta using
+<code>AddMetaData</code>.</p>
+<pre class="r"><code>pbmc &lt;- AddMetaData(
+  object = pbmc,
+  metadata = percent.mito,
+  col.name = &quot;percent.mito&quot;
+)
 head(pbmc@meta.data)</code></pre>
 <pre><code>                 orig.ident nCount_RNA nFeature_RNA percent.mito
-AAACATACAACCAC-1     pbmc3k       2419          779  0.030177759
-AAACATTGAGCTAC-1     pbmc3k       4903         1352  0.037935958
-AAACATTGATCAGC-1     pbmc3k       3147         1129  0.008897363
-AAACCGTGCTTCCG-1     pbmc3k       2639          960  0.017430845
-AAACCGTGTATGCG-1     pbmc3k        980          521  0.012244898
-AAACGCACTGGTAC-1     pbmc3k       2163          781  0.016643551</code></pre>
+AAACATACAACCAC-1     pbmc3k       2419          779    3.0177759
+AAACATTGAGCTAC-1     pbmc3k       4903         1352    3.7935958
+AAACATTGATCAGC-1     pbmc3k       3147         1129    0.8897363
+AAACCGTGCTTCCG-1     pbmc3k       2639          960    1.7430845
+AAACCGTGTATGCG-1     pbmc3k        980          521    1.2244898
+AAACGCACTGGTAC-1     pbmc3k       2163          781    1.6643551</code></pre>
+<p>Use <code>PercentageFeatureSet</code> to calculate the percentage of
+a set of features, which saves us from some typing. The <code>[[</code>
+operator can add columns to object metadata, which is a great place to
+stash QC stats.</p>
+<pre class="r"><code>pbmc[[&quot;percent.mt&quot;]] &lt;- PercentageFeatureSet(pbmc, pattern = &quot;^MT-&quot;)
+head(pbmc@meta.data[, c(&#39;percent.mito&#39;, &#39;percent.mt&#39;)])</code></pre>
+<pre><code>                 percent.mito percent.mt
+AAACATACAACCAC-1    3.0177759  3.0177759
+AAACATTGAGCTAC-1    3.7935958  3.7935958
+AAACATTGATCAGC-1    0.8897363  0.8897363
+AAACCGTGCTTCCG-1    1.7430845  1.7430845
+AAACCGTGTATGCG-1    1.2244898  1.2244898
+AAACGCACTGGTAC-1    1.6643551  1.6643551</code></pre>
+<p>Instead of setting a hard filtering threshold, one can use the 3 * <a
+href="https://www.sc-best-practices.org/preprocessing_visualization/quality_control.html#filtering-low-quality-reads">Median
+Absolute Deviation</a> to determine threshold limits for filtering out
+cells.</p>
+<pre class="r"><code>median(pbmc@meta.data$percent.mt) - 3 * mad(pbmc@meta.data$percent.mt)</code></pre>
+<pre><code>[1] -0.3751742</code></pre>
+<pre class="r"><code>median(pbmc@meta.data$percent.mt) + 3 * mad(pbmc@meta.data$percent.mt)</code></pre>
+<pre><code>[1] 4.436775</code></pre>
 <p>Plot number of genes, UMIs, and % mitochondria</p>
 <p>Visualize QC metrics as a violin plot</p>
-<pre class="r"><code>VlnPlot(pbmc, features = c(&quot;nFeature_RNA&quot;, &quot;nCount_RNA&quot;, &quot;percent.mito&quot;), ncol = 3)</code></pre>
+<pre class="r"><code>VlnPlot(pbmc, features = c(&quot;nFeature_RNA&quot;, &quot;nCount_RNA&quot;, &quot;percent.mt&quot;), ncol = 3)</code></pre>
 <pre><code>Warning: Default search for &quot;data&quot; layer in &quot;RNA&quot; assay yielded no results;
 utilizing &quot;counts&quot; layer instead.</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -1143,7 +1202,7 @@ unique molecules and the number of genes captured.</p>
 <p>FeatureScatter is typically used to visualize feature-feature
 relationships, but can be used for anything calculated by the object,
 i.e. columns in object metadata, PC scores etc.</p>
-<pre class="r"><code>plot1 &lt;- FeatureScatter(pbmc, feature1 = &quot;nCount_RNA&quot;, feature2 = &quot;percent.mito&quot;)
+<pre class="r"><code>plot1 &lt;- FeatureScatter(pbmc, feature1 = &quot;nCount_RNA&quot;, feature2 = &quot;percent.mt&quot;)
 plot2 &lt;- FeatureScatter(pbmc, feature1 = &quot;nCount_RNA&quot;, feature2 = &quot;nFeature_RNA&quot;)
 plot1 + plot2</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -1185,11 +1244,11 @@ Dave Tang
 </div>
 </div>
 <p>Manual check; I already know all cells have &gt;200 genes.</p>
-<pre class="r"><code>table(pbmc@meta.data$percent.mito &lt; 0.05 &amp; pbmc@meta.data$nFeature_RNA&lt;2500)</code></pre>
+<pre class="r"><code>table(pbmc@meta.data$percent.mito &lt; 5 &amp; pbmc@meta.data$nFeature_RNA&lt;2500)</code></pre>
 <pre><code>
 FALSE  TRUE 
    62  2638 </code></pre>
-<pre class="r"><code>pbmc &lt;- subset(pbmc, subset = nFeature_RNA &gt; 200 &amp; nFeature_RNA &lt; 2500 &amp; percent.mito &lt; 0.05)
+<pre class="r"><code>pbmc &lt;- subset(pbmc, subset = nFeature_RNA &gt; 200 &amp; nFeature_RNA &lt; 2500 &amp; percent.mt &lt; 5)
 pbmc</code></pre>
 <pre><code>An object of class Seurat 
 13714 features across 2638 samples within 1 assay 
@@ -1473,7 +1532,7 @@ Dave Tang
 remove unwanted sources of variation from a single-cell dataset. For
 example, we could “regress out” heterogeneity associated with (for
 example) cell cycle stage, or mitochondrial contamination i.e.:</p>
-<pre class="r"><code>pbmc &lt;- ScaleData(pbmc, features = all.genes, vars.to.regress = &quot;percent.mito&quot;)</code></pre>
+<pre class="r"><code>pbmc &lt;- ScaleData(pbmc, features = all.genes, vars.to.regress = &quot;percent.mt&quot;)</code></pre>
 <p>However, particularly for advanced users who would like to use this
 functionality, we strongly recommend the use of our new normalization
 workflow, <code>SCTransform()</code>. The method is described in <a
@@ -1553,8 +1612,82 @@ Positive:  GZMB, NKG7, S100A8, FGFBP2, GNLY
 Negative:  LTB, IL7R, CKB, VIM, MS4A7 </code></pre>
 <pre class="r"><code>VizDimLoadings(pbmc, dims = 1:2, reduction = &quot;pca&quot;)</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-38-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-38-1">
+Past versions of unnamed-chunk-38-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-38-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-38-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>DimPlot(pbmc, reduction = &quot;pca&quot;) + NoLegend()</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-39-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-39-1">
+Past versions of unnamed-chunk-39-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-39-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-39-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>In particular <code>DimHeatmap()</code> allows for easy exploration
 of the primary sources of heterogeneity in a dataset, and can be useful
 when trying to decide which PCs to include for further downstream
@@ -1565,8 +1698,82 @@ Though clearly a supervised analysis, we find this to be a valuable tool
 for exploring correlated feature sets.</p>
 <pre class="r"><code>DimHeatmap(pbmc, dims = 1, cells = 500, balanced = TRUE)</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-40-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-40-1">
+Past versions of unnamed-chunk-40-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-40-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-40-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>DimHeatmap(pbmc, dims = 1:15, cells = 500, balanced = TRUE)</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-41-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-41-1">
+Past versions of unnamed-chunk-41-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-41-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-41-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="determine-the-dimensionality-of-the-dataset"
 class="section level2">
@@ -1589,6 +1796,43 @@ each one (ElbowPlot() function). In this example, we can observe an
 captured in the first 10 PCs.</p>
 <pre class="r"><code>ElbowPlot(pbmc)</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-42-1">
+Past versions of unnamed-chunk-42-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-42-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-42-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Identifying the true dimensionality of a dataset – can be
 challenging/uncertain for the user. We therefore suggest these multiple
 approaches for users. The first is more supervised, exploring PCs to
@@ -1687,24 +1931,61 @@ conclusions solely on the basis of visualization techniques.</p>
 <pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
 To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
 This message will be shown once per session</code></pre>
-<pre><code>12:33:31 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
-<pre><code>12:33:31 Read 2638 rows and found 10 numeric columns</code></pre>
-<pre><code>12:33:31 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
-<pre><code>12:33:31 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>13:03:21 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>13:03:21 Read 2638 rows and found 10 numeric columns</code></pre>
+<pre><code>13:03:21 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>13:03:21 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
 <pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
 <pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
 <pre><code>**************************************************|
-12:33:31 Writing NN index file to temp file /tmp/RtmpaMxsZf/file277a3aaab702
-12:33:31 Searching Annoy index using 1 thread, search_k = 3000
-12:33:32 Annoy recall = 100%
-12:33:32 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-12:33:32 Initializing from normalized Laplacian + noise (using RSpectra)
-12:33:32 Commencing optimization for 500 epochs, with 105124 positive edges
-12:33:35 Optimization finished</code></pre>
+13:03:22 Writing NN index file to temp file /tmp/Rtmpo9PSkm/file29d918ccc007
+13:03:22 Searching Annoy index using 1 thread, search_k = 3000
+13:03:22 Annoy recall = 100%
+13:03:23 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+13:03:23 Initializing from normalized Laplacian + noise (using RSpectra)
+13:03:23 Commencing optimization for 500 epochs, with 105124 positive edges
+13:03:26 Optimization finished</code></pre>
 <p>Note that you can set <code>label = TRUE</code> or use the
 LabelClusters function to help label individual clusters</p>
 <pre class="r"><code>DimPlot(pbmc, reduction = &quot;umap&quot;)</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-46-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-46-1">
+Past versions of unnamed-chunk-46-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-46-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-46-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="finding-differentially-expressed-features"
 class="section level2">
@@ -1795,12 +2076,123 @@ visualizations. We also suggest exploring <code>RidgePlot()</code>,
 methods to view your dataset.</p>
 <pre class="r"><code>VlnPlot(pbmc, features = c(&quot;MS4A1&quot;, &quot;CD79A&quot;))</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-53-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-53-1">
+Past versions of unnamed-chunk-53-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-53-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-53-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>You can plot raw counts as well.</p>
 <pre class="r"><code>VlnPlot(pbmc, features = c(&quot;NKG7&quot;, &quot;PF4&quot;), layer = &quot;counts&quot;, log = TRUE)</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-54-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-54-1">
+Past versions of unnamed-chunk-54-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-54-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-54-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>FeaturePlot(pbmc, features = c(&quot;MS4A1&quot;, &quot;GNLY&quot;, &quot;CD3E&quot;, &quot;CD14&quot;, &quot;FCER1A&quot;, &quot;FCGR3A&quot;, &quot;LYZ&quot;, &quot;PPBP&quot;,
     &quot;CD8A&quot;))</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-55-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-55-1">
+Past versions of unnamed-chunk-55-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-55-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-55-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p><code>DoHeatmap()</code> generates an expression heatmap for given
 cells and features. In this case, we are plotting the top 20 markers (or
 all markers if less than 20) for each cluster.</p>
@@ -1812,6 +2204,43 @@ all markers if less than 20) for each cluster.</p>
 
 DoHeatmap(pbmc, features = top10$gene) + NoLegend()</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-56-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-56-1">
+Past versions of unnamed-chunk-56-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-56-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-56-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="assigning-cell-type-identity-to-clusters"
 class="section level2">
@@ -1880,12 +2309,86 @@ names(new.cluster.ids) &lt;- levels(pbmc)
 pbmc &lt;- RenameIdents(pbmc, new.cluster.ids)
 DimPlot(pbmc, reduction = &quot;umap&quot;, label = TRUE, pt.size = 0.5) + NoLegend()</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-57-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-57-1">
+Past versions of unnamed-chunk-57-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-57-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-57-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>library(ggplot2)
 DimPlot(pbmc, reduction = &quot;umap&quot;, label = TRUE, label.size = 4.5) + xlab(&quot;UMAP 1&quot;) +
   ylab(&quot;UMAP 2&quot;) +
   theme(axis.title = element_text(size = 18), legend.text = element_text(size = 18)) +
   guides(colour = guide_legend(override.aes = list(size = 10)))</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-58-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-58-1">
+Past versions of unnamed-chunk-58-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-58-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-58-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
