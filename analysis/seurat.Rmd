@@ -66,7 +66,7 @@ ls -1 data/pbmc3k/filtered_gene_bc_matrices/hg19
 head data/pbmc3k/filtered_gene_bc_matrices/hg19/matrix.mtx
 ```
 
-## Seurat
+## Seurat object
 
 Load 10x data into a matrix.
 
@@ -100,6 +100,8 @@ summary(colSums(pbmc.data))
 
 Check how many genes have at least one transcript in each cell.
 
+The median number of detected genes among the single cells is 817.
+
 ```{r}
 at_least_one <- apply(pbmc.data, 2, function(x) sum(x>0))
 hist(
@@ -108,9 +110,10 @@ hist(
   main = "Distribution of detected genes",
   xlab = "Genes with at least one tag"
 )
+abline(v = median(at_least_one), col = 2, lty = 3)
 ```
 
-Total expression per cell.
+Total expression per cell. The median sum of expression among the single cells is 2,197. This distribution is very similar to the distribution of detected genes shown above.
 
 ```{r}
 hist(
@@ -119,4 +122,128 @@ hist(
   main = "Expression sum per cell",
   xlab = "Sum expression"
 )
+abline(v = median(colSums(pbmc.data)), col = 2, lty = 3)
 ```
+
+We will filter out genes and single cells before we continue with the analysis. The tutorial has arbitrary values of keeping genes expressed in three or more cells and keeping cells with at least 200 detected genes.
+
+Manually check the number of genes detected in three or more cells; a lot of genes are not detected in 3 or more cells.
+
+```{r}
+tmp <- apply(pbmc.data, 1, function(x) sum(x>0))
+table(tmp>=3)
+```
+
+All cells have at least 200 detected genes
+
+```{r}
+keep <- tmp>=3
+tmp <- pbmc.data[keep,]
+at_least_one <- apply(tmp, 2, function(x) sum(x>0))
+summary(at_least_one)
+```
+
+
+```{r}
+dim(tmp)
+```
+
+See `?SeuratObject` for more information on the class.
+
+```{r}
+pbmc <- CreateSeuratObject(
+  counts = pbmc.data,
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k"
+)
+
+class(pbmc)
+```
+
+Same numbers as above 
+
+```{r}
+pbmc
+```
+
+Slots in Seurat object.
+
+> SeuratObject: Data Structures for Single Cell Data
+>
+> Defines S4 classes for single-cell genomic data and associated information, such as dimensionality reduction embeddings, nearest-neighbor graphs, and spatially-resolved coordinates. Provides data access methods and R-native hooks to ensure the Seurat object is familiar to other R users
+
+Read more about the [S4 class](https://adv-r.hadley.nz/s4.html) in the Advanced R book.
+
+```{r}
+slotNames(pbmc)
+```
+
+
+
+## Basic filtering
+
+The tutorial states that "The number of genes and UMIs (nGene and nUMI) are automatically calculated for every object by Seurat." The nUMI is calculated as num.mol <- colSums(object.raw.data), i.e. each transcript is a unique molecule. The number of genes is simply the tally of genes with at least 1 transcript; num.genes <- colSums(object.raw.data > is.expr) where is.expr is zero.
+
+A common quality control metric is the percentage of transcripts from the mitochondrial genome. According to the paper [Classification of low quality cells from single-cell RNA-seq data](https://pubmed.ncbi.nlm.nih.gov/26887813/) the reason this is a quality control metric is because if a single cell is lysed, cytoplasmic RNA will be lost apart from the RNA that is enclosed in the mitochondria, which will be retained and sequenced.
+
+Mitochondria genes conveniently start with MT
+
+```{r}
+mito.genes <- grep(pattern = "^MT-", x = rownames(x = pbmc@assays$RNA), value = TRUE)
+length(mito.genes)
+```
+
+
+```{r}
+percent.mito <- Matrix::colSums(pbmc[['RNA']]$counts[mito.genes, ]) / Matrix::colSums(pbmc[['RNA']]$counts)
+head(percent.mito)
+```
+
+Check out the meta data
+
+```{r}
+head(pbmc@meta.data)
+```
+
+add some more meta data
+
+```{r}
+pbmc <- AddMetaData(object = pbmc,
+                    metadata = percent.mito,
+                    col.name = "percent.mito")
+head(pbmc@meta.data)
+```
+
+Plot number of genes, UMIs, and % mitochondria
+
+Visualize QC metrics as a violin plot
+
+```{r}
+VlnPlot(pbmc, features = c("nFeature_RNA", "nCount_RNA", "percent.mito"), ncol = 3)
+```
+
+A couple of cells have high mitochondrial percentage which may indicate lost of cytoplasmic RNA.
+
+The GenePlot() function can be used to visualise gene-gene relationships as well as any columns in the seurat object. Below we use the plotting function to spot cells that have a high percentage of mitochondrial RNA and to plot the relationship between the number of unique molecules and the number of genes captured.
+
+FeatureScatter is typically used to visualize feature-feature relationships, but can be used
+for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
+
+```{r}
+plot1 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "percent.mito")
+plot2 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
+plot1 + plot2
+```
+
+Manual check; I already know all cells have >200 genes.
+
+```{r}
+table(pbmc@meta.data$percent.mito < 0.05 & pbmc@meta.data$nFeature_RNA<2500)
+```
+
+```{r}
+pbmc <- subset(pbmc, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mito < 0.05)
+pbmc
+```
+
