@@ -86,6 +86,23 @@ class(pbmc.data)
 dim(pbmc.data)
 ```
 
+Save as CSV file.
+
+```{r write_csv}
+system.time(
+  write.csv(x = pbmc.data, file = "data/pbmc3k.csv")
+)
+```
+
+Gzip.
+
+```{bash}
+if [[ -f data/pbmc3k.csv ]]; then
+   gzip data/pbmc3k.csv
+fi
+ls -lh data/pbmc3k.csv.gz
+```
+
 Check out the first six genes and cells
 
 ```{r}
