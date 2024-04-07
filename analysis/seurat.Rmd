@@ -97,7 +97,7 @@ system.time(
 Gzip.
 
 ```{bash}
-if [[ -f data/pbmc3k.csv ]]; then
+if [[ ! -f data/pbmc3k.csv.gz ]]; then
    gzip data/pbmc3k.csv
 fi
 ls -lh data/pbmc3k.csv.gz
