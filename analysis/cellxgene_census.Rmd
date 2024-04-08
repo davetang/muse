@@ -1,0 +1,137 @@
+---
+title: "Getting started with CELLxGENE Discover Census"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Preparation
+
+Following the [documentation](https://chanzuckerberg.github.io/cellxgene-census/r/index.html) for the R package {cellxgene.census} which is part of CZ CELLxGENE Discover Census. 
+
+{cellxgene.census} provides an API to efficiently access the cloud-hosted Census single-cell data from R. In just a few seconds users can access any slice of Census data using cell or gene filters across hundreds of single-cell datasets.
+
+Census data can be fetched in an iterative fashion for bigger-than-memory slices of data, or quickly exported to basic R structures, as well as {Seurat} or {SingleCellExperiment} objects for downstream analysis.
+
+Install from the [R-universe platform](https://ropensci.org/r-universe/). If installing using Ubuntu/Debian, you may need to install the following libraries via APT:
+
+* libxml2-dev
+* libssl-dev
+* libcurl4-openssl-dev
+
+In addition you must have at least `cmake` v3.21. Install the {tiledbsoma} dependency first, since this takes some time to compile and install, it's better to fail first.
+
+```{r install_tiledbsoma, eval=FALSE}
+install.packages('tiledbsoma', repos = c('https://tiledb-inc.r-universe.dev',
+                                         'https://cloud.r-project.org'))
+```
+
+Now install {cellxgene.census}, which should be a breeze now.
+
+```{r install_cellxgene_census, eval=FALSE}
+install.packages(
+  "cellxgene.census",
+  repos=c('https://chanzuckerberg.r-universe.dev', 'https://cloud.r-project.org')
+)
+```
+
+Now install {Seurat}.
+
+```{r install_seurat, eval=FALSE}
+install.packages("Seurat")
+```
+
+## Querying the metadata
+
+[Querying and fetching the single-cell data and cell/gene metadata](https://chanzuckerberg.github.io/cellxgene-census/r/articles/census_query_extract.html)
+
+```{r load_cellxgene_census}
+library("cellxgene.census")
+packageVersion("cellxgene.census")
+```
+
+The human gene metadata of the Census, for RNA assays, is located at `census$get("census_data")$get("homo_sapiens")$obs`. The mouse cell metadata is at `census$get("census_data")$get("mus_musculus").obs`.
+
+To learn what metadata columns are available for fetching and filtering we can directly look at the keys of the cell metadata.
+
+```{r my_keys}
+census <- open_soma()
+my_keys <- census$get("census_data")$get("homo_sapiens")$obs$colnames()
+my_keys
+```
+
+`soma_joinid` is a special `SOMADataFrame` column that is used for join operations. All of the keys can be used to fetch specific columns or specific rows matching a condition. For the latter we need to know the values we are looking for _a priori_.
+
+For example let's see what are the possible values available for `sex`. To this we can load all cell metadata but fetching only for the column sex; `column_names` are character vector indicating what metadata columns to fetch.
+
+```{r sex_values}
+census$get("census_data")$get("homo_sapiens")$obs$read(column_names = "sex")$concat() |>
+  as.data.frame() |>
+  unique()
+```
+
+With this information we can fetch all cell metadata for a specific sex value, for example "unknown"; the `value_filter` is an R expression with selection conditions to fetch rows.
+
+```{r sex_unknown}
+census$get("census_data")$get("homo_sapiens")$obs$read(value_filter = "sex == 'unknown'")$concat() |>
+  as.data.frame() -> sex_unknown
+
+head(sex_unknown)
+```
+
+We can use both `column_names` and `value_filter` to perform specific queries. For example fetching the disease column for the cell_type "B cell" in the `tissue_general` "lung".
+
+```{r cell_metadata_b_cell}
+cell_metadata_b_cell <- census$get("census_data")$get("homo_sapiens")$obs$read(
+  value_filter = "cell_type == 'B cell' & tissue_general == 'lung'",
+  column_names = "disease"
+)
+
+cell_metadata_b_cell <- as.data.frame(cell_metadata_b_cell$concat())
+
+table(cell_metadata_b_cell)
+```
+
+### Querying expression data as Seurat
+
+Use `get_seurat()` to perform the same type of filtering but returning a Seurat object.
+
+* `obs_column_names` — character vector indicating the columns to select for cell metadata.
+* `obs_value_filter` — expression with selection conditions to fetch cells meeting a criteria.
+* `var_column_names` — character vector indicating the columns to select for gene metadata.
+* `var_value_filter` — expression with selection conditions to fetch genes meeting a criteria.
+
+```{r get_seurat, eval=FALSE}
+library("Seurat")
+
+seurat_obj <- get_seurat(
+  census, "Homo sapiens",
+  obs_column_names = c("cell_type", "tissue_general", "disease", "sex"),
+  var_value_filter = "feature_id %in% c('ENSG00000161798', 'ENSG00000188229')",
+  obs_value_filter = "cell_type == 'B cell' & tissue_general == 'lung' & disease == 'COVID-19'"
+)
+
+saveRDS(object = seurat_obj, file = "data/lung_bcell.rds")
+```
+
+Seurat object.
+
+```{r seurat_obj}
+seurat_obj <- readRDS(file = "data/lung_bcell.rds")
+seurat_obj
+```
+
+### Close the census
+
+After use, the census object should be closed to release memory and other resources. This also closes all SOMA objects accessed via the top-level census. Closing can be automated using `on.exit(census$close(), add = TRUE)` immediately after `census <- open_soma()`.
+
+```{r census_close}
+census$close()
+```
