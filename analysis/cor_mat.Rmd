@@ -100,39 +100,6 @@ ggplot(data.frame(x = x, y = y), aes(x, y)) +
 
 Since the number of comparisons increases exponentially, we will need to use more cores to calculate all pairwise comparisons if we want results in a reasonable time.
 
-## Cell network
-
-Dataset with 2,700 cells.
-
-```{r pbmc3k}
-pbmc3k <- read_csv(file = "https://davetang.org/file/pbmc3k/pbmc3k.csv.gz", show_col_types = FALSE)
-rn <- pull(pbmc3k[, 1])
-pbmc3k <- pbmc3k[, -1]
-pbmc3k <- as.matrix(pbmc3k)
-row.names(pbmc3k) <- rn
-pbmc3k <- pbmc3k[rowSums(pbmc3k)>9, ]
-pbmc3k <- pbmc3k[, colSums(pbmc3k)>200 ]
-dim(pbmc3k)
-```
-
-Number of comparisons.
-
-```{r pbmc3k_ncor}
-choose(ncol(pbmc3k), 2)
-```
-
-```{r pbmc3k_cor}
-system.time(
-  pbmc3k_cor <- cor(pbmc3k, method = "spearman")
-)
-```
-
-Dimensions of the correlation matrix.
-
-```{r pbmc3k_cor_dim}
-dim(pbmc3k_cor)
-```
-
 ## Gene network
 
 We will use [pnas_expression.txt](https://davetang.org/file/pnas_expression.txt) from the study [" Determination of tag density required for digital transcriptome analysis: application to an androgen-sensitive prostate cancer model"](https://pubmed.ncbi.nlm.nih.gov/19088194/).
@@ -254,4 +221,94 @@ Plot network.
 
 ```{r plot_net}
 plot(net)
+```
+
+## Cell network
+
+Dataset with 2,700 cells.
+
+```{r pbmc3k}
+pbmc3k <- read_csv(file = "https://davetang.org/file/pbmc3k/pbmc3k.csv.gz", show_col_types = FALSE)
+rn <- pull(pbmc3k[, 1])
+pbmc3k <- pbmc3k[, -1]
+pbmc3k <- as.matrix(pbmc3k)
+row.names(pbmc3k) <- rn
+pbmc3k <- pbmc3k[rowSums(pbmc3k)>9, ]
+pbmc3k <- pbmc3k[, colSums(pbmc3k)>200 ]
+pbmc3k_rn <- row.names(pbmc3k)
+dim(pbmc3k)
+```
+
+Number of comparisons.
+
+```{r pbmc3k_ncor}
+choose(ncol(pbmc3k), 2)
+```
+
+Normalise each column by its "depth", then center and scale.
+
+```{r pbmc3k_norm}
+pbmc3k_norm <- apply(pbmc3k, 2, function(x) x / sum(x) * 10000)
+pbmc3k_norm <- apply(pbmc3k_norm, 2, scale)
+row.names(pbmc3k_norm) <- pbmc3k_rn
+dim(pbmc3k_norm)
+```
+
+Subset to the 2000 most highly variable genes.
+
+```{r pbmc3k_hvgs}
+pbmc3k_vars <- apply(pbmc3k_norm, 1, var)
+pbmc3k_hvgs <- head(sort(pbmc3k_vars, decreasing = TRUE), 2000)
+pbmc3k_norm <- pbmc3k_norm[names(pbmc3k_hvgs), ]
+dim(pbmc3k_norm)
+```
+
+```{r pbmc3k_cor}
+system.time(
+  pbmc3k_cor <- cor(pbmc3k_norm, method = "spearman")
+)
+```
+
+Dimensions of the correlation matrix.
+
+```{r pbmc3k_cor_dim}
+dim(pbmc3k_cor)
+```
+
+```{r pbmc3k_cor_adj}
+pbmc3k_cor[upper.tri(pbmc3k_cor)] <- 42
+my_index <- which(pbmc3k_cor < 42, arr.ind = TRUE)
+pbmc3k_cor_adj <- cbind(my_index, pbmc3k_cor[my_index])
+colnames(pbmc3k_cor_adj) <- c('row', 'col', 'spearman')
+to_keep <- which(pbmc3k_cor_adj[, 'row'] != pbmc3k_cor_adj[, 'col'], arr.ind = TRUE)
+pbmc3k_cor_adj <- pbmc3k_cor_adj[to_keep, ]
+dim(pbmc3k_cor_adj)
+```
+
+Distribution of the correlations.
+
+```{r pbmc3k_cor_adj_summary}
+summary(pbmc3k_cor_adj[, 'spearman'])
+```
+
+
+```{r pbmc3k_cor_adj_sub}
+pbmc3k_cor_adj_sub <- pbmc3k_cor_adj[abs(pbmc3k_cor_adj[, 'spearman']) >= 0.58, ]
+dim(pbmc3k_cor_adj_sub)
+```
+
+Create network.
+
+```{r pbmc3k_create_network}
+pbmc3k_net <- network::network(pbmc3k_cor_adj_sub, directed = FALSE)
+pbmc3k_net
+```
+
+Plot cell network.
+
+```{r pbmc3k_plot_net}
+pbmc3k_comp_dist <- component.dist(pbmc3k_net)
+delete.vertices(pbmc3k_net, which(pbmc3k_comp_dist$csize[pbmc3k_comp_dist$membership] == 1))
+
+plot(pbmc3k_net)
 ```
