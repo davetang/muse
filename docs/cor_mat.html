@@ -443,15 +443,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7fac1025cc31f22381af285ce5c28017d710544btargetblank7fac102a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeed7b17aac327b827fba649fb526c230bf47cf473targetblanked7b17aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/7fac1025cc31f22381af285ce5c28017d710544b" target="_blank">7fac102</a>
+<a href="https://github.com/davetang/muse/tree/ed7b17aac327b827fba649fb526c230bf47cf473" target="_blank">ed7b17a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7fac1025cc31f22381af285ce5c28017d710544btargetblank7fac102a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeed7b17aac327b827fba649fb526c230bf47cf473targetblanked7b17aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +461,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/7fac1025cc31f22381af285ce5c28017d710544b" target="_blank">7fac102</a>.
+<a href="https://github.com/davetang/muse/tree/ed7b17aac327b827fba649fb526c230bf47cf473" target="_blank">ed7b17a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -524,6 +524,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/ed7b17aac327b827fba649fb526c230bf47cf473/analysis/cor_mat.Rmd" target="_blank">ed7b17a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-10
+</td>
+<td>
+Cell network
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/e911e7c808461ffec1908d35ee77762bb0abfeae/docs/cor_mat.html" target="_blank">e911e7c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -603,6 +637,43 @@ A &lt;- matrix(
 )
 image(A)</code></pre>
 <p><img src="figure/cor_mat.Rmd/eg1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-eg1-1">
+Past versions of eg1-1.png
+</button>
+</p>
+<div id="fig-eg1-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/e911e7c808461ffec1908d35ee77762bb0abfeae/docs/figure/cor_mat.Rmd/eg1-1.png" target="_blank">e911e7c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>We will calculate the <a
 href="https://en.wikipedia.org/wiki/Spearman&#39;s_rank_correlation_coefficient">Spearman’s
 rank correlation coefficient</a>, which is a more robust measure of
@@ -673,35 +744,46 @@ ggplot(data.frame(x = x, y = y), aes(x, y)) +
   geom_point() +
   theme_minimal()</code></pre>
 <p><img src="figure/cor_mat.Rmd/double_num-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-double_num-1">
+Past versions of double_num-1.png
+</button>
+</p>
+<div id="fig-double_num-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/e911e7c808461ffec1908d35ee77762bb0abfeae/docs/figure/cor_mat.Rmd/double_num-1.png" target="_blank">e911e7c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Since the number of comparisons increases exponentially, we will need
 to use more cores to calculate all pairwise comparisons if we want
 results in a reasonable time.</p>
-</div>
-<div id="cell-network" class="section level2">
-<h2>Cell network</h2>
-<p>Dataset with 2,700 cells.</p>
-<pre class="r"><code>pbmc3k &lt;- read_csv(file = &quot;https://davetang.org/file/pbmc3k/pbmc3k.csv.gz&quot;, show_col_types = FALSE)</code></pre>
-<pre><code>New names:
-• `` -&gt; `...1`</code></pre>
-<pre class="r"><code>rn &lt;- pull(pbmc3k[, 1])
-pbmc3k &lt;- pbmc3k[, -1]
-pbmc3k &lt;- as.matrix(pbmc3k)
-row.names(pbmc3k) &lt;- rn
-pbmc3k &lt;- pbmc3k[rowSums(pbmc3k)&gt;9, ]
-pbmc3k &lt;- pbmc3k[, colSums(pbmc3k)&gt;200 ]
-dim(pbmc3k)</code></pre>
-<pre><code>[1] 11259  2700</code></pre>
-<p>Number of comparisons.</p>
-<pre class="r"><code>choose(ncol(pbmc3k), 2)</code></pre>
-<pre><code>[1] 3643650</code></pre>
-<pre class="r"><code>system.time(
-  pbmc3k_cor &lt;- cor(pbmc3k, method = &quot;spearman&quot;)
-)</code></pre>
-<pre><code>   user  system elapsed 
- 41.650   2.282  43.938 </code></pre>
-<p>Dimensions of the correlation matrix.</p>
-<pre class="r"><code>dim(pbmc3k_cor)</code></pre>
-<pre><code>[1] 2700 2700</code></pre>
 </div>
 <div id="gene-network" class="section level2">
 <h2>Gene network</h2>
@@ -865,6 +947,121 @@ net</code></pre>
 <p>Plot network.</p>
 <pre class="r"><code>plot(net)</code></pre>
 <p><img src="figure/cor_mat.Rmd/plot_net-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_net-1">
+Past versions of plot_net-1.png
+</button>
+</p>
+<div id="fig-plot_net-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/e911e7c808461ffec1908d35ee77762bb0abfeae/docs/figure/cor_mat.Rmd/plot_net-1.png" target="_blank">e911e7c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-10
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="cell-network" class="section level2">
+<h2>Cell network</h2>
+<p>Dataset with 2,700 cells.</p>
+<pre class="r"><code>pbmc3k &lt;- read_csv(file = &quot;https://davetang.org/file/pbmc3k/pbmc3k.csv.gz&quot;, show_col_types = FALSE)</code></pre>
+<pre><code>New names:
+• `` -&gt; `...1`</code></pre>
+<pre class="r"><code>rn &lt;- pull(pbmc3k[, 1])
+pbmc3k &lt;- pbmc3k[, -1]
+pbmc3k &lt;- as.matrix(pbmc3k)
+row.names(pbmc3k) &lt;- rn
+pbmc3k &lt;- pbmc3k[rowSums(pbmc3k)&gt;9, ]
+pbmc3k &lt;- pbmc3k[, colSums(pbmc3k)&gt;200 ]
+pbmc3k_rn &lt;- row.names(pbmc3k)
+dim(pbmc3k)</code></pre>
+<pre><code>[1] 11259  2700</code></pre>
+<p>Number of comparisons.</p>
+<pre class="r"><code>choose(ncol(pbmc3k), 2)</code></pre>
+<pre><code>[1] 3643650</code></pre>
+<p>Normalise each column by its “depth”, then center and scale.</p>
+<pre class="r"><code>pbmc3k_norm &lt;- apply(pbmc3k, 2, function(x) x / sum(x) * 10000)
+pbmc3k_norm &lt;- apply(pbmc3k_norm, 2, scale)
+row.names(pbmc3k_norm) &lt;- pbmc3k_rn
+dim(pbmc3k_norm)</code></pre>
+<pre><code>[1] 11259  2700</code></pre>
+<p>Subset to the 2000 most highly variable genes.</p>
+<pre class="r"><code>pbmc3k_vars &lt;- apply(pbmc3k_norm, 1, var)
+pbmc3k_hvgs &lt;- head(sort(pbmc3k_vars, decreasing = TRUE), 2000)
+pbmc3k_norm &lt;- pbmc3k_norm[names(pbmc3k_hvgs), ]
+dim(pbmc3k_norm)</code></pre>
+<pre><code>[1] 2000 2700</code></pre>
+<pre class="r"><code>system.time(
+  pbmc3k_cor &lt;- cor(pbmc3k_norm, method = &quot;spearman&quot;)
+)</code></pre>
+<pre><code>   user  system elapsed 
+  6.897   0.476   7.373 </code></pre>
+<p>Dimensions of the correlation matrix.</p>
+<pre class="r"><code>dim(pbmc3k_cor)</code></pre>
+<pre><code>[1] 2700 2700</code></pre>
+<pre class="r"><code>pbmc3k_cor[upper.tri(pbmc3k_cor)] &lt;- 42
+my_index &lt;- which(pbmc3k_cor &lt; 42, arr.ind = TRUE)
+pbmc3k_cor_adj &lt;- cbind(my_index, pbmc3k_cor[my_index])
+colnames(pbmc3k_cor_adj) &lt;- c(&#39;row&#39;, &#39;col&#39;, &#39;spearman&#39;)
+to_keep &lt;- which(pbmc3k_cor_adj[, &#39;row&#39;] != pbmc3k_cor_adj[, &#39;col&#39;], arr.ind = TRUE)
+pbmc3k_cor_adj &lt;- pbmc3k_cor_adj[to_keep, ]
+dim(pbmc3k_cor_adj)</code></pre>
+<pre><code>[1] 3643650       3</code></pre>
+<p>Distribution of the correlations.</p>
+<pre class="r"><code>summary(pbmc3k_cor_adj[, &#39;spearman&#39;])</code></pre>
+<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+0.07545 0.37744 0.40419 0.40542 0.43483 0.70344 </code></pre>
+<pre class="r"><code>pbmc3k_cor_adj_sub &lt;- pbmc3k_cor_adj[abs(pbmc3k_cor_adj[, &#39;spearman&#39;]) &gt;= 0.58, ]
+dim(pbmc3k_cor_adj_sub)</code></pre>
+<pre><code>[1] 141   3</code></pre>
+<p>Create network.</p>
+<pre class="r"><code>pbmc3k_net &lt;- network::network(pbmc3k_cor_adj_sub, directed = FALSE)
+pbmc3k_net</code></pre>
+<pre><code> Network attributes:
+  vertices = 2641 
+  directed = FALSE 
+  hyper = FALSE 
+  loops = FALSE 
+  multiple = FALSE 
+  bipartite = FALSE 
+  total edges= 141 
+    missing edges= 0 
+    non-missing edges= 141 
+
+ Vertex attribute names: 
+    vertex.names 
+
+No edge attributes</code></pre>
+<p>Plot cell network.</p>
+<pre class="r"><code>pbmc3k_comp_dist &lt;- component.dist(pbmc3k_net)
+delete.vertices(pbmc3k_net, which(pbmc3k_comp_dist$csize[pbmc3k_comp_dist$membership] == 1))
+
+plot(pbmc3k_net)</code></pre>
+<p><img src="figure/cor_mat.Rmd/pbmc3k_plot_net-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -910,8 +1107,8 @@ loaded via a namespace (and not attached):
 [13] parallel_4.3.3    fansi_1.0.6       highr_0.10        pkgconfig_2.0.3  
 [17] lifecycle_1.0.4   compiler_4.3.3    farver_2.1.1      git2r_0.33.0     
 [21] munsell_0.5.1     getPass_0.2-4     httpuv_1.6.15     htmltools_0.5.8.1
-[25] sass_0.4.9        yaml_2.3.8        later_1.3.2       pillar_1.9.0     
-[29] crayon_1.5.2      jquerylib_0.1.4   whisker_0.4.1     cachem_1.0.8     
+[25] sass_0.4.9        yaml_2.3.8        crayon_1.5.2      later_1.3.2      
+[29] pillar_1.9.0      jquerylib_0.1.4   whisker_0.4.1     cachem_1.0.8     
 [33] tidyselect_1.2.1  digest_0.6.35     stringi_1.8.3     labeling_0.4.3   
 [37] rprojroot_2.0.4   fastmap_1.1.1     grid_4.3.3        colorspace_2.1-0 
 [41] cli_3.6.2         magrittr_2.0.3    utf8_1.2.4        withr_3.0.0      
