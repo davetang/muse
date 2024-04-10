@@ -1,0 +1,257 @@
+---
+title: "Creating a correlation matrix with R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Incentive
+
+Let $A$ be a $m \times n$ matrix, where $a_{ij}$ are elements of $A$, where $i$ is the $i_{th}$ row and $j$ is the $j_{th}$ column.
+
+$$
+A = 
+\begin{bmatrix}
+a_{11} & \cdots & a_{1j} & \cdots & a_{1n} \\
+\vdots & \ddots & \vdots && \vdots \\
+a_{i1} & \cdots & a_{ij} & \cdots & a_{in} \\
+\vdots && \vdots & \ddots & \vdots \\
+a_{m1} & \cdots & a_{mj} & \cdots & a_{mn}
+\end{bmatrix}
+$$
+
+If the matrix $A$ contained transcript expression data, then $a_{ij}$ is the expression level of the $i^{th}$ transcript in the $j^{th}$ assay. The elements of the $i^{th}$ row of $A$ form the _transcriptional response_ of the $i^{th}$ transcript. The elements of the $j^{th}$ column of $A$ form the _expression profile_ of the $j^{th}$ assay.
+
+Transcripts that have a similar transcriptional response may indicate that they are co-expressed together and could have related biological functions. A simple way of looking at co-expression is through correlation, i.e., correlating all pairs of transcriptional responses, which results in a correlation matrix.
+
+## Getting started
+
+Let's get started with a small $10 \times 10$ matrix. The code below will create random matrix with numbers ranging from 1 to 100.
+
+```{r eg1}
+set.seed(12345)
+my_rows <- 10
+my_cols <- 10
+x <- runif(n = my_rows * my_cols, min = 1, max = 100)
+A <- matrix(
+  data = runif(100,1,100),
+  nrow = my_rows,
+  ncol = my_cols,
+  byrow = TRUE
+)
+image(A)
+```
+
+We will calculate the [Spearman's rank correlation coefficient](https://en.wikipedia.org/wiki/Spearman's_rank_correlation_coefficient), which is a more robust measure of correlation.
+
+Below are the first and second rows of matrix A.
+
+```{r row_1_and_2}
+A[1, ]
+A[2, ]
+```
+
+Use `cor()` to calculate the correlation between row 1 and 2.
+
+```{r row_1_and_2_cor}
+cor(A[1,], A[2,], method = "spearman")
+```
+
+If we provide `cor()` with a matrix, it will calculate all correlations between columns. If we are interested in row correlations, we need to transpose the matrix.
+
+```{r cor_mat}
+cor_mat <- cor(t(A), method = "spearman")
+cor_mat
+```
+
+The correlation of row 1 with row 1, row 2 with row 2, and so on are all 1 because we are correlating identical rows. The correlation of row 1 with row 2 and row 2 with row 1 are the same because the order does not matter with correlation; this value is also the same as the one we manually calculated before, which is a good sanity check.
+
+## Larger matrices
+
+For 10 rows, we needed to calculate 45 correlations. We can use the `choose()` function to return the number of comparisons.
+
+```{r}
+choose(10, 2)
+```
+
+Let's plot the number of comparisons as the number of rows doubles.
+
+```{r double_num}
+double_num <- function(n, l){
+  if(n == 1){
+    return(c(l, list(l[[length(l)]]*2)))
+  }
+  return(double_num(n-1, c(l, l[[length(l)]]*2)))
+}
+
+x <- unlist(double_num(10, list(10)))
+y <- sapply(x, function(x) choose(x, 2))
+
+ggplot(data.frame(x = x, y = y), aes(x, y)) +
+  geom_point() +
+  theme_minimal()
+```
+
+Since the number of comparisons increases exponentially, we will need to use more cores to calculate all pairwise comparisons if we want results in a reasonable time.
+
+## Cell network
+
+Dataset with 2,700 cells.
+
+```{r pbmc3k}
+pbmc3k <- read_csv(file = "https://davetang.org/file/pbmc3k/pbmc3k.csv.gz", show_col_types = FALSE)
+rn <- pull(pbmc3k[, 1])
+pbmc3k <- pbmc3k[, -1]
+pbmc3k <- as.matrix(pbmc3k)
+row.names(pbmc3k) <- rn
+pbmc3k <- pbmc3k[rowSums(pbmc3k)>9, ]
+pbmc3k <- pbmc3k[, colSums(pbmc3k)>200 ]
+dim(pbmc3k)
+```
+
+Number of comparisons.
+
+```{r pbmc3k_ncor}
+choose(ncol(pbmc3k), 2)
+```
+
+```{r pbmc3k_cor}
+system.time(
+  pbmc3k_cor <- cor(pbmc3k, method = "spearman")
+)
+```
+
+Dimensions of the correlation matrix.
+
+```{r pbmc3k_cor_dim}
+dim(pbmc3k_cor)
+```
+
+## Gene network
+
+We will use [pnas_expression.txt](https://davetang.org/file/pnas_expression.txt) from the study [" Determination of tag density required for digital transcriptome analysis: application to an androgen-sensitive prostate cancer model"](https://pubmed.ncbi.nlm.nih.gov/19088194/).
+
+```{r pnas_exp}
+pnas_exp <- read.table(
+  file = "https://davetang.org/file/pnas_expression.txt",
+  header = TRUE,
+  row.names = 1
+)
+pnas_exp_rn <- row.names(pnas_exp)
+
+dim(pnas_exp)
+```
+
+We won't be using the gene lengths, so we will remove the `len` column.
+
+```{r remove_len}
+pnas_exp <- pnas_exp[,-pnas_exp$len]
+head(pnas_exp)
+```
+
+Top 10 most highly expressed genes.
+
+```{r top10_genes}
+rs <- rowSums(pnas_exp)
+top10 <- head(sort(rs, decreasing = TRUE), 10)
+
+pnas_exp[names(top10), ]
+```
+
+Normalise each column by its "depth", then center and scale.
+
+```{r pnas_exp_norm}
+pnas_exp_norm <- apply(pnas_exp, 2, function(x) x / sum(x) * 1000000)
+pnas_exp_norm <- apply(pnas_exp_norm, 2, scale)
+row.names(pnas_exp_norm) <- pnas_exp_rn
+pnas_exp_norm[names(top10), ]
+```
+
+Subset to the 500 most highly variable genes.
+
+```{r hvgs}
+my_vars <- apply(pnas_exp_norm, 1, var)
+hvgs <- head(sort(my_vars, decreasing = TRUE), 500)
+pnas_exp_norm <- pnas_exp_norm[names(hvgs), ]
+head(pnas_exp_norm)
+```
+
+Create correlation matrix.
+
+```{r}
+pnas_exp_cor <- cor(t(pnas_exp_norm), method="spearman")
+dim(pnas_exp_cor)
+```
+
+Install the {network} and {sna} packages.
+
+```{r install_network_sna, eval=FALSE}
+install.packages(c("network", "sna"))
+```
+
+Load libraries.
+
+```{r load_network_and_sna, message=FALSE}
+library(network)
+library(sna)
+```
+
+The `network::network()` function takes a matrix giving the network structure in adjacency, incidence, or edgelist form or otherwise, an object of class network.
+
+We will convert the correlation matrix into a adjacency matrix.
+
+```{r pnas_exp_cor_adj}
+pnas_exp_cor[upper.tri(pnas_exp_cor)] <- 42
+my_index <- which(pnas_exp_cor < 42, arr.ind = TRUE)
+pnas_exp_cor_adj <- cbind(my_index, pnas_exp_cor[my_index])
+colnames(pnas_exp_cor_adj) <- c('row', 'col', 'spearman')
+to_keep <- which(pnas_exp_cor_adj[, 'row'] != pnas_exp_cor_adj[, 'col'], arr.ind = TRUE)
+pnas_exp_cor_adj <- pnas_exp_cor_adj[to_keep, ]
+dim(pnas_exp_cor_adj)
+```
+
+Distribution of the correlations.
+
+```{r}
+summary(pnas_exp_cor_adj[, 'spearman'])
+```
+
+Keep only the higher correlations.
+
+```{r pnas_exp_cor_adj_sub}
+pnas_exp_cor_adj_sub <- pnas_exp_cor_adj[abs(pnas_exp_cor_adj[, 'spearman']) >= 0.95, ]
+dim(pnas_exp_cor_adj_sub)
+```
+
+Create network.
+
+```{r create_network}
+net <- network::network(pnas_exp_cor_adj_sub, directed = FALSE)
+net
+```
+
+Component analysis
+
+```{r comp_dist}
+comp_dist <- component.dist(net)
+class(comp_dist)
+```
+
+Delete genes not connected with others
+
+```{r delete_vertices}
+delete.vertices(net, which(comp_dist$csize[comp_dist$membership] == 1))
+net
+```
+
+Plot network.
+
+```{r plot_net}
+plot(net)
+```
