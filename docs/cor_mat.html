@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2024-04-10" />
+
+<title>Creating a correlation matrix with R</title>
+
+<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Creating a correlation matrix with R</h1>
+<h4 class="date">2024-04-10</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2024-04-10
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7fac1025cc31f22381af285ce5c28017d710544btargetblank7fac102a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/7fac1025cc31f22381af285ce5c28017d710544b" target="_blank">7fac102</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7fac1025cc31f22381af285ce5c28017d710544btargetblank7fac102a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/7fac1025cc31f22381af285ce5c28017d710544b" target="_blank">7fac102</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    r_packages_4.3.2/
+    Ignored:    r_packages_4.3.3/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/cor_mat.Rmd</code>) and HTML
+(<code>docs/cor_mat.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/7fac1025cc31f22381af285ce5c28017d710544b/analysis/cor_mat.Rmd" target="_blank">7fac102</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-10
+</td>
+<td>
+Creating a correlation matrix with R
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="incentive" class="section level2">
+<h2>Incentive</h2>
+<p>Let <span class="math inline">\(A\)</span> be a <span
+class="math inline">\(m \times n\)</span> matrix, where <span
+class="math inline">\(a_{ij}\)</span> are elements of <span
+class="math inline">\(A\)</span>, where <span
+class="math inline">\(i\)</span> is the <span
+class="math inline">\(i_{th}\)</span> row and <span
+class="math inline">\(j\)</span> is the <span
+class="math inline">\(j_{th}\)</span> column.</p>
+<p><span class="math display">\[
+A =
+\begin{bmatrix}
+a_{11} &amp; \cdots &amp; a_{1j} &amp; \cdots &amp; a_{1n} \\
+\vdots &amp; \ddots &amp; \vdots &amp;&amp; \vdots \\
+a_{i1} &amp; \cdots &amp; a_{ij} &amp; \cdots &amp; a_{in} \\
+\vdots &amp;&amp; \vdots &amp; \ddots &amp; \vdots \\
+a_{m1} &amp; \cdots &amp; a_{mj} &amp; \cdots &amp; a_{mn}
+\end{bmatrix}
+\]</span></p>
+<p>If the matrix <span class="math inline">\(A\)</span> contained
+transcript expression data, then <span
+class="math inline">\(a_{ij}\)</span> is the expression level of the
+<span class="math inline">\(i^{th}\)</span> transcript in the <span
+class="math inline">\(j^{th}\)</span> assay. The elements of the <span
+class="math inline">\(i^{th}\)</span> row of <span
+class="math inline">\(A\)</span> form the <em>transcriptional
+response</em> of the <span class="math inline">\(i^{th}\)</span>
+transcript. The elements of the <span
+class="math inline">\(j^{th}\)</span> column of <span
+class="math inline">\(A\)</span> form the <em>expression profile</em> of
+the <span class="math inline">\(j^{th}\)</span> assay.</p>
+<p>Transcripts that have a similar transcriptional response may indicate
+that they are co-expressed together and could have related biological
+functions. A simple way of looking at co-expression is through
+correlation, i.e., correlating all pairs of transcriptional responses,
+which results in a correlation matrix.</p>
+</div>
+<div id="getting-started" class="section level2">
+<h2>Getting started</h2>
+<p>Let’s get started with a small <span class="math inline">\(10 \times
+10\)</span> matrix. The code below will create random matrix with
+numbers ranging from 1 to 100.</p>
+<pre class="r"><code>set.seed(12345)
+my_rows &lt;- 10
+my_cols &lt;- 10
+x &lt;- runif(n = my_rows * my_cols, min = 1, max = 100)
+A &lt;- matrix(
+  data = runif(100,1,100),
+  nrow = my_rows,
+  ncol = my_cols,
+  byrow = TRUE
+)
+image(A)</code></pre>
+<p><img src="figure/cor_mat.Rmd/eg1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>We will calculate the <a
+href="https://en.wikipedia.org/wiki/Spearman&#39;s_rank_correlation_coefficient">Spearman’s
+rank correlation coefficient</a>, which is a more robust measure of
+correlation.</p>
+<p>Below are the first and second rows of matrix A.</p>
+<pre class="r"><code>A[1, ]</code></pre>
+<pre><code> [1] 30.15207 62.10811 97.45314 62.20299 52.61555 90.34788 64.10799 86.56581
+ [9] 25.86066 22.29184</code></pre>
+<pre class="r"><code>A[2, ]</code></pre>
+<pre><code> [1] 61.338128 38.961019 75.771833 38.593888 79.702234 90.663422 98.418591
+ [8] 59.206849  1.936941 32.758415</code></pre>
+<p>Use <code>cor()</code> to calculate the correlation between row 1 and
+2.</p>
+<pre class="r"><code>cor(A[1,], A[2,], method = &quot;spearman&quot;)</code></pre>
+<pre><code>[1] 0.6121212</code></pre>
+<p>If we provide <code>cor()</code> with a matrix, it will calculate all
+correlations between columns. If we are interested in row correlations,
+we need to transpose the matrix.</p>
+<pre class="r"><code>cor_mat &lt;- cor(t(A), method = &quot;spearman&quot;)
+cor_mat</code></pre>
+<pre><code>             [,1]        [,2]        [,3]        [,4]        [,5]        [,6]
+ [1,]  1.00000000  0.61212121 -0.15151515  0.33333333  0.11515152 -0.06666667
+ [2,]  0.61212121  1.00000000  0.41818182  0.52727273  0.12727273 -0.05454545
+ [3,] -0.15151515  0.41818182  1.00000000  0.40606061  0.39393939 -0.18787879
+ [4,]  0.33333333  0.52727273  0.40606061  1.00000000 -0.27272727 -0.34545455
+ [5,]  0.11515152  0.12727273  0.39393939 -0.27272727  1.00000000  0.35757576
+ [6,] -0.06666667 -0.05454545 -0.18787879 -0.34545455  0.35757576  1.00000000
+ [7,]  0.16363636  0.10303030 -0.01818182 -0.18787879  0.45454545  0.55151515
+ [8,] -0.21212121 -0.13939394 -0.16363636 -0.41818182 -0.12727273  0.50303030
+ [9,]  0.51515152  0.57575758  0.10303030  0.40606061 -0.04242424 -0.62424242
+[10,] -0.27272727 -0.10303030 -0.22424242 -0.01818182 -0.62424242 -0.63636364
+             [,7]       [,8]        [,9]       [,10]
+ [1,]  0.16363636 -0.2121212  0.51515152 -0.27272727
+ [2,]  0.10303030 -0.1393939  0.57575758 -0.10303030
+ [3,] -0.01818182 -0.1636364  0.10303030 -0.22424242
+ [4,] -0.18787879 -0.4181818  0.40606061 -0.01818182
+ [5,]  0.45454545 -0.1272727 -0.04242424 -0.62424242
+ [6,]  0.55151515  0.5030303 -0.62424242 -0.63636364
+ [7,]  1.00000000 -0.2363636 -0.46666667 -0.58787879
+ [8,] -0.23636364  1.0000000 -0.36969697 -0.13939394
+ [9,] -0.46666667 -0.3696970  1.00000000  0.36969697
+[10,] -0.58787879 -0.1393939  0.36969697  1.00000000</code></pre>
+<p>The correlation of row 1 with row 1, row 2 with row 2, and so on are
+all 1 because we are correlating identical rows. The correlation of row
+1 with row 2 and row 2 with row 1 are the same because the order does
+not matter with correlation; this value is also the same as the one we
+manually calculated before, which is a good sanity check.</p>
+</div>
+<div id="larger-matrices" class="section level2">
+<h2>Larger matrices</h2>
+<p>For 10 rows, we needed to calculate 45 correlations. We can use the
+<code>choose()</code> function to return the number of comparisons.</p>
+<pre class="r"><code>choose(10, 2)</code></pre>
+<pre><code>[1] 45</code></pre>
+<p>Let’s plot the number of comparisons as the number of rows
+doubles.</p>
+<pre class="r"><code>double_num &lt;- function(n, l){
+  if(n == 1){
+    return(c(l, list(l[[length(l)]]*2)))
+  }
+  return(double_num(n-1, c(l, l[[length(l)]]*2)))
+}
+
+x &lt;- unlist(double_num(10, list(10)))
+y &lt;- sapply(x, function(x) choose(x, 2))
+
+ggplot(data.frame(x = x, y = y), aes(x, y)) +
+  geom_point() +
+  theme_minimal()</code></pre>
+<p><img src="figure/cor_mat.Rmd/double_num-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Since the number of comparisons increases exponentially, we will need
+to use more cores to calculate all pairwise comparisons if we want
+results in a reasonable time.</p>
+</div>
+<div id="cell-network" class="section level2">
+<h2>Cell network</h2>
+<p>Dataset with 2,700 cells.</p>
+<pre class="r"><code>pbmc3k &lt;- read_csv(file = &quot;https://davetang.org/file/pbmc3k/pbmc3k.csv.gz&quot;, show_col_types = FALSE)</code></pre>
+<pre><code>New names:
+• `` -&gt; `...1`</code></pre>
+<pre class="r"><code>rn &lt;- pull(pbmc3k[, 1])
+pbmc3k &lt;- pbmc3k[, -1]
+pbmc3k &lt;- as.matrix(pbmc3k)
+row.names(pbmc3k) &lt;- rn
+pbmc3k &lt;- pbmc3k[rowSums(pbmc3k)&gt;9, ]
+pbmc3k &lt;- pbmc3k[, colSums(pbmc3k)&gt;200 ]
+dim(pbmc3k)</code></pre>
+<pre><code>[1] 11259  2700</code></pre>
+<p>Number of comparisons.</p>
+<pre class="r"><code>choose(ncol(pbmc3k), 2)</code></pre>
+<pre><code>[1] 3643650</code></pre>
+<pre class="r"><code>system.time(
+  pbmc3k_cor &lt;- cor(pbmc3k, method = &quot;spearman&quot;)
+)</code></pre>
+<pre><code>   user  system elapsed 
+ 41.650   2.282  43.938 </code></pre>
+<p>Dimensions of the correlation matrix.</p>
+<pre class="r"><code>dim(pbmc3k_cor)</code></pre>
+<pre><code>[1] 2700 2700</code></pre>
+</div>
+<div id="gene-network" class="section level2">
+<h2>Gene network</h2>
+<p>We will use <a
+href="https://davetang.org/file/pnas_expression.txt">pnas_expression.txt</a>
+from the study <a href="https://pubmed.ncbi.nlm.nih.gov/19088194/">”
+Determination of tag density required for digital transcriptome
+analysis: application to an androgen-sensitive prostate cancer
+model”</a>.</p>
+<pre class="r"><code>pnas_exp &lt;- read.table(
+  file = &quot;https://davetang.org/file/pnas_expression.txt&quot;,
+  header = TRUE,
+  row.names = 1
+)
+pnas_exp_rn &lt;- row.names(pnas_exp)
+
+dim(pnas_exp)</code></pre>
+<pre><code>[1] 37435     8</code></pre>
+<p>We won’t be using the gene lengths, so we will remove the
+<code>len</code> column.</p>
+<pre class="r"><code>pnas_exp &lt;- pnas_exp[,-pnas_exp$len]
+head(pnas_exp)</code></pre>
+<pre><code>                lane1 lane2 lane3 lane4 lane5 lane6 lane8
+ENSG00000215696     0     0     0     0     0     0     0
+ENSG00000215700     0     0     0     0     0     0     0
+ENSG00000215699     0     0     0     0     0     0     0
+ENSG00000215784     0     0     0     0     0     0     0
+ENSG00000212914     0     0     0     0     0     0     0
+ENSG00000212042     0     0     0     0     0     0     0</code></pre>
+<p>Top 10 most highly expressed genes.</p>
+<pre class="r"><code>rs &lt;- rowSums(pnas_exp)
+top10 &lt;- head(sort(rs, decreasing = TRUE), 10)
+
+pnas_exp[names(top10), ]</code></pre>
+<pre><code>                lane1 lane2 lane3 lane4 lane5 lane6 lane8
+ENSG00000157214  5270  6208  7359  7521  9806  9786  4418
+ENSG00000131051  4141  4926  5615  5548  8762  8479  3496
+ENSG00000212875  4652  5409  6445  6668  5623  5727  2875
+ENSG00000122566  3775  4131  5427  5831  6959  7069  2505
+ENSG00000142875  3166  3735  3920  4375  8123  7758  3880
+ENSG00000132570  4070  4704  5471  5548  6027  5665  2613
+ENSG00000115053  4352  4612  5880  5892  4744  4948  1892
+ENSG00000008128  3467  4300  4514  5018  5800  5814  2079
+ENSG00000162669  4212  5000  5516  5812  4328  4172  1632
+ENSG00000115648   940  1084  1317  1345  9730  9942  3272</code></pre>
+<p>Normalise each column by its “depth”, then center and scale.</p>
+<pre class="r"><code>pnas_exp_norm &lt;- apply(pnas_exp, 2, function(x) x / sum(x) * 1000000)
+pnas_exp_norm &lt;- apply(pnas_exp_norm, 2, scale)
+row.names(pnas_exp_norm) &lt;- pnas_exp_rn
+pnas_exp_norm[names(top10), ]</code></pre>
+<pre><code>                    lane1     lane2     lane3     lane4    lane5    lane6
+ENSG00000157214 41.702924 42.345887 40.954637 40.769545 41.78237 41.50440
+ENSG00000131051 32.724307 33.557386 31.197773 30.017650 37.31179 35.93325
+ENSG00000212875 36.788145 36.868498 35.841235 36.121108 23.87006 24.20273
+ENSG00000122566 29.813613 28.107418 30.146001 31.559863 29.59104 29.92307
+ENSG00000142875 24.970409 25.392717 21.715040 23.625368 34.57548 32.85996
+ENSG00000132570 32.159665 32.035508 30.392160 30.017650 25.60005 23.93845
+ENSG00000115053 34.402330 31.404820 32.680324 31.892284 20.10603 20.88221
+ENSG00000008128 27.364177 29.265965 25.038192 27.129407 24.62800 24.57357
+ENSG00000162669 33.288950 34.064678 30.643914 31.456322 18.32465 17.57447
+ENSG00000115648  7.267664  7.219303  7.152472  7.113335 41.45693 42.16936
+                   lane8
+ENSG00000157214 48.15434
+ENSG00000131051 38.06333
+ENSG00000212875 31.26667
+ENSG00000122566 27.21714
+ENSG00000142875 42.26609
+ENSG00000132570 28.39916
+ENSG00000115053 20.50804
+ENSG00000008128 22.55470
+ENSG00000162669 17.66242
+ENSG00000115648 35.61172</code></pre>
+<p>Subset to the 500 most highly variable genes.</p>
+<pre class="r"><code>my_vars &lt;- apply(pnas_exp_norm, 1, var)
+hvgs &lt;- head(sort(my_vars, decreasing = TRUE), 500)
+pnas_exp_norm &lt;- pnas_exp_norm[names(hvgs), ]
+head(pnas_exp_norm)</code></pre>
+<pre><code>                     lane1      lane2      lane3      lane4     lane5     lane6
+ENSG00000115648  7.2676637  7.2193031  7.1524721  7.1133353 41.456929 42.169359
+ENSG00000106070 31.9449412 30.7261446 34.3251164 34.5788950  6.193259  6.214789
+ENSG00000064042 10.6873315 10.9143126 12.0476880 11.7508733 33.239445 33.115712
+ENSG00000142192 13.5423565 12.6487048 13.5694009 14.2903476 34.232908 32.979311
+ENSG00000155368  3.8479958  3.2089496  2.5425773  2.7809702 19.035487 19.087676
+ENSG00000096060  0.3090372  0.3297214  0.3718987  0.3995318 16.813041 15.677639
+                    lane8
+ENSG00000115648 35.611717
+ENSG00000106070  4.397453
+ENSG00000064042 31.135338
+ENSG00000142192 31.485568
+ENSG00000155368 22.127855
+ENSG00000096060 15.681431</code></pre>
+<p>Create correlation matrix.</p>
+<pre class="r"><code>pnas_exp_cor &lt;- cor(t(pnas_exp_norm), method=&quot;spearman&quot;)
+dim(pnas_exp_cor)</code></pre>
+<pre><code>[1] 500 500</code></pre>
+<p>Install the {network} and {sna} packages.</p>
+<pre class="r"><code>install.packages(c(&quot;network&quot;, &quot;sna&quot;))</code></pre>
+<p>Load libraries.</p>
+<pre class="r"><code>library(network)
+library(sna)</code></pre>
+<p>The <code>network::network()</code> function takes a matrix giving
+the network structure in adjacency, incidence, or edgelist form or
+otherwise, an object of class network.</p>
+<p>We will convert the correlation matrix into a adjacency matrix.</p>
+<pre class="r"><code>pnas_exp_cor[upper.tri(pnas_exp_cor)] &lt;- 42
+my_index &lt;- which(pnas_exp_cor &lt; 42, arr.ind = TRUE)
+pnas_exp_cor_adj &lt;- cbind(my_index, pnas_exp_cor[my_index])
+colnames(pnas_exp_cor_adj) &lt;- c(&#39;row&#39;, &#39;col&#39;, &#39;spearman&#39;)
+to_keep &lt;- which(pnas_exp_cor_adj[, &#39;row&#39;] != pnas_exp_cor_adj[, &#39;col&#39;], arr.ind = TRUE)
+pnas_exp_cor_adj &lt;- pnas_exp_cor_adj[to_keep, ]
+dim(pnas_exp_cor_adj)</code></pre>
+<pre><code>[1] 124750      3</code></pre>
+<p>Distribution of the correlations.</p>
+<pre class="r"><code>summary(pnas_exp_cor_adj[, &#39;spearman&#39;])</code></pre>
+<pre><code>     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+-1.000000 -0.714286  0.000000  0.003178  0.714286  1.000000 </code></pre>
+<p>Keep only the higher correlations.</p>
+<pre class="r"><code>pnas_exp_cor_adj_sub &lt;- pnas_exp_cor_adj[abs(pnas_exp_cor_adj[, &#39;spearman&#39;]) &gt;= 0.95, ]
+dim(pnas_exp_cor_adj_sub)</code></pre>
+<pre><code>[1] 5264    3</code></pre>
+<p>Create network.</p>
+<pre class="r"><code>net &lt;- network::network(pnas_exp_cor_adj_sub, directed = FALSE)
+net</code></pre>
+<pre><code> Network attributes:
+  vertices = 500 
+  directed = FALSE 
+  hyper = FALSE 
+  loops = FALSE 
+  multiple = FALSE 
+  bipartite = FALSE 
+  total edges= 5264 
+    missing edges= 0 
+    non-missing edges= 5264 
+
+ Vertex attribute names: 
+    vertex.names 
+
+ Edge attribute names not shown </code></pre>
+<p>Component analysis</p>
+<pre class="r"><code>comp_dist &lt;- component.dist(net)
+class(comp_dist)</code></pre>
+<pre><code>[1] &quot;list&quot;</code></pre>
+<p>Delete genes not connected with others</p>
+<pre class="r"><code>delete.vertices(net, which(comp_dist$csize[comp_dist$membership] == 1))
+net</code></pre>
+<pre><code> Network attributes:
+  vertices = 475 
+  directed = FALSE 
+  hyper = FALSE 
+  loops = FALSE 
+  multiple = FALSE 
+  bipartite = FALSE 
+  total edges= 5264 
+    missing edges= 0 
+    non-missing edges= 5264 
+
+ Vertex attribute names: 
+    vertex.names 
+
+ Edge attribute names not shown </code></pre>
+<p>Plot network.</p>
+<pre class="r"><code>plot(net)</code></pre>
+<p><img src="figure/cor_mat.Rmd/plot_net-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.3.3 (2024-02-29)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 22.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] sna_2.7-2            statnet.common_4.9.0 network_1.18.2      
+ [4] lubridate_1.9.3      forcats_1.0.0        stringr_1.5.1       
+ [7] dplyr_1.1.4          purrr_1.0.2          readr_2.1.5         
+[10] tidyr_1.3.1          tibble_3.2.1         ggplot2_3.5.0       
+[13] tidyverse_2.0.0      workflowr_1.7.1     
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.4      xfun_0.43         bslib_0.7.0       processx_3.8.4   
+ [5] lattice_0.22-5    callr_3.7.6       tzdb_0.4.0        vctrs_0.6.5      
+ [9] tools_4.3.3       ps_1.7.6          generics_0.1.3    curl_5.2.1       
+[13] parallel_4.3.3    fansi_1.0.6       highr_0.10        pkgconfig_2.0.3  
+[17] lifecycle_1.0.4   compiler_4.3.3    farver_2.1.1      git2r_0.33.0     
+[21] munsell_0.5.1     getPass_0.2-4     httpuv_1.6.15     htmltools_0.5.8.1
+[25] sass_0.4.9        yaml_2.3.8        later_1.3.2       pillar_1.9.0     
+[29] crayon_1.5.2      jquerylib_0.1.4   whisker_0.4.1     cachem_1.0.8     
+[33] tidyselect_1.2.1  digest_0.6.35     stringi_1.8.3     labeling_0.4.3   
+[37] rprojroot_2.0.4   fastmap_1.1.1     grid_4.3.3        colorspace_2.1-0 
+[41] cli_3.6.2         magrittr_2.0.3    utf8_1.2.4        withr_3.0.0      
+[45] scales_1.3.0      promises_1.3.0    bit64_4.0.5       timechange_0.3.0 
+[49] rmarkdown_2.26    httr_1.4.7        bit_4.0.5         hms_1.1.3        
+[53] coda_0.19-4.1     evaluate_0.23     knitr_1.46        rlang_1.1.3      
+[57] Rcpp_1.0.12       glue_1.7.0        rstudioapi_0.16.0 vroom_1.6.5      
+[61] jsonlite_1.8.8    R6_2.5.1          fs_1.6.3         </code></pre>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
