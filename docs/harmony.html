@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree72ffea914f6fbdb9d1648bb7adc93b0a5b7e0fa1targetblank72ffea9a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree95fa6fdcfe7dd694a9c5ac6192b6a92b46101950targetblank95fa6fda">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/72ffea914f6fbdb9d1648bb7adc93b0a5b7e0fa1" target="_blank">72ffea9</a>
+<a href="https://github.com/davetang/muse/tree/95fa6fdcfe7dd694a9c5ac6192b6a92b46101950" target="_blank">95fa6fd</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree72ffea914f6fbdb9d1648bb7adc93b0a5b7e0fa1targetblank72ffea9a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree95fa6fdcfe7dd694a9c5ac6192b6a92b46101950targetblank95fa6fda"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/72ffea914f6fbdb9d1648bb7adc93b0a5b7e0fa1" target="_blank">72ffea9</a>.
+<a href="https://github.com/davetang/muse/tree/95fa6fdcfe7dd694a9c5ac6192b6a92b46101950" target="_blank">95fa6fd</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -614,6 +614,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/95fa6fdcfe7dd694a9c5ac6192b6a92b46101950/analysis/harmony.Rmd" target="_blank">95fa6fd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-14
+</td>
+<td>
+Create some plots
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/9abb7b6548fe687ab4143fed5109ff9b47ac0d2c/docs/harmony.html" target="_blank">9abb7b6</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/72ffea914f6fbdb9d1648bb7adc93b0a5b7e0fa1/analysis/harmony.Rmd" target="_blank">72ffea9</a>
 </td>
 <td>
@@ -653,29 +687,89 @@ embeddings and meta data are available as part of this package.</p>
 <pre class="r"><code>data(cell_lines)
 V &lt;- cell_lines$scaled_pcs
 meta_data &lt;- cell_lines$meta_data
-head(meta_data)</code></pre>
-<pre><code># A tibble: 6 × 5
-  cell_id               dataset nGene percent_mito cell_type
-  &lt;chr&gt;                 &lt;chr&gt;   &lt;int&gt;        &lt;dbl&gt; &lt;chr&gt;    
-1 half_GTACGAACCACCAA   half     1508       0.0148 jurkat   
-2 t293_AGGTCATGCACTTT   t293     4009       0.0232 t293     
-3 half_ATAGTTGACTTCTA   half     3545       0.0153 jurkat   
-4 half_GAGCGGCTTGCTTT   half     2450       0.0170 jurkat   
-5 jurkat_CTGATACTCCGTAA jurkat   2388       0.0601 jurkat   
-6 half_GTGGAGGACTGTTT   half     3762       0.0211 t293     </code></pre>
+
+str(cell_lines)</code></pre>
+<pre><code>List of 2
+ $ meta_data : tibble [2,370 × 5] (S3: tbl_df/tbl/data.frame)
+  ..$ cell_id     : chr [1:2370] &quot;half_GTACGAACCACCAA&quot; &quot;t293_AGGTCATGCACTTT&quot; &quot;half_ATAGTTGACTTCTA&quot; &quot;half_GAGCGGCTTGCTTT&quot; ...
+  ..$ dataset     : chr [1:2370] &quot;half&quot; &quot;t293&quot; &quot;half&quot; &quot;half&quot; ...
+  ..$ nGene       : int [1:2370] 1508 4009 3545 2450 2388 3762 3792 4089 3374 3023 ...
+  ..$ percent_mito: num [1:2370] 0.0148 0.0232 0.0153 0.017 0.0601 ...
+  ..$ cell_type   : chr [1:2370] &quot;jurkat&quot; &quot;t293&quot; &quot;jurkat&quot; &quot;jurkat&quot; ...
+  ..- attr(*, &quot;.internal.selfref&quot;)=&lt;externalptr&gt; 
+ $ scaled_pcs:Classes &#39;data.table&#39; and &#39;data.frame&#39;:    2370 obs. of  20 variables:
+  ..$ X1 : num [1:2370] 0.00281 -0.01167 0.00933 0.00634 0.00855 ...
+  ..$ X2 : num [1:2370] -0.00145 0.000877 -0.006972 -0.002518 0.007087 ...
+  ..$ X3 : num [1:2370] -0.00639 0.000897 -0.002599 -0.00439 -0.002254 ...
+  ..$ X4 : num [1:2370] 0.000282 0.001324 0.001882 0.000274 0.001679 ...
+  ..$ X5 : num [1:2370] 0.00144 -0.00329 -0.0038 -0.0025 0.00455 ...
+  ..$ X6 : num [1:2370] 0.000752 0.001303 -0.000347 0.000435 0.0003 ...
+  ..$ X7 : num [1:2370] -0.00283 -0.00198 -0.00157 0.00136 -0.0016 ...
+  ..$ X8 : num [1:2370] -0.000653 0.001625 -0.003272 -0.00263 -0.000263 ...
+  ..$ X9 : num [1:2370] 0.001411 -0.000913 -0.001031 -0.001876 0.001389 ...
+  ..$ X10: num [1:2370] -0.000417 -0.000175 -0.001623 -0.000425 0.000391 ...
+  ..$ X11: num [1:2370] 0.001652 -0.000034 0.001241 -0.000458 -0.001444 ...
+  ..$ X12: num [1:2370] 6.71e-05 3.76e-04 -7.61e-04 -6.52e-04 -2.44e-03 ...
+  ..$ X13: num [1:2370] 0.000542 0.000219 -0.001502 -0.002067 -0.000907 ...
+  ..$ X14: num [1:2370] 0.001223 0.001688 -0.000279 -0.000927 -0.000135 ...
+  ..$ X15: num [1:2370] 0.002081 0.000386 -0.001141 0.001114 0.001015 ...
+  ..$ X16: num [1:2370] 1.87e-03 -1.50e-03 5.99e-04 -1.98e-05 -1.25e-03 ...
+  ..$ X17: num [1:2370] 0.000429 0.000259 0.001224 -0.001069 -0.001165 ...
+  ..$ X18: num [1:2370] 0.00115 -0.00106 0.00145 0.00028 0.00111 ...
+  ..$ X19: num [1:2370] -1.09e-03 4.11e-04 7.41e-05 9.33e-04 -1.76e-04 ...
+  ..$ X20: num [1:2370] 0.000265 -0.00171 -0.000662 0.000365 0.000477 ...
+  ..- attr(*, &quot;.internal.selfref&quot;)=&lt;externalptr&gt; </code></pre>
+<p>Cell types.</p>
+<pre class="r"><code>table(cell_lines$meta_data$cell_type)</code></pre>
+<pre><code>
+jurkat   t293 
+  1266   1104 </code></pre>
+<p>Dataset.</p>
+<pre class="r"><code>table(cell_lines$meta_data$dataset)</code></pre>
+<pre><code>
+  half jurkat   t293 
+   846    824    700 </code></pre>
 </div>
 <div id="analysis" class="section level2">
 <h2>Analysis</h2>
 <p>Initially, the cells cluster by both dataset (left) and cell type
-(right). Can’t find the <code>do_scatter</code> function.</p>
+(right). The quickstart guide uses the <code>do_scatter()</code>
+function, which is <a
+href="https://github.com/immunogenomics/harmony/issues/239">missing</a>.
+We can simply plot the first two PCs using {ggplot2}.</p>
+<p>Plot PC1 versus PC2.</p>
+<pre class="r"><code>my_df &lt;- data.frame(PC1 = V$X1, PC2 = V$X2, dataset = meta_data$dataset, cell_type = meta_data$cell_type)
+
+ggplot(my_df, aes(PC1, PC2, colour = dataset)) +
+  geom_point() +
+  theme_minimal() +
+  ggtitle(&quot;Before harmony&quot;) -&gt; p1
+
+ggplot(my_df, aes(PC1, PC2, colour = cell_type)) +
+  geom_point() +
+  theme_minimal() -&gt; p2
+
+p1 + p2</code></pre>
+<p><img src="figure/harmony.Rmd/plot_pc1_pc2-1.png" width="960" style="display: block; margin: auto;" /></p>
 <p>Let’s run Harmony to remove the influence of dataset-of-origin from
 the cell embeddings.</p>
 <pre class="r"><code>harmony_embeddings &lt;- harmony::RunHarmony(
     V, meta_data, &#39;dataset&#39;, verbose=FALSE
 )
 
-dim(harmony_embeddings)</code></pre>
-<pre><code>[1] 2370   20</code></pre>
+my_df2 &lt;- data.frame(PC1 = harmony_embeddings[, 1], PC2 = harmony_embeddings[, 2], dataset = meta_data$dataset, cell_type = meta_data$cell_type)
+
+ggplot(my_df2, aes(PC1, PC2, colour = dataset)) +
+  geom_point() +
+  theme_minimal() +
+  ggtitle(&quot;After harmony&quot;) -&gt; p1
+
+ggplot(my_df2, aes(PC1, PC2, colour = cell_type)) +
+  geom_point() +
+  theme_minimal() -&gt; p2
+
+p1 + p2</code></pre>
+<p><img src="figure/harmony.Rmd/run_harmony-1.png" width="960" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -708,28 +802,32 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] harmony_1.2.0   Rcpp_1.0.12     workflowr_1.7.1
+ [1] harmony_1.2.0   Rcpp_1.0.12     patchwork_1.2.0 lubridate_1.9.3
+ [5] forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4     purrr_1.0.2    
+ [9] readr_2.1.5     tidyr_1.3.1     tibble_3.2.1    ggplot2_3.5.0  
+[13] tidyverse_2.0.0 workflowr_1.7.1
 
 loaded via a namespace (and not attached):
- [1] sass_0.4.9          utf8_1.2.4          generics_0.1.3     
- [4] lattice_0.22-5      stringi_1.8.3       digest_0.6.35      
- [7] magrittr_2.0.3      evaluate_0.23       grid_4.3.3         
-[10] fastmap_1.1.1       rprojroot_2.0.4     jsonlite_1.8.8     
-[13] Matrix_1.6-5        processx_3.8.4      whisker_0.4.1      
-[16] ps_1.7.6            promises_1.3.0      httr_1.4.7         
-[19] fansi_1.0.6         scales_1.3.0        RhpcBLASctl_0.23-42
-[22] codetools_0.2-19    jquerylib_0.1.4     cli_3.6.2          
-[25] rlang_1.1.3         cowplot_1.1.3       munsell_0.5.1      
-[28] cachem_1.0.8        yaml_2.3.8          tools_4.3.3        
-[31] dplyr_1.1.4         colorspace_2.1-0    ggplot2_3.5.0      
-[34] httpuv_1.6.15       vctrs_0.6.5         R6_2.5.1           
-[37] lifecycle_1.0.4     git2r_0.33.0        stringr_1.5.1      
-[40] fs_1.6.3            pkgconfig_2.0.3     callr_3.7.6        
-[43] pillar_1.9.0        bslib_0.7.0         later_1.3.2        
-[46] gtable_0.3.4        glue_1.7.0          xfun_0.43          
-[49] tibble_3.2.1        tidyselect_1.2.1    rstudioapi_0.16.0  
-[52] knitr_1.46          htmltools_0.5.8.1   rmarkdown_2.26     
-[55] compiler_4.3.3      getPass_0.2-4      </code></pre>
+ [1] gtable_0.3.4        xfun_0.43           bslib_0.7.0        
+ [4] processx_3.8.4      lattice_0.22-5      callr_3.7.6        
+ [7] tzdb_0.4.0          vctrs_0.6.5         tools_4.3.3        
+[10] ps_1.7.6            generics_0.1.3      fansi_1.0.6        
+[13] highr_0.10          pkgconfig_2.0.3     Matrix_1.6-5       
+[16] lifecycle_1.0.4     compiler_4.3.3      farver_2.1.1       
+[19] git2r_0.33.0        munsell_0.5.1       RhpcBLASctl_0.23-42
+[22] getPass_0.2-4       codetools_0.2-19    httpuv_1.6.15      
+[25] htmltools_0.5.8.1   sass_0.4.9          yaml_2.3.8         
+[28] later_1.3.2         pillar_1.9.0        jquerylib_0.1.4    
+[31] whisker_0.4.1       cachem_1.0.8        tidyselect_1.2.1   
+[34] digest_0.6.35       stringi_1.8.3       labeling_0.4.3     
+[37] cowplot_1.1.3       rprojroot_2.0.4     fastmap_1.1.1      
+[40] grid_4.3.3          colorspace_2.1-0    cli_3.6.2          
+[43] magrittr_2.0.3      utf8_1.2.4          withr_3.0.0        
+[46] scales_1.3.0        promises_1.3.0      timechange_0.3.0   
+[49] rmarkdown_2.26      httr_1.4.7          hms_1.1.3          
+[52] evaluate_0.23       knitr_1.46          rlang_1.1.3        
+[55] glue_1.7.0          rstudioapi_0.16.0   jsonlite_1.8.8     
+[58] R6_2.5.1            fs_1.6.3           </code></pre>
 </div>
 </div>
 
