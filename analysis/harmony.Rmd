@@ -10,6 +10,8 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 # https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+library(tidyverse)
+library(patchwork)
 ```
 
 ## Quickstart
@@ -35,22 +37,60 @@ We library normalized the cells, log transformed the counts, and scaled the gene
 data(cell_lines)
 V <- cell_lines$scaled_pcs
 meta_data <- cell_lines$meta_data
-head(meta_data)
+
+str(cell_lines)
+```
+
+Cell types.
+
+```{r}
+table(cell_lines$meta_data$cell_type)
+```
+
+Dataset.
+
+```{r type}
+table(cell_lines$meta_data$dataset)
 ```
 
 ## Analysis
 
-Initially, the cells cluster by both dataset (left) and cell type (right). Can't find the `do_scatter` function.
+Initially, the cells cluster by both dataset (left) and cell type (right). The quickstart guide uses the `do_scatter()` function, which is [missing](https://github.com/immunogenomics/harmony/issues/239). We can simply plot the first two PCs using {ggplot2}.
 
-```{r}
+Plot PC1 versus PC2.
+
+```{r plot_pc1_pc2, fig.width=10, fig.height=7}
+my_df <- data.frame(PC1 = V$X1, PC2 = V$X2, dataset = meta_data$dataset, cell_type = meta_data$cell_type)
+
+ggplot(my_df, aes(PC1, PC2, colour = dataset)) +
+  geom_point() +
+  theme_minimal() +
+  ggtitle("Before harmony") -> p1
+
+ggplot(my_df, aes(PC1, PC2, colour = cell_type)) +
+  geom_point() +
+  theme_minimal() -> p2
+
+p1 + p2
 ```
 
-Let’s run Harmony to remove the influence of dataset-of-origin from the cell embeddings.
+Let's run Harmony to remove the influence of dataset-of-origin from the cell embeddings.
 
-```{r run_harmony}
+```{r run_harmony, fig.width=10, fig.height=7}
 harmony_embeddings <- harmony::RunHarmony(
     V, meta_data, 'dataset', verbose=FALSE
 )
 
-dim(harmony_embeddings)
+my_df2 <- data.frame(PC1 = harmony_embeddings[, 1], PC2 = harmony_embeddings[, 2], dataset = meta_data$dataset, cell_type = meta_data$cell_type)
+
+ggplot(my_df2, aes(PC1, PC2, colour = dataset)) +
+  geom_point() +
+  theme_minimal() +
+  ggtitle("After harmony") -> p1
+
+ggplot(my_df2, aes(PC1, PC2, colour = cell_type)) +
+  geom_point() +
+  theme_minimal() -> p2
+
+p1 + p2
 ```
