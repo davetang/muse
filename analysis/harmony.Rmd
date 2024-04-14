@@ -1,0 +1,56 @@
+---
+title: "Getting started with harmony"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Quickstart
+
+Follow the [quickstart tutorial](https://htmlpreview.github.io/?https://github.com/immunogenomics/harmony/blob/master/doc/quickstart.html)
+
+```{r install_seurat, eval=FALSE}
+install.packages("harmony")
+```
+
+Load {harmony}.
+
+```{r load_seurat}
+library("harmony")
+packageVersion("harmony")
+```
+
+## Data
+
+We library normalized the cells, log transformed the counts, and scaled the genes. Then we performed PCA and kept the top 20 PCs. The PCA embeddings and meta data are available as part of this package.
+
+```{r cell_lines}
+data(cell_lines)
+V <- cell_lines$scaled_pcs
+meta_data <- cell_lines$meta_data
+head(meta_data)
+```
+
+## Analysis
+
+Initially, the cells cluster by both dataset (left) and cell type (right). Can't find the `do_scatter` function.
+
+```{r}
+```
+
+Let’s run Harmony to remove the influence of dataset-of-origin from the cell embeddings.
+
+```{r run_harmony}
+harmony_embeddings <- harmony::RunHarmony(
+    V, meta_data, 'dataset', verbose=FALSE
+)
+
+dim(harmony_embeddings)
+```
