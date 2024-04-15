@@ -254,11 +254,11 @@ pbmc <- FindNeighbors(pbmc, reduction = "harmony") |>
 
 TSNE visualisation of harmony embeddings.
 
-```{r tsne}
+```{r tsne, fig.width=8, fig.height=5, message=FALSE, warning=FALSE}
 pbmc <- RunTSNE(pbmc, reduction = "harmony")
 
-p1 <- DimPlot(pbmc, reduction = "tsne", group.by = "stim", pt.size = .1)
-p2 <- DimPlot(pbmc, reduction = "tsne", label = TRUE, pt.size = .1)
+p1 <- DimPlot(pbmc, reduction = "tsne", group.by = "stim", pt.size = .1) + ggtitle("tSNE using harmony")
+p2 <- DimPlot(pbmc, reduction = "tsne", label = TRUE, pt.size = .1) + ggtitle("Cell clusters")
 p1 + p2
 ```
 
@@ -278,7 +278,7 @@ FeaturePlot(
 
 Similar to TSNE, we can run UMAP by passing the harmony reduction in the function.
 
-```{r umap_harmony}
+```{r umap_harmony, message=FALSE, warning=FALSE}
 pbmc <- RunUMAP(pbmc, reduction = "harmony",  dims = 1:20)
 
 p1 <- DimPlot(pbmc, reduction = "umap", group.by = "stim", pt.size = .1)
@@ -288,9 +288,9 @@ p1 + p2
 
 ### Seurat SCTransform workflow with harmony
 
-Use SCTransform instead of `NormalizeData()`, `ScaleData()`, and `FindVariableFeatures()`.
+Use `SCTransform()` instead of `NormalizeData()`, `ScaleData()`, and `FindVariableFeatures()`.
 
-```{r sctransform_with_harmony, fig.width=8, fig.height=5}
+```{r sctransform_with_harmony, fig.width=8, fig.height=5, message=FALSE, warning=FALSE}
 pbmc <- CreateSeuratObject(
   counts = cbind(pbmc.stim, pbmc.ctrl),
   project = "Kang",
