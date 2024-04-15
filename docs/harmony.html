@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-04-14" />
+<meta name="date" content="2024-04-15" />
 
 <title>Getting started with harmony</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Getting started with harmony</h1>
-<h4 class="date">2024-04-14</h4>
+<h4 class="date">2024-04-15</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-04-14
+<strong>Last updated:</strong> 2024-04-15
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree95fa6fdcfe7dd694a9c5ac6192b6a92b46101950targetblank95fa6fda">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree708f1ab53a05e899ce6a1512929dfa5ac9ac346btargetblank708f1aba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/95fa6fdcfe7dd694a9c5ac6192b6a92b46101950" target="_blank">95fa6fd</a>
+<a href="https://github.com/davetang/muse/tree/708f1ab53a05e899ce6a1512929dfa5ac9ac346b" target="_blank">708f1ab</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree95fa6fdcfe7dd694a9c5ac6192b6a92b46101950targetblank95fa6fda"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree708f1ab53a05e899ce6a1512929dfa5ac9ac346btargetblank708f1aba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/95fa6fdcfe7dd694a9c5ac6192b6a92b46101950" target="_blank">95fa6fd</a>.
+<a href="https://github.com/davetang/muse/tree/708f1ab53a05e899ce6a1512929dfa5ac9ac346b" target="_blank">708f1ab</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -614,6 +614,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/708f1ab53a05e899ce6a1512929dfa5ac9ac346b/analysis/harmony.Rmd" target="_blank">708f1ab</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+<td>
+Using harmony with Seurat
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/085be81db7542032f44afdd8690c1a38cf5cc2c9/docs/harmony.html" target="_blank">085be81</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/95fa6fdcfe7dd694a9c5ac6192b6a92b46101950/analysis/harmony.Rmd" target="_blank">95fa6fd</a>
 </td>
 <td>
@@ -674,13 +708,11 @@ href="https://htmlpreview.github.io/?https://github.com/immunogenomics/harmony/b
 tutorial</a></p>
 <pre class="r"><code>install.packages(&quot;harmony&quot;)</code></pre>
 <p>Load {harmony}.</p>
-<pre class="r"><code>library(&quot;harmony&quot;)</code></pre>
-<pre><code>Loading required package: Rcpp</code></pre>
-<pre class="r"><code>packageVersion(&quot;harmony&quot;)</code></pre>
+<pre class="r"><code>library(&quot;harmony&quot;)
+packageVersion(&quot;harmony&quot;)</code></pre>
 <pre><code>[1] &#39;1.2.0&#39;</code></pre>
-</div>
-<div id="data" class="section level2">
-<h2>Data</h2>
+<div id="data" class="section level3">
+<h3>Data</h3>
 <p>We library normalized the cells, log transformed the counts, and
 scaled the genes. Then we performed PCA and kept the top 20 PCs. The PCA
 embeddings and meta data are available as part of this package.</p>
@@ -719,19 +751,19 @@ str(cell_lines)</code></pre>
   ..$ X19: num [1:2370] -1.09e-03 4.11e-04 7.41e-05 9.33e-04 -1.76e-04 ...
   ..$ X20: num [1:2370] 0.000265 -0.00171 -0.000662 0.000365 0.000477 ...
   ..- attr(*, &quot;.internal.selfref&quot;)=&lt;externalptr&gt; </code></pre>
-<p>Cell types.</p>
+<p>Table of cell types.</p>
 <pre class="r"><code>table(cell_lines$meta_data$cell_type)</code></pre>
 <pre><code>
 jurkat   t293 
   1266   1104 </code></pre>
-<p>Dataset.</p>
+<p>Table of datasets.</p>
 <pre class="r"><code>table(cell_lines$meta_data$dataset)</code></pre>
 <pre><code>
   half jurkat   t293 
    846    824    700 </code></pre>
 </div>
-<div id="analysis" class="section level2">
-<h2>Analysis</h2>
+<div id="analysis" class="section level3">
+<h3>Analysis</h3>
 <p>Initially, the cells cluster by both dataset (left) and cell type
 (right). The quickstart guide uses the <code>do_scatter()</code>
 function, which is <a
@@ -751,6 +783,43 @@ ggplot(my_df, aes(PC1, PC2, colour = cell_type)) +
 
 p1 + p2</code></pre>
 <p><img src="figure/harmony.Rmd/plot_pc1_pc2-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_pc1_pc2-1">
+Past versions of plot_pc1_pc2-1.png
+</button>
+</p>
+<div id="fig-plot_pc1_pc2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/085be81db7542032f44afdd8690c1a38cf5cc2c9/docs/figure/harmony.Rmd/plot_pc1_pc2-1.png" target="_blank">085be81</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-14
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Let’s run Harmony to remove the influence of dataset-of-origin from
 the cell embeddings.</p>
 <pre class="r"><code>harmony_embeddings &lt;- harmony::RunHarmony(
@@ -769,7 +838,344 @@ ggplot(my_df2, aes(PC1, PC2, colour = cell_type)) +
   theme_minimal() -&gt; p2
 
 p1 + p2</code></pre>
-<p><img src="figure/harmony.Rmd/run_harmony-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><img src="figure/harmony.Rmd/run_harmony_quickstart-1.png" width="960" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="using-harmony-with-seurat" class="section level2">
+<h2>Using harmony with Seurat</h2>
+<p>Following the <a
+href="https://github.com/immunogenomics/harmony/blob/master/doc/Seurat.Rmd">Using
+harmony with Seurat</a> tutorial, which describes how to use harmony in
+Seurat v5 single-cell analysis workflows. Also, it will provide some
+basic downstream analyses demonstrating the properties of harmonised
+cell embeddings and a brief explanation of the exposed algorithm
+parameters.</p>
+<div id="data-1" class="section level3">
+<h3>Data</h3>
+<p>For this demo, we will be aligning two groups of PBMCs <a
+href="https://doi.org/10.1038/nbt.4042">Kang et al., 2017</a>:</p>
+<ul>
+<li>Control PBMCs</li>
+<li>Stimulated PBMCs treated with interferon beta.</li>
+</ul>
+<pre class="r"><code>data(&quot;pbmc_stim&quot;)
+str(pbmc.ctrl)</code></pre>
+<pre><code>Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots
+  ..@ i       : int [1:558407] 1 3 8 19 33 40 51 53 89 100 ...
+  ..@ p       : int [1:1001] 0 812 1248 1692 2463 2810 3314 4127 4660 5229 ...
+  ..@ Dim     : int [1:2] 9015 1000
+  ..@ Dimnames:List of 2
+  .. ..$ : chr [1:9015] &quot;LINC00115&quot; &quot;NOC2L&quot; &quot;HES4&quot; &quot;ISG15&quot; ...
+  .. ..$ : chr [1:1000] &quot;TCGCAAGAGCGATT-1&quot; &quot;GCAAACTGAACTGC-1&quot; &quot;TGATAAACTGGTAC-1&quot; &quot;GTTAAATGACTGTG-1&quot; ...
+  ..@ x       : num [1:558407] 1 1 1 1 1 2 1 3 1 2 ...
+  ..@ factors : list()</code></pre>
+<pre class="r"><code>str(pbmc.stim)</code></pre>
+<pre><code>Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots
+  ..@ i       : int [1:571399] 3 33 53 118 128 138 144 154 171 208 ...
+  ..@ p       : int [1:1001] 0 425 505 852 1403 2010 2325 2859 3435 3955 ...
+  ..@ Dim     : int [1:2] 9015 1000
+  ..@ Dimnames:List of 2
+  .. ..$ : chr [1:9015] &quot;LINC00115&quot; &quot;NOC2L&quot; &quot;HES4&quot; &quot;ISG15&quot; ...
+  .. ..$ : chr [1:1000] &quot;ATCACTTGCTCGAA-1&quot; &quot;CCGGAGACTGTGAC-1&quot; &quot;CAAGCCCTGTTAGC-1&quot; &quot;GAGGTACTAACGGG-1&quot; ...
+  ..@ x       : num [1:571399] 1 2 3 1 8 1 1 1 3 1 ...
+  ..@ factors : list()</code></pre>
+<p>The full dataset used for this vignette have been upload to <a
+href="https://zenodo.org/record/8164711">Zenodo</a> but currently <a
+href="https://github.com/immunogenomics/harmony/issues/248#issuecomment-2051755519">does
+not work</a> with newer versions of R.</p>
+</div>
+<div id="create-seurat-object" class="section level3">
+<h3>Create Seurat object</h3>
+<p>Create a Seurat object with treatment conditions in the metadata.</p>
+<pre class="r"><code>pbmc &lt;- CreateSeuratObject(
+  counts = cbind(pbmc.stim, pbmc.ctrl),
+  project = &quot;Kang&quot;,
+  min.cells = 5
+)
+
+pbmc@meta.data$stim &lt;- c(rep(&quot;STIM&quot;, ncol(pbmc.stim)), rep(&quot;CTRL&quot;, ncol(pbmc.ctrl)))
+pbmc</code></pre>
+<pre><code>An object of class Seurat 
+9015 features across 2000 samples within 1 assay 
+Active assay: RNA (9015 features, 0 variable features)
+ 1 layer present: counts</code></pre>
+</div>
+<div id="seurat-workflow" class="section level3">
+<h3>Seurat workflow</h3>
+<p>Harmony works on an existing matrix with cell embeddings and outputs
+its transformed version with the datasets aligned according to some
+user-defined experimental conditions. By default, harmony will look up
+the <code>pca</code> cell embeddings and use these to run harmony.
+Therefore, it assumes that the Seurat object has these embeddings
+already precomputed.</p>
+<p>We will run the Seurat workflow to generate the embeddings.</p>
+<p>Here, using <code>Seurat::NormalizeData()</code>, we will be
+generating a union of highly variable genes using each condition (the
+control and stimulated cells). These features are going to be
+subsequently used to generate the 20 PCs with
+<code>Seurat::RunPCA()</code>.</p>
+<p>Note that the defaults for <code>NormalizeData</code> are:</p>
+<ul>
+<li><code>normalization.method</code> = “LogNormalize”</li>
+<li><code>scale.factor</code> = 10000</li>
+</ul>
+<pre class="r"><code>pbmc &lt;- NormalizeData(pbmc, verbose = FALSE)
+
+pbmc &lt;- FindVariableFeatures(object = pbmc, selection.method = &quot;vst&quot;, nfeatures = 2000)</code></pre>
+<pre><code>Finding variable features for layer counts</code></pre>
+<pre class="r"><code>cell_by_cond &lt;- split(row.names(pbmc@meta.data), pbmc@meta.data$stim)
+
+vfeatures &lt;- lapply(cell_by_cond, function(cells){
+  FindVariableFeatures(object = pbmc[, cells], selection.method = &quot;vst&quot;, nfeatures = 2000) |&gt;
+    VariableFeatures()
+})</code></pre>
+<pre><code>Finding variable features for layer counts
+Finding variable features for layer counts</code></pre>
+<pre class="r"><code>VariableFeatures(pbmc) &lt;- unique(unlist(vfeatures))
+length(VariableFeatures(pbmc))</code></pre>
+<pre><code>[1] 3237</code></pre>
+<p>Scale and perform PCA.</p>
+<pre class="r"><code>pbmc &lt;- ScaleData(pbmc, verbose = FALSE) |&gt;
+  RunPCA(features = VariableFeatures(pbmc), npcs = 20, verbose = FALSE)</code></pre>
+<p><code>RunHarmony()</code> is a generic function designed to interact
+with Seurat objects. To run harmony on a Seurat object after it has been
+normalised, only one argument needs to be specified which contains the
+batch covariate located in the metadata. For this vignette, further
+parameters are specified to align the dataset but the minimum parameters
+are shown in the snippet below and is <strong>not run</strong>.</p>
+<pre class="r"><code>pbmc &lt;- RunHarmony(pbmc, &quot;stim&quot;)</code></pre>
+<p>Here, we will be running harmony with some indicative parameters and
+plotting the convergence plot to illustrate some of the under the hood
+functionality. By setting <code>plot_converge=TRUE</code>, harmony will
+generate a plot with its objective showing the flow of the integration.
+Each point represents the cost measured after a clustering round.
+Different colors represent different Harmony iterations which is
+controlled by <code>max_iter</code> (assuming that
+<code>early_stop=FALSE</code>). Here <code>max_iter=10</code> and up to
+10 correction steps are expected. However, <code>early_stop=TRUE</code>
+so harmony will stop after the cost plateaus.</p>
+<pre class="r"><code>pbmc &lt;- RunHarmony(pbmc, &quot;stim&quot;, plot_convergence = TRUE, nclust = 50, max_iter = 10, early_stop = TRUE)</code></pre>
+<pre><code>Transposing data matrix</code></pre>
+<pre><code>Initializing state using k-means centroids initialization</code></pre>
+<pre><code>Harmony 1/10</code></pre>
+<pre><code>Harmony 2/10</code></pre>
+<pre><code>Harmony 3/10</code></pre>
+<pre><code>Harmony 4/10</code></pre>
+<pre><code>Harmony 5/10</code></pre>
+<pre><code>Harmony converged after 5 iterations</code></pre>
+<p><img src="figure/harmony.Rmd/run_harmony_pbmc-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><code>RunHarmony</code> has several parameters accessible to users
+which are outlined below.</p>
+<ul>
+<li><code>object</code> (required) - The Seurat object. This vignette
+assumes Seurat objects are version 5.</li>
+<li><code>group.by.vars</code> (required) - A character vector that
+specifies all the experimental covariates to be corrected/harmonized by
+the algorithm.</li>
+</ul>
+<p>When using <code>RunHarmony()</code> with Seurat, harmony will look
+up the <code>group.by.vars</code> metadata fields in the Seurat Object
+metadata. For example, given the <code>pbmc[["stim"]]</code> exists as
+the stim condition, setting <code>group.by.vars="stim"</code> will
+perform integration of these samples accordingly. If you want to
+integrate on another variable, it needs to be present in Seurat object’s
+meta.data. To correct for several covariates, specify them in a vector:
+<code>group.by.vars = c("stim", "new_covariate")</code>.</p>
+<ul>
+<li><code>reduction.use</code> - The cell embeddings to be used for the
+batch alignment. This parameter assumes that a reduced dimension already
+exists in the reduction slot of the Seurat object. By default, the
+<code>pca</code> reduction is used.</li>
+<li><code>dims.use</code> - Optional parameter which can use a name
+vector to select specific dimensions to be harmonised.</li>
+<li><code>nclust</code> - is a positive integer. Under the hood, harmony
+applies k-means soft-clustering. For this task, <code>k</code> needs to
+be determined. <code>nclust</code> corresponds to <code>k</code>. The
+harmonisation results and performance are not particularly sensitive for
+a reasonable range of this parameter value. If this parameter is not
+set, harmony will autodetermine this based on the dataset size with a
+maximum cap of 200. For dataset with a vast amount of different cell
+types and batches this pamameter may need to be determined
+manually.</li>
+<li><code>sigma</code> - a positive scalar that controls the soft
+clustering probability assignment of single-cells to different clusters.
+Larger values will assign a larger probability to distant clusters of
+cells resulting in a different correction profile. Single-cells are
+assigned to clusters by their euclidean distance <span
+class="math inline">\(d\)</span> to some cluster center <span
+class="math inline">\(Y\)</span> after cosine normalisation which is
+defined in the range [0,4]. The clustering probability of each cell is
+calculated as <span class="math inline">\(e^{-\frac{d}{\sigma}}\)</span>
+where <span class="math inline">\(\sigma\)</span> is controlled by the
+<code>sigma</code> parameter. Default value of <code>sigma</code> is 0.1
+and it generally works well since it defines probability assignment of a
+cell in the range <span class="math inline">\([e^{-40}, e^0]\)</span>.
+Larger values of <code>sigma</code> restrict the dynamic range of
+probabilities that can be assigned to cells. For example,
+<code>sigma=1</code> will yield a probabilities in the range of <span
+class="math inline">\([e^{-4}, e^0]\)</span>.</li>
+<li><code>theta</code> - <code>theta</code> is a positive scalar vector
+that determines the coefficient of harmony’s diversity penalty for each
+corrected experimental covariate. In challenging experimental
+conditions, increasing theta may result in better integration results.
+Theta is an expontential parameter of the diversity penalty, thus
+setting <code>theta=0</code> disables this penalty while increasing it
+to greater values than 1 will perform more aggressive corrections in an
+expontential manner. By default, it will set <code>theta=2</code> for
+each experimental covariate.</li>
+<li><code>max_iter</code> - The number of correction steps harmony will
+perform before completing the data set integration. In general, more
+iterations than necessary increases computational runtime especially
+which becomes evident in bigger datasets. Setting
+<code>early_stop=TRUE</code> may reduce the actual number of correction
+steps which will be smaller than <code>max_iter</code>.</li>
+<li><code>early_stop</code> - Under the hood, harmony minimizes its
+objective function through a series of clustering and integration tests.
+By setting <code>early_stop=TRUE</code>, when the objective function is
+less than <code>1e-4</code> after a correction step harmony exits before
+reaching the <code>max_iter</code> correction steps. This parameter can
+drastically reduce run-time in bigger datasets.</li>
+<li><code>.options</code> - A set of internal algorithm parameters that
+can be overriden. For advanced users only.</li>
+</ul>
+<p>These parameters are Seurat-specific and do not affect the flow of
+the algorithm.</p>
+<ul>
+<li><code>project_dim</code> - Toggle-like parameter, by default
+<code>project_dim=TRUE</code>. When enabled, <code>RunHarmony()</code>
+calculates genomic feature loadings using Seurat’s
+<code>ProjectDim()</code> that correspond to the harmonized cell
+embeddings.</li>
+<li><code>reduction.save</code> - The new Reduced Dimension slot
+identifier. By default, <code>reduction.save=TRUE</code>. This option
+allows several independent runs of harmony to be retained in the
+appropriate slots in the SeuratObjects. It is useful if you want to try
+Harmony with multiple parameters and save them as e.g. ‘harmony_theta0’,
+‘harmony_theta1’, ‘harmony_theta2’.</li>
+</ul>
+<p>Miscellaneous parameters</p>
+<p>These parameters help users troubleshoot harmony.</p>
+<ul>
+<li><code>plot_convergence</code> - Option that plots the convergence
+plot after the execution of the algorithm. By default
+<code>FALSE</code>. Setting it to <code>TRUE</code> will collect
+harmony’s objective value and plot it allowing the user to troubleshoot
+the flow of the algorithm and fine-tune the parameters of the dataset
+integration procedure.</li>
+</ul>
+</div>
+<div id="results" class="section level3">
+<h3>Results</h3>
+<p><code>RunHarmony()</code> returns the Seurat object which contains
+the harmonised cell embeddings in a slot named <code>harmony</code>.
+This entry can be accessed via <code>pbmc@reductions$harmony</code>. To
+access the values of the cell embeddings we can also use
+<code>Embeddings</code>.</p>
+<pre class="r"><code>harmony.embeddings &lt;- Embeddings(pbmc, reduction = &quot;harmony&quot;)
+head(harmony.embeddings)</code></pre>
+<pre><code>                 harmony_1    harmony_2   harmony_3 harmony_4    harmony_5
+ATCACTTGCTCGAA-1 -6.479702  0.008171644  3.37515156 -4.099469 -0.008402849
+CCGGAGACTGTGAC-1 -6.899788 -1.576543680  6.21883818 -4.600855  5.431930567
+CAAGCCCTGTTAGC-1 -6.778387  1.168303812  6.51744885  9.119283  0.221378456
+GAGGTACTAACGGG-1 -7.457892  0.230626098 -0.04633372 -2.056185  2.202061677
+CGCGGATGCCACAA-1 14.727748 -4.628065895  4.46893682 -1.576657  1.511387377
+ACATGGTGCCTAAG-1 -7.610653  0.169061161  3.56685757 -2.899556  1.763453269
+                   harmony_6  harmony_7  harmony_8  harmony_9   harmony_10
+ATCACTTGCTCGAA-1 -0.50324290  0.7064309  1.3559831  0.6606093 -0.896258741
+CCGGAGACTGTGAC-1  2.62606436 -3.8302384  4.4752736  2.4579002 -2.165149731
+CAAGCCCTGTTAGC-1  0.02790648 -1.6405949  1.1675994  1.3743442  0.161641981
+GAGGTACTAACGGG-1  0.76979146  4.0367549 -0.9729053  2.6217274  2.654879912
+CGCGGATGCCACAA-1  0.50237890 -0.7808236 -1.7185065 -2.1407409 -2.190081503
+ACATGGTGCCTAAG-1  0.81828382 -0.1700942  0.6456826 -0.7853121 -0.002772687
+                 harmony_11 harmony_12 harmony_13   harmony_14 harmony_15
+ATCACTTGCTCGAA-1 -0.4417489  1.4743115 -0.4759258 -0.212537776  0.2676670
+CCGGAGACTGTGAC-1  2.7730307  3.3926242  0.7897797  4.203443728  4.3141192
+CAAGCCCTGTTAGC-1 -0.6121661  1.3246926  0.3312554 -1.127996550 -0.5355179
+GAGGTACTAACGGG-1  0.9421837  3.7047669 -0.3159213 -0.707279006 -1.3044352
+CGCGGATGCCACAA-1  0.1525977  0.1711006  4.2970980  3.255725383 -0.7619538
+ACATGGTGCCTAAG-1  0.3060353  2.1010580 -0.5419756  0.004886988  0.6353239
+                 harmony_16  harmony_17 harmony_18 harmony_19 harmony_20
+ATCACTTGCTCGAA-1  0.6435108  0.62385140  2.3402714 -0.3539086  0.1408163
+CCGGAGACTGTGAC-1  3.4670592  9.67068155 -1.5557773  1.5395016  4.0110442
+CAAGCCCTGTTAGC-1  3.9306648 -2.37229434 -0.4681119  1.1673524  0.0574584
+GAGGTACTAACGGG-1 -2.4202051 -0.09903653  0.3197214  1.0333426 -3.4470187
+CGCGGATGCCACAA-1 -1.0867898  0.55686789  3.0173422  4.8504994  1.5093119
+ACATGGTGCCTAAG-1 -0.9257885  0.08646308 -0.6890350 -0.4465735 -0.3449852</code></pre>
+<p>After Harmony integration, we should inspect the quality of the
+harmonisation and contrast it with the unharmonised algorithm input.
+Ideally, cells from different conditions will align along the Harmonized
+PCs. If they are not, you could increase the <em>theta</em> value above
+to force a more aggressive fit of the dataset and rerun the
+workflow.</p>
+<pre class="r"><code>p1 &lt;- DimPlot(object = pbmc, reduction = &quot;harmony&quot;, pt.size = .1, group.by = &quot;stim&quot;)
+p2 &lt;- VlnPlot(object = pbmc, features = &quot;harmony_1&quot;, group.by = &quot;stim&quot;,  pt.size = .1)
+p1 + p2</code></pre>
+<p><img src="figure/harmony.Rmd/contrast_harmony-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Plot Genes correlated with the Harmonized PCs</p>
+<pre class="r"><code>DimHeatmap(object = pbmc, reduction = &quot;harmony&quot;, cells = 500, dims = 1:3)</code></pre>
+<p><img src="figure/harmony.Rmd/heatmap_harmony-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The harmonised cell embeddings generated by harmony can be used for
+further integrated analyses. In this workflow, the Seurat object
+contains the harmony <code>reduction</code> modality name in the method
+that requires it.</p>
+<p>Perform clustering using the harmonized vectors of cells</p>
+<pre class="r"><code>pbmc &lt;- FindNeighbors(pbmc, reduction = &quot;harmony&quot;) |&gt;
+  FindClusters(resolution = 0.5) </code></pre>
+<pre><code>Computing nearest neighbor graph</code></pre>
+<pre><code>Computing SNN</code></pre>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 2000
+Number of edges: 71873
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8714
+Number of communities: 10
+Elapsed time: 0 seconds</code></pre>
+<p>TSNE visualisation of harmony embeddings.</p>
+<pre class="r"><code>pbmc &lt;- RunTSNE(pbmc, reduction = &quot;harmony&quot;)
+
+p1 &lt;- DimPlot(pbmc, reduction = &quot;tsne&quot;, group.by = &quot;stim&quot;, pt.size = .1)
+p2 &lt;- DimPlot(pbmc, reduction = &quot;tsne&quot;, label = TRUE, pt.size = .1)
+p1 + p2</code></pre>
+<p><img src="figure/harmony.Rmd/tsne-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>One important observation is to assess that the harmonised data
+contain biological states of the cells. Therefore by checking the
+following genes we can see that biological cell states are preserved
+after harmonisation.</p>
+<p>Expression of gene panel heatmap in the harmonized PBMC dataset.</p>
+<pre class="r"><code>FeaturePlot(
+  object = pbmc,
+  features= c(&quot;CD3D&quot;, &quot;SELL&quot;, &quot;CREM&quot;, &quot;CD8A&quot;, &quot;GNLY&quot;, &quot;CD79A&quot;, &quot;FCGR3A&quot;, &quot;CCL2&quot;, &quot;PPBP&quot;), 
+  min.cutoff = &quot;q9&quot;,
+  cols = c(&quot;lightgrey&quot;, &quot;blue&quot;),
+  pt.size = 0.5
+)</code></pre>
+<p><img src="figure/harmony.Rmd/feature_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Similar to TSNE, we can run UMAP by passing the harmony reduction in
+the function.</p>
+<pre class="r"><code>pbmc &lt;- RunUMAP(pbmc, reduction = &quot;harmony&quot;,  dims = 1:20)</code></pre>
+<pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
+This message will be shown once per session</code></pre>
+<pre><code>00:11:02 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>00:11:02 Read 2000 rows and found 20 numeric columns</code></pre>
+<pre><code>00:11:02 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>00:11:02 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
+<pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
+<pre><code>**************************************************|
+00:11:03 Writing NN index file to temp file /tmp/Rtmp8Qb919/file223c3ddbe8a6
+00:11:03 Searching Annoy index using 1 thread, search_k = 3000
+00:11:03 Annoy recall = 100%
+00:11:03 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+00:11:04 Initializing from normalized Laplacian + noise (using RSpectra)
+00:11:04 Commencing optimization for 500 epochs, with 83170 positive edges
+00:11:06 Optimization finished</code></pre>
+<pre class="r"><code>p1 &lt;- DimPlot(pbmc, reduction = &quot;umap&quot;, group.by = &quot;stim&quot;, pt.size = .1)
+p2 &lt;- DimPlot(pbmc, reduction = &quot;umap&quot;, label = TRUE,  pt.size = .1)
+p1 + p2</code></pre>
+<p><img src="figure/harmony.Rmd/umap_harmony-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -802,32 +1208,55 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] harmony_1.2.0   Rcpp_1.0.12     patchwork_1.2.0 lubridate_1.9.3
- [5] forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4     purrr_1.0.2    
- [9] readr_2.1.5     tidyr_1.3.1     tibble_3.2.1    ggplot2_3.5.0  
-[13] tidyverse_2.0.0 workflowr_1.7.1
+ [1] Seurat_5.0.3       SeuratObject_5.0.1 sp_2.1-3           harmony_1.2.0     
+ [5] Rcpp_1.0.12        patchwork_1.2.0    lubridate_1.9.3    forcats_1.0.0     
+ [9] stringr_1.5.1      dplyr_1.1.4        purrr_1.0.2        readr_2.1.5       
+[13] tidyr_1.3.1        tibble_3.2.1       ggplot2_3.5.0      tidyverse_2.0.0   
+[17] workflowr_1.7.1   
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.4        xfun_0.43           bslib_0.7.0        
- [4] processx_3.8.4      lattice_0.22-5      callr_3.7.6        
- [7] tzdb_0.4.0          vctrs_0.6.5         tools_4.3.3        
-[10] ps_1.7.6            generics_0.1.3      fansi_1.0.6        
-[13] highr_0.10          pkgconfig_2.0.3     Matrix_1.6-5       
-[16] lifecycle_1.0.4     compiler_4.3.3      farver_2.1.1       
-[19] git2r_0.33.0        munsell_0.5.1       RhpcBLASctl_0.23-42
-[22] getPass_0.2-4       codetools_0.2-19    httpuv_1.6.15      
-[25] htmltools_0.5.8.1   sass_0.4.9          yaml_2.3.8         
-[28] later_1.3.2         pillar_1.9.0        jquerylib_0.1.4    
-[31] whisker_0.4.1       cachem_1.0.8        tidyselect_1.2.1   
-[34] digest_0.6.35       stringi_1.8.3       labeling_0.4.3     
-[37] cowplot_1.1.3       rprojroot_2.0.4     fastmap_1.1.1      
-[40] grid_4.3.3          colorspace_2.1-0    cli_3.6.2          
-[43] magrittr_2.0.3      utf8_1.2.4          withr_3.0.0        
-[46] scales_1.3.0        promises_1.3.0      timechange_0.3.0   
-[49] rmarkdown_2.26      httr_1.4.7          hms_1.1.3          
-[52] evaluate_0.23       knitr_1.46          rlang_1.1.3        
-[55] glue_1.7.0          rstudioapi_0.16.0   jsonlite_1.8.8     
-[58] R6_2.5.1            fs_1.6.3           </code></pre>
+  [1] RColorBrewer_1.1-3     rstudioapi_0.16.0      jsonlite_1.8.8        
+  [4] magrittr_2.0.3         spatstat.utils_3.0-4   farver_2.1.1          
+  [7] rmarkdown_2.26         fs_1.6.3               vctrs_0.6.5           
+ [10] ROCR_1.0-11            spatstat.explore_3.2-7 htmltools_0.5.8.1     
+ [13] sass_0.4.9             sctransform_0.4.1      parallelly_1.37.1     
+ [16] KernSmooth_2.23-22     bslib_0.7.0            htmlwidgets_1.6.4     
+ [19] ica_1.0-3              plyr_1.8.9             plotly_4.10.4         
+ [22] zoo_1.8-12             cachem_1.0.8           whisker_0.4.1         
+ [25] igraph_2.0.3           mime_0.12              lifecycle_1.0.4       
+ [28] pkgconfig_2.0.3        Matrix_1.6-5           R6_2.5.1              
+ [31] fastmap_1.1.1          fitdistrplus_1.1-11    future_1.33.2         
+ [34] shiny_1.8.1.1          digest_0.6.35          colorspace_2.1-0      
+ [37] ps_1.7.6               rprojroot_2.0.4        tensor_1.5            
+ [40] RSpectra_0.16-1        irlba_2.3.5.1          labeling_0.4.3        
+ [43] progressr_0.14.0       fansi_1.0.6            spatstat.sparse_3.0-3 
+ [46] timechange_0.3.0       httr_1.4.7             polyclip_1.10-6       
+ [49] abind_1.4-5            compiler_4.3.3         withr_3.0.0           
+ [52] fastDummies_1.7.3      highr_0.10             MASS_7.3-60.0.1       
+ [55] tools_4.3.3            lmtest_0.9-40          httpuv_1.6.15         
+ [58] future.apply_1.11.2    goftest_1.2-3          glue_1.7.0            
+ [61] callr_3.7.6            nlme_3.1-164           promises_1.3.0        
+ [64] grid_4.3.3             Rtsne_0.17             getPass_0.2-4         
+ [67] cluster_2.1.6          reshape2_1.4.4         generics_0.1.3        
+ [70] gtable_0.3.4           spatstat.data_3.0-4    tzdb_0.4.0            
+ [73] data.table_1.15.4      hms_1.1.3              utf8_1.2.4            
+ [76] spatstat.geom_3.2-9    RcppAnnoy_0.0.22       ggrepel_0.9.5         
+ [79] RANN_2.6.1             pillar_1.9.0           spam_2.10-0           
+ [82] RcppHNSW_0.6.0         later_1.3.2            splines_4.3.3         
+ [85] lattice_0.22-5         survival_3.5-8         deldir_2.0-4          
+ [88] tidyselect_1.2.1       miniUI_0.1.1.1         pbapply_1.7-2         
+ [91] knitr_1.46             git2r_0.33.0           gridExtra_2.3         
+ [94] scattermore_1.2        RhpcBLASctl_0.23-42    xfun_0.43             
+ [97] matrixStats_1.2.0      stringi_1.8.3          lazyeval_0.2.2        
+[100] yaml_2.3.8             evaluate_0.23          codetools_0.2-19      
+[103] cli_3.6.2              uwot_0.1.16            xtable_1.8-4          
+[106] reticulate_1.35.0      munsell_0.5.1          processx_3.8.4        
+[109] jquerylib_0.1.4        spatstat.random_3.2-3  globals_0.16.3        
+[112] png_0.1-8              parallel_4.3.3         dotCall64_1.1-1       
+[115] listenv_0.9.1          viridisLite_0.4.2      scales_1.3.0          
+[118] ggridges_0.5.6         leiden_0.4.3.1         rlang_1.1.3           
+[121] cowplot_1.1.3         </code></pre>
+</div>
 </div>
 </div>
 
