@@ -285,3 +285,29 @@ p1 <- DimPlot(pbmc, reduction = "umap", group.by = "stim", pt.size = .1)
 p2 <- DimPlot(pbmc, reduction = "umap", label = TRUE,  pt.size = .1)
 p1 + p2
 ```
+
+### Seurat SCTransform workflow with harmony
+
+Use SCTransform instead of `NormalizeData()`, `ScaleData()`, and `FindVariableFeatures()`.
+
+```{r sctransform_with_harmony, fig.width=8, fig.height=5}
+pbmc <- CreateSeuratObject(
+  counts = cbind(pbmc.stim, pbmc.ctrl),
+  project = "Kang",
+  min.cells = 5
+)
+
+pbmc@meta.data$stim <- c(rep("STIM", ncol(pbmc.stim)), rep("CTRL", ncol(pbmc.ctrl)))
+
+pbmc <- SCTransform(pbmc) |>
+  RunPCA(npcs = 20, verbose = FALSE)
+
+pbmc <- RunHarmony(pbmc, "stim")
+
+pbmc <- RunUMAP(pbmc, reduction = "harmony",  dims = 1:20)
+
+DimPlot(pbmc_sct, reduction = "umap", group.by = "stim", pt.size = .1) + ggtitle("SCTransform without harmony") -> p1
+DimPlot(pbmc, reduction = "umap", group.by = "stim", pt.size = .1) + ggtitle("SCTransform with harmony") -> p2
+
+p1 + p2
+```
