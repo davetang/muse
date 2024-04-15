@@ -20,14 +20,13 @@ library(Seurat)
 
 Follow the [quickstart tutorial](https://htmlpreview.github.io/?https://github.com/immunogenomics/harmony/blob/master/doc/quickstart.html)
 
-```{r install_seurat, eval=FALSE}
+```{r install_harmony, eval=FALSE}
 install.packages("harmony")
 ```
 
-Load {harmony}.
+{harmony} version.
 
-```{r load_seurat}
-library("harmony")
+```{r harmony_version}
 packageVersion("harmony")
 ```
 
@@ -310,4 +309,60 @@ DimPlot(pbmc_sct, reduction = "umap", group.by = "stim", pt.size = .1) + ggtitle
 DimPlot(pbmc, reduction = "umap", group.by = "stim", pt.size = .1) + ggtitle("SCTransform with harmony") -> p2
 
 p1 + p2
+```
+
+## From 10x Genomics filtered matrices
+
+[Downloaded](https://github.com/davetang/benchmark/tree/main/data/10x) Jurkat, 293t, and mixture cells.
+
+```{r from_10x_filtered, message=FALSE, warning=FALSE}
+jurkat <- Seurat::Read10X("data/jurkat/filtered_matrices_mex/hg19/")
+t293 <- Seurat::Read10X("data/293t/filtered_matrices_mex/hg19/")
+half <- Seurat::Read10X("data/jurkat_293t/filtered_matrices_mex/hg19/")
+
+colnames(jurkat) <- paste0('jurkat_', colnames(jurkat))
+colnames(t293) <- paste0('t293_', colnames(t293))
+colnames(half) <- paste0('half_', colnames(half))
+
+seurat_obj <- CreateSeuratObject(
+  counts = cbind(jurkat, t293, half),
+  project = "Mix",
+  min.cells = 5
+)
+
+seurat_obj@meta.data$dataset <- c(
+  rep("jurkat", ncol(jurkat)),
+  rep("t293", ncol(t293)),
+  rep("half", ncol(half))
+)
+
+seurat_obj <- SCTransform(seurat_obj) |>
+  RunPCA(npcs = 20, verbose = FALSE)
+
+seurat_obj <- RunUMAP(seurat_obj, dims = 1:20)
+
+DimPlot(seurat_obj, reduction = "umap", group.by = "dataset", pt.size = .1) + ggtitle("Without harmony")
+```
+
+With harmony.
+
+```{r from_10x_filtered_with_harmony, message=FALSE, warning=FALSE}
+seurat_obj_harmony <- RunHarmony(seurat_obj, "dataset")
+seurat_obj_harmony <- RunUMAP(seurat_obj_harmony, reduction = "harmony",  dims = 1:20)
+
+DimPlot(seurat_obj_harmony, reduction = "umap", group.by = "dataset", pt.size = .1) + ggtitle("With harmony")
+```
+
+Plot XIST.
+
+* [Human embryonic kidney 293 cells](https://en.wikipedia.org/wiki/HEK_293_cells), also often referred to as HEK 293, HEK-293, 293 cells, are an immortalised cell line derived from HEK cells isolated from a **female** fetus in the 1970s.
+* The [Jurkat cell line](https://en.wikipedia.org/wiki/Jurkat_cells) (originally called JM) was established in the mid-1970s from the peripheral blood of a 14-year-old boy with T cell leukemia.
+
+```{r feature_plot_xist}
+FeaturePlot(
+  object = seurat_obj_harmony,
+  features= "XIST",
+  cols = c("lightgrey", "blue"),
+  pt.size = 0.5
+)
 ```
