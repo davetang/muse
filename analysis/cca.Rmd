@@ -1,0 +1,187 @@
+---
+title: "Introduction to Canonical Correlation Analysis"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+Based on [Introduction to Canonical Correlation Analysis (CCA) in R](https://cmdlinetips.com/2020/12/canonical-correlation-analysis-in-r/).
+
+Canonical Correlation Analysis (CCA) is a dimension reduction technique like Principal Component Analysis (PCA). PCA aims to find the directions or projections that account for most of the observed variance. In comparison, CCA deals with two datasets and aims to find directions or projections that account for most of co-variance between two data sets.
+
+To try to understand the intuition behind CCA, imagine there is one or more variables generating two high-dimensional data sets $X$ and $Y$. Here, the data sets $X$ and $Y$ are observables and we don't know the latent variable(s) behind the two data sets. By performing CCA, we can identify the canonical variates that are highly correlated to the unknown latent variable. Basically, CCA helps us remove the noise in the two datasets and gets to the canonical variable that captures the hidden variable.
+
+We will use Palmer Penguin data and the {CCA} package; install them if necessary.
+
+```{r install_palmerpenguins, eval=FALSE}
+install.packages("palmerpenguins")
+install.packages("CCA")
+```
+
+Load {CCA}.
+
+```{r load_cca}
+suppressPackageStartupMessages(library(CCA))
+packageVersion("CCA")
+```
+
+Load data.
+
+```{r palmerpenguins}
+library(palmerpenguins)
+data("penguins", package = 'palmerpenguins')
+penguins <- tidyr::drop_na(penguins)
+penguins
+```
+
+We will split the penguin's body measurements into two datasets. Just for illustration of CCA, we will assume species/island is the hidden variable and the two "split" body measurements are our two data matrices. In this simple example, clearly the data matrices captures the underlies the "species" variable. And then we will perform CCA and infer canonical covariates and show that the canonical covariates captures species variable, our hidden factor.
+
+Our data matrix $X$ contains bill depth and bill length from the penguins data. We will also scale the variables to put them on the same scale. Here we use scale function to center and scale the columns.
+
+```{r x}
+X <- penguins |>
+  dplyr::select(bill_depth_mm, bill_length_mm) |>
+  scale()
+```
+	
+Our data matrix $Y$ contains flipper length and bill length from the penguins data. We will also scale the columns in $Y$ data matrix.
+	
+```{r y}
+Y <- penguins |>
+  dplyr::select(flipper_length_mm,body_mass_g) |>
+  scale()
+
+head(Y)
+```
+
+CCA aims to find the associations between two data matrices (two sets of variables) $X$ and $Y$. CCA's goal is to find the linear projection of the first data matrix that is maximally correlated with the linear projection of the second data matrix.
+
+To perform classical CCA, we use `cancor()`; this function computes canonical covariates between two input data matrices. By default `cancor()` centers the columns of data matrices.
+	
+```{r cancor}
+cc_results <- cancor(X,Y)
+```
+
+The `cancor()` function returns a list containing the correlation between the variables and the coefficients.
+	
+```{r cc_results}
+str(cc_results)
+```
+	
+Let us take a look at the coefficients from data matrix $X$.
+	
+```{r xcoef}
+cc_results$xcoef
+```
+
+Here is the coefficients from data matrix $Y$.
+	
+```{r ycoef}
+cc_results$ycoef
+```
+
+We can also check the correlations between the canonical variates. We can notice that the correlation between the first canonical variates from datasets $X$ and $Y$ is pretty high, suggesting that both the data sets have strong covariation.
+	
+```{r cor}
+cc_results$cor
+```
+
+We can use our data sets X and Y and the corresponding coefficients to get the canonical covariate pairs. In the code below, we perform matrix multiplication with each data sets and its first (and second separately) coefficient column to get the first canonical covariate pairs.
+
+```{r}
+CC1_X <- as.matrix(X) %*% cc_results$xcoef[, 1]
+CC1_Y <- as.matrix(Y) %*% cc_results$ycoef[, 1]
+CC2_X <- as.matrix(X) %*% cc_results$xcoef[, 2]
+CC2_Y <- as.matrix(Y) %*% cc_results$ycoef[, 2]
+```
+	
+We can also get all pairs of canonical covariates by multiplying data with the coefficient matrix instead of multiplying one by one.
+
+Let us look at the first pair of canonical covariates we computed. We can compute the correlation between the first pair of canonical covariates and it is the same as correlation we get as results from `cancor()` function's cor.
+
+```{r cor_cc1xy}
+cor(CC1_X,CC1_Y)
+```
+
+Here we verify the the correlation we computed between the first pair of canonical covariates is the same as cancor's cor results.
+
+```{r}
+all.equal(
+  cc_results$cor[1],
+  cor(CC1_X,CC1_Y)[1]
+)
+```
+	
+Now that we have done canonical correlation analysis, let us dig deeper to understand the canonical covariate pair we got as results.
+
+In this toy example, we kind of know that two sets of measures we have as the two data matrices came from the same group of penguins. And we kind of suspected earlier the differences in these measurements are due to penguin species differences. Therefore, a common latent variable behind these two measurements is species variable. And our CCA analysis' main goal is to capture the common variable. We also saw that the first pair of canonical variate is highly correlated.
+
+Let us check if that the canonical covariate is actually species variable. First, let us create a data frame with the penguins data and the first pair of canonical covariates.
+
+```{r cca_df}
+cca_df <- penguins |>
+  dplyr::mutate(
+    CC1_X=CC1_X,
+    CC1_Y=CC1_Y,
+    CC2_X=CC2_X,
+    CC2_Y=CC2_Y
+  )
+```
+
+Let us make a scatter plot between the first pair of canonical covariates. We can see that they both are clearly correlated.
+
+```{r plot_cca_df}
+ggplot(cca_df, aes(x=CC1_X, y=CC1_Y))+
+  geom_point() +
+  theme_minimal()
+```
+	
+To see if each of canonical variate is correlated with species variable in the penguin's dataset, we make a boxplot between canonical covariate and the species.
+
+```{r cca_df_boxplot}
+ggplot(cca_df, aes(x=species,y=CC1_X, color=species))+
+  geom_boxplot(width=0.5)+
+  geom_jitter(width=0.15)+
+  theme_minimal() +
+  theme(legend.position="none") +
+  NULL
+```
+	
+It is clear from boxplots that the first pair of canonical covariate is highly correlated with species.
+
+```{r}
+ggplot(cca_df, aes(x=species,y=CC1_Y, color=species))+
+  geom_boxplot(width=0.5) +
+  geom_jitter(width=0.15) +
+  theme_minimal() +
+  theme(legend.position="none") +
+  NULL
+```
+
+We could have come to same conclusion by coloring the scatter plot between the first pair of canonical covariates by species variable.
+
+```{r}
+ggplot(cca_df, aes(x=CC1_X,y=CC1_Y, color=species))+
+  geom_point() +
+  theme_minimal() +
+  NULL
+```
+	
+In this toy example for illustrating CCA, we know of the latent variable, i.e. species, beforehand. However, in a real world data we may no know the latent variable and CCA informs us that our two datasets actually came from three groups/clusters.
+
+Let us try to understand the meaning behind the second pair of canonical covarites. We will make a scatterplot of the second pair of canonical covariates. We know from the correlation values, the second pair is not that highly correlated. In our penguin data, we have sex variable that is common to the body measurements. We can hypothesise that the second pair of canonical covariate could have captured the effect of sex in the datasets. To verify let us make scatter plot between the second pair of canonical covariates and color the data points by sex.
+	
+```{r}
+ggplot(cca_df, aes(x=CC2_X,y=CC2_Y, color=sex))+
+  geom_point() +
+  theme_minimal() +
+  NULL
+```
+
+We can see the modest effect of sex on the data is captured by the second pair of canonical covariates.
