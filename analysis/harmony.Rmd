@@ -131,7 +131,21 @@ pbmc@meta.data$stim <- c(rep("STIM", ncol(pbmc.stim)), rep("CTRL", ncol(pbmc.ctr
 pbmc
 ```
 
-### Seurat workflow
+### Seurat SCTransform workflow
+
+[Using sctransform in Seurat](https://satijalab.org/seurat/articles/sctransform_vignette.html).
+
+```{r sctransform_workflow, message=FALSE, warning=FALSE}
+pbmc_sct <- SCTransform(pbmc) |>
+  RunPCA() |>
+  FindNeighbors() |>
+  RunUMAP(dims = 1:20) |>
+  FindClusters()
+
+DimPlot(pbmc_sct, reduction = "umap", group.by = "stim", pt.size = .1) + ggtitle("Seurat SCTransform workflow")
+```
+
+### Seurat workflow with harmony
 
 Harmony works on an existing matrix with cell embeddings and outputs its transformed version with the datasets aligned according to some user-defined experimental conditions. By default, harmony will look up the `pca` cell embeddings and use these to run harmony. Therefore, it assumes that the Seurat object has these embeddings already precomputed.
 
