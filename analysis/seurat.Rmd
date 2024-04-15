@@ -417,6 +417,20 @@ DimHeatmap(pbmc, dims = 1, cells = 500, balanced = TRUE)
 DimHeatmap(pbmc, dims = 1:15, cells = 500, balanced = TRUE)
 ```
 
+[Variance explained](https://github.com/satijalab/seurat/issues/982).
+
+```{r variance_explained}
+# manually calculate
+total_variance <- sum(
+  matrixStats::rowVars(pbmc[['RNA']]$scale.data[VariableFeatures(pbmc), ])
+)
+
+stopifnot(all.equal(total_variance, pbmc@reductions$pca@misc$total.variance))
+
+eig_values <- (pbmc@reductions$pca@stdev)^2
+eig_values / total_variance
+```
+
 ## Determine the dimensionality of the dataset 
 
 To overcome the extensive technical noise in any single feature for scRNA-seq data, Seurat clusters cells based on their PCA scores, with each PC essentially representing a ‘metafeature’ that combines information across a correlated feature set. The top principal components therefore represent a robust compression of the dataset. However, how many components should we choose to include? 10? 20? 100?
@@ -425,7 +439,8 @@ In Macosko et al, we implemented a resampling test inspired by the JackStraw pro
 
 An alternative heuristic method generates an ‘Elbow plot’: a ranking of principle components based on the percentage of variance explained by each one (ElbowPlot() function). In this example, we can observe an ‘elbow’ around PC9-10, suggesting that the majority of true signal is captured in the first 10 PCs.
 
-```{r}
+```{r elbow_plot}
+# plots pbmc@reductions$pca@stdev
 ElbowPlot(pbmc)
 ```
 
