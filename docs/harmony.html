@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree708f1ab53a05e899ce6a1512929dfa5ac9ac346btargetblank708f1aba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3ec33679dd70ebc29333a10f971660b918a0420etargetblank3ec3367a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/708f1ab53a05e899ce6a1512929dfa5ac9ac346b" target="_blank">708f1ab</a>
+<a href="https://github.com/davetang/muse/tree/3ec33679dd70ebc29333a10f971660b918a0420e" target="_blank">3ec3367</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree708f1ab53a05e899ce6a1512929dfa5ac9ac346btargetblank708f1aba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3ec33679dd70ebc29333a10f971660b918a0420etargetblank3ec3367a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/708f1ab53a05e899ce6a1512929dfa5ac9ac346b" target="_blank">708f1ab</a>.
+<a href="https://github.com/davetang/muse/tree/3ec33679dd70ebc29333a10f971660b918a0420e" target="_blank">3ec3367</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -609,6 +609,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/3ec33679dd70ebc29333a10f971660b918a0420e/analysis/harmony.Rmd" target="_blank">3ec3367</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+<td>
+Seurat SCTransform workflow
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/c3d7314fea2e83d5bf86f0932c6be6bee6ecbd13/docs/harmony.html" target="_blank">c3d7314</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -839,6 +873,43 @@ ggplot(my_df2, aes(PC1, PC2, colour = cell_type)) +
 
 p1 + p2</code></pre>
 <p><img src="figure/harmony.Rmd/run_harmony_quickstart-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-run_harmony_quickstart-1">
+Past versions of run_harmony_quickstart-1.png
+</button>
+</p>
+<div id="fig-run_harmony_quickstart-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/c3d7314fea2e83d5bf86f0932c6be6bee6ecbd13/docs/figure/harmony.Rmd/run_harmony_quickstart-1.png" target="_blank">c3d7314</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 </div>
 <div id="using-harmony-with-seurat" class="section level2">
@@ -900,8 +971,30 @@ pbmc</code></pre>
 Active assay: RNA (9015 features, 0 variable features)
  1 layer present: counts</code></pre>
 </div>
-<div id="seurat-workflow" class="section level3">
-<h3>Seurat workflow</h3>
+<div id="seurat-sctransform-workflow" class="section level3">
+<h3>Seurat SCTransform workflow</h3>
+<p><a
+href="https://satijalab.org/seurat/articles/sctransform_vignette.html">Using
+sctransform in Seurat</a>.</p>
+<pre class="r"><code>pbmc_sct &lt;- SCTransform(pbmc) |&gt;
+  RunPCA() |&gt;
+  FindNeighbors() |&gt;
+  RunUMAP(dims = 1:20) |&gt;
+  FindClusters()</code></pre>
+<pre><code>Modularity Optimizer version 1.3.0 by Ludo Waltman and Nees Jan van Eck
+
+Number of nodes: 2000
+Number of edges: 64544
+
+Running Louvain algorithm...
+Maximum modularity in 10 random starts: 0.8838
+Number of communities: 15
+Elapsed time: 0 seconds</code></pre>
+<pre class="r"><code>DimPlot(pbmc_sct, reduction = &quot;umap&quot;, group.by = &quot;stim&quot;, pt.size = .1) + ggtitle(&quot;Seurat SCTransform workflow&quot;)</code></pre>
+<p><img src="figure/harmony.Rmd/sctransform_workflow-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="seurat-workflow-with-harmony" class="section level3">
+<h3>Seurat workflow with harmony</h3>
 <p>Harmony works on an existing matrix with cell embeddings and outputs
 its transformed version with the datasets aligned according to some
 user-defined experimental conditions. By default, harmony will look up
@@ -964,6 +1057,43 @@ so harmony will stop after the cost plateaus.</p>
 <pre><code>Harmony 5/10</code></pre>
 <pre><code>Harmony converged after 5 iterations</code></pre>
 <p><img src="figure/harmony.Rmd/run_harmony_pbmc-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-run_harmony_pbmc-1">
+Past versions of run_harmony_pbmc-1.png
+</button>
+</p>
+<div id="fig-run_harmony_pbmc-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/c3d7314fea2e83d5bf86f0932c6be6bee6ecbd13/docs/figure/harmony.Rmd/run_harmony_pbmc-1.png" target="_blank">c3d7314</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p><code>RunHarmony</code> has several parameters accessible to users
 which are outlined below.</p>
 <ul>
@@ -1111,9 +1241,83 @@ workflow.</p>
 p2 &lt;- VlnPlot(object = pbmc, features = &quot;harmony_1&quot;, group.by = &quot;stim&quot;,  pt.size = .1)
 p1 + p2</code></pre>
 <p><img src="figure/harmony.Rmd/contrast_harmony-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-contrast_harmony-1">
+Past versions of contrast_harmony-1.png
+</button>
+</p>
+<div id="fig-contrast_harmony-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/c3d7314fea2e83d5bf86f0932c6be6bee6ecbd13/docs/figure/harmony.Rmd/contrast_harmony-1.png" target="_blank">c3d7314</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Plot Genes correlated with the Harmonized PCs</p>
 <pre class="r"><code>DimHeatmap(object = pbmc, reduction = &quot;harmony&quot;, cells = 500, dims = 1:3)</code></pre>
 <p><img src="figure/harmony.Rmd/heatmap_harmony-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-heatmap_harmony-1">
+Past versions of heatmap_harmony-1.png
+</button>
+</p>
+<div id="fig-heatmap_harmony-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/c3d7314fea2e83d5bf86f0932c6be6bee6ecbd13/docs/figure/harmony.Rmd/heatmap_harmony-1.png" target="_blank">c3d7314</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The harmonised cell embeddings generated by harmony can be used for
 further integrated analyses. In this workflow, the Seurat object
 contains the harmony <code>reduction</code> modality name in the method
@@ -1139,6 +1343,43 @@ p1 &lt;- DimPlot(pbmc, reduction = &quot;tsne&quot;, group.by = &quot;stim&quot;
 p2 &lt;- DimPlot(pbmc, reduction = &quot;tsne&quot;, label = TRUE, pt.size = .1)
 p1 + p2</code></pre>
 <p><img src="figure/harmony.Rmd/tsne-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-tsne-1">
+Past versions of tsne-1.png
+</button>
+</p>
+<div id="fig-tsne-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/c3d7314fea2e83d5bf86f0932c6be6bee6ecbd13/docs/figure/harmony.Rmd/tsne-1.png" target="_blank">c3d7314</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>One important observation is to assess that the harmonised data
 contain biological states of the cells. Therefore by checking the
 following genes we can see that biological cell states are preserved
@@ -1152,30 +1393,105 @@ after harmonisation.</p>
   pt.size = 0.5
 )</code></pre>
 <p><img src="figure/harmony.Rmd/feature_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-feature_plot-1">
+Past versions of feature_plot-1.png
+</button>
+</p>
+<div id="fig-feature_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/c3d7314fea2e83d5bf86f0932c6be6bee6ecbd13/docs/figure/harmony.Rmd/feature_plot-1.png" target="_blank">c3d7314</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Similar to TSNE, we can run UMAP by passing the harmony reduction in
 the function.</p>
 <pre class="r"><code>pbmc &lt;- RunUMAP(pbmc, reduction = &quot;harmony&quot;,  dims = 1:20)</code></pre>
-<pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
-To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
-This message will be shown once per session</code></pre>
-<pre><code>00:11:02 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
-<pre><code>00:11:02 Read 2000 rows and found 20 numeric columns</code></pre>
-<pre><code>00:11:02 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
-<pre><code>00:11:02 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>00:52:27 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;spam&#39;</code></pre>
+<pre><code>Also defined by &#39;BiocGenerics&#39;</code></pre>
+<pre><code>00:52:27 Read 2000 rows and found 20 numeric columns</code></pre>
+<pre><code>00:52:27 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;spam&#39;</code></pre>
+<pre><code>Also defined by &#39;BiocGenerics&#39;</code></pre>
+<pre><code>00:52:27 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
 <pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
 <pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
 <pre><code>**************************************************|
-00:11:03 Writing NN index file to temp file /tmp/Rtmp8Qb919/file223c3ddbe8a6
-00:11:03 Searching Annoy index using 1 thread, search_k = 3000
-00:11:03 Annoy recall = 100%
-00:11:03 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-00:11:04 Initializing from normalized Laplacian + noise (using RSpectra)
-00:11:04 Commencing optimization for 500 epochs, with 83170 positive edges
-00:11:06 Optimization finished</code></pre>
+00:52:27 Writing NN index file to temp file /tmp/RtmpmvO8of/file764a24ce3864
+00:52:27 Searching Annoy index using 1 thread, search_k = 3000
+00:52:28 Annoy recall = 100%
+00:52:28 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+00:52:29 Initializing from normalized Laplacian + noise (using RSpectra)
+00:52:29 Commencing optimization for 500 epochs, with 83170 positive edges
+00:52:31 Optimization finished</code></pre>
 <pre class="r"><code>p1 &lt;- DimPlot(pbmc, reduction = &quot;umap&quot;, group.by = &quot;stim&quot;, pt.size = .1)
 p2 &lt;- DimPlot(pbmc, reduction = &quot;umap&quot;, label = TRUE,  pt.size = .1)
 p1 + p2</code></pre>
 <p><img src="figure/harmony.Rmd/umap_harmony-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-umap_harmony-1">
+Past versions of umap_harmony-1.png
+</button>
+</p>
+<div id="fig-umap_harmony-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/c3d7314fea2e83d5bf86f0932c6be6bee6ecbd13/docs/figure/harmony.Rmd/umap_harmony-1.png" target="_blank">c3d7314</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1215,47 +1531,77 @@ other attached packages:
 [17] workflowr_1.7.1   
 
 loaded via a namespace (and not attached):
-  [1] RColorBrewer_1.1-3     rstudioapi_0.16.0      jsonlite_1.8.8        
-  [4] magrittr_2.0.3         spatstat.utils_3.0-4   farver_2.1.1          
-  [7] rmarkdown_2.26         fs_1.6.3               vctrs_0.6.5           
- [10] ROCR_1.0-11            spatstat.explore_3.2-7 htmltools_0.5.8.1     
- [13] sass_0.4.9             sctransform_0.4.1      parallelly_1.37.1     
- [16] KernSmooth_2.23-22     bslib_0.7.0            htmlwidgets_1.6.4     
- [19] ica_1.0-3              plyr_1.8.9             plotly_4.10.4         
- [22] zoo_1.8-12             cachem_1.0.8           whisker_0.4.1         
- [25] igraph_2.0.3           mime_0.12              lifecycle_1.0.4       
- [28] pkgconfig_2.0.3        Matrix_1.6-5           R6_2.5.1              
- [31] fastmap_1.1.1          fitdistrplus_1.1-11    future_1.33.2         
- [34] shiny_1.8.1.1          digest_0.6.35          colorspace_2.1-0      
- [37] ps_1.7.6               rprojroot_2.0.4        tensor_1.5            
- [40] RSpectra_0.16-1        irlba_2.3.5.1          labeling_0.4.3        
- [43] progressr_0.14.0       fansi_1.0.6            spatstat.sparse_3.0-3 
- [46] timechange_0.3.0       httr_1.4.7             polyclip_1.10-6       
- [49] abind_1.4-5            compiler_4.3.3         withr_3.0.0           
- [52] fastDummies_1.7.3      highr_0.10             MASS_7.3-60.0.1       
- [55] tools_4.3.3            lmtest_0.9-40          httpuv_1.6.15         
- [58] future.apply_1.11.2    goftest_1.2-3          glue_1.7.0            
- [61] callr_3.7.6            nlme_3.1-164           promises_1.3.0        
- [64] grid_4.3.3             Rtsne_0.17             getPass_0.2-4         
- [67] cluster_2.1.6          reshape2_1.4.4         generics_0.1.3        
- [70] gtable_0.3.4           spatstat.data_3.0-4    tzdb_0.4.0            
- [73] data.table_1.15.4      hms_1.1.3              utf8_1.2.4            
- [76] spatstat.geom_3.2-9    RcppAnnoy_0.0.22       ggrepel_0.9.5         
- [79] RANN_2.6.1             pillar_1.9.0           spam_2.10-0           
- [82] RcppHNSW_0.6.0         later_1.3.2            splines_4.3.3         
- [85] lattice_0.22-5         survival_3.5-8         deldir_2.0-4          
- [88] tidyselect_1.2.1       miniUI_0.1.1.1         pbapply_1.7-2         
- [91] knitr_1.46             git2r_0.33.0           gridExtra_2.3         
- [94] scattermore_1.2        RhpcBLASctl_0.23-42    xfun_0.43             
- [97] matrixStats_1.2.0      stringi_1.8.3          lazyeval_0.2.2        
-[100] yaml_2.3.8             evaluate_0.23          codetools_0.2-19      
-[103] cli_3.6.2              uwot_0.1.16            xtable_1.8-4          
-[106] reticulate_1.35.0      munsell_0.5.1          processx_3.8.4        
-[109] jquerylib_0.1.4        spatstat.random_3.2-3  globals_0.16.3        
-[112] png_0.1-8              parallel_4.3.3         dotCall64_1.1-1       
-[115] listenv_0.9.1          viridisLite_0.4.2      scales_1.3.0          
-[118] ggridges_0.5.6         leiden_0.4.3.1         rlang_1.1.3           
-[121] cowplot_1.1.3         </code></pre>
+  [1] RColorBrewer_1.1-3          rstudioapi_0.16.0          
+  [3] jsonlite_1.8.8              magrittr_2.0.3             
+  [5] spatstat.utils_3.0-4        farver_2.1.1               
+  [7] rmarkdown_2.26              zlibbioc_1.48.2            
+  [9] fs_1.6.3                    vctrs_0.6.5                
+ [11] ROCR_1.0-11                 DelayedMatrixStats_1.24.0  
+ [13] spatstat.explore_3.2-7      RCurl_1.98-1.14            
+ [15] S4Arrays_1.2.1              htmltools_0.5.8.1          
+ [17] SparseArray_1.2.4           sass_0.4.9                 
+ [19] sctransform_0.4.1           parallelly_1.37.1          
+ [21] KernSmooth_2.23-22          bslib_0.7.0                
+ [23] htmlwidgets_1.6.4           ica_1.0-3                  
+ [25] plyr_1.8.9                  plotly_4.10.4              
+ [27] zoo_1.8-12                  cachem_1.0.8               
+ [29] whisker_0.4.1               igraph_2.0.3               
+ [31] mime_0.12                   lifecycle_1.0.4            
+ [33] pkgconfig_2.0.3             Matrix_1.6-5               
+ [35] R6_2.5.1                    fastmap_1.1.1              
+ [37] GenomeInfoDbData_1.2.11     MatrixGenerics_1.14.0      
+ [39] fitdistrplus_1.1-11         future_1.33.2              
+ [41] shiny_1.8.1.1               digest_0.6.35              
+ [43] colorspace_2.1-0            S4Vectors_0.40.2           
+ [45] ps_1.7.6                    rprojroot_2.0.4            
+ [47] tensor_1.5                  RSpectra_0.16-1            
+ [49] irlba_2.3.5.1               GenomicRanges_1.54.1       
+ [51] labeling_0.4.3              progressr_0.14.0           
+ [53] fansi_1.0.6                 spatstat.sparse_3.0-3      
+ [55] timechange_0.3.0            httr_1.4.7                 
+ [57] polyclip_1.10-6             abind_1.4-5                
+ [59] compiler_4.3.3              withr_3.0.0                
+ [61] fastDummies_1.7.3           highr_0.10                 
+ [63] MASS_7.3-60.0.1             DelayedArray_0.28.0        
+ [65] tools_4.3.3                 lmtest_0.9-40              
+ [67] httpuv_1.6.15               future.apply_1.11.2        
+ [69] goftest_1.2-3               glmGamPoi_1.14.3           
+ [71] glue_1.7.0                  callr_3.7.6                
+ [73] nlme_3.1-164                promises_1.3.0             
+ [75] grid_4.3.3                  Rtsne_0.17                 
+ [77] getPass_0.2-4               cluster_2.1.6              
+ [79] reshape2_1.4.4              generics_0.1.3             
+ [81] gtable_0.3.4                spatstat.data_3.0-4        
+ [83] tzdb_0.4.0                  data.table_1.15.4          
+ [85] hms_1.1.3                   XVector_0.42.0             
+ [87] utf8_1.2.4                  BiocGenerics_0.48.1        
+ [89] spatstat.geom_3.2-9         RcppAnnoy_0.0.22           
+ [91] ggrepel_0.9.5               RANN_2.6.1                 
+ [93] pillar_1.9.0                spam_2.10-0                
+ [95] RcppHNSW_0.6.0              later_1.3.2                
+ [97] splines_4.3.3               lattice_0.22-5             
+ [99] survival_3.5-8              deldir_2.0-4               
+[101] tidyselect_1.2.1            miniUI_0.1.1.1             
+[103] pbapply_1.7-2               knitr_1.46                 
+[105] git2r_0.33.0                gridExtra_2.3              
+[107] IRanges_2.36.0              SummarizedExperiment_1.32.0
+[109] scattermore_1.2             stats4_4.3.3               
+[111] RhpcBLASctl_0.23-42         xfun_0.43                  
+[113] Biobase_2.62.0              matrixStats_1.2.0          
+[115] stringi_1.8.3               lazyeval_0.2.2             
+[117] yaml_2.3.8                  evaluate_0.23              
+[119] codetools_0.2-19            cli_3.6.2                  
+[121] uwot_0.1.16                 xtable_1.8-4               
+[123] reticulate_1.35.0           munsell_0.5.1              
+[125] processx_3.8.4              jquerylib_0.1.4            
+[127] GenomeInfoDb_1.38.8         spatstat.random_3.2-3      
+[129] globals_0.16.3              png_0.1-8                  
+[131] parallel_4.3.3              dotCall64_1.1-1            
+[133] sparseMatrixStats_1.14.0    bitops_1.0-7               
+[135] listenv_0.9.1               viridisLite_0.4.2          
+[137] scales_1.3.0                ggridges_0.5.6             
+[139] crayon_1.5.2                leiden_0.4.3.1             
+[141] rlang_1.1.3                 cowplot_1.1.3              </code></pre>
 </div>
 </div>
 </div>
