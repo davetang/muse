@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6c16dce83b8942f9d10c15a28de506f8eca86bd4targetblank6c16dcea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree03f3f3b183f3b7cc7db4cff53bb43f35707fd3a1targetblank03f3f3ba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/6c16dce83b8942f9d10c15a28de506f8eca86bd4" target="_blank">6c16dce</a>
+<a href="https://github.com/davetang/muse/tree/03f3f3b183f3b7cc7db4cff53bb43f35707fd3a1" target="_blank">03f3f3b</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6c16dce83b8942f9d10c15a28de506f8eca86bd4targetblank6c16dcea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree03f3f3b183f3b7cc7db4cff53bb43f35707fd3a1targetblank03f3f3ba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/6c16dce83b8942f9d10c15a28de506f8eca86bd4" target="_blank">6c16dce</a>.
+<a href="https://github.com/davetang/muse/tree/03f3f3b183f3b7cc7db4cff53bb43f35707fd3a1" target="_blank">03f3f3b</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -609,6 +609,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/03f3f3b183f3b7cc7db4cff53bb43f35707fd3a1/analysis/harmony.Rmd" target="_blank">03f3f3b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+<td>
+Quieter
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/b174605ed41929903234d582b174888e56ed5de6/docs/harmony.html" target="_blank">b174605</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1410,10 +1444,10 @@ Elapsed time: 0 seconds</code></pre>
 <p>TSNE visualisation of harmony embeddings.</p>
 <pre class="r"><code>pbmc &lt;- RunTSNE(pbmc, reduction = &quot;harmony&quot;)
 
-p1 &lt;- DimPlot(pbmc, reduction = &quot;tsne&quot;, group.by = &quot;stim&quot;, pt.size = .1)
-p2 &lt;- DimPlot(pbmc, reduction = &quot;tsne&quot;, label = TRUE, pt.size = .1)
+p1 &lt;- DimPlot(pbmc, reduction = &quot;tsne&quot;, group.by = &quot;stim&quot;, pt.size = .1) + ggtitle(&quot;tSNE using harmony&quot;)
+p2 &lt;- DimPlot(pbmc, reduction = &quot;tsne&quot;, label = TRUE, pt.size = .1) + ggtitle(&quot;Cell clusters&quot;)
 p1 + p2</code></pre>
-<p><img src="figure/harmony.Rmd/tsne-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/harmony.Rmd/tsne-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-tsne-1">
 Past versions of tsne-1.png
@@ -1503,26 +1537,9 @@ Dave Tang
 </div>
 <p>Similar to TSNE, we can run UMAP by passing the harmony reduction in
 the function.</p>
-<pre class="r"><code>pbmc &lt;- RunUMAP(pbmc, reduction = &quot;harmony&quot;,  dims = 1:20)</code></pre>
-<pre><code>01:02:09 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
-<pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;spam&#39;</code></pre>
-<pre><code>Also defined by &#39;BiocGenerics&#39;</code></pre>
-<pre><code>01:02:09 Read 2000 rows and found 20 numeric columns</code></pre>
-<pre><code>01:02:09 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
-<pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;spam&#39;</code></pre>
-<pre><code>Also defined by &#39;BiocGenerics&#39;</code></pre>
-<pre><code>01:02:09 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
-<pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
-<pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
-<pre><code>**************************************************|
-01:02:09 Writing NN index file to temp file /tmp/Rtmp7dlVK0/file78867e62c47c
-01:02:09 Searching Annoy index using 1 thread, search_k = 3000
-01:02:10 Annoy recall = 100%
-01:02:10 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-01:02:11 Initializing from normalized Laplacian + noise (using RSpectra)
-01:02:11 Commencing optimization for 500 epochs, with 83170 positive edges
-01:02:13 Optimization finished</code></pre>
-<pre class="r"><code>p1 &lt;- DimPlot(pbmc, reduction = &quot;umap&quot;, group.by = &quot;stim&quot;, pt.size = .1)
+<pre class="r"><code>pbmc &lt;- RunUMAP(pbmc, reduction = &quot;harmony&quot;,  dims = 1:20)
+
+p1 &lt;- DimPlot(pbmc, reduction = &quot;umap&quot;, group.by = &quot;stim&quot;, pt.size = .1)
 p2 &lt;- DimPlot(pbmc, reduction = &quot;umap&quot;, label = TRUE,  pt.size = .1)
 p1 + p2</code></pre>
 <p><img src="figure/harmony.Rmd/umap_harmony-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -1567,8 +1584,9 @@ Dave Tang
 <div id="seurat-sctransform-workflow-with-harmony"
 class="section level3">
 <h3>Seurat SCTransform workflow with harmony</h3>
-<p>Use SCTransform instead of <code>NormalizeData()</code>,
-<code>ScaleData()</code>, and <code>FindVariableFeatures()</code>.</p>
+<p>Use <code>SCTransform()</code> instead of
+<code>NormalizeData()</code>, <code>ScaleData()</code>, and
+<code>FindVariableFeatures()</code>.</p>
 <pre class="r"><code>pbmc &lt;- CreateSeuratObject(
   counts = cbind(pbmc.stim, pbmc.ctrl),
   project = &quot;Kang&quot;,
@@ -1578,56 +1596,54 @@ class="section level3">
 pbmc@meta.data$stim &lt;- c(rep(&quot;STIM&quot;, ncol(pbmc.stim)), rep(&quot;CTRL&quot;, ncol(pbmc.ctrl)))
 
 pbmc &lt;- SCTransform(pbmc) |&gt;
-  RunPCA(npcs = 20, verbose = FALSE)</code></pre>
-<pre><code>Running SCTransform on assay: RNA</code></pre>
-<pre><code>Running SCTransform on layer: counts</code></pre>
-<pre><code>vst.flavor=&#39;v2&#39; set. Using model with fixed slope and excluding poisson genes.</code></pre>
-<pre><code>Variance stabilizing transformation of count matrix of size 9015 by 2000</code></pre>
-<pre><code>Model formula is y ~ log_umi</code></pre>
-<pre><code>Get Negative Binomial regression parameters per gene</code></pre>
-<pre><code>Using 2000 genes, 2000 cells</code></pre>
-<pre><code>Found 18 outliers - those will be ignored in fitting/regularization step</code></pre>
-<pre><code>Second step: Get residuals using fitted parameters for 9015 genes</code></pre>
-<pre><code>Computing corrected count matrix for 9015 genes</code></pre>
-<pre><code>Calculating gene attributes</code></pre>
-<pre><code>Wall clock passed: Time difference of 5.555778 secs</code></pre>
-<pre><code>Determine variable features</code></pre>
-<pre><code>Centering data matrix</code></pre>
-<pre><code>Set default assay to SCT</code></pre>
-<pre class="r"><code>pbmc &lt;- RunHarmony(pbmc, &quot;stim&quot;)</code></pre>
-<pre><code>Transposing data matrix</code></pre>
-<pre><code>Initializing state using k-means centroids initialization</code></pre>
-<pre><code>Harmony 1/10</code></pre>
-<pre><code>Harmony 2/10</code></pre>
-<pre><code>Harmony 3/10</code></pre>
-<pre><code>Harmony 4/10</code></pre>
-<pre><code>Harmony 5/10</code></pre>
-<pre><code>Harmony 6/10</code></pre>
-<pre><code>Harmony converged after 6 iterations</code></pre>
-<pre class="r"><code>pbmc &lt;- RunUMAP(pbmc, reduction = &quot;harmony&quot;,  dims = 1:20)</code></pre>
-<pre><code>01:02:22 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
-<pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;spam&#39;</code></pre>
-<pre><code>Also defined by &#39;BiocGenerics&#39;</code></pre>
-<pre><code>01:02:22 Read 2000 rows and found 20 numeric columns</code></pre>
-<pre><code>01:02:22 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
-<pre><code>Found more than one class &quot;dist&quot; in cache; using the first, from namespace &#39;spam&#39;</code></pre>
-<pre><code>Also defined by &#39;BiocGenerics&#39;</code></pre>
-<pre><code>01:02:22 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
-<pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
-<pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
-<pre><code>**************************************************|
-01:02:22 Writing NN index file to temp file /tmp/Rtmp7dlVK0/file7886875ae10
-01:02:22 Searching Annoy index using 1 thread, search_k = 3000
-01:02:22 Annoy recall = 100%
-01:02:23 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-01:02:23 Initializing from normalized Laplacian + noise (using RSpectra)
-01:02:23 Commencing optimization for 500 epochs, with 82548 positive edges
-01:02:26 Optimization finished</code></pre>
-<pre class="r"><code>DimPlot(pbmc_sct, reduction = &quot;umap&quot;, group.by = &quot;stim&quot;, pt.size = .1) + ggtitle(&quot;SCTransform without harmony&quot;) -&gt; p1
+  RunPCA(npcs = 20, verbose = FALSE)
+
+pbmc &lt;- RunHarmony(pbmc, &quot;stim&quot;)
+
+pbmc &lt;- RunUMAP(pbmc, reduction = &quot;harmony&quot;,  dims = 1:20)
+
+DimPlot(pbmc_sct, reduction = &quot;umap&quot;, group.by = &quot;stim&quot;, pt.size = .1) + ggtitle(&quot;SCTransform without harmony&quot;) -&gt; p1
 DimPlot(pbmc, reduction = &quot;umap&quot;, group.by = &quot;stim&quot;, pt.size = .1) + ggtitle(&quot;SCTransform with harmony&quot;) -&gt; p2
 
 p1 + p2</code></pre>
 <p><img src="figure/harmony.Rmd/sctransform_with_harmony-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-sctransform_with_harmony-1">
+Past versions of sctransform_with_harmony-1.png
+</button>
+</p>
+<div id="fig-sctransform_with_harmony-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/b174605ed41929903234d582b174888e56ed5de6/docs/figure/harmony.Rmd/sctransform_with_harmony-1.png" target="_blank">b174605</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
