@@ -509,7 +509,7 @@ head(cluster5.markers, n = 5)
 
 Find markers for every cluster compared to all remaining cells, report only the positive ones.
 
-```{r}
+```{r find_all_markers, warning=FALSE, message=FALSE}
 pbmc.markers <- FindAllMarkers(pbmc, only.pos = TRUE)
 pbmc.markers %>%
     dplyr::group_by(cluster) %>%
@@ -581,4 +581,12 @@ DimPlot(pbmc, reduction = "umap", label = TRUE, label.size = 4.5) + xlab("UMAP 1
   ylab("UMAP 2") +
   theme(axis.title = element_text(size = 18), legend.text = element_text(size = 18)) +
   guides(colour = guide_legend(override.aes = list(size = 10)))
+```
+
+## From AnnData
+
+Download [1k PBMCs](https://openproblems.bio/datasets/openproblems_v1/tenx_1k_pbmc/) in AnnData format from [Open Problems in Single-Cell Analysis](https://openproblems.bio/).
+
+```
+aws s3 cp --no-sign-request s3://openproblems-data/resources/datasets/openproblems_v1/tenx_1k_pbmc/l1_sqrt/dataset.h5ad .
 ```
