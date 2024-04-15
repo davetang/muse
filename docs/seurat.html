@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree30c319dfbe945dc04793063fa25c1d291aad990etargetblank30c319da">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed10317047924abe45011362f723a76cee5584658targetblankd103170a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/30c319dfbe945dc04793063fa25c1d291aad990e" target="_blank">30c319d</a>
+<a href="https://github.com/davetang/muse/tree/d10317047924abe45011362f723a76cee5584658" target="_blank">d103170</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree30c319dfbe945dc04793063fa25c1d291aad990etargetblank30c319da"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed10317047924abe45011362f723a76cee5584658targetblankd103170a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/30c319dfbe945dc04793063fa25c1d291aad990e" target="_blank">30c319d</a>.
+<a href="https://github.com/davetang/muse/tree/d10317047924abe45011362f723a76cee5584658" target="_blank">d103170</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -560,7 +560,10 @@ Ignored files:
 Untracked files:
     Untracked:  analysis/breast_cancer.Rmd
     Untracked:  code/multiz100way/
+    Untracked:  data/293t/
     Untracked:  data/dataset.h5ad
+    Untracked:  data/jurkat/
+    Untracked:  data/jurkat_293t/
     Untracked:  data/lung_bcell.rds
     Untracked:  data/pbmc3k.csv
     Untracked:  data/pbmc3k.csv.gz
@@ -609,6 +612,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/d10317047924abe45011362f723a76cee5584658/analysis/seurat.Rmd" target="_blank">d103170</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+<td>
+Variance explained
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/b1853704502f2dbd42a59d77f9aef121ab4fab46/docs/seurat.html" target="_blank">b185370</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -998,7 +1035,7 @@ attr(,&quot;package&quot;)
   write.csv(x = pbmc.data, file = &quot;data/pbmc3k.csv&quot;)
 )</code></pre>
 <pre><code>   user  system elapsed 
- 54.959   0.572 100.727 </code></pre>
+ 55.002   0.581  58.528 </code></pre>
 <p>Gzip.</p>
 <pre class="bash"><code>if [[ ! -f data/pbmc3k.csv.gz ]]; then
    gzip data/pbmc3k.csv
@@ -1589,6 +1626,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/b1853704502f2dbd42a59d77f9aef121ab4fab46/docs/figure/seurat.Rmd/unnamed-chunk-33-1.png" target="_blank">b185370</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/5f6b5a75f1dfa606244f52e6a9963e2bdfef2cc3/docs/figure/seurat.Rmd/unnamed-chunk-33-1.png" target="_blank">5f6b5a7</a>
 </td>
 <td>
@@ -1962,6 +2010,26 @@ Dave Tang
 </table>
 </div>
 </div>
+<p><a href="https://github.com/satijalab/seurat/issues/982">Variance
+explained</a>.</p>
+<pre class="r"><code># manually calculate
+total_variance &lt;- sum(
+  matrixStats::rowVars(pbmc[[&#39;RNA&#39;]]$scale.data[VariableFeatures(pbmc), ])
+)
+
+stopifnot(all.equal(total_variance, pbmc@reductions$pca@misc$total.variance))
+
+eig_values &lt;- (pbmc@reductions$pca@stdev)^2
+eig_values / total_variance</code></pre>
+<pre><code> [1] 0.029064316 0.011657124 0.008650478 0.008106527 0.005802778 0.003736905
+ [7] 0.002467149 0.002182405 0.001968552 0.001941607 0.001911565 0.001844931
+[13] 0.001825969 0.001781458 0.001769644 0.001759204 0.001730575 0.001725452
+[19] 0.001712370 0.001707524 0.001701826 0.001696903 0.001687343 0.001678263
+[25] 0.001677217 0.001671899 0.001668394 0.001658801 0.001657135 0.001649345
+[31] 0.001644300 0.001630762 0.001627221 0.001625400 0.001617703 0.001617336
+[37] 0.001608842 0.001604178 0.001602133 0.001597393 0.001590078 0.001585467
+[43] 0.001583661 0.001578873 0.001578360 0.001569454 0.001565028 0.001561961
+[49] 0.001556993 0.001553569</code></pre>
 </div>
 <div id="determine-the-dimensionality-of-the-dataset"
 class="section level2">
@@ -1982,45 +2050,9 @@ of principle components based on the percentage of variance explained by
 each one (ElbowPlot() function). In this example, we can observe an
 ‘elbow’ around PC9-10, suggesting that the majority of true signal is
 captured in the first 10 PCs.</p>
-<pre class="r"><code>ElbowPlot(pbmc)</code></pre>
-<p><img src="figure/seurat.Rmd/unnamed-chunk-43-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-43-1">
-Past versions of unnamed-chunk-43-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-43-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/5f6b5a75f1dfa606244f52e6a9963e2bdfef2cc3/docs/figure/seurat.Rmd/unnamed-chunk-43-1.png" target="_blank">5f6b5a7</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2024-04-07
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<pre class="r"><code># plots pbmc@reductions$pca@stdev
+ElbowPlot(pbmc)</code></pre>
+<p><img src="figure/seurat.Rmd/elbow_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Identifying the true dimensionality of a dataset – can be
 challenging/uncertain for the user. We therefore suggest these multiple
 approaches for users. The first is more supervised, exploring PCs to
@@ -2119,30 +2151,30 @@ conclusions solely on the basis of visualization techniques.</p>
 <pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
 To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
 This message will be shown once per session</code></pre>
-<pre><code>04:11:10 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
-<pre><code>04:11:10 Read 2638 rows and found 10 numeric columns</code></pre>
-<pre><code>04:11:10 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
-<pre><code>04:11:10 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>07:16:50 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>07:16:50 Read 2638 rows and found 10 numeric columns</code></pre>
+<pre><code>07:16:50 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>07:16:50 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
 <pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
 <pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
 <pre><code>**************************************************|
-04:11:11 Writing NN index file to temp file /tmp/RtmpLVAiWh/file8234212b9c4b
-04:11:11 Searching Annoy index using 1 thread, search_k = 3000
-04:11:11 Annoy recall = 100%
-04:11:11 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-04:11:12 Initializing from normalized Laplacian + noise (using RSpectra)
-04:11:12 Commencing optimization for 500 epochs, with 105124 positive edges
-04:11:14 Optimization finished</code></pre>
+07:16:50 Writing NN index file to temp file /tmp/RtmpHT7qKj/file8d8779300ec2
+07:16:50 Searching Annoy index using 1 thread, search_k = 3000
+07:16:50 Annoy recall = 100%
+07:16:51 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+07:16:51 Initializing from normalized Laplacian + noise (using RSpectra)
+07:16:51 Commencing optimization for 500 epochs, with 105124 positive edges
+07:16:54 Optimization finished</code></pre>
 <p>Note that you can set <code>label = TRUE</code> or use the
 LabelClusters function to help label individual clusters</p>
 <pre class="r"><code>DimPlot(pbmc, reduction = &quot;umap&quot;)</code></pre>
-<p><img src="figure/seurat.Rmd/unnamed-chunk-47-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/seurat.Rmd/unnamed-chunk-46-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-47-1">
-Past versions of unnamed-chunk-47-1.png
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-46-1">
+Past versions of unnamed-chunk-46-1.png
 </button>
 </p>
-<div id="fig-unnamed-chunk-47-1" class="collapse">
+<div id="fig-unnamed-chunk-46-1" class="collapse">
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
 <thead>
@@ -2161,13 +2193,24 @@ Date
 <tbody>
 <tr>
 <td>
-<a href="https://github.com/davetang/muse/blob/5f6b5a75f1dfa606244f52e6a9963e2bdfef2cc3/docs/figure/seurat.Rmd/unnamed-chunk-47-1.png" target="_blank">5f6b5a7</a>
+<a href="https://github.com/davetang/muse/blob/5f6b5a75f1dfa606244f52e6a9963e2bdfef2cc3/docs/figure/seurat.Rmd/unnamed-chunk-46-1.png" target="_blank">5f6b5a7</a>
 </td>
 <td>
 Dave Tang
 </td>
 <td>
 2024-04-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-46-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
 </td>
 </tr>
 </tbody>
@@ -2254,6 +2297,9 @@ visualizations. We also suggest exploring <code>RidgePlot()</code>,
 <code>CellScatter()</code>, and <code>DotPlot()</code> as additional
 methods to view your dataset.</p>
 <pre class="r"><code>VlnPlot(pbmc, features = c(&quot;MS4A1&quot;, &quot;CD79A&quot;))</code></pre>
+<p><img src="figure/seurat.Rmd/unnamed-chunk-52-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>You can plot raw counts as well.</p>
+<pre class="r"><code>VlnPlot(pbmc, features = c(&quot;NKG7&quot;, &quot;PF4&quot;), layer = &quot;counts&quot;, log = TRUE)</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-53-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-53-1">
@@ -2277,6 +2323,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/b1853704502f2dbd42a59d77f9aef121ab4fab46/docs/figure/seurat.Rmd/unnamed-chunk-53-1.png" target="_blank">b185370</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/5f6b5a75f1dfa606244f52e6a9963e2bdfef2cc3/docs/figure/seurat.Rmd/unnamed-chunk-53-1.png" target="_blank">5f6b5a7</a>
@@ -2303,9 +2360,9 @@ Dave Tang
 </table>
 </div>
 </div>
-<p>You can plot raw counts as well.</p>
-<pre class="r"><code>VlnPlot(pbmc, features = c(&quot;NKG7&quot;, &quot;PF4&quot;), layer = &quot;counts&quot;, log = TRUE)</code></pre>
-<p><img src="figure/seurat.Rmd/unnamed-chunk-54-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>FeaturePlot(pbmc, features = c(&quot;MS4A1&quot;, &quot;GNLY&quot;, &quot;CD3E&quot;, &quot;CD14&quot;, &quot;FCER1A&quot;, &quot;FCGR3A&quot;, &quot;LYZ&quot;, &quot;PPBP&quot;,
+    &quot;CD8A&quot;))</code></pre>
+<p><img src="figure/seurat.Rmd/unnamed-chunk-54-1.png" width="960" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-54-1">
 Past versions of unnamed-chunk-54-1.png
@@ -2328,6 +2385,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/b1853704502f2dbd42a59d77f9aef121ab4fab46/docs/figure/seurat.Rmd/unnamed-chunk-54-1.png" target="_blank">b185370</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/5f6b5a75f1dfa606244f52e6a9963e2bdfef2cc3/docs/figure/seurat.Rmd/unnamed-chunk-54-1.png" target="_blank">5f6b5a7</a>
@@ -2354,9 +2422,17 @@ Dave Tang
 </table>
 </div>
 </div>
-<pre class="r"><code>FeaturePlot(pbmc, features = c(&quot;MS4A1&quot;, &quot;GNLY&quot;, &quot;CD3E&quot;, &quot;CD14&quot;, &quot;FCER1A&quot;, &quot;FCGR3A&quot;, &quot;LYZ&quot;, &quot;PPBP&quot;,
-    &quot;CD8A&quot;))</code></pre>
-<p><img src="figure/seurat.Rmd/unnamed-chunk-55-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p><code>DoHeatmap()</code> generates an expression heatmap for given
+cells and features. In this case, we are plotting the top 20 markers (or
+all markers if less than 20) for each cluster.</p>
+<pre class="r"><code>pbmc.markers %&gt;%
+    dplyr::group_by(cluster) %&gt;%
+    dplyr::filter(avg_log2FC &gt; 1) %&gt;%
+    dplyr::slice_head(n = 10) %&gt;%
+    dplyr::ungroup() -&gt; top10
+
+DoHeatmap(pbmc, features = top10$gene) + NoLegend()</code></pre>
+<p><img src="figure/seurat.Rmd/unnamed-chunk-55-1.png" width="1152" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-55-1">
 Past versions of unnamed-chunk-55-1.png
@@ -2381,6 +2457,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/b1853704502f2dbd42a59d77f9aef121ab4fab46/docs/figure/seurat.Rmd/unnamed-chunk-55-1.png" target="_blank">b185370</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/5f6b5a75f1dfa606244f52e6a9963e2bdfef2cc3/docs/figure/seurat.Rmd/unnamed-chunk-55-1.png" target="_blank">5f6b5a7</a>
 </td>
 <td>
@@ -2393,65 +2480,6 @@ Dave Tang
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-55-1.png" target="_blank">03bb7a1</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2024-03-20
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p><code>DoHeatmap()</code> generates an expression heatmap for given
-cells and features. In this case, we are plotting the top 20 markers (or
-all markers if less than 20) for each cluster.</p>
-<pre class="r"><code>pbmc.markers %&gt;%
-    dplyr::group_by(cluster) %&gt;%
-    dplyr::filter(avg_log2FC &gt; 1) %&gt;%
-    dplyr::slice_head(n = 10) %&gt;%
-    dplyr::ungroup() -&gt; top10
-
-DoHeatmap(pbmc, features = top10$gene) + NoLegend()</code></pre>
-<p><img src="figure/seurat.Rmd/unnamed-chunk-56-1.png" width="1152" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-56-1">
-Past versions of unnamed-chunk-56-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-56-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/5f6b5a75f1dfa606244f52e6a9963e2bdfef2cc3/docs/figure/seurat.Rmd/unnamed-chunk-56-1.png" target="_blank">5f6b5a7</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2024-04-07
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-56-1.png" target="_blank">03bb7a1</a>
 </td>
 <td>
 Dave Tang
@@ -2531,7 +2559,72 @@ to easily match the unbiased clustering to known cell types:</p>
 names(new.cluster.ids) &lt;- levels(pbmc)
 pbmc &lt;- RenameIdents(pbmc, new.cluster.ids)
 DimPlot(pbmc, reduction = &quot;umap&quot;, label = TRUE, pt.size = 0.5) + NoLegend()</code></pre>
-<p><img src="figure/seurat.Rmd/unnamed-chunk-57-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/seurat.Rmd/unnamed-chunk-56-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-56-1">
+Past versions of unnamed-chunk-56-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-56-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/b1853704502f2dbd42a59d77f9aef121ab4fab46/docs/figure/seurat.Rmd/unnamed-chunk-56-1.png" target="_blank">b185370</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/5f6b5a75f1dfa606244f52e6a9963e2bdfef2cc3/docs/figure/seurat.Rmd/unnamed-chunk-56-1.png" target="_blank">5f6b5a7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-07
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-56-1.png" target="_blank">03bb7a1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-03-20
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>library(ggplot2)
+DimPlot(pbmc, reduction = &quot;umap&quot;, label = TRUE, label.size = 4.5) + xlab(&quot;UMAP 1&quot;) +
+  ylab(&quot;UMAP 2&quot;) +
+  theme(axis.title = element_text(size = 18), legend.text = element_text(size = 18)) +
+  guides(colour = guide_legend(override.aes = list(size = 10)))</code></pre>
+<p><img src="figure/seurat.Rmd/unnamed-chunk-57-1.png" width="1152" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-57-1">
 Past versions of unnamed-chunk-57-1.png
@@ -2556,6 +2649,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/b1853704502f2dbd42a59d77f9aef121ab4fab46/docs/figure/seurat.Rmd/unnamed-chunk-57-1.png" target="_blank">b185370</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/5f6b5a75f1dfa606244f52e6a9963e2bdfef2cc3/docs/figure/seurat.Rmd/unnamed-chunk-57-1.png" target="_blank">5f6b5a7</a>
 </td>
 <td>
@@ -2568,60 +2672,6 @@ Dave Tang
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-57-1.png" target="_blank">03bb7a1</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2024-03-20
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<pre class="r"><code>library(ggplot2)
-DimPlot(pbmc, reduction = &quot;umap&quot;, label = TRUE, label.size = 4.5) + xlab(&quot;UMAP 1&quot;) +
-  ylab(&quot;UMAP 2&quot;) +
-  theme(axis.title = element_text(size = 18), legend.text = element_text(size = 18)) +
-  guides(colour = guide_legend(override.aes = list(size = 10)))</code></pre>
-<p><img src="figure/seurat.Rmd/unnamed-chunk-58-1.png" width="1152" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-58-1">
-Past versions of unnamed-chunk-58-1.png
-</button>
-</p>
-<div id="fig-unnamed-chunk-58-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/5f6b5a75f1dfa606244f52e6a9963e2bdfef2cc3/docs/figure/seurat.Rmd/unnamed-chunk-58-1.png" target="_blank">5f6b5a7</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2024-04-07
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/03bb7a1bd974a1557d1f99682950668bc9d23b48/docs/figure/seurat.Rmd/unnamed-chunk-58-1.png" target="_blank">03bb7a1</a>
 </td>
 <td>
 Dave Tang
