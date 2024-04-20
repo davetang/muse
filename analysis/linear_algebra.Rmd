@@ -4,6 +4,7 @@ date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
     toc: true
+    code_folding: show
 ---
 
 ```{r setup, include=FALSE}
@@ -71,6 +72,74 @@ A = [a_{1}, a_{2}, \dotsc, a_{n}] \\
 B = [b_{1}, b_{2}, \dotsc, b_{n}] \\
 A + B = [a_{1} + b_{1}, a_{2} + b_{2}, \dotsc, a_{n} + b_{n}]
 $$
+
+Vector addition can be pictured by what is often called the _parallelogram law for vector addition_. If the vector $B = (1, 2)$ is drawn so that its initial point is at the terminal point of $A = (3, 1)$, then the vector that goes from the initial point of $A$ to the terminal point of $B$ is $A + B$. This can be drawn giving a triangle.
+
+```{r warning=FALSE, class.source = 'fold-hide'}
+my_df <- data.frame(
+  x = c(3, 1),
+  y = c(1, 2)
+)
+my_df <- rbind(my_df, c(sum(my_df$x), sum(my_df$y)))
+my_arrow <- arrow(length = unit(0.03, "npc"), type = "closed")
+
+ggplot(my_df, aes(x, y)) +
+  geom_point() +
+  scale_x_continuous(limits = c(0, max(my_df[, 1]))) +
+  scale_y_continuous(limits = c(0, max(my_df[, 2]))) +
+  geom_segment(
+    aes(
+      x=0,
+      y=0,
+      xend=my_df[1,1],
+      yend=my_df[1,2]
+    ),
+    lty=3,
+    arrow = my_arrow
+  ) +
+  geom_segment(
+    aes(
+      x=0,
+      y=0,
+      xend=my_df[2,1],
+      yend=my_df[2,2]
+    ),
+    lty=3,
+    arrow = my_arrow
+  ) +
+  geom_segment(
+    aes(
+      x=my_df[1,1],
+      y=my_df[1,2],
+      xend=my_df[3,1],
+      yend=my_df[3,2]
+    ),
+    lty=3,
+    arrow = my_arrow
+  ) +
+  geom_segment(
+    aes(
+      x=my_df[2,1],
+      y=my_df[2,2],
+      xend=my_df[3,1],
+      yend=my_df[3,2]
+    ),
+    lty=3,
+    arrow = my_arrow
+  ) +
+  geom_segment(
+    aes(
+      x=0,
+      y=0,
+      xend=my_df[3,1],
+      yend=my_df[3,2]
+    ),
+    lty=1,
+    arrow = my_arrow
+  ) +
+  theme_minimal() +
+  NULL
+```
 
 ## Orthogonality
 
