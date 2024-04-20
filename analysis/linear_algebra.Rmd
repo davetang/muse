@@ -1,0 +1,140 @@
+---
+title: "Linear algebra basics"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Vectors
+
+A simple (column) vector.
+
+$$
+\vec{x} = \begin{pmatrix}8\\6\\7\\5\\3\end{pmatrix}
+$$
+
+Vector addition.
+
+$$
+A = [a_{1}, a_{2}, \dotsc, a_{n}] \\
+B = [b_{1}, b_{2}, \dotsc, b_{n}] \\
+A + B = [a_{1} + b_{1}, a_{2} + b_{2}, \dotsc, a_{n} + b_{n}]
+$$
+
+Scalar multiplication.
+
+$$
+\vec{v} = [3, 6, 8, 4] \times 1.5 = [4.5, 9, 12, 6]
+$$
+
+The [dot product](https://en.wikipedia.org/wiki/Dot_product) or scalar product is an algebraic operation that takes two equal-length sequences of numbers (usually coordinate vectors), and returns a single number. In Euclidean geometry, the dot product of the Cartesian coordinates of two vectors is widely used. It is often called the **inner product** of Euclidean space, even though it is not the only inner product that can be defined on Euclidean space.
+
+$$
+(\vec{x}, \vec{y}) = \vec{x} \cdot \vec{y} = \sum_{i=1}^{n}{x_{i}y_{i}}
+$$
+
+## Orthogonality
+
+Two vectors are orthogonal if their inner product is zero.
+
+$$
+[2, 1, -2, 4] \cdot [3, -6, 4, 2] = 2(3) + 1(-6) - 2(4) + 4(2) = 0
+$$
+
+Calculating vector length is the square root of the sum of squares.
+
+$$
+{\lvert}\vec{v}{\rvert} = \sqrt{ \sum_{i=1}^{n}{v_i^2} }
+$$
+
+A normal vector (or unit vector) is a vector of length 1.
+
+$$
+{\lvert}\vec{u}{\rvert} = \sqrt{(2/5)^2 + (4/5)^2 + (1/5)^2 + (2/5)^2} = \sqrt{25/25} = 1
+$$
+
+Vectors of unit length that are orthogonal to each other are said to be orthonormal.
+
+$$
+\vec{u} = [2/5, 1/5, -2/5, 4/5] \\
+\vec{v} = [3 / \sqrt{65}, -6 / \sqrt{65}, 4 / \sqrt{65}, 2 / \sqrt{65}] \\
+{\lvert}\vec{u}\rvert = \sqrt{(2/5)^2 + (1/5)^2 + (-2/5)^2 + (4/5)^2} = 1 \\
+{\lvert}\vec{v}\rvert = \sqrt{(3 / \sqrt{65})^2 + (-6 / \sqrt{65})^2 + (4 / \sqrt{65})^2 + (2 / \sqrt{65})^2} = 1 \\
+\vec{u} \cdot \vec{v} = \frac{6}{5\sqrt{65}} - \frac{6}{5\sqrt{65}} - \frac{8}{5\sqrt{65}} + \frac{8}{5\sqrt{65}} = 0
+$$
+
+## Matrices
+
+Matrix of numbers.
+
+$$
+\begin{bmatrix}
+17 & 18 & 5 & 5 & 45 & 1 \\
+42 & 28 & 30 & 15 & 115 & 3 \\
+10 & 10 & 10 & 21 & 51 & 2 \\
+28 & 5 & 65 & 39 & 132 & 5 \\
+24 & 26 & 45 & 21 & 116 & 4
+\end{bmatrix}
+$$
+
+Matrix with subscripts and dots
+
+$$
+A = \begin{bmatrix}
+a_{11} & \cdots & a_{1j} & \cdots & a_{1n} \\
+\vdots & \ddots & \vdots & \ddots & \vdots \\
+a_{i1} & \cdots & a_{ij} & \cdots & a_{in} \\
+\vdots & \ddots & \vdots & \ddots & \vdots \\
+a_{m1} & \cdots & a_{mj} & \cdots & a_{mn}
+\end{bmatrix}
+$$
+
+Square matrix
+
+$$
+A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \\ 7 & 8 & 9 \end{bmatrix}
+$$
+
+Transpose.
+
+$$
+A = \begin{bmatrix} 1 & 2 & 3 \\ 4 & 5 & 6 \end{bmatrix} \\
+A^T = \begin{bmatrix} 1 & 4 \\ 2 & 5 \\ 3 & 6 \end{bmatrix}
+$$
+
+Matrix multiplication.
+
+$$
+AB = \begin{bmatrix} 2 & 1 & 4 \\ 1 & 5 & 2 \end{bmatrix} \begin{bmatrix} 3 & 2 \\ -1 & 4 \\ 1 & 2 \end{bmatrix} = \begin{bmatrix} 9 & 16 \\ 0 & 26 \end{bmatrix}
+$$
+
+Identity matrix.
+
+$$
+AI = \begin{bmatrix}2 & 4 & 6 \\ 1 & 3 & 5 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix} = \begin{bmatrix}2 & 4 & 6 \\ 1 & 3 & 5 \end{bmatrix}
+$$
+
+Orthogonal matrix.
+
+$$
+AA^T = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 3/5 & -4/5 \\ 0 & 4/5 & 3/5 \end{bmatrix} \begin{bmatrix} 1 & 0 & 0 \\ 0 & 3/5 & 4/5 \\ 0 & -4/5 & 3/5 \end{bmatrix} = \begin{bmatrix} 1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1 \end{bmatrix}
+$$
+
+Diagonal matrix
+
+$$
+A = \begin{bmatrix} a_{11} & 0 & 0 & 0 \\ 0 & a_{22} & 0 & 0 \\ 0 & 0 & a_{33} & 0 \\ 0 & 0 & 0 & a_{mm} \end{bmatrix}
+$$
+
+Determinant of a 2x2 matrix.
+
+$$
+{\lvert}A\rvert = \left| \begin{array}{cc} a & b \\ c & d \end{array} \right| = ad - bc
+$$
+
