@@ -13,24 +13,50 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Vectors
 
-A simple (column) vector.
+A vector is just a list of numbers and the dimension of the vector is the number of numbers in the list. Vectors can be written vertically (column vectors) or horizontally (row vectors). The numbers that make up a vector are often called entries.
+
+A simple five-dimensional (column) vector.
 
 $$
 \vec{x} = \begin{pmatrix}8\\6\\7\\5\\3\end{pmatrix}
 $$
 
-Vector addition.
+The length of a vector is the distance from its initial point to its terminal point. Calculating vector length is the square root of the sum of squares.
 
 $$
-A = [a_{1}, a_{2}, \dotsc, a_{n}] \\
-B = [b_{1}, b_{2}, \dotsc, b_{n}] \\
-A + B = [a_{1} + b_{1}, a_{2} + b_{2}, \dotsc, a_{n} + b_{n}]
+{\lvert}\vec{v}{\rvert} = \sqrt{ \sum_{i=1}^{n}{v_i^2} }
 $$
 
-Scalar multiplication.
+Length of the $(3, 1)$ vector.
+
+$$
+\sqrt{3^2 + 1^2} = \sqrt{10}
+$$
+
+A normal vector (or unit vector) is a vector of length 1. For example, the vector $(2/5, 4/5, 1/5, 2/5)$ has length 1.
+
+$$
+{\lvert}\vec{u}{\rvert} =
+\sqrt{(\frac{2}{5})^2 + (\frac{4}{5})^2 + (\frac{1}{5})^2 + (\frac{2}{5})^2} =
+\sqrt{\frac{4}{25} + \frac{16}{25} + \frac{1}{25} + \frac{4}{25}} =
+\sqrt{\frac{25}{25}} = 1
+$$
+
+We can multiply a vector by a number and in linear algebra, numbers are often called scalars. Scalar multiplication just refers to multiplying by a number. We do this by multiplying each of the entries by the scalar.
 
 $$
 \vec{v} = [3, 6, 8, 4] \times 1.5 = [4.5, 9, 12, 6]
+$$
+
+If we multiply a vector by the reciprocal of its length, we obtain a unit vector. For example the vector $(3, 1)$ has length $\sqrt{10}$.
+
+$$
+\frac{1}{\sqrt{10}} \times \begin{pmatrix}3\\1\end{pmatrix} =
+\begin{pmatrix} \frac{3}{\sqrt{10}}\\\frac{1}{\sqrt{10}}\end{pmatrix}
+\\
+
+\sqrt{\bigg(\frac{3}{\sqrt{10}}\bigg)^2 + \bigg(\frac{1}{\sqrt{10}}\bigg)^2} =
+\sqrt{\frac{9}{10} + \frac{1}{10}} = \sqrt{1} = 1
 $$
 
 The [dot product](https://en.wikipedia.org/wiki/Dot_product) or scalar product is an algebraic operation that takes two equal-length sequences of numbers (usually coordinate vectors), and returns a single number. In Euclidean geometry, the dot product of the Cartesian coordinates of two vectors is widely used. It is often called the **inner product** of Euclidean space, even though it is not the only inner product that can be defined on Euclidean space.
@@ -39,24 +65,20 @@ $$
 (\vec{x}, \vec{y}) = \vec{x} \cdot \vec{y} = \sum_{i=1}^{n}{x_{i}y_{i}}
 $$
 
+Given two vectors with the same dimension, we can add them together to get a new vector with the same dimension. The first entry of the new vector is just the addition of the first entries of the two vectors and so on.
+
+$$
+A = [a_{1}, a_{2}, \dotsc, a_{n}] \\
+B = [b_{1}, b_{2}, \dotsc, b_{n}] \\
+A + B = [a_{1} + b_{1}, a_{2} + b_{2}, \dotsc, a_{n} + b_{n}]
+$$
+
 ## Orthogonality
 
 Two vectors are orthogonal if their inner product is zero.
 
 $$
 [2, 1, -2, 4] \cdot [3, -6, 4, 2] = 2(3) + 1(-6) - 2(4) + 4(2) = 0
-$$
-
-Calculating vector length is the square root of the sum of squares.
-
-$$
-{\lvert}\vec{v}{\rvert} = \sqrt{ \sum_{i=1}^{n}{v_i^2} }
-$$
-
-A normal vector (or unit vector) is a vector of length 1.
-
-$$
-{\lvert}\vec{u}{\rvert} = \sqrt{(2/5)^2 + (4/5)^2 + (1/5)^2 + (2/5)^2} = \sqrt{25/25} = 1
 $$
 
 Vectors of unit length that are orthogonal to each other are said to be orthonormal.
