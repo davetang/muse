@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1a7c3c15f7f5a4b8ca4b3f2220ee81de8428183atargetblank1a7c3c1a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8d79433db929db46a285fbf9de93a6638a00f738targetblank8d79433a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/1a7c3c15f7f5a4b8ca4b3f2220ee81de8428183a" target="_blank">1a7c3c1</a>
+<a href="https://github.com/davetang/muse/tree/8d79433db929db46a285fbf9de93a6638a00f738" target="_blank">8d79433</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1a7c3c15f7f5a4b8ca4b3f2220ee81de8428183atargetblank1a7c3c1a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8d79433db929db46a285fbf9de93a6638a00f738targetblank8d79433a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/1a7c3c15f7f5a4b8ca4b3f2220ee81de8428183a" target="_blank">1a7c3c1</a>.
+<a href="https://github.com/davetang/muse/tree/8d79433db929db46a285fbf9de93a6638a00f738" target="_blank">8d79433</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -604,6 +604,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/8d79433db929db46a285fbf9de93a6638a00f738/analysis/linear_algebra.Rmd" target="_blank">8d79433</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-20
+</td>
+<td>
+Expand and rearrange vectors section
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/cd09128e5cadd6f9ee90800f342d2b2c126eb8ef/docs/linear_algebra.html" target="_blank">cd09128</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/1a7c3c15f7f5a4b8ca4b3f2220ee81de8428183a/analysis/linear_algebra.Rmd" target="_blank">1a7c3c1</a>
 </td>
 <td>
@@ -625,20 +659,52 @@ Linear algebra basics
 </div>
 <div id="vectors" class="section level2">
 <h2>Vectors</h2>
-<p>A simple (column) vector.</p>
+<p>A vector is just a list of numbers and the dimension of the vector is
+the number of numbers in the list. Vectors can be written vertically
+(column vectors) or horizontally (row vectors). The numbers that make up
+a vector are often called entries.</p>
+<p>A simple five-dimensional (column) vector.</p>
 <p><span class="math display">\[
 \vec{x} = \begin{pmatrix}8\\6\\7\\5\\3\end{pmatrix}
 \]</span></p>
-<p>Vector addition.</p>
+<p>The length of a vector is the distance from its initial point to its
+terminal point. Calculating vector length is the square root of the sum
+of squares.</p>
 <p><span class="math display">\[
-A = [a_{1}, a_{2}, \dotsc, a_{n}] \\
-B = [b_{1}, b_{2}, \dotsc, b_{n}] \\
-A + B = [a_{1} + b_{1}, a_{2} + b_{2}, \dotsc, a_{n} + b_{n}]
+{\lvert}\vec{v}{\rvert} = \sqrt{ \sum_{i=1}^{n}{v_i^2} }
 \]</span></p>
-<p>Scalar multiplication.</p>
+<p>Length of the <span class="math inline">\((3, 1)\)</span> vector.</p>
+<p><span class="math display">\[
+\sqrt{3^2 + 1^2} = \sqrt{10}
+\]</span></p>
+<p>A normal vector (or unit vector) is a vector of length 1. For
+example, the vector <span class="math inline">\((2/5, 4/5, 1/5,
+2/5)\)</span> has length 1.</p>
+<p><span class="math display">\[
+{\lvert}\vec{u}{\rvert} =
+\sqrt{(\frac{2}{5})^2 + (\frac{4}{5})^2 + (\frac{1}{5})^2 +
+(\frac{2}{5})^2} =
+\sqrt{\frac{4}{25} + \frac{16}{25} + \frac{1}{25} + \frac{4}{25}} =
+\sqrt{\frac{25}{25}} = 1
+\]</span></p>
+<p>We can multiply a vector by a number and in linear algebra, numbers
+are often called scalars. Scalar multiplication just refers to
+multiplying by a number. We do this by multiplying each of the entries
+by the scalar.</p>
 <p><span class="math display">\[
 \vec{v} = [3, 6, 8, 4] \times 1.5 = [4.5, 9, 12, 6]
 \]</span></p>
+<p>If we multiply a vector by the reciprocal of its length, we obtain a
+unit vector. For example the vector <span class="math inline">\((3,
+1)\)</span> has length <span
+class="math inline">\(\sqrt{10}\)</span>.</p>
+$$
+<span class="math display">\[\begin{pmatrix}3\\1\end{pmatrix}\]</span>
+=
+<span class="math display">\[\begin{pmatrix}
+\frac{3}{\sqrt{10}}\\\frac{1}{\sqrt{10}}\end{pmatrix}\]</span>
+<p>\</p>
+<p> = = = 1 $$</p>
 <p>The <a href="https://en.wikipedia.org/wiki/Dot_product">dot
 product</a> or scalar product is an algebraic operation that takes two
 equal-length sequences of numbers (usually coordinate vectors), and
@@ -649,22 +715,21 @@ not the only inner product that can be defined on Euclidean space.</p>
 <p><span class="math display">\[
 (\vec{x}, \vec{y}) = \vec{x} \cdot \vec{y} = \sum_{i=1}^{n}{x_{i}y_{i}}
 \]</span></p>
+<p>Given two vectors with the same dimension, we can add them together
+to get a new vector with the same dimension. The first entry of the new
+vector is just the addition of the first entries of the two vectors and
+so on.</p>
+<p><span class="math display">\[
+A = [a_{1}, a_{2}, \dotsc, a_{n}] \\
+B = [b_{1}, b_{2}, \dotsc, b_{n}] \\
+A + B = [a_{1} + b_{1}, a_{2} + b_{2}, \dotsc, a_{n} + b_{n}]
+\]</span></p>
 </div>
 <div id="orthogonality" class="section level2">
 <h2>Orthogonality</h2>
 <p>Two vectors are orthogonal if their inner product is zero.</p>
 <p><span class="math display">\[
 [2, 1, -2, 4] \cdot [3, -6, 4, 2] = 2(3) + 1(-6) - 2(4) + 4(2) = 0
-\]</span></p>
-<p>Calculating vector length is the square root of the sum of
-squares.</p>
-<p><span class="math display">\[
-{\lvert}\vec{v}{\rvert} = \sqrt{ \sum_{i=1}^{n}{v_i^2} }
-\]</span></p>
-<p>A normal vector (or unit vector) is a vector of length 1.</p>
-<p><span class="math display">\[
-{\lvert}\vec{u}{\rvert} = \sqrt{(2/5)^2 + (4/5)^2 + (1/5)^2 + (2/5)^2} =
-\sqrt{25/25} = 1
 \]</span></p>
 <p>Vectors of unit length that are orthogonal to each other are said to
 be orthonormal.</p>
