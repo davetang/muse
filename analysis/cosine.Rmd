@@ -1,0 +1,158 @@
+---
+title: "Euclidean vs. Cosine Distance"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Following this excellent [Euclidean vs. Cosine Distance article](https://cmry.github.io/notes/euclidean-v-cosine).
+
+```{r my_df}
+c(
+  c(6.6, 6.2, 1),
+  c(9.7, 9.9, 2),
+  c(8.0, 8.3, 2),
+  c(6.3, 5.4, 1),
+  c(1.3, 2.7, 0),
+  c(2.3, 3.1, 0),
+  c(6.6, 6.0, 1),
+  c(6.5, 6.4, 1),
+  c(6.3, 5.8, 1),
+  c(9.5, 9.9, 2),
+  c(8.9, 8.9, 2),
+  c(8.7, 9.5, 2),
+  c(2.5, 3.8, 0),
+  c(2.0, 3.1, 0),
+  c(1.3, 1.3, 0)
+) |>
+  matrix(ncol = 3, byrow = TRUE) |>
+  as.data.frame() -> my_df
+
+colnames(my_df) <- c('weight', 'length', 'label')
+my_df <- dplyr::mutate(my_df, label = factor(label, levels = 0:2))
+head(my_df)
+```
+
+Plot.
+
+```{r}
+ggplot(my_df, aes(weight, length, colour = label)) +
+  geom_point() +
+  theme_minimal()
+```
+
+Example.
+
+```{r}
+my_eg <- my_df[c(1, 2, 5, 15), ]
+my_eg
+```
+
+Euclidean distance.
+
+$$
+\sqrt{\sum^n_{i=1} (x_i - y_i)^2}
+$$
+Calculate Euclidean distances.
+
+```{r euclid_dist}
+euclid_dist <- function(x, y){
+  sqrt(sum((x - y)^2))
+}
+
+x <- my_eg[4, -3]
+apply(my_eg[-4, -3], 1, function(y) euclid_dist(x, y))
+```
+
+Cosine distance.
+
+$$
+\frac{x \cdot y}{\sqrt{x \cdot x} \sqrt{y \cdot y}}
+$$
+
+Dot product.
+
+$$
+(\vec{x}, \vec{y}) = \vec{x} \cdot \vec{y} = \sum_{i=1}^{n}{x_{i}y_{i}}
+$$
+
+`dot_prod()` function versus built-in.
+
+```{r dot_prod}
+dot_prod <- function(x, y){
+  sum(x * y)
+}
+
+x <- unlist(as.vector(my_eg[4, -3]))
+
+identical(dot_prod(x, x), as.vector(x %*% x))
+```
+
+Calculate Cosine distances.
+
+```{r cosine_dist}
+cosine_dist <- function(x, y){
+  x <- unlist(as.vector(x))
+  y <- unlist(as.vector(y))
+  as.vector((x %*% y) / (sqrt(x %*% x) * sqrt(y %*% y)))
+}
+
+x <- my_eg[4, -3]
+apply(my_eg[-4, -3], 1, function(y) cosine_dist(x, y))
+```
+
+Angles.
+
+```{r}
+ggplot(my_eg, aes(weight, length)) +
+  geom_point() +
+  geom_segment(aes(xend=weight, yend = length), x = 0, y=0, lty = 3) +
+  theme_minimal() +
+  scale_x_continuous(limits = c(0, max(my_eg[, 1]))) +
+  scale_y_continuous(limits = c(0, max(my_eg[, 2])))
+```
+
+```{r}
+x0 <- unlist(as.vector(my_eg[1, -3]))
+x1 <- unlist(as.vector(my_eg[2, -3]))
+
+euclid_dist(x0, x1)
+cosine_dist(x0, x1)
+```
+
+$L_1$ norm:
+
+$$
+\sum_i{x_i}
+$$
+
+$L_2$ norm:
+
+$$
+\sqrt{\sum_i{x^2_i}}
+$$
+
+Distances with $L_1$ normalisation.
+
+```{r normalisation}
+l1_norm <- function(x){
+  x/sum(x)
+}
+
+l2_norm <- function(x){
+  x/sqrt(sum(x^2))
+}
+
+x0_n <- l1_norm(x0)
+x1_n <- l1_norm(x1)
+
+euclid_dist(x0_n, x1_n)
+cosine_dist(x0_n, x1_n)
+```
+
