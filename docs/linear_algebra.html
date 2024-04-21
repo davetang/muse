@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-04-20" />
+<meta name="date" content="2024-04-21" />
 
 <title>Linear algebra basics</title>
 
@@ -371,7 +371,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Linear algebra basics</h1>
-<h4 class="date">2024-04-20</h4>
+<h4 class="date">2024-04-21</h4>
 
 </div>
 
@@ -400,7 +400,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-04-20
+<strong>Last updated:</strong> 2024-04-21
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -531,15 +531,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefb1ef5b719f96fb9bf80723caa3ebcff0fb56e91targetblankfb1ef5ba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeed752d3b430af763845871ecb6d74fcb957ee3e3targetblanked752d3a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/fb1ef5b719f96fb9bf80723caa3ebcff0fb56e91" target="_blank">fb1ef5b</a>
+<a href="https://github.com/davetang/muse/tree/ed752d3b430af763845871ecb6d74fcb957ee3e3" target="_blank">ed752d3</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefb1ef5b719f96fb9bf80723caa3ebcff0fb56e91targetblankfb1ef5ba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeed752d3b430af763845871ecb6d74fcb957ee3e3targetblanked752d3a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -549,7 +549,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/fb1ef5b719f96fb9bf80723caa3ebcff0fb56e91" target="_blank">fb1ef5b</a>.
+<a href="https://github.com/davetang/muse/tree/ed752d3b430af763845871ecb6d74fcb957ee3e3" target="_blank">ed752d3</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -611,6 +611,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/ed752d3b430af763845871ecb6d74fcb957ee3e3/analysis/linear_algebra.Rmd" target="_blank">ed752d3</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-21
+</td>
+<td>
+Orthogonal means perpendicular
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/75b63aee145491e23d99a025bc6df5ca0f2358ee/docs/linear_algebra.html" target="_blank">75b63ae</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -876,11 +910,104 @@ ggplot(my_df, aes(x, y)) +
   ) +
   theme_minimal() +
   NULL</code></pre>
-<p><img src="figure/linear_algebra.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<div class="figure" style="text-align: center">
+<img src="figure/linear_algebra.Rmd/parallelogram-1.png" alt="Parallelogram law for vector addition" width="672" />
+<p class="caption">
+Parallelogram law for vector addition
+</p>
+</div>
 </div>
 <div id="orthogonality" class="section level2">
 <h2>Orthogonality</h2>
-<p>Two vectors are orthogonal if their inner product is zero.</p>
+<p>The parallelogram law for vector addition figure helps us visualise
+some basic properties of vector addition. One of the most important
+comes from the Pythagorean theorem. We know that if <span
+class="math inline">\(a\)</span>, <span
+class="math inline">\(b\)</span>, and <span
+class="math inline">\(c\)</span> represent the lengths of the three
+sides of a triangle, then <span class="math inline">\(a^2 + b^2 =
+c^2\)</span> <strong>if and only if the triangle is a right
+triangle</strong>. The figure then tells us that two vectors <span
+class="math inline">\(a\)</span> and <span
+class="math inline">\(b\)</span> are perpendicular **if and only if and
+only if <span class="math inline">\(len(a)^2 + len(b)^2 =
+len(a+b)^2\)</span>.</p>
+<pre class="r fold-hide"><code>my_df &lt;- data.frame(
+  x = c(0, 4),
+  y = c(4, 0)
+)
+my_df &lt;- rbind(my_df, c(sum(my_df$x), sum(my_df$y)))
+my_arrow &lt;- arrow(length = unit(0.03, &quot;npc&quot;), type = &quot;closed&quot;)
+
+ggplot(my_df, aes(x, y)) +
+  geom_point() +
+  scale_x_continuous(limits = c(0, max(my_df[, 1]))) +
+  scale_y_continuous(limits = c(0, max(my_df[, 2]))) +
+  geom_segment(
+    aes(
+      x=0,
+      y=0,
+      xend=my_df[1,1],
+      yend=my_df[1,2]
+    ),
+    lty=3,
+    arrow = my_arrow
+  ) +
+  geom_segment(
+    aes(
+      x=0,
+      y=0,
+      xend=my_df[2,1],
+      yend=my_df[2,2]
+    ),
+    lty=3,
+    arrow = my_arrow
+  ) +
+  geom_segment(
+    aes(
+      x=my_df[1,1],
+      y=my_df[1,2],
+      xend=my_df[3,1],
+      yend=my_df[3,2]
+    ),
+    lty=3,
+    arrow = my_arrow
+  ) +
+  geom_segment(
+    aes(
+      x=my_df[2,1],
+      y=my_df[2,2],
+      xend=my_df[3,1],
+      yend=my_df[3,2]
+    ),
+    lty=3,
+    arrow = my_arrow
+  ) +
+  geom_segment(
+    aes(
+      x=0,
+      y=0,
+      xend=my_df[3,1],
+      yend=my_df[3,2]
+    ),
+    lty=1,
+    arrow = my_arrow
+  ) +
+  theme_minimal() +
+  NULL</code></pre>
+<p><img src="figure/linear_algebra.Rmd/perpendicular-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The word <em>orthogonal</em> means exactly the same thing as
+perpendicular and it is the word used in linear algebra. Two vectors
+<span class="math inline">\(a\)</span> and <span
+class="math inline">\(b\)</span> are orthogonal if and only if <span
+class="math inline">\(len(a)^2 + len(b)^2 = len(a+b)^2\)</span>.</p>
+<p>Two vectors are orthogonal if their inner product is zero. Using the
+example of the plot above where <span class="math inline">\(a = (0,
+4)\)</span> and <span class="math inline">\(b = (4, 0)\)</span>.</p>
+<p><span class="math display">\[
+[0, 4] \cdot [4, 0] = 0(4) + 4(0) = 0
+\]</span></p>
+<p>Another example.</p>
 <p><span class="math display">\[
 [2, 1, -2, 4] \cdot [3, -6, 4, 2] = 2(3) + 1(-6) - 2(4) + 4(2) = 0
 \]</span></p>
