@@ -13,6 +13,17 @@ library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Paul Dirac's notation
+
+[How to denote Bra-ket notation in LaTeX?](https://www.physicsread.com/latex-braket-notation/)
+
+$$
+\langle a | b \rangle \\
+\langle p \vert q \rangle \\
+\langle a \mid b \rangle \\
+\langle \frac{m}{2} \vert \frac{n}{2} \rangle
+$$
+
 ## Vectors
 
 A vector is just a list of numbers and the dimension of the vector is the number of numbers in the list. Vectors can be written vertically (column vectors) or horizontally (row vectors). The numbers that make up a vector are often called entries.
@@ -191,6 +202,12 @@ $$
 {\lvert}\vec{u}\rvert = \sqrt{(2/5)^2 + (1/5)^2 + (-2/5)^2 + (4/5)^2} = 1 \\
 {\lvert}\vec{v}\rvert = \sqrt{(3 / \sqrt{65})^2 + (-6 / \sqrt{65})^2 + (4 / \sqrt{65})^2 + (2 / \sqrt{65})^2} = 1 \\
 \vec{u} \cdot \vec{v} = \frac{6}{5\sqrt{65}} - \frac{6}{5\sqrt{65}} - \frac{8}{5\sqrt{65}} + \frac{8}{5\sqrt{65}} = 0
+$$
+
+If we have row and column vectors with the same dimension, we can multiply them (row on the left and column on the right) to obtain a number.
+
+$$
+[a_1, a_2, \cdots, a_n] \begin{bmatrix} b_1 \\ b_2 \\ \vdots \\ b_n \end{bmatrix} = a_1b_1 + a_2b_2 + \cdots + a_nb_n
 $$
 
 ## Matrices
