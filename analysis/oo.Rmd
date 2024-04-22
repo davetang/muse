@@ -3,9 +3,7 @@ title: "Object-Oriented Programming"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
-    toc: false
-editor_options:
-  chunk_output_type: console
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
@@ -14,11 +12,17 @@ library(reticulate)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Very brief history
+
+From "Clean Architecture by Robert C. Martin".
+
+In 1966 Ole Johan Dahl and Kristen Nygaard discovered Object-Oriented Programming (OOP). They noticed that the function call stack (static) frame in ALGOL could be moved to a heap (dynamic), thereby allowing local variables declared by a function to exist long after the function returned. The function became a constructor for a class, the local variables became instance variables, and the nested fcuntions became methods. This led to the discovery of polymorphism through the disciplined use of function pointers.
+
 ## Introduction
 
 From [Introduction to OOP systems in Advanced R](https://adv-r.hadley.nz/oo.html).
 
-The main reason to use Object-Oriented Programming (OOP) is **polymorphism**. Polymorphism means that a developer can consider a function's interface separately from its implementation, making it possible to use the same function form for different types of input. This is closely related to the idea of **encapsulation**: the user does not need to worry about details of an object because they are encapsulated behind a standard interface.
+The main reason to use OOP is **polymorphism**. Polymorphism means that a developer can consider a function's interface separately from its implementation, making it possible to use the same function form for different types of input. This is closely related to the idea of **encapsulation**: the user does not need to worry about details of an object because they are encapsulated behind a standard interface.
 
 To be concrete, polymorphism is what allows `summary()` to produce different outputs for numeric and factor variables.
 
