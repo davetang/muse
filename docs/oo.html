@@ -30,6 +30,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -232,6 +235,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -239,6 +305,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -443,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0fd28476232e870b1cf0acf140d8c4fa3939649atargetblank0fd2847a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5922b9bd69ad5fafb5bf6c4e1fedb1d0a167c6eftargetblank5922b9ba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/0fd28476232e870b1cf0acf140d8c4fa3939649a" target="_blank">0fd2847</a>
+<a href="https://github.com/davetang/muse/tree/5922b9bd69ad5fafb5bf6c4e1fedb1d0a167c6ef" target="_blank">5922b9b</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0fd28476232e870b1cf0acf140d8c4fa3939649atargetblank0fd2847a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5922b9bd69ad5fafb5bf6c4e1fedb1d0a167c6eftargetblank5922b9ba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/0fd28476232e870b1cf0acf140d8c4fa3939649a" target="_blank">0fd2847</a>.
+<a href="https://github.com/davetang/muse/tree/5922b9bd69ad5fafb5bf6c4e1fedb1d0a167c6ef" target="_blank">5922b9b</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -528,6 +604,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/5922b9bd69ad5fafb5bf6c4e1fedb1d0a167c6ef/analysis/oo.Rmd" target="_blank">5922b9b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-22
+</td>
+<td>
+Add a very brief history
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/c7022b9f327b64e50cca6a4c604a1e3be45b1c69/docs/oo.html" target="_blank">c7022b9</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/0fd28476232e870b1cf0acf140d8c4fa3939649a/analysis/oo.Rmd" target="_blank">0fd2847</a>
 </td>
 <td>
@@ -581,18 +691,29 @@ Object-Oriented Programming
 </div>
 </div>
 </div>
+<div id="very-brief-history" class="section level2">
+<h2>Very brief history</h2>
+<p>From “Clean Architecture by Robert C. Martin”.</p>
+<p>In 1966 Ole Johan Dahl and Kristen Nygaard discovered Object-Oriented
+Programming (OOP). They noticed that the function call stack (static)
+frame in ALGOL could be moved to a heap (dynamic), thereby allowing
+local variables declared by a function to exist long after the function
+returned. The function became a constructor for a class, the local
+variables became instance variables, and the nested fcuntions became
+methods. This led to the discovery of polymorphism through the
+disciplined use of function pointers.</p>
+</div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>From <a href="https://adv-r.hadley.nz/oo.html">Introduction to OOP
 systems in Advanced R</a>.</p>
-<p>The main reason to use Object-Oriented Programming (OOP) is
-<strong>polymorphism</strong>. Polymorphism means that a developer can
-consider a function’s interface separately from its implementation,
-making it possible to use the same function form for different types of
-input. This is closely related to the idea of
-<strong>encapsulation</strong>: the user does not need to worry about
-details of an object because they are encapsulated behind a standard
-interface.</p>
+<p>The main reason to use OOP is <strong>polymorphism</strong>.
+Polymorphism means that a developer can consider a function’s interface
+separately from its implementation, making it possible to use the same
+function form for different types of input. This is closely related to
+the idea of <strong>encapsulation</strong>: the user does not need to
+worry about details of an object because they are encapsulated behind a
+standard interface.</p>
 <p>To be concrete, polymorphism is what allows <code>summary()</code> to
 produce different outputs for numeric and factor variables.</p>
 <pre class="r"><code>class(women$height)</code></pre>
@@ -714,10 +835,10 @@ object is automatically passed as the first argument</strong>. The
 following are equivalent; self is the instance object which we assigned
 to x.</p>
 <pre class="python"><code>x.f()</code></pre>
-<pre><code>&lt;__main__.MyClass2 object at 0x7f890bc0a8d0&gt;
+<pre><code>&lt;__main__.MyClass2 object at 0x7f571c779b50&gt;
 &#39;Big Brother is watching you&#39;</code></pre>
 <pre class="python"><code>MyClass2.f(x)</code></pre>
-<pre><code>&lt;__main__.MyClass2 object at 0x7f890bc0a8d0&gt;
+<pre><code>&lt;__main__.MyClass2 object at 0x7f571c779b50&gt;
 &#39;Big Brother is watching you&#39;</code></pre>
 <p>Use the <code>obj.name</code> syntax to add a new data attribute not
 defined in the class. Use the <code>dir()</code> function to return all
@@ -867,6 +988,8 @@ footer is added to webpages before the MathJax javascript. -->
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -899,6 +1022,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
