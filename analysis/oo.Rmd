@@ -14,11 +14,33 @@ library(reticulate)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-If there's one topic that has continually eluded me despite my efforts to
-understand it, it's Object-Oriented Programming (OOP). Well, I have finally had
-enough of not "getting it" and I'm going to, once and for all, understand
-enough to be able to write code under the OOP paradigm. I will use this document
-to keep the key ideas behind OOP.
+## Introduction
+
+From [Introduction to OOP systems in Advanced R](https://adv-r.hadley.nz/oo.html).
+
+The main reason to use Object-Oriented Programming (OOP) is **polymorphism**. Polymorphism means that a developer can consider a function's interface separately from its implementation, making it possible to use the same function form for different types of input. This is closely related to the idea of **encapsulation**: the user does not need to worry about details of an object because they are encapsulated behind a standard interface.
+
+To be concrete, polymorphism is what allows `summary()` to produce different outputs for numeric and factor variables.
+
+```{r summary_height}
+class(women$height)
+summary(women$height)
+```
+```{r summary_diet}
+class(ChickWeight$Diet)
+summary(ChickWeight$Diet)
+```
+
+You could imagine `summary()` containing a series of if-else statements, but that would mean only the original author could add new implementations (because you can't inherit the function?). An OOP system makes it possible for any developer to extend the interface with implementations for new types of input.
+
+To be more precise, OO systems call the type of an object its **class**, and an implementation for a specific class is called a **method**. Roughly speaking, a class defines what an object _is_ and methods describe what that object can _do_. The class defines the **fields**, the data possessed by every instance of that class. Classes are organised in a hierarchy so that if a method does not exist for one class, its parent's method is used, and the child is said to **inherit** behaviour. For example, in R, an ordered factor inherits from a regular factor, and a generalised linear model inherits from a linear model. The process of finding the correct method given a class is called **method dispatch**.
+
+There are two main paradigms of OOP which differ in how methods and classes are related. These paradigms can be considered encapsulated and functional:
+
+* In **encapsulated** OOP, methods belong to objects or classes, and method calls typically look like `object.method(arg1, arg2)`. This is called encapsulated because the object encapsulates both data (with fields) and behaviour (with methods), and is the paradigm found in most popular languages, like Python.
+* In **functional** OOP, methods belong to **generic** functions, and method calls look like ordinary function class: `generic(object, arg2, arg3)`. This is called functional because from the outside it looks like a regular function call, and internally the components are also functions.
+
+## Programming paradigms
 
 Most of the code I write ends up in scripts that perform a certain task. The
 code is interpreted starting from the first line until it reaches the last
@@ -29,6 +51,8 @@ which is a style that focuses on the use of functions that have certain
 characteristics (that make it a pure function). OOP organises a program into
 objects, which are data structures consisting of **attributes** and **methods**,
 and these objects interact with each other to solve a problem.
+
+## OOP in Python
 
 ```{r include=FALSE, message=FALSE}
 if (!dir.exists(miniconda_path())){
