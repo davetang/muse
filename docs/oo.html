@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5922b9bd69ad5fafb5bf6c4e1fedb1d0a167c6eftargetblank5922b9ba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebfd5f8f0976b953028dd38b63f5e3111339f00a1targetblankbfd5f8fa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/5922b9bd69ad5fafb5bf6c4e1fedb1d0a167c6ef" target="_blank">5922b9b</a>
+<a href="https://github.com/davetang/muse/tree/bfd5f8f0976b953028dd38b63f5e3111339f00a1" target="_blank">bfd5f8f</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5922b9bd69ad5fafb5bf6c4e1fedb1d0a167c6eftargetblank5922b9ba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebfd5f8f0976b953028dd38b63f5e3111339f00a1targetblankbfd5f8fa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/5922b9bd69ad5fafb5bf6c4e1fedb1d0a167c6ef" target="_blank">5922b9b</a>.
+<a href="https://github.com/davetang/muse/tree/bfd5f8f0976b953028dd38b63f5e3111339f00a1" target="_blank">bfd5f8f</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -599,6 +599,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/bfd5f8f0976b953028dd38b63f5e3111339f00a1/analysis/oo.Rmd" target="_blank">bfd5f8f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-22
+</td>
+<td>
+Introduction to encapsulated OOP
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/495b1ed0db6acd3e5d1a78a469423e373c6ba167/docs/oo.html" target="_blank">495b1ed</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -759,6 +793,27 @@ function class: <code>generic(object, arg2, arg3)</code>. This is called
 functional because from the outside it looks like a regular function
 call, and internally the components are also functions.</li>
 </ul>
+<div id="encapsulated-oop" class="section level3">
+<h3>Encapsulated OOP</h3>
+<p>Encapsulated OOP is a programming paradigm that organises a program
+into objects, which are data structures consisting of
+<strong>attributes</strong> and <strong>methods</strong>. Objects are
+instantiated from a class; you can think of a class as blueprints or a
+factory. Each instance generated from a class has access to the class’s
+attributes and methods.</p>
+<p>Classes can be inherited into sub-classes and it is this inheritance
+hierarchy that makes code object-oriented. Classes support code reuse in
+ways that other components cannot and this is the main purpose of OOP.
+With classes, we code by customising existing code, instead of either
+changing existing code in place or starting from scratch. Once you get
+used to programming by software customisation, writing a new program
+becomes a task of mixing together existing superclasses that already
+implement the behaviour required by your program. In many application
+domains, collections of superclasses are known as frameworks that
+implement common programming tasks as classes that are ready to be used
+in your programs. With frameworks, you often simply code a subclass that
+is specific to your purposes, and inherit from all class tree.</p>
+</div>
 </div>
 <div id="programming-paradigms" class="section level2">
 <h2>Programming paradigms</h2>
@@ -835,10 +890,10 @@ object is automatically passed as the first argument</strong>. The
 following are equivalent; self is the instance object which we assigned
 to x.</p>
 <pre class="python"><code>x.f()</code></pre>
-<pre><code>&lt;__main__.MyClass2 object at 0x7f571c779b50&gt;
+<pre><code>&lt;__main__.MyClass2 object at 0x7fb12dcb5b50&gt;
 &#39;Big Brother is watching you&#39;</code></pre>
 <pre class="python"><code>MyClass2.f(x)</code></pre>
-<pre><code>&lt;__main__.MyClass2 object at 0x7f571c779b50&gt;
+<pre><code>&lt;__main__.MyClass2 object at 0x7fb12dcb5b50&gt;
 &#39;Big Brother is watching you&#39;</code></pre>
 <p>Use the <code>obj.name</code> syntax to add a new data attribute not
 defined in the class. Use the <code>dir()</code> function to return all
@@ -893,31 +948,6 @@ searching twice in the same class when there is an overlap in the
 hierarchy. But it is slightly more complex with the method resolution
 order changing dynamically to support cooperative calls to super().</p>
 <p>TBC.</p>
-</div>
-<div id="key-ideas" class="section level1">
-<h1>Key ideas</h1>
-<ul>
-<li><p>Object-Oriented Programming (OOP) is a programming paradigm that
-organises a program into objects, which are data structures consisting
-of <strong>attributes</strong> and <strong>methods</strong>.</p></li>
-<li><p>Objects are instantiated from a class; you can think of a class
-as blueprints or a factory.</p></li>
-<li><p>Each instance generated from a class has access to the class’s
-attributes and methods.</p></li>
-<li><p>Classes can be inherited into sub-classes and it is this
-inheritance hierarchy that makes code object-oriented.</p></li>
-</ul>
-<p>Classes support code reuse in ways that other components cannot and
-this is the main purpose of OOP. With classes, we code by customising
-existing code, instead of either changing existing code in place or
-starting from scratch. Once you get used to programming by software
-customisation, writing a new program becomes a task of mixing together
-existing superclasses that already implement the behaviour required by
-your program. In many application domains, collections of superclasses
-are known as frameworks that implement common programming tasks as
-classes that are ready to be used in your programs. With frameworks, you
-often simply code a subclass that is specific to your purposes, and
-inherit from all class tree.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
