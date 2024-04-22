@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebfd5f8f0976b953028dd38b63f5e3111339f00a1targetblankbfd5f8fa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7d1f6a3387987e44e8065a0fa7c8582feccb69c2targetblank7d1f6a3a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/bfd5f8f0976b953028dd38b63f5e3111339f00a1" target="_blank">bfd5f8f</a>
+<a href="https://github.com/davetang/muse/tree/7d1f6a3387987e44e8065a0fa7c8582feccb69c2" target="_blank">7d1f6a3</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebfd5f8f0976b953028dd38b63f5e3111339f00a1targetblankbfd5f8fa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7d1f6a3387987e44e8065a0fa7c8582feccb69c2targetblank7d1f6a3a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/bfd5f8f0976b953028dd38b63f5e3111339f00a1" target="_blank">bfd5f8f</a>.
+<a href="https://github.com/davetang/muse/tree/7d1f6a3387987e44e8065a0fa7c8582feccb69c2" target="_blank">7d1f6a3</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -599,6 +599,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/7d1f6a3387987e44e8065a0fa7c8582feccb69c2/analysis/oo.Rmd" target="_blank">7d1f6a3</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-22
+</td>
+<td>
+OOP in R
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/ee8e123a49087dbe478254e3f2296b4428626fff/docs/oo.html" target="_blank">ee8e123</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -829,6 +863,40 @@ structures consisting of <strong>attributes</strong> and
 <strong>methods</strong>, and these objects interact with each other to
 solve a problem.</p>
 </div>
+<div id="oop-in-r" class="section level2">
+<h2>OOP in R</h2>
+<p>Base R provides three OOP systems: S3, S4, and reference classes
+(RC):</p>
+<ul>
+<li><p><strong>S3</strong> is R’s first OOP system and is an informal
+implementation of functional OOP and relies on common conventions rather
+than formal guarantees. This makes it easy to get started with,
+providing a low cost way of solving many simple problems.</p></li>
+<li><p><strong>S4</strong> is a formal and rigorous rewrite of S3 that
+requires more upfront work than S3, but in return provides more
+guarantees and greater encapsulation. S4 is implemented in the base
+{methods} package. (S3 and S4 were named according to the versions of S
+that they accompanied; the first two versions of S didn’t have any OOP
+framework, so there is no S1 or S2.)</p></li>
+<li><p><strong>RC</strong> implements encapsulated OO. RC objects are a
+special type of S4 objects that are also <strong>mutable</strong>, i.e.,
+instead of using R’s usual copy-on-modify semantics, they can be
+modified in place. This makes them harder to reason about, but allows
+them to solve problems that are difficult to solve in the functional OOP
+style of S3 and S4.</p></li>
+</ul>
+<p>There are a number of other OOP systems provided by CRAN
+packages:</p>
+<ul>
+<li><strong>R6</strong> implements encapsulated OOP like RC but resolves
+some important issues.</li>
+<li><strong>R.oo</strong> provides some formalism on top of S3 and makes
+it possible to have mutable S3 objects.</li>
+<li><strong>proto</strong> implements another style of OOP based on the
+idea of <strong>prototypes</strong>, which blur the distinctions between
+classes and instances of classes (objects).</li>
+</ul>
+</div>
 <div id="oop-in-python" class="section level2">
 <h2>OOP in Python</h2>
 <p>I will use Python to illustrate some OOP concepts. Python’s main
@@ -890,10 +958,10 @@ object is automatically passed as the first argument</strong>. The
 following are equivalent; self is the instance object which we assigned
 to x.</p>
 <pre class="python"><code>x.f()</code></pre>
-<pre><code>&lt;__main__.MyClass2 object at 0x7fb12dcb5b50&gt;
+<pre><code>&lt;__main__.MyClass2 object at 0x7fd1be6068d0&gt;
 &#39;Big Brother is watching you&#39;</code></pre>
 <pre class="python"><code>MyClass2.f(x)</code></pre>
-<pre><code>&lt;__main__.MyClass2 object at 0x7fb12dcb5b50&gt;
+<pre><code>&lt;__main__.MyClass2 object at 0x7fd1be6068d0&gt;
 &#39;Big Brother is watching you&#39;</code></pre>
 <p>Use the <code>obj.name</code> syntax to add a new data attribute not
 defined in the class. Use the <code>dir()</code> function to return all
