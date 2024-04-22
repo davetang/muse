@@ -78,6 +78,41 @@ There are a number of other OOP systems provided by CRAN packages:
 * **R.oo** provides some formalism on top of S3 and makes it possible to have mutable S3 objects.
 * **proto** implements another style of OOP based on the idea of **prototypes**, which blur the distinctions between classes and instances of classes (objects).
 
+### Objects
+
+While everything that exists in R is an object, not everything is object-oriented. This confusion arises because the base objects come from S, and were developed before anyone thought that S might need an OOP system. The tools and nomenclature evolved organically over many years without a single guiding principle.
+
+Most of the time, the distinction between objects and object-oriented objects is not important. But when discussing about OOP in R, it is important to differentiate them using the terms **base objects** and **OO objects**. Use `is.object()` or `sloop::otype()` to tell the difference.
+
+A base object.
+
+```{r base_object}
+is.object(1:10)
+sloop::otype(1:10)
+```
+
+An OO object.
+
+```{r oo_object}
+is.object(mtcars)
+sloop::otype(mtcars)
+```
+
+Technical, the difference between base and OO objects is that OO objects have a "class" attribute.
+
+```{r attr_class}
+attr(x = 1:10, which = "class")
+attr(x = mtcars, which = "class")
+```
+
+While only OO objects have a class attribute, every object has a **base type**. `typeof()` determines the (R internal) type or storage mode of any object. (There are currently 25 different base types in R and they are primarily written in C.)
+
+```{r typeof}
+typeof(1:10)
+typeof(mtcars)
+typeof(mean)
+```
+
 ## OOP in Python
 
 ```{r include=FALSE, message=FALSE}
