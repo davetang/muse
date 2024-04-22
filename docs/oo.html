@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7d1f6a3387987e44e8065a0fa7c8582feccb69c2targetblank7d1f6a3a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree20d4c1d48a9a2386c343007f199cfacc9bd3b80btargetblank20d4c1da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/7d1f6a3387987e44e8065a0fa7c8582feccb69c2" target="_blank">7d1f6a3</a>
+<a href="https://github.com/davetang/muse/tree/20d4c1d48a9a2386c343007f199cfacc9bd3b80b" target="_blank">20d4c1d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7d1f6a3387987e44e8065a0fa7c8582feccb69c2targetblank7d1f6a3a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree20d4c1d48a9a2386c343007f199cfacc9bd3b80btargetblank20d4c1da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/7d1f6a3387987e44e8065a0fa7c8582feccb69c2" target="_blank">7d1f6a3</a>.
+<a href="https://github.com/davetang/muse/tree/20d4c1d48a9a2386c343007f199cfacc9bd3b80b" target="_blank">20d4c1d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -599,6 +599,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/20d4c1d48a9a2386c343007f199cfacc9bd3b80b/analysis/oo.Rmd" target="_blank">20d4c1d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-22
+</td>
+<td>
+Objects in R
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/5df945dfceb4bd4e6097c45210b11e5c8bd30c70/docs/oo.html" target="_blank">5df945d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -896,6 +930,46 @@ it possible to have mutable S3 objects.</li>
 idea of <strong>prototypes</strong>, which blur the distinctions between
 classes and instances of classes (objects).</li>
 </ul>
+<div id="objects" class="section level3">
+<h3>Objects</h3>
+<p>While everything that exists in R is an object, not everything is
+object-oriented. This confusion arises because the base objects come
+from S, and were developed before anyone thought that S might need an
+OOP system. The tools and nomenclature evolved organically over many
+years without a single guiding principle.</p>
+<p>Most of the time, the distinction between objects and object-oriented
+objects is not important. But when discussing about OOP in R, it is
+important to differentiate them using the terms <strong>base
+objects</strong> and <strong>OO objects</strong>. Use
+<code>is.object()</code> or <code>sloop::otype()</code> to tell the
+difference.</p>
+<p>A base object.</p>
+<pre class="r"><code>is.object(1:10)</code></pre>
+<pre><code>[1] FALSE</code></pre>
+<pre class="r"><code>sloop::otype(1:10)</code></pre>
+<pre><code>[1] &quot;base&quot;</code></pre>
+<p>An OO object.</p>
+<pre class="r"><code>is.object(mtcars)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<pre class="r"><code>sloop::otype(mtcars)</code></pre>
+<pre><code>[1] &quot;S3&quot;</code></pre>
+<p>Technical, the difference between base and OO objects is that OO
+objects have a “class” attribute.</p>
+<pre class="r"><code>attr(x = 1:10, which = &quot;class&quot;)</code></pre>
+<pre><code>NULL</code></pre>
+<pre class="r"><code>attr(x = mtcars, which = &quot;class&quot;)</code></pre>
+<pre><code>[1] &quot;data.frame&quot;</code></pre>
+<p>While only OO objects have a class attribute, every object has a
+<strong>base type</strong>. <code>typeof()</code> determines the (R
+internal) type or storage mode of any object. (There are currently 25
+different base types in R and they are primarily written in C.)</p>
+<pre class="r"><code>typeof(1:10)</code></pre>
+<pre><code>[1] &quot;integer&quot;</code></pre>
+<pre class="r"><code>typeof(mtcars)</code></pre>
+<pre><code>[1] &quot;list&quot;</code></pre>
+<pre class="r"><code>typeof(mean)</code></pre>
+<pre><code>[1] &quot;closure&quot;</code></pre>
+</div>
 </div>
 <div id="oop-in-python" class="section level2">
 <h2>OOP in Python</h2>
@@ -958,10 +1032,10 @@ object is automatically passed as the first argument</strong>. The
 following are equivalent; self is the instance object which we assigned
 to x.</p>
 <pre class="python"><code>x.f()</code></pre>
-<pre><code>&lt;__main__.MyClass2 object at 0x7fd1be6068d0&gt;
+<pre><code>&lt;__main__.MyClass2 object at 0x7fe86e6eaea0&gt;
 &#39;Big Brother is watching you&#39;</code></pre>
 <pre class="python"><code>MyClass2.f(x)</code></pre>
-<pre><code>&lt;__main__.MyClass2 object at 0x7fd1be6068d0&gt;
+<pre><code>&lt;__main__.MyClass2 object at 0x7fe86e6eaea0&gt;
 &#39;Big Brother is watching you&#39;</code></pre>
 <p>Use the <code>obj.name</code> syntax to add a new data attribute not
 defined in the class. Use the <code>dir()</code> function to return all
@@ -1066,7 +1140,8 @@ loaded via a namespace (and not attached):
 [41] pkgconfig_2.0.3   callr_3.7.6       pillar_1.9.0      bslib_0.7.0      
 [45] later_1.3.2       gtable_0.3.4      glue_1.7.0        Rcpp_1.0.12      
 [49] xfun_0.43         tidyselect_1.2.1  rstudioapi_0.16.0 knitr_1.46       
-[53] htmltools_0.5.8.1 rmarkdown_2.26    compiler_4.3.3    getPass_0.2-4    </code></pre>
+[53] htmltools_0.5.8.1 rmarkdown_2.26    sloop_1.0.1       compiler_4.3.3   
+[57] getPass_0.2-4    </code></pre>
 </div>
 </div>
 
