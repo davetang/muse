@@ -18,6 +18,16 @@ From "Clean Architecture by Robert C. Martin".
 
 In 1966 Ole Johan Dahl and Kristen Nygaard discovered Object-Oriented Programming (OOP). They noticed that the function call stack (static) frame in ALGOL could be moved to a heap (dynamic), thereby allowing local variables declared by a function to exist long after the function returned. The function became a constructor for a class, the local variables became instance variables, and the nested fcuntions became methods. This led to the discovery of polymorphism through the disciplined use of function pointers.
 
+## Polymorphism
+
+[Polymorphism](https://stackoverflow.com/a/1031385) (poly meaning many and morph meaning change or form) is the ability to present the same interface for differing underlying forms (data types).
+
+The classic example is the `Shape` class and all the classes that can inherit from it (square, circle, etc.). With polymorphism, each of these classes will have different underlying data. A point shape needs only two co-ordinates (assuming it's in a two-dimensional space of course). A circle needs a center and radius. A square or rectangle needs two co-ordinates for the top left and bottom right corners and (possibly) a rotation.
+
+By making the class responsible for its code as well as its data, you can achieve polymorphism. In this example, every class would have its own `Draw()` function and the code could simply do `shape.Draw()` to get the correct behavior for any shape.
+
+This is in contrast to the old way of doing things in which the code was separate from the data, and you would have had functions such as `drawSquare()` and `drawCircle()`.
+
 ## Introduction
 
 From [Introduction to OOP systems in Advanced R](https://adv-r.hadley.nz/oo.html).
