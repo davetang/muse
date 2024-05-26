@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-04-22" />
+<meta name="date" content="2024-05-26" />
 
 <title>Object-Oriented Programming</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Object-Oriented Programming</h1>
-<h4 class="date">2024-04-22</h4>
+<h4 class="date">2024-05-26</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-04-22
+<strong>Last updated:</strong> 2024-05-26
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree20d4c1d48a9a2386c343007f199cfacc9bd3b80btargetblank20d4c1da">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree19fad91540f024640750e90ec2635c2f8ca88f27targetblank19fad91a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/20d4c1d48a9a2386c343007f199cfacc9bd3b80b" target="_blank">20d4c1d</a>
+<a href="https://github.com/davetang/muse/tree/19fad91540f024640750e90ec2635c2f8ca88f27" target="_blank">19fad91</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree20d4c1d48a9a2386c343007f199cfacc9bd3b80btargetblank20d4c1da"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree19fad91540f024640750e90ec2635c2f8ca88f27targetblank19fad91a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/20d4c1d48a9a2386c343007f199cfacc9bd3b80b" target="_blank">20d4c1d</a>.
+<a href="https://github.com/davetang/muse/tree/19fad91540f024640750e90ec2635c2f8ca88f27" target="_blank">19fad91</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -599,6 +599,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/19fad91540f024640750e90ec2635c2f8ca88f27/analysis/oo.Rmd" target="_blank">19fad91</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-05-26
+</td>
+<td>
+Introduction to polymorphism
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/cec7a11b661ab236e4c17b6e3add0692feae5697/docs/oo.html" target="_blank">cec7a11</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -804,6 +838,26 @@ returned. The function became a constructor for a class, the local
 variables became instance variables, and the nested fcuntions became
 methods. This led to the discovery of polymorphism through the
 disciplined use of function pointers.</p>
+</div>
+<div id="polymorphism" class="section level2">
+<h2>Polymorphism</h2>
+<p><a href="https://stackoverflow.com/a/1031385">Polymorphism</a> (poly
+meaning many and morph meaning change or form) is the ability to present
+the same interface for differing underlying forms (data types).</p>
+<p>The classic example is the <code>Shape</code> class and all the
+classes that can inherit from it (square, circle, etc.). With
+polymorphism, each of these classes will have different underlying data.
+A point shape needs only two co-ordinates (assuming it’s in a
+two-dimensional space of course). A circle needs a center and radius. A
+square or rectangle needs two co-ordinates for the top left and bottom
+right corners and (possibly) a rotation.</p>
+<p>By making the class responsible for its code as well as its data, you
+can achieve polymorphism. In this example, every class would have its
+own <code>Draw()</code> function and the code could simply do
+<code>shape.Draw()</code> to get the correct behavior for any shape.</p>
+<p>This is in contrast to the old way of doing things in which the code
+was separate from the data, and you would have had functions such as
+<code>drawSquare()</code> and <code>drawCircle()</code>.</p>
 </div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
@@ -1032,10 +1086,10 @@ object is automatically passed as the first argument</strong>. The
 following are equivalent; self is the instance object which we assigned
 to x.</p>
 <pre class="python"><code>x.f()</code></pre>
-<pre><code>&lt;__main__.MyClass2 object at 0x7fe86e6eaea0&gt;
+<pre><code>&lt;__main__.MyClass2 object at 0x7efce00f0dd0&gt;
 &#39;Big Brother is watching you&#39;</code></pre>
 <pre class="python"><code>MyClass2.f(x)</code></pre>
-<pre><code>&lt;__main__.MyClass2 object at 0x7fe86e6eaea0&gt;
+<pre><code>&lt;__main__.MyClass2 object at 0x7efce00f0dd0&gt;
 &#39;Big Brother is watching you&#39;</code></pre>
 <p>Use the <code>obj.name</code> syntax to add a new data attribute not
 defined in the class. Use the <code>dir()</code> function to return all
