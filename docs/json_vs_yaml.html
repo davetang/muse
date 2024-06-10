@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree38bfda109c467a51485f2ff899eafaa8d99b1a85targetblank38bfda1a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeeaa2acae7e13fcc8b4ef2d09f6df9a2f60524f45targetblankeaa2acaa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/38bfda109c467a51485f2ff899eafaa8d99b1a85" target="_blank">38bfda1</a>
+<a href="https://github.com/davetang/muse/tree/eaa2acae7e13fcc8b4ef2d09f6df9a2f60524f45" target="_blank">eaa2aca</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree38bfda109c467a51485f2ff899eafaa8d99b1a85targetblank38bfda1a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeeaa2acae7e13fcc8b4ef2d09f6df9a2f60524f45targetblankeaa2acaa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/38bfda109c467a51485f2ff899eafaa8d99b1a85" target="_blank">38bfda1</a>.
+<a href="https://github.com/davetang/muse/tree/eaa2acae7e13fcc8b4ef2d09f6df9a2f60524f45" target="_blank">eaa2aca</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -556,6 +556,9 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    r_packages_4.3.3/
     Ignored:    r_packages_4.4.0/
+
+Untracked files:
+    Untracked:  women.json
 
 </code></pre>
 <p>
@@ -600,6 +603,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/eaa2acae7e13fcc8b4ef2d09f6df9a2f60524f45/analysis/json_vs_yaml.Rmd" target="_blank">eaa2aca</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-06-10
+</td>
+<td>
+Load nested lists
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/097bb550125ccf5789deb13c5892ff6cda2d6d4d/docs/json_vs_yaml.html" target="_blank">097bb55</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-06-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -783,8 +820,6 @@ converting JSON to tidy data frames</li>
 JSON</li>
 </ul>
 <pre class="r"><code>install.packages(c(&quot;jsonlite&quot;, &quot;yaml&quot;, &quot;tidyjson&quot;, &quot;rjson&quot;))</code></pre>
-<pre><code>Installing packages into &#39;/packages&#39;
-(as &#39;lib&#39; is unspecified)</code></pre>
 <p>Load libraries.</p>
 <pre class="r"><code>library(jsonlite)
 library(yaml)
@@ -1437,6 +1472,38 @@ by a space to create key/value pairs:</p>
 - name: Kate Kateson
   department: IT support
   country: United Kingdom</code></pre>
+</div>
+<div id="read-yaml" class="section level3">
+<h3>Read YAML</h3>
+<p>Read a test YAML file.</p>
+<pre class="r"><code>dat &lt;- yaml::read_yaml(&quot;data/nested_list.yml&quot;)
+dat$root</code></pre>
+<pre><code>$simple_list
+[1] &quot;one&quot;   &quot;two&quot;   &quot;three&quot;
+
+$simple_list_2
+[1] &quot;four&quot; &quot;five&quot; &quot;six&quot; 
+
+$nested_list
+$nested_list$one
+[1] &quot;one&quot;   &quot;two&quot;   &quot;three&quot;
+
+$nested_list$two
+[1] &quot;four&quot; &quot;five&quot; &quot;six&quot; 
+
+
+$nested_list_2
+$nested_list_2$one
+$nested_list_2$one$two
+[1] &quot;one&quot;   &quot;two&quot;   &quot;three&quot;
+
+$nested_list_2$one$three
+[1] &quot;four&quot; &quot;five&quot; &quot;six&quot; </code></pre>
+<p>Return only specific “level” by using <code>names()</code>.</p>
+<pre class="r"><code>names(dat$root)</code></pre>
+<pre><code>[1] &quot;simple_list&quot;   &quot;simple_list_2&quot; &quot;nested_list&quot;   &quot;nested_list_2&quot;</code></pre>
+<pre class="r"><code>names(dat$root$nested_list)</code></pre>
+<pre><code>[1] &quot;one&quot; &quot;two&quot;</code></pre>
 </div>
 <div id="json-defined" class="section level3">
 <h3>JSON defined</h3>
