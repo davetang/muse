@@ -3,7 +3,7 @@ title: "JSON versus YAML"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
-    toc: false
+    toc: true
 editor_options:
   chunk_output_type: console
 ---
@@ -164,6 +164,119 @@ test[grepl("ftp.url\\d+$", names(test))]
 ```
 
 ## Appendix
+
+### YAML defined
+
+[What is YAML? The YML File Format](https://www.freecodecamp.org/news/what-is-yaml-the-yml-file-format/).
+
+* YAML created in 2001 stands for YAML Ain't Markup Language, but it originally stood for Yet Another Markup Language.
+* YAML is a human-readable data serialisation language, just like XML and JSON.
+    * YAML can do everything that JSON can and more. A valid YAML file can contain JSON, and JSON can transform into YAML.
+* Serialisation is a process where one application or service, which has different data structures and is written in a different set of technologies, can transfer data to another application using a standard format.
+* In other words, serialisation is about translating, converting, and wrapping up a data structure in another format.
+* The data in the new format can be stored in a file or transmitted to another application or service over a network.
+* YAML is a widely used format for writing configuration files for different DevOps tools, programs, and applications because of its human-readable and intuitive syntax.
+* YAML uses indentation to define structure in the file, which is helpful if you are used to writing Python code and are familiar with the indentation style the language uses.
+
+To create a YAML file, use either the `.yaml` or `.yml` file extension. Before writing any YAML code, you can add three dashes (`---`) at the start of the file to allow having multiple YAML documents in a single YAML file, making file organisation much easier; separate each document with three dashes (`---`). You can use three dots (`...`) to mark the end of the document.
+
+* In YAML, there is an emphasis on indentation and line separation to denote levels and structure in data. The indentation system is quite similar to the one Python uses.
+* YAML doesn't use symbols such as curly braces, square brackets, or opening or closing tags - just indentation.
+* YAML doesn't allow you to use any tabs when creating indentation - use spaces instead.
+* Whitespace doesn't matter as long as child elements are indented inside the parent element.
+* To add a comment to comment out a line of code, use the `#` character
+
+Although YAML auto-detects the data types in a file, you can specify the type of data you want to use. To explicitly specify the type of data, use the `!!` symbol and the name of the data type before the value:
+
+```
+# parse this value as a string
+date: !!str 2022-11-11
+
+## parse this value as a float (it will be 1.0 instead of 1)
+fave_number: !!float 1
+```
+
+In YAML, strings in some cases can be left unquoted, but you can also wrap them in single (`'`) or double (`"`) quotation marks.
+
+If you want to write a string that spans across multiple lines and you want to preserve the line breaks, use the pipe symbol (`|`) and make sure that the message is indented!
+
+```
+|
+ I am message that spans multiple lines
+ I go on and on across lines
+ and lines
+ and more lines
+```
+
+If you have a string in a YAML file that spans across multiple lines for readability, but you want the parser to interpret it as a single line string, you can use the `>` character instead of `|`, which will replace each line break with a space.
+
+Numbers express numerical data, and in YAML, these include integers (whole numbers), floats (numbers with a decimal point), exponentials, octals, and hexadecimals.
+
+```
+# integer
+19
+
+# float 
+8.7
+
+# exponential
+4.5e+13
+
+# octal 
+0o23
+
+# hexadecimal
+0xFF
+```
+
+Booleans in YAML, and other programming languages, have one of two states and are expressed with either `true` or `false`. Words like `true` and `false` are keywords in YAML, so don't surround them with quotation marks if you want them interpreted as Booleans. Null values are expressed with the keyword null or the tilde character, `~`.
+
+Collections in YAML can be:
+
+* Sequences (lists/arrays)
+* Mappings (dictionaries/hashes)
+
+To write a sequence, use a dash (`-`) followed by a space:
+
+```
+- HTML
+- CSS
+- JavaScript
+```
+
+Each item in the sequence (list) is placed on a separate line, with a dash in front of the value and each item in the list is on the same level.
+
+You can create a nested sequence (remember, use spaces - not tabs - to create the levels of indentation):
+
+```
+- HTML
+- CSS
+- JavaScript
+ - React
+ - Angular
+ - Vue
+```
+
+Mappings allow you to list keys with values. Key/value pairs are the building blocks of YAML documents. Use a colon (`:`) followed by a space to create key/value pairs:
+
+```
+Employees:
+ name: John Doe
+ age: 23
+ country: USA
+```
+
+Combining the two to create a list of objects:
+
+```
+Employees:
+- name: John Doe
+  department: Engineering
+  country: USA
+- name: Kate Kateson
+  department: IT support
+  country: United Kingdom
+```
 
 ### JSON defined
 
