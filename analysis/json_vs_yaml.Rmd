@@ -23,7 +23,7 @@ Install the following packages:
 * [tidyjson](https://github.com/colearendt/tidyjson) for converting JSON to tidy data frames
 * [rjson](https://github.com/alexcb/rjson) for parsing JSON
 
-```{r install}
+```{r install, eval=FALSE}
 install.packages(c("jsonlite", "yaml", "tidyjson", "rjson"))
 ```
 
@@ -276,6 +276,22 @@ Employees:
 - name: Kate Kateson
   department: IT support
   country: United Kingdom
+```
+
+### Read YAML
+
+Read a test YAML file.
+
+```{r read_nested_list}
+dat <- yaml::read_yaml("data/nested_list.yml")
+dat$root
+```
+
+Return only specific "level" by using `names()`.
+
+```{r}
+names(dat$root)
+names(dat$root$nested_list)
 ```
 
 ### JSON defined
