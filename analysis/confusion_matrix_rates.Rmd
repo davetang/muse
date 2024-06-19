@@ -3,7 +3,7 @@ title: "R function for calculating confusion matrix rates"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
-    toc: false
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
@@ -119,4 +119,64 @@ High accuracy but low $F_1$.
 
 ```{r}
 yardstick::accuracy(cm)
+```
+
+## Compare calculations
+
+Double check to see if `table_metrics()` calculations are correct.
+
+```{r testing}
+true_label <- factor(c(rep(1, 90), rep(2, 10)), levels = 1:2)
+pred_label <- factor(rep(1, 100), levels = 1:2)
+
+cm <- table(truth = true_label, predict = pred_label)
+cm
+```
+
+Calculate metrics.
+
+```{r cm_metrics}
+cm_metrics <- table_metrics(cm, 1, 2, 'row')
+```
+
+Using {yardstick}.
+
+```{r}
+cm_metrics$accuracy
+yardstick::accuracy(cm)$.estimate
+```
+
+F1 score.
+
+```{r}
+cm_metrics$f1_score
+yardstick::f_meas(cm)$.estimate
+```
+
+Specificity.
+
+```{r}
+cm_metrics$specificity
+yardstick::specificity(cm)$.estimate
+```
+
+Note the difference in sensitivity; this is because the function expects that **the true class results should be in the columns of the table** and we have it the other way around.
+
+```{r}
+cm_metrics$recall
+yardstick::recall(cm)$.estimate
+yardstick::sensitivity(cm)$.estimate
+```
+
+If we provide the labels manually, the sensitivity is calculated properly.
+
+```{r}
+yardstick::sensitivity_vec(true_label, pred_label)
+```
+
+Same for precision.
+
+```{r}
+cm_metrics$precision
+yardstick::precision_vec(true_label, pred_label)
 ```
