@@ -30,6 +30,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -232,6 +235,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -239,6 +305,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -444,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef08c5d15af14ff90f9d21c1b82319b105317350ftargetblankf08c5d1a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2195f450f8adfbc73d9e93f4ebf9b4a8a9004e31targetblank2195f45a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/f08c5d15af14ff90f9d21c1b82319b105317350f" target="_blank">f08c5d1</a>
+<a href="https://github.com/davetang/muse/tree/2195f450f8adfbc73d9e93f4ebf9b4a8a9004e31" target="_blank">2195f45</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef08c5d15af14ff90f9d21c1b82319b105317350ftargetblankf08c5d1a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2195f450f8adfbc73d9e93f4ebf9b4a8a9004e31targetblank2195f45a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -462,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/f08c5d15af14ff90f9d21c1b82319b105317350f" target="_blank">f08c5d1</a>.
+<a href="https://github.com/davetang/muse/tree/2195f450f8adfbc73d9e93f4ebf9b4a8a9004e31" target="_blank">2195f45</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -526,6 +602,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/2195f450f8adfbc73d9e93f4ebf9b4a8a9004e31/analysis/confusion_matrix_rates.Rmd" target="_blank">2195f45</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-06-19
+</td>
+<td>
+Compare calculations
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/af2bef5d5ec53ae46051627b51226056a634b102/docs/confusion_matrix_rates.html" target="_blank">af2bef5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-06-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -709,6 +819,60 @@ Attaching package: &#39;yardstick&#39;</code></pre>
   .metric  .estimator .estimate
   &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;
 1 accuracy multiclass      0.78</code></pre>
+</div>
+<div id="compare-calculations" class="section level2">
+<h2>Compare calculations</h2>
+<p>Double check to see if <code>table_metrics()</code> calculations are
+correct.</p>
+<pre class="r"><code>true_label &lt;- factor(c(rep(1, 90), rep(2, 10)), levels = 1:2)
+pred_label &lt;- factor(rep(1, 100), levels = 1:2)
+
+cm &lt;- table(truth = true_label, predict = pred_label)
+cm</code></pre>
+<pre><code>     predict
+truth  1  2
+    1 90  0
+    2 10  0</code></pre>
+<p>Calculate metrics.</p>
+<pre class="r"><code>cm_metrics &lt;- table_metrics(cm, 1, 2, &#39;row&#39;)</code></pre>
+<p>Using {yardstick}.</p>
+<pre class="r"><code>cm_metrics$accuracy</code></pre>
+<pre><code>[1] 0.9</code></pre>
+<pre class="r"><code>yardstick::accuracy(cm)$.estimate</code></pre>
+<pre><code>[1] 0.9</code></pre>
+<p>F1 score.</p>
+<pre class="r"><code>cm_metrics$f1_score</code></pre>
+<pre><code>[1] 0.9473684</code></pre>
+<pre class="r"><code>yardstick::f_meas(cm)$.estimate</code></pre>
+<pre><code>[1] 0.9473684</code></pre>
+<p>Specificity.</p>
+<pre class="r"><code>cm_metrics$specificity</code></pre>
+<pre><code>[1] 0</code></pre>
+<pre class="r"><code>yardstick::specificity(cm)$.estimate</code></pre>
+<pre><code>Warning: While computing binary `spec()`, no true negatives were detected (i.e.
+`true_negative + false_positive = 0`).
+Specificity is undefined in this case, and `NA` will be returned.
+Note that 10 predicted negatives(s) actually occurred for the problematic event
+level, 1</code></pre>
+<pre><code>[1] NA</code></pre>
+<p>Note the difference in sensitivity; this is because the function
+expects that <strong>the true class results should be in the columns of
+the table</strong> and we have it the other way around.</p>
+<pre class="r"><code>cm_metrics$recall</code></pre>
+<pre><code>[1] 1</code></pre>
+<pre class="r"><code>yardstick::recall(cm)$.estimate</code></pre>
+<pre><code>[1] 0.9</code></pre>
+<pre class="r"><code>yardstick::sensitivity(cm)$.estimate</code></pre>
+<pre><code>[1] 0.9</code></pre>
+<p>If we provide the labels manually, the sensitivity is calculated
+properly.</p>
+<pre class="r"><code>yardstick::sensitivity_vec(true_label, pred_label)</code></pre>
+<pre><code>[1] 1</code></pre>
+<p>Same for precision.</p>
+<pre class="r"><code>cm_metrics$precision</code></pre>
+<pre><code>[1] 0.9</code></pre>
+<pre class="r"><code>yardstick::precision_vec(true_label, pred_label)</code></pre>
+<pre><code>[1] 0.9</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -783,6 +947,8 @@ footer is added to webpages before the MathJax javascript. -->
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -815,6 +981,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
