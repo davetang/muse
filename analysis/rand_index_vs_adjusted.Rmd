@@ -1,0 +1,158 @@
+---
+title: "Rand Index versus the Adjusted Rand Index"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I wrote about the [Rand Index](rand_index.html) (RI) and the [Adjusted Rand Index](adjusted_rand_index.html) (ARI) but how do we interpret the indices and how are they different?
+
+As a quick recap, the RI is:
+
+$$ RI = \frac{a + b}{ { {n}\choose{2} } } $$
+
+where $a$ and $b$ are the number of times a pair of elements were clustered concordantly in two different sets, like clustering results. I wrote some code (based on `fossil::rand.index`) that calculates the RI, as well as returning values for $a$, $b$, and $n\choose{2}$.
+
+```{r rand_index}
+rand_index <- function(group1, group2){
+  x <- abs(sapply(group1, \(x) x - group1))
+  x[x > 1] <- 1
+  y <- abs(sapply(group2, \(x) x - group2))
+  y[y > 1] <- 1
+  i <- x[upper.tri(x)] == y[upper.tri(y)]
+  a <- sum(x[upper.tri(x)][i] == 0)
+  b <- sum(x[upper.tri(x)][i] == 1)
+  bc <- choose(length(group1), 2)
+  ri <- (a + b) / bc
+  list(a = a, b = b, denom = bc, index = ri)
+}
+```
+
+I'll use the example from [my previous post](rand_index.html), where I compared a set of known labels with results from k-means clustering:
+
+```{r ri}
+set.seed(1984)
+true_label <- as.numeric(iris$Species)
+my_kmeans <- kmeans(x = iris[,-5], centers = 3)
+ 
+rand_index(true_label, my_kmeans$cluster)
+```
+
+Since the RI ranges from 0 to 1, an index of 0.8797315 implies that the two sets are similar. But how does this compare with a random set? The ARI takes randomness into account and is defined as:
+
+$$ ARI = \frac{ \sum_{ij} { {n_{ij}}\choose{2} } - [ \sum_{i} { {a_{i}}\choose{2} } \sum_{j} { {b_{j}}\choose{2} } ] / { {n}\choose{2} } } { \frac{1}{2} [ \sum_{i} { a_{i}\choose{2} } + \sum_{j} { {b_{j}}\choose{2} } ] - [ \sum_{i} { {a_{i}}\choose{2} } \sum_{j} { {b_{j}}\choose{2} } ] / { {n}\choose{2} } } $$
+
+See my [previous post](adjusted_rand_index.html) for an explanation of the ARI. I wrote some code below that will return the ARI, as well as each part of the ARI formula.
+
+```{r ari}
+adjusted_rand_index <- function(x, y){
+  my_table <- table(x, y)
+  my_choose <- \(x) choose(x, 2)
+  n_ij <- sum(sapply(my_table, my_choose))
+  a_i <- sum(sapply(rowSums(my_table), my_choose))
+  b_j <- sum(sapply(colSums(my_table), my_choose))
+  c <- my_choose(length(x))
+  e <- a_i*b_j/c
+  ari <- (n_ij - e) / (1/2*(a_i+b_j) - e)
+  list(n_ij = n_ij, a_i = a_i, b_j = b_j, c = c, e = e, index = ari)
+}
+```
+
+Here's the ARI for the previous example.
+
+```{r}
+adjusted_rand_index(true_label, my_kmeans$cluster)
+```
+
+The ARI (0.7302383) is slightly lower than the RI (0.8797315). Now let's calculate the RI and ARI between the known labels and a random set.
+
+```{r}
+set.seed(1984)
+my_random <- sample(x = true_label, size = length(true_label))
+ 
+rand_index(true_label, my_random)
+adjusted_rand_index(true_label, my_random)$index
+```
+
+Even with a random set, there is a lot of agreement with the known labels (6239/11175). The ARI provides an index that is close to 0 because it takes into account the chance of overlap. In addition, note that the ARI is a negative value indicating that the amount of overlap is less than expected.
+
+Let's calculate the RI and ARI for 1,000 randomly sets generated from the known labels of the iris dataset to get a distribution of the indices.
+
+```{r}
+n <- 1000
+
+random_clusters <- purrr::map(1:n, \(x){
+  set.seed(x)
+  sample(true_label, length(true_label))
+})
+
+my_ri <- purrr::map_dbl(random_clusters, \(x) rand_index(true_label, x)$index)
+my_ari <- purrr::map_dbl(random_clusters, \(x) adjusted_rand_index(true_label, x)$index)
+ 
+library(ggplot2)
+library(patchwork)
+
+df <- data.frame(ri = my_ri, ari = my_ari)
+theme_set(theme_minimal())
+ri_plot <- ggplot(df, aes(ri)) + geom_histogram(bins = 30) + ggtitle("Rand Index")
+ari_plot <- ggplot(df, aes(ari)) + geom_histogram(bins = 30) + ggtitle("Adjusted Rand Index")
+ri_plot + ari_plot
+```
+
+Note that the RI and ARI have a very similar distribution; only the scale on the x-axis differs. In addition, note that the ARI distribution is centred around zero.
+
+I'll perform another 1,000 calculations on random sets but this time using larger sets (1,000) and more clusters (10).
+
+```{r}
+n <- 1000
+
+random_clusters_1 <- purrr::map(1:n, \(x){
+  set.seed(x)
+  sample(1:10, 1000, replace = TRUE)
+})
+
+random_clusters_2 <- purrr::map(1:n, \(x){
+  set.seed(10000 + x)
+  sample(1:10, 1000, replace = TRUE)
+})
+
+my_ri <- purrr::map2_dbl(random_clusters_1, random_clusters_2, \(x, y) rand_index(x, y)$index)
+my_ari <- purrr::map2_dbl(random_clusters_1, random_clusters_2, \(x, y) adjusted_rand_index(x, y)$index)
+
+df <- data.frame(ri = my_ri, ari = my_ari)
+ri_plot <- ggplot(df, aes(ri)) + geom_histogram(bins = 30) + ggtitle("Rand Index")
+ari_plot <- ggplot(df, aes(ari)) + geom_histogram(bins = 30) + ggtitle("Adjusted Rand Index")
+ri_plot + ari_plot
+```
+
+## High RI but low ARI
+
+How do two random sets have a RI that is close to 1? The reason is due to the number of clusters. When there are a lot of clusters, there's a higher chance that a pair of items in both sets are in different clusters. This is still counted as a concordant event in the RI. If we run `rand_index()` we will see that there's a large discrepancy between $a$ and $b$.
+
+```{r}
+set.seed(1)
+x <- sample(1:10, 1000, replace = TRUE)
+set.seed(2)
+y <- sample(1:10, 1000, replace = TRUE)
+ 
+rand_index(x, y)
+```
+
+The ARI on the other hand considers all cluster pairs in contrast to the RI, which only considers whether a pair of elements are in the same cluster or in different clusters.
+
+```{r}
+adjusted_rand_index(x, y)
+```
+
+The ARI is based on this contingency table
+
+```{r}
+table(x, y)
+```
+Conclusion: **use the ARI**.
