@@ -146,6 +146,7 @@ true_label <- as.numeric(iris$Species)
 true_label
  
 # perform k-means clustering
+set.seed(1984)
 my_kmeans <- kmeans(x = iris[,-5], centers = 3)
 # clustering results
 my_kmeans$cluster
