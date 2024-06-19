@@ -443,15 +443,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree77a8ff4c455d31b4440a9a18c4d8e49858fbf017targetblank77a8ff4a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8755da5a0a6f7f61dd3599f8a3096e6ee94ea531targetblank8755da5a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/77a8ff4c455d31b4440a9a18c4d8e49858fbf017" target="_blank">77a8ff4</a>
+<a href="https://github.com/davetang/muse/tree/8755da5a0a6f7f61dd3599f8a3096e6ee94ea531" target="_blank">8755da5</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree77a8ff4c455d31b4440a9a18c4d8e49858fbf017targetblank77a8ff4a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8755da5a0a6f7f61dd3599f8a3096e6ee94ea531targetblank8755da5a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +461,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/77a8ff4c455d31b4440a9a18c4d8e49858fbf017" target="_blank">77a8ff4</a>.
+<a href="https://github.com/davetang/muse/tree/8755da5a0a6f7f61dd3599f8a3096e6ee94ea531" target="_blank">8755da5</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -524,6 +524,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/8755da5a0a6f7f61dd3599f8a3096e6ee94ea531/analysis/rand_index.Rmd" target="_blank">8755da5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-06-19
+</td>
+<td>
+Set seed before k-means clustering
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/01c75b79e2d32b45bd98a50e5acb6b837cb020fb/docs/rand_index.html" target="_blank">01c75b7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-06-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -662,7 +696,7 @@ b</code></pre>
     ri &lt;- 1 - sg/bc
     return(ri)
 }
-&lt;bytecode: 0x5583137c39b0&gt;
+&lt;bytecode: 0x556b1f3e5088&gt;
 &lt;environment: namespace:fossil&gt;</code></pre>
 <p>Let’s go through the code step by step to see what it is doing. First
 we’ll create two sets of clustering results.</p>
@@ -746,16 +780,17 @@ true_label</code></pre>
 [112] 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
 [149] 3 3</code></pre>
 <pre class="r"><code># perform k-means clustering
+set.seed(1984)
 my_kmeans &lt;- kmeans(x = iris[,-5], centers = 3)
 # clustering results
 my_kmeans$cluster</code></pre>
-<pre><code>  [1] 1 3 3 3 1 1 1 1 3 3 1 1 3 3 1 1 1 1 1 1 1 1 1 1 3 3 1 1 1 3 3 1 1 1 3 1 1
- [38] 1 3 1 1 3 3 1 1 3 1 3 1 1 2 2 2 2 2 2 2 3 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2 2
- [75] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 2 2 2 2 3 2 2 2 2 2 2 2 2 2 2 2 2
-[112] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
-[149] 2 2</code></pre>
+<pre><code>  [1] 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+ [38] 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3
+ [75] 3 3 3 1 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 3 1 1 1 1 3 1 1 1 1
+[112] 1 1 3 3 1 1 1 1 3 1 3 1 3 1 1 3 3 1 1 1 1 1 3 1 1 1 1 3 1 1 1 3 1 1 1 3 1
+[149] 1 3</code></pre>
 <pre class="r"><code>fossil::rand.index(true_label, my_kmeans$cluster)</code></pre>
-<pre><code>[1] 0.7214318</code></pre>
+<pre><code>[1] 0.8797315</code></pre>
 <p>From the <a href="https://en.wikipedia.org/wiki/Rand_index">Wikipedia
 article</a>:</p>
 <blockquote>
