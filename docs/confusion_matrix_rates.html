@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-06-19" />
+<meta name="date" content="2024-06-20" />
 
 <title>R function for calculating confusion matrix rates</title>
 
@@ -360,7 +360,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">R function for calculating confusion matrix
 rates</h1>
-<h4 class="date">2024-06-19</h4>
+<h4 class="date">2024-06-20</h4>
 
 </div>
 
@@ -389,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-06-19
+<strong>Last updated:</strong> 2024-06-20
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2195f450f8adfbc73d9e93f4ebf9b4a8a9004e31targetblank2195f45a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree97f4197269ef663d0827db556f0d24a9b3d301catargetblank97f4197a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/2195f450f8adfbc73d9e93f4ebf9b4a8a9004e31" target="_blank">2195f45</a>
+<a href="https://github.com/davetang/muse/tree/97f4197269ef663d0827db556f0d24a9b3d301ca" target="_blank">97f4197</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2195f450f8adfbc73d9e93f4ebf9b4a8a9004e31targetblank2195f45a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree97f4197269ef663d0827db556f0d24a9b3d301catargetblank97f4197a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/2195f450f8adfbc73d9e93f4ebf9b4a8a9004e31" target="_blank">2195f45</a>.
+<a href="https://github.com/davetang/muse/tree/97f4197269ef663d0827db556f0d24a9b3d301ca" target="_blank">97f4197</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -602,6 +602,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/97f4197269ef663d0827db556f0d24a9b3d301ca/analysis/confusion_matrix_rates.Rmd" target="_blank">97f4197</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-06-20
+</td>
+<td>
+Multiclass metrics
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/130f8d4455a62afff3cc67ca6a6760ac55f7b520/docs/confusion_matrix_rates.html" target="_blank">130f8d4</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-06-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -873,6 +907,102 @@ properly.</p>
 <pre><code>[1] 0.9</code></pre>
 <pre class="r"><code>yardstick::precision_vec(true_label, pred_label)</code></pre>
 <pre><code>[1] 0.9</code></pre>
+</div>
+<div id="multiclass" class="section level2">
+<h2>Multiclass</h2>
+<p>Install <a
+href="https://cran.r-project.org/web/packages/palmerpenguins/index.html">Palmer
+Archipelago (Antarctica) Penguin Data</a>.</p>
+<pre class="r"><code>if(!require(&quot;palmerpenguins&quot;)){
+  install.packages(&quot;palmerpenguins&quot;)
+}</code></pre>
+<pre><code>Loading required package: palmerpenguins</code></pre>
+<pre class="r"><code>library(dplyr)
+library(palmerpenguins)
+palmerpenguins::penguins |&gt;
+  select(contains(&quot;_&quot;), species) |&gt;
+  na.omit() |&gt;
+  group_by(species) |&gt;
+  mutate(species_n = row_number()) -&gt; dat
+  
+head(dat)</code></pre>
+<pre><code># A tibble: 6 × 6
+# Groups:   species [1]
+  bill_length_mm bill_depth_mm flipper_length_mm body_mass_g species species_n
+           &lt;dbl&gt;         &lt;dbl&gt;             &lt;int&gt;       &lt;int&gt; &lt;fct&gt;       &lt;int&gt;
+1           39.1          18.7               181        3750 Adelie          1
+2           39.5          17.4               186        3800 Adelie          2
+3           40.3          18                 195        3250 Adelie          3
+4           36.7          19.3               193        3450 Adelie          4
+5           39.3          20.6               190        3650 Adelie          5
+6           38.9          17.8               181        3625 Adelie          6</code></pre>
+<p>Number of species.</p>
+<pre class="r"><code>table(dat$species)</code></pre>
+<pre><code>
+   Adelie Chinstrap    Gentoo 
+      151        68       123 </code></pre>
+<p>80% of species.</p>
+<pre class="r"><code>dat |&gt;
+  group_by(species) |&gt;
+  summarise(thres = floor(.8 * n())) -&gt; thres
+
+thres</code></pre>
+<pre><code># A tibble: 3 × 2
+  species   thres
+  &lt;fct&gt;     &lt;dbl&gt;
+1 Adelie      120
+2 Chinstrap    54
+3 Gentoo       98</code></pre>
+<p>Training and testing data.</p>
+<pre class="r"><code>dat |&gt;
+  group_by(species) |&gt;
+  inner_join(y = thres, by = &quot;species&quot;) |&gt;
+  filter(species_n &lt; thres) |&gt;
+  select(-c(species_n, thres)) -&gt; training
+
+dat |&gt;
+  group_by(species) |&gt;
+  inner_join(y = thres, by = &quot;species&quot;) |&gt;
+  filter(species_n &gt;= thres) |&gt;
+  select(-c(species_n, thres)) -&gt; testing
+
+stopifnot(nrow(rbind(training, testing)) == nrow(dat))</code></pre>
+<p>Decision tree.</p>
+<pre class="r"><code>if(!require(&quot;tree&quot;)){
+  install.packages(&quot;tree&quot;)
+}</code></pre>
+<pre><code>Loading required package: tree</code></pre>
+<pre class="r"><code>library(tree)
+
+fit &lt;- tree(species ~ ., data = training)
+pred &lt;- predict(fit, testing, type = &quot;class&quot;)
+tab &lt;- table(predict = pred, truth = testing$species)
+tab</code></pre>
+<pre><code>           truth
+predict     Adelie Chinstrap Gentoo
+  Adelie        29         1      0
+  Chinstrap      3        14      1
+  Gentoo         0         0     25</code></pre>
+<p>Sensitivity, where the <code>.estimator</code> refers to:</p>
+<blockquote>
+<p>One of: “binary”, “macro”, “macro_weighted”, or “micro” to specify
+the type of averaging to be done. “binary” is only relevant for the two
+class case. The other three are general methods for calculating
+multiclass metrics. The default will automatically choose “binary” or
+“macro” based on estimate.</p>
+</blockquote>
+<pre class="r"><code>yardstick::sensitivity(tab, estimator = &quot;macro&quot;)$.estimate</code></pre>
+<pre><code>[1] 0.9337073</code></pre>
+<pre class="r"><code>yardstick::sensitivity(tab, estimator = &quot;macro_weighted&quot;)$.estimate</code></pre>
+<pre><code>[1] 0.9315068</code></pre>
+<pre class="r"><code>yardstick::sensitivity(tab, estimator = &quot;micro&quot;)$.estimate</code></pre>
+<pre><code>[1] 0.9315068</code></pre>
+<p>See <code>vignette("multiclass", "yardstick")</code>.</p>
+<pre class="r"><code>yardstick::f_meas(tab)</code></pre>
+<pre><code># A tibble: 1 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 f_meas  macro          0.921</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -905,9 +1035,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] yardstick_1.3.1 lubridate_1.9.3 forcats_1.0.0   stringr_1.5.1  
- [5] dplyr_1.1.4     purrr_1.0.2     readr_2.1.5     tidyr_1.3.1    
- [9] tibble_3.2.1    ggplot2_3.5.1   tidyverse_2.0.0 workflowr_1.7.1
+ [1] tree_1.0-43          palmerpenguins_0.1.1 yardstick_1.3.1     
+ [4] lubridate_1.9.3      forcats_1.0.0        stringr_1.5.1       
+ [7] dplyr_1.1.4          purrr_1.0.2          readr_2.1.5         
+[10] tidyr_1.3.1          tibble_3.2.1         ggplot2_3.5.1       
+[13] tidyverse_2.0.0      workflowr_1.7.1     
 
 loaded via a namespace (and not attached):
  [1] sass_0.4.9        utf8_1.2.4        generics_0.1.3    stringi_1.8.4    
