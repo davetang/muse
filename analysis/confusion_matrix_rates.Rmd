@@ -180,3 +180,87 @@ Same for precision.
 cm_metrics$precision
 yardstick::precision_vec(true_label, pred_label)
 ```
+
+## Multiclass
+
+Install [Palmer Archipelago (Antarctica) Penguin Data](https://cran.r-project.org/web/packages/palmerpenguins/index.html).
+
+```{r palmerpenguins}
+if(!require("palmerpenguins")){
+  install.packages("palmerpenguins")
+}
+
+library(dplyr)
+library(palmerpenguins)
+palmerpenguins::penguins |>
+  select(contains("_"), species) |>
+  na.omit() |>
+  group_by(species) |>
+  mutate(species_n = row_number()) -> dat
+  
+head(dat)
+```
+
+Number of species.
+
+```{r}
+table(dat$species)
+```
+
+80% of species.
+
+```{r}
+dat |>
+  group_by(species) |>
+  summarise(thres = floor(.8 * n())) -> thres
+
+thres
+```
+
+Training and testing data.
+
+```{r}
+dat |>
+  group_by(species) |>
+  inner_join(y = thres, by = "species") |>
+  filter(species_n < thres) |>
+  select(-c(species_n, thres)) -> training
+
+dat |>
+  group_by(species) |>
+  inner_join(y = thres, by = "species") |>
+  filter(species_n >= thres) |>
+  select(-c(species_n, thres)) -> testing
+
+stopifnot(nrow(rbind(training, testing)) == nrow(dat))
+```
+
+Decision tree.
+
+```{r}
+if(!require("tree")){
+  install.packages("tree")
+}
+library(tree)
+
+fit <- tree(species ~ ., data = training)
+pred <- predict(fit, testing, type = "class")
+tab <- table(predict = pred, truth = testing$species)
+tab
+```
+
+Sensitivity, where the `.estimator` refers to:
+	
+> One of: "binary", "macro", "macro_weighted", or "micro" to specify the type of averaging to be done. "binary" is only relevant for the two class case. The other three are general methods for calculating multiclass metrics. The default will automatically choose "binary" or "macro" based on estimate.
+
+```{r}
+yardstick::sensitivity(tab, estimator = "macro")$.estimate
+yardstick::sensitivity(tab, estimator = "macro_weighted")$.estimate
+yardstick::sensitivity(tab, estimator = "micro")$.estimate
+```
+
+See `vignette("multiclass", "yardstick")`.
+
+```{r}
+yardstick::f_meas(tab)
+```
