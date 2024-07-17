@@ -34,10 +34,16 @@ File size.
 file.size(outfile) |> utils:::format.object_size(units = 'Gb')
 ```
 
-`arrow::open_dataset()` will scan a the input file and figure out the structure of the dataset; it will only read further rows if specified.
+`arrow::open_dataset()` will scan a the input file and figure out the structure of the dataset; it will only read further rows if specified. Code below from a [GitHub issue](https://github.com/hadley/r4ds/issues/1374#issuecomment-1479893607).
 
 ```{r seattle_csv}
-seattle_csv <- arrow::open_dataset(sources = outfile, format = 'csv')
+opts <- CsvConvertOptions$create(col_types = schema(ISBN = string())) 
+
+seattle_csv <- open_dataset( 
+  sources = "data/seattle-library-checkouts.csv",  
+  format = "csv", 
+  convert_options = opts 
+) 
 seattle_csv
 ```
 
@@ -54,4 +60,64 @@ seattle_csv |>
   dplyr::count(CheckoutYear, wt = Checkouts) |>
   dplyr::arrange(CheckoutYear) |>
   dplyr::collect()
+```
+
+## The Parquet Format
+
+The parquet format is used for rectangular data and is a custom binary format designed specifically for large datasets.
+
+* Parquet files are usually smaller than the equivalent CSV file because of efficient encodings and file compression.
+* Parquet files have a rich type system.
+* Parquet files are "column-oriented", like R's data frame.
+* Parquet files are chunked making it possible to work on different parts of the file at the same time.
+
+Partition the Seattle library data by `CheckoutYear`, since it is likely some analyses will want to only look at recent data and partitioning by year yields 18 chunks of reasonable size.
+
+```{r partition_seattle_csv_by_checkout_year}
+pq_path <- 'data/seattle-library-checkouts'
+
+seattle_csv |>
+  dplyr::group_by(CheckoutYear) |>
+  arrow::write_dataset(path = pq_path, format = "parquet")
+```
+
+Examine files.
+
+```{r parquet_files}
+tibble::tibble(
+  files = list.files(pq_path, recursive = TRUE),
+  size_MB = file.size(file.path(pq_path, files)) / 1024^2
+)
+```
+
+### Using dplyr with Arrow
+
+Open parquet files.
+
+```{r seattle_pq}
+seattle_pq <- open_dataset(pq_path)
+```
+
+Write a dplyr query.
+
+```{r query}
+seattle_pq |>
+  dplyr::count(CheckoutYear, wt = Checkouts) |>
+  dplyr::arrange(CheckoutYear) -> query
+```
+
+Collect.
+
+```{r query_collect}
+query |> dplyr::collect() |> system.time()
+```
+
+Compare runtime.
+
+```{r compare_runtime}
+seattle_csv |>
+  dplyr::count(CheckoutYear, wt = Checkouts) |>
+  dplyr::arrange(CheckoutYear) |>
+  dplyr::collect() |>
+  system.time()
 ```
