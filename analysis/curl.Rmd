@@ -1,0 +1,44 @@
+---
+title: "Downloading files using the curl package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(curl)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+The [{curl} package](https://cran.r-project.org/web/packages/curl/index.html) provides:
+
+> The `curl()` and `curl_download()` functions provide highly configurable drop-in replacements for base `url()` and `download.file()` with better performance, support for encryption (https, ftps), gzip compression, authentication, and other 'libcurl' goodies. The core of the package implements a framework for performing fully customized requests where data can be processed either in memory, on disk, or streaming via the callback or connection interfaces. Some knowledge of 'libcurl' is recommended; for a more-user-friendly web client see the 'httr' package which builds on this package with http specific tools and logic.
+
+Use `multi_download()` to download a relatively big file (9 GB).
+
+```{r multi_download}
+outdir <- 'data'
+dir.create(outdir, showWarnings = FALSE)
+
+library_file <- "seattle-library-checkouts.csv"
+outfile <- paste0(outdir, '/', library_file)
+
+if(!file.exists(outfile)){
+  curl::multi_download(
+    urls = "https://r4ds.s3.us-west-2.amazonaws.com/seattle-library-checkouts.csv",
+    destfiles = outfile,
+    resume = TRUE
+  )
+}
+```
+
+File size.
+
+```{r file_size}
+file.size(outfile) |> utils:::format.object_size(units = 'Gb')
+```
