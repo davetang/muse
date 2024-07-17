@@ -1,0 +1,38 @@
+---
+title: "Interfacing with databases in R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(DBI)
+library(dbplyr)
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+The [{DIB} package](https://cran.r-project.org/web/packages/DBI/index.html) provides:
+
+> A database interface definition for communication between R and relational database management systems. All classes in this package are virtual and need to be extended by the various R/DBMS implementations.
+
+A database table can be thought of as a data frame, however there are three high-level differences between them:
+
+1. Database tables are stored on disk and can be arbitrarily large, whereas data frames are stored in memory and are fundamentally limited.
+
+2. Database tables almost always have indexes making it possible to quickly find rows of interest without having to look at every single row. Data frames don't have indexes but data tables do, which is one of the reasons why they're so fast.
+
+3. Most classical databases are optimised for rapidly collecting data and not for analysing existing data. These databases are called _row-oriented_ because the data is stored row by row, rather than column by column like data frames. More recently, there's been much development of _column-oriented_ databases that make analysing existing data much faster.
+
+Databases are run by database management systems (DBMS), which come in three basic forms:
+
+1. Client-server DBMS run on a powerful central server, which you connect from your computer (the client). They are useful for sharing data with multiple people and popular client-server DBMS include PostgreSQL, MariaDB, SQL Server, and Oracle.
+
+2. Cloud DBMS, like Snowflake, Amazon's RedShift, and Google's BigQuery, are similar to client-server DBMS, but they run in the cloud, taking advantage of cloud capabilities.
+
+3. _In-process_ DBMS, like SQLite or duckdb, run entirely on your computer. They're great for working with large datasets where you are the primary user.
