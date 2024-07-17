@@ -1,0 +1,57 @@
+---
+title: "Getting started with the R arrow package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(arrow)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+The [{arrow} package](https://cran.r-project.org/web/packages/arrow/index.html) provides an interface to the Arrow C++ library.
+
+> [Apache Arrow](https://arrow.apache.org/) is a cross-language development platform for in-memory data. It specifies a standardized language-independent columnar memory format for flat and hierarchical data, organized for efficient analytic operations on modern hardware.
+
+An example file was downloaded using [curl](curl.html).
+
+```{r multi_download}
+outdir <- 'data'
+library_file <- "seattle-library-checkouts.csv"
+outfile <- paste0(outdir, '/', library_file)
+stopifnot(file.exists(outfile))
+```
+
+File size.
+
+```{r file_size}
+file.size(outfile) |> utils:::format.object_size(units = 'Gb')
+```
+
+`arrow::open_dataset()` will scan a the input file and figure out the structure of the dataset; it will only read further rows if specified.
+
+```{r seattle_csv}
+seattle_csv <- arrow::open_dataset(sources = outfile, format = 'csv')
+seattle_csv
+```
+
+Get a glimpse of the data.
+
+```{r seattle_csv_glimpse}
+seattle_csv |> dplyr::glimpse()
+```
+
+Use `collect()` to force arrow to perform a computation to return some data.
+
+```{r seattle_csv_collect}
+seattle_csv |>
+  dplyr::count(CheckoutYear, wt = Checkouts) |>
+  dplyr::arrange(CheckoutYear) |>
+  dplyr::collect()
+```
