@@ -1,0 +1,60 @@
+---
+title: "Interfacing with the Sequence Read Archive in R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(SRAdb)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## SQLite database
+
+First download `SRAmetadb.sqlite.gz` and gunzip it; the function `getSRAdbFile()` can do this but I recommend downloading this file externally. The gzipped file is around 6.8G in size (2024-07-26) and when uncompressed is 138G in size.
+
+```{r get_sra_db_file, eval=FALSE}
+sqlfile <- getSRAdbFile(method = "wget")
+```
+
+Download database file externally using `wget`.
+
+```
+wget -c https://gbnci.cancer.gov/backup/SRAmetadb.sqlite.gz
+```
+
+Point to the location of downloaded and gunzipped file.
+
+```{r sqlfile}
+sqlfile <- '/data2/sradb/SRAmetadb.sqlite'
+```
+
+Create a connection for queries. The standard DBI functionality as implemented in RSQLite function dbConnect makes the connection to the database. The dbDisconnect function disconnects the connection.
+
+```{r dbconnect}
+sra_con <- dbConnect(SQLite(), sqlfile)
+```
+
+## SRX to SRR
+
+How do we get the SRR accession for [SRX510365](https://www.ncbi.nlm.nih.gov/sra/SRX510365[accn])? (Should be SRR1216135)
+
+```{r conversion}
+my_id <- 'SRX510365'
+
+conversion <- sraConvert(my_id, sra_con = sra_con)
+conversion
+```
+
+## End
+
+Disconnect.
+
+```{r dbdisconnect}
+dbDisconnect(conn = sra_con)
+```
