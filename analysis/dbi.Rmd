@@ -83,7 +83,33 @@ table_fields <- purrr::map(tabs, \(x){
 
 names(table_fields) <- tabs
 table_fields[[1]]
+table_fields
 ```
+
+## dbplyr basics
+
+Use `tbl()` to create an object that represents a database table.
+
+```{r run_db}
+run_db <- tbl(src = mydb, 'run')
+run_db
+```
+
+Select specific fields.
+
+```{r select_fields}
+run_db |>
+  select(run_accession, experiment_name)
+```
+
+SRA table.
+
+```{r sra_db}
+sra_db <- tbl(src = mydb, 'sra')
+sra_db
+```
+
+## End
 
 Disconnect.
 
