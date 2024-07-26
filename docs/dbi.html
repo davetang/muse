@@ -443,15 +443,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea9be34eab760c5ce561cb533f086c49e61ea3d3dtargetblanka9be34ea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee897914d97e671477085262eb10edffcfd46e576targetblanke897914a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/a9be34eab760c5ce561cb533f086c49e61ea3d3d" target="_blank">a9be34e</a>
+<a href="https://github.com/davetang/muse/tree/e897914d97e671477085262eb10edffcfd46e576" target="_blank">e897914</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea9be34eab760c5ce561cb533f086c49e61ea3d3dtargetblanka9be34ea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee897914d97e671477085262eb10edffcfd46e576targetblanke897914a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +461,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/a9be34eab760c5ce561cb533f086c49e61ea3d3d" target="_blank">a9be34e</a>.
+<a href="https://github.com/davetang/muse/tree/e897914d97e671477085262eb10edffcfd46e576" target="_blank">e897914</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -480,9 +480,6 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    r_packages_4.3.3/
     Ignored:    r_packages_4.4.0/
-
-Unstaged changes:
-    Modified:   script/run_rstudio.sh
 
 </code></pre>
 <p>
@@ -526,6 +523,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/e897914d97e671477085262eb10edffcfd46e576/analysis/dbi.Rmd" target="_blank">e897914</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-26
+</td>
+<td>
+dbplyr basics
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/47f20cf31f4de4388c1b66e1add50d2703b891ab/docs/dbi.html" target="_blank">47f20cf</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -685,6 +716,281 @@ table_fields[[1]]</code></pre>
 <pre><code>[1] col_desc_ID   table_name    field_name    type          description  
 [6] value_list    sradb_updated
 &lt;0 rows&gt; (or 0-length row.names)</code></pre>
+<pre class="r"><code>table_fields</code></pre>
+<pre><code>$col_desc
+[1] col_desc_ID   table_name    field_name    type          description  
+[6] value_list    sradb_updated
+&lt;0 rows&gt; (or 0-length row.names)
+
+$experiment
+ [1] experiment_ID                 bamFile                      
+ [3] fastqFTP                      experiment_alias             
+ [5] experiment_accession          broker_name                  
+ [7] center_name                   title                        
+ [9] study_name                    study_accession              
+[11] design_description            sample_name                  
+[13] sample_accession              sample_member                
+[15] library_name                  library_strategy             
+[17] library_source                library_selection            
+[19] library_layout                targeted_loci                
+[21] library_construction_protocol spot_length                  
+[23] adapter_spec                  read_spec                    
+[25] platform                      instrument_model             
+[27] platform_parameters           sequence_space               
+[29] base_caller                   quality_scorer               
+[31] number_of_levels              multiplier                   
+[33] qtype                         sra_link                     
+[35] experiment_url_link           xref_link                    
+[37] experiment_entrez_link        ddbj_link                    
+[39] ena_link                      experiment_attribute         
+[41] submission_accession          sradb_updated                
+&lt;0 rows&gt; (or 0-length row.names)
+
+$metaInfo
+[1] name  value
+&lt;0 rows&gt; (or 0-length row.names)
+
+$run
+ [1] run_ID               bamFile              run_alias           
+ [4] run_accession        broker_name          instrument_name     
+ [7] run_date             run_file             run_center          
+[10] total_data_blocks    experiment_accession experiment_name     
+[13] sra_link             run_url_link         xref_link           
+[16] run_entrez_link      ddbj_link            ena_link            
+[19] run_attribute        submission_accession sradb_updated       
+&lt;0 rows&gt; (or 0-length row.names)
+
+$sample
+ [1] sample_ID            sample_alias         sample_accession    
+ [4] broker_name          center_name          taxon_id            
+ [7] scientific_name      common_name          anonymized_name     
+[10] individual_name      description          sra_link            
+[13] sample_url_link      xref_link            sample_entrez_link  
+[16] ddbj_link            ena_link             sample_attribute    
+[19] submission_accession sradb_updated       
+&lt;0 rows&gt; (or 0-length row.names)
+
+$sra
+ [1] sra_ID                        SRR_bamFile                  
+ [3] SRX_bamFile                   SRX_fastqFTP                 
+ [5] run_ID                        run_alias                    
+ [7] run_accession                 run_date                     
+ [9] updated_date                  spots                        
+[11] bases                         run_center                   
+[13] experiment_name               run_url_link                 
+[15] run_entrez_link               run_attribute                
+[17] experiment_ID                 experiment_alias             
+[19] experiment_accession          experiment_title             
+[21] study_name                    sample_name                  
+[23] design_description            library_name                 
+[25] library_strategy              library_source               
+[27] library_selection             library_layout               
+[29] library_construction_protocol adapter_spec                 
+[31] read_spec                     platform                     
+[33] instrument_model              instrument_name              
+[35] platform_parameters           sequence_space               
+[37] base_caller                   quality_scorer               
+[39] number_of_levels              multiplier                   
+[41] qtype                         experiment_url_link          
+[43] experiment_entrez_link        experiment_attribute         
+[45] sample_ID                     sample_alias                 
+[47] sample_accession              taxon_id                     
+[49] common_name                   anonymized_name              
+[51] individual_name               description                  
+[53] sample_url_link               sample_entrez_link           
+[55] sample_attribute              study_ID                     
+[57] study_alias                   study_accession              
+[59] study_title                   study_type                   
+[61] study_abstract                center_project_name          
+[63] study_description             study_url_link               
+[65] study_entrez_link             study_attribute              
+[67] related_studies               primary_study                
+[69] submission_ID                 submission_accession         
+[71] submission_comment            submission_center            
+[73] submission_lab                submission_date              
+[75] sradb_updated                
+&lt;0 rows&gt; (or 0-length row.names)
+
+$sra_ft
+ [1] SRR_bamFile                   SRX_bamFile                  
+ [3] SRX_fastqFTP                  run_ID                       
+ [5] run_alias                     run_accession                
+ [7] run_date                      updated_date                 
+ [9] spots                         bases                        
+[11] run_center                    experiment_name              
+[13] run_url_link                  run_entrez_link              
+[15] run_attribute                 experiment_ID                
+[17] experiment_alias              experiment_accession         
+[19] experiment_title              study_name                   
+[21] sample_name                   design_description           
+[23] library_name                  library_strategy             
+[25] library_source                library_selection            
+[27] library_layout                library_construction_protocol
+[29] adapter_spec                  read_spec                    
+[31] platform                      instrument_model             
+[33] instrument_name               platform_parameters          
+[35] sequence_space                base_caller                  
+[37] quality_scorer                number_of_levels             
+[39] multiplier                    qtype                        
+[41] experiment_url_link           experiment_entrez_link       
+[43] experiment_attribute          sample_ID                    
+[45] sample_alias                  sample_accession             
+[47] taxon_id                      common_name                  
+[49] anonymized_name               individual_name              
+[51] description                   sample_url_link              
+[53] sample_entrez_link            sample_attribute             
+[55] study_ID                      study_alias                  
+[57] study_accession               study_title                  
+[59] study_type                    study_abstract               
+[61] center_project_name           study_description            
+[63] study_url_link                study_entrez_link            
+[65] study_attribute               related_studies              
+[67] primary_study                 submission_ID                
+[69] submission_accession          submission_comment           
+[71] submission_center             submission_lab               
+[73] submission_date               sradb_updated                
+&lt;0 rows&gt; (or 0-length row.names)
+
+$sra_ft_content
+ [1] docid                            c0SRR_bamFile                   
+ [3] c1SRX_bamFile                    c2SRX_fastqFTP                  
+ [5] c3run_ID                         c4run_alias                     
+ [7] c5run_accession                  c6run_date                      
+ [9] c7updated_date                   c8spots                         
+[11] c9bases                          c10run_center                   
+[13] c11experiment_name               c12run_url_link                 
+[15] c13run_entrez_link               c14run_attribute                
+[17] c15experiment_ID                 c16experiment_alias             
+[19] c17experiment_accession          c18experiment_title             
+[21] c19study_name                    c20sample_name                  
+[23] c21design_description            c22library_name                 
+[25] c23library_strategy              c24library_source               
+[27] c25library_selection             c26library_layout               
+[29] c27library_construction_protocol c28adapter_spec                 
+[31] c29read_spec                     c30platform                     
+[33] c31instrument_model              c32instrument_name              
+[35] c33platform_parameters           c34sequence_space               
+[37] c35base_caller                   c36quality_scorer               
+[39] c37number_of_levels              c38multiplier                   
+[41] c39qtype                         c40experiment_url_link          
+[43] c41experiment_entrez_link        c42experiment_attribute         
+[45] c43sample_ID                     c44sample_alias                 
+[47] c45sample_accession              c46taxon_id                     
+[49] c47common_name                   c48anonymized_name              
+[51] c49individual_name               c50description                  
+[53] c51sample_url_link               c52sample_entrez_link           
+[55] c53sample_attribute              c54study_ID                     
+[57] c55study_alias                   c56study_accession              
+[59] c57study_title                   c58study_type                   
+[61] c59study_abstract                c60center_project_name          
+[63] c61study_description             c62study_url_link               
+[65] c63study_entrez_link             c64study_attribute              
+[67] c65related_studies               c66primary_study                
+[69] c67submission_ID                 c68submission_accession         
+[71] c69submission_comment            c70submission_center            
+[73] c71submission_lab                c72submission_date              
+[75] c73sradb_updated                
+&lt;0 rows&gt; (or 0-length row.names)
+
+$sra_ft_segdir
+[1] level            idx              start_block      leaves_end_block
+[5] end_block        root            
+&lt;0 rows&gt; (or 0-length row.names)
+
+$sra_ft_segments
+[1] blockid block  
+&lt;0 rows&gt; (or 0-length row.names)
+
+$study
+ [1] study_ID             study_alias          study_accession     
+ [4] study_title          study_type           study_abstract      
+ [7] broker_name          center_name          center_project_name 
+[10] study_description    related_studies      primary_study       
+[13] sra_link             study_url_link       xref_link           
+[16] study_entrez_link    ddbj_link            ena_link            
+[19] study_attribute      submission_accession sradb_updated       
+&lt;0 rows&gt; (or 0-length row.names)
+
+$submission
+ [1] submission_ID          submission_alias       submission_accession  
+ [4] submission_comment     files                  broker_name           
+ [7] center_name            lab_name               submission_date       
+[10] sra_link               submission_url_link    xref_link             
+[13] submission_entrez_link ddbj_link              ena_link              
+[16] submission_attribute   sradb_updated         
+&lt;0 rows&gt; (or 0-length row.names)</code></pre>
+</div>
+<div id="dbplyr-basics" class="section level2">
+<h2>dbplyr basics</h2>
+<p>Use <code>tbl()</code> to create an object that represents a database
+table.</p>
+<pre class="r"><code>run_db &lt;- tbl(src = mydb, &#39;run&#39;)
+run_db</code></pre>
+<pre><code># Source:   table&lt;`run`&gt; [?? x 21]
+# Database: sqlite 3.46.0 [/data2/sradb/SRAmetadb.sqlite]
+   run_ID bamFile run_alias   run_accession broker_name instrument_name run_date
+    &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;       &lt;chr&gt;         &lt;chr&gt;       &lt;chr&gt;           &lt;chr&gt;   
+ 1      1 &lt;NA&gt;    2008-09-12… DRR000001     &lt;NA&gt;        &lt;NA&gt;            2008-09…
+ 2      2 &lt;NA&gt;    2008-09-12… DRR000002     &lt;NA&gt;        &lt;NA&gt;            2008-09…
+ 3      3 &lt;NA&gt;    DRR000004   DRR000004     &lt;NA&gt;        &lt;NA&gt;            2009-03…
+ 4      4 &lt;NA&gt;    DRR000005   DRR000005     &lt;NA&gt;        &lt;NA&gt;            2009-03…
+ 5      5 &lt;NA&gt;    DRR000006   DRR000006     &lt;NA&gt;        &lt;NA&gt;            2009-03…
+ 6      6 &lt;NA&gt;    DRR000007   DRR000007     &lt;NA&gt;        &lt;NA&gt;            2009-02…
+ 7      7 &lt;NA&gt;    DRR000363   DRR000363     &lt;NA&gt;        &lt;NA&gt;            2010-02…
+ 8      8 &lt;NA&gt;    DRR000364   DRR000364     &lt;NA&gt;        &lt;NA&gt;            2010-02…
+ 9      9 &lt;NA&gt;    DRR000365   DRR000365     &lt;NA&gt;        &lt;NA&gt;            2010-02…
+10     10 &lt;NA&gt;    DRR000366   DRR000366     &lt;NA&gt;        &lt;NA&gt;            2010-02…
+# ℹ more rows
+# ℹ 14 more variables: run_file &lt;chr&gt;, run_center &lt;chr&gt;,
+#   total_data_blocks &lt;int&gt;, experiment_accession &lt;chr&gt;, experiment_name &lt;chr&gt;,
+#   sra_link &lt;chr&gt;, run_url_link &lt;chr&gt;, xref_link &lt;chr&gt;, run_entrez_link &lt;chr&gt;,
+#   ddbj_link &lt;chr&gt;, ena_link &lt;chr&gt;, run_attribute &lt;chr&gt;,
+#   submission_accession &lt;chr&gt;, sradb_updated &lt;chr&gt;</code></pre>
+<p>Select specific fields.</p>
+<pre class="r"><code>run_db |&gt;
+  select(run_accession, experiment_name)</code></pre>
+<pre><code># Source:   SQL [?? x 2]
+# Database: sqlite 3.46.0 [/data2/sradb/SRAmetadb.sqlite]
+   run_accession experiment_name
+   &lt;chr&gt;         &lt;chr&gt;          
+ 1 DRR000001     DRX000001      
+ 2 DRR000002     DRX000002      
+ 3 DRR000004     DRX000003      
+ 4 DRR000005     DRX000003      
+ 5 DRR000006     DRX000003      
+ 6 DRR000007     DRX000003      
+ 7 DRR000363     DRX000003      
+ 8 DRR000364     DRX000003      
+ 9 DRR000365     DRX000003      
+10 DRR000366     DRX000003      
+# ℹ more rows</code></pre>
+<p>SRA table.</p>
+<pre class="r"><code>sra_db &lt;- tbl(src = mydb, &#39;sra&#39;)
+sra_db</code></pre>
+<pre><code># Source:   table&lt;`sra`&gt; [?? x 75]
+# Database: sqlite 3.46.0 [/data2/sradb/SRAmetadb.sqlite]
+   sra_ID SRR_bamFile SRX_bamFile SRX_fastqFTP run_ID run_alias    run_accession
+    &lt;dbl&gt; &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;         &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;        
+ 1      1 &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;              1 2008-09-12.… DRR000001    
+ 2      2 &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;              2 2008-09-12.… DRR000002    
+ 3      3 &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;             11 DRR000003    DRR000003    
+ 4      4 &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;              5 DRR000006    DRR000006    
+ 5      5 &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;              3 DRR000004    DRR000004    
+ 6      6 &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;              7 DRR000363    DRR000363    
+ 7      7 &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;              6 DRR000007    DRR000007    
+ 8      8 &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;             10 DRR000366    DRR000366    
+ 9      9 &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;              4 DRR000005    DRR000005    
+10     10 &lt;NA&gt;        &lt;NA&gt;        &lt;NA&gt;              8 DRR000364    DRR000364    
+# ℹ more rows
+# ℹ 68 more variables: run_date &lt;chr&gt;, updated_date &lt;chr&gt;, spots &lt;dbl&gt;,
+#   bases &lt;dbl&gt;, run_center &lt;chr&gt;, experiment_name &lt;chr&gt;, run_url_link &lt;chr&gt;,
+#   run_entrez_link &lt;chr&gt;, run_attribute &lt;chr&gt;, experiment_ID &lt;dbl&gt;,
+#   experiment_alias &lt;chr&gt;, experiment_accession &lt;chr&gt;, experiment_title &lt;chr&gt;,
+#   study_name &lt;chr&gt;, sample_name &lt;chr&gt;, design_description &lt;chr&gt;,
+#   library_name &lt;chr&gt;, library_strategy &lt;chr&gt;, library_source &lt;chr&gt;, …</code></pre>
+</div>
+<div id="end" class="section level2">
+<h2>End</h2>
 <p>Disconnect.</p>
 <pre class="r"><code>DBI::dbDisconnect(mydb)</code></pre>
 <br>
