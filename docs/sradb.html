@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-07-25" />
+<meta name="date" content="2024-07-27" />
 
 <title>Interfacing with the Sequence Read Archive in R</title>
 
@@ -284,7 +284,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Interfacing with the Sequence Read Archive
 in R</h1>
-<h4 class="date">2024-07-25</h4>
+<h4 class="date">2024-07-27</h4>
 
 </div>
 
@@ -313,7 +313,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-07-25
+<strong>Last updated:</strong> 2024-07-27
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -444,15 +444,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea0610af323c88e3a3248277c50f609fbca863543targetblanka0610afa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3c6da947fb5b834852e343ce462abbc08c17e612targetblank3c6da94a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/a0610af323c88e3a3248277c50f609fbca863543" target="_blank">a0610af</a>
+<a href="https://github.com/davetang/muse/tree/3c6da947fb5b834852e343ce462abbc08c17e612" target="_blank">3c6da94</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea0610af323c88e3a3248277c50f609fbca863543targetblanka0610afa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3c6da947fb5b834852e343ce462abbc08c17e612targetblank3c6da94a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -462,7 +462,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/a0610af323c88e3a3248277c50f609fbca863543" target="_blank">a0610af</a>.
+<a href="https://github.com/davetang/muse/tree/3c6da947fb5b834852e343ce462abbc08c17e612" target="_blank">3c6da94</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -481,9 +481,6 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    r_packages_4.3.3/
     Ignored:    r_packages_4.4.0/
-
-Unstaged changes:
-    Modified:   script/run_rstudio.sh
 
 </code></pre>
 <p>
@@ -527,6 +524,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/3c6da947fb5b834852e343ce462abbc08c17e612/analysis/sradb.Rmd" target="_blank">3c6da94</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-27
+</td>
+<td>
+Get sample information
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/7e58caec9c038fe058323029e28b6e50bd595015/docs/sradb.html" target="_blank">7e58cae</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-25
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -643,25 +674,87 @@ sra_tables</code></pre>
 [13] &quot;sra_link&quot;             &quot;study_url_link&quot;       &quot;xref_link&quot;           
 [16] &quot;study_entrez_link&quot;    &quot;ddbj_link&quot;            &quot;ena_link&quot;            
 [19] &quot;study_attribute&quot;      &quot;submission_accession&quot; &quot;sradb_updated&quot;       </code></pre>
+<p>Sample fields.</p>
+<pre class="r"><code>dbListFields(sra_con, &quot;sample&quot;)</code></pre>
+<pre><code> [1] &quot;sample_ID&quot;            &quot;sample_alias&quot;         &quot;sample_accession&quot;    
+ [4] &quot;broker_name&quot;          &quot;center_name&quot;          &quot;taxon_id&quot;            
+ [7] &quot;scientific_name&quot;      &quot;common_name&quot;          &quot;anonymized_name&quot;     
+[10] &quot;individual_name&quot;      &quot;description&quot;          &quot;sra_link&quot;            
+[13] &quot;sample_url_link&quot;      &quot;xref_link&quot;            &quot;sample_entrez_link&quot;  
+[16] &quot;ddbj_link&quot;            &quot;ena_link&quot;             &quot;sample_attribute&quot;    
+[19] &quot;submission_accession&quot; &quot;sradb_updated&quot;       </code></pre>
 <p>Query.</p>
 <pre class="r"><code>rs &lt;- dbGetQuery(sra_con, &quot;select * from study limit 3&quot;)
-rs[, 1:3]</code></pre>
+rs[, 1:5]</code></pre>
 <pre><code>  study_ID study_alias study_accession
 1        1   DRP000001       DRP000001
 2        2   DRP000002       DRP000002
-3        3   DRP000003       DRP000003</code></pre>
+3        3   DRP000003       DRP000003
+                                                                                study_title
+1                          Bacillus subtilis subsp. natto BEST195 genome sequencing project
+2                       Model organism for prokaryotic cell differentiation and development
+3 Comprehensive identification and characterization of the nucleosome             structure
+               study_type
+1 Whole Genome Sequencing
+2 Whole Genome Sequencing
+3  Transcriptome Analysis</code></pre>
+<p>Query matching specific study accession.</p>
+<pre class="r"><code>dbGetQuery(sra_con, &quot;select * from study where study_accession == &#39;DRP000001&#39;&quot;)</code></pre>
+<pre><code>  study_ID study_alias study_accession
+1        1   DRP000001       DRP000001
+                                                       study_title
+1 Bacillus subtilis subsp. natto BEST195 genome sequencing project
+               study_type
+1 Whole Genome Sequencing
+                                                                                                                                                                                           study_abstract
+1 &lt;b&gt;&lt;i&gt;Bacillus subtilis&lt;/i&gt; subsp. &lt;i&gt;natto&lt;/i&gt; BEST195&lt;/b&gt;. i&gt;Bacillus subtilis&lt;/i&gt; subsp. &lt;i&gt;natto&lt;/i&gt; BEST195 was isolated from fermented soybeans and will be used for comparative genome analysis.
+  broker_name center_name                    center_project_name
+1        &lt;NA&gt;        KEIO Bacillus subtilis subsp. natto BEST195
+  study_description related_studies primary_study sra_link study_url_link
+1              &lt;NA&gt;            &lt;NA&gt;          &lt;NA&gt;     &lt;NA&gt;           &lt;NA&gt;
+                             xref_link study_entrez_link ddbj_link ena_link
+1 pubmed: 20398357 || pubmed: 25329997              &lt;NA&gt;      &lt;NA&gt;     &lt;NA&gt;
+  study_attribute submission_accession       sradb_updated
+1            &lt;NA&gt;            DRA000001 2023-12-03 23:10:21</code></pre>
+<p>Match a list of study accessions.</p>
+<pre class="r"><code>rs &lt;- dbGetQuery(sra_con, &quot;select * from study where study_accession in (&#39;DRP000001&#39;, &#39;DRP000003&#39;)&quot;)
+rs[, 1:5]</code></pre>
+<pre><code>  study_ID study_alias study_accession
+1        1   DRP000001       DRP000001
+2        3   DRP000003       DRP000003
+                                                                                study_title
+1                          Bacillus subtilis subsp. natto BEST195 genome sequencing project
+2 Comprehensive identification and characterization of the nucleosome             structure
+               study_type
+1 Whole Genome Sequencing
+2  Transcriptome Analysis</code></pre>
 </div>
 <div id="srx-to-srr" class="section level2">
 <h2>SRX to SRR</h2>
 <p>How do we get the SRR accession for <a
 href="https://www.ncbi.nlm.nih.gov/sra/SRX510365%5Baccn%5D">SRX510365</a>?
 (Should be SRR1216135)</p>
-<pre class="r"><code>my_id &lt;- &#39;SRX510365&#39;
+<pre class="r"><code>exps &lt;- c(&quot;SRX510281&quot;, &quot;SRX510280&quot;, &quot;SRX510279&quot;, &quot;SRX510278&quot;, &quot;SRX510277&quot;, &quot;SRX510276&quot;)
 
-conversion &lt;- sraConvert(my_id, sra_con = sra_con)
-conversion</code></pre>
+lookup &lt;- sraConvert(exps, sra_con = sra_con)
+lookup</code></pre>
 <pre><code>  experiment submission     study    sample        run
-1  SRX510365  SRA090948 SRP025982 SRS588883 SRR1216135</code></pre>
+1  SRX510276  SRA090948 SRP025982 SRS588793 SRR1216046
+2  SRX510277  SRA090948 SRP025982 SRS588794 SRR1216047
+3  SRX510278  SRA090948 SRP025982 SRS588795 SRR1216048
+4  SRX510279  SRA090948 SRP025982 SRS588796 SRR1216049
+5  SRX510280  SRA090948 SRP025982 SRS588798 SRR1216050
+6  SRX510281  SRA090948 SRP025982 SRS588797 SRR1216051</code></pre>
+<p>Get sample information.</p>
+<pre class="r"><code>purrr::map_df(lookup$sample, \(x){
+  dbGetQuery(sra_con, paste0(&quot;select * from sample where sample_accession == &#39;&quot;, x, &quot;&#39;&quot;))
+})$sample_attribute</code></pre>
+<pre><code>[1] &quot;source_name: Human Brain Reference RNA (HBRR) from Ambion || seqc sample: B || platform: Illumina HiSeq 2000 || site: NYG || library id: 4 || lane: L03 || barcode: TAGCTT || flowcell: AC132FACXX&quot;
+[2] &quot;source_name: Human Brain Reference RNA (HBRR) from Ambion || seqc sample: B || platform: Illumina HiSeq 2000 || site: NYG || library id: 4 || lane: L04 || barcode: TAGCTT || flowcell: AC132FACXX&quot;
+[3] &quot;source_name: Human Brain Reference RNA (HBRR) from Ambion || seqc sample: B || platform: Illumina HiSeq 2000 || site: NYG || library id: 4 || lane: L05 || barcode: TAGCTT || flowcell: AC132FACXX&quot;
+[4] &quot;source_name: Human Brain Reference RNA (HBRR) from Ambion || seqc sample: B || platform: Illumina HiSeq 2000 || site: NYG || library id: 4 || lane: L06 || barcode: TAGCTT || flowcell: AC132FACXX&quot;
+[5] &quot;source_name: Human Brain Reference RNA (HBRR) from Ambion || seqc sample: B || platform: Illumina HiSeq 2000 || site: NYG || library id: 4 || lane: L07 || barcode: TAGCTT || flowcell: AC132FACXX&quot;
+[6] &quot;source_name: Human Brain Reference RNA (HBRR) from Ambion || seqc sample: B || platform: Illumina HiSeq 2000 || site: NYG || library id: 4 || lane: L08 || barcode: TAGCTT || flowcell: AC132FACXX&quot;</code></pre>
 </div>
 <div id="end" class="section level2">
 <h2>End</h2>
