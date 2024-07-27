@@ -61,26 +61,53 @@ sra_tables
 
 Study fields.
 
-```{r dblistfields}
+```{r dblistfields_study}
 dbListFields(sra_con, "study")
+```
+
+Sample fields.
+
+```{r dblistfields_sample}
+dbListFields(sra_con, "sample")
 ```
 
 Query.
 
-```{r}
+```{r select_from_study}
 rs <- dbGetQuery(sra_con, "select * from study limit 3")
-rs[, 1:3]
+rs[, 1:5]
+```
+
+Query matching specific study accession.
+
+```{r select_where}
+dbGetQuery(sra_con, "select * from study where study_accession == 'DRP000001'")
+```
+
+Match a list of study accessions.
+
+```{r list_of_accessions}
+rs <- dbGetQuery(sra_con, "select * from study where study_accession in ('DRP000001', 'DRP000003')")
+rs[, 1:5]
 ```
 
 ## SRX to SRR
 
 How do we get the SRR accession for [SRX510365](https://www.ncbi.nlm.nih.gov/sra/SRX510365[accn])? (Should be SRR1216135)
 
-```{r conversion}
-my_id <- 'SRX510365'
+```{r lookup}
+exps <- c("SRX510281", "SRX510280", "SRX510279", "SRX510278", "SRX510277", "SRX510276")
 
-conversion <- sraConvert(my_id, sra_con = sra_con)
-conversion
+lookup <- sraConvert(exps, sra_con = sra_con)
+lookup
+```
+
+Get sample information.
+
+```{r get_sample_info}
+purrr::map_df(lookup$sample, \(x){
+  dbGetQuery(sra_con, paste0("select * from sample where sample_accession == '", x, "'"))
+})$sample_attribute
 ```
 
 ## End
