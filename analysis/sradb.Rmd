@@ -118,7 +118,13 @@ sample_info |>
   select(sample_accession, sample_attribute) |>
   tidyr::separate_longer_delim(cols = sample_attribute, delim = " || ") |>
   tidyr::separate_wider_delim(cols = sample_attribute, delim = ": ", names = c('key', 'value')) |>
-  tidyr::pivot_wider(id_cols = sample_accession, names_from = key, values_from = value)
+  tidyr::pivot_wider(id_cols = sample_accession, names_from = key, values_from = value) -> sample_attribute
+```
+
+Join into one table.
+
+```{r lookup_join_sample_attribute}
+dplyr::inner_join(x = lookup, y = sample_attribute, by = c('sample' = "sample_accession"))
 ```
 
 ## End
