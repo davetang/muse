@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee6dba7a34d58cbb2aa4d47353359ca4d2c88b477targetblanke6dba7aa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree00acf0d9ca8d4ea4853b619e1cea1e613faf40f0targetblank00acf0da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/e6dba7a34d58cbb2aa4d47353359ca4d2c88b477" target="_blank">e6dba7a</a>
+<a href="https://github.com/davetang/muse/tree/00acf0d9ca8d4ea4853b619e1cea1e613faf40f0" target="_blank">00acf0d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee6dba7a34d58cbb2aa4d47353359ca4d2c88b477targetblanke6dba7aa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree00acf0d9ca8d4ea4853b619e1cea1e613faf40f0targetblank00acf0da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/e6dba7a34d58cbb2aa4d47353359ca4d2c88b477" target="_blank">e6dba7a</a>.
+<a href="https://github.com/davetang/muse/tree/00acf0d9ca8d4ea4853b619e1cea1e613faf40f0" target="_blank">00acf0d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -600,6 +600,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/00acf0d9ca8d4ea4853b619e1cea1e613faf40f0/analysis/sradb.Rmd" target="_blank">00acf0d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-27
+</td>
+<td>
+Join lookup with sample attribute table
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/38767631c0282f743cd468df759b254b3b5a99ba/docs/sradb.html" target="_blank">3876763</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -867,17 +901,30 @@ formatted.</p>
   select(sample_accession, sample_attribute) |&gt;
   tidyr::separate_longer_delim(cols = sample_attribute, delim = &quot; || &quot;) |&gt;
   tidyr::separate_wider_delim(cols = sample_attribute, delim = &quot;: &quot;, names = c(&#39;key&#39;, &#39;value&#39;)) |&gt;
-  tidyr::pivot_wider(id_cols = sample_accession, names_from = key, values_from = value)</code></pre>
-<pre><code># A tibble: 6 × 9
-  sample_accession source_name   `seqc sample` platform site  `library id` lane 
-  &lt;chr&gt;            &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;        &lt;chr&gt;
-1 SRS588793        Human Brain … B             Illumin… NYG   4            L03  
-2 SRS588794        Human Brain … B             Illumin… NYG   4            L04  
-3 SRS588795        Human Brain … B             Illumin… NYG   4            L05  
-4 SRS588796        Human Brain … B             Illumin… NYG   4            L06  
-5 SRS588798        Human Brain … B             Illumin… NYG   4            L07  
-6 SRS588797        Human Brain … B             Illumin… NYG   4            L08  
-# ℹ 2 more variables: barcode &lt;chr&gt;, flowcell &lt;chr&gt;</code></pre>
+  tidyr::pivot_wider(id_cols = sample_accession, names_from = key, values_from = value) -&gt; sample_attribute</code></pre>
+<p>Join into one table.</p>
+<pre class="r"><code>dplyr::inner_join(x = lookup, y = sample_attribute, by = c(&#39;sample&#39; = &quot;sample_accession&quot;))</code></pre>
+<pre><code>  experiment submission     study    sample        run
+1  SRX510276  SRA090948 SRP025982 SRS588793 SRR1216046
+2  SRX510277  SRA090948 SRP025982 SRS588794 SRR1216047
+3  SRX510278  SRA090948 SRP025982 SRS588795 SRR1216048
+4  SRX510279  SRA090948 SRP025982 SRS588796 SRR1216049
+5  SRX510280  SRA090948 SRP025982 SRS588798 SRR1216050
+6  SRX510281  SRA090948 SRP025982 SRS588797 SRR1216051
+                                   source_name seqc sample            platform
+1 Human Brain Reference RNA (HBRR) from Ambion           B Illumina HiSeq 2000
+2 Human Brain Reference RNA (HBRR) from Ambion           B Illumina HiSeq 2000
+3 Human Brain Reference RNA (HBRR) from Ambion           B Illumina HiSeq 2000
+4 Human Brain Reference RNA (HBRR) from Ambion           B Illumina HiSeq 2000
+5 Human Brain Reference RNA (HBRR) from Ambion           B Illumina HiSeq 2000
+6 Human Brain Reference RNA (HBRR) from Ambion           B Illumina HiSeq 2000
+  site library id lane barcode   flowcell
+1  NYG          4  L03  TAGCTT AC132FACXX
+2  NYG          4  L04  TAGCTT AC132FACXX
+3  NYG          4  L05  TAGCTT AC132FACXX
+4  NYG          4  L06  TAGCTT AC132FACXX
+5  NYG          4  L07  TAGCTT AC132FACXX
+6  NYG          4  L08  TAGCTT AC132FACXX</code></pre>
 </div>
 <div id="end" class="section level2">
 <h2>End</h2>
