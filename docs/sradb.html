@@ -30,6 +30,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -232,6 +235,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -239,6 +305,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -444,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3c6da947fb5b834852e343ce462abbc08c17e612targetblank3c6da94a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee6dba7a34d58cbb2aa4d47353359ca4d2c88b477targetblanke6dba7aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/3c6da947fb5b834852e343ce462abbc08c17e612" target="_blank">3c6da94</a>
+<a href="https://github.com/davetang/muse/tree/e6dba7a34d58cbb2aa4d47353359ca4d2c88b477" target="_blank">e6dba7a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3c6da947fb5b834852e343ce462abbc08c17e612targetblank3c6da94a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee6dba7a34d58cbb2aa4d47353359ca4d2c88b477targetblanke6dba7aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -462,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/3c6da947fb5b834852e343ce462abbc08c17e612" target="_blank">3c6da94</a>.
+<a href="https://github.com/davetang/muse/tree/e6dba7a34d58cbb2aa4d47353359ca4d2c88b477" target="_blank">e6dba7a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -524,6 +600,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/e6dba7a34d58cbb2aa4d47353359ca4d2c88b477/analysis/sradb.Rmd" target="_blank">e6dba7a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-27
+</td>
+<td>
+Format sample attribute
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/f3646e2f37ce74ab13338e83f5e9cb1222390fa1/docs/sradb.html" target="_blank">f3646e2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -748,13 +858,26 @@ lookup</code></pre>
 <p>Get sample information.</p>
 <pre class="r"><code>purrr::map_df(lookup$sample, \(x){
   dbGetQuery(sra_con, paste0(&quot;select * from sample where sample_accession == &#39;&quot;, x, &quot;&#39;&quot;))
-})$sample_attribute</code></pre>
-<pre><code>[1] &quot;source_name: Human Brain Reference RNA (HBRR) from Ambion || seqc sample: B || platform: Illumina HiSeq 2000 || site: NYG || library id: 4 || lane: L03 || barcode: TAGCTT || flowcell: AC132FACXX&quot;
-[2] &quot;source_name: Human Brain Reference RNA (HBRR) from Ambion || seqc sample: B || platform: Illumina HiSeq 2000 || site: NYG || library id: 4 || lane: L04 || barcode: TAGCTT || flowcell: AC132FACXX&quot;
-[3] &quot;source_name: Human Brain Reference RNA (HBRR) from Ambion || seqc sample: B || platform: Illumina HiSeq 2000 || site: NYG || library id: 4 || lane: L05 || barcode: TAGCTT || flowcell: AC132FACXX&quot;
-[4] &quot;source_name: Human Brain Reference RNA (HBRR) from Ambion || seqc sample: B || platform: Illumina HiSeq 2000 || site: NYG || library id: 4 || lane: L06 || barcode: TAGCTT || flowcell: AC132FACXX&quot;
-[5] &quot;source_name: Human Brain Reference RNA (HBRR) from Ambion || seqc sample: B || platform: Illumina HiSeq 2000 || site: NYG || library id: 4 || lane: L07 || barcode: TAGCTT || flowcell: AC132FACXX&quot;
-[6] &quot;source_name: Human Brain Reference RNA (HBRR) from Ambion || seqc sample: B || platform: Illumina HiSeq 2000 || site: NYG || library id: 4 || lane: L08 || barcode: TAGCTT || flowcell: AC132FACXX&quot;</code></pre>
+}) -&gt; sample_info</code></pre>
+<p>The required sample information is stored in
+<code>sample_attribute</code> and that needs to be further
+formatted.</p>
+<pre class="r"><code>sample_info |&gt;
+  as_tibble() |&gt;
+  select(sample_accession, sample_attribute) |&gt;
+  tidyr::separate_longer_delim(cols = sample_attribute, delim = &quot; || &quot;) |&gt;
+  tidyr::separate_wider_delim(cols = sample_attribute, delim = &quot;: &quot;, names = c(&#39;key&#39;, &#39;value&#39;)) |&gt;
+  tidyr::pivot_wider(id_cols = sample_accession, names_from = key, values_from = value)</code></pre>
+<pre><code># A tibble: 6 × 9
+  sample_accession source_name   `seqc sample` platform site  `library id` lane 
+  &lt;chr&gt;            &lt;chr&gt;         &lt;chr&gt;         &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;        &lt;chr&gt;
+1 SRS588793        Human Brain … B             Illumin… NYG   4            L03  
+2 SRS588794        Human Brain … B             Illumin… NYG   4            L04  
+3 SRS588795        Human Brain … B             Illumin… NYG   4            L05  
+4 SRS588796        Human Brain … B             Illumin… NYG   4            L06  
+5 SRS588798        Human Brain … B             Illumin… NYG   4            L07  
+6 SRS588797        Human Brain … B             Illumin… NYG   4            L08  
+# ℹ 2 more variables: barcode &lt;chr&gt;, flowcell &lt;chr&gt;</code></pre>
 </div>
 <div id="end" class="section level2">
 <h2>End</h2>
@@ -841,6 +964,8 @@ footer is added to webpages before the MathJax javascript. -->
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -873,6 +998,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
