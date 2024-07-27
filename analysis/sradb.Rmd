@@ -3,7 +3,7 @@ title: "Interfacing with the Sequence Read Archive in R"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
-    toc: false
+    toc: true
 editor_options:
   chunk_output_type: console
 ---
@@ -107,7 +107,18 @@ Get sample information.
 ```{r get_sample_info}
 purrr::map_df(lookup$sample, \(x){
   dbGetQuery(sra_con, paste0("select * from sample where sample_accession == '", x, "'"))
-})$sample_attribute
+}) -> sample_info
+```
+
+The required sample information is stored in `sample_attribute` and that needs to be further formatted.
+
+```{r separate_sample_attribute}
+sample_info |>
+  as_tibble() |>
+  select(sample_accession, sample_attribute) |>
+  tidyr::separate_longer_delim(cols = sample_attribute, delim = " || ") |>
+  tidyr::separate_wider_delim(cols = sample_attribute, delim = ": ", names = c('key', 'value')) |>
+  tidyr::pivot_wider(id_cols = sample_accession, names_from = key, values_from = value)
 ```
 
 ## End
