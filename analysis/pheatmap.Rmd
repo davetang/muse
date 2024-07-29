@@ -3,7 +3,7 @@ title: "Making a heatmap in R with the pheatmap package"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
-    toc: false
+    toc: true
 editor_options:
   chunk_output_type: console
 ---
@@ -16,19 +16,28 @@ library(grid)
 library(gridExtra)
 ```
 
-Making a heatmap using the `pheatmap` package.
+## Example data
+
+Load data and subset for demonstration purposes.
 
 ```{r example_data}
 example_file <- "https://davetang.org/file/TagSeqExample.tab"
 data <- read.delim(example_file, header = TRUE, row.names = "gene")
 data_subset <- as.matrix(data[rowSums(data)>50000,])
+dim(data_subset)
 ```
+
+## Default heatmap
 
 Default heatmap using `pheatmap`.
 
 ```{r pheatmap_default, fig.width=7, fig.height=7}
 pheatmap(data_subset)
+```
 
+Manually scale the rows of the dataset.
+
+```{r pheatmap_default_own_scale, fig.width=7, fig.height=7}
 cal_z_score <- function(x){
   (x - mean(x)) / sd(x)
 }
@@ -37,11 +46,13 @@ data_subset_norm <- t(apply(data_subset, 1, cal_z_score))
 pheatmap(data_subset_norm)
 ```
 
-Using scale produces the same heatmap as using `cal_z_score`.
+Using `scale = "row"` produces the same heatmap when we manually scaled the data.
 
 ```{r pheatmap_scale, fig.width=7, fig.height=7}
 pheatmap(data_subset, scale = "row")
 ```
+
+## Adding a title
 
 Add a title using `main`.
 
@@ -57,13 +68,30 @@ one <- pheatmap(data_subset, silent = TRUE)
 grid.arrange(grobs = list(my_title, one[[4]]), heights = c(0.1, 1))
 ```
 
-Two heatmaps.
+## Two heatmaps
+
+Use `grid.arrange` to arrange multiple heatmaps.
 
 ```{r two_heatmaps}
 one <- pheatmap(data_subset, silent = TRUE)
 two <- pheatmap(data_subset, silent = TRUE)
 
 grid.arrange(grobs = list(one[[4]], two[[4]]))
+```
+
+## Dendrogram
+
+Dendrogram results from pheatmap().
+
+```{r pheatmap_result, fig.height=8, fig.width=10}
+par(mar = c(3.1, 2.1, 1.1, 5.1))
+
+my_heatmap <- pheatmap(data_subset, silent = TRUE)
+names(my_heatmap)
+
+my_heatmap$tree_row %>%
+  as.dendrogram() %>%
+  plot(horiz = TRUE)
 ```
 
 Reproduce the gene dendrogram.
@@ -93,7 +121,9 @@ as.dendrogram(my_hclust_sample) %>%
   plot()
 ```
 
-Add annotations.
+## Heatmap annotations
+
+Add row and column annotations.
 
 ```{r annotation, fig.height=7, fig.width=7}
 my_gene_col <- cutree(tree = as.dendrogram(my_hclust_gene), k = 2)
@@ -114,13 +144,16 @@ Define your own column order by modifying `data_subset` and setting `cluster_col
 ```{r own_col_order}
 my_col_order <- c("N2", "T1a", "N1", "T1b", "T2", "T3")
 
-pheatmap(data_subset[, my_col_order],
-         annotation_col = my_sample_col,
-         cluster_cols = FALSE
-         )
+pheatmap(
+  data_subset[, my_col_order],
+  annotation_col = my_sample_col,
+  cluster_cols = FALSE
+)
 ```
 
-More clusters.
+## Gene clusters
+
+Adding more clusters.
 
 ```{r more_clusters, fig.height=7, fig.width=7}
 my_gene_col <- cutree(tree = as.dendrogram(my_hclust_gene), k = 6)
@@ -176,25 +209,16 @@ save_pheatmap_png <- function(x, filename, width=1200, height=1000, res = 150) {
 # save_pheatmap_png(p, "heatmap_colour.png")
 ```
 
+## Breaks
+
 Introduce breaks by cutting the dendrogram.
 
 ```{r break, fig.height=7, fig.width=7}
-pheatmap(data_subset,
-         annotation_row = my_gene_col,
-         annotation_col = my_sample_col,
-         cutree_rows = 2,
-         cutree_cols = 2)
-```
-
-Dendrogram results from pheatmap().
-
-```{r pheatmap_result, fig.height=8, fig.width=10}
-par(mar = c(3.1, 2.1, 1.1, 5.1))
-
-my_heatmap <- pheatmap(data_subset, silent = TRUE)
-names(my_heatmap)
-
-my_heatmap$tree_row %>%
-  as.dendrogram() %>%
-  plot(horiz = TRUE)
+pheatmap(
+  data_subset,
+  annotation_row = my_gene_col,
+  annotation_col = my_sample_col,
+  cutree_rows = 2,
+  cutree_cols = 2
+)
 ```
