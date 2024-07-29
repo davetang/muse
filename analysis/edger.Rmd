@@ -4,305 +4,44 @@ date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
     toc: true
+editor_options:
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
+library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-A short post on comparing the different normalisation methods implemented in `edgeR` and their downstream effects on differential expression calling.
+> Differential expression analysis of RNA-seq expression profiles with biological replication. Implements a range of statistical methodology based on the negative binomial distributions, including empirical Bayes estimation, exact tests, generalized linear models and quasi-likelihood tests. As well as RNA-seq, it be applied to differential signal analysis of other types of genomic data that produce read counts, including ChIP-seq, ATAC-seq, Bisulfite-seq, SAGE and CAGE. 
 
 ## Installation
 
-Install using `BiocManager`.
+Install using `BiocManager::install()`.
 
-```{r install_edger, message=FALSE, warning=FALSE, eval=FALSE}
-if (!requireNamespace("BiocManager", quietly = TRUE))
-       install.packages("BiocManager")
+```{r install_edger, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
 
 BiocManager::install("edgeR")
 ```
 
-## Normalisation methods
+## Documentation
 
-Load package.
+From `?edgeR::calcNormFactors`:
 
-```{r load_edger, message=FALSE, warning=FALSE}
-library("edgeR")
-packageVersion("edgeR")
-```
-
-Historically, `calcNormFactors` was the function used for normalisation but `normLibSizes` is the new name. The help page on `normLibSizes` provides some details on the normalisation methods.
-
->Calculate scaling factors to convert the raw library sizes for a set of sequenced samples into normalized effective library sizes.
+> Calculate scaling factors to convert the raw library sizes for a set of sequenced samples into normalized effective library sizes.
 >
->This function computes scaling factors to convert observed library sizes into normalized library sizes, also called "effective library sizes". The effective library sizes for use in downstream analysis are lib.size * norm.factors where lib.size contains the original library sizes and norm.factors is the vector of scaling factors computed by this function.
+> This function computes scaling factors to convert observed library sizes into normalized library sizes, also called "effective library sizes". The effective library sizes for use in downstream analysis are lib.size * norm.factors where lib.size contains the original library sizes and norm.factors is the vector of scaling factors computed by this function.
 >
->The TMM method implements the trimmed mean of M-values method proposed by Robinson and Oshlack (2010). By default, the M-values are weighted according to inverse variances, as computed by the delta method for logarithms of binomial random variables. If refColumn is unspecified, then the column whose count-per-million upper quartile is closest to the mean upper quartile is set as the reference library.
+> The TMM method implements the trimmed mean of M-values method proposed by Robinson and Oshlack (2010). By default, the M-values are weighted according to inverse variances, as computed by the delta method for logarithms of binomial random variables. If refColumn is unspecified, then the column whose count-per-million upper quartile is closest to the mean upper quartile is set as the reference library.
 >
->The TMMwsp method stands for "TMM with singleton pairing". This is a variant of TMM that is intended to perform better for data with a high proportion of zeros. In the TMM method, genes that have zero count in either library are ignored when comparing pairs of libraries. In the TMMwsp method, the positive counts from such genes are reused to increase the number of features by which the libraries are compared. The singleton positive counts are paired up between the libraries in decreasing order of size and then a slightly modified TMM method is applied to the re-ordered libraries. If refColumn is unspecified, then the column with largest sum of square-root counts is used as the reference library.
+> The TMMwsp method stands for "TMM with singleton pairing". This is a variant of TMM that is intended to have more stable performance when the counts have a high proportion of zeros. In the TMM method, genes that have zero count in either library are ignored when comparing pairs of libraries. In the TMMwsp method, the positive counts from such genes are reused to increase the number of features by which the libraries are compared. The singleton positive counts are paired up between the libraries in decreasing order of size and then a slightly modified TMM method is applied to the re-ordered libraries. If refColumn is unspecified, then the column with largest sum of square-root counts is used as the reference library.
 >
->RLE is the scaling factor method proposed by Anders and Huber (2010). We call it "relative log expression", as median library is calculated from the geometric mean of all columns and the median ratio of each sample to the median library is taken as the scale factor.
+> RLE is the scaling factor method proposed by Anders and Huber (2010). We call it "relative log expression", as median library is calculated from the geometric mean of all columns and the median ratio of each sample to the median library is taken as the scale factor.
 >
->The upperquartile method is the upper-quartile normalization method of Bullard et al (2010), in which the scale factors are calculated from the 75% quantile of the counts for each library, after removing genes that are zero in all libraries. The idea is generalized here to allow normalization by any quantile of the count distributions.
+> The upperquartile method is the upper-quartile normalization method of Bullard et al (2010), in which the scale factors are calculated from the 75% quantile of the counts for each library, after removing genes that are zero in all libraries. The idea is generalized here to allow normalization by any quantile of the count distributions.
 >
->If method="none", then the normalization factors are set to 1.
+> If method="none", then the normalization factors are set to 1.
 >
->For symmetry, normalization factors are adjusted to multiply to 1. Rows of object that have zero counts for all columns are removed before normalization factors are computed. The number of such rows does not affect the estimated normalization factors.
-
-## A test dataset
-
-I created a dataset to test the different normalisation methods; this was based on the hypothetical situation described in [Robinson and Oshlack](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25).
-
-There are four samples; column one and two are the controls (`c1` and `c2`) and column three and four are the patients (`p1` and `p2`).
-
-```{r eg1}
-eg1 <- data.frame(
-  c1 = rep(10, 50),
-  c2 = rep(10, 50),
-  p1 = c(rep(20, 25),rep(0,25)),
-  p2 = c(rep(20, 25),rep(0,25))
-)
-
-colnames(eg1)
-```
-
-25 transcripts are in all four samples in equal amount. (They are equal because they are sequenced at twice the depth in the patient samples, i.e., the patient samples have half the number of transcripts than the controls (25 versus 50) so they are sequenced at twice the depth.)
-
-```{r present_in_all}
-eg1[c(1:3, 23:25), ]
-```
-
-Another 25 transcripts are only present in the controls and their expression is the same as the first 25 transcripts in the controls.
-
-```{r only_in_control}
-eg1[c(26:28, 48:50), ]
-```
-
-The four samples have exactly the same depth (500 counts).
-
-```{r same_depth}
-colSums(eg1)
-```
-
-## Differential gene expression
-
-From the Quick start section in the `edgeRUsersGuide.pdf`:
-
->edgeR offers many variants on analyses. The glm approach is more popular than the classic approach as it offers great flexibilities. There are two testing methods under the glm framework: likelihood ratio tests and quasi-likelihood F-tests. The quasi-likelihood method is highly recommended for differential expression analyses of bulk RNA-seq data as it gives stricter error rate control by accounting for the uncertainty in dispersion estimation. The likelihood ratio test can be useful in some special cases such as single cell RNA-seq and datasets with no replicates.
->
->A typical edgeR analysis might look like the following.
-
-```{r typical_edger_analysis}
-group <- factor(c(1,1,2,2))
-y <- DGEList(counts=eg1, group=group)
-keep <- filterByExpr(y)
-y <- y[keep,,keep.lib.sizes=FALSE]
-y <- normLibSizes(y)
-design <- model.matrix(~group)
-y <- estimateDisp(y, design)
-fit <- glmQLFit(y, design)
-qlf <- glmQLFTest(fit, coef=2)
-topTags(qlf)
-```
-
-Number of differentially expressed genes.
-
-```{r num_de}
-table(p.adjust(qlf$table$PValue, method="fdr") < 0.01)
-```
-
-### No normalisation
-
-Function for `edgeR` workflow.
-
-```{r run_edger}
-run_edger <- function(norm_method){
-  group <- factor(c(1,1,2,2))
-  y <- DGEList(counts=eg1, group=group)
-  keep <- filterByExpr(y)
-  y <- y[keep,,keep.lib.sizes=FALSE]
-  y <- normLibSizes(y, method=norm_method)
-  design <- model.matrix(~group)
-  y <- estimateDisp(y, design)
-  fit <- glmQLFit(y, design)
-  qlf <- glmQLFTest(fit, coef=2)
-  qlf$table$FDR <- p.adjust(qlf$table$PValue, method="fdr")
-  qlf
-}
-```
- 
-Run differential expression without any normalisation step.
-
-```{r norm_none, message=FALSE, warning=FALSE}
-norm_none <- run_edger("none")
-table(norm_none$table$FDR < 0.01)
-```
-
-Without normalisation, every transcript is differentially expressed.
-
-### TMM
-
-Normalise using the weighted trimmed mean of M-values method.
-
-```{r norm_tmm, message=FALSE, warning=FALSE}
-norm_tmm <- run_edger("TMM")
-norm_tmm$samples
-```
-
-The `norm.factors` is used to normalise the library size. Using the normalised library size, transcript one is equally expressed in all four samples, i.e., not differentially expressed.
-
-```{r norm_lib_size}
-norm_lib_size <- norm_tmm$samples$lib.size * norm_tmm$samples$norm.factors
-
-rbind(
-  raw = eg1[1, ],
-  normalised = eg1[1, ] / norm_lib_size
-)
-```
-
-With TMM normalisation, only half of the transcripts are differentially expressed (the last 25 transcripts in the control samples).
-
-```{r norm_tmm_de}
-table(norm_tmm$table$FDR < 0.01)
-```
-
-### TMMwsp
-
-The TMMwsp method stands for "TMM with singleton pairing". This is a variant of TMM that is intended to perform better for data with a high proportion of zeros.
-
-```{r norm_tmm_wsp, message=FALSE, warning=FALSE}
-norm_tmm_wsp <- run_edger("TMMwsp")
-table(norm_tmm_wsp$table$FDR < 0.01)
-```
-
-### RLE normalisation
-
-RLE is the scaling factor method proposed by Anders and Huber (2010). We call it "relative log expression", as median library is calculated from the geometric mean of all columns and the median ratio of each sample to the median library is taken as the scale factor.
- 
-```{r norm_rle, message=FALSE, warning=FALSE}
-norm_rle <- run_edger("RLE")
-table(norm_rle$table$FDR < 0.01)
-```
-
-### Upper-quartile normalisation
-
-The upperquartile method is the upper-quartile normalization method of Bullard et al (2010), in which the scale factors are calculated from the 75% quantile of the counts for each library, after removing genes that are zero in all libraries. The idea is generalized here to allow normalization by any quantile of the count distributions.
-
- 
-```{r norm_upper_quartile, message=FALSE, warning=FALSE}
-norm_uq <- run_edger("upperquartile")
-table(norm_uq$table$FDR < 0.01)
-```
-   
-## Using a real dataset
-
-Perform differential gene expression analysis using various normalisation methods on the `pnas_expression.txt` dataset, which is from [Li et al.](https://pubmed.ncbi.nlm.nih.gov/19088194/).
-
-```{r pnas_expression}
-my_url <- "https://davetang.org/file/pnas_expression.txt"
-eg2 <- read.table(my_url, header=TRUE, sep="\t")
-rownames(eg2) <- eg2[,1]
-eg2 <- eg2[,2:8]
-head(eg2)
-```
-
-Create `run_edger_pnas` to run the edgeR workflow on the real dataset.
-
-```{r run_edger_pnas}
-run_edger_pnas <- function(norm_method){
-  group <- c(rep("Control",4),rep("DHT",3))
-  y <- DGEList(counts=eg2, group=group)
-  keep <- filterByExpr(y)
-  y <- y[keep,,keep.lib.sizes=FALSE]
-  y <- normLibSizes(y, method=norm_method)
-  design <- model.matrix(~group)
-  y <- estimateDisp(y, design)
-  fit <- glmQLFit(y, design)
-  qlf <- glmQLFTest(fit, coef=2)
-  qlf$table$FDR <- p.adjust(qlf$table$PValue, method="fdr")
-  qlf
-}
-```
- 
-Carry out differential gene expression analysis with no normalisation.
-
-```{r norm_none_eg2, message=FALSE, warning=FALSE}
-norm_none_eg2 <- run_edger_pnas("none")
-norm_none_eg2$samples
-```
-
-Number of differentially expressed genes.
-
-```{r norm_none_eg2_de}
-table(norm_none_eg2$table$FDR < 0.01)
-```
-
-TMM normalisation.
-
-```{r norm_tmm_eg2, message=FALSE, warning=FALSE}
-norm_tmm_eg2 <- run_edger_pnas("TMM")
-table(norm_tmm_eg2$table$FDR < 0.01)
-```
-
-TMMwsp normalisation.
-
-```{r norm_tmm_wsp_eg2, message=FALSE, warning=FALSE}
-norm_tmm_wsp_eg2 <- run_edger_pnas("TMMwsp")
-table(norm_tmm_wsp_eg2$table$FDR < 0.01)
-```
-RLE.
-
-```{r norm_rle_eg2, message=FALSE, warning=FALSE}
-norm_rle_eg2 <- run_edger_pnas("RLE")
-table(norm_rle_eg2$table$FDR < 0.01)
-```
- 
-Upper quartile normalisation.
-
-```{r norm_uq_eg2, message=FALSE, warning=FALSE}
-norm_uq_eg2 <- run_edger_pnas("upperquartile")
-table(norm_uq_eg2$table$FDR < 0.01)
-```
-
-Plot the overlaps between the different normalisation methods.
-
-```{r de_overlap}
-library(UpSetR)
-get_de <- function(x, thres = 0.01){
-  i <- x$table$FDR < thres
-  row.names(x$table)[i]
-}
-
-my_list <- list(
-  none = get_de(norm_none_eg2),
-  TMM = get_de(norm_tmm_eg2),
-  TMMwsp = get_de(norm_tmm_wsp_eg2),
-  RLE = get_de(norm_rle_eg2),
-  UQ = get_de(norm_uq_eg2)
-)
-
-upset(fromList(my_list), order.by = "freq")
-```
-
-The scaling factors are not too different hence the majority of the differentially expressed genes overlap. The upper quartile method's scaling factor is the most similar to having no normalisation at all, and hence they have an exclusive set of genes (154) that only they call as differentially expressed.
-
-```{r compare_norm_factors}
-library(tidyr)
-library(ggplot2)
-norm_factors <- data.frame(
-  Lane = colnames(eg2),
-  none = norm_none_eg2$samples$norm.factors,
-  TMM = norm_tmm_eg2$samples$norm.factors,
-  TMMwsp = norm_tmm_wsp_eg2$samples$norm.factors,
-  RLE = norm_rle_eg2$samples$norm.factors,
-  upperquartile = norm_uq_eg2$samples$norm.factors
-)
-
-pivot_longer(data = norm_factors, -Lane, names_to = "Normalisation", values_to = "Scaling") |>
-  ggplot(data = _, aes(Lane, Scaling, group = Normalisation, colour = Normalisation)) +
-  geom_line() +
-  geom_point() +
-  theme_minimal()
-```
- 
+> For symmetry, normalization factors are adjusted to multiply to 1. Rows of object that have zero counts for all columns are removed before normalization factors are computed. The number of such rows does not affect the estimated normalization factors. 
