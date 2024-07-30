@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree67813b659cb5356c234b01cde9c5be2660c07c2etargetblank67813b6a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree482856cb4706caafdc9a5f3569d2b7b43520a72dtargetblank482856ca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/67813b659cb5356c234b01cde9c5be2660c07c2e" target="_blank">67813b6</a>
+<a href="https://github.com/davetang/muse/tree/482856cb4706caafdc9a5f3569d2b7b43520a72d" target="_blank">482856c</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree67813b659cb5356c234b01cde9c5be2660c07c2etargetblank67813b6a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree482856cb4706caafdc9a5f3569d2b7b43520a72dtargetblank482856ca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/67813b659cb5356c234b01cde9c5be2660c07c2e" target="_blank">67813b6</a>.
+<a href="https://github.com/davetang/muse/tree/482856cb4706caafdc9a5f3569d2b7b43520a72d" target="_blank">482856c</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -600,6 +600,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/482856cb4706caafdc9a5f3569d2b7b43520a72d/analysis/poisson.Rmd" target="_blank">482856c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-30
+</td>
+<td>
+Sampling from a sequencing library
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/7efed52410c20a2f7e2f3468fab7651e95c4d148/docs/poisson.html" target="_blank">7efed52</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -688,6 +722,8 @@ following formula:</p>
 </div>
 <div id="examples" class="section level2">
 <h2>Examples</h2>
+<div id="homes-sold" class="section level3">
+<h3>Homes sold</h3>
 <p>The average number of homes sold is 2 homes per day. What is the
 probability that exactly 3 homes will be sold tomorrow?</p>
 <p><span class="math display">\[ P(3; 2) = \frac{(e^{-2}) (2^3)}{3!}
@@ -700,8 +736,8 @@ probability that exactly 3 homes will be sold tomorrow?</p>
 <pre class="r"><code>dpois(x = 3, lambda = 2)</code></pre>
 <pre><code>[1] 0.180447</code></pre>
 </div>
-<div id="rna-seq" class="section level2">
-<h2>RNA-seq</h2>
+<div id="rna-seq" class="section level3">
+<h3>RNA-seq</h3>
 <p>The Poisson distribution can be used to estimate the <a
 href="https://genome.cshlp.org/content/early/2008/06/11/gr.079558.108">technical
 variance in high-throughput sequencing experiments</a>. My basic
@@ -716,6 +752,53 @@ at random to produce a read. This is a Poisson process. If you plot the
 depth of sequence along this theoretical genome, it will be a poisson
 distribution.</p>
 </blockquote>
+<p>Expanding on the idea above in <a
+href="https://web.stanford.edu/class/bios221/book/">Modern Statistics
+for Modern Biology</a>:</p>
+<p>Consider a sequencing library that contains <span
+class="math inline">\(n_1\)</span> fragments corresponding to gene 1,
+<span class="math inline">\(n_2\)</span> fragments for gene 2, and so
+on, with a total library size of <span class="math inline">\(n = n_1 +
+n_2 + \ldots\)</span>. This library is then sequenced and the identity
+of <span class="math inline">\(r\)</span> randomly sampled fragments are
+determined. To paint a better mental picture, the following are some
+typical numbers. The number of genes will be in the order of tens of
+thousands; the value of <span class="math inline">\(n\)</span> depends
+on the amount of cells that were used to prepare the library and
+typically this is in the order of billions or trillions; and the number
+of reads <span class="math inline">\(r\)</span> is usually in the tens
+of millions, which is much smaller than <span
+class="math inline">\(n\)</span>. Sequencing is sampling from <span
+class="math inline">\(n\)</span>.</p>
+<p>From this we can conclude that the probability that a given read maps
+to the <span class="math inline">\(i\)</span> th gene is <span
+class="math inline">\(p_i = n_i/n\)</span> (ratio of a specific fragment
+to all fragments) and this is independent of the outcomes for all the
+other reads. So we can model the number of reads for gene <span
+class="math inline">\(i\)</span> by a Poisson distribution, where the
+<em>rate</em> of the Poisson process is the product of <span
+class="math inline">\(p_i\)</span>, the initial proportion of fragments
+for the <span class="math inline">\(i\)</span> th gene, times <span
+class="math inline">\(r\)</span>, the number of reads sequenced; that is
+<span class="math inline">\(\lambda_i = rp_i\)</span>.</p>
+<p>In practice, we are usually not interested in modeling the read
+counts within a single library, but in comparing the counts between
+libraries. That is, we want to know whether any differences that we see
+between different biological conditions are larger than what we might
+expect even between biological replicates. Empirically, it turns out
+that replicate experiments vary more than the Poisson distribution
+predicts.</p>
+<p>Intuitively, what happens is that <span
+class="math inline">\(p_i\)</span>, and therefore also <span
+class="math inline">\(\lambda_i\)</span>, varies even between biological
+replicates. To account for that variation, we need to add another layer
+of modeling on top and it turns out that the gamma-Poisson (a.k.a.
+negative binomial) distribution suits our modeling requirements. Instead
+of a single <span class="math inline">\(\lambda\)</span>, which
+represents both mean and variance, this distribution has two parameters.
+In principle, these can be different for each gene and we can estimate
+them from the data.</p>
+</div>
 </div>
 <div id="calculating-confidence-intervals" class="section level2">
 <h2>Calculating confidence intervals</h2>
