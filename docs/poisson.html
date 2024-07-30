@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2dceb55c092541f597a5167960f16c7c1492ec83targetblank2dceb55a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree67813b659cb5356c234b01cde9c5be2660c07c2etargetblank67813b6a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/2dceb55c092541f597a5167960f16c7c1492ec83" target="_blank">2dceb55</a>
+<a href="https://github.com/davetang/muse/tree/67813b659cb5356c234b01cde9c5be2660c07c2e" target="_blank">67813b6</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2dceb55c092541f597a5167960f16c7c1492ec83targetblank2dceb55a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree67813b659cb5356c234b01cde9c5be2660c07c2etargetblank67813b6a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/2dceb55c092541f597a5167960f16c7c1492ec83" target="_blank">2dceb55</a>.
+<a href="https://github.com/davetang/muse/tree/67813b659cb5356c234b01cde9c5be2660c07c2e" target="_blank">67813b6</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -605,6 +605,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/67813b659cb5356c234b01cde9c5be2660c07c2e/analysis/poisson.Rmd" target="_blank">67813b6</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-30
+</td>
+<td>
+Fix LaTeX
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/e49a794b1f5e7cc98d76425ba2a4a21b61073839/docs/poisson.html" target="_blank">e49a794</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-30
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/2dceb55c092541f597a5167960f16c7c1492ec83/analysis/poisson.Rmd" target="_blank">2dceb55</a>
 </td>
 <td>
@@ -646,15 +680,18 @@ region is virtually zero.</li>
 a Poisson experiment. Given the mean number of successes that occur in a
 specified region, we can compute the Poisson probability based on the
 following formula:</p>
-<p>$ P(x; ) = $</p>
+<p><span class="math display">\[ P(x; \mu) =
+\frac{(e^{-\mu})(\mu^x)}{x!} \]</span></p>
 <p>which is also written as:</p>
-<p>$ Pr(X = k) = e^{-}   k = 0, 1, 2, $</p>
+<p><span class="math display">\[ Pr(X = k) = e^{-\lambda}
+\frac{\lambda^k}{k!} \ \ k = 0, 1, 2, \dotsc \]</span></p>
 </div>
 <div id="examples" class="section level2">
 <h2>Examples</h2>
 <p>The average number of homes sold is 2 homes per day. What is the
 probability that exactly 3 homes will be sold tomorrow?</p>
-<p>$ P(3; 2) = $</p>
+<p><span class="math display">\[ P(3; 2) = \frac{(e^{-2}) (2^3)}{3!}
+\]</span></p>
 <p>Calculating this manually in R:</p>
 <pre class="r"><code>e &lt;- exp(1)
 ((e^-2)*(2^3))/factorial(3)</code></pre>
@@ -720,6 +757,43 @@ poisson_upper_tail &lt;- function(n) {
 abline(v=poisson_lower_tail(20))
 abline(v=poisson_upper_tail(20))</code></pre>
 <p><img src="figure/poisson.Rmd/plot_pois_cis-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_pois_cis-1">
+Past versions of plot_pois_cis-1.png
+</button>
+</p>
+<div id="fig-plot_pois_cis-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/e49a794b1f5e7cc98d76425ba2a4a21b61073839/docs/figure/poisson.Rmd/plot_pois_cis-1.png" target="_blank">e49a794</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-30
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <div id="webtool" class="section level3">
 <h3>Webtool</h3>
 <p>Using the <a
