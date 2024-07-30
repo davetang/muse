@@ -1,0 +1,125 @@
+---
+title: "The Poisson distribution"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Introduction
+
+A [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution) is the probability distribution that results from a Poisson experiment. A probability distribution assigns a probability to possible outcomes of a random experiment. A Poisson experiment has the following properties:
+
+1. The outcomes of the experiment can be classified as either successes or failures.
+2. The average number of successes that occurs in a specified region is known.
+3. The probability that a success will occur is proportional to the size of the region.
+4. The probability that a success will occur in an extremely small region is virtually zero.
+
+A Poisson random variable is the number of successes that result from a Poisson experiment. Given the mean number of successes that occur in a specified region, we can compute the Poisson probability based on the following formula:
+
+$ P(x; \mu) = \frac{(e^{-\mu})(\mu^x)}{x!} $
+
+which is also written as:
+
+$ Pr(X = k) = e^{-\lambda} \frac{\lambda^k}{k!} \ \ k = 0, 1, 2, \dotsc $
+
+## Examples
+
+The average number of homes sold is 2 homes per day. What is the probability that exactly 3 homes will be sold tomorrow?
+
+$ P(3; 2) = \frac{(e^{-2}) (2^3)}{3!} $
+
+Calculating this manually in R:
+
+```{r homes_sold}
+e <- exp(1)
+((e^-2)*(2^3))/factorial(3)
+```
+
+Using `dpois()`:
+
+```{r dpois}
+dpois(x = 3, lambda = 2)
+```
+
+## RNA-seq
+
+The Poisson distribution can be used to estimate the [technical variance in high-throughput sequencing experiments](https://genome.cshlp.org/content/early/2008/06/11/gr.079558.108). My basic understanding is that the variance between technical replicates can be modelled using the Poisson distribution. Check out [Why Does Rna-Seq Read Count Fit Poisson Distribution?](https://www.biostars.org/p/84445/) on Biostars.
+
+From Chris Miller:
+
+> Picture a process whereby you take the genome and choose a location at random to produce a read. This is a Poisson process. If you plot the depth of sequence along this theoretical genome, it will be a poisson distribution.
+
+## Calculating confidence intervals
+
+Calculate the [confidence intervals](https://www.math.mcmaster.ca/peter/s743/poissonalpha.html) using R. Create data with 1,000,000 values that follow a Poisson distribution with lambda = 20.
+
+```{r poisson_data}
+set.seed(1984)
+n <- 1000000
+data <- rpois(n, 20)
+```
+
+Functions for calculating the lower and upper tails.
+
+```{r poisson_tails}
+poisson_lower_tail <- function(n) {
+   qchisq(0.025, 2*n)/2
+}
+poisson_upper_tail <- function(n) {
+   qchisq(0.975, 2*(n+1))/2
+}
+```
+
+Lower limit for lambda = 20.
+
+```{r lower_limit}
+poisson_lower_tail(20)
+```
+
+Upper limit for lambda = 20.
+
+```{r upper_limit}
+poisson_upper_tail(20)
+```
+
+How many values in data are lower than the lower limit?
+
+```{r check_lower}
+table(data<poisson_lower_tail(20))
+```
+
+How many values in data are higher than the upper limit?
+
+```{r check_upper}
+table(data>poisson_upper_tail(20))
+```
+
+What percentage of values were outside of the 95% CI?
+
+```{r check_outside}
+(sum(data<poisson_lower_tail(20)) + sum(data>poisson_upper_tail(20))) * 100 / n
+```
+
+Plot.
+
+```{r plot_pois_cis}
+hist(data)
+abline(v=poisson_lower_tail(20))
+abline(v=poisson_upper_tail(20))
+```
+
+### Webtool
+
+Using the [Poisson Confidence Interval Calculator](https://www.danielsoper.com/statcalc/calculator.aspx?id=86) and lambda = 20 returns:
+
+* 99% confidence interval: 10.35327 - 34.66800
+* 95% confidence interval: 12.21652 - 30.88838
+* 90% confidence interval: 13.25465 - 29.06202
+
+which matches our 95% CI values.
