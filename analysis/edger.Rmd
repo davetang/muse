@@ -28,7 +28,7 @@ BiocManager::install("edgeR")
 
 ## Documentation
 
-From `?edgeR::calcNormFactors`:
+From `?edgeR::normLibSizes`:
 
 > Calculate scaling factors to convert the raw library sizes for a set of sequenced samples into normalized effective library sizes.
 >
@@ -45,3 +45,231 @@ From `?edgeR::calcNormFactors`:
 > If method="none", then the normalization factors are set to 1.
 >
 > For symmetry, normalization factors are adjusted to multiply to 1. Rows of object that have zero counts for all columns are removed before normalization factors are computed. The number of such rows does not affect the estimated normalization factors. 
+
+## A test dataset
+
+I created a dataset to test the different normalisation methods. There are four samples; column one and two are the controls and column three and four are the patients. 25 transcripts are in all four samples in equal amount. Another 25 transcripts are **only** present in the controls and their expression is the same as the first 25 transcripts in the controls. The four samples have exactly the same depth (500 counts). However, since the patient samples have half the number of transcripts than the controls (25 versus 50), they are sequenced at twice the depth. This hypothetical situation was described in [Robinson and Oshlack Genome Biology 2010](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25).
+
+```{r create_df}
+control_1 <- rep(10, 50)
+control_2 <- rep(10, 50)
+patient_1 <- c(rep(20, 25),rep(0,25))
+patient_2 <- c(rep(20, 25),rep(0,25))
+
+df <- data.frame(c1=control_1,
+                 c2=control_2,
+                 p1=patient_1,
+                 p2=patient_2)
+
+head(df)
+```
+
+Tail of the dataset.
+
+```{r tail_df}
+tail(df)
+```
+
+Equal depth.
+
+```{r depth_df}
+colSums(df)
+```
+
+## No normalisation
+
+Let's run the differential expression analysis without any normalisation step:
+
+```{r no_norm}
+library(edgeR)
+
+# create group vector
+group <- c('control','control','patient','patient')
+
+# create DGEList object
+d <- DGEList(counts=df, group=group)
+
+# check out the DGEList object
+d
+```
+
+Perform a differential gene expression analysis.
+
+```{r no_norm_de}
+d <- DGEList(counts=df, group=group)
+d <- estimateCommonDisp(d)
+
+# perform the DE test
+de <- exactTest(d)
+
+# how many differentially expressed transcripts?
+table(p.adjust(de$table$PValue, method="BH")<0.05)
+```
+
+Without normalisation, every transcript is differentially expressed.
+
+## TMM normalisation
+
+From the [edgeR manual](https://bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf):
+
+{edgeR} is concerned with differential expression analysis rather than with the quantification of expression levels. It is concerned with relative changes in expression levels between conditions, but not directly with estimating absolute expression levels.
+
+The `normLibSizes()` function normalises the library sizes in such a way to minimise the log-fold changes between the samples for most genes. The default method for computing these scale factors uses a trimmed mean of M-values (TMM) between each pair of samples. We call the product of the original library size and the scaling factor the effective library size, i.e., the normalised library size. The effective library size replaces the original library size in all downstream analyses
+
+Let's test the weighted trimmed mean of M-values method:
+
+```{r d_tmm}
+d_tmm <- normLibSizes(d, method="TMM")
+d_tmm
+```
+
+If we use the scaling, we will observe that the differences are now less pronounced.
+
+```{r head_d_tmm}
+head(d$counts)
+head(d_tmm$counts * d_tmm$samples$norm.factors)
+```
+
+Perform the differential expression test.
+
+```{r d_tmm_de}
+d_tmm <- estimateCommonDisp(d_tmm)
+d_tmm <- exactTest(d_tmm)
+table(p.adjust(d_tmm$table$PValue, method="BH")<0.05)
+```
+
+Only half of the transcripts are differentially expressed (the last 25 transcripts).
+
+## RLE normalisation
+
+Let's test the relative log expression normalisation method:
+
+```{r d_rle}
+d_rle <- normLibSizes(d, method="RLE")
+d_rle
+```
+
+Perform the differential gene expression analysis.
+
+```{r d_rle_de}
+d_rle <- estimateCommonDisp(d_rle)
+d_rle <- exactTest(d_rle)
+table(p.adjust(d_rle$table$PValue, method="BH")<0.05)
+```
+
+## Upper-quartile normalisation
+
+Lastly let's try the upper-quartile normalisation method:
+
+```{r d_uq}
+d_uq <- normLibSizes(d, method="upperquartile")
+d_uq
+```
+
+DE test.
+
+```{r d_uq_de}
+d_uq <- estimateCommonDisp(d_uq)
+d_uq <- exactTest(d_uq)
+table(p.adjust(d_uq$table$PValue, method="BH")<0.05)
+```
+
+## Testing a real dataset
+
+Perform differential gene expression analysis using various normalisation methods on the [pnas_expression.txt](https://pubmed.ncbi.nlm.nih.gov/19088194/) dataset.
+
+```{r data}
+my_url <- "https://davetang.org/file/pnas_expression.txt"
+data <- read.table(my_url, header=TRUE, sep="\t")
+
+dim(data)
+```
+
+Prepare a DGEList object.
+
+```{r data_d}
+d <- data[,2:8]
+rownames(d) <- data[,1]
+group <- c(rep("Control",4),rep("DHT",3))
+d <- DGEList(counts = d, group=group)
+```
+
+Filter out lowly expressed genes.
+
+```{r keep}
+keep <- rowSums(cpm(d) > 0.5) >= 2
+d <- d[keep, , keep.lib.sizes=FALSE]
+```
+
+Carry out differential gene expression analysis with no normalisation.
+
+```{r}
+no_norm <- estimateCommonDisp(d)
+no_norm <- exactTest(no_norm)
+table(p.adjust(no_norm$table$PValue, method="BH")<0.05)
+```
+
+With TMM normalisation.
+
+```{r}
+TMM <- normLibSizes(d, method="TMM")
+TMM
+```
+
+```{r}
+TMM <- estimateCommonDisp(TMM)
+TMM <- exactTest(TMM)
+table(p.adjust(TMM$table$PValue, method="BH")<0.05)
+```
+
+With RLE.
+
+```{r}
+RLE <- normLibSizes(d, method="RLE")
+RLE
+```
+```{r}
+RLE <- estimateCommonDisp(RLE)
+RLE <- exactTest(RLE)
+table(p.adjust(RLE$table$PValue, method="BH")<0.05)
+```
+
+With the upper quartile method.
+
+```{r}
+uq <- normLibSizes(d, method="upperquartile")
+uq
+```
+```{r}
+uq <- estimateCommonDisp(uq)
+uq <- exactTest(uq)
+table(p.adjust(uq$table$PValue, method="BH")<0.05)
+```
+
+Finding the overlaps between the differential gene expression analyses.
+
+```{r}
+library(gplots)
+
+get_de <- function(x, pvalue){
+  my_i <- p.adjust(x$PValue, method="BH") < pvalue
+  row.names(x)[my_i]
+}
+
+my_de_no_norm <- get_de(no_norm$table, 0.05)
+my_de_tmm <- get_de(TMM$table, 0.05)
+my_de_rle <- get_de(RLE$table, 0.05)
+my_de_uq <- get_de(uq$table, 0.05)
+
+gplots::venn(list(no_norm = my_de_no_norm, TMM = my_de_tmm, RLE = my_de_rle, UQ = my_de_uq))
+```
+
+There is a large overlap of differentially expressed genes in the different normalisation approaches.
+
+```{r}
+gplots::venn(list(TMM = my_de_tmm, RLE = my_de_rle, UQ = my_de_uq))
+```
+
+## Summary
+
+The normalisation factors were quite similar between all normalisation methods, which is why the results of the differential expression were quite concordant. Most methods down sized the DHT samples with a normalisation factor of less than one to account for the larger library sizes of these samples.
