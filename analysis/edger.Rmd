@@ -201,58 +201,56 @@ keep <- rowSums(cpm(d) > 0.5) >= 2
 d <- d[keep, , keep.lib.sizes=FALSE]
 ```
 
+Function to run edgeR.
+
+```{r run_edger}
+run_edger <- function(d, method = NULL){
+  if(!is.null(method)){
+    d <- normLibSizes(d, method = method)
+  }
+  design <- model.matrix(~d$samples$group)
+  d <- estimateDisp(d, design)
+  # use Quasi-likelihood F-tests
+  fit <- glmQLFit(d, design)
+  qlf <- glmQLFTest(fit)
+}
+```
+
 Carry out differential gene expression analysis with no normalisation.
 
-```{r}
-no_norm <- estimateCommonDisp(d)
-no_norm <- exactTest(no_norm)
-table(p.adjust(no_norm$table$PValue, method="BH")<0.05)
+```{r run_edger_no_norm}
+no_norm <- run_edger(d)
+table(p.adjust(no_norm$table$PValue, method="fdr")<0.05)
 ```
 
 With TMM normalisation.
 
-```{r}
-TMM <- normLibSizes(d, method="TMM")
-TMM
-```
-
-```{r}
-TMM <- estimateCommonDisp(TMM)
-TMM <- exactTest(TMM)
-table(p.adjust(TMM$table$PValue, method="BH")<0.05)
+```{r run_edger_tmm}
+TMM <- run_edger(d, method="TMM")
+table(p.adjust(TMM$table$PValue, method="fdr")<0.05)
 ```
 
 With RLE.
 
-```{r}
-RLE <- normLibSizes(d, method="RLE")
-RLE
-```
-```{r}
-RLE <- estimateCommonDisp(RLE)
-RLE <- exactTest(RLE)
-table(p.adjust(RLE$table$PValue, method="BH")<0.05)
+```{r run_edger_rle}
+RLE <- run_edger(d, method="RLE")
+table(p.adjust(RLE$table$PValue, method="fdr")<0.05)
 ```
 
 With the upper quartile method.
 
-```{r}
-uq <- normLibSizes(d, method="upperquartile")
-uq
-```
-```{r}
-uq <- estimateCommonDisp(uq)
-uq <- exactTest(uq)
-table(p.adjust(uq$table$PValue, method="BH")<0.05)
+```{r run_edger_uq}
+uq <- run_edger(d, method="upperquartile")
+table(p.adjust(uq$table$PValue, method="fdr")<0.05)
 ```
 
 Finding the overlaps between the differential gene expression analyses.
 
-```{r}
+```{r run_edger_overlap}
 library(gplots)
 
 get_de <- function(x, pvalue){
-  my_i <- p.adjust(x$PValue, method="BH") < pvalue
+  my_i <- p.adjust(x$PValue, method="fdr") < pvalue
   row.names(x)[my_i]
 }
 
@@ -266,7 +264,7 @@ gplots::venn(list(no_norm = my_de_no_norm, TMM = my_de_tmm, RLE = my_de_rle, UQ 
 
 There is a large overlap of differentially expressed genes in the different normalisation approaches.
 
-```{r}
+```{r run_edger_norm}
 gplots::venn(list(TMM = my_de_tmm, RLE = my_de_rle, UQ = my_de_uq))
 ```
 
