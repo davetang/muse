@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree566ad8cd53be8041cecdee7688cd154dca82df69targetblank566ad8ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree29c97e058e62cd7432daa3480c14decbb181efe7targetblank29c97e0a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/566ad8cd53be8041cecdee7688cd154dca82df69" target="_blank">566ad8c</a>
+<a href="https://github.com/davetang/muse/tree/29c97e058e62cd7432daa3480c14decbb181efe7" target="_blank">29c97e0</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree566ad8cd53be8041cecdee7688cd154dca82df69targetblank566ad8ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree29c97e058e62cd7432daa3480c14decbb181efe7targetblank29c97e0a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/566ad8cd53be8041cecdee7688cd154dca82df69" target="_blank">566ad8c</a>.
+<a href="https://github.com/davetang/muse/tree/29c97e058e62cd7432daa3480c14decbb181efe7" target="_blank">29c97e0</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -600,6 +600,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/29c97e058e62cd7432daa3480c14decbb181efe7/analysis/edger.Rmd" target="_blank">29c97e0</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-31
+</td>
+<td>
+Update edgeR workflow
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/413584195c23245d728ef3ee88a18b4c78f1cfcb/docs/edger.html" target="_blank">4135841</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-07-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1043,98 +1077,42 @@ d &lt;- DGEList(counts = d, group=group)</code></pre>
 <p>Filter out lowly expressed genes.</p>
 <pre class="r"><code>keep &lt;- rowSums(cpm(d) &gt; 0.5) &gt;= 2
 d &lt;- d[keep, , keep.lib.sizes=FALSE]</code></pre>
+<p>Function to run edgeR.</p>
+<pre class="r"><code>run_edger &lt;- function(d, method = NULL){
+  if(!is.null(method)){
+    d &lt;- normLibSizes(d, method = method)
+  }
+  design &lt;- model.matrix(~d$samples$group)
+  d &lt;- estimateDisp(d, design)
+  # use Quasi-likelihood F-tests
+  fit &lt;- glmQLFit(d, design)
+  qlf &lt;- glmQLFTest(fit)
+}</code></pre>
 <p>Carry out differential gene expression analysis with no
 normalisation.</p>
-<pre class="r"><code>no_norm &lt;- estimateCommonDisp(d)
-no_norm &lt;- exactTest(no_norm)
-table(p.adjust(no_norm$table$PValue, method=&quot;BH&quot;)&lt;0.05)</code></pre>
+<pre class="r"><code>no_norm &lt;- run_edger(d)
+table(p.adjust(no_norm$table$PValue, method=&quot;fdr&quot;)&lt;0.05)</code></pre>
 <pre><code>
 FALSE  TRUE 
-14683  4782 </code></pre>
+15173  4292 </code></pre>
 <p>With TMM normalisation.</p>
-<pre class="r"><code>TMM &lt;- normLibSizes(d, method=&quot;TMM&quot;)
-TMM</code></pre>
-<pre><code>An object of class &quot;DGEList&quot;
-$counts
-                lane1 lane2 lane3 lane4 lane5 lane6 lane8
-ENSG00000124208   478   619   628   744   483   716   240
-ENSG00000182463    27    20    27    26    48    55    24
-ENSG00000124201   180   218   293   275   373   301    88
-ENSG00000124205     0     0     5     5     0     0     0
-ENSG00000124207    76    80    85    97    80    81    37
-19460 more rows ...
-
-$samples
-        group lib.size norm.factors
-lane1 Control   978233    1.0327868
-lane2 Control  1156431    1.0371519
-lane3 Control  1441598    1.0278995
-lane4 Control  1484958    1.0294240
-lane5     DHT  1822854    0.9366119
-lane6     DHT  1833704    0.9340634
-lane8     DHT   681509    1.0084769</code></pre>
-<pre class="r"><code>TMM &lt;- estimateCommonDisp(TMM)
-TMM &lt;- exactTest(TMM)
-table(p.adjust(TMM$table$PValue, method=&quot;BH&quot;)&lt;0.05)</code></pre>
+<pre class="r"><code>TMM &lt;- run_edger(d, method=&quot;TMM&quot;)
+table(p.adjust(TMM$table$PValue, method=&quot;fdr&quot;)&lt;0.05)</code></pre>
 <pre><code>
 FALSE  TRUE 
-14913  4552 </code></pre>
+15411  4054 </code></pre>
 <p>With RLE.</p>
-<pre class="r"><code>RLE &lt;- normLibSizes(d, method=&quot;RLE&quot;)
-RLE</code></pre>
-<pre><code>An object of class &quot;DGEList&quot;
-$counts
-                lane1 lane2 lane3 lane4 lane5 lane6 lane8
-ENSG00000124208   478   619   628   744   483   716   240
-ENSG00000182463    27    20    27    26    48    55    24
-ENSG00000124201   180   218   293   275   373   301    88
-ENSG00000124205     0     0     5     5     0     0     0
-ENSG00000124207    76    80    85    97    80    81    37
-19460 more rows ...
-
-$samples
-        group lib.size norm.factors
-lane1 Control   978233    1.0149859
-lane2 Control  1156431    1.0236589
-lane3 Control  1441598    1.0345742
-lane4 Control  1484958    1.0400447
-lane5     DHT  1822854    0.9706371
-lane6     DHT  1833704    0.9734747
-lane8     DHT   681509    0.9466503</code></pre>
-<pre class="r"><code>RLE &lt;- estimateCommonDisp(RLE)
-RLE &lt;- exactTest(RLE)
-table(p.adjust(RLE$table$PValue, method=&quot;BH&quot;)&lt;0.05)</code></pre>
+<pre class="r"><code>RLE &lt;- run_edger(d, method=&quot;RLE&quot;)
+table(p.adjust(RLE$table$PValue, method=&quot;fdr&quot;)&lt;0.05)</code></pre>
 <pre><code>
 FALSE  TRUE 
-14801  4664 </code></pre>
+15318  4147 </code></pre>
 <p>With the upper quartile method.</p>
-<pre class="r"><code>uq &lt;- normLibSizes(d, method=&quot;upperquartile&quot;)
-uq</code></pre>
-<pre><code>An object of class &quot;DGEList&quot;
-$counts
-                lane1 lane2 lane3 lane4 lane5 lane6 lane8
-ENSG00000124208   478   619   628   744   483   716   240
-ENSG00000182463    27    20    27    26    48    55    24
-ENSG00000124201   180   218   293   275   373   301    88
-ENSG00000124205     0     0     5     5     0     0     0
-ENSG00000124207    76    80    85    97    80    81    37
-19460 more rows ...
-
-$samples
-        group lib.size norm.factors
-lane1 Control   978233    1.0110884
-lane2 Control  1156431    1.0263441
-lane3 Control  1441598    1.0291497
-lane4 Control  1484958    1.0324023
-lane5     DHT  1822854    0.9766795
-lane6     DHT  1833704    0.9843852
-lane8     DHT   681509    0.9433508</code></pre>
-<pre class="r"><code>uq &lt;- estimateCommonDisp(uq)
-uq &lt;- exactTest(uq)
-table(p.adjust(uq$table$PValue, method=&quot;BH&quot;)&lt;0.05)</code></pre>
+<pre class="r"><code>uq &lt;- run_edger(d, method=&quot;upperquartile&quot;)
+table(p.adjust(uq$table$PValue, method=&quot;fdr&quot;)&lt;0.05)</code></pre>
 <pre><code>
 FALSE  TRUE 
-14796  4669 </code></pre>
+15333  4132 </code></pre>
 <p>Finding the overlaps between the differential gene expression
 analyses.</p>
 <pre class="r"><code>library(gplots)</code></pre>
@@ -1144,7 +1122,7 @@ Attaching package: &#39;gplots&#39;</code></pre>
 
     lowess</code></pre>
 <pre class="r"><code>get_de &lt;- function(x, pvalue){
-  my_i &lt;- p.adjust(x$PValue, method=&quot;BH&quot;) &lt; pvalue
+  my_i &lt;- p.adjust(x$PValue, method=&quot;fdr&quot;) &lt; pvalue
   row.names(x)[my_i]
 }
 
@@ -1154,11 +1132,11 @@ my_de_rle &lt;- get_de(RLE$table, 0.05)
 my_de_uq &lt;- get_de(uq$table, 0.05)
 
 gplots::venn(list(no_norm = my_de_no_norm, TMM = my_de_tmm, RLE = my_de_rle, UQ = my_de_uq))</code></pre>
-<p><img src="figure/edger.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/edger.Rmd/run_edger_overlap-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>There is a large overlap of differentially expressed genes in the
 different normalisation approaches.</p>
 <pre class="r"><code>gplots::venn(list(TMM = my_de_tmm, RLE = my_de_rle, UQ = my_de_uq))</code></pre>
-<p><img src="figure/edger.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/edger.Rmd/run_edger_norm-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
@@ -1214,12 +1192,13 @@ loaded via a namespace (and not attached):
 [25] htmltools_0.5.8.1  sass_0.4.9         yaml_2.3.8         later_1.3.2       
 [29] pillar_1.9.0       jquerylib_0.1.4    whisker_0.4.1      cachem_1.1.0      
 [33] gtools_3.9.5       tidyselect_1.2.1   locfit_1.5-9.9     digest_0.6.35     
-[37] stringi_1.8.4      rprojroot_2.0.4    fastmap_1.2.0      grid_4.4.0        
-[41] colorspace_2.1-0   cli_3.6.2          magrittr_2.0.3     utf8_1.2.4        
-[45] withr_3.0.0        scales_1.3.0       promises_1.3.0     timechange_0.3.0  
-[49] rmarkdown_2.27     httr_1.4.7         hms_1.1.3          evaluate_0.24.0   
-[53] knitr_1.47         rlang_1.1.4        Rcpp_1.0.12        glue_1.7.0        
-[57] rstudioapi_0.16.0  jsonlite_1.8.8     R6_2.5.1           fs_1.6.4          </code></pre>
+[37] stringi_1.8.4      splines_4.4.0      rprojroot_2.0.4    fastmap_1.2.0     
+[41] grid_4.4.0         colorspace_2.1-0   cli_3.6.2          magrittr_2.0.3    
+[45] utf8_1.2.4         withr_3.0.0        scales_1.3.0       promises_1.3.0    
+[49] timechange_0.3.0   rmarkdown_2.27     httr_1.4.7         hms_1.1.3         
+[53] evaluate_0.24.0    knitr_1.47         rlang_1.1.4        Rcpp_1.0.12       
+[57] glue_1.7.0         rstudioapi_0.16.0  jsonlite_1.8.8     R6_2.5.1          
+[61] fs_1.6.4          </code></pre>
 </div>
 </div>
 </div>
