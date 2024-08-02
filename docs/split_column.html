@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2022-09-01" />
+<meta name="date" content="2024-08-02" />
 
 <title>Split single column of annotations into multiple columns in R</title>
 
-<script src="site_libs/header-attrs-2.14/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -33,8 +33,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -154,11 +154,15 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.tab('show');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
   // Navbar adjustments
   var navHeight = $(".navbar").first().height() + 15;
@@ -187,8 +191,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -196,16 +200,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -287,7 +284,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Split single column of annotations into
 multiple columns in R</h1>
-<h4 class="date">2022-09-01</h4>
+<h4 class="date">2024-08-02</h4>
 
 </div>
 
@@ -316,7 +313,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2022-09-01
+<strong>Last updated:</strong> 2024-08-02
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -334,7 +331,7 @@ title="This is the local directory in which the code in this file was executed."
 This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
 analysis was created with <a
   href="https://github.com/workflowr/workflowr">workflowr</a> (version
-1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
 that were applied when the results were created. The <em>Past
 versions</em> tab lists the development history.
 </p>
@@ -447,15 +444,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec8588b7211da908a96779e6e88c053b112e6ea7etargetblankc8588b7a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb0eadf1b37408fcf8c607f24895b2f7ab5730869targetblankb0eadf1a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/c8588b7211da908a96779e6e88c053b112e6ea7e" target="_blank">c8588b7</a>
+<a href="https://github.com/davetang/muse/tree/b0eadf1b37408fcf8c607f24895b2f7ab5730869" target="_blank">b0eadf1</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec8588b7211da908a96779e6e88c053b112e6ea7etargetblankc8588b7a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb0eadf1b37408fcf8c607f24895b2f7ab5730869targetblankb0eadf1a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -465,7 +462,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/c8588b7211da908a96779e6e88c053b112e6ea7e" target="_blank">c8588b7</a>.
+<a href="https://github.com/davetang/muse/tree/b0eadf1b37408fcf8c607f24895b2f7ab5730869" target="_blank">b0eadf1</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -482,16 +479,8 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    r_packages_4.1.2/
-    Ignored:    r_packages_4.2.0/
-
-Untracked files:
-    Untracked:  analysis/cell_ranger.Rmd
-    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
-    Untracked:  data/ncrna_noncode_v3.fa
-
-Unstaged changes:
-    Modified:   script/run_rstudio.sh
+    Ignored:    r_packages_4.3.3/
+    Ignored:    r_packages_4.4.0/
 
 </code></pre>
 <p>
@@ -506,7 +495,6 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
 These are the previous versions of the repository in which changes were
 made to the R Markdown (<code>analysis/split_column.Rmd</code>) and HTML
@@ -537,6 +525,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/b0eadf1b37408fcf8c607f24895b2f7ab5730869/analysis/split_column.Rmd" target="_blank">b0eadf1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-02
+</td>
+<td>
+Update VCF example
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/5fa80f2a968bf218621dc00beccce106685b374b/docs/split_column.html" target="_blank">5fa80f2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-09-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -611,27 +633,36 @@ already.</p>
   install.packages(&quot;tidyverse&quot;)
 }
 library(tidyverse)</code></pre>
-<p>I have a small package called <a
-href="https://github.com/davetang/importbio">importbio</a> that can be
-used to load a VCF and GTF file. You can install it using the
-<code>remotes</code> package.</p>
-<pre class="r"><code>if(!require(&quot;remotes&quot;)){
-  install.packages(&quot;remotes&quot;)
-}
-
-if(!require(&quot;importbio&quot;)){
-  remotes::install_github(&#39;davetang/importbio&#39;)
-}</code></pre>
 </div>
 <div id="splitting-the-info-column-in-a-vcf-file"
 class="section level2">
 <h2>Splitting the info column in a VCF file</h2>
-<p>We will load a small VCF file using <code>importvcf</code>.</p>
-<pre class="r"><code>library(importbio)
-my_vcf &lt;- importvcf(&quot;https://raw.githubusercontent.com/davetang/learning_vcf_file/master/eg/Pfeiffer.vcf&quot;)
+<p>We will load a small portion of a VCF file using
+<code>read_tsv</code>; in addition we will rename <code>#CHROM</code> to
+<code>CHROM</code> and then change all the column names to lower
+case.</p>
+<pre class="r"><code>vcf_url &lt;- &quot;https://raw.githubusercontent.com/davetang/learning_vcf_file/master/eg/Pfeiffer.vcf&quot;
+read_tsv(vcf_url, comment = &quot;##&quot;, show_col_types = FALSE, n_max = 1000) |&gt;
+  dplyr::rename(CHROM = `#CHROM`) |&gt;
+  dplyr::rename_with(tolower) -&gt; my_vcf
 
-my_vcf %&gt;%
-  select(info) %&gt;%
+head(my_vcf)</code></pre>
+<pre><code># A tibble: 6 × 10
+  chrom    pos id         ref   alt    qual filter info            format manuel
+  &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;           &lt;chr&gt;  &lt;chr&gt; 
+1     1 866511 rs60722469 C     CCCCT 259.  PASS   AC=2;AF=1.00;A… GT:AD… 1/1:6…
+2     1 879317 rs7523549  C     T     151.  PASS   AC=1;AF=0.50;A… GT:AD… 0/1:1…
+3     1 879482 .          G     C     485.  PASS   AC=1;AF=0.50;A… GT:AD… 0/1:2…
+4     1 880390 rs3748593  C     A     288.  PASS   AC=1;AF=0.50;A… GT:AD… 0/1:1…
+5     1 881627 rs2272757  G     A     486.  PASS   AC=1;AF=0.50;A… GT:AD… 0/1:1…
+6     1 884091 rs7522415  C     G      65.5 PASS   AC=1;AF=0.50;A… GT:AD… 0/1:6…</code></pre>
+<p>Note that the <code>info</code> column is packed with all sorts of
+information for each variant. Also note the consistent format of the
+<code>info</code> column: each annotation is separated by a semi-colon
+(<code>;</code>) and annotations are stored as key-value pairs with an
+equal sign in between.</p>
+<pre class="r"><code>my_vcf |&gt;
+  select(info) |&gt;
   head()</code></pre>
 <pre><code># A tibble: 6 × 1
   info                                                                          
@@ -642,91 +673,103 @@ my_vcf %&gt;%
 4 AC=1;AF=0.50;AN=2;BaseQRankSum=-4.517;DB;DP=29;Dels=0.00;FS=1.485;HRun=0;Hapl…
 5 AC=1;AF=0.50;AN=2;BaseQRankSum=0.199;DB;DP=33;Dels=0.00;FS=0.000;HRun=1;Haplo…
 6 AC=1;AF=0.50;AN=2;BaseQRankSum=-0.259;DB;DP=12;Dels=0.00;FS=0.000;HRun=1;Hapl…</code></pre>
-<p>Note that the <code>info</code> column is packed with all sorts of
-information for each variant. Also note the consistent format of the
-<code>info</code> column: each annotation is separated by a semi-colon
-(<code>;</code>) and annotations are stored as key-value pairs with an
-equal sign in between.</p>
 <p>Firstly, we will use <code>separate_rows</code> to create a new row
 for each annotation by using <code>;</code> as the separator/delimiter;
 note that I have included <code>\\s*</code> after <code>;</code>, which
 is a regex for specifying a single whitespace occurring 0 or more times.
 By including the regex, whitespace after <code>;</code> will be removed,
-which is good because we do not want whitespace in our data. In
+which is good because we do not want whitespaces in our data. In
 addition, a <code>mutate</code> call is used prior to calling
 <code>separate_rows</code> and it is used to remove a trailing
 semicolon, if it exists.</p>
-<pre class="r"><code>my_vcf %&gt;%
-  mutate(info = sub(pattern = &quot;;$&quot;, replacement = &quot;&quot;, x = .data$info)) %&gt;%
-  separate_rows(info, sep = &quot;;\\s*&quot;) %&gt;%
+<pre class="r"><code>my_vcf |&gt;
+  mutate(info = sub(pattern = &quot;;$&quot;, replacement = &quot;&quot;, x = .data$info)) |&gt;
+  separate_rows(info, sep = &quot;;\\s*&quot;) |&gt;
   head()</code></pre>
 <pre><code># A tibble: 6 × 10
-  vid              chrom    pos id         ref   alt   qual   filter info  type 
-  &lt;chr&gt;            &lt;fct&gt;  &lt;int&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;
-1 1_866511_C_CCCCT 1     866511 rs60722469 C     CCCCT 258.62 PASS   AC=2  ins  
-2 1_866511_C_CCCCT 1     866511 rs60722469 C     CCCCT 258.62 PASS   AF=1… ins  
-3 1_866511_C_CCCCT 1     866511 rs60722469 C     CCCCT 258.62 PASS   AN=2  ins  
-4 1_866511_C_CCCCT 1     866511 rs60722469 C     CCCCT 258.62 PASS   DB    ins  
-5 1_866511_C_CCCCT 1     866511 rs60722469 C     CCCCT 258.62 PASS   DP=11 ins  
-6 1_866511_C_CCCCT 1     866511 rs60722469 C     CCCCT 258.62 PASS   FS=0… ins  </code></pre>
+  chrom    pos id         ref   alt    qual filter info     format        manuel
+  &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;         &lt;chr&gt; 
+1     1 866511 rs60722469 C     CCCCT  259. PASS   AC=2     GT:AD:DP:GQ:… 1/1:6…
+2     1 866511 rs60722469 C     CCCCT  259. PASS   AF=1.00  GT:AD:DP:GQ:… 1/1:6…
+3     1 866511 rs60722469 C     CCCCT  259. PASS   AN=2     GT:AD:DP:GQ:… 1/1:6…
+4     1 866511 rs60722469 C     CCCCT  259. PASS   DB       GT:AD:DP:GQ:… 1/1:6…
+5     1 866511 rs60722469 C     CCCCT  259. PASS   DP=11    GT:AD:DP:GQ:… 1/1:6…
+6     1 866511 rs60722469 C     CCCCT  259. PASS   FS=0.000 GT:AD:DP:GQ:… 1/1:6…</code></pre>
 <p>The next step is to split the key-value pairs and we will use the
 <code>separate</code> function to separate the pairs into two columns,
 which we will name <code>key</code> and <code>value</code>, using the
 equal sign as the separator/delimiter. Sometimes a key is missing a
 value and in these cases, the value will be <code>NA</code>.</p>
-<pre class="r"><code>my_vcf %&gt;%
-  mutate(info = sub(pattern = &quot;;$&quot;, replacement = &quot;&quot;, x = .data$info)) %&gt;%
-  separate_rows(info, sep = &quot;;\\s*&quot;) %&gt;%
-  separate(info, c(&#39;key&#39;, &#39;value&#39;), sep = &quot;=&quot;) %&gt;%
+<pre class="r"><code>my_vcf |&gt;
+  mutate(info = sub(pattern = &quot;;$&quot;, replacement = &quot;&quot;, x = .data$info)) |&gt;
+  separate_rows(info, sep = &quot;;\\s*&quot;) |&gt;
+  separate(info, c(&#39;key&#39;, &#39;value&#39;), sep = &quot;=&quot;) |&gt;
   head(10)</code></pre>
 <pre><code># A tibble: 10 × 11
-   vid             chrom    pos id    ref   alt   qual  filter key   value type 
-   &lt;chr&gt;           &lt;fct&gt;  &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
- 1 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   AC    2     ins  
- 2 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   AF    1.00  ins  
- 3 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   AN    2     ins  
- 4 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   DB    &lt;NA&gt;  ins  
- 5 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   DP    11    ins  
- 6 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   FS    0.000 ins  
- 7 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   HRun  0     ins  
- 8 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   Hapl… 41.3… ins  
- 9 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   MQ0   0     ins  
-10 1_866511_C_CCC… 1     866511 rs60… C     CCCCT 258.… PASS   MQ    61.94 ins  </code></pre>
+   chrom    pos id         ref   alt    qual filter key      value format manuel
+   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; 
+ 1     1 866511 rs60722469 C     CCCCT  259. PASS   AC       2     GT:AD… 1/1:6…
+ 2     1 866511 rs60722469 C     CCCCT  259. PASS   AF       1.00  GT:AD… 1/1:6…
+ 3     1 866511 rs60722469 C     CCCCT  259. PASS   AN       2     GT:AD… 1/1:6…
+ 4     1 866511 rs60722469 C     CCCCT  259. PASS   DB       &lt;NA&gt;  GT:AD… 1/1:6…
+ 5     1 866511 rs60722469 C     CCCCT  259. PASS   DP       11    GT:AD… 1/1:6…
+ 6     1 866511 rs60722469 C     CCCCT  259. PASS   FS       0.000 GT:AD… 1/1:6…
+ 7     1 866511 rs60722469 C     CCCCT  259. PASS   HRun     0     GT:AD… 1/1:6…
+ 8     1 866511 rs60722469 C     CCCCT  259. PASS   Haploty… 41.3… GT:AD… 1/1:6…
+ 9     1 866511 rs60722469 C     CCCCT  259. PASS   MQ0      0     GT:AD… 1/1:6…
+10     1 866511 rs60722469 C     CCCCT  259. PASS   MQ       61.94 GT:AD… 1/1:6…</code></pre>
 <p>The current state of the transformation produces a new row for each
 variant annotation and two columns containing the key and value. If we
 want our data in wide format where each annotation is a column, we can
 use the <code>pivot_wider</code> function.</p>
-<p>In the code below, I have used the first eight columns
-(<code>id_cols = vid:filter</code>) to specify the columns that uniquely
-identifies each variant, i.e. the same variant will have the same values
-in these columns. We specify our column names from the <code>key</code>
-column and the values for these cells will come from the
-<code>value</code> column.</p>
-<pre class="r"><code>my_vcf %&gt;%
-  mutate(info = sub(pattern = &quot;;$&quot;, replacement = &quot;&quot;, x = .data$info)) %&gt;%
-  separate_rows(info, sep = &quot;;\\s*&quot;) %&gt;%
-  separate(info, c(&#39;key&#39;, &#39;value&#39;), sep = &quot;=&quot;) %&gt;%
-  distinct() %&gt;% # remove duplicated annotations, if any
-  pivot_wider(id_cols = vid:filter, names_from = key, values_from = value) %&gt;%
-  head(10)</code></pre>
-<pre><code># A tibble: 10 × 28
-   vid       chrom    pos id    ref   alt   qual  filter AC    AF    AN    DB   
-   &lt;chr&gt;     &lt;fct&gt;  &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
- 1 1_866511… 1     866511 rs60… C     CCCCT 258.… PASS   2     1.00  2     &lt;NA&gt; 
- 2 1_879317… 1     879317 rs75… C     T     150.… PASS   1     0.50  2     &lt;NA&gt; 
- 3 1_879482… 1     879482 .     G     C     484.… PASS   1     0.50  2     &lt;NA&gt; 
- 4 1_880390… 1     880390 rs37… C     A     288.… PASS   1     0.50  2     &lt;NA&gt; 
- 5 1_881627… 1     881627 rs22… G     A     486.… PASS   1     0.50  2     &lt;NA&gt; 
- 6 1_884091… 1     884091 rs75… C     G     65.46 PASS   1     0.50  2     &lt;NA&gt; 
- 7 1_884101… 1     884101 rs49… A     C     85.81 PASS   1     0.50  2     &lt;NA&gt; 
- 8 1_892460… 1     892460 rs41… G     C     1736… PASS   1     0.50  2     &lt;NA&gt; 
- 9 1_897730… 1     897730 rs75… C     T     225.… PASS   1     0.50  2     &lt;NA&gt; 
-10 1_909238… 1     909238 rs38… G     C     247.… PASS   1     0.50  2     &lt;NA&gt; 
-# … with 16 more variables: DP &lt;chr&gt;, FS &lt;chr&gt;, HRun &lt;chr&gt;,
-#   HaplotypeScore &lt;chr&gt;, MQ0 &lt;chr&gt;, MQ &lt;chr&gt;, QD &lt;chr&gt;, set &lt;chr&gt;,
-#   BaseQRankSum &lt;chr&gt;, Dels &lt;chr&gt;, MQRankSum &lt;chr&gt;, ReadPosRankSum &lt;chr&gt;,
-#   DS &lt;chr&gt;, GENE &lt;chr&gt;, INHERITANCE &lt;chr&gt;, MIM &lt;chr&gt;</code></pre>
-<p>Now each row is a single variant and each column is a variable.</p>
+<p>In the code below, I have used the first seven columns
+(<code>id_cols = chrom:filter</code>) to specify the columns that
+uniquely identifies each variant, i.e. the same variant will have the
+same values in these columns. We specify our column names from the
+<code>key</code> column and the values for these cells will come from
+the <code>value</code> column.</p>
+<pre class="r"><code>my_vcf |&gt;
+  mutate(info = sub(pattern = &quot;;$&quot;, replacement = &quot;&quot;, x = .data$info)) |&gt;
+  separate_rows(info, sep = &quot;;\\s*&quot;) |&gt;
+  separate(info, c(&#39;key&#39;, &#39;value&#39;), sep = &quot;=&quot;) |&gt;
+  distinct() |&gt; # remove duplicated annotations, if any
+  pivot_wider(id_cols = chrom:filter, names_from = key, values_from = value) -&gt; my_vcf_tidy
+
+head(my_vcf_tidy, 10)</code></pre>
+<pre><code># A tibble: 10 × 24
+   chrom    pos id       ref   alt     qual filter AC    AF    AN    DB    DP   
+   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+ 1     1 866511 rs60722… C     CCCCT  259.  PASS   2     1.00  2     &lt;NA&gt;  11   
+ 2     1 879317 rs75235… C     T      151.  PASS   1     0.50  2     &lt;NA&gt;  21   
+ 3     1 879482 .        G     C      485.  PASS   1     0.50  2     &lt;NA&gt;  48   
+ 4     1 880390 rs37485… C     A      288.  PASS   1     0.50  2     &lt;NA&gt;  29   
+ 5     1 881627 rs22727… G     A      486.  PASS   1     0.50  2     &lt;NA&gt;  33   
+ 6     1 884091 rs75224… C     G       65.5 PASS   1     0.50  2     &lt;NA&gt;  12   
+ 7     1 884101 rs49704… A     C       85.8 PASS   1     0.50  2     &lt;NA&gt;  12   
+ 8     1 892460 rs41285… G     C     1737.  PASS   1     0.50  2     &lt;NA&gt;  152  
+ 9     1 897730 rs75496… C     T      225.  PASS   1     0.50  2     &lt;NA&gt;  21   
+10     1 909238 rs38297… G     C      248.  PASS   1     0.50  2     &lt;NA&gt;  19   
+# ℹ 12 more variables: FS &lt;chr&gt;, HRun &lt;chr&gt;, HaplotypeScore &lt;chr&gt;, MQ0 &lt;chr&gt;,
+#   MQ &lt;chr&gt;, QD &lt;chr&gt;, set &lt;chr&gt;, BaseQRankSum &lt;chr&gt;, Dels &lt;chr&gt;,
+#   MQRankSum &lt;chr&gt;, ReadPosRankSum &lt;chr&gt;, DS &lt;chr&gt;</code></pre>
+<p>Now each row is a single variant and each column is a variable,
+making it much easier to work with! We can easily subset variants with a
+<code>QD &gt; 50</code> (after transforming the type of numeric).</p>
+<pre class="r"><code>my_vcf_tidy |&gt;
+  dplyr::mutate(QD = as.numeric(QD)) |&gt;
+  dplyr::filter(QD &gt; 50)</code></pre>
+<pre><code># A tibble: 6 × 24
+  chrom      pos id       ref   alt    qual filter AC    AF    AN    DB    DP   
+  &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;
+1     1  1276973 rs70949… G     GACAC  459. PASS   2     1.00  2     &lt;NA&gt;  7    
+2     1  3396278 .        T     TGCC…  447. PASS   1     0.50  2     &lt;NA&gt;  8    
+3     1 19208145 rs11254… G     GGGT… 2735. PASS   2     1.00  2     &lt;NA&gt;  25   
+4     1 22207804 rs66803… ACCC… A     1769. PASS   2     1.00  2     &lt;NA&gt;  27   
+5     1 31764713 rs11166… C     CAAG  1018. PASS   2     1.00  2     &lt;NA&gt;  16   
+6     1 31905889 rs30504… A     ACAG  2172. PASS   2     1.00  2     &lt;NA&gt;  39   
+# ℹ 12 more variables: FS &lt;chr&gt;, HRun &lt;chr&gt;, HaplotypeScore &lt;chr&gt;, MQ0 &lt;chr&gt;,
+#   MQ &lt;chr&gt;, QD &lt;dbl&gt;, set &lt;chr&gt;, BaseQRankSum &lt;chr&gt;, Dels &lt;chr&gt;,
+#   MQRankSum &lt;chr&gt;, ReadPosRankSum &lt;chr&gt;, DS &lt;chr&gt;</code></pre>
 </div>
 <div id="splitting-the-group-column-in-a-gtf-file"
 class="section level2">
@@ -736,10 +779,11 @@ class="section level2">
   file = &quot;https://github.com/davetang/importbio/raw/master/inst/extdata/gencode.v38.annotation.sample.gtf.gz&quot;,
   comment = &quot;#&quot;,
   show_col_types = FALSE,
-  col_names = c(&#39;chr&#39;, &#39;src&#39;, &#39;feat&#39;, &#39;start&#39;, &#39;end&#39;, &#39;score&#39;, &#39;strand&#39;, &#39;frame&#39;, &#39;group&#39;))
+  col_names = c(&#39;chr&#39;, &#39;src&#39;, &#39;feat&#39;, &#39;start&#39;, &#39;end&#39;, &#39;score&#39;, &#39;strand&#39;, &#39;frame&#39;, &#39;group&#39;)
+)
 
-my_gtf %&gt;%
-  select(group) %&gt;%
+my_gtf |&gt;
+  select(group) |&gt;
   head()</code></pre>
 <pre><code># A tibble: 6 × 1
   group                                                                         
@@ -752,40 +796,39 @@ my_gtf %&gt;%
 6 &quot;gene_id \&quot;ENSG00000223972.5\&quot;; transcript_id \&quot;ENST00000450305.2\&quot;; gene_typ…</code></pre>
 <p>We can use the same strategy (but with some additional formatting
 steps) to split the column up.</p>
-<pre class="r"><code>my_gtf %&gt;%
-  mutate(group = sub(pattern = &quot;;$&quot;, replacement = &quot;&quot;, x = .data$group)) %&gt;%
-  mutate(group = gsub(pattern = &#39;&quot;&#39;, replacement = &quot;&quot;, x = .data$group)) %&gt;%
-  separate_rows(group, sep = &quot;;\\s*&quot;) %&gt;%
-  separate(group, c(&#39;key&#39;, &#39;value&#39;), sep = &quot;\\s&quot;) %&gt;%
-  distinct() %&gt;% # remove duplicated annotations, if any
+<pre class="r"><code>my_gtf |&gt;
+  mutate(group = sub(pattern = &quot;;$&quot;, replacement = &quot;&quot;, x = .data$group)) |&gt;
+  mutate(group = gsub(pattern = &#39;&quot;&#39;, replacement = &quot;&quot;, x = .data$group)) |&gt;
+  separate_rows(group, sep = &quot;;\\s*&quot;) |&gt;
+  separate(group, c(&#39;key&#39;, &#39;value&#39;), sep = &quot;\\s&quot;) |&gt;
+  distinct() |&gt; # remove duplicated annotations, if any
   pivot_wider(id_cols = chr:frame, names_from = key, values_from = value) -&gt; my_gtf_split</code></pre>
 <pre><code>Warning: Values from `value` are not uniquely identified; output will contain list-cols.
-* Use `values_fn = list` to suppress this warning.
-* Use `values_fn = {summary_fun}` to summarise duplicates.
-* Use the following dplyr code to identify duplicates.
-  {data} %&gt;%
-    dplyr::group_by(chr, src, feat, start, end, score, strand, frame, key) %&gt;%
-    dplyr::summarise(n = dplyr::n(), .groups = &quot;drop&quot;) %&gt;%
-    dplyr::filter(n &gt; 1L)</code></pre>
+• Use `values_fn = list` to suppress this warning.
+• Use `values_fn = {summary_fun}` to summarise duplicates.
+• Use the following dplyr code to identify duplicates.
+  {data} |&gt;
+  dplyr::summarise(n = dplyr::n(), .by = c(chr, src, feat, start, end, score,
+  strand, frame, key)) |&gt;
+  dplyr::filter(n &gt; 1L)</code></pre>
 <pre class="r"><code>head(my_gtf_split, 10)</code></pre>
 <pre><code># A tibble: 10 × 24
-   chr   src    feat      start   end score strand frame gene_id gene_…¹ gene_…²
-   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;list&gt;  &lt;list&gt;  &lt;list&gt; 
- 1 chr1  HAVANA gene      11869 14409 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
- 2 chr1  HAVANA transcri… 11869 14409 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
- 3 chr1  HAVANA exon      11869 12227 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
- 4 chr1  HAVANA exon      12613 12721 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
- 5 chr1  HAVANA exon      13221 14409 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
- 6 chr1  HAVANA transcri… 12010 13670 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
- 7 chr1  HAVANA exon      12010 12057 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
- 8 chr1  HAVANA exon      12179 12227 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
- 9 chr1  HAVANA exon      12613 12697 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
-10 chr1  HAVANA exon      12975 13052 .     +      .     &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
-# … with 13 more variables: level &lt;list&gt;, hgnc_id &lt;list&gt;, havana_gene &lt;list&gt;,
+   chr   src    feat  start   end score strand frame gene_id gene_type gene_name
+   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;list&gt;  &lt;list&gt;    &lt;list&gt;   
+ 1 chr1  HAVANA gene  11869 14409 .     +      .     &lt;chr&gt;   &lt;chr [1]&gt; &lt;chr [1]&gt;
+ 2 chr1  HAVANA tran… 11869 14409 .     +      .     &lt;chr&gt;   &lt;chr [1]&gt; &lt;chr [1]&gt;
+ 3 chr1  HAVANA exon  11869 12227 .     +      .     &lt;chr&gt;   &lt;chr [1]&gt; &lt;chr [1]&gt;
+ 4 chr1  HAVANA exon  12613 12721 .     +      .     &lt;chr&gt;   &lt;chr [1]&gt; &lt;chr [1]&gt;
+ 5 chr1  HAVANA exon  13221 14409 .     +      .     &lt;chr&gt;   &lt;chr [1]&gt; &lt;chr [1]&gt;
+ 6 chr1  HAVANA tran… 12010 13670 .     +      .     &lt;chr&gt;   &lt;chr [1]&gt; &lt;chr [1]&gt;
+ 7 chr1  HAVANA exon  12010 12057 .     +      .     &lt;chr&gt;   &lt;chr [1]&gt; &lt;chr [1]&gt;
+ 8 chr1  HAVANA exon  12179 12227 .     +      .     &lt;chr&gt;   &lt;chr [1]&gt; &lt;chr [1]&gt;
+ 9 chr1  HAVANA exon  12613 12697 .     +      .     &lt;chr&gt;   &lt;chr [1]&gt; &lt;chr [1]&gt;
+10 chr1  HAVANA exon  12975 13052 .     +      .     &lt;chr&gt;   &lt;chr [1]&gt; &lt;chr [1]&gt;
+# ℹ 13 more variables: level &lt;list&gt;, hgnc_id &lt;list&gt;, havana_gene &lt;list&gt;,
 #   transcript_id &lt;list&gt;, transcript_type &lt;list&gt;, transcript_name &lt;list&gt;,
 #   transcript_support_level &lt;list&gt;, tag &lt;list&gt;, havana_transcript &lt;list&gt;,
-#   exon_number &lt;list&gt;, exon_id &lt;list&gt;, ont &lt;list&gt;, protein_id &lt;list&gt;, and
-#   abbreviated variable names ¹​gene_type, ²​gene_name</code></pre>
+#   exon_number &lt;list&gt;, exon_id &lt;list&gt;, ont &lt;list&gt;, protein_id &lt;list&gt;</code></pre>
 <p>However, the split columns are lists because there were some cases
 where there were multiple annotations with the same key and a list is
 needed to store multiple values (which was what the warning above was
@@ -816,29 +859,28 @@ values, all the pivoted columns were turned into lists. However we can
 turn the columns back into characters, which makes sense for the
 <code>gene_id</code> column which only contained single unique character
 values in the first place.</p>
-<pre class="r"><code>my_gtf_split %&gt;%
-  mutate(gene_id = as.character(gene_id)) %&gt;%
+<pre class="r"><code>my_gtf_split |&gt;
+  mutate(gene_id = as.character(gene_id)) |&gt;
   head()</code></pre>
 <pre><code># A tibble: 6 × 24
-  chr   src   feat  start   end score strand frame gene_id gene_…¹ gene_…² level
-  &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;list&gt;  &lt;list&gt;  &lt;lis&gt;
-1 chr1  HAVA… gene  11869 14409 .     +      .     ENSG00… &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
-2 chr1  HAVA… tran… 11869 14409 .     +      .     ENSG00… &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
-3 chr1  HAVA… exon  11869 12227 .     +      .     ENSG00… &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
-4 chr1  HAVA… exon  12613 12721 .     +      .     ENSG00… &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
-5 chr1  HAVA… exon  13221 14409 .     +      .     ENSG00… &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
-6 chr1  HAVA… tran… 12010 13670 .     +      .     ENSG00… &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;
-# … with 12 more variables: hgnc_id &lt;list&gt;, havana_gene &lt;list&gt;,
+  chr   src    feat   start   end score strand frame gene_id gene_type gene_name
+  &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;list&gt;    &lt;list&gt;   
+1 chr1  HAVANA gene   11869 14409 .     +      .     ENSG00… &lt;chr [1]&gt; &lt;chr [1]&gt;
+2 chr1  HAVANA trans… 11869 14409 .     +      .     ENSG00… &lt;chr [1]&gt; &lt;chr [1]&gt;
+3 chr1  HAVANA exon   11869 12227 .     +      .     ENSG00… &lt;chr [1]&gt; &lt;chr [1]&gt;
+4 chr1  HAVANA exon   12613 12721 .     +      .     ENSG00… &lt;chr [1]&gt; &lt;chr [1]&gt;
+5 chr1  HAVANA exon   13221 14409 .     +      .     ENSG00… &lt;chr [1]&gt; &lt;chr [1]&gt;
+6 chr1  HAVANA trans… 12010 13670 .     +      .     ENSG00… &lt;chr [1]&gt; &lt;chr [1]&gt;
+# ℹ 13 more variables: level &lt;list&gt;, hgnc_id &lt;list&gt;, havana_gene &lt;list&gt;,
 #   transcript_id &lt;list&gt;, transcript_type &lt;list&gt;, transcript_name &lt;list&gt;,
 #   transcript_support_level &lt;list&gt;, tag &lt;list&gt;, havana_transcript &lt;list&gt;,
-#   exon_number &lt;list&gt;, exon_id &lt;list&gt;, ont &lt;list&gt;, protein_id &lt;list&gt;, and
-#   abbreviated variable names ¹​gene_type, ²​gene_name</code></pre>
+#   exon_number &lt;list&gt;, exon_id &lt;list&gt;, ont &lt;list&gt;, protein_id &lt;list&gt;</code></pre>
 <p>But we can also do this to the <code>tag</code> column (even if it
 needed a list to store the multiple values) and entries with multiple
 values get turned into R (character) code!</p>
-<pre class="r"><code>my_gtf_split %&gt;%
-  mutate(tag = as.character(tag)) %&gt;%
-  select(tag) %&gt;%
+<pre class="r"><code>my_gtf_split |&gt;
+  mutate(tag = as.character(tag)) |&gt;
+  select(tag) |&gt;
   head()</code></pre>
 <pre><code># A tibble: 6 × 1
   tag                                  
@@ -851,26 +893,26 @@ values get turned into R (character) code!</p>
 6 &quot;c(\&quot;basic\&quot;, \&quot;Ensembl_canonical\&quot;)&quot;</code></pre>
 <p>If you don’t mind having R (character) code in your data, you can
 perform this transformation across all pivoted columns.</p>
-<pre class="r"><code>my_gtf_split %&gt;%
+<pre class="r"><code>my_gtf_split |&gt;
   mutate(across(gene_id:protein_id, as.character))</code></pre>
 <pre><code># A tibble: 94 × 24
-   chr   src    feat      start   end score strand frame gene_id gene_…¹ gene_…²
-   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;     &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
- 1 chr1  HAVANA gene      11869 14409 .     +      .     ENSG00… transc… DDX11L1
- 2 chr1  HAVANA transcri… 11869 14409 .     +      .     ENSG00… transc… DDX11L1
- 3 chr1  HAVANA exon      11869 12227 .     +      .     ENSG00… transc… DDX11L1
- 4 chr1  HAVANA exon      12613 12721 .     +      .     ENSG00… transc… DDX11L1
- 5 chr1  HAVANA exon      13221 14409 .     +      .     ENSG00… transc… DDX11L1
- 6 chr1  HAVANA transcri… 12010 13670 .     +      .     ENSG00… transc… DDX11L1
- 7 chr1  HAVANA exon      12010 12057 .     +      .     ENSG00… transc… DDX11L1
- 8 chr1  HAVANA exon      12179 12227 .     +      .     ENSG00… transc… DDX11L1
- 9 chr1  HAVANA exon      12613 12697 .     +      .     ENSG00… transc… DDX11L1
-10 chr1  HAVANA exon      12975 13052 .     +      .     ENSG00… transc… DDX11L1
-# … with 84 more rows, 13 more variables: level &lt;chr&gt;, hgnc_id &lt;chr&gt;,
-#   havana_gene &lt;chr&gt;, transcript_id &lt;chr&gt;, transcript_type &lt;chr&gt;,
-#   transcript_name &lt;chr&gt;, transcript_support_level &lt;chr&gt;, tag &lt;chr&gt;,
-#   havana_transcript &lt;chr&gt;, exon_number &lt;chr&gt;, exon_id &lt;chr&gt;, ont &lt;chr&gt;,
-#   protein_id &lt;chr&gt;, and abbreviated variable names ¹​gene_type, ²​gene_name</code></pre>
+   chr   src    feat  start   end score strand frame gene_id gene_type gene_name
+   &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;     &lt;chr&gt;    
+ 1 chr1  HAVANA gene  11869 14409 .     +      .     ENSG00… transcri… DDX11L1  
+ 2 chr1  HAVANA tran… 11869 14409 .     +      .     ENSG00… transcri… DDX11L1  
+ 3 chr1  HAVANA exon  11869 12227 .     +      .     ENSG00… transcri… DDX11L1  
+ 4 chr1  HAVANA exon  12613 12721 .     +      .     ENSG00… transcri… DDX11L1  
+ 5 chr1  HAVANA exon  13221 14409 .     +      .     ENSG00… transcri… DDX11L1  
+ 6 chr1  HAVANA tran… 12010 13670 .     +      .     ENSG00… transcri… DDX11L1  
+ 7 chr1  HAVANA exon  12010 12057 .     +      .     ENSG00… transcri… DDX11L1  
+ 8 chr1  HAVANA exon  12179 12227 .     +      .     ENSG00… transcri… DDX11L1  
+ 9 chr1  HAVANA exon  12613 12697 .     +      .     ENSG00… transcri… DDX11L1  
+10 chr1  HAVANA exon  12975 13052 .     +      .     ENSG00… transcri… DDX11L1  
+# ℹ 84 more rows
+# ℹ 13 more variables: level &lt;chr&gt;, hgnc_id &lt;chr&gt;, havana_gene &lt;chr&gt;,
+#   transcript_id &lt;chr&gt;, transcript_type &lt;chr&gt;, transcript_name &lt;chr&gt;,
+#   transcript_support_level &lt;chr&gt;, tag &lt;chr&gt;, havana_transcript &lt;chr&gt;,
+#   exon_number &lt;chr&gt;, exon_id &lt;chr&gt;, ont &lt;chr&gt;, protein_id &lt;chr&gt;</code></pre>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
@@ -895,13 +937,13 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.2.0 (2022-04-22)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 20.04.4 LTS
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.4 LTS
 
 Matrix products: default
-BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3
-LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
 
 locale:
  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -911,34 +953,38 @@ locale:
  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
 [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] importbio_0.0.0.9000 remotes_2.4.2        forcats_0.5.1       
- [4] stringr_1.4.0        dplyr_1.0.9          purrr_0.3.4         
- [7] readr_2.1.2          tidyr_1.2.0          tibble_3.1.8        
-[10] ggplot2_3.3.6        tidyverse_1.3.1      workflowr_1.7.0     
+ [1] lubridate_1.9.3 forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4    
+ [5] purrr_1.0.2     readr_2.1.5     tidyr_1.3.1     tibble_3.2.1   
+ [9] ggplot2_3.5.1   tidyverse_2.0.0 workflowr_1.7.1
 
 loaded via a namespace (and not attached):
- [1] Rcpp_1.0.8.3     lubridate_1.8.0  getPass_0.2-2    ps_1.7.0        
- [5] assertthat_0.2.1 rprojroot_2.0.3  digest_0.6.29    utf8_1.2.2      
- [9] R6_2.5.1         cellranger_1.1.0 backports_1.4.1  reprex_2.0.1    
-[13] evaluate_0.15    httr_1.4.3       pillar_1.8.1     rlang_1.0.4     
-[17] curl_4.3.2       readxl_1.4.0     rstudioapi_0.13  whisker_0.4     
-[21] callr_3.7.0      jquerylib_0.1.4  rmarkdown_2.14   bit_4.0.4       
-[25] munsell_0.5.0    broom_0.8.0      compiler_4.2.0   httpuv_1.6.5    
-[29] modelr_0.1.8     xfun_0.31        pkgconfig_2.0.3  htmltools_0.5.2 
-[33] tidyselect_1.1.2 fansi_1.0.3      crayon_1.5.1     tzdb_0.3.0      
-[37] dbplyr_2.1.1     withr_2.5.0      later_1.3.0      grid_4.2.0      
-[41] jsonlite_1.8.0   gtable_0.3.0     lifecycle_1.0.1  DBI_1.1.2       
-[45] git2r_0.30.1     magrittr_2.0.3   scales_1.2.0     vroom_1.5.7     
-[49] cli_3.3.0        stringi_1.7.6    fs_1.5.2         promises_1.2.0.1
-[53] xml2_1.3.3       bslib_0.3.1      ellipsis_0.3.2   generics_0.1.3  
-[57] vctrs_0.4.1      tools_4.2.0      bit64_4.0.5      glue_1.6.2      
-[61] hms_1.1.2        parallel_4.2.0   processx_3.5.3   fastmap_1.1.0   
-[65] yaml_2.3.5       colorspace_2.0-3 rvest_1.0.2      knitr_1.39      
-[69] haven_2.5.0      sass_0.4.1      </code></pre>
+ [1] sass_0.4.9        utf8_1.2.4        generics_0.1.3    stringi_1.8.4    
+ [5] hms_1.1.3         digest_0.6.35     magrittr_2.0.3    timechange_0.3.0 
+ [9] evaluate_0.24.0   grid_4.4.0        fastmap_1.2.0     rprojroot_2.0.4  
+[13] jsonlite_1.8.8    processx_3.8.4    whisker_0.4.1     ps_1.7.6         
+[17] promises_1.3.0    httr_1.4.7        fansi_1.0.6       scales_1.3.0     
+[21] jquerylib_0.1.4   cli_3.6.2         crayon_1.5.2      rlang_1.1.4      
+[25] bit64_4.0.5       munsell_0.5.1     withr_3.0.0       cachem_1.1.0     
+[29] yaml_2.3.8        parallel_4.4.0    tools_4.4.0       tzdb_0.4.0       
+[33] colorspace_2.1-0  httpuv_1.6.15     curl_5.2.1        vctrs_0.6.5      
+[37] R6_2.5.1          lifecycle_1.0.4   git2r_0.33.0      bit_4.0.5        
+[41] fs_1.6.4          vroom_1.6.5       pkgconfig_2.0.3   callr_3.7.6      
+[45] pillar_1.9.0      bslib_0.7.0       later_1.3.2       gtable_0.3.5     
+[49] glue_1.7.0        Rcpp_1.0.12       xfun_0.44         tidyselect_1.2.1 
+[53] rstudioapi_0.16.0 knitr_1.47        htmltools_0.5.8.1 rmarkdown_2.27   
+[57] compiler_4.4.0    getPass_0.2-4    </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 
