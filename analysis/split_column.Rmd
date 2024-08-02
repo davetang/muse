@@ -23,67 +23,68 @@ if(!require("tidyverse")){
 library(tidyverse)
 ```
 
-I have a small package called [importbio](https://github.com/davetang/importbio) that can be used to load a VCF and GTF file. You can install it using the `remotes` package.
-
-```{r install_packages, message=FALSE, warning=FALSE}
-if(!require("remotes")){
-  install.packages("remotes")
-}
-
-if(!require("importbio")){
-  remotes::install_github('davetang/importbio')
-}
-```
-
 ## Splitting the info column in a VCF file
 
-We will load a small VCF file using `importvcf`.
+We will load a small portion of a VCF file using `read_tsv`; in addition we will rename `#CHROM` to `CHROM` and then change all the column names to lower case.
 
-```{r importvcf}
-library(importbio)
-my_vcf <- importvcf("https://raw.githubusercontent.com/davetang/learning_vcf_file/master/eg/Pfeiffer.vcf")
+```{r my_vcf}
+vcf_url <- "https://raw.githubusercontent.com/davetang/learning_vcf_file/master/eg/Pfeiffer.vcf"
+read_tsv(vcf_url, comment = "##", show_col_types = FALSE, n_max = 1000) |>
+  dplyr::rename(CHROM = `#CHROM`) |>
+  dplyr::rename_with(tolower) -> my_vcf
 
-my_vcf %>%
-  select(info) %>%
-  head()
+head(my_vcf)
 ```
 
 Note that the `info` column is packed with all sorts of information for each variant. Also note the consistent format of the `info` column: each annotation is separated by a semi-colon (`;`) and annotations are stored as key-value pairs with an equal sign in between.
 
-Firstly, we will use `separate_rows` to create a new row for each annotation by using `;` as the separator/delimiter; note that I have included `\\s*` after `;`, which is a regex for specifying a single whitespace occurring 0 or more times. By including the regex, whitespace after `;` will be removed, which is good because we do not want whitespace in our data. In addition, a `mutate` call is used prior to calling `separate_rows` and it is used to remove a trailing semicolon, if it exists.
+```{r head_info}
+my_vcf |>
+  select(info) |>
+  head()
+```
+
+Firstly, we will use `separate_rows` to create a new row for each annotation by using `;` as the separator/delimiter; note that I have included `\\s*` after `;`, which is a regex for specifying a single whitespace occurring 0 or more times. By including the regex, whitespace after `;` will be removed, which is good because we do not want whitespaces in our data. In addition, a `mutate` call is used prior to calling `separate_rows` and it is used to remove a trailing semicolon, if it exists.
 
 ```{r separate_rows}
-my_vcf %>%
-  mutate(info = sub(pattern = ";$", replacement = "", x = .data$info)) %>%
-  separate_rows(info, sep = ";\\s*") %>%
+my_vcf |>
+  mutate(info = sub(pattern = ";$", replacement = "", x = .data$info)) |>
+  separate_rows(info, sep = ";\\s*") |>
   head()
 ```
 
 The next step is to split the key-value pairs and we will use the `separate` function to separate the pairs into two columns, which we will name `key` and `value`, using the equal sign as the separator/delimiter. Sometimes a key is missing a value and in these cases, the value will be `NA`.
 
 ```{r separate, warning=FALSE, message=FALSE}
-my_vcf %>%
-  mutate(info = sub(pattern = ";$", replacement = "", x = .data$info)) %>%
-  separate_rows(info, sep = ";\\s*") %>%
-  separate(info, c('key', 'value'), sep = "=") %>%
+my_vcf |>
+  mutate(info = sub(pattern = ";$", replacement = "", x = .data$info)) |>
+  separate_rows(info, sep = ";\\s*") |>
+  separate(info, c('key', 'value'), sep = "=") |>
   head(10)
 ```
 
 The current state of the transformation produces a new row for each variant annotation and two columns containing the key and value. If we want our data in wide format where each annotation is a column, we can use the `pivot_wider` function.
 
-In the code below, I have used the first eight columns (`id_cols = vid:filter`) to specify the columns that uniquely identifies each variant, i.e. the same variant will have the same values in these columns. We specify our column names from the `key` column and the values for these cells will come from the `value` column.
+In the code below, I have used the first seven columns (`id_cols = chrom:filter`) to specify the columns that uniquely identifies each variant, i.e. the same variant will have the same values in these columns. We specify our column names from the `key` column and the values for these cells will come from the `value` column.
 
 ```{r pivot_wider, warning=FALSE, message=FALSE}
-my_vcf %>%
-  mutate(info = sub(pattern = ";$", replacement = "", x = .data$info)) %>%
-  separate_rows(info, sep = ";\\s*") %>%
-  separate(info, c('key', 'value'), sep = "=") %>%
-  distinct() %>% # remove duplicated annotations, if any
-  pivot_wider(id_cols = vid:filter, names_from = key, values_from = value) %>%
-  head(10)
+my_vcf |>
+  mutate(info = sub(pattern = ";$", replacement = "", x = .data$info)) |>
+  separate_rows(info, sep = ";\\s*") |>
+  separate(info, c('key', 'value'), sep = "=") |>
+  distinct() |> # remove duplicated annotations, if any
+  pivot_wider(id_cols = chrom:filter, names_from = key, values_from = value) -> my_vcf_tidy
+
+head(my_vcf_tidy, 10)
 ```
 
-Now each row is a single variant and each column is a variable.
+Now each row is a single variant and each column is a variable, making it much easier to work with! We can easily subset variants with a `QD > 50` (after transforming the type of numeric).
+
+```{r filter_qd}
+my_vcf_tidy |>
+  dplyr::mutate(QD = as.numeric(QD)) |>
+  dplyr::filter(QD > 50)
+```
 
 ## Splitting the group column in a GTF file
 
@@ -94,22 +95,23 @@ my_gtf <- read_tsv(
   file = "https://github.com/davetang/importbio/raw/master/inst/extdata/gencode.v38.annotation.sample.gtf.gz",
   comment = "#",
   show_col_types = FALSE,
-  col_names = c('chr', 'src', 'feat', 'start', 'end', 'score', 'strand', 'frame', 'group'))
+  col_names = c('chr', 'src', 'feat', 'start', 'end', 'score', 'strand', 'frame', 'group')
+)
 
-my_gtf %>%
-  select(group) %>%
+my_gtf |>
+  select(group) |>
   head()
 ```
 
 We can use the same strategy (but with some additional formatting steps) to split the column up.
 
 ```{r gtf_example}
-my_gtf %>%
-  mutate(group = sub(pattern = ";$", replacement = "", x = .data$group)) %>%
-  mutate(group = gsub(pattern = '"', replacement = "", x = .data$group)) %>%
-  separate_rows(group, sep = ";\\s*") %>%
-  separate(group, c('key', 'value'), sep = "\\s") %>%
-  distinct() %>% # remove duplicated annotations, if any
+my_gtf |>
+  mutate(group = sub(pattern = ";$", replacement = "", x = .data$group)) |>
+  mutate(group = gsub(pattern = '"', replacement = "", x = .data$group)) |>
+  separate_rows(group, sep = ";\\s*") |>
+  separate(group, c('key', 'value'), sep = "\\s") |>
+  distinct() |> # remove duplicated annotations, if any
   pivot_wider(id_cols = chr:frame, names_from = key, values_from = value) -> my_gtf_split
 
 head(my_gtf_split, 10)
@@ -135,24 +137,24 @@ my_check[my_check]
 Therefore despite only a subset of the columns containing multiple values, all the pivoted columns were turned into lists. However we can turn the columns back into characters, which makes sense for the `gene_id` column which only contained single unique character values in the first place.
 
 ```{r gene_id_as_chr}
-my_gtf_split %>%
-  mutate(gene_id = as.character(gene_id)) %>%
+my_gtf_split |>
+  mutate(gene_id = as.character(gene_id)) |>
   head()
 ```
 
 But we can also do this to the `tag` column (even if it needed a list to store the multiple values) and entries with multiple values get turned into R (character) code!
 
 ```{r tag_as_chr}
-my_gtf_split %>%
-  mutate(tag = as.character(tag)) %>%
-  select(tag) %>%
+my_gtf_split |>
+  mutate(tag = as.character(tag)) |>
+  select(tag) |>
   head()
 ```
 
 If you don't mind having R (character) code in your data, you can perform this transformation across all pivoted columns.
 
 ```{r mutate_across}
-my_gtf_split %>%
+my_gtf_split |>
   mutate(across(gene_id:protein_id, as.character))
 ```
 
