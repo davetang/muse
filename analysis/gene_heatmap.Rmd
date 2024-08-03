@@ -64,6 +64,12 @@ Get tissue expression for TNF in CSV.
 gget archs4 --which tissue --csv --out TNF_tissue.csv TNF
 ```
 
+Get the 100 most correlated genes to TNF from ARCHS4.
+
+```
+gget archs4 --which correlation --csv --out TNF_correlation.csv TNF
+```
+
 ## TNF tissue expression
 
 Load data.
@@ -109,6 +115,40 @@ ggplot(
     axis.text.x = element_text(angle = 70, hjust = 1)
   ) +
   labs(y = "Expression (TPM)")
+```
+
+## Top 100 most correlated genes to TNF
+
+Load data.
+
+```{r tnf_cor}
+tnf_cor <- readr::read_csv(file = "data/archs4/TNF_correlation.csv", show_col_types = FALSE)
+head(tnf_cor)
+```
+
+CCL4 is the most correlated to TNF. Get the 100 most correlated genes to CCL4 from ARCHS4 to check if this is reciprocated.
+
+```
+gget archs4 --which correlation --csv --out CCL4_correlation.csv CCL4
+```
+
+Load CCL4 correlation data.
+
+```{r ccl4_cor}
+ccl4_cor <- readr::read_csv(file = "data/archs4/CCL4_correlation.csv", show_col_types = FALSE)
+head(ccl4_cor)
+```
+
+Check rank of TNF.
+
+```{r ccl4_tnf}
+which(ccl4_cor$gene_symbol == "TNF")
+```
+
+Check correlation as a sanity check.
+
+```{r ccl4_tnf_cor}
+ccl4_cor[which(ccl4_cor$gene_symbol == "TNF"), ]
 ```
 
 ## Load data
