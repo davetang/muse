@@ -1,5 +1,5 @@
 ---
-title: "Gene expression heatmap using ARCHS4 data"
+title: "Plot ARCHS4 gene expression data"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
@@ -13,6 +13,105 @@ knitr::opts_chunk$set(echo = TRUE)
 library(pheatmap)
 library(plotly)
 ```
+
+## ARCHS4
+
+Use [gget](https://github.com/pachterlab/gget) and the [archs4](https://pachterlab.github.io/gget/en/archs4.html) subtool to find the most correlated genes to a gene of interest or find the gene's tissue expression atlas using [ARCHS4](https://maayanlab.cloud/archs4/).
+
+[Install](https://pachterlab.github.io/gget/en/installation.html) using pip:
+
+```
+pip install --upgrade gget
+```
+
+Usage.
+
+```
+gget archs4 -h
+```
+```
+usage: gget archs4 [-h] [-e] [-w {correlation,tissue}] [-gc GENE_COUNT] [-s {human,mouse}] [-csv] [-o OUT] [-q] [-g GENE_DEPRECATED] [-j] gene
+
+Find the most correlated genes or the tissue expression atlas of a gene using data from the human and mouse RNA-seq database ARCHS4 (https://maayanlab.cloud/archs4/).
+
+positional arguments:
+  gene                  Gene symbol or Ensembl gene ID of gene of interest, e.g. 'STAT4'.
+
+options:
+  -h, --help            show this help message and exit
+  -e, --ensembl         Add this flag if gene is given as an Ensembl gene ID. (default: False)
+  -w {correlation,tissue}, --which {correlation,tissue}
+                        'correlation' (default) or 'tissue'.
+                        - 'correlation' returns a gene correlation table that contains the 100 most correlated genes to the gene of interest. The Pearson correlation is calculated over all samples and tissues in ARCHS4.
+                        - 'tissue' returns a tissue expression atlas calculated from human or mouse samples (as defined by 'species') in ARCHS4. (default: correlation)
+  -gc GENE_COUNT, --gene_count GENE_COUNT
+                        Number of correlated genes to return (default: 100).
+                        (Only for gene correlation.) (default: 100)
+  -s {human,mouse}, --species {human,mouse}
+                        'human' (default) or 'mouse'. (Only for tissue expression atlas.) (default: human)
+  -csv, --csv           Returns results in csv format instead of json. (default: True)
+  -o OUT, --out OUT     Path to the csv file the results will be saved in, e.g. path/to/directory/results.csv.
+                        Default: Standard out.
+  -q, --quiet           Does not print progress information. (default: True)
+  -g GENE_DEPRECATED, --gene GENE_DEPRECATED
+                        DEPRECATED - use positional argument instead. Gene symbol or Ensembl gene ID of gene of interest (str), e.g. 'STAT4'.
+  -j, --json            DEPRECATED - json is now the default output format (convert to csv using flag [--csv]). (default: False)
+```
+
+Get tissue expression for TNF in CSV.
+
+```
+gget archs4 --which tissue --csv --out TNF_tissue.csv TNF
+```
+
+## TNF tissue expression
+
+Load data.
+
+```{r tnf_exp}
+tnf_exp <- readr::read_csv(file = "data/archs4/TNF_tissue.csv", show_col_types = FALSE)
+head(tnf_exp)
+```
+
+Split the ID into multiple columns.
+
+```{r split_id}
+tnf_exp |>
+  tidyr::separate(col = id, sep = "\\.", into = c("junk", "system", "organ", "tissue")) |>
+  dplyr::mutate(tissue = stringr::str_to_title(tissue)) |>
+  dplyr::arrange(system) |>
+  dplyr::mutate(tissue = factor(tissue, levels = tissue)) -> tnf_exp
+
+head(tnf_exp)
+```
+
+Plot tissue expression as box plots.
+
+```{r tnf_box_plot}
+library(ggplot2)
+ggplot(
+  tnf_exp,
+  aes(
+    x = tissue,
+    ymin = min,
+    lower = q1,
+    middle = median,
+    upper = q3,
+    ymax = max,
+    fill = system
+  )
+) +
+  geom_boxplot(stat = 'identity') +
+  theme_minimal() +
+  theme(
+    legend.position = 'right',
+    axis.title.x = element_blank(),
+    axis.text.x = element_text(angle = 70, hjust = 1)
+  ) +
+  labs(y = "Expression (TPM)")
+```
+
+## Load data
 
 Prepare data using base R.
 
