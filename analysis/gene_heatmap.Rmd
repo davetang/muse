@@ -156,9 +156,9 @@ dplyr::inner_join(tnf_exp, ccl4_exp, by = c('junk', 'system', 'organ', 'tissue')
   dplyr::summarise(correlation = cor(median_tnf, median_ccl4))
 ```
 
-## Prepare data
+## Combine all data
 
-Prepare data using base R.
+Tissue expression was retrieved for a list of other genes. We will combine their expressions together into one data frame.
 
 ```{r my_df}
 lapply(
@@ -201,6 +201,8 @@ my_df |>
   tidyr::pivot_wider(names_from = tissue, values_from = median) -> my_df_wide
 ```
 
+## Heatmap
+
 Convert to matrix and plot.
 
 ```{r pheatmap, fig.width=12, fig.height=6}
@@ -224,8 +226,6 @@ my_df |>
 row.names(sample_anno) <- my_order
 head(sample_anno)
 ```
-
-## Heatmap
 
 Heatmap with system annotation.
 
