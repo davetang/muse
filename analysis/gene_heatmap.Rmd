@@ -3,7 +3,7 @@ title: "Plot ARCHS4 gene expression data"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
-    toc: false
+    toc: true
 editor_options:
   chunk_output_type: console
 ---
@@ -91,7 +91,7 @@ head(tnf_exp)
 
 Plot tissue expression as box plots.
 
-```{r tnf_box_plot}
+```{r tnf_box_plot, fig.width=12, fig.height=8}
 library(ggplot2)
 ggplot(
   tnf_exp,
@@ -156,7 +156,7 @@ dplyr::inner_join(tnf_exp, ccl4_exp, by = c('junk', 'system', 'organ', 'tissue')
   dplyr::summarise(correlation = cor(median_tnf, median_ccl4))
 ```
 
-## Load data
+## Prepare data
 
 Prepare data using base R.
 
@@ -224,6 +224,8 @@ my_df |>
 row.names(sample_anno) <- my_order
 head(sample_anno)
 ```
+
+## Heatmap
 
 Heatmap with system annotation.
 
