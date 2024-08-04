@@ -58,10 +58,11 @@ options:
   -j, --json            DEPRECATED - json is now the default output format (convert to csv using flag [--csv]). (default: False)
 ```
 
-Get tissue expression for TNF in CSV.
+Get tissue expression for TNF and CCL4 in CSV.
 
 ```
 gget archs4 --which tissue --csv --out TNF_tissue.csv TNF
+gget archs4 --which tissue --csv --out CCL4_tissue.csv CCL4
 ```
 
 Get the 100 most correlated genes to TNF from ARCHS4.
@@ -70,24 +71,21 @@ Get the 100 most correlated genes to TNF from ARCHS4.
 gget archs4 --which correlation --csv --out TNF_correlation.csv TNF
 ```
 
-## TNF tissue expression
+## Tissue expression
 
-Load data.
+Load data and split the ID into multiple columns.
 
-```{r tnf_exp}
-tnf_exp <- readr::read_csv(file = "data/archs4/TNF_tissue.csv", show_col_types = FALSE)
-head(tnf_exp)
-```
+```{r read_tissue}
+read_tissue <- function(fn){
+  readr::read_csv(file = fn, show_col_types = FALSE) |>
+    tidyr::separate(col = id, sep = "\\.", into = c("junk", "system", "organ", "tissue")) |>
+    dplyr::mutate(tissue = stringr::str_to_title(tissue)) |>
+    dplyr::arrange(system) |>
+    dplyr::mutate(tissue = factor(tissue, levels = tissue)) -> tnf_exp
+}
 
-Split the ID into multiple columns.
-
-```{r split_id}
-tnf_exp |>
-  tidyr::separate(col = id, sep = "\\.", into = c("junk", "system", "organ", "tissue")) |>
-  dplyr::mutate(tissue = stringr::str_to_title(tissue)) |>
-  dplyr::arrange(system) |>
-  dplyr::mutate(tissue = factor(tissue, levels = tissue)) -> tnf_exp
-
+tnf_exp <- read_tissue("data/archs4/TNF_tissue.csv")
+ccl4_exp <- read_tissue("data/archs4/CCL4_tissue.csv")
 head(tnf_exp)
 ```
 
@@ -149,6 +147,13 @@ Check correlation as a sanity check.
 
 ```{r ccl4_tnf_cor}
 ccl4_cor[which(ccl4_cor$gene_symbol == "TNF"), ]
+```
+
+Calculate correlation from retrieved tissue expression data.
+
+```{r manual_cor}
+dplyr::inner_join(tnf_exp, ccl4_exp, by = c('junk', 'system', 'organ', 'tissue'), suffix = c("_tnf", "_ccl4")) |>
+  dplyr::summarise(correlation = cor(median_tnf, median_ccl4))
 ```
 
 ## Load data
