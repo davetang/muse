@@ -158,13 +158,13 @@ dplyr::inner_join(tnf_exp, ccl4_exp, by = c('junk', 'system', 'organ', 'tissue')
 
 ## Combine all data
 
-Tissue expression was retrieved for a list of other genes. We will combine their expressions together into one data frame.
+Tissue expression was retrieved for a list of cancer-related genes. We will combine their expressions together into one data frame.
 
 ```{r my_df}
 lapply(
-  list.files("data/archs4/cancer", pattern = ".csv$", full.names = TRUE),
+  list.files("data/archs4/cancer", pattern = "*tissue.csv$", full.names = TRUE),
   function(x){
-    cbind(gene = sub("\\.\\w+$", "", basename(x)), read.csv(x))
+    cbind(gene = sub("_tissue\\.\\w+$", "", basename(x)), read.csv(x))
   }
 ) |>
   do.call("rbind", args = _) -> my_df
