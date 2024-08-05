@@ -34,7 +34,7 @@ BiocManager::install("DESeq2")
 
 We will use data from the [pasilla package](https://www.bioconductor.org/packages/release/data/experiment/html/pasilla.html) so install it too.
 
-```{r install_pasilla}
+```{r install_pasilla, eval=FALSE}
 BiocManager::install("pasilla")
 ```
 
@@ -42,7 +42,7 @@ BiocManager::install("pasilla")
 
 Example dataset in the experiment data package {pasilla}.
 
-```{r}
+```{r counts}
 fn <- system.file("extdata", "pasilla_gene_counts.tsv", package = "pasilla", mustWork = TRUE)
 counts <- as.matrix(read.csv(fn, sep="\t", row.names = "gene_id"))
 dim(counts)
@@ -89,3 +89,66 @@ ggplot(
 ```
 
 The green line is what we expect if the variance equals the mean, as is the case for a Poisson-distributed random variable. This approximately fits the data in the lower range. The red line corresponds to the quadratic mean-variance relationship $v = m^2$. We can see that in the upper range of the data, the quadratic relationship approximately fits the data.
+
+## A basic analysis
+
+The {pasilla} data set is from an experiment on _Drosophila melanogaster_ cell cultures that tested the effect of RNAi knockdown of the splicing factor _pasilla_ on the cells' transcriptome. There were two experimental conditions, termed _untreated_ and _treated_ in the column headers and they correspond to negative control and siRNA against _pasilla_. The experimental metadata of the seven samples in this dataset are loaded below.
+
+```{r pasilla_sample_anno}
+annotationFile <- system.file("extdata", "pasilla_sample_annotation.csv", package = "pasilla", mustWork = TRUE)
+pasillaSampleAnno <- readr::read_csv(annotationFile)
+pasillaSampleAnno
+```
+
+The dataset was produced in two batches, the first consisting of three sequencing libraries using single read sequencing and the second using using paired-end sequencing.
+
+Create factors.
+
+```{r format_pasilla_sample_anno}
+mutate(
+  pasillaSampleAnno,
+  condition = factor(condition, levels = c("untreated", "treated")),
+  type = factor(sub("-.*", "", type), levels = c("single", "paired"))
+) -> pasillaSampleAnno
+```
+
+Note that the design is approximately balanced between the factor of interest, `condition`, and the "nuisance factor", `type`.
+
+```{r table_interest_versus_nuisance}
+with(pasillaSampleAnno, table(condition, type))
+```
+
+{DESeq2} uses `DESeqDataSet` objects and is an extension of the `SummarizedExperiment` class in Bioconductor. We can create a `DESeqDataSet` object using the constructor function `DESeqDataSetFromMatrix`.
+
+```{r create_deseq_data_set}
+mt <- match(colnames(counts), sub("fb$", "", pasillaSampleAnno$file))
+stopifnot(!any(is.na(mt)))
+
+pasilla <- DESeqDataSetFromMatrix(
+  countData = counts,
+  colData   = pasillaSampleAnno[mt, ],
+  design    = ~ condition
+)
+
+class(pasilla)
+is(pasilla, "SummarizedExperiment")
+```
+
+After creating a `DESeqDataSet` we are ready to carry out a differential expression analysis. The aim is to identify genes that are differentially abundant between the treated and untreated cells. A test that is conceptually similar to the _t_-test is used. A choice of standard analysis steps are wrapped into a single function, `DESeq()`.
+
+```{r deseq}
+pasilla <- DESeq(pasilla)
+```
+
+The `DESeq()` function is a wrapper that calls:
+
+* `estimateSizeFactors` for normalisation
+* `estimateDispersions` for dispersion estimation
+* `nbinomWaldTest` for hypothesis tests for differential abundance
+
+The test is between the two levels `untreated` and `treated` of the factor `condition`, since this is what was specified in the design: `design = ~ condition`.
+
+```{r}
+res <- results(pasilla)
+res[order(res$padj), ] |> head()
+```
