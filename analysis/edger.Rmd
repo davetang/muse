@@ -10,8 +10,11 @@ editor_options:
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(edgeR)
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+[edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html) carries out:
 
 > Differential expression analysis of RNA-seq expression profiles with biological replication. Implements a range of statistical methodology based on the negative binomial distributions, including empirical Bayes estimation, exact tests, generalized linear models and quasi-likelihood tests. As well as RNA-seq, it be applied to differential signal analysis of other types of genomic data that produce read counts, including ChIP-seq, ATAC-seq, Bisulfite-seq, SAGE and CAGE. 
 
@@ -26,12 +29,10 @@ if (!require("BiocManager", quietly = TRUE))
 BiocManager::install("edgeR")
 ```
 
-## Documentation
+## Normalize library sizes
 
-From `?edgeR::normLibSizes`:
+The function `normLibSizes()` calculates scaling factors to convert the raw library sizes for a set of sequenced samples into normalized effective library sizes. Additional information on each method is provided in the help page for the function, i.e., `?edgeR::normLibSizes`:
 
-> Calculate scaling factors to convert the raw library sizes for a set of sequenced samples into normalized effective library sizes.
->
 > This function computes scaling factors to convert observed library sizes into normalized library sizes, also called "effective library sizes". The effective library sizes for use in downstream analysis are lib.size * norm.factors where lib.size contains the original library sizes and norm.factors is the vector of scaling factors computed by this function.
 >
 > The TMM method implements the trimmed mean of M-values method proposed by Robinson and Oshlack (2010). By default, the M-values are weighted according to inverse variances, as computed by the delta method for logarithms of binomial random variables. If refColumn is unspecified, then the column whose count-per-million upper quartile is closest to the mean upper quartile is set as the reference library.
@@ -46,20 +47,26 @@ From `?edgeR::normLibSizes`:
 >
 > For symmetry, normalization factors are adjusted to multiply to 1. Rows of object that have zero counts for all columns are removed before normalization factors are computed. The number of such rows does not affect the estimated normalization factors. 
 
-## A test dataset
+## A hypothetical situation
 
-I created a dataset to test the different normalisation methods. There are four samples; column one and two are the controls and column three and four are the patients. 25 transcripts are in all four samples in equal amount. Another 25 transcripts are **only** present in the controls and their expression is the same as the first 25 transcripts in the controls. The four samples have exactly the same depth (500 counts). However, since the patient samples have half the number of transcripts than the controls (25 versus 50), they are sequenced at twice the depth. This hypothetical situation was described in [Robinson and Oshlack Genome Biology 2010](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25).
+We will recreate a hypothetical situation described in [Robinson and Oshlack Genome Biology 2010](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25) to test the different normalisation methods.
+
+There are four samples; columns one and two are the controls and columns three and four are the cases. The total number of transcripts across all the samples is 50. The first 25 transcripts are in all four samples in equal counts. The remaining 25 transcripts are only present in the controls and their counts are the same as the first 25 transcripts.
+
+The four samples have exactly the same depth (500 counts). However, since the case samples have half the number of transcripts than the controls (25 versus 50), the first 25 transcripts are sequenced at twice the depth.
 
 ```{r create_df}
 control_1 <- rep(10, 50)
 control_2 <- rep(10, 50)
-patient_1 <- c(rep(20, 25),rep(0,25))
-patient_2 <- c(rep(20, 25),rep(0,25))
+case_1 <- c(rep(20, 25),rep(0,25))
+case_2 <- c(rep(20, 25),rep(0,25))
 
-df <- data.frame(c1=control_1,
-                 c2=control_2,
-                 p1=patient_1,
-                 p2=patient_2)
+df <- data.frame(
+  cont1 = control_1,
+  cont2 = control_2,
+  case1 = case_1,
+  case2 = case_2
+)
 
 head(df)
 ```
@@ -78,25 +85,17 @@ colSums(df)
 
 ## No normalisation
 
-Let's run the differential expression analysis without any normalisation step:
+In order to use {edgeR} we need to create a `DGEList` object with the groups.
 
-```{r no_norm}
-library(edgeR)
-
-# create group vector
-group <- c('control','control','patient','patient')
-
-# create DGEList object
+```{r dgelist_no_norm}
+group <- rep(c('control', 'case'), each = 2)
 d <- DGEList(counts=df, group=group)
-
-# check out the DGEList object
 d
 ```
 
-Perform a differential gene expression analysis.
+Let's run the differential expression analysis without any normalisation step.
 
 ```{r no_norm_de}
-d <- DGEList(counts=df, group=group)
 d <- estimateCommonDisp(d)
 
 # perform the DE test
@@ -112,9 +111,9 @@ Without normalisation, every transcript is differentially expressed.
 
 From the [edgeR manual](https://bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf):
 
-{edgeR} is concerned with differential expression analysis rather than with the quantification of expression levels. It is concerned with relative changes in expression levels between conditions, but not directly with estimating absolute expression levels.
-
-The `normLibSizes()` function normalises the library sizes in such a way to minimise the log-fold changes between the samples for most genes. The default method for computing these scale factors uses a trimmed mean of M-values (TMM) between each pair of samples. We call the product of the original library size and the scaling factor the effective library size, i.e., the normalised library size. The effective library size replaces the original library size in all downstream analyses
+> {edgeR} is concerned with differential expression analysis rather than with the quantification of expression levels. It is concerned with relative changes in expression levels between conditions, but not directly with estimating absolute expression levels.
+>
+> The `normLibSizes()` function normalises the library sizes in such a way to minimise the log-fold changes between the samples for most genes. The default method for computing these scale factors uses a trimmed mean of M-values (TMM) between each pair of samples. We call the product of the original library size and the scaling factor the effective library size, i.e., the normalised library size. The effective library size replaces the original library size in all downstream analyses
 
 Let's test the weighted trimmed mean of M-values method:
 
@@ -123,11 +122,24 @@ d_tmm <- normLibSizes(d, method="TMM")
 d_tmm
 ```
 
-If we use the scaling, we will observe that the differences are now less pronounced.
+The effective library size.
+
+```{r effective_lib_size}
+effective_lib_size <- d_tmm$samples$lib.size * d_tmm$samples$norm.factors
+effective_lib_size
+```
+
+Counts before scaling.
 
 ```{r head_d_tmm}
 head(d$counts)
-head(d_tmm$counts * d_tmm$samples$norm.factors)
+```
+
+Scaling with the effective library size eliminates the differences in the first 25 transcripts.
+
+```{r scale_with_effective_lib_size}
+t(t(d$counts) / effective_lib_size) |>
+  head()
 ```
 
 Perform the differential expression test.
@@ -138,7 +150,7 @@ d_tmm <- exactTest(d_tmm)
 table(p.adjust(d_tmm$table$PValue, method="BH")<0.05)
 ```
 
-Only half of the transcripts are differentially expressed (the last 25 transcripts).
+Only half of the transcripts are differentially expressed (the last 25 transcripts), which is the correct conclusion.
 
 ## RLE normalisation
 
