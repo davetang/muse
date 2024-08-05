@@ -1,0 +1,91 @@
+---
+title: "Differential gene expression analysis with DESeq2"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(DESeq2)
+library(pasilla)
+library(matrixStats)
+library(hexbin)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) is used to:
+
+> Estimate variance-mean dependence in count data from high-throughput sequencing assays and test for differential expression based on a model using the negative binomial distribution. 
+
+## Installation
+
+Install using `BiocManager::install()`.
+
+```{r install_edger, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("DESeq2")
+```
+
+We will use data from the [pasilla package](https://www.bioconductor.org/packages/release/data/experiment/html/pasilla.html) so install it too.
+
+```{r install_pasilla}
+BiocManager::install("pasilla")
+```
+
+## Example data
+
+Example dataset in the experiment data package {pasilla}.
+
+```{r}
+fn <- system.file("extdata", "pasilla_gene_counts.tsv", package = "pasilla", mustWork = TRUE)
+counts <- as.matrix(read.csv(fn, sep="\t", row.names = "gene_id"))
+dim(counts)
+```
+
+The matrix tallies the number of reads assigned for each gene in each sample.
+
+```{r tail_counts}
+tail(counts)
+```
+
+## Size factors
+
+Estimate size factors.
+
+```{r est_sz_fc}
+DESeq2::estimateSizeFactorsForMatrix(counts)
+```
+
+## Mean-variance relationship
+
+Variance versus mean for the (size factor adjusted) `counts` data. The axes are logarithmic. Also shown are lines through the origin with slopes 1 (green) and 2 (red).
+
+```{r mean_variance}
+sf <- DESeq2::estimateSizeFactorsForMatrix(counts)
+
+ncounts <- t(t(counts) / sf)
+
+# untreated samples
+uncounts <- ncounts[, grep("^untreated", colnames(ncounts)), drop = FALSE]
+
+ggplot(
+  tibble(
+    mean = rowMeans(uncounts),
+    var  = rowVars(uncounts)
+  ),
+  aes(x = log1p(mean), y = log1p(var))
+) +
+  geom_hex() +
+  coord_fixed() +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  geom_abline(slope = 1:2, color = c("forestgreen", "red"))
+```
+
+The green line is what we expect if the variance equals the mean, as is the case for a Poisson-distributed random variable. This approximately fits the data in the lower range. The red line corresponds to the quadratic mean-variance relationship $v = m^2$. We can see that in the upper range of the data, the quadratic relationship approximately fits the data.
