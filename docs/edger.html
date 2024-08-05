@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree372285b4b55cde5a2bb7a500e810e7590a427a72targetblank372285ba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec5672263c940e565c610f2df5ef0445d3a6b66e7targetblankc567226a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/372285b4b55cde5a2bb7a500e810e7590a427a72" target="_blank">372285b</a>
+<a href="https://github.com/davetang/muse/tree/c5672263c940e565c610f2df5ef0445d3a6b66e7" target="_blank">c567226</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree372285b4b55cde5a2bb7a500e810e7590a427a72targetblank372285ba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec5672263c940e565c610f2df5ef0445d3a6b66e7targetblankc567226a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/372285b4b55cde5a2bb7a500e810e7590a427a72" target="_blank">372285b</a>.
+<a href="https://github.com/davetang/muse/tree/c5672263c940e565c610f2df5ef0445d3a6b66e7" target="_blank">c567226</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -600,6 +600,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/c5672263c940e565c610f2df5ef0445d3a6b66e7/analysis/edger.Rmd" target="_blank">c567226</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-05
+</td>
+<td>
+Technical details of TMM
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/e1484025fafe589021db3b14a7ab9a3f4cd98318/docs/edger.html" target="_blank">e148402</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1005,6 +1039,86 @@ FALSE  TRUE
    25    25 </code></pre>
 <p>Only half of the transcripts are differentially expressed (the last
 25 transcripts), which is the correct conclusion.</p>
+<div id="the-need-for-normalisation" class="section level3">
+<h3>The need for normalisation</h3>
+<p>From the Sampling framework section of Robinson and Oshlack.</p>
+<p>A more formal explanation for the requirement of normalisation uses
+the following framework. Define <span
+class="math inline">\(Y_{gk}\)</span> as the observed count for gene
+<span class="math inline">\(g\)</span> in library <span
+class="math inline">\(k\)</span> summarised from the raw reads, <span
+class="math inline">\(\mu_{gk}\)</span> as the true and unknown
+expression level (number of transcripts), <span
+class="math inline">\(L_g\)</span> as the length of gene <span
+class="math inline">\(g\)</span> and <span
+class="math inline">\(N_k\)</span> as total number of reads for library
+<span class="math inline">\(k\)</span>. We can model the expected value
+of <span class="math inline">\(Y_{gk}\)</span> as:</p>
+<p><span class="math display">\[
+E[Y_{gk}] = \frac{\mu_{gk} \times L_g}{S_k} \times N_k \\
+\\
+where\ S_k = \sum^G_{g=1} \mu_{gk} \times L_g
+\]</span></p>
+<p><span class="math inline">\(S_k\)</span> represents the total RNA
+output of a sample. The problem underlying the analysis of RNA-seq data
+is that while <span class="math inline">\(N_k\)</span> is known, <span
+class="math inline">\(S_k\)</span> is unknown and can vary drastically
+from sample to sample, depending on the RNA composition. If a population
+has a larger total RNA output, then RNA-seq experiments will
+under-sample many genes, relative to another sample.</p>
+<p>At this stage, we leave the variance in the above model for <span
+class="math inline">\(Y_{gk}\)</span> unspecified. Depending on the
+experimental situation, Poisson seems appropriate for technical
+replicates and Negative Binomial may be appropriate for the additional
+variation observed from biological replicates. It is also worth noting
+that, in practice, the <span class="math inline">\(L_g\)</span> is
+generally absorbed into the <span
+class="math inline">\(\mu_{gk}\)</span> parameter and does not get used
+in the inference procedure. However, it has been well established that
+gene length biases are prominent in the analysis of gene expression.</p>
+</div>
+<div id="the-trimmed-mean-of-m-values-normalisation-method"
+class="section level3">
+<h3>The trimmed mean of M-values normalisation method</h3>
+<p>The total RNA production, <span class="math inline">\(S_k\)</span>,
+cannot be estimated directly, since we do not know the expression levels
+and true lengths of every gene. However, the relative RNA production of
+two samples, <span class="math inline">\(f_k = S_k /S_{k&#39;}\)</span>,
+essentially a global fold change, can more easily be determined. We
+propose an empirical strategy that equates the overall expression levels
+of genes between samples under the assumption that the majority of them
+are not DE. One simple yet robust way to estimate the ratio of RNA
+production uses a weighted trimmed mean of the log expression ratios
+(trimmed mean of M values (TMM)). For sequencing data, we define the
+gene-wise log-fold-changes as:</p>
+<p><span class="math display">\[
+M_g = log_2\frac{y_{gk}/N_k}{y_{gk&#39;}/N_{k&#39;}}
+\]</span></p>
+<p>and absolute expression levels:</p>
+<p><span class="math display">\[
+A_g = \frac{1}{2}log_2(Y_{gk}/N_k \times Y_{gk&#39;}/N_{k&#39;})\ for\
+Y_{gk&#39;} \ne 0
+\]</span></p>
+<p>To robustly summarise the observed M values, we trim both the M
+values and the A values before taking the weighted average. Precision
+(inverse of the variance) weights are used to account for the fact that
+log fold changes (effectively, a log relative risk) from genes with
+larger read counts have lower variance on the logarithm scale.</p>
+<p>For a two-sample comparison, only one relative scaling factor (<span
+class="math inline">\(f_k\)</span>) is required. It can be used to
+adjust both library sizes (divide the reference by <span
+class="math inline">\(\sqrt{f_k}\)</span> and multiply non-reference by
+<span class="math inline">\(\sqrt{f_k}\)</span>) in the statistical
+analysis (for example, Fisher’s exact test).</p>
+<p>Normalisation factors across several samples can be calculated by
+selecting one sample as a reference and calculating the TMM factor for
+each non-reference sample. Similar to two-sample comparisons, the TMM
+normalization factors can be built into the statistical model used to
+test for DE. For example, a Poisson model would modify the observed
+library size to an effective library size, which adjusts the modeled
+mean (for example, using an additional offset in a generalized linear
+model).</p>
+</div>
 </div>
 <div id="rle-normalisation" class="section level2">
 <h2>RLE normalisation</h2>
