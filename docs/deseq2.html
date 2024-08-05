@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3780bfab5474f613432aac97371b9b7e50b22f4dtargetblank3780bfaa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9293da5953964d919bbacd4c01f53c4674f6e8e7targetblank9293da5a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/3780bfab5474f613432aac97371b9b7e50b22f4d" target="_blank">3780bfa</a>
+<a href="https://github.com/davetang/muse/tree/9293da5953964d919bbacd4c01f53c4674f6e8e7" target="_blank">9293da5</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3780bfab5474f613432aac97371b9b7e50b22f4dtargetblank3780bfaa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9293da5953964d919bbacd4c01f53c4674f6e8e7targetblank9293da5a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/3780bfab5474f613432aac97371b9b7e50b22f4d" target="_blank">3780bfa</a>.
+<a href="https://github.com/davetang/muse/tree/9293da5953964d919bbacd4c01f53c4674f6e8e7" target="_blank">9293da5</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -600,6 +600,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/9293da5953964d919bbacd4c01f53c4674f6e8e7/analysis/deseq2.Rmd" target="_blank">9293da5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-05
+</td>
+<td>
+Visualisations after a DGE analysis
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/365890ed39ee3f688897840df5742a07f4cfca27/docs/deseq2.html" target="_blank">365890e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -891,6 +925,72 @@ FBgn0029167 3.69104e-110
 FBgn0003360 1.98979e-105
 FBgn0035085  2.14354e-74
 FBgn0039827  1.74316e-68</code></pre>
+<div id="exploring-the-results" class="section level3">
+<h3>Exploring the results</h3>
+<p>The first step after a differential expression analysis is to
+visualise the following plots:</p>
+<ul>
+<li>the histogram of p-values</li>
+<li>the MA plot</li>
+<li>an ordination plot</li>
+<li>a heatmap</li>
+</ul>
+<p>Histogram of p-values of a differential expression analysis.”</p>
+<pre class="r"><code>ggplot(as(res, &quot;data.frame&quot;), aes(x = pvalue)) +
+  geom_histogram(binwidth = 0.01, fill = &quot;Royalblue&quot;, boundary = 0) +
+  geom_hline(yintercept = 100, lty = 3) +
+  theme_minimal()</code></pre>
+<pre><code>Warning: Removed 2241 rows containing non-finite outside the scale range
+(`stat_bin()`).</code></pre>
+<p><img src="figure/deseq2.Rmd/pvalue_hist-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The p-value distribution shows a uniform background (non-DE genes)
+with values between 0 and 1 and a peak of small p-values at the left (DE
+genes). The ratio of the level of the background to the height of the
+peak provides us with a rough indication of the false discovery rate
+(FDR) that would be associated with calling the genes in the leftmost
+bin differentially expressed.</p>
+<p>In this case, the leftmost bin contains 993 genes and the background
+level (dotted line) is around 100, so the FDR associated with calling
+all genes in the leftmost bin would be around 10%.</p>
+<pre class="r"><code>table(res$pvalue &lt; 0.01)</code></pre>
+<pre><code>
+FALSE  TRUE 
+11365   993 </code></pre>
+<p>A background distribution that is not uniform, but shows a tilted
+shape with an increase towards the right, tends to indicate batch
+effects, that is, underlying systematic variation that makes replicates
+look more different than expected.</p>
+<p>The {DESeq2} package can produce the MA plot.</p>
+<pre class="r"><code>plotMA(pasilla, ylim = c(-2, 2))</code></pre>
+<p><img src="figure/deseq2.Rmd/plot_ma-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>{DESeq2} also has a function <code>plotPCA()</code> that can produce
+PCA plots. PC1 is mostly aligned with the experimental covariate of
+interest (<code>untreated</code>/<code>treated</code>), while PC2 is
+roughly aligned with the sequencing protocol
+(<code>single</code>/<code>paired</code>).</p>
+<pre class="r"><code># transform using regularised logarithm
+pas_rlog &lt;- rlogTransformation(pasilla)
+plotPCA(pas_rlog, intgroup=c(&quot;condition&quot;, &quot;type&quot;)) + coord_fixed()</code></pre>
+<pre><code>using ntop=500 top features by variance</code></pre>
+<pre><code>Coordinate system already present. Adding new coordinate system, which will
+replace the existing one.</code></pre>
+<p><img src="figure/deseq2.Rmd/deseq2_pca-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Heatmap using the regularised logarithm (rlog) transformed data of
+the 30 most variable genes.</p>
+<pre class="r"><code>library(&quot;pheatmap&quot;)
+wanted &lt;- order(rowMeans(assay(pas_rlog)), decreasing = TRUE)[1:30]
+
+pheatmap(
+  assay(pas_rlog)[wanted, ],
+  scale = &quot;row&quot;,
+  annotation_col = as.data.frame(
+    colData(pas_rlog)[, c(&quot;condition&quot;, &quot;type&quot;)]
+  )
+)</code></pre>
+<p><img src="figure/deseq2.Rmd/pheatmap-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>Note the clustering of the sequencing protocol and this highlights
+that our differential expression analysis was probably too naive and
+that we should adjust for the “nuisance” factor.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -924,56 +1024,57 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] hexbin_1.28.3               pasilla_1.32.0             
- [3] DEXSeq_1.50.0               RColorBrewer_1.1-3         
- [5] AnnotationDbi_1.66.0        BiocParallel_1.38.0        
- [7] DESeq2_1.44.0               SummarizedExperiment_1.34.0
- [9] Biobase_2.64.0              MatrixGenerics_1.16.0      
-[11] matrixStats_1.3.0           GenomicRanges_1.56.1       
-[13] GenomeInfoDb_1.40.1         IRanges_2.38.1             
-[15] S4Vectors_0.42.1            BiocGenerics_0.50.0        
-[17] lubridate_1.9.3             forcats_1.0.0              
-[19] stringr_1.5.1               dplyr_1.1.4                
-[21] purrr_1.0.2                 readr_2.1.5                
-[23] tidyr_1.3.1                 tibble_3.2.1               
-[25] ggplot2_3.5.1               tidyverse_2.0.0            
-[27] workflowr_1.7.1            
+ [1] pheatmap_1.0.12             hexbin_1.28.3              
+ [3] pasilla_1.32.0              DEXSeq_1.50.0              
+ [5] RColorBrewer_1.1-3          AnnotationDbi_1.66.0       
+ [7] BiocParallel_1.38.0         DESeq2_1.44.0              
+ [9] SummarizedExperiment_1.34.0 Biobase_2.64.0             
+[11] MatrixGenerics_1.16.0       matrixStats_1.3.0          
+[13] GenomicRanges_1.56.1        GenomeInfoDb_1.40.1        
+[15] IRanges_2.38.1              S4Vectors_0.42.1           
+[17] BiocGenerics_0.50.0         lubridate_1.9.3            
+[19] forcats_1.0.0               stringr_1.5.1              
+[21] dplyr_1.1.4                 purrr_1.0.2                
+[23] readr_2.1.5                 tidyr_1.3.1                
+[25] tibble_3.2.1                ggplot2_3.5.1              
+[27] tidyverse_2.0.0             workflowr_1.7.1            
 
 loaded via a namespace (and not attached):
-  [1] DBI_1.2.3               bitops_1.0-7            httr2_1.0.1            
-  [4] biomaRt_2.60.1          rlang_1.1.4             magrittr_2.0.3         
-  [7] git2r_0.33.0            compiler_4.4.0          RSQLite_2.3.7          
- [10] getPass_0.2-4           png_0.1-8               callr_3.7.6            
- [13] vctrs_0.6.5             pkgconfig_2.0.3         crayon_1.5.2           
- [16] fastmap_1.2.0           dbplyr_2.5.0            XVector_0.44.0         
- [19] labeling_0.4.3          utf8_1.2.4              Rsamtools_2.20.0       
- [22] promises_1.3.0          rmarkdown_2.27          tzdb_0.4.0             
- [25] UCSC.utils_1.0.0        ps_1.7.6                bit_4.0.5              
- [28] xfun_0.44               zlibbioc_1.50.0         cachem_1.1.0           
- [31] jsonlite_1.8.8          progress_1.2.3          blob_1.2.4             
- [34] highr_0.11              later_1.3.2             DelayedArray_0.30.1    
- [37] parallel_4.4.0          prettyunits_1.2.0       R6_2.5.1               
- [40] bslib_0.7.0             stringi_1.8.4           genefilter_1.86.0      
- [43] jquerylib_0.1.4         Rcpp_1.0.12             knitr_1.47             
- [46] splines_4.4.0           httpuv_1.6.15           Matrix_1.7-0           
- [49] timechange_0.3.0        tidyselect_1.2.1        rstudioapi_0.16.0      
- [52] abind_1.4-5             yaml_2.3.8              codetools_0.2-20       
- [55] hwriter_1.3.2.1         curl_5.2.1              processx_3.8.4         
- [58] lattice_0.22-6          withr_3.0.0             KEGGREST_1.44.1        
- [61] evaluate_0.24.0         survival_3.5-8          BiocFileCache_2.12.0   
- [64] xml2_1.3.6              Biostrings_2.72.1       filelock_1.0.3         
- [67] pillar_1.9.0            whisker_0.4.1           generics_0.1.3         
- [70] vroom_1.6.5             rprojroot_2.0.4         hms_1.1.3              
- [73] munsell_0.5.1           scales_1.3.0            xtable_1.8-4           
- [76] glue_1.7.0              tools_4.4.0             annotate_1.82.0        
- [79] locfit_1.5-9.9          XML_3.99-0.16.1         fs_1.6.4               
- [82] grid_4.4.0              colorspace_2.1-0        GenomeInfoDbData_1.2.12
- [85] cli_3.6.2               rappdirs_0.3.3          fansi_1.0.6            
- [88] S4Arrays_1.4.1          gtable_0.3.5            sass_0.4.9             
- [91] digest_0.6.35           SparseArray_1.4.8       farver_2.1.2           
- [94] geneplotter_1.82.0      memoise_2.0.1           htmltools_0.5.8.1      
- [97] lifecycle_1.0.4         httr_1.4.7              statmod_1.5.0          
-[100] bit64_4.0.5            </code></pre>
+  [1] rstudioapi_0.16.0       jsonlite_1.8.8          magrittr_2.0.3         
+  [4] farver_2.1.2            rmarkdown_2.27          fs_1.6.4               
+  [7] zlibbioc_1.50.0         vctrs_0.6.5             memoise_2.0.1          
+ [10] Rsamtools_2.20.0        htmltools_0.5.8.1       S4Arrays_1.4.1         
+ [13] progress_1.2.3          curl_5.2.1              SparseArray_1.4.8      
+ [16] sass_0.4.9              bslib_0.7.0             httr2_1.0.1            
+ [19] cachem_1.1.0            whisker_0.4.1           lifecycle_1.0.4        
+ [22] pkgconfig_2.0.3         Matrix_1.7-0            R6_2.5.1               
+ [25] fastmap_1.2.0           GenomeInfoDbData_1.2.12 digest_0.6.35          
+ [28] colorspace_2.1-0        ps_1.7.6                rprojroot_2.0.4        
+ [31] geneplotter_1.82.0      RSQLite_2.3.7           hwriter_1.3.2.1        
+ [34] filelock_1.0.3          labeling_0.4.3          fansi_1.0.6            
+ [37] timechange_0.3.0        httr_1.4.7              abind_1.4-5            
+ [40] compiler_4.4.0          bit64_4.0.5             withr_3.0.0            
+ [43] DBI_1.2.3               highr_0.11              biomaRt_2.60.1         
+ [46] rappdirs_0.3.3          DelayedArray_0.30.1     tools_4.4.0            
+ [49] httpuv_1.6.15           glue_1.7.0              callr_3.7.6            
+ [52] promises_1.3.0          grid_4.4.0              getPass_0.2-4          
+ [55] generics_0.1.3          gtable_0.3.5            tzdb_0.4.0             
+ [58] hms_1.1.3               xml2_1.3.6              utf8_1.2.4             
+ [61] XVector_0.44.0          pillar_1.9.0            vroom_1.6.5            
+ [64] genefilter_1.86.0       later_1.3.2             splines_4.4.0          
+ [67] BiocFileCache_2.12.0    lattice_0.22-6          survival_3.5-8         
+ [70] bit_4.0.5               annotate_1.82.0         tidyselect_1.2.1       
+ [73] locfit_1.5-9.9          Biostrings_2.72.1       knitr_1.47             
+ [76] git2r_0.33.0            xfun_0.44               statmod_1.5.0          
+ [79] stringi_1.8.4           UCSC.utils_1.0.0        yaml_2.3.8             
+ [82] evaluate_0.24.0         codetools_0.2-20        cli_3.6.2              
+ [85] xtable_1.8-4            munsell_0.5.1           processx_3.8.4         
+ [88] jquerylib_0.1.4         Rcpp_1.0.12             dbplyr_2.5.0           
+ [91] png_0.1-8               XML_3.99-0.16.1         parallel_4.4.0         
+ [94] blob_1.2.4              prettyunits_1.2.0       bitops_1.0-7           
+ [97] scales_1.3.0            crayon_1.5.2            rlang_1.1.4            
+[100] KEGGREST_1.44.1        </code></pre>
+</div>
 </div>
 </div>
 </div>
