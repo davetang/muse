@@ -148,7 +148,66 @@ The `DESeq()` function is a wrapper that calls:
 
 The test is between the two levels `untreated` and `treated` of the factor `condition`, since this is what was specified in the design: `design = ~ condition`.
 
-```{r}
+```{r deseq2_res}
 res <- results(pasilla)
 res[order(res$padj), ] |> head()
 ```
+
+### Exploring the results
+
+The first step after a differential expression analysis is to visualise the following plots:
+
+* the histogram of p-values
+* the MA plot
+* an ordination plot
+* a heatmap
+
+Histogram of p-values of a differential expression analysis."
+
+```{r pvalue_hist}
+ggplot(as(res, "data.frame"), aes(x = pvalue)) +
+  geom_histogram(binwidth = 0.01, fill = "Royalblue", boundary = 0) +
+  geom_hline(yintercept = 100, lty = 3) +
+  theme_minimal()
+```
+
+The p-value distribution shows a uniform background (non-DE genes) with values between 0 and 1 and a peak of small p-values at the left (DE genes). The ratio of the level of the background to the height of the peak provides us with a rough indication of the false discovery rate (FDR) that would be associated with calling the genes in the leftmost bin differentially expressed.
+
+In this case, the leftmost bin contains 993 genes and the background level (dotted line) is around 100, so the FDR associated with calling all genes in the leftmost bin would be around 10%.
+
+```{r fdr_est}
+table(res$pvalue < 0.01)
+```
+
+A background distribution that is not uniform, but shows a tilted shape with an increase towards the right, tends to indicate batch effects, that is, underlying systematic variation that makes replicates look more different than expected.
+
+The {DESeq2} package can produce the MA plot.
+
+```{r plot_ma}
+plotMA(pasilla, ylim = c(-2, 2))
+```
+
+{DESeq2} also has a function `plotPCA()` that can produce PCA plots. PC1 is mostly aligned with the experimental covariate of interest (`untreated`/`treated`), while PC2 is roughly aligned with the sequencing protocol (`single`/`paired`).
+
+```{r deseq2_pca}
+# transform using regularised logarithm
+pas_rlog <- rlogTransformation(pasilla)
+plotPCA(pas_rlog, intgroup=c("condition", "type")) + coord_fixed()
+```
+
+Heatmap using the regularised logarithm (rlog) transformed data of the 30 most variable genes.
+
+```{r pheatmap, fig.height=10, fig.width=8}
+library("pheatmap")
+wanted <- order(rowMeans(assay(pas_rlog)), decreasing = TRUE)[1:30]
+
+pheatmap(
+  assay(pas_rlog)[wanted, ],
+  scale = "row",
+  annotation_col = as.data.frame(
+    colData(pas_rlog)[, c("condition", "type")]
+  )
+)
+```
+
+Note the clustering of the sequencing protocol and this highlights that our differential expression analysis was probably too naive and that we should adjust for the "nuisance" factor.
