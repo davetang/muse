@@ -152,6 +152,42 @@ table(p.adjust(d_tmm$table$PValue, method="BH")<0.05)
 
 Only half of the transcripts are differentially expressed (the last 25 transcripts), which is the correct conclusion.
 
+### The need for normalisation
+
+From the Sampling framework section of Robinson and Oshlack.
+
+A more formal explanation for the requirement of normalisation uses the following framework. Define $Y_{gk}$ as the observed count for gene $g$ in library $k$ summarised from the raw reads, $\mu_{gk}$ as the true and unknown expression level (number of transcripts), $L_g$ as the length of gene $g$ and $N_k$ as total number of reads for library $k$. We can model the expected value of $Y_{gk}$ as:
+
+$$
+E[Y_{gk}] = \frac{\mu_{gk} \times L_g}{S_k} \times N_k \\
+\\
+where\ S_k = \sum^G_{g=1} \mu_{gk} \times L_g
+$$
+
+$S_k$ represents the total RNA output of a sample. The problem underlying the analysis of RNA-seq data is that while $N_k$ is known, $S_k$ is unknown and can vary drastically from sample to sample, depending on the RNA composition. If a population has a larger total RNA output, then RNA-seq experiments will under-sample many genes, relative to another sample.
+
+At this stage, we leave the variance in the above model for $Y_{gk}$ unspecified. Depending on the experimental situation, Poisson seems appropriate for technical replicates and Negative Binomial may be appropriate for the additional variation observed from biological replicates. It is also worth noting that, in practice, the $L_g$ is generally absorbed into the $\mu_{gk}$ parameter and does not get used in the inference procedure. However, it has been well established that gene length biases are prominent in the analysis of gene expression.
+
+### The trimmed mean of M-values normalisation method
+
+The total RNA production, $S_k$, cannot be estimated directly, since we do not know the expression levels and true lengths of every gene. However, the relative RNA production of two samples, $f_k = S_k /S_{k'}$, essentially a global fold change, can more easily be determined. We propose an empirical strategy that equates the overall expression levels of genes between samples under the assumption that the majority of them are not DE. One simple yet robust way to estimate the ratio of RNA production uses a weighted trimmed mean of the log expression ratios (trimmed mean of M values (TMM)). For sequencing data, we define the gene-wise log-fold-changes as:
+
+$$
+M_g = log_2\frac{y_{gk}/N_k}{y_{gk'}/N_{k'}}
+$$
+
+and absolute expression levels:
+
+$$
+A_g = \frac{1}{2}log_2(Y_{gk}/N_k \times Y_{gk'}/N_{k'})\ for\ Y_{gk'} \ne 0
+$$
+
+To robustly summarise the observed M values, we trim both the M values and the A values before taking the weighted average. Precision (inverse of the variance) weights are used to account for the fact that log fold changes (effectively, a log relative risk) from genes with larger read counts have lower variance on the logarithm scale.
+
+For a two-sample comparison, only one relative scaling factor ($f_k$) is required. It can be used to adjust both library sizes (divide the reference by $\sqrt{f_k}$ and multiply non-reference by $\sqrt{f_k}$) in the statistical analysis (for example, Fisher's exact test).
+
+Normalisation factors across several samples can be calculated by selecting one sample as a reference and calculating the TMM factor for each non-reference sample. Similar to two-sample comparisons, the TMM normalization factors can be built into the statistical model used to test for DE. For example, a Poisson model would modify the observed library size to an effective library size, which adjusts the modeled mean (for example, using an additional offset in a generalized linear model).
+
 ## RLE normalisation
 
 Let's test the relative log expression normalisation method:
