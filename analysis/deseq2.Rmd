@@ -211,3 +211,54 @@ pheatmap(
 ```
 
 Note the clustering of the sequencing protocol and this highlights that our differential expression analysis was probably too naive and that we should adjust for the "nuisance" factor.
+
+## Multifactorial designs and linear models
+
+Let's assume that, in addition to the siRNA knockdown of the pasilla gene, we also want to test the effect of a certain drug. We would then envisage an experiment in which the experimenter treats the cells either with negative control, with the siRNA against pasilla, with the drug, or with both. To analyse this experiment, we can introduce the notation:
+
+$$
+y = \beta_0 + x_1 \beta_1 + x_2 \beta_2 + x_1 x_2 \beta_{12}
+$$
+
+The left-hand size, $y$, is the experimental measurement of interest, which in our case is the suitably transformed expression level of a gene. Since in an RNA-seq experiment there are lots of genes, we'll have as many copies of the above equation, one for each.
+
+The coefficient $\beta_0$ is the base level of the measurement in the negative control; often it is called the **intercept**.
+
+The design factors $x_1$ and $x_2$ are binary indicator variables: $x_1$ takes the value 1 if the siRNA was transfected and 0 if not, and similarly, $x_2$ indicates whether the drug was administered.
+
+In the experiment where only where only the siRNA is used, $x_1$ = 1 and $x_2$ = 0, and the third and fourth terms of the equation vanish. The equation then simplifies to $y = \beta_0 + \beta_1$. This means that $\beta_1$ represents the difference between treatment and control. If our measurements are on a logarithmic scale, then:
+
+$$
+y = \beta_0 + \beta_1 \\
+\beta_1 = y - \beta_0 = log_2(expression_{treated}) - log2(expression_{untreated}) \\
+= log_2\frac{expression_{treated}}{expression_{untreated}}
+$$
+
+is the logarithmic fold change due to treatment with the siRNA. In exactly the same way, $\beta_2$ is the logarithmic fold change due to treatment with the drug.
+
+If we treat the cells with both siRNA and drug, $x_1$ = $x_2$ = 1:
+
+$$
+y = \beta_0 + x_1 \beta_1 + x_2 \beta_2 + x_1 x_2 \beta_{12} \\
+y = \beta_0 + \beta_1 + \beta_2 + \beta_{12} \\
+\beta_{12} = y - (\beta_0 + \beta_1 + \beta_2)
+$$
+
+This means that $\beta_{12}$ is the difference between the observed outcome, $y$, and the outcome expected from the individual treatments, obtained by adding to the baseline the effect of siRNA alone, $\beta_1$, and of drug alone, $\beta_2$.
+
+We call $\beta_{12}$ the _interaction_ effect of siRNA and drug. It has nothing to do with a physical interaction: the terminology indicates that the effects of these two different experimental factors do not simply add up, but combine in a more complicated fashion. For instance, if the target of the drug and of the siRNA were equivalent, leading to the same effect on the cells, then we would biologically expect that $\beta_1$ = $\beta_2$. We would also expect that their combination has no further effect, so that $\beta_{12}$ = $-\beta_1$.
+
+If, on the other hand, the targets of the drug and of the siRNA are in parallel pathways that can buffer each other, we would expect that $\beta_1$ and $\beta_2$ are both relatively small, but the combined effect is synergistic, and $\beta_{12}$ is large.
+
+We don't always care about interactions. Many experiments are designed with multiple factors where we care most about each of their individual effects. In that case, the combinatorial treatment might not be present in the experimental design, and the model to use for the analysis is a version of the equation with the rightmost term removed.
+
+We can succinctly encode the design of the experiment in the **design matrix**. The combinatorial experiment would be:
+
+| $x_0$ | $x_1$ | $x_2$ |
+| :---: | :---: | :---: |
+| 1     | 0     | 0     |
+| 1     | 1     | 0     |
+| 1     | 0     | 1     |
+| 1     | 1     | 1     |
+
+The columns of the design matrix correspond to the experimental factors, and its rows represent the different experimental conditions, four in this case. If the combinatorial treatment is not performed, then the design matrix is reduced to only the first three rows.
