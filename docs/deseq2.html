@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3738c6f4da763bc34b6e6aff1bdd004b1fca040dtargetblank3738c6fa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree665782bb8465a8773d6924849ed75eae1772f1b5targetblank665782ba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/3738c6f4da763bc34b6e6aff1bdd004b1fca040d" target="_blank">3738c6f</a>
+<a href="https://github.com/davetang/muse/tree/665782bb8465a8773d6924849ed75eae1772f1b5" target="_blank">665782b</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3738c6f4da763bc34b6e6aff1bdd004b1fca040dtargetblank3738c6fa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree665782bb8465a8773d6924849ed75eae1772f1b5targetblank665782ba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/3738c6f4da763bc34b6e6aff1bdd004b1fca040d" target="_blank">3738c6f</a>.
+<a href="https://github.com/davetang/muse/tree/665782bb8465a8773d6924849ed75eae1772f1b5" target="_blank">665782b</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -600,6 +600,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/665782bb8465a8773d6924849ed75eae1772f1b5/analysis/deseq2.Rmd" target="_blank">665782b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-06
+</td>
+<td>
+Noise and replicates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/3a1d43a87502d6cefd79f879373e86fd32928482/docs/deseq2.html" target="_blank">3a1d43a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1184,9 +1218,9 @@ envisage an experiment in which the experimenter treats the cells either
 with negative control, with the siRNA against pasilla, with the drug, or
 with both. To analyse this experiment, we can introduce the
 notation:</p>
-<p><span class="math display">\[
-y = \beta_0 + x_1 \beta_1 + x_2 \beta_2 + x_1 x_2 \beta_{12}
-\]</span></p>
+<p><span class="math display">\[\begin{equation}
+   y = \beta_0 + x_1 \beta_1 + x_2 \beta_2 + x_1 x_2 \beta_{12}
+\end{equation}\]</span></p>
 <p>The left-hand size, <span class="math inline">\(y\)</span>, is the
 experimental measurement of interest, which in our case is the suitably
 transformed expression level of a gene. Since in an RNA-seq experiment
@@ -1294,6 +1328,61 @@ be:</p>
 factors, and its rows represent the different experimental conditions,
 four in this case. If the combinatorial treatment is not performed, then
 the design matrix is reduced to only the first three rows.</p>
+</div>
+<div id="noise-and-replicates" class="section level2">
+<h2>Noise and replicates</h2>
+<p>The equation:</p>
+<p><span class="math display">\[\begin{equation}
+   y = \beta_0 + x_1 \beta_1 + x_2 \beta_2 + x_1 x_2 \beta_{12}
+\end{equation}\]</span></p>
+<p>provides a conceptual decomposition of the observed data into the
+effects caused by the different experimental variables. If our data (the
+<span class="math inline">\(y\)</span>s) were absolutely precise, we
+could set up a linear system of equations, one equation for each of the
+four possible experimental conditions represented by the <span
+class="math inline">\(x\)</span>s, and solve for the <span
+class="math inline">\(\beta\)</span>s.</p>
+<p>However real data is usually affected by noise and we need replicates
+to estimate the levels of noise and assess the uncertainty of our
+estimated <span class="math inline">\(\beta\)</span>s. Only then can we
+empirically assess whether any of the observed changes between
+conditions are significantly larger than those occurring due just to
+experimental or natural variation. We extend the equation to:</p>
+<p><span class="math display">\[
+y_j = x_{j0} \beta_0 + x_{j1} \beta_1 + x_{j2} \beta_2 + x_{j1} x_{j2}
+\beta_{12} + \epsilon_j
+\]</span></p>
+<p>We have included the index <span class="math inline">\(j\)</span> and
+a new term <span class="math inline">\(\epsilon_j\)</span>. The index
+<span class="math inline">\(j\)</span> now explicitly counts over our
+individual replicate experiments; for example, if for each of the four
+conditions we perform three replicates, then <span
+class="math inline">\(j\)</span> counts from 1 to 12. The design matrix
+now has 12 rows, and <span class="math inline">\(x_{jk}\)</span> is the
+value of the matrix in its <span class="math inline">\(j\)</span>th row
+and <span class="math inline">\(k\)</span>th column.</p>
+<p>The additional terms <span class="math inline">\(\epsilon_j\)</span>,
+which we call the <strong>residuals</strong>, are there to absorb
+differences between replicates. However, one additional modeling
+component is needed: the system of 12 equations would be underdetermined
+without further information, since it now has more variables (12 <span
+class="math inline">\(\epsilon\)</span>s and four <span
+class="math inline">\(\beta\)</span>s) than it has equations (12, one
+for each <span class="math inline">\(j\)</span>). To address this, we
+require that the <span class="math inline">\(\epsilon_j\)</span> be
+small. One popular way to overcome this is to minimise the sum of
+squared residuals,</p>
+<p><span class="math display">\[
+\sum_j \epsilon^2_j \rightarrow min.
+\]</span></p>
+<p>It turns out that with this requirement satisfied, the <span
+class="math inline">\(\beta\)</span>s represent the <em>average</em>
+effects of each of the experimental factors, while the residuals <span
+class="math inline">\(\epsilon_j\)</span> reflect the experimental
+fluntuations around the mean between the replicates. This approach,
+which is called <strong>least sum of squares fitting</strong>, is
+mathematically convenient, since it can be achieved by straight-forward
+matrix algebra and it is what the <code>lm()</code> function does.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
