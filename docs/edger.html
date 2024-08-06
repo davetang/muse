@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-08-05" />
+<meta name="date" content="2024-08-06" />
 
 <title>Normalisation methods implemented in edgeR</title>
 
@@ -360,7 +360,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Normalisation methods implemented in
 edgeR</h1>
-<h4 class="date">2024-08-05</h4>
+<h4 class="date">2024-08-06</h4>
 
 </div>
 
@@ -389,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-08-05
+<strong>Last updated:</strong> 2024-08-06
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec5672263c940e565c610f2df5ef0445d3a6b66e7targetblankc567226a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8714ef301e9fdb9d39b13943b6887d26c4ba67d4targetblank8714ef3a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/c5672263c940e565c610f2df5ef0445d3a6b66e7" target="_blank">c567226</a>
+<a href="https://github.com/davetang/muse/tree/8714ef301e9fdb9d39b13943b6887d26c4ba67d4" target="_blank">8714ef3</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec5672263c940e565c610f2df5ef0445d3a6b66e7targetblankc567226a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8714ef301e9fdb9d39b13943b6887d26c4ba67d4targetblank8714ef3a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/c5672263c940e565c610f2df5ef0445d3a6b66e7" target="_blank">c567226</a>.
+<a href="https://github.com/davetang/muse/tree/8714ef301e9fdb9d39b13943b6887d26c4ba67d4" target="_blank">8714ef3</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -557,6 +557,9 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    r_packages_4.3.3/
     Ignored:    r_packages_4.4.0/
+
+Unstaged changes:
+    Modified:   analysis/deseq2.Rmd
 
 </code></pre>
 <p>
@@ -600,6 +603,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/8714ef301e9fdb9d39b13943b6887d26c4ba67d4/analysis/edger.Rmd" target="_blank">8714ef3</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-06
+</td>
+<td>
+Data from {pascilla}
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/3e5ae4b4b6de03279d5e0f5ec0c98a199d352fb8/docs/edger.html" target="_blank">3e5ae4b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -882,14 +919,14 @@ control_2 &lt;- rep(10, 50)
 case_1 &lt;- c(rep(20, 25),rep(0,25))
 case_2 &lt;- c(rep(20, 25),rep(0,25))
 
-df &lt;- data.frame(
+eg1 &lt;- data.frame(
   cont1 = control_1,
   cont2 = control_2,
   case1 = case_1,
   case2 = case_2
 )
 
-head(df)</code></pre>
+head(eg1)</code></pre>
 <pre><code>  cont1 cont2 case1 case2
 1    10    10    20    20
 2    10    10    20    20
@@ -898,7 +935,7 @@ head(df)</code></pre>
 5    10    10    20    20
 6    10    10    20    20</code></pre>
 <p>Tail of the dataset.</p>
-<pre class="r"><code>tail(df)</code></pre>
+<pre class="r"><code>tail(eg1)</code></pre>
 <pre><code>   cont1 cont2 case1 case2
 45    10    10     0     0
 46    10    10     0     0
@@ -907,7 +944,7 @@ head(df)</code></pre>
 49    10    10     0     0
 50    10    10     0     0</code></pre>
 <p>Equal depth.</p>
-<pre class="r"><code>colSums(df)</code></pre>
+<pre class="r"><code>colSums(eg1)</code></pre>
 <pre><code>cont1 cont2 case1 case2 
   500   500   500   500 </code></pre>
 </div>
@@ -916,7 +953,7 @@ head(df)</code></pre>
 <p>In order to use {edgeR} we need to create a <code>DGEList</code>
 object with the groups.</p>
 <pre class="r"><code>group &lt;- rep(c(&#39;control&#39;, &#39;case&#39;), each = 2)
-d &lt;- DGEList(counts=df, group=group)
+d &lt;- DGEList(counts=eg1, group=group)
 d</code></pre>
 <pre><code>An object of class &quot;DGEList&quot;
 $counts
@@ -1216,8 +1253,10 @@ table(p.adjust(d_uq$table$PValue, method=&quot;BH&quot;)&lt;0.05)</code></pre>
 FALSE  TRUE 
    25    25 </code></pre>
 </div>
-<div id="testing-a-real-dataset" class="section level2">
-<h2>Testing a real dataset</h2>
+<div id="using-real-datasets" class="section level2">
+<h2>Using real datasets</h2>
+<div id="pnas-expression" class="section level3">
+<h3>PNAS expression</h3>
 <p>Perform differential gene expression analysis using various
 normalisation methods on the <a
 href="https://pubmed.ncbi.nlm.nih.gov/19088194/">pnas_expression.txt</a>
@@ -1368,6 +1407,73 @@ Dave Tang
 </tbody>
 </table>
 </div>
+</div>
+</div>
+<div id="data-from-pascilla" class="section level3">
+<h3>Data from {pascilla}</h3>
+<p>Example dataset in the experiment data package {pasilla}.</p>
+<pre class="r"><code>fn &lt;- system.file(&quot;extdata&quot;, &quot;pasilla_gene_counts.tsv&quot;, package = &quot;pasilla&quot;, mustWork = TRUE)
+counts &lt;- as.matrix(read.csv(fn, sep=&quot;\t&quot;, row.names = &quot;gene_id&quot;))
+head(counts)</code></pre>
+<pre><code>            untreated1 untreated2 untreated3 untreated4 treated1 treated2
+FBgn0000003          0          0          0          0        0        0
+FBgn0000008         92        161         76         70      140       88
+FBgn0000014          5          1          0          0        4        0
+FBgn0000015          0          2          1          2        1        0
+FBgn0000017       4664       8714       3564       3150     6205     3072
+FBgn0000018        583        761        245        310      722      299
+            treated3
+FBgn0000003        1
+FBgn0000008       70
+FBgn0000014        0
+FBgn0000015        0
+FBgn0000017     3334
+FBgn0000018      308</code></pre>
+<p>Subset counts.</p>
+<pre class="r"><code>counts_subset &lt;- counts[, c(1,5)]
+head(counts_subset)</code></pre>
+<pre><code>            untreated1 treated1
+FBgn0000003          0        0
+FBgn0000008         92      140
+FBgn0000014          5        4
+FBgn0000015          0        1
+FBgn0000017       4664     6205
+FBgn0000018        583      722</code></pre>
+<p>Create <code>DGEList</code> object.</p>
+<pre class="r"><code>group &lt;- factor(colnames(counts_subset))
+d &lt;- DGEList(counts=counts_subset, group=group)
+d</code></pre>
+<pre><code>An object of class &quot;DGEList&quot;
+$counts
+            untreated1 treated1
+FBgn0000003          0        0
+FBgn0000008         92      140
+FBgn0000014          5        4
+FBgn0000015          0        1
+FBgn0000017       4664     6205
+14594 more rows ...
+
+$samples
+                group lib.size norm.factors
+untreated1 untreated1 13972512            1
+treated1     treated1 18670279            1</code></pre>
+<p>Normalise.</p>
+<pre class="r"><code>d_tmm &lt;- normLibSizes(d, method=&quot;TMM&quot;)
+d_tmm</code></pre>
+<pre><code>An object of class &quot;DGEList&quot;
+$counts
+            untreated1 treated1
+FBgn0000003          0        0
+FBgn0000008         92      140
+FBgn0000014          5        4
+FBgn0000015          0        1
+FBgn0000017       4664     6205
+14594 more rows ...
+
+$samples
+                group lib.size norm.factors
+untreated1 untreated1 13972512    0.9639914
+treated1     treated1 18670279    1.0373536</code></pre>
 </div>
 </div>
 <div id="summary" class="section level2">
