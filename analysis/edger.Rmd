@@ -61,26 +61,26 @@ control_2 <- rep(10, 50)
 case_1 <- c(rep(20, 25),rep(0,25))
 case_2 <- c(rep(20, 25),rep(0,25))
 
-df <- data.frame(
+eg1 <- data.frame(
   cont1 = control_1,
   cont2 = control_2,
   case1 = case_1,
   case2 = case_2
 )
 
-head(df)
+head(eg1)
 ```
 
 Tail of the dataset.
 
 ```{r tail_df}
-tail(df)
+tail(eg1)
 ```
 
 Equal depth.
 
 ```{r depth_df}
-colSums(df)
+colSums(eg1)
 ```
 
 ## No normalisation
@@ -89,7 +89,7 @@ In order to use {edgeR} we need to create a `DGEList` object with the groups.
 
 ```{r dgelist_no_norm}
 group <- rep(c('control', 'case'), each = 2)
-d <- DGEList(counts=df, group=group)
+d <- DGEList(counts=eg1, group=group)
 d
 ```
 
@@ -222,7 +222,9 @@ d_uq <- exactTest(d_uq)
 table(p.adjust(d_uq$table$PValue, method="BH")<0.05)
 ```
 
-## Testing a real dataset
+## Using real datasets
+
+### PNAS expression
 
 Perform differential gene expression analysis using various normalisation methods on the [pnas_expression.txt](https://pubmed.ncbi.nlm.nih.gov/19088194/) dataset.
 
@@ -314,6 +316,38 @@ There is a large overlap of differentially expressed genes in the different norm
 
 ```{r run_edger_norm}
 gplots::venn(list(TMM = my_de_tmm, RLE = my_de_rle, UQ = my_de_uq))
+```
+
+### Data from {pascilla}
+
+Example dataset in the experiment data package {pasilla}.
+
+```{r pascilla_counts}
+fn <- system.file("extdata", "pasilla_gene_counts.tsv", package = "pasilla", mustWork = TRUE)
+counts <- as.matrix(read.csv(fn, sep="\t", row.names = "gene_id"))
+head(counts)
+```
+
+Subset counts.
+
+```{r counts_subset}
+counts_subset <- counts[, c(1,5)]
+head(counts_subset)
+```
+
+Create `DGEList` object.
+
+```{r counts_subset_d}
+group <- factor(colnames(counts_subset))
+d <- DGEList(counts=counts_subset, group=group)
+d
+```
+
+Normalise.
+
+```{r counts_subset_tmm}
+d_tmm <- normLibSizes(d, method="TMM")
+d_tmm
 ```
 
 ## Summary
