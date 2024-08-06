@@ -216,9 +216,9 @@ Note the clustering of the sequencing protocol and this highlights that our diff
 
 Let's assume that, in addition to the siRNA knockdown of the pasilla gene, we also want to test the effect of a certain drug. We would then envisage an experiment in which the experimenter treats the cells either with negative control, with the siRNA against pasilla, with the drug, or with both. To analyse this experiment, we can introduce the notation:
 
-$$
-y = \beta_0 + x_1 \beta_1 + x_2 \beta_2 + x_1 x_2 \beta_{12}
-$$
+\begin{equation}
+   y = \beta_0 + x_1 \beta_1 + x_2 \beta_2 + x_1 x_2 \beta_{12}
+\end{equation} 
 
 The left-hand size, $y$, is the experimental measurement of interest, which in our case is the suitably transformed expression level of a gene. Since in an RNA-seq experiment there are lots of genes, we'll have as many copies of the above equation, one for each.
 
@@ -262,3 +262,29 @@ We can succinctly encode the design of the experiment in the **design matrix**. 
 | 1     | 1     | 1     |
 
 The columns of the design matrix correspond to the experimental factors, and its rows represent the different experimental conditions, four in this case. If the combinatorial treatment is not performed, then the design matrix is reduced to only the first three rows.
+
+## Noise and replicates
+
+The equation:
+
+\begin{equation}
+   y = \beta_0 + x_1 \beta_1 + x_2 \beta_2 + x_1 x_2 \beta_{12}
+\end{equation} 
+
+provides a conceptual decomposition of the observed data into the effects caused by the different experimental variables. If our data (the $y$s) were absolutely precise, we could set up a linear system of equations, one equation for each of the four possible experimental conditions represented by the $x$s, and solve for the $\beta$s.
+
+However real data is usually affected by noise and we need replicates to estimate the levels of noise and assess the uncertainty of our estimated $\beta$s. Only then can we empirically assess whether any of the observed changes between conditions are significantly larger than those occurring due just to experimental or natural variation. We extend the equation to:
+
+$$
+y_j = x_{j0} \beta_0 + x_{j1} \beta_1 + x_{j2} \beta_2 + x_{j1} x_{j2} \beta_{12} + \epsilon_j
+$$
+
+We have included the index $j$ and a new term $\epsilon_j$. The index $j$ now explicitly counts over our individual replicate experiments; for example, if for each of the four conditions we perform three replicates, then $j$ counts from 1 to 12. The design matrix now has 12 rows, and $x_{jk}$ is the value of the matrix in its $j$th row and $k$th column.
+
+The additional terms $\epsilon_j$, which we call the **residuals**, are there to absorb differences between replicates. However, one additional modeling component is needed: the system of 12 equations would be underdetermined without further information, since it now has more variables (12 $\epsilon$s and four $\beta$s) than it has equations (12, one for each $j$). To address this, we require that the $\epsilon_j$ be small. One popular way to overcome this is to minimise the sum of squared residuals,
+
+$$
+\sum_j \epsilon^2_j \rightarrow min.
+$$
+
+It turns out that with this requirement satisfied, the $\beta$s represent the _average_ effects of each of the experimental factors, while the residuals $\epsilon_j$ reflect the experimental fluntuations around the mean between the replicates. This approach, which is called **least sum of squares fitting**, is mathematically convenient, since it can be achieved by straight-forward matrix algebra and it is what the `lm()` function does.
