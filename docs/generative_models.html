@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5cd88105e2b2568443a5b08377786ec50d5b6bc6targetblank5cd8810a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree66b58259988948e290217f7b20275af259c916fdtargetblank66b5825a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/5cd88105e2b2568443a5b08377786ec50d5b6bc6" target="_blank">5cd8810</a>
+<a href="https://github.com/davetang/muse/tree/66b58259988948e290217f7b20275af259c916fd" target="_blank">66b5825</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5cd88105e2b2568443a5b08377786ec50d5b6bc6targetblank5cd8810a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree66b58259988948e290217f7b20275af259c916fdtargetblank66b5825a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/5cd88105e2b2568443a5b08377786ec50d5b6bc6" target="_blank">5cd8810</a>.
+<a href="https://github.com/davetang/muse/tree/66b58259988948e290217f7b20275af259c916fd" target="_blank">66b5825</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -554,8 +554,12 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    r_packages_4.3.3/
     Ignored:    r_packages_4.4.0/
+
+Untracked files:
+    Untracked:  data/e100.RData
 
 </code></pre>
 <p>
@@ -600,6 +604,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/66b58259988948e290217f7b20275af259c916fd/analysis/generative_models.Rmd" target="_blank">66b5825</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-07
+</td>
+<td>
+Epitope detection
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/738aa36d5df7b41a6ab0824fae770678fd58a69a/docs/generative_models.html" target="_blank">738aa36</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -809,6 +847,43 @@ outputted using the <code>dbinom()</code> function:</p>
 <pre class="r"><code>dbinom(0:15, prob = 0.3, size = 15) |&gt;
   barplot(names.arg = 0:15, col = 2)</code></pre>
 <p><img src="figure/generative_models.Rmd/plot_dbinom-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_dbinom-1">
+Past versions of plot_dbinom-1.png
+</button>
+</p>
+<div id="fig-plot_dbinom-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/738aa36d5df7b41a6ab0824fae770678fd58a69a/docs/figure/generative_models.Rmd/plot_dbinom-1.png" target="_blank">738aa36</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The number of trials is the number we input to R as <code>size</code>
 and is often written <span class="math inline">\(n\)</span>, while the
 probability of success is <span class="math inline">\(p\)</span>.
@@ -828,6 +903,73 @@ my_dbinom(4, 15, 0.3)</code></pre>
 <pre><code>[1] 0.2186231</code></pre>
 <pre class="r"><code>dbinom(x = 4, size = 15, prob = 0.3)</code></pre>
 <pre><code>[1] 0.2186231</code></pre>
+</div>
+<div id="epitope-detection" class="section level3">
+<h3>Epitope detection</h3>
+<p>When testing certain pharmaceutical compounds, it is important to
+detect proteins that provoke an allergic reaction. The molecular sites
+that are responsible for such reactions are called
+<strong>epitopes</strong>:</p>
+<blockquote>
+<p>A specific portion of a macromolecular antigen to which an antibody
+binds. In the case of a protein antigen recognised by a T cell, the
+epitope or determinant is the peptide portion or site that binds to a
+major histocompatibility complex (MHC) molecule for recognition by the
+T-cell receptor (TCR)</p>
+</blockquote>
+<p>An <a href="antibody.html">antibody</a> is a type of protein made by
+certain white blood cells in response to a foreign substance in the
+body, which is called an antigen. An antibody binds (with more or less
+specificity) to its antigen. The purpose of the binding is to help
+destroy the antigen.</p>
+<p>Antibodies can work in several ways, depending on the nature of the
+antigen. Some antibodies destroy antigens directly while others help
+recruit white blood cells to destroy the antigen. An epitope, also known
+as antigenic determinant, is the part of an antigen that is recognised
+by the immune system, specifically by antibodies, B cells or T
+cells.</p>
+<p>ELISA assays are used to detect specific epitopes at different
+positions along a protein. Suppose the following facts hold for an ELISA
+assay:</p>
+<ul>
+<li>The baseline noise level per position, or more precisely the false
+positive rate, is 1%. This is the probability of declaring a hit - we
+think we have an epitope - when there is none. We write this as <span
+class="math inline">\(P\)</span>(declare epitope | no epitope).</li>
+<li>The protein is tested at 100 different positions, supposed to be
+independent.</li>
+</ul>
+<p>Below is data for 50 patients tallied at each of the 100 positions.
+If there are no allergic reactions, the false positive rate of 1% means
+that for a single patient, each individual position has a probability of
+1 in 100 of being a 1. After tallying 50 patients, we expect at any
+given position the sum of the 50 observed 0/1 variables to have a
+Poisson distribution with paramater 0.5 (50 * 1/100).</p>
+<pre class="r"><code>load(&quot;data/e100.RData&quot;)
+barplot(e100, names.arg = 1:100, col = 2)</code></pre>
+<p><img src="figure/generative_models.Rmd/e100-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>What are the chances of seeing a value as large as 7, if no epitope
+is present?</p>
+<p>If we look for the probability of seeing a number as big as 7 (or
+larger) when considering one Poisson(0.5) random variable, the answer
+can be calculated in closed form as:</p>
+<p><span class="math display">\[
+P(X \ge 7) = \sum^\infty_{k=7} P(X = k)
+\]</span></p>
+<p>This is the same as <span class="math inline">\(1 - P(X \le
+6)\)</span> and the probability <span class="math inline">\(P(X \le
+6)\)</span> is the so-called cumulative distribution function at 6 and
+the <code>ppois()</code> function is used this calculate this.</p>
+<pre class="r"><code>1 - ppois(6, 0.5)</code></pre>
+<pre><code>[1] 1.00238e-06</code></pre>
+<p>We denote this number by <span
+class="math inline">\(\epsilon\)</span> and have shown that the
+probability of seeing a count as large as 7, assuming no epitope
+reactions, is:</p>
+<p><span class="math display">\[
+\epsilon = P(X \ge 7) = 1 - P(X \le 6) \approx 10^{-6}
+\]</span></p>
+<p>However, the above calculation is not the correct computation.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
