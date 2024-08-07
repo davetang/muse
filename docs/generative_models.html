@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7f9058a5b42353dceb05074dbc2d6275d29952a9targetblank7f9058aa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5cd88105e2b2568443a5b08377786ec50d5b6bc6targetblank5cd8810a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/7f9058a5b42353dceb05074dbc2d6275d29952a9" target="_blank">7f9058a</a>
+<a href="https://github.com/davetang/muse/tree/5cd88105e2b2568443a5b08377786ec50d5b6bc6" target="_blank">5cd8810</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7f9058a5b42353dceb05074dbc2d6275d29952a9targetblank7f9058aa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5cd88105e2b2568443a5b08377786ec50d5b6bc6targetblank5cd8810a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/7f9058a5b42353dceb05074dbc2d6275d29952a9" target="_blank">7f9058a</a>.
+<a href="https://github.com/davetang/muse/tree/5cd88105e2b2568443a5b08377786ec50d5b6bc6" target="_blank">5cd8810</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -605,6 +605,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/5cd88105e2b2568443a5b08377786ec50d5b6bc6/analysis/generative_models.Rmd" target="_blank">5cd8810</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-07
+</td>
+<td>
+Binomial success counts
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4ec2479562fb0a2588e7ec42efb914478873cf6f/docs/generative_models.html" target="_blank">4ec2479</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/7f9058a5b42353dceb05074dbc2d6275d29952a9/analysis/generative_models.Rmd" target="_blank">7f9058a</a>
 </td>
 <td>
@@ -654,6 +688,43 @@ is around 0.14 or about 1 in 7.</p>
 <pre class="r"><code>dpois(x = 0:12, lambda = 5) |&gt;
   barplot(names.arg = 0:12, col = 2)</code></pre>
 <p><img src="figure/generative_models.Rmd/dpois_0_to_12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-dpois_0_to_12-1">
+Past versions of dpois_0_to_12-1.png
+</button>
+</p>
+<div id="fig-dpois_0_to_12-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4ec2479562fb0a2588e7ec42efb914478873cf6f/docs/figure/generative_models.Rmd/dpois_0_to_12-1.png" target="_blank">4ec2479</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Mathematical theory tells us that the Poisson probability of seeing
 <span class="math inline">\(x\)</span> is given by:</p>
 <p><span class="math display">\[
@@ -671,6 +742,92 @@ my_dpois(3, 5)</code></pre>
 <p>The Poisson distribution is a good model for rare events such as
 mutations. Other useful probability models for discrete events are the
 Bernoulli, binomial, and multinomial distributions.</p>
+<div id="using-discrete-probability-models" class="section level3">
+<h3>Using discrete probability models</h3>
+<p>A point mutation can either occur or not; it is a binary event. The
+two possible outcomes (yes, no) are called the <strong>levels</strong>
+of the categorical variable. However, not all events are binary such as
+the genotypes in a diploid organism, which can take three levels:
+<code>AA</code>, <code>Aa</code>, and <code>aa</code>.</p>
+<p>Sometimes the number of levels in a categorical variable is very
+large; examples include the number of different types of bacteria in a
+biological sample (hundreds or thousands) and the number of codons
+formed of three nucleotides (64 levels).</p>
+<p>Tossing a coin has two possible outcomes and this simple experiment
+is called a Bernoulli trial; this is modeled using a so-called Bernoulli
+random variable. Bernoulli trials can be used to build more complex
+models.</p>
+<p>We can use the <code>rbinom()</code> function (<code>r</code> for
+random and <code>binom</code> for binomial) to generate some random
+events that follow a binomial distribution. Below we simulate a sequence
+of 15 fair coin tosses. For <code>rbinom()</code> we have specified 15
+trials (<code>n = 15</code>), where each individual trial consists of
+just one single toss (<code>size = 1</code>), and the probability of
+success is 50/50 (<code>prob = 0.5</code>).</p>
+<pre class="r"><code>set.seed(1984)
+rbinom(n = 15, size = 1, prob = 0.5)</code></pre>
+<pre><code> [1] 1 0 0 0 1 1 0 0 1 0 1 0 1 1 0</code></pre>
+<p>Success and failure can have unequal probabilities in a Bernoulli
+trial, as long as the probabilities sum to one, i.e., complementary
+events. To simulate 12 trials with unequal probabilities, we just use a
+different <code>prob</code>. The <code>1</code>’s indicate success and
+<code>0</code>’s failure.</p>
+<pre class="r"><code>set.seed(1984)
+rbinom(n = 12, size = 1, prob = 2/3)</code></pre>
+<pre><code> [1] 1 1 1 1 0 0 1 1 0 1 0 1</code></pre>
+</div>
+<div id="binomial-success-counts" class="section level3">
+<h3>Binomial success counts</h3>
+<p>If we only care about successes, then the order doesn’t matter and we
+can just sum the <code>1</code>’s. We can get just the successes by
+setting <code>n = 1</code> and <code>size</code> to the number of
+trials. The number of successes below is close to the specified
+probability.</p>
+<pre class="r"><code>set.seed(1984)
+rbinom(n = 1, size = 100, prob = 2/3)</code></pre>
+<pre><code>[1] 62</code></pre>
+<p>When there are only two possible outcomes, such as heads or tails, we
+only need to specify the probability, <span
+class="math inline">\(p\)</span>, of “success” since the probability of
+“failure” is <span class="math inline">\(1 - p\)</span>.</p>
+<p>The number of successes in 15 Bernoulli trials with a probability of
+success of 0.3 is called a <strong>binomial</strong> random variable or
+a random variable that follows the <span
+class="math inline">\(B\)</span>(15,0.3) distribution. If we replicate
+trial 100 times, we will see that the most frequent value is 4.</p>
+<pre class="r"><code>set.seed(1984)
+replicate(
+  n = 100,
+  rbinom(n = 1, prob = 0.3, size = 15)
+) |&gt;
+  table()</code></pre>
+<pre><code>
+ 0  1  2  3  4  5  6  7  8  9 
+ 1  4  6 16 22 19 17 10  3  2 </code></pre>
+<p>The complete <strong>probability mass distribution</strong> is
+outputted using the <code>dbinom()</code> function:</p>
+<pre class="r"><code>dbinom(0:15, prob = 0.3, size = 15) |&gt;
+  barplot(names.arg = 0:15, col = 2)</code></pre>
+<p><img src="figure/generative_models.Rmd/plot_dbinom-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The number of trials is the number we input to R as <code>size</code>
+and is often written <span class="math inline">\(n\)</span>, while the
+probability of success is <span class="math inline">\(p\)</span>.
+Mathematical theory tells us that for <span
+class="math inline">\(X\)</span> distributed as a binomial distribution
+with parameters <span class="math inline">\((n,p)\)</span>, written
+<span class="math inline">\(X \sim B(n,p)\)</span>, the probability of
+seeing <span class="math inline">\(X = k\)</span> successes is</p>
+<p><span class="math display">\[
+P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}
+\]</span></p>
+<pre class="r"><code>my_dbinom &lt;- function(k, n, p){
+  choose(n, k) * p^k * (1-p)^(n-k)
+}
+
+my_dbinom(4, 15, 0.3)</code></pre>
+<pre><code>[1] 0.2186231</code></pre>
+<pre class="r"><code>dbinom(x = 4, size = 15, prob = 0.3)</code></pre>
+<pre><code>[1] 0.2186231</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -722,6 +879,7 @@ loaded via a namespace (and not attached):
 [45] highr_0.11        xfun_0.44         tidyselect_1.2.1  rstudioapi_0.16.0
 [49] knitr_1.47        htmltools_0.5.8.1 rmarkdown_2.27    compiler_4.4.0   
 [53] getPass_0.2-4    </code></pre>
+</div>
 </div>
 </div>
 </div>
