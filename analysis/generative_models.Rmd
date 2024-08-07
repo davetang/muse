@@ -1,0 +1,53 @@
+---
+title: "Generative models"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+## Discrete example
+
+If we know the rules (parameters) of a mechanism, then even if the outcomes are random, we can generate probabilities of any event by using computations and standard probability laws.
+
+Consider that mutations along the genome of Human Immunodeficiency Virus (HIV) occur at random with a rate of $5 \times 10^{-4}$ per nucleotide per replication cycle. This means that after one cycle, the number of mutations in a genome of about $10^4$ = 10,000 nucleotides will follow a [Poisson distribution](poisson.html) with rate 5.
+
+This **probability model** predicts that the number of mutations over one replication cycle will be close to 5 and that the variability of this estimate is $\sqrt{5}$ (the standard error). We now have baseline reference values for both the number of mutations we expect to see in a typical HIV strain and its variability.
+
+If we want to know how often 3 mutations could occur under the Poisson(5) model, we can use the `dpois()` function to generate the probability of seeing x = 3 events, taking the value of the _rate parameter_ of the Poisson distribution, called lambda ($\lambda$), to be 5.
+
+```{r poisson_lambda_5}
+dpois(x = 3, lambda = 5)
+```
+
+The output above says that the chance of seeing exactly three events is around 0.14 or about 1 in 7.
+
+Probabilities of a range of values.
+
+```{r dpois_0_to_12}
+dpois(x = 0:12, lambda = 5) |>
+  barplot(names.arg = 0:12, col = 2)
+```
+
+Mathematical theory tells us that the Poisson probability of seeing $x$ is given by:
+
+$$
+p = \frac{e^{-\lambda} \lambda^x}{x!}
+$$
+
+```{r my_dpois}
+my_dpois <- function(x, lambda){
+  e <- exp(1)
+  ((e^-lambda)*(lambda^x))/factorial(x)
+}
+
+my_dpois(3, 5)
+dpois(3, 5)
+```
+
+The Poisson distribution is a good model for rare events such as mutations. Other useful probability models for discrete events are the Bernoulli, binomial, and multinomial distributions.
