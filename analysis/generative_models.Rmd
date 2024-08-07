@@ -117,3 +117,47 @@ my_dbinom <- function(k, n, p){
 my_dbinom(4, 15, 0.3)
 dbinom(x = 4, size = 15, prob = 0.3)
 ```
+
+### Epitope detection
+
+When testing certain pharmaceutical compounds, it is important to detect proteins that provoke an allergic reaction. The molecular sites that are responsible for such reactions are called **epitopes**:
+
+> A specific portion of a macromolecular antigen to which an antibody binds. In the case of a protein antigen recognised by a T cell, the epitope or determinant is the peptide portion or site that binds to a major histocompatibility complex (MHC) molecule for recognition by the T-cell receptor (TCR)
+
+An [antibody](antibody.html) is a type of protein made by certain white blood cells in response to a foreign substance in the body, which is called an antigen. An antibody binds (with more or less specificity) to its antigen. The purpose of the binding is to help destroy the antigen.
+
+Antibodies can work in several ways, depending on the nature of the antigen. Some antibodies destroy antigens directly while others help recruit white blood cells to destroy the antigen. An epitope, also known as antigenic determinant, is the part of an antigen that is recognised by the immune system, specifically by antibodies, B cells or T cells.
+
+ELISA assays are used to detect specific epitopes at different positions along a protein. Suppose the following facts hold for an ELISA assay:
+
+* The baseline noise level per position, or more precisely the false positive rate, is 1%. This is the probability of declaring a hit - we think we have an epitope - when there is none. We write this as $P$(declare epitope | no epitope).
+* The protein is tested at 100 different positions, supposed to be independent.
+
+Below is data for 50 patients tallied at each of the 100 positions. If there are no allergic reactions, the false positive rate of 1% means that for a single patient, each individual position has a probability of 1 in 100 of being a 1. After tallying 50 patients, we expect at any given position the sum of the 50 observed 0/1 variables to have a Poisson distribution with paramater 0.5 (50 * 1/100).
+
+```{r e100}
+load("data/e100.RData")
+barplot(e100, names.arg = 1:100, col = 2)
+```
+
+What are the chances of seeing a value as large as 7, if no epitope is present?
+
+If we look for the probability of seeing a number as big as 7 (or larger) when considering one Poisson(0.5) random variable, the answer can be calculated in closed form as:
+
+$$
+P(X \ge 7) = \sum^\infty_{k=7} P(X = k)
+$$
+
+This is the same as $1 - P(X \le 6)$ and the probability $P(X \le 6)$ is the so-called cumulative distribution function at 6 and the `ppois()` function is used this calculate this.
+
+```{r ppois}
+1 - ppois(6, 0.5)
+```
+
+We denote this number by $\epsilon$ and have shown that the probability of seeing a count as large as 7, assuming no epitope reactions, is:
+
+$$
+\epsilon = P(X \ge 7) = 1 - P(X \le 6) \approx 10^{-6}
+$$
+
+However, the above calculation is not the correct computation.
