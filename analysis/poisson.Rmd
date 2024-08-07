@@ -49,6 +49,19 @@ Using `dpois()`:
 dpois(x = 3, lambda = 2)
 ```
 
+### HIV mutations
+
+When the probability of success $p$ is small and the number of trials $n$ is large, the binomial distribution $B(n,p)$ can be faithfully approximated by the Poisson distribution with rate parameter $\lambda = np$.
+
+Question: What is the probability mass distribution of observing `0:12` mutations in a genome of $n = 10^4$ nucleotides, when the probability of mutation is $p = 5 \times 10^{-4}$ per nucleotide?
+
+Note that, unlike the binomial distribution, the Poisson does not depend on two separate parameters $n$ and $p$, but only on their product $np$.
+
+```{r hiv_mutation_poisson}
+dpois(x = 0:12, lambda = 10^4 * 5 * 10^-4) |>
+  barplot(names.arg = 0:12, col = 2)
+```
+
 ### RNA-seq
 
 The Poisson distribution can be used to estimate the [technical variance in high-throughput sequencing experiments](https://genome.cshlp.org/content/early/2008/06/11/gr.079558.108). My basic understanding is that the variance between technical replicates can be modelled using the Poisson distribution. Check out [Why Does Rna-Seq Read Count Fit Poisson Distribution?](https://www.biostars.org/p/84445/) on Biostars.
