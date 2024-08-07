@@ -51,3 +51,69 @@ dpois(3, 5)
 ```
 
 The Poisson distribution is a good model for rare events such as mutations. Other useful probability models for discrete events are the Bernoulli, binomial, and multinomial distributions.
+
+### Using discrete probability models
+
+A point mutation can either occur or not; it is a binary event. The two possible outcomes (yes, no) are called the **levels** of the categorical variable. However, not all events are binary such as the genotypes in a diploid organism, which can take three levels: `AA`, `Aa`, and `aa`.
+
+Sometimes the number of levels in a categorical variable is very large; examples include the number of different types of bacteria in a biological sample (hundreds or thousands) and the number of codons formed of three nucleotides (64 levels).
+
+Tossing a coin has two possible outcomes and this simple experiment is called a Bernoulli trial; this is modeled using a so-called Bernoulli random variable. Bernoulli trials can be used to build more complex models.
+
+We can use the `rbinom()` function (`r` for random and `binom` for binomial) to generate some random events that follow a binomial distribution. Below we simulate a sequence of 15 fair coin tosses. For `rbinom()` we have specified 15 trials (`n = 15`), where each individual trial consists of just one single toss (`size = 1`), and the probability of success is 50/50 (`prob = 0.5`).
+
+```{r rbinom_15_coin_toss}
+set.seed(1984)
+rbinom(n = 15, size = 1, prob = 0.5)
+```
+
+Success and failure can have unequal probabilities in a Bernoulli trial, as long as the probabilities sum to one, i.e., complementary events. To simulate 12 trials with unequal probabilities, we just use a different `prob`. The `1`'s indicate success and `0`'s failure.
+
+```{r rbinom_12_unequal}
+set.seed(1984)
+rbinom(n = 12, size = 1, prob = 2/3)
+```
+
+### Binomial success counts
+
+If we only care about successes, then the order doesn't matter and we can just sum the `1`'s. We can get just the successes by setting `n = 1` and `size` to the number of trials. The number of successes below is close to the specified probability.
+
+```{r rbinom_successes}
+set.seed(1984)
+rbinom(n = 1, size = 100, prob = 2/3)
+```
+
+When there are only two possible outcomes, such as heads or tails, we only need to specify the probability, $p$, of "success" since the probability of "failure" is $1 - p$.
+
+The number of successes in 15 Bernoulli trials with a probability of success of 0.3 is called a **binomial** random variable or a random variable that follows the $B$(15,0.3) distribution. If we replicate trial 100 times, we will see that the most frequent value is 4.
+
+```{r rbinom_replicate}
+set.seed(1984)
+replicate(
+  n = 100,
+  rbinom(n = 1, prob = 0.3, size = 15)
+) |>
+  table()
+```
+
+The complete **probability mass distribution** is outputted using the `dbinom()` function:
+
+```{r plot_dbinom}
+dbinom(0:15, prob = 0.3, size = 15) |>
+  barplot(names.arg = 0:15, col = 2)
+```
+
+The number of trials is the number we input to R as `size` and is often written $n$, while the probability of success is $p$. Mathematical theory tells us that for $X$ distributed as a binomial distribution with parameters $(n,p)$, written $X \sim B(n,p)$, the probability of seeing $X = k$ successes is
+
+$$
+P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}
+$$
+
+```{r my_dbinom}
+my_dbinom <- function(k, n, p){
+  choose(n, k) * p^k * (1-p)^(n-k)
+}
+
+my_dbinom(4, 15, 0.3)
+dbinom(x = 4, size = 15, prob = 0.3)
+```
