@@ -12,13 +12,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Following the [vignette](https://bioconductor.org/packages/release/data/experiment/vignettes/msigdb/inst/doc/msigdb.html).
 
->The molecular signatures database (MSigDB) is one of the largest collections of molecular signatures or gene expression signatures. A variety of gene expression signatures are hosted on this database including experimentally derived signatures and signatures representing pathways and ontologies from other curated databases. This rich collection of gene expression signatures (>25,000) can facilitate a wide variety of signature-based analyses, the most popular being gene set enrichment analyses. These signatures can be used to perform enrichment analysis in a DE experiment using tools such as {GSEA}, {fry} (from {limma}) and {camera} (from {limma}). Alternatively, they can be used to perform single-sample gene-set analysis of individual transcriptomic profiles using approaches such as {singscore}, {ssGSEA} and {GSVA}.
+> The molecular signatures database (MSigDB) is one of the largest collections of molecular signatures or gene expression signatures. A variety of gene expression signatures are hosted on this database including experimentally derived signatures and signatures representing pathways and ontologies from other curated databases. This rich collection of gene expression signatures (>25,000) can facilitate a wide variety of signature-based analyses, the most popular being gene set enrichment analyses. These signatures can be used to perform enrichment analysis in a DE experiment using tools such as {GSEA}, {fry} (from {limma}) and {camera} (from {limma}). Alternatively, they can be used to perform single-sample gene-set analysis of individual transcriptomic profiles using approaches such as {singscore}, {ssGSEA} and {GSVA}.
 >
->This package provides the gene sets in the MSigDB in the form of `GeneSet` objects. This data structure is specifically designed to store information about gene sets, including their member genes and metadata. Other packages, such as {msigdbr} and {EGSEAdata} provide these gene sets too, however, they do so by storing them as lists or tibbles. These structures are not specific to gene sets therefore do not allow storage of important metadata associated with each gene set, for example, their short and long descriptions. Additionally, the lack of structure allows creation of invalid gene sets. Accessory functions implemented in the {GSEABase} package provide a neat interface to interact with `GeneSet` objects.
+> This package provides the gene sets in the MSigDB in the form of `GeneSet` objects. This data structure is specifically designed to store information about gene sets, including their member genes and metadata. Other packages, such as {msigdbr} and {EGSEAdata} provide these gene sets too, however, they do so by storing them as lists or tibbles. These structures are not specific to gene sets therefore do not allow storage of important metadata associated with each gene set, for example, their short and long descriptions. Additionally, the lack of structure allows creation of invalid gene sets. Accessory functions implemented in the {GSEABase} package provide a neat interface to interact with `GeneSet` objects.
 
 ## Package
 
-Install GSVA. (Dependencies are listed in the Imports section in the [DESCRIPTION](https://github.com/rcastelo/GSVA/blob/devel/DESCRIPTION) file.)
+Install {msigdb}. (Dependencies are listed in the Imports section in the [DESCRIPTION](https://github.com/DavisLaboratory/msigdb/blob/main/DESCRIPTION) file.)
 
 ```{r install_fgsea, message=FALSE, warning=FALSE}
 if (!require("BiocManager", quietly = TRUE))
@@ -39,9 +39,9 @@ packageVersion("msigdb")
 
 In order to download the MSigDB database, we need to load {ExperimentHub} and {GSEABase}.
 
-```{r load_additional, message=FALSE, warning=FALSE}
-library(ExperimentHub)
-library(GSEABase)
+```{r load_additional_packages}
+suppressPackageStartupMessages(library(ExperimentHub))
+suppressPackageStartupMessages(library(GSEABase))
 ```
 
 Query an `ExperimentHub` object.
@@ -69,7 +69,7 @@ msigdb_hs_latest
 
 Data can be downloaded using the unique ID.
 
-```{r download_hs_latest, warning=FALSE, message=FALSE}
+```{r download_hs_latest, warning=FALSE, message=FALSE, eval=FALSE}
 eh[[names(msigdb_hs_latest)]]
 ```
 
@@ -77,9 +77,22 @@ Data can also be downloaded using `msigdb::getMsigdb()`.
 
 ```{r get_msigdb}
 msigdb_ver <- sub(pattern = "msigdb.v(.*).hs.SYM", replacement = "\\1", msigdb_hs_latest$title)
-
 msigdb.hs <- msigdb::getMsigdb(org = "hs", id = "SYM", version = msigdb_ver)
 msigdb.hs
+```
+
+Save as RDS.
+
+```{r save_msigdbhs}
+outfile <- paste0(msigdb_hs_latest$title, '.rds')
+saveRDS(object = msigdb.hs, file = outfile)
+```
+
+File size in bytes.
+
+```{r msigdbhs_rds_size}
+file.size(outfile)
+unlink(outfile)
 ```
 
 ## Accessing the GeneSet and GeneSetCollection objects
@@ -87,13 +100,19 @@ msigdb.hs
 A `GeneSetCollection` object is effectively a list and therefore all list processing functions work.
 
 ```{r msigdb_length}
-length(msigdb.hs)
+str(msigdb.hs, max.level = 2)
 ```
 
 Each signature is stored in a `GeneSet` object and can be processed using functions from the {GSEABase} package.
 
+```{r example_gene_set}
+gs <- msigdb.hs[[1984]]
+gs
+```
+
+Get gene IDs.
+
 ```{r gene_ids}
-gs <- msigdb.hs[[1000]]
 geneIds(gs)
 ```
 
@@ -117,4 +136,24 @@ details(gs)
 
 ```{r collection_types}
 table(sapply(lapply(msigdb.hs, collectionType), bcCategory))
+```
+
+Create vector to subset hallmark gene sets.
+
+```{r wanted}
+wanted <- sapply(lapply(msigdb.hs, collectionType), bcCategory) == "h"
+table(wanted)
+```
+
+Hallmark gene sets.
+
+```{r hallmark_gs}
+hallmark_gs <- msigdb.hs[wanted]
+hallmark_gs
+```
+
+Genes in the [HALLMARK_TNFA_SIGNALING_VIA_NFKB](https://www.gsea-msigdb.org/gsea/msigdb/human/geneset/HALLMARK_TNFA_SIGNALING_VIA_NFKB.html) gene set.
+
+```{r HALLMARK_TNFA_SIGNALING_VIA_NFKB}
+geneIds(hallmark_gs[[1]])
 ```
