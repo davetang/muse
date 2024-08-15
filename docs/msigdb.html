@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2023-12-13" />
+<meta name="date" content="2024-08-15" />
 
 <title>Downloading molecular signatures from MSigDB in R</title>
 
-<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -360,7 +360,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Downloading molecular signatures from
 MSigDB in R</h1>
-<h4 class="date">2023-12-13</h4>
+<h4 class="date">2024-08-15</h4>
 
 </div>
 
@@ -389,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-12-13
+<strong>Last updated:</strong> 2024-08-15
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5b0e19403f3c936540ae08673bd2826e92327a08targetblank5b0e194a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee8b87fbf0289b5b7d58a03dc2ca117eed2e787c3targetblanke8b87fba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/5b0e19403f3c936540ae08673bd2826e92327a08" target="_blank">5b0e194</a>
+<a href="https://github.com/davetang/muse/tree/e8b87fbf0289b5b7d58a03dc2ca117eed2e787c3" target="_blank">e8b87fb</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5b0e19403f3c936540ae08673bd2826e92327a08targetblank5b0e194a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee8b87fbf0289b5b7d58a03dc2ca117eed2e787c3targetblanke8b87fba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/5b0e19403f3c936540ae08673bd2826e92327a08" target="_blank">5b0e194</a>.
+<a href="https://github.com/davetang/muse/tree/e8b87fbf0289b5b7d58a03dc2ca117eed2e787c3" target="_blank">e8b87fb</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -553,8 +553,10 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
+    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    r_packages_4.3.2/
+    Ignored:    r_packages_4.3.3/
+    Ignored:    r_packages_4.4.0/
 
 </code></pre>
 <p>
@@ -569,7 +571,6 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
 These are the previous versions of the repository in which changes were
 made to the R Markdown (<code>analysis/msigdb.Rmd</code>) and HTML
@@ -599,6 +600,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/e8b87fbf0289b5b7d58a03dc2ca117eed2e787c3/analysis/msigdb.Rmd" target="_blank">e8b87fb</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-15
+</td>
+<td>
+Update notebook
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/42419750aab9c5976adeaaea32a9f9605c80fa6a/docs/msigdb.html" target="_blank">4241975</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-12-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -653,9 +688,9 @@ a neat interface to interact with <code>GeneSet</code> objects.</p>
 </blockquote>
 <div id="package" class="section level2">
 <h2>Package</h2>
-<p>Install GSVA. (Dependencies are listed in the Imports section in the
-<a
-href="https://github.com/rcastelo/GSVA/blob/devel/DESCRIPTION">DESCRIPTION</a>
+<p>Install {msigdb}. (Dependencies are listed in the Imports section in
+the <a
+href="https://github.com/DavisLaboratory/msigdb/blob/main/DESCRIPTION">DESCRIPTION</a>
 file.)</p>
 <pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
   install.packages(&quot;BiocManager&quot;)
@@ -665,19 +700,19 @@ if (!require(&quot;msigdb&quot;, quietly = TRUE))
 <p>Load package.</p>
 <pre class="r"><code>library(msigdb)
 packageVersion(&quot;msigdb&quot;)</code></pre>
-<pre><code>[1] &#39;1.10.0&#39;</code></pre>
+<pre><code>[1] &#39;1.12.0&#39;</code></pre>
 </div>
 <div id="downloading-the-msigdb-database" class="section level2">
 <h2>Downloading the MSigDB database</h2>
 <p>In order to download the MSigDB database, we need to load
 {ExperimentHub} and {GSEABase}.</p>
-<pre class="r"><code>library(ExperimentHub)
-library(GSEABase)</code></pre>
+<pre class="r"><code>suppressPackageStartupMessages(library(ExperimentHub))
+suppressPackageStartupMessages(library(GSEABase))</code></pre>
 <p>Query an <code>ExperimentHub</code> object.</p>
 <pre class="r"><code>eh &lt;- ExperimentHub(ask = FALSE)
 AnnotationHub::query(x = eh, pattern = &#39;msigdb&#39;)</code></pre>
 <pre><code>ExperimentHub with 49 records
-# snapshotDate(): 2023-10-24
+# snapshotDate(): 2024-04-29
 # $dataprovider: Broad Institute, Emory University, EBI
 # $species: Homo sapiens, Mus musculus
 # $rdataclass: GSEABase::GeneSetCollection, list, data.frame
@@ -702,7 +737,7 @@ AnnotationHub::query(x = eh, pattern = &#39;msigdb&#39;)</code></pre>
 collections.</p>
 <pre class="r"><code>AnnotationHub::query(x = eh, pattern = &#39;msigdb.*hs.SYM&#39;)</code></pre>
 <pre><code>ExperimentHub with 7 records
-# snapshotDate(): 2023-10-24
+# snapshotDate(): 2024-04-29
 # $dataprovider: Broad Institute
 # $species: Homo sapiens
 # $rdataclass: GSEABase::GeneSetCollection
@@ -727,7 +762,7 @@ names(msigdb_hs_latest)</code></pre>
 <pre><code>[1] &quot;EH8296&quot;</code></pre>
 <pre class="r"><code>msigdb_hs_latest</code></pre>
 <pre><code>ExperimentHub with 1 record
-# snapshotDate(): 2023-10-24
+# snapshotDate(): 2024-04-29
 # names(): EH8296
 # package(): msigdb
 # $dataprovider: Broad Institute
@@ -745,16 +780,9 @@ names(msigdb_hs_latest)</code></pre>
 # retrieve record with &#39;object[[&quot;EH8296&quot;]]&#39; </code></pre>
 <p>Data can be downloaded using the unique ID.</p>
 <pre class="r"><code>eh[[names(msigdb_hs_latest)]]</code></pre>
-<pre><code>GeneSetCollection
-  names: chr1p11, chr1p12, ..., GOMF_STARCH_BINDING (45226 total)
-  unique identifiers: RPL22P6, NBPF8, ..., POM121L15P (41072 total)
-  types in collection:
-    geneIdType: SymbolIdentifier (1 total)
-    collectionType: BroadCollection (1 total)</code></pre>
 <p>Data can also be downloaded using
 <code>msigdb::getMsigdb()</code>.</p>
 <pre class="r"><code>msigdb_ver &lt;- sub(pattern = &quot;msigdb.v(.*).hs.SYM&quot;, replacement = &quot;\\1&quot;, msigdb_hs_latest$title)
-
 msigdb.hs &lt;- msigdb::getMsigdb(org = &quot;hs&quot;, id = &quot;SYM&quot;, version = msigdb_ver)</code></pre>
 <pre><code>see ?msigdb and browseVignettes(&#39;msigdb&#39;) for documentation</code></pre>
 <pre><code>loading from cache</code></pre>
@@ -765,40 +793,52 @@ msigdb.hs &lt;- msigdb::getMsigdb(org = &quot;hs&quot;, id = &quot;SYM&quot;, ve
   types in collection:
     geneIdType: SymbolIdentifier (1 total)
     collectionType: BroadCollection (1 total)</code></pre>
+<p>Save as RDS.</p>
+<pre class="r"><code>outfile &lt;- paste0(msigdb_hs_latest$title, &#39;.rds&#39;)
+saveRDS(object = msigdb.hs, file = outfile)</code></pre>
+<p>File size in bytes.</p>
+<pre class="r"><code>file.size(outfile)</code></pre>
+<pre><code>[1] 24207930</code></pre>
+<pre class="r"><code>unlink(outfile)</code></pre>
 </div>
 <div id="accessing-the-geneset-and-genesetcollection-objects"
 class="section level2">
 <h2>Accessing the GeneSet and GeneSetCollection objects</h2>
 <p>A <code>GeneSetCollection</code> object is effectively a list and
 therefore all list processing functions work.</p>
-<pre class="r"><code>length(msigdb.hs)</code></pre>
-<pre><code>[1] 45226</code></pre>
+<pre class="r"><code>str(msigdb.hs, max.level = 2)</code></pre>
+<pre><code>Formal class &#39;GeneSetCollection&#39; [package &quot;GSEABase&quot;] with 1 slot
+  ..@ .Data:List of 45226</code></pre>
 <p>Each signature is stored in a <code>GeneSet</code> object and can be
 processed using functions from the {GSEABase} package.</p>
-<pre class="r"><code>gs &lt;- msigdb.hs[[1000]]
-geneIds(gs)</code></pre>
-<pre><code> [1] &quot;HOXC13&quot;      &quot;MYC&quot;         &quot;BTG3&quot;        &quot;PIK3CG&quot;      &quot;MXI1&quot;       
- [6] &quot;NCSTN&quot;       &quot;HOXA11&quot;      &quot;GADD45B&quot;     &quot;RFNG&quot;        &quot;FZD6&quot;       
-[11] &quot;CCND2&quot;       &quot;PRKCD&quot;       &quot;SOCS2&quot;       &quot;TNFSF13B&quot;    &quot;FANCA&quot;      
-[16] &quot;FOSB&quot;        &quot;VSX2&quot;        &quot;MBD1&quot;        &quot;PSEN2&quot;       &quot;HES3&quot;       
-[21] &quot;PRDM1&quot;       &quot;POU2AF1&quot;     &quot;XBP1&quot;        &quot;STAT5A&quot;      &quot;AKT1&quot;       
-[26] &quot;COMMD3-BMI1&quot; &quot;DTX2&quot;        &quot;MIB1&quot;        &quot;IRF4&quot;        &quot;TRAF3&quot;      
-[31] &quot;IRF6&quot;       </code></pre>
-<p>Details of a gene set.</p>
-<pre class="r"><code>details(gs)</code></pre>
-<pre><code>setName: SHIN_B_CELL_LYMPHOMA_CLUSTER_2 
-geneIds: HOXC13, MYC, ..., IRF6 (total: 31)
+<pre class="r"><code>gs &lt;- msigdb.hs[[1984]]
+gs</code></pre>
+<pre><code>setName: BAUS_TFF2_TARGETS_DN 
+geneIds: BEX4, NAT8, ..., THRSP (total: 12)
 geneIdType: Symbol
 collectionType: Broad
   bcCategory: c2 (Curated)
   bcSubCategory: CGP
-setIdentifier: LVY1HGGWMJ7:35020:Fri May 26 12:20:46 2023:93736
-description: Cluster 2 of genes distinguishing among different B lymphocyte neoplasms.
+details: use &#39;details(object)&#39;</code></pre>
+<p>Get gene IDs.</p>
+<pre class="r"><code>geneIds(gs)</code></pre>
+<pre><code> [1] &quot;BEX4&quot;  &quot;NAT8&quot;  &quot;RBP4&quot;  &quot;ART3&quot;  &quot;DDX6&quot;  &quot;PRDX2&quot; &quot;HEBP1&quot; &quot;CTSC&quot;  &quot;PCP4&quot; 
+[10] &quot;OR2H2&quot; &quot;BAG2&quot;  &quot;THRSP&quot;</code></pre>
+<p>Details of a gene set.</p>
+<pre class="r"><code>details(gs)</code></pre>
+<pre><code>setName: BAUS_TFF2_TARGETS_DN 
+geneIds: BEX4, NAT8, ..., THRSP (total: 12)
+geneIdType: Symbol
+collectionType: Broad
+  bcCategory: c2 (Curated)
+  bcSubCategory: CGP
+setIdentifier: LVY1HGGWMJ7:35020:Fri May 26 12:20:46 2023:95704
+description: Genes down-regulated in pyloric atrium with knockout of TFF2 [GeneID=7032].
   (longDescription available)
 organism: Mus musculus
-pubMedIds: 19010892
+pubMedIds: 16121031
 urls: https://data.broadinstitute.org/gsea-msigdb/msigdb/release/7.5.1/msigdb_v7.5.1.xml
-contributor: Jessica Robertson
+contributor: Arthur Liberzon
 setVersion: 7.5.1
 creationDate: </code></pre>
 <p><a href="https://www.gsea-msigdb.org/gsea/msigdb">Human collection
@@ -829,6 +869,59 @@ identified in single-cell sequencing studies of human tissue.</li>
 <pre><code>
    c1    c2    c3    c4    c5    c6    c7    c8     h 
   299  6180  3726   858 28005   189  5219   700    50 </code></pre>
+<p>Create vector to subset hallmark gene sets.</p>
+<pre class="r"><code>wanted &lt;- sapply(lapply(msigdb.hs, collectionType), bcCategory) == &quot;h&quot;
+table(wanted)</code></pre>
+<pre><code>wanted
+FALSE  TRUE 
+45176    50 </code></pre>
+<p>Hallmark gene sets.</p>
+<pre class="r"><code>hallmark_gs &lt;- msigdb.hs[wanted]
+hallmark_gs</code></pre>
+<pre><code>GeneSetCollection
+  names: HALLMARK_TNFA_SIGNALING_VIA_NFKB, HALLMARK_HYPOXIA, ..., HALLMARK_PANCREAS_BETA_CELLS (50 total)
+  unique identifiers: JUNB, CXCL2, ..., SRP14 (4383 total)
+  types in collection:
+    geneIdType: SymbolIdentifier (1 total)
+    collectionType: BroadCollection (1 total)</code></pre>
+<p>Genes in the <a
+href="https://www.gsea-msigdb.org/gsea/msigdb/human/geneset/HALLMARK_TNFA_SIGNALING_VIA_NFKB.html">HALLMARK_TNFA_SIGNALING_VIA_NFKB</a>
+gene set.</p>
+<pre class="r"><code>geneIds(hallmark_gs[[1]])</code></pre>
+<pre><code>  [1] &quot;JUNB&quot;     &quot;CXCL2&quot;    &quot;ATF3&quot;     &quot;NFKBIA&quot;   &quot;TNFAIP3&quot;  &quot;PTGS2&quot;   
+  [7] &quot;CXCL1&quot;    &quot;IER3&quot;     &quot;CD83&quot;     &quot;CCL20&quot;    &quot;CXCL3&quot;    &quot;MAFF&quot;    
+ [13] &quot;NFKB2&quot;    &quot;TNFAIP2&quot;  &quot;HBEGF&quot;    &quot;KLF6&quot;     &quot;BIRC3&quot;    &quot;PLAUR&quot;   
+ [19] &quot;ZFP36&quot;    &quot;ICAM1&quot;    &quot;JUN&quot;      &quot;EGR3&quot;     &quot;IL1B&quot;     &quot;BCL2A1&quot;  
+ [25] &quot;PPP1R15A&quot; &quot;ZC3H12A&quot;  &quot;SOD2&quot;     &quot;NR4A2&quot;    &quot;IL1A&quot;     &quot;RELB&quot;    
+ [31] &quot;TRAF1&quot;    &quot;BTG2&quot;     &quot;DUSP1&quot;    &quot;MAP3K8&quot;   &quot;ETS2&quot;     &quot;F3&quot;      
+ [37] &quot;SDC4&quot;     &quot;EGR1&quot;     &quot;IL6&quot;      &quot;TNF&quot;      &quot;KDM6B&quot;    &quot;NFKB1&quot;   
+ [43] &quot;LIF&quot;      &quot;PTX3&quot;     &quot;FOSL1&quot;    &quot;NR4A1&quot;    &quot;JAG1&quot;     &quot;CCL4&quot;    
+ [49] &quot;GCH1&quot;     &quot;CCL2&quot;     &quot;RCAN1&quot;    &quot;DUSP2&quot;    &quot;EHD1&quot;     &quot;IER2&quot;    
+ [55] &quot;REL&quot;      &quot;CFLAR&quot;    &quot;RIPK2&quot;    &quot;NFKBIE&quot;   &quot;NR4A3&quot;    &quot;PHLDA1&quot;  
+ [61] &quot;IER5&quot;     &quot;TNFSF9&quot;   &quot;GEM&quot;      &quot;GADD45A&quot;  &quot;CXCL10&quot;   &quot;PLK2&quot;    
+ [67] &quot;BHLHE40&quot;  &quot;EGR2&quot;     &quot;SOCS3&quot;    &quot;SLC2A6&quot;   &quot;PTGER4&quot;   &quot;DUSP5&quot;   
+ [73] &quot;SERPINB2&quot; &quot;NFIL3&quot;    &quot;SERPINE1&quot; &quot;TRIB1&quot;    &quot;TIPARP&quot;   &quot;RELA&quot;    
+ [79] &quot;BIRC2&quot;    &quot;CXCL6&quot;    &quot;LITAF&quot;    &quot;TNFAIP6&quot;  &quot;CD44&quot;     &quot;INHBA&quot;   
+ [85] &quot;PLAU&quot;     &quot;MYC&quot;      &quot;TNFRSF9&quot;  &quot;SGK1&quot;     &quot;TNIP1&quot;    &quot;NAMPT&quot;   
+ [91] &quot;FOSL2&quot;    &quot;PNRC1&quot;    &quot;ID2&quot;      &quot;CD69&quot;     &quot;IL7R&quot;     &quot;EFNA1&quot;   
+ [97] &quot;PHLDA2&quot;   &quot;PFKFB3&quot;   &quot;CCL5&quot;     &quot;YRDC&quot;     &quot;IFNGR2&quot;   &quot;SQSTM1&quot;  
+[103] &quot;BTG3&quot;     &quot;GADD45B&quot;  &quot;KYNU&quot;     &quot;G0S2&quot;     &quot;BTG1&quot;     &quot;MCL1&quot;    
+[109] &quot;VEGFA&quot;    &quot;MAP2K3&quot;   &quot;CDKN1A&quot;   &quot;CCN1&quot;     &quot;TANK&quot;     &quot;IFIT2&quot;   
+[115] &quot;IL18&quot;     &quot;TUBB2A&quot;   &quot;IRF1&quot;     &quot;FOS&quot;      &quot;OLR1&quot;     &quot;RHOB&quot;    
+[121] &quot;AREG&quot;     &quot;NINJ1&quot;    &quot;ZBTB10&quot;   &quot;PLPP3&quot;    &quot;KLF4&quot;     &quot;CXCL11&quot;  
+[127] &quot;SAT1&quot;     &quot;CSF1&quot;     &quot;GPR183&quot;   &quot;PMEPA1&quot;   &quot;PTPRE&quot;    &quot;TLR2&quot;    
+[133] &quot;ACKR3&quot;    &quot;KLF10&quot;    &quot;MARCKS&quot;   &quot;LAMB3&quot;    &quot;CEBPB&quot;    &quot;TRIP10&quot;  
+[139] &quot;F2RL1&quot;    &quot;KLF9&quot;     &quot;LDLR&quot;     &quot;TGIF1&quot;    &quot;RNF19B&quot;   &quot;DRAM1&quot;   
+[145] &quot;B4GALT1&quot;  &quot;DNAJB4&quot;   &quot;CSF2&quot;     &quot;PDE4B&quot;    &quot;SNN&quot;      &quot;PLEK&quot;    
+[151] &quot;STAT5A&quot;   &quot;DENND5A&quot;  &quot;CCND1&quot;    &quot;DDX58&quot;    &quot;SPHK1&quot;    &quot;CD80&quot;    
+[157] &quot;TNFAIP8&quot;  &quot;CCNL1&quot;    &quot;FUT4&quot;     &quot;CCRL2&quot;    &quot;SPSB1&quot;    &quot;TSC22D1&quot; 
+[163] &quot;B4GALT5&quot;  &quot;SIK1&quot;     &quot;CLCF1&quot;    &quot;NFE2L2&quot;   &quot;FOSB&quot;     &quot;PER1&quot;    
+[169] &quot;NFAT5&quot;    &quot;ATP2B1&quot;   &quot;IL12B&quot;    &quot;IL6ST&quot;    &quot;SLC16A6&quot;  &quot;ABCA1&quot;   
+[175] &quot;HES1&quot;     &quot;BCL6&quot;     &quot;IRS2&quot;     &quot;SLC2A3&quot;   &quot;CEBPD&quot;    &quot;IL23A&quot;   
+[181] &quot;SMAD3&quot;    &quot;TAP1&quot;     &quot;MSC&quot;      &quot;IFIH1&quot;    &quot;IL15RA&quot;   &quot;TNIP2&quot;   
+[187] &quot;BCL3&quot;     &quot;PANX1&quot;    &quot;FJX1&quot;     &quot;EDN1&quot;     &quot;EIF1&quot;     &quot;BMP2&quot;    
+[193] &quot;DUSP4&quot;    &quot;PDLIM5&quot;   &quot;ICOSLG&quot;   &quot;GFPT2&quot;    &quot;KLF2&quot;     &quot;TNC&quot;     
+[199] &quot;SERPINB8&quot; &quot;MXD1&quot;    </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -838,9 +931,9 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.3.2 (2023-10-31)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 22.04.3 LTS
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.4 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -862,51 +955,42 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] GSEABase_1.64.0      graph_1.80.0         annotate_1.80.0     
- [4] XML_3.99-0.16        AnnotationDbi_1.64.1 IRanges_2.36.0      
- [7] S4Vectors_0.40.2     Biobase_2.62.0       ExperimentHub_2.10.0
-[10] AnnotationHub_3.10.0 BiocFileCache_2.10.1 dbplyr_2.4.0        
-[13] BiocGenerics_0.48.1  msigdb_1.10.0        BiocManager_1.30.22 
+ [1] GSEABase_1.66.0      graph_1.82.0         annotate_1.82.0     
+ [4] XML_3.99-0.16.1      AnnotationDbi_1.66.0 IRanges_2.38.1      
+ [7] S4Vectors_0.42.1     Biobase_2.64.0       ExperimentHub_2.12.0
+[10] AnnotationHub_3.12.0 BiocFileCache_2.12.0 dbplyr_2.5.0        
+[13] BiocGenerics_0.50.0  msigdb_1.12.0        BiocManager_1.30.23 
 [16] workflowr_1.7.1     
 
 loaded via a namespace (and not attached):
- [1] tidyselect_1.2.0              dplyr_1.1.4                  
- [3] blob_1.2.4                    filelock_1.0.3               
- [5] Biostrings_2.70.1             bitops_1.0-7                 
- [7] fastmap_1.1.1                 RCurl_1.98-1.13              
- [9] promises_1.2.1                digest_0.6.33                
-[11] mime_0.12                     lifecycle_1.0.4              
-[13] ellipsis_0.3.2                processx_3.8.3               
-[15] KEGGREST_1.42.0               interactiveDisplayBase_1.40.0
-[17] RSQLite_2.3.4                 magrittr_2.0.3               
-[19] compiler_4.3.2                rlang_1.1.2                  
-[21] sass_0.4.8                    tools_4.3.2                  
-[23] utf8_1.2.4                    yaml_2.3.8                   
-[25] knitr_1.45                    bit_4.0.5                    
-[27] curl_5.2.0                    withr_2.5.2                  
-[29] purrr_1.0.2                   fansi_1.0.6                  
-[31] git2r_0.33.0                  xtable_1.8-4                 
-[33] cli_3.6.2                     rmarkdown_2.25               
-[35] crayon_1.5.2                  generics_0.1.3               
-[37] rstudioapi_0.15.0             httr_1.4.7                   
-[39] DBI_1.1.3                     cachem_1.0.8                 
-[41] stringr_1.5.1                 zlibbioc_1.48.0              
-[43] XVector_0.42.0                vctrs_0.6.5                  
-[45] jsonlite_1.8.8                callr_3.7.3                  
-[47] bit64_4.0.5                   jquerylib_0.1.4              
-[49] glue_1.6.2                    ps_1.7.5                     
-[51] stringi_1.8.3                 BiocVersion_3.18.1           
-[53] later_1.3.2                   GenomeInfoDb_1.38.1          
-[55] tibble_3.2.1                  pillar_1.9.0                 
-[57] rappdirs_0.3.3                htmltools_0.5.7              
-[59] GenomeInfoDbData_1.2.11       R6_2.5.1                     
-[61] rprojroot_2.0.4               evaluate_0.23                
-[63] shiny_1.8.0                   png_0.1-8                    
-[65] memoise_2.0.1                 httpuv_1.6.13                
-[67] bslib_0.6.1                   Rcpp_1.0.11                  
-[69] whisker_0.4.1                 xfun_0.41                    
-[71] fs_1.6.3                      getPass_0.2-4                
-[73] pkgconfig_2.0.3              </code></pre>
+ [1] KEGGREST_1.44.1         xfun_0.44               bslib_0.7.0            
+ [4] processx_3.8.4          callr_3.7.6             vctrs_0.6.5            
+ [7] tools_4.4.0             ps_1.7.6                generics_0.1.3         
+[10] curl_5.2.1              tibble_3.2.1            fansi_1.0.6            
+[13] RSQLite_2.3.7           blob_1.2.4              pkgconfig_2.0.3        
+[16] GenomeInfoDbData_1.2.12 lifecycle_1.0.4         compiler_4.4.0         
+[19] stringr_1.5.1           git2r_0.33.0            Biostrings_2.72.1      
+[22] getPass_0.2-4           GenomeInfoDb_1.40.1     httpuv_1.6.15          
+[25] htmltools_0.5.8.1       sass_0.4.9              yaml_2.3.8             
+[28] later_1.3.2             pillar_1.9.0            crayon_1.5.2           
+[31] jquerylib_0.1.4         whisker_0.4.1           cachem_1.1.0           
+[34] mime_0.12               tidyselect_1.2.1        digest_0.6.35          
+[37] stringi_1.8.4           purrr_1.0.2             dplyr_1.1.4            
+[40] BiocVersion_3.19.1      rprojroot_2.0.4         fastmap_1.2.0          
+[43] cli_3.6.2               magrittr_2.0.3          utf8_1.2.4             
+[46] withr_3.0.0             UCSC.utils_1.0.0        filelock_1.0.3         
+[49] promises_1.3.0          rappdirs_0.3.3          bit64_4.0.5            
+[52] XVector_0.44.0          rmarkdown_2.27          httr_1.4.7             
+[55] bit_4.0.5               png_0.1-8               memoise_2.0.1          
+[58] evaluate_0.24.0         knitr_1.47              rlang_1.1.4            
+[61] Rcpp_1.0.12             xtable_1.8-4            glue_1.7.0             
+[64] DBI_1.2.3               rstudioapi_0.16.0       jsonlite_1.8.8         
+[67] R6_2.5.1                zlibbioc_1.50.0         fs_1.6.4               </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 
