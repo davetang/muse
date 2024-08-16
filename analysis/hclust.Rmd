@@ -14,3 +14,15 @@ knitr::opts_chunk$set(echo = TRUE)
 Hierarchical clustering is a bottom-up approach, by which similar observations and sub-classes are assembled iteratively. The order of the labels does not matter within sibling pairs. Horizontal distances are usually meaningless, while the vertical distances do encode some information. These properties are important to remember when making interpretations about neighbours that are not monophyletic (i.e., not in the same subtree or clade), but appear as neighbours in the plot.
 
 An alternative, top-down, approach takes all the objects and splits them sequentially according to a chosen criterion. Such so-called recursive partitioning methods are often used to make decision trees. They can be useful for prediction: the goal is to split heterogeneous populations into more homogeneous subgroups by partitioning.
+
+## Computing (dis)dimilarities between aggregates
+
+There are different choices of how to calculate distances between aggregates and each choice results in a different type of hierarchical clustering.
+
+| Method           | Pros                      | Cons                              |
+| -                | -                         | -                                 |
+| Single linkage   | Number of clusters        | Comb-like trees                   |
+| Complete linkage | Compact classes           | One observation can alter groups  |
+| Average linkage  | Similar size and variance | Not robust                        |
+| Centroid         | Robust to outliers        | Smaller number of clusters        |
+| Ward's           | Minimises inertia         | Classes small if high variability |
