@@ -152,6 +152,12 @@ details(gs)
 table(sapply(lapply(msigdb_hs_sym, collectionType), bcCategory))
 ```
 
+Number of KEGG gene lists.
+
+```{r grep_kegg}
+table(grepl(pattern = "KEGG", x = names(msigdb_hs_sym), ignore.case = TRUE))
+```
+
 Create vector to subset hallmark gene sets.
 
 ```{r wanted}
@@ -170,4 +176,10 @@ Genes in the [HALLMARK_TNFA_SIGNALING_VIA_NFKB](https://www.gsea-msigdb.org/gsea
 
 ```{r HALLMARK_TNFA_SIGNALING_VIA_NFKB}
 geneIds(hallmark_gs[[1]])
+```
+
+Names of hallmark gene lists.
+
+```{r hallmark_names}
+names(hallmark_gs)
 ```
