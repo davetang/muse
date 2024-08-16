@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreead9ead7a0564ae551471e7d994e5f58f86d9c3ebtargetblankad9ead7a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5bf3bfdbc3af6f09c7ad5337c3ad4af8b621bc2btargetblank5bf3bfda">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/ad9ead7a0564ae551471e7d994e5f58f86d9c3eb" target="_blank">ad9ead7</a>
+<a href="https://github.com/davetang/muse/tree/5bf3bfdbc3af6f09c7ad5337c3ad4af8b621bc2b" target="_blank">5bf3bfd</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreead9ead7a0564ae551471e7d994e5f58f86d9c3ebtargetblankad9ead7a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5bf3bfdbc3af6f09c7ad5337c3ad4af8b621bc2btargetblank5bf3bfda"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/ad9ead7a0564ae551471e7d994e5f58f86d9c3eb" target="_blank">ad9ead7</a>.
+<a href="https://github.com/davetang/muse/tree/5bf3bfdbc3af6f09c7ad5337c3ad4af8b621bc2b" target="_blank">5bf3bfd</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -604,6 +604,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/5bf3bfdbc3af6f09c7ad5337c3ad4af8b621bc2b/analysis/hclust.Rmd" target="_blank">5bf3bfd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-16
+</td>
+<td>
+Pros and cons of different linkage methods
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/850c62d78478807bbbcfa79785c116ceb1d53eb8/docs/hclust.html" target="_blank">850c62d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/ad9ead7a0564ae551471e7d994e5f58f86d9c3eb/analysis/hclust.Rmd" target="_blank">ad9ead7</a>
 </td>
 <td>
@@ -635,6 +669,53 @@ them sequentially according to a chosen criterion. Such so-called
 recursive partitioning methods are often used to make decision trees.
 They can be useful for prediction: the goal is to split heterogeneous
 populations into more homogeneous subgroups by partitioning.</p>
+<div id="computing-disdimilarities-between-aggregates"
+class="section level2">
+<h2>Computing (dis)dimilarities between aggregates</h2>
+<p>There are different choices of how to calculate distances between
+aggregates and each choice results in a different type of hierarchical
+clustering.</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Pros</th>
+<th>Cons</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Single linkage</td>
+<td>Number of clusters</td>
+<td>Comb-like trees</td>
+</tr>
+<tr class="even">
+<td>Complete linkage</td>
+<td>Compact classes</td>
+<td>One observation can alter groups</td>
+</tr>
+<tr class="odd">
+<td>Average linkage</td>
+<td>Similar size and variance</td>
+<td>Not robust</td>
+</tr>
+<tr class="even">
+<td>Centroid</td>
+<td>Robust to outliers</td>
+<td>Smaller number of clusters</td>
+</tr>
+<tr class="odd">
+<td>Ward’s</td>
+<td>Minimises inertia</td>
+<td>Classes small if high variability</td>
+</tr>
+</tbody>
+</table>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -685,6 +766,7 @@ loaded via a namespace (and not attached):
 [41] later_1.3.2       gtable_0.3.5      glue_1.7.0        Rcpp_1.0.12      
 [45] xfun_0.44         tidyselect_1.2.1  rstudioapi_0.16.0 knitr_1.47       
 [49] htmltools_0.5.8.1 rmarkdown_2.27    compiler_4.4.0    getPass_0.2-4    </code></pre>
+</div>
 </div>
 </div>
 </div>
