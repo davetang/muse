@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree71fae59f83b2c5fb63a1890b2e479e4e9a62d580targetblank71fae59a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree12ca0ddb2c1188b09ce19b691d3d093568888afetargetblank12ca0dda">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/71fae59f83b2c5fb63a1890b2e479e4e9a62d580" target="_blank">71fae59</a>
+<a href="https://github.com/davetang/muse/tree/12ca0ddb2c1188b09ce19b691d3d093568888afe" target="_blank">12ca0dd</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree71fae59f83b2c5fb63a1890b2e479e4e9a62d580targetblank71fae59a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree12ca0ddb2c1188b09ce19b691d3d093568888afetargetblank12ca0dda"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/71fae59f83b2c5fb63a1890b2e479e4e9a62d580" target="_blank">71fae59</a>.
+<a href="https://github.com/davetang/muse/tree/12ca0ddb2c1188b09ce19b691d3d093568888afe" target="_blank">12ca0dd</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -604,6 +604,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/12ca0ddb2c1188b09ce19b691d3d093568888afe/analysis/msigdb.Rmd" target="_blank">12ca0dd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-16
+</td>
+<td>
+Names of gene lists
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/1f77a9663e9be34a40963ea07e2cdfb1c291073f/docs/msigdb.html" target="_blank">1f77a96</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -926,6 +960,11 @@ identified in single-cell sequencing studies of human tissue.</li>
 <pre><code>
    c1    c2    c3    c4    c5    c6    c7    c8     h 
   299  6180  3726   858 28005   189  5219   700    50 </code></pre>
+<p>Number of KEGG gene lists.</p>
+<pre class="r"><code>table(grepl(pattern = &quot;KEGG&quot;, x = names(msigdb_hs_sym), ignore.case = TRUE))</code></pre>
+<pre><code>
+FALSE 
+45226 </code></pre>
 <p>Create vector to subset hallmark gene sets.</p>
 <pre class="r"><code>wanted &lt;- sapply(lapply(msigdb_hs_sym, collectionType), bcCategory) == &quot;h&quot;
 table(wanted)</code></pre>
@@ -979,6 +1018,58 @@ gene set.</p>
 [187] &quot;BCL3&quot;     &quot;PANX1&quot;    &quot;FJX1&quot;     &quot;EDN1&quot;     &quot;EIF1&quot;     &quot;BMP2&quot;    
 [193] &quot;DUSP4&quot;    &quot;PDLIM5&quot;   &quot;ICOSLG&quot;   &quot;GFPT2&quot;    &quot;KLF2&quot;     &quot;TNC&quot;     
 [199] &quot;SERPINB8&quot; &quot;MXD1&quot;    </code></pre>
+<p>Names of hallmark gene lists.</p>
+<pre class="r"><code>names(hallmark_gs)</code></pre>
+<pre><code> [1] &quot;HALLMARK_TNFA_SIGNALING_VIA_NFKB&quot;          
+ [2] &quot;HALLMARK_HYPOXIA&quot;                          
+ [3] &quot;HALLMARK_CHOLESTEROL_HOMEOSTASIS&quot;          
+ [4] &quot;HALLMARK_MITOTIC_SPINDLE&quot;                  
+ [5] &quot;HALLMARK_WNT_BETA_CATENIN_SIGNALING&quot;       
+ [6] &quot;HALLMARK_TGF_BETA_SIGNALING&quot;               
+ [7] &quot;HALLMARK_IL6_JAK_STAT3_SIGNALING&quot;          
+ [8] &quot;HALLMARK_DNA_REPAIR&quot;                       
+ [9] &quot;HALLMARK_G2M_CHECKPOINT&quot;                   
+[10] &quot;HALLMARK_APOPTOSIS&quot;                        
+[11] &quot;HALLMARK_NOTCH_SIGNALING&quot;                  
+[12] &quot;HALLMARK_ADIPOGENESIS&quot;                     
+[13] &quot;HALLMARK_ESTROGEN_RESPONSE_EARLY&quot;          
+[14] &quot;HALLMARK_ESTROGEN_RESPONSE_LATE&quot;           
+[15] &quot;HALLMARK_ANDROGEN_RESPONSE&quot;                
+[16] &quot;HALLMARK_MYOGENESIS&quot;                       
+[17] &quot;HALLMARK_PROTEIN_SECRETION&quot;                
+[18] &quot;HALLMARK_INTERFERON_ALPHA_RESPONSE&quot;        
+[19] &quot;HALLMARK_INTERFERON_GAMMA_RESPONSE&quot;        
+[20] &quot;HALLMARK_APICAL_JUNCTION&quot;                  
+[21] &quot;HALLMARK_APICAL_SURFACE&quot;                   
+[22] &quot;HALLMARK_HEDGEHOG_SIGNALING&quot;               
+[23] &quot;HALLMARK_COMPLEMENT&quot;                       
+[24] &quot;HALLMARK_UNFOLDED_PROTEIN_RESPONSE&quot;        
+[25] &quot;HALLMARK_PI3K_AKT_MTOR_SIGNALING&quot;          
+[26] &quot;HALLMARK_MTORC1_SIGNALING&quot;                 
+[27] &quot;HALLMARK_E2F_TARGETS&quot;                      
+[28] &quot;HALLMARK_MYC_TARGETS_V1&quot;                   
+[29] &quot;HALLMARK_MYC_TARGETS_V2&quot;                   
+[30] &quot;HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION&quot;
+[31] &quot;HALLMARK_INFLAMMATORY_RESPONSE&quot;            
+[32] &quot;HALLMARK_XENOBIOTIC_METABOLISM&quot;            
+[33] &quot;HALLMARK_FATTY_ACID_METABOLISM&quot;            
+[34] &quot;HALLMARK_OXIDATIVE_PHOSPHORYLATION&quot;        
+[35] &quot;HALLMARK_GLYCOLYSIS&quot;                       
+[36] &quot;HALLMARK_REACTIVE_OXYGEN_SPECIES_PATHWAY&quot;  
+[37] &quot;HALLMARK_P53_PATHWAY&quot;                      
+[38] &quot;HALLMARK_UV_RESPONSE_UP&quot;                   
+[39] &quot;HALLMARK_UV_RESPONSE_DN&quot;                   
+[40] &quot;HALLMARK_ANGIOGENESIS&quot;                     
+[41] &quot;HALLMARK_HEME_METABOLISM&quot;                  
+[42] &quot;HALLMARK_COAGULATION&quot;                      
+[43] &quot;HALLMARK_IL2_STAT5_SIGNALING&quot;              
+[44] &quot;HALLMARK_BILE_ACID_METABOLISM&quot;             
+[45] &quot;HALLMARK_PEROXISOME&quot;                       
+[46] &quot;HALLMARK_ALLOGRAFT_REJECTION&quot;              
+[47] &quot;HALLMARK_SPERMATOGENESIS&quot;                  
+[48] &quot;HALLMARK_KRAS_SIGNALING_UP&quot;                
+[49] &quot;HALLMARK_KRAS_SIGNALING_DN&quot;                
+[50] &quot;HALLMARK_PANCREAS_BETA_CELLS&quot;              </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
