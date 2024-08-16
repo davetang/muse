@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-08-15" />
+<meta name="date" content="2024-08-16" />
 
 <title>Downloading molecular signatures from MSigDB in R</title>
 
@@ -360,7 +360,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Downloading molecular signatures from
 MSigDB in R</h1>
-<h4 class="date">2024-08-15</h4>
+<h4 class="date">2024-08-16</h4>
 
 </div>
 
@@ -389,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-08-15
+<strong>Last updated:</strong> 2024-08-16
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee8b87fbf0289b5b7d58a03dc2ca117eed2e787c3targetblanke8b87fba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree71fae59f83b2c5fb63a1890b2e479e4e9a62d580targetblank71fae59a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/e8b87fbf0289b5b7d58a03dc2ca117eed2e787c3" target="_blank">e8b87fb</a>
+<a href="https://github.com/davetang/muse/tree/71fae59f83b2c5fb63a1890b2e479e4e9a62d580" target="_blank">71fae59</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee8b87fbf0289b5b7d58a03dc2ca117eed2e787c3targetblanke8b87fba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree71fae59f83b2c5fb63a1890b2e479e4e9a62d580targetblank71fae59a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/e8b87fbf0289b5b7d58a03dc2ca117eed2e787c3" target="_blank">e8b87fb</a>.
+<a href="https://github.com/davetang/muse/tree/71fae59f83b2c5fb63a1890b2e479e4e9a62d580" target="_blank">71fae59</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -557,6 +557,10 @@ Ignored files:
     Ignored:    .Rproj.user/
     Ignored:    r_packages_4.3.3/
     Ignored:    r_packages_4.4.0/
+
+Untracked files:
+    Untracked:  data/msigdb.v7.5.1.hs.EZID.rds
+    Untracked:  data/msigdb.v7.5.1.hs.SYM.rds
 
 </code></pre>
 <p>
@@ -600,6 +604,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/71fae59f83b2c5fb63a1890b2e479e4e9a62d580/analysis/msigdb.Rmd" target="_blank">71fae59</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-16
+</td>
+<td>
+Export Entrez IDs
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/7f4de36556551facdb7a6247c26d365b17062bff/docs/msigdb.html" target="_blank">7f4de36</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -783,35 +821,54 @@ names(msigdb_hs_latest)</code></pre>
 <p>Data can also be downloaded using
 <code>msigdb::getMsigdb()</code>.</p>
 <pre class="r"><code>msigdb_ver &lt;- sub(pattern = &quot;msigdb.v(.*).hs.SYM&quot;, replacement = &quot;\\1&quot;, msigdb_hs_latest$title)
-msigdb.hs &lt;- msigdb::getMsigdb(org = &quot;hs&quot;, id = &quot;SYM&quot;, version = msigdb_ver)</code></pre>
+
+msigdb_hs_sym &lt;- msigdb::getMsigdb(org = &quot;hs&quot;, id = &quot;SYM&quot;, version = msigdb_ver)</code></pre>
 <pre><code>see ?msigdb and browseVignettes(&#39;msigdb&#39;) for documentation</code></pre>
 <pre><code>loading from cache</code></pre>
-<pre class="r"><code>msigdb.hs</code></pre>
+<pre class="r"><code>msigdb_hs_ezid &lt;- msigdb::getMsigdb(org = &quot;hs&quot;, id = &quot;EZID&quot;, version = msigdb_ver)</code></pre>
+<pre><code>see ?msigdb and browseVignettes(&#39;msigdb&#39;) for documentation
+loading from cache</code></pre>
+<pre class="r"><code>msigdb_hs_sym</code></pre>
 <pre><code>GeneSetCollection
   names: chr1p11, chr1p12, ..., GOMF_STARCH_BINDING (45226 total)
   unique identifiers: RPL22P6, NBPF8, ..., POM121L15P (41072 total)
   types in collection:
     geneIdType: SymbolIdentifier (1 total)
     collectionType: BroadCollection (1 total)</code></pre>
+<pre class="r"><code>msigdb_hs_ezid</code></pre>
+<pre><code>GeneSetCollection
+  names: chr1p11, chr1p12, ..., GOMF_STARCH_BINDING (45226 total)
+  unique identifiers: 100132047, 728841, ..., 100101629 (40905 total)
+  types in collection:
+    geneIdType: EntrezIdentifier (1 total)
+    collectionType: BroadCollection (1 total)</code></pre>
 <p>Save as RDS.</p>
-<pre class="r"><code>outfile &lt;- paste0(msigdb_hs_latest$title, &#39;.rds&#39;)
-saveRDS(object = msigdb.hs, file = outfile)</code></pre>
+<pre class="r"><code>sym_outfile &lt;- paste0(&#39;data/msigdb.v&#39;, msigdb_ver, &#39;.hs.SYM.rds&#39;)
+ezid_outfile &lt;- paste0(&#39;data/msigdb.v&#39;, msigdb_ver, &#39;.hs.EZID.rds&#39;)
+
+saveRDS(object = msigdb_hs_sym, file = sym_outfile)
+saveRDS(object = msigdb_hs_ezid, file = ezid_outfile)</code></pre>
 <p>File size in bytes.</p>
-<pre class="r"><code>file.size(outfile)</code></pre>
+<pre class="r"><code>file.size(sym_outfile)</code></pre>
 <pre><code>[1] 24207930</code></pre>
-<pre class="r"><code>unlink(outfile)</code></pre>
+<pre class="r"><code>file.size(ezid_outfile)</code></pre>
+<pre><code>[1] 19925429</code></pre>
+<p>Load RDS and compare.</p>
+<pre class="r"><code>test &lt;- readRDS(sym_outfile)
+identical(test, msigdb_hs_sym)</code></pre>
+<pre><code>[1] TRUE</code></pre>
 </div>
 <div id="accessing-the-geneset-and-genesetcollection-objects"
 class="section level2">
 <h2>Accessing the GeneSet and GeneSetCollection objects</h2>
 <p>A <code>GeneSetCollection</code> object is effectively a list and
 therefore all list processing functions work.</p>
-<pre class="r"><code>str(msigdb.hs, max.level = 2)</code></pre>
+<pre class="r"><code>str(msigdb_hs_sym, max.level = 2)</code></pre>
 <pre><code>Formal class &#39;GeneSetCollection&#39; [package &quot;GSEABase&quot;] with 1 slot
   ..@ .Data:List of 45226</code></pre>
 <p>Each signature is stored in a <code>GeneSet</code> object and can be
 processed using functions from the {GSEABase} package.</p>
-<pre class="r"><code>gs &lt;- msigdb.hs[[1984]]
+<pre class="r"><code>gs &lt;- msigdb_hs_sym[[1984]]
 gs</code></pre>
 <pre><code>setName: BAUS_TFF2_TARGETS_DN 
 geneIds: BEX4, NAT8, ..., THRSP (total: 12)
@@ -865,18 +922,18 @@ perturbations within the immune system.</li>
 <li>C8 - cell type signature gene sets curated from cluster markers
 identified in single-cell sequencing studies of human tissue.</li>
 </ul>
-<pre class="r"><code>table(sapply(lapply(msigdb.hs, collectionType), bcCategory))</code></pre>
+<pre class="r"><code>table(sapply(lapply(msigdb_hs_sym, collectionType), bcCategory))</code></pre>
 <pre><code>
    c1    c2    c3    c4    c5    c6    c7    c8     h 
   299  6180  3726   858 28005   189  5219   700    50 </code></pre>
 <p>Create vector to subset hallmark gene sets.</p>
-<pre class="r"><code>wanted &lt;- sapply(lapply(msigdb.hs, collectionType), bcCategory) == &quot;h&quot;
+<pre class="r"><code>wanted &lt;- sapply(lapply(msigdb_hs_sym, collectionType), bcCategory) == &quot;h&quot;
 table(wanted)</code></pre>
 <pre><code>wanted
 FALSE  TRUE 
 45176    50 </code></pre>
 <p>Hallmark gene sets.</p>
-<pre class="r"><code>hallmark_gs &lt;- msigdb.hs[wanted]
+<pre class="r"><code>hallmark_gs &lt;- msigdb_hs_sym[wanted]
 hallmark_gs</code></pre>
 <pre><code>GeneSetCollection
   names: HALLMARK_TNFA_SIGNALING_VIA_NFKB, HALLMARK_HYPOXIA, ..., HALLMARK_PANCREAS_BETA_CELLS (50 total)
