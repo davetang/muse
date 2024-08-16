@@ -77,22 +77,36 @@ Data can also be downloaded using `msigdb::getMsigdb()`.
 
 ```{r get_msigdb}
 msigdb_ver <- sub(pattern = "msigdb.v(.*).hs.SYM", replacement = "\\1", msigdb_hs_latest$title)
-msigdb.hs <- msigdb::getMsigdb(org = "hs", id = "SYM", version = msigdb_ver)
-msigdb.hs
+
+msigdb_hs_sym <- msigdb::getMsigdb(org = "hs", id = "SYM", version = msigdb_ver)
+msigdb_hs_ezid <- msigdb::getMsigdb(org = "hs", id = "EZID", version = msigdb_ver)
+
+msigdb_hs_sym
+msigdb_hs_ezid
 ```
 
 Save as RDS.
 
-```{r save_msigdbhs}
-outfile <- paste0(msigdb_hs_latest$title, '.rds')
-saveRDS(object = msigdb.hs, file = outfile)
+```{r save_msigdb}
+sym_outfile <- paste0('data/msigdb.v', msigdb_ver, '.hs.SYM.rds')
+ezid_outfile <- paste0('data/msigdb.v', msigdb_ver, '.hs.EZID.rds')
+
+saveRDS(object = msigdb_hs_sym, file = sym_outfile)
+saveRDS(object = msigdb_hs_ezid, file = ezid_outfile)
 ```
 
 File size in bytes.
 
 ```{r msigdbhs_rds_size}
-file.size(outfile)
-unlink(outfile)
+file.size(sym_outfile)
+file.size(ezid_outfile)
+```
+
+Load RDS and compare.
+
+```{r compare_rds}
+test <- readRDS(sym_outfile)
+identical(test, msigdb_hs_sym)
 ```
 
 ## Accessing the GeneSet and GeneSetCollection objects
@@ -100,13 +114,13 @@ unlink(outfile)
 A `GeneSetCollection` object is effectively a list and therefore all list processing functions work.
 
 ```{r msigdb_length}
-str(msigdb.hs, max.level = 2)
+str(msigdb_hs_sym, max.level = 2)
 ```
 
 Each signature is stored in a `GeneSet` object and can be processed using functions from the {GSEABase} package.
 
 ```{r example_gene_set}
-gs <- msigdb.hs[[1984]]
+gs <- msigdb_hs_sym[[1984]]
 gs
 ```
 
@@ -135,20 +149,20 @@ details(gs)
 * C8 - cell type signature gene sets curated from cluster markers identified in single-cell sequencing studies of human tissue.
 
 ```{r collection_types}
-table(sapply(lapply(msigdb.hs, collectionType), bcCategory))
+table(sapply(lapply(msigdb_hs_sym, collectionType), bcCategory))
 ```
 
 Create vector to subset hallmark gene sets.
 
 ```{r wanted}
-wanted <- sapply(lapply(msigdb.hs, collectionType), bcCategory) == "h"
+wanted <- sapply(lapply(msigdb_hs_sym, collectionType), bcCategory) == "h"
 table(wanted)
 ```
 
 Hallmark gene sets.
 
 ```{r hallmark_gs}
-hallmark_gs <- msigdb.hs[wanted]
+hallmark_gs <- msigdb_hs_sym[wanted]
 hallmark_gs
 ```
 
