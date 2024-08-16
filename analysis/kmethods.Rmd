@@ -1,0 +1,28 @@
+---
+title: "_k_-methods: _k_-means, _k_-medoids, and PAM"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The Partitioning Around Medoids (PAM) methods is as follows:
+
+1. Start from a matrix of $p$ features measured on a set of $n$ observations.
+2. Randomly pick $k$ distinct _cluster centers_ out of the $n$ observations ("seeds").
+3. Assign each of the remaining observations to the group to whose center it is the closest.
+4. For each group, choose a new center from the observations in the group, such that the sum of the distances of group members to the center is minimal; this is called the _medoid_.
+5. Repeat Steps 3 and 4 until the groups stabilise.
+
+Each time the algorithm is run, different initial seeds will be picked in Step 2, and in general, this can lead to different final results. A popular implementation is the `pam()` function in the {cluster} package.
+
+A slight variation of the method replaces the medoids by the arithematic means (centers of gravity) of the clusters and is called _k_-means. Whereas in PAM the centers are observations, this is not, in general, the case with _k_-means. The function `kmeans()` comes with base R via the {stats} package.
+
+These so-called _k_-methods are the most common off-the-shelf methods for clustering; they work particularly well when the clusters are of comparable size and convex (blob-shaped). On the other hand, if the true clusters are very different in size, the larger ones will tend to be broken up; the same is true for groups that have pronounced non-spherical or non-elliptical shapes.
+
+There are clever schemes that repeat the process many times using different initial centers or resampled datasets. Repeating a clustering procedure multiple times on the same data but with different starting points creates _strong forms_. Repeatedly subsampling the dataset and applying a clustering method will result in groups of observations that are "almost always" grouped together; these are called _tight clusters_. The study of strong forms or tight clusters facilitates the choice of the number of clusters. The {clusterExperiment} package can combine and compare the output from many different clusterings.
