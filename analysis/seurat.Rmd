@@ -16,6 +16,7 @@ This post follows the Peripheral Blood Mononuclear Cells (PBMCs) [tutorial](http
 
 ```{r install_seurat, eval=FALSE}
 install.packages("Seurat")
+remotes::install_github("immunogenomics/presto")
 ```
 
 If you get the warning:
@@ -26,16 +27,18 @@ reinstall ‘SeuratObject’ as the ABI for R may have changed
 re-install the `SeuratObject` package using a repository that has an updated copy. The same goes for the `htmltools` package.
 
 ```{r install_seurat_obj, eval=FALSE}
-install.packages("SeuratObject", repos = "https://cran.ism.ac.jp/")
-install.packages("htmltools", repos = "https://cran.ism.ac.jp/")
+install.packages("SeuratObject", repos = "https://cloud.r-project.org/")
+install.packages("htmltools", repos = "https://cloud.r-project.org/")
 packageVersion("SeuratObject")
 packageVersion("htmltools")
 ```
 
-Load `Seurat`.
+Load `Seurat` and `bench` for some benchmarking.
 
 ```{r load_seurat}
 library("Seurat")
+library("bench")
+library("presto")
 packageVersion("Seurat")
 ```
 
@@ -71,7 +74,9 @@ head data/pbmc3k/filtered_gene_bc_matrices/hg19/matrix.mtx
 Load 10x data into a matrix.
 
 ```{r}
-pbmc.data <- Read10X(data.dir = "data/pbmc3k/filtered_gene_bc_matrices/hg19/")
+bench::mark(
+  pbmc.data <- Read10X(data.dir = "data/pbmc3k/filtered_gene_bc_matrices/hg19/")
+)
 ```
 
 [dgTMatrix-class](https://stat.ethz.ch/R-manual/R-devel/library/Matrix/html/dgTMatrix-class.html).
