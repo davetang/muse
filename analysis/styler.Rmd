@@ -1,0 +1,61 @@
+---
+title: "Non-invasive pretty printing of R code"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(bench)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Install.
+
+```{r install_styler, eval=FALSE}
+install.packages("styler")
+```
+
+Load.
+
+```{r load_styler}
+library(styler)
+```
+
+Create badly formated function.
+
+```{r}
+add<-function(a,b){
+a+b
+}
+
+dump(list = 'add', file = "add.R")
+```
+
+Check it out.
+
+```{bash}
+cat add.R
+```
+
+Style it.
+
+```{r}
+style_file("add.R")
+```
+
+Check it out again!
+
+```{bash}
+cat add.R
+```
+
+Remove file.
+
+```{r}
+unlink("add.R")
+```
+
