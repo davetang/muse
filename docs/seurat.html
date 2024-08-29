@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2024-04-15" />
+<meta name="date" content="2024-08-29" />
 
 <title>Getting started with Seurat</title>
 
-<script src="site_libs/header-attrs-2.26/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Getting started with Seurat</h1>
-<h4 class="date">2024-04-15</h4>
+<h4 class="date">2024-08-29</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-04-15
+<strong>Last updated:</strong> 2024-08-29
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed10317047924abe45011362f723a76cee5584658targetblankd103170a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree717d440cc434d3600b98502c3de91aa2d9112e5ftargetblank717d440a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/d10317047924abe45011362f723a76cee5584658" target="_blank">d103170</a>
+<a href="https://github.com/davetang/muse/tree/717d440cc434d3600b98502c3de91aa2d9112e5f" target="_blank">717d440</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed10317047924abe45011362f723a76cee5584658targetblankd103170a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree717d440cc434d3600b98502c3de91aa2d9112e5ftargetblank717d440a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/d10317047924abe45011362f723a76cee5584658" target="_blank">d103170</a>.
+<a href="https://github.com/davetang/muse/tree/717d440cc434d3600b98502c3de91aa2d9112e5f" target="_blank">717d440</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -552,20 +552,13 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
+    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    r_packages_4.3.0/
-    Ignored:    r_packages_4.3.2/
+    Ignored:    analysis/figure/
     Ignored:    r_packages_4.3.3/
+    Ignored:    r_packages_4.4.0/
 
 Untracked files:
-    Untracked:  analysis/breast_cancer.Rmd
-    Untracked:  code/multiz100way/
-    Untracked:  data/293t/
-    Untracked:  data/dataset.h5ad
-    Untracked:  data/jurkat/
-    Untracked:  data/jurkat_293t/
-    Untracked:  data/lung_bcell.rds
-    Untracked:  data/pbmc3k.csv
     Untracked:  data/pbmc3k.csv.gz
     Untracked:  data/pbmc3k/
 
@@ -582,7 +575,6 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
 These are the previous versions of the repository in which changes were
 made to the R Markdown (<code>analysis/seurat.Rmd</code>) and HTML
@@ -612,6 +604,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/717d440cc434d3600b98502c3de91aa2d9112e5f/analysis/seurat.Rmd" target="_blank">717d440</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-29
+</td>
+<td>
+Re-run using updated Seurat version
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/8188fefc3d1003fd5abbe964b502e6ff138cbb37/docs/seurat.html" target="_blank">8188fef</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -955,7 +981,8 @@ detected and sequencing was performed on an Illumina NextSeq 500 with
 around 69,000 reads per cell. To get started <a
 href="https://satijalab.org/seurat/articles/install.html">install
 Seurat</a> by using install.packages().</p>
-<pre class="r"><code>install.packages(&quot;Seurat&quot;)</code></pre>
+<pre class="r"><code>install.packages(&quot;Seurat&quot;)
+remotes::install_github(&quot;immunogenomics/presto&quot;)</code></pre>
 <p>If you get the warning:</p>
 <blockquote>
 <p>‘SeuratObject’ was built under R 4.3.0 but the current version is
@@ -965,24 +992,26 @@ R may have changed</p>
 <p>re-install the <code>SeuratObject</code> package using a repository
 that has an updated copy. The same goes for the <code>htmltools</code>
 package.</p>
-<pre class="r"><code>install.packages(&quot;SeuratObject&quot;, repos = &quot;https://cran.ism.ac.jp/&quot;)
-install.packages(&quot;htmltools&quot;, repos = &quot;https://cran.ism.ac.jp/&quot;)
+<pre class="r"><code>install.packages(&quot;SeuratObject&quot;, repos = &quot;https://cloud.r-project.org/&quot;)
+install.packages(&quot;htmltools&quot;, repos = &quot;https://cloud.r-project.org/&quot;)
 packageVersion(&quot;SeuratObject&quot;)
 packageVersion(&quot;htmltools&quot;)</code></pre>
-<p>Load <code>Seurat</code>.</p>
+<p>Load <code>Seurat</code> and <code>bench</code> for some
+benchmarking.</p>
 <pre class="r"><code>library(&quot;Seurat&quot;)</code></pre>
 <pre><code>Loading required package: SeuratObject</code></pre>
 <pre><code>Loading required package: sp</code></pre>
-<pre><code>&#39;SeuratObject&#39; was built under R 4.3.0 but the current version is
-4.3.3; it is recomended that you reinstall &#39;SeuratObject&#39; as the ABI
-for R may have changed</code></pre>
 <pre><code>
 Attaching package: &#39;SeuratObject&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:base&#39;:
+<pre><code>The following objects are masked from &#39;package:base&#39;:
 
-    intersect</code></pre>
+    intersect, t</code></pre>
+<pre class="r"><code>library(&quot;bench&quot;)
+library(&quot;presto&quot;)</code></pre>
+<pre><code>Loading required package: Rcpp</code></pre>
+<pre><code>Loading required package: data.table</code></pre>
 <pre class="r"><code>packageVersion(&quot;Seurat&quot;)</code></pre>
-<pre><code>[1] &#39;5.0.3&#39;</code></pre>
+<pre><code>[1] &#39;5.1.0&#39;</code></pre>
 <div id="data" class="section level2">
 <h2>Data</h2>
 <p>To follow the tutorial, you need the 10X data.</p>
@@ -1020,7 +1049,15 @@ and the value at that coordinate</li>
 <div id="seurat-object" class="section level2">
 <h2>Seurat object</h2>
 <p>Load 10x data into a matrix.</p>
-<pre class="r"><code>pbmc.data &lt;- Read10X(data.dir = &quot;data/pbmc3k/filtered_gene_bc_matrices/hg19/&quot;)</code></pre>
+<pre class="r"><code>bench::mark(
+  pbmc.data &lt;- Read10X(data.dir = &quot;data/pbmc3k/filtered_gene_bc_matrices/hg19/&quot;)
+)</code></pre>
+<pre><code>Warning: Some expressions had a GC in every iteration; so filtering is
+disabled.</code></pre>
+<pre><code># A tibble: 1 × 6
+  expression                             min median `itr/sec` mem_alloc `gc/sec`
+  &lt;bch:expr&gt;                           &lt;bch&gt; &lt;bch:&gt;     &lt;dbl&gt; &lt;bch:byt&gt;    &lt;dbl&gt;
+1 &quot;pbmc.data &lt;- Read10X(data.dir = \&quot;… 866ms  866ms      1.16     206MB     4.62</code></pre>
 <p><a
 href="https://stat.ethz.ch/R-manual/R-devel/library/Matrix/html/dgTMatrix-class.html">dgTMatrix-class</a>.</p>
 <pre class="r"><code>class(pbmc.data)</code></pre>
@@ -1035,13 +1072,13 @@ attr(,&quot;package&quot;)
   write.csv(x = pbmc.data, file = &quot;data/pbmc3k.csv&quot;)
 )</code></pre>
 <pre><code>   user  system elapsed 
- 55.002   0.581  58.528 </code></pre>
+ 51.866   0.467  52.346 </code></pre>
 <p>Gzip.</p>
 <pre class="bash"><code>if [[ ! -f data/pbmc3k.csv.gz ]]; then
    gzip data/pbmc3k.csv
 fi
 ls -lh data/pbmc3k.csv.gz</code></pre>
-<pre><code>-rw-r--r-- 1 rstudio rstudio 3.4M Apr  7 13:19 data/pbmc3k.csv.gz</code></pre>
+<pre><code>-rw-r--r-- 1 rstudio rstudio 3.4M Aug 29 09:22 data/pbmc3k.csv.gz</code></pre>
 <p>Check out the first six genes and cells</p>
 <pre class="r"><code>pbmc.data[1:6, 1:6]</code></pre>
 <pre><code>6 x 6 sparse Matrix of class &quot;dgCMatrix&quot;
@@ -2053,6 +2090,43 @@ captured in the first 10 PCs.</p>
 <pre class="r"><code># plots pbmc@reductions$pca@stdev
 ElbowPlot(pbmc)</code></pre>
 <p><img src="figure/seurat.Rmd/elbow_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-elbow_plot-1">
+Past versions of elbow_plot-1.png
+</button>
+</p>
+<div id="fig-elbow_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/8188fefc3d1003fd5abbe964b502e6ff138cbb37/docs/figure/seurat.Rmd/elbow_plot-1.png" target="_blank">8188fef</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Identifying the true dimensionality of a dataset – can be
 challenging/uncertain for the user. We therefore suggest these multiple
 approaches for users. The first is more supervised, exploring PCs to
@@ -2151,20 +2225,20 @@ conclusions solely on the basis of visualization techniques.</p>
 <pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
 To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
 This message will be shown once per session</code></pre>
-<pre><code>07:16:50 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
-<pre><code>07:16:50 Read 2638 rows and found 10 numeric columns</code></pre>
-<pre><code>07:16:50 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
-<pre><code>07:16:50 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>09:25:55 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>09:25:55 Read 2638 rows and found 10 numeric columns</code></pre>
+<pre><code>09:25:55 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>09:25:55 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
 <pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
 <pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
 <pre><code>**************************************************|
-07:16:50 Writing NN index file to temp file /tmp/RtmpHT7qKj/file8d8779300ec2
-07:16:50 Searching Annoy index using 1 thread, search_k = 3000
-07:16:50 Annoy recall = 100%
-07:16:51 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
-07:16:51 Initializing from normalized Laplacian + noise (using RSpectra)
-07:16:51 Commencing optimization for 500 epochs, with 105124 positive edges
-07:16:54 Optimization finished</code></pre>
+09:25:55 Writing NN index file to temp file /tmp/RtmpUkyYeG/file13c750c4354b
+09:25:55 Searching Annoy index using 1 thread, search_k = 3000
+09:25:56 Annoy recall = 100%
+09:25:56 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+09:25:57 Initializing from normalized Laplacian + noise (using RSpectra)
+09:25:57 Commencing optimization for 500 epochs, with 105124 positive edges
+09:25:59 Optimization finished</code></pre>
 <p>Note that you can set <code>label = TRUE</code> or use the
 LabelClusters function to help label individual clusters</p>
 <pre class="r"><code>DimPlot(pbmc, reduction = &quot;umap&quot;)</code></pre>
@@ -2191,6 +2265,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/8188fefc3d1003fd5abbe964b502e6ff138cbb37/docs/figure/seurat.Rmd/unnamed-chunk-46-1.png" target="_blank">8188fef</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/5f6b5a75f1dfa606244f52e6a9963e2bdfef2cc3/docs/figure/seurat.Rmd/unnamed-chunk-46-1.png" target="_blank">5f6b5a7</a>
@@ -2240,10 +2325,8 @@ efficient implementation (no further action necessary).</p>
 <pre class="r"><code>install.packages(&quot;remotes&quot;)
 remotes::install_github(&#39;immunogenomics/presto&#39;)</code></pre>
 <p>Load {presto}.</p>
-<pre class="r"><code>library(&#39;presto&#39;)</code></pre>
-<pre><code>Loading required package: Rcpp</code></pre>
-<pre><code>Loading required package: data.table</code></pre>
-<pre class="r"><code>packageVersion(&#39;presto&#39;)</code></pre>
+<pre class="r"><code>library(&#39;presto&#39;)
+packageVersion(&#39;presto&#39;)</code></pre>
 <pre><code>[1] &#39;1.0.0&#39;</code></pre>
 <p>Find all markers of cluster 2.</p>
 <pre class="r"><code>cluster2.markers &lt;- FindMarkers(pbmc, ident.1 = 2)
@@ -2298,6 +2381,43 @@ visualizations. We also suggest exploring <code>RidgePlot()</code>,
 methods to view your dataset.</p>
 <pre class="r"><code>VlnPlot(pbmc, features = c(&quot;MS4A1&quot;, &quot;CD79A&quot;))</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-52-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-52-1">
+Past versions of unnamed-chunk-52-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-52-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/8188fefc3d1003fd5abbe964b502e6ff138cbb37/docs/figure/seurat.Rmd/unnamed-chunk-52-1.png" target="_blank">8188fef</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>You can plot raw counts as well.</p>
 <pre class="r"><code>VlnPlot(pbmc, features = c(&quot;NKG7&quot;, &quot;PF4&quot;), layer = &quot;counts&quot;, log = TRUE)</code></pre>
 <p><img src="figure/seurat.Rmd/unnamed-chunk-53-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -2323,6 +2443,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/8188fefc3d1003fd5abbe964b502e6ff138cbb37/docs/figure/seurat.Rmd/unnamed-chunk-53-1.png" target="_blank">8188fef</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/b1853704502f2dbd42a59d77f9aef121ab4fab46/docs/figure/seurat.Rmd/unnamed-chunk-53-1.png" target="_blank">b185370</a>
@@ -2385,6 +2516,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/8188fefc3d1003fd5abbe964b502e6ff138cbb37/docs/figure/seurat.Rmd/unnamed-chunk-54-1.png" target="_blank">8188fef</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/b1853704502f2dbd42a59d77f9aef121ab4fab46/docs/figure/seurat.Rmd/unnamed-chunk-54-1.png" target="_blank">b185370</a>
@@ -2455,6 +2597,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/8188fefc3d1003fd5abbe964b502e6ff138cbb37/docs/figure/seurat.Rmd/unnamed-chunk-55-1.png" target="_blank">8188fef</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/b1853704502f2dbd42a59d77f9aef121ab4fab46/docs/figure/seurat.Rmd/unnamed-chunk-55-1.png" target="_blank">b185370</a>
@@ -2584,6 +2737,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/8188fefc3d1003fd5abbe964b502e6ff138cbb37/docs/figure/seurat.Rmd/unnamed-chunk-56-1.png" target="_blank">8188fef</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/b1853704502f2dbd42a59d77f9aef121ab4fab46/docs/figure/seurat.Rmd/unnamed-chunk-56-1.png" target="_blank">b185370</a>
 </td>
 <td>
@@ -2649,6 +2813,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/8188fefc3d1003fd5abbe964b502e6ff138cbb37/docs/figure/seurat.Rmd/unnamed-chunk-57-1.png" target="_blank">8188fef</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-04-15
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/b1853704502f2dbd42a59d77f9aef121ab4fab46/docs/figure/seurat.Rmd/unnamed-chunk-57-1.png" target="_blank">b185370</a>
 </td>
 <td>
@@ -2702,8 +2877,8 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.3.3 (2024-02-29)
-Platform: x86_64-pc-linux-gnu (64-bit)
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: x86_64-pc-linux-gnu
 Running under: Ubuntu 22.04.4 LTS
 
 Matrix products: default
@@ -2725,51 +2900,59 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] ggplot2_3.5.0      presto_1.0.0       data.table_1.15.4  Rcpp_1.0.12       
-[5] Seurat_5.0.3       SeuratObject_5.0.1 sp_2.1-3           workflowr_1.7.1   
+[1] ggplot2_3.5.1      presto_1.0.0       data.table_1.15.4  Rcpp_1.0.12       
+[5] bench_1.1.3        Seurat_5.1.0       SeuratObject_5.0.2 sp_2.1-4          
+[9] workflowr_1.7.1   
 
 loaded via a namespace (and not attached):
   [1] RColorBrewer_1.1-3     rstudioapi_0.16.0      jsonlite_1.8.8        
-  [4] magrittr_2.0.3         spatstat.utils_3.0-4   farver_2.1.1          
-  [7] rmarkdown_2.26         fs_1.6.3               vctrs_0.6.5           
+  [4] magrittr_2.0.3         spatstat.utils_3.0-4   farver_2.1.2          
+  [7] rmarkdown_2.27         fs_1.6.4               vctrs_0.6.5           
  [10] ROCR_1.0-11            spatstat.explore_3.2-7 htmltools_0.5.8.1     
  [13] sass_0.4.9             sctransform_0.4.1      parallelly_1.37.1     
  [16] KernSmooth_2.23-22     bslib_0.7.0            htmlwidgets_1.6.4     
  [19] ica_1.0-3              plyr_1.8.9             plotly_4.10.4         
- [22] zoo_1.8-12             cachem_1.0.8           whisker_0.4.1         
+ [22] zoo_1.8-12             cachem_1.1.0           whisker_0.4.1         
  [25] igraph_2.0.3           mime_0.12              lifecycle_1.0.4       
- [28] pkgconfig_2.0.3        Matrix_1.6-5           R6_2.5.1              
- [31] fastmap_1.1.1          fitdistrplus_1.1-11    future_1.33.2         
- [34] shiny_1.8.1.1          digest_0.6.35          colorspace_2.1-0      
+ [28] pkgconfig_2.0.3        Matrix_1.7-0           R6_2.5.1              
+ [31] fastmap_1.2.0          fitdistrplus_1.1-11    future_1.33.2         
+ [34] shiny_1.8.1.1          digest_0.6.37          colorspace_2.1-0      
  [37] patchwork_1.2.0        ps_1.7.6               rprojroot_2.0.4       
  [40] tensor_1.5             RSpectra_0.16-1        irlba_2.3.5.1         
  [43] labeling_0.4.3         progressr_0.14.0       fansi_1.0.6           
  [46] spatstat.sparse_3.0-3  httr_1.4.7             polyclip_1.10-6       
- [49] abind_1.4-5            compiler_4.3.3         withr_3.0.0           
- [52] fastDummies_1.7.3      highr_0.10             MASS_7.3-60.0.1       
- [55] tools_4.3.3            lmtest_0.9-40          httpuv_1.6.15         
- [58] future.apply_1.11.2    goftest_1.2-3          glue_1.7.0            
- [61] callr_3.7.6            nlme_3.1-164           promises_1.3.0        
- [64] grid_4.3.3             Rtsne_0.17             getPass_0.2-4         
- [67] cluster_2.1.6          reshape2_1.4.4         generics_0.1.3        
- [70] gtable_0.3.4           spatstat.data_3.0-4    tidyr_1.3.1           
- [73] utf8_1.2.4             spatstat.geom_3.2-9    RcppAnnoy_0.0.22      
- [76] ggrepel_0.9.5          RANN_2.6.1             pillar_1.9.0          
- [79] stringr_1.5.1          spam_2.10-0            RcppHNSW_0.6.0        
- [82] later_1.3.2            splines_4.3.3          dplyr_1.1.4           
- [85] lattice_0.22-5         survival_3.5-8         deldir_2.0-4          
- [88] tidyselect_1.2.1       miniUI_0.1.1.1         pbapply_1.7-2         
- [91] knitr_1.46             git2r_0.33.0           gridExtra_2.3         
- [94] scattermore_1.2        xfun_0.43              matrixStats_1.2.0     
- [97] stringi_1.8.3          lazyeval_0.2.2         yaml_2.3.8            
-[100] evaluate_0.23          codetools_0.2-19       tibble_3.2.1          
-[103] cli_3.6.2              uwot_0.1.16            xtable_1.8-4          
-[106] reticulate_1.35.0      munsell_0.5.1          processx_3.8.4        
-[109] jquerylib_0.1.4        globals_0.16.3         spatstat.random_3.2-3 
-[112] png_0.1-8              parallel_4.3.3         dotCall64_1.1-1       
-[115] listenv_0.9.1          viridisLite_0.4.2      scales_1.3.0          
-[118] ggridges_0.5.6         leiden_0.4.3.1         purrr_1.0.2           
-[121] rlang_1.1.3            cowplot_1.1.3         </code></pre>
+ [49] abind_1.4-5            compiler_4.4.0         withr_3.0.1           
+ [52] fastDummies_1.7.3      highr_0.11             R.utils_2.12.3        
+ [55] MASS_7.3-60.2          tools_4.4.0            lmtest_0.9-40         
+ [58] httpuv_1.6.15          future.apply_1.11.2    goftest_1.2-3         
+ [61] R.oo_1.26.0            glue_1.7.0             callr_3.7.6           
+ [64] profmem_0.6.0          nlme_3.1-164           promises_1.3.0        
+ [67] grid_4.4.0             Rtsne_0.17             getPass_0.2-4         
+ [70] cluster_2.1.6          reshape2_1.4.4         generics_0.1.3        
+ [73] gtable_0.3.5           spatstat.data_3.0-4    R.methodsS3_1.8.2     
+ [76] tidyr_1.3.1            utf8_1.2.4             spatstat.geom_3.2-9   
+ [79] RcppAnnoy_0.0.22       ggrepel_0.9.5          RANN_2.6.1            
+ [82] pillar_1.9.0           stringr_1.5.1          limma_3.60.4          
+ [85] spam_2.10-0            RcppHNSW_0.6.0         later_1.3.2           
+ [88] splines_4.4.0          dplyr_1.1.4            lattice_0.22-6        
+ [91] survival_3.5-8         deldir_2.0-4           tidyselect_1.2.1      
+ [94] miniUI_0.1.1.1         pbapply_1.7-2          knitr_1.47            
+ [97] git2r_0.33.0           gridExtra_2.3          scattermore_1.2       
+[100] xfun_0.44              statmod_1.5.0          matrixStats_1.3.0     
+[103] stringi_1.8.4          lazyeval_0.2.2         yaml_2.3.8            
+[106] evaluate_0.24.0        codetools_0.2-20       tibble_3.2.1          
+[109] cli_3.6.3              uwot_0.2.2             xtable_1.8-4          
+[112] reticulate_1.37.0      munsell_0.5.1          processx_3.8.4        
+[115] jquerylib_0.1.4        globals_0.16.3         spatstat.random_3.2-3 
+[118] png_0.1-8              parallel_4.4.0         dotCall64_1.1-1       
+[121] listenv_0.9.1          viridisLite_0.4.2      scales_1.3.0          
+[124] ggridges_0.5.6         leiden_0.4.3.1         purrr_1.0.2           
+[127] rlang_1.1.4            cowplot_1.1.3         </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 
