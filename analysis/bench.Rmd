@@ -1,0 +1,71 @@
+---
+title: "High Precision Timing of R Expressions"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(bench)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The goal of the [{bench} package](https://github.com/r-lib/bench) is to benchmark code, tracking execution time, memory allocations and garbage collections.
+
+You can install the release version from CRAN with:
+
+```{r install_bench, eval=FALSE}
+install.packages("bench")
+```
+
+`bench::mark()` is used to benchmark one or a series of expressions, we feel it has a number of advantages over alternatives.
+
+* Always uses the highest precision APIs available for each operating system (often nanoseconds).
+* Tracks memory allocations for each expression.
+* Tracks the number and type of R garbage collections per expression iteration.
+* Verifies equality of expression results by default, to avoid accidentally benchmarking inequivalent code.
+* Has bench::press(), which allows you to easily perform and combine benchmarks across a large grid of values.
+* Uses adaptive stopping by default, running each expression for a set amount of time rather than for a specific number of iterations.
+* Expressions are run in batches and summary statistics are calculated after filtering out iterations with garbage collections. This allows you to isolate the performance and effects of garbage collection on running time (for more details see Neal 2014).
+
+The times and memory usage are returned as custom objects which have human readable formatting for display (e.g. `104ns`) and comparisons (e.g. `x$mem_alloc > "10MB"`).
+
+There is also full support for plotting with {ggplot2} including custom scales and formatting.
+
+## Usage
+
+Benchmarks can be run with `bench::mark()`, which takes one or more expressions to benchmark against each other. Returns a tibble with the additional summary columns; the following summary columns are computed:
+
+* `expression - bench_expr` The deparsed expression that was evaluated (or its name if one was provided).
+* `min - bench_time` The minimum execution time.
+* `median - bench_time` The sample median of execution time.
+* `itr/sec - double` The estimated number of executions performed per second.
+* `mem_alloc - bench_bytes` Total amount of memory allocated by R while running the expression. Memory allocated outside the R heap, e.g. by malloc() or new directly is not tracked, take care to avoid misinterpreting the results if running code that may do this.
+* `gc/sec - double` The number of garbage collections per second.
+* `n_itr - integer` Total number of iterations after filtering garbage collections (if filter_gc == TRUE).
+* `n_gc - double` Total number of garbage collections performed over all iterations. This is a psudo-measure of the pressure on the garbage collector, if it varies greatly between to alternatives generally the one with fewer collections will cause fewer allocation in real usage.
+* `total_time - bench_time` The total time to perform the benchmarks.
+* `result - list` A list column of the object(s) returned by the evaluated expression(s).
+* `memory` - list` A list column with results from Rprofmem().
+* `time` - list` A list column of bench_time vectors for each evaluated expression.
+* `gc - list` A list column with tibbles containing the level of garbage collection (0-2, columns) for each iteration (rows).
+
+```{r bench_mark}
+library(bench)
+
+bench::mark(
+  runif(n = 1000000)
+)
+```
+
+## `system_time()`
+
+{bench} also includes `system_time()`, a higher precision alternative to `system.time()`.
+
+```{r system_time}
+system.time(Sys.sleep(.5))
+bench::system_time(Sys.sleep(.5))
+```
