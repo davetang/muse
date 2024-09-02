@@ -12,17 +12,18 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
-This post follows the Peripheral Blood Mononuclear Cells (PBMCs) [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial) for 2,700 single cells. It was written while I was going through the tutorial and contains my notes. The dataset for this tutorial can be downloaded from the [10X Genomics dataset page](https://support.10xgenomics.com/single-cell-gene-expression/datasets/1.1.0/pbmc3k) but it is also hosted on Amazon (see below). The PBMCs, which are primary cells with relatively small amounts of RNA (around 1pg RNA/cell), come from a healthy donor. There were 2,700 cells detected and sequencing was performed on an Illumina NextSeq 500 with around 69,000 reads per cell. To get started [install Seurat](https://satijalab.org/seurat/articles/install.html) by using install.packages().
+This post follows the Peripheral Blood Mononuclear Cells (PBMCs) [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial) for 2,700 single cells. It was written while I was going through the tutorial and contains my notes. The dataset for this tutorial can be downloaded from the [10X Genomics dataset page](https://support.10xgenomics.com/single-cell-gene-expression/datasets/1.1.0/pbmc3k) but it is also hosted on Amazon (see below). The PBMCs, which are primary cells with relatively small amounts of RNA (around 1pg RNA/cell), come from a healthy donor. There were 2,700 cells detected and sequencing was performed on an Illumina NextSeq 500 with around 69,000 reads per cell. To get started [install Seurat](https://satijalab.org/seurat/articles/install.html) by using install.packages() and the [presto](https://github.com/immunogenomics/presto) package, which will be used finding markers. (The [bench](https://github.com/r-lib/bench) package is also installed for timing some steps.)
 
 ```{r install_seurat, eval=FALSE}
 install.packages("Seurat")
 remotes::install_github("immunogenomics/presto")
+install.packages("bench")
 ```
 
 If you get the warning:
 
 >‘SeuratObject’ was built under R 4.3.0 but the current version is 4.3.2; it is recomended that you
-reinstall ‘SeuratObject’ as the ABI for R may have changed
+reinstall ‘SeuratObject’ as the ABI (sic) for R may have changed
 
 re-install the `SeuratObject` package using a repository that has an updated copy. The same goes for the `htmltools` package.
 
@@ -36,15 +37,15 @@ packageVersion("htmltools")
 Load `Seurat` and `bench` for some benchmarking.
 
 ```{r load_seurat}
-library("Seurat")
-library("bench")
-library("presto")
+suppressPackageStartupMessages(library("Seurat"))
+suppressPackageStartupMessages(library("bench"))
+suppressPackageStartupMessages(library("presto"))
 packageVersion("Seurat")
 ```
 
 ## Data
 
-To follow the tutorial, you need the 10X data.
+To follow the tutorial, you'll need the 10X data, which can be download from AWS.
 
 ```{bash, eval=FALSE}
 mkdir -p data/pbmc3k && cd data/pbmc3k
@@ -71,23 +72,25 @@ head data/pbmc3k/filtered_gene_bc_matrices/hg19/matrix.mtx
 
 ## Seurat object
 
-Load 10x data into a matrix.
+Load 10x data into a matrix using `Read10X()`; we will use `bench::mark()` to measure memory usage and to time how long the function ran. Note that using `bench::mark()` will mean that the expression will run at least twice.
 
-```{r}
+```{r read_10x}
 bench::mark(
   pbmc.data <- Read10X(data.dir = "data/pbmc3k/filtered_gene_bc_matrices/hg19/")
 )
 ```
 
-[dgTMatrix-class](https://stat.ethz.ch/R-manual/R-devel/library/Matrix/html/dgTMatrix-class.html).
+The matrix is in the [dgCMatrix-class](https://stat.ethz.ch/R-manual/R-patched/library/Matrix/html/dgCMatrix-class.html):
 
-```{r}
+> The dgCMatrix class is a class of sparse numeric matrices in the compressed, sparse, column-oriented format. In this implementation the non-zero elements in the columns are sorted into increasing row order. dgCMatrix is the “standard” class for sparse numeric matrices in the Matrix package. 
+
+```{r dg_c_matrix_class}
 class(pbmc.data)
 ```
 
-32,738 genes and 2,700 cells.
+The matrix (gene by barcode) contains `r nrow(pbmc.data)` rows (genes) and `r ncol(pbmc.data)` columns (barcodes).
 
-```{r}
+```{r dim_pbmc_data}
 dim(pbmc.data)
 ```
 
@@ -108,24 +111,33 @@ fi
 ls -lh data/pbmc3k.csv.gz
 ```
 
-Check out the first six genes and cells
+Check out the first six genes and barcodes.
 
-```{r}
+```{r glimpse_pbmc_data}
 pbmc.data[1:6, 1:6]
 ```
 
-Summary of total expression per single cell.
+Summary of total expression (number of detected transcripts) per single barcode.
 
-```{r}
+```{r total_expression_per_bc}
 summary(colSums(pbmc.data))
 ```
 
-Check how many genes have at least one transcript in each cell.
+Summary of total number of transcripts per gene.
 
-The median number of detected genes among the single cells is 817.
+```{r total_expression_per_gene}
+summary(colSums(t(pbmc.data)))
+```
 
-```{r}
+The range in the total expression of genes is quite large. A more useful summary is how often a gene is detected (at least one transcript) across all barcodes.
+
+```{r at_least_one_transcript}
 at_least_one <- apply(pbmc.data, 2, function(x) sum(x>0))
+```
+
+On average (median), a gene is detected in `r median(at_least_one)` barcodes (out of `r ncol(pbmc.data)`). This is a more useful metric for filtering out genes instead of relying on total expression.
+
+```{r at_least_one_transcript_dist}
 hist(
   at_least_one,
   breaks = 100,
@@ -135,9 +147,9 @@ hist(
 abline(v = median(at_least_one), col = 2, lty = 3)
 ```
 
-Total expression per cell. The median sum of expression among the single cells is 2,197. This distribution is very similar to the distribution of detected genes shown above.
+Total expression per cell. The median sum of expression among the single cells is `r median(colSums(pbmc.data))`. This distribution is very similar to the distribution of detected genes shown above.
 
-```{r}
+```{r expression_sum_per_cell_dist}
 hist(
   colSums(pbmc.data),
   breaks = 100,
@@ -147,32 +159,27 @@ hist(
 abline(v = median(colSums(pbmc.data)), col = 2, lty = 3)
 ```
 
-We will filter out genes and single cells before we continue with the analysis. The tutorial has arbitrary values of keeping genes expressed in three or more cells and keeping cells with at least 200 detected genes.
+We will filter out genes and barcodes before we continue with the analysis. The tutorial has arbitrary values of keeping genes expressed in three or more cells and keeping barcodes with at least 200 detected genes.
 
 Manually check the number of genes detected in three or more cells; a lot of genes are not detected in 3 or more cells.
 
-```{r}
+```{r manual_check_genes_filter}
 tmp <- apply(pbmc.data, 1, function(x) sum(x>0))
 table(tmp>=3)
 ```
 
-All cells have at least 200 detected genes
+All cells have at least 200 detected genes (where detected is at least one transcript).
 
-```{r}
+```{r manual_check_at_least_one}
 keep <- tmp>=3
 tmp <- pbmc.data[keep,]
 at_least_one <- apply(tmp, 2, function(x) sum(x>0))
 summary(at_least_one)
 ```
 
+We will now create the Seurat object using `CreateSeuratObject`; see `?SeuratObject` for more information on the class.
 
-```{r}
-dim(tmp)
-```
-
-See `?SeuratObject` for more information on the class.
-
-```{r}
+```{r create_seurat_object}
 pbmc <- CreateSeuratObject(
   counts = pbmc.data,
   min.cells = 3,
@@ -183,9 +190,9 @@ pbmc <- CreateSeuratObject(
 class(pbmc)
 ```
 
-Same numbers as above 
+The Seurat object contains the same number of genes and barcodes as our manual checks above. 
 
-```{r}
+```{r check_out_seurat_obj}
 pbmc
 ```
 
@@ -197,7 +204,7 @@ Slots in Seurat object.
 
 Read more about the [S4 class](https://adv-r.hadley.nz/s4.html) in the Advanced R book.
 
-```{r}
+```{r seurat_obj_slot_names}
 slotNames(pbmc)
 ```
 
