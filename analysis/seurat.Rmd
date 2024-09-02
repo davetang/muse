@@ -214,28 +214,29 @@ The tutorial states that "The number of genes and UMIs (nGene and nUMI) are auto
 
 A common quality control metric is the percentage of transcripts from the mitochondrial genome. According to the paper [Classification of low quality cells from single-cell RNA-seq data](https://pubmed.ncbi.nlm.nih.gov/26887813/) the reason this is a quality control metric is because if a single cell is lysed, cytoplasmic RNA will be lost apart from the RNA that is enclosed in the mitochondria, which will be retained and sequenced.
 
-Human mitochondria genes conveniently start with MT.
+Human mitochondria genes conveniently start with MT; however, we can generalise this a little (for use with other organisms) by ignoring case.
 
 ```{r mito_genes}
-mito.genes <- grep(pattern = "^MT-", x = rownames(x = pbmc@assays$RNA), value = TRUE)
+mito.genes <- grep(pattern = "^MT-", x = rownames(x = pbmc@assays$RNA), ignore.case = TRUE, value = TRUE)
 length(mito.genes)
 ```
 
+Manually calculate the mitochrondrial percent for each barcode.
 
-```{r}
+```{r manual_percent_mito}
 percent.mito <- Matrix::colSums(pbmc[['RNA']]$counts[mito.genes, ]) / Matrix::colSums(pbmc[['RNA']]$counts) * 100
 head(percent.mito)
 ```
 
-Check out the meta data.
+Metadata is stored in the `meta.data` slot.
 
-```{r}
+```{r meta_data_slot}
 head(pbmc@meta.data)
 ```
 
 Add mitochondrial percent to the meta using `AddMetaData`.
 
-```{r}
+```{r add_percent_mito}
 pbmc <- AddMetaData(
   object = pbmc,
   metadata = percent.mito,
@@ -253,39 +254,37 @@ head(pbmc@meta.data[, c('percent.mito', 'percent.mt')])
 
 Instead of setting a hard filtering threshold, one can use the 3 * [Median Absolute Deviation](https://www.sc-best-practices.org/preprocessing_visualization/quality_control.html#filtering-low-quality-reads) to determine threshold limits for filtering out cells.
 
-```{r}
+```{r mad_percent_mito}
 median(pbmc@meta.data$percent.mt) - 3 * mad(pbmc@meta.data$percent.mt)
 median(pbmc@meta.data$percent.mt) + 3 * mad(pbmc@meta.data$percent.mt)
 ```
 
-Plot number of genes, UMIs, and % mitochondria
+Plot number of genes, UMIs, and percent mitochondria, which are typical QC metrics, as a violin plot using `VlnPlot()`.
 
-Visualize QC metrics as a violin plot
-
-```{r}
+```{r vln_plot_qc}
 VlnPlot(pbmc, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
 ```
 
 A couple of cells have high mitochondrial percentage which may indicate lost of cytoplasmic RNA.
 
-The GenePlot() function can be used to visualise gene-gene relationships as well as any columns in the seurat object. Below we use the plotting function to spot cells that have a high percentage of mitochondrial RNA and to plot the relationship between the number of unique molecules and the number of genes captured.
-
-FeatureScatter is typically used to visualize feature-feature relationships, but can be used
+`FeatureScatter()` is typically used to visualise feature-feature relationships, but can be used
 for anything calculated by the object, i.e. columns in object metadata, PC scores etc.
 
-```{r}
+```{r feature_scatter_qc}
 plot1 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "percent.mt")
 plot2 <- FeatureScatter(pbmc, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 plot1 + plot2
 ```
 
-Manual check; I already know all cells have >200 genes.
+Additional sanity checks; I already know all cells have >200 genes.
 
-```{r}
+```{r percent_mito_nfeat_check}
 table(pbmc@meta.data$percent.mito < 5 & pbmc@meta.data$nFeature_RNA<2500)
 ```
 
-```{r}
+62 barcodes will be filtered out.
+
+```{r subset_seurat_obj}
 pbmc <- subset(pbmc, subset = nFeature_RNA > 200 & nFeature_RNA < 2500 & percent.mt < 5)
 pbmc
 ```
