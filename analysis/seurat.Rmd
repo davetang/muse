@@ -327,30 +327,34 @@ hist(
 
 ## Identification of highly variable features (feature selection)
 
-Once the data is normalised, the next step is to find genes are vary between single cells; genes that are constant among all cells have no distinguishing power. The `FindVariableFeatures()` function calculates the average expression and dispersion for each gene, places these genes into bins, and then calculates a z-score for dispersion within each bin. I interpret that as take each gene, get the average expression and variance of the gene across the 2,638 cells, categorise genes into bins (default is 20) based on their expression and variance, and finally normalise the variance in each bin. This was the same approach in [Macosko et al.](https://www.ncbi.nlm.nih.gov/pubmed/26000488) and new methods for detecting genes with variable expression patterns will be implemented in Seurat soon (according to the tutorial). The parameters used below are typical settings for UMI data that is normalised to a total of 10,000 molecules and will identify around 2,000 variable genes. The tutorial recommends that users should explore the parameters themselves since each dataset is different.
+Once the data is normalised, the next step is to find genes are vary between single cells since genes that are constant among all cells have no distinguishing power. These are genes that exhibit high cell-to-cell variation in the dataset (i.e., they are highly expressed in some cells, and lowly expressed in others) and it has been found that focusing on these genes in downstream analysis helps to highlight biological signal in single-cell datasets.
 
-We next calculate a subset of features that exhibit high cell-to-cell variation in the dataset (i.e, they are highly expressed in some cells, and lowly expressed in others). We and others have found that focusing on these genes in downstream analysis helps to highlight biological signal in single-cell datasets.
+The `FindVariableFeatures()` function calculates the average expression and dispersion for each gene, places these genes into bins, and then calculates a Z-score for dispersion within each bin. This is interpreted as take each gene, calculate the average expression and variance of the gene across the `r ncol(pbmc@assays$RNA$counts)` barcodes, categorise genes into 20 bins (default is 20) based on their expression and variance, and finally normalise the variance in each bin.
 
-Our procedure in Seurat is described in detail here, and improves on previous versions by directly modeling the mean-variance relationship inherent in single-cell data, and is implemented in the FindVariableFeatures() function. By default, we return 2,000 features per dataset. These will be used in downstream analysis, like PCA.
+This was the same approach in [Macosko et al.](https://www.ncbi.nlm.nih.gov/pubmed/26000488) and new methods for detecting genes with variable expression patterns have been implemented in Seurat. The parameters used below are typical settings for UMI data that is normalised to a total of 10,000 molecules and will identify 2,000 variable genes. These genes will be used in downstream analyses, like PCA. The tutorial recommends that users should explore the parameters themselves since each dataset is different.
 
-```{r}
-pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000)
+> vst: First, fits a line to the relationship of log(variance) and log(mean) using local polynomial regression (loess). Then standardizes the feature values using the observed mean and expected variance (given by the fitted line). Feature variance is then calculated on the standardized values after clipping to a maximum (see clip.max parameter). 
+
+```{r find_variable_features}
+pbmc <- FindVariableFeatures(pbmc, selection.method = "vst", nfeatures = 2000, verbose = FALSE)
 ```
 
-```{r}
+Double check that 2000 genes are returned.
+
+```{r number_of_variable_features}
 length(VariableFeatures(pbmc))
 ```
 
 Identify the 10 most highly variable genes
 
-```{r}
+```{r top10_variable_features}
 top10 <- head(VariableFeatures(pbmc), 10)
 top10
 ```
 
 Plot variable features with and without labels
 
-```{r, fig.width=10, fig.height=6}
+```{r plot_top10_variable_features, fig.width=10, fig.height=6}
 plot1 <- VariableFeaturePlot(pbmc)
 plot2 <- LabelPoints(plot = plot1, points = top10, repel = TRUE)
 plot1 + plot2
