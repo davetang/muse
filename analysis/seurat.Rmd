@@ -291,9 +291,9 @@ pbmc
 
 ## Normalisation
 
-The next step is to normalise the data, so that each cell can be compared against each other. At the time of writing, the only normalisation method implemented in Seurat is by log normalisation. Gene expression measurements for each cell are normalised by its total expression, scaled by 10,000, and log-transformed.
+After removing unwanted cells from the dataset, the next step is to normalise the data, so that barcodes can be compared against each other. At the time of writing (2017), the only normalisation method implemented in Seurat was log normalisation.
 
-```{r}
+```{r total_exp_before_lognorm}
 hist(
   colSums(pbmc[['RNA']]$counts),
   breaks = 100,
@@ -302,21 +302,21 @@ hist(
 )
 ```
 
-After removing unwanted cells from the dataset, the next step is to normalise the data. By default, we employ a global-scaling normalization method "LogNormalize" that normalises the feature expression measurements for each cell by the total expression, multiplies this by a scale factor (10,000 by default), and log-transforms the result. In Seurat v5, Normalized values are stored in pbmc[["RNA"]]$data.
-
-```{r}
-pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
-```
+The global-scaling normalisation method known as "LogNormalize" normalises the feature expression measurements for each barcode by its total expression, multiplies this value by a scale factor (10,000 by default), and finally log-transforms the result. In Seurat v5, normalised values are stored in the data layer, i.e., `pbmc[["RNA"]]$data`.
 
 For clarity, in this previous line of code (and in future commands), we provide the default values for certain parameters in the function call. However, this isn’t required and the same behavior can be achieved with:
 
-```{r}
-pbmc <- NormalizeData(pbmc)
+```{r normalise_data}
+# the code below is the same as
+# pbmc <- NormalizeData(pbmc)
+# since the two arguments are the default
+pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
+pbmc
 ```
 
-While this method of normalization is standard and widely used in scRNA-seq analysis, global-scaling relies on an assumption that each cell originally contains the same number of RNA molecules. We and others have developed alternative workflows for the single cell preprocessing that do not make these assumptions. For users who are interested, please check out our SCTransform() normalization workflow. The method is described in ourpaper, with a separate vignette using Seurat here. The use of SCTransform replaces the need to run NormalizeData, FindVariableFeatures, or ScaleData (described below.)
+While this method of normalisation is standard and widely used in scRNA-seq analysis, global-scaling relies on an assumption that **each cell originally contains the same number of RNA molecules**. Alternative workflows for the single cell pre-processing are available that do not make these assumptions. For example the `SCTransform()` normalisation workflow is an alternative method and its replaces the need to run `NormalizeData`, `FindVariableFeatures`, or `ScaleData`.
 
-```{r}
+```{r total_exp_after_lognorm}
 hist(
   colSums(pbmc[['RNA']]$data),
   breaks = 100,
