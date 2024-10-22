@@ -1,0 +1,123 @@
+---
+title: "Differential gene expression analysis using edgeR"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(edgeR)
+library(ggrepel)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html) carries out:
+
+> Differential expression analysis of RNA-seq expression profiles with biological replication. Implements a range of statistical methodology based on the negative binomial distributions, including empirical Bayes estimation, exact tests, generalized linear models and quasi-likelihood tests. As well as RNA-seq, it be applied to differential signal analysis of other types of genomic data that produce read counts, including ChIP-seq, ATAC-seq, Bisulfite-seq, SAGE and CAGE.
+
+[edgeR Manual](https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf).
+
+## Installation
+
+Install using `BiocManager::install()`.
+
+```{r install_edger, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("edgeR")
+```
+
+## Data
+
+https://zenodo.org/records/13968456
+
+```{r gene_counts}
+download.file(url = "https://zenodo.org/records/13968456/files/rsem.merged.gene_counts.tsv?download=1", destfile = "rsem.merged.gene_counts.tsv")
+gene_counts <- read_tsv("rsem.merged.gene_counts.tsv", show_col_types = FALSE)
+head(gene_counts)
+```
+
+Metadata.
+
+```{r metadata}
+tibble::tribble(
+  ~sample, ~run_id, ~group,
+  "C2_norm", "ERR160122", "normal",
+  "C3_norm", "ERR160123", "normal",
+  "C1_norm", "ERR164473", "normal",
+  "C1_cancer", "ERR164550", "cancer",
+  "C2_cancer", "ERR164551", "cancer",
+  "C3_cancer", "ERR164552", "cancer"
+) -> my_metadata
+
+my_metadata$group <- factor(my_metadata$group, levels = c('normal', 'cancer'))
+```
+
+## DGEList
+
+The input to `edgeR` is the `DGEList` object. The required inputs for creating a `DGEList` object is the count table and a grouping factor.
+
+```{r dgelist_obj, include=FALSE}
+gene_counts |>
+  dplyr::select(starts_with("ERR")) |>
+  mutate(across(everything(), as.integer)) |>
+  as.matrix() -> gene_counts_mat
+
+row.names(gene_counts_mat) <- gene_counts$gene_id
+
+idx <- match(colnames(gene_counts_mat), my_metadata$run_id)
+colnames(gene_counts_mat) <- my_metadata$sample[idx]
+
+y <- DGEList(
+  counts = gene_counts_mat,
+  group = my_metadata$group[idx]
+)
+
+y
+```
+
+## Filtering to remove low counts
+
+Remove genes that are lowly expressed.
+
+```{r filter_low_counts}
+keep <- rowSums(cpm(y) > 0.5) >= 2
+y <- y[keep, , keep.lib.sizes=FALSE]
+y
+```
+
+## Normalisation for composition bias
+
+> The `normLibSizes()` function normalizes the library sizes in such a way to minimize the log-fold changes between the samples for most genes. The default method for computing these scale factors uses a trimmed mean of M-values (TMM) between each pair of samples. We call the product of the original library size and the scaling factor the effective library size, i.e., the normalized library size. The effective library size replaces the original library size in all downstream analyses
+
+```{r calc_norm_factors, include=FALSE}
+y <- normLibSizes(y)
+y
+```
+
+## MDS
+
+```{r mds}
+plotMDS(y, plot = FALSE)$eigen.vectors[, 1:2] |>
+  as.data.frame() |>
+  cbind(my_metadata) |>
+  dplyr::rename(`Eigenvector 1` = V1, `Eigenvector 2` = V2) |>
+  ggplot(aes(`Eigenvector 1`, `Eigenvector 2`, colour = group, label = sample)) +
+  geom_point(size = 2) +
+  geom_text_repel(show.legend = FALSE) +
+  theme_minimal() +
+  ggtitle("MDS plot")
+```
+
+## Differential expression
+
+```{r de}
+design <- model.matrix(~y$samples$group)
+y <- estimateDisp(y, design, robust=TRUE)
+fit <- glmQLFit(y, design, robust=TRUE)
+res <- glmQLFTest(fit)
+topTags(res)
+```
