@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3661a2e11475b2b827b70a86800c1e939966510dtargetblank3661a2ea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreedda9d85bb9e9c9117d4f65bbdae02328ae957c9btargetblankdda9d85a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/3661a2e11475b2b827b70a86800c1e939966510d" target="_blank">3661a2e</a>
+<a href="https://github.com/davetang/muse/tree/dda9d85bb9e9c9117d4f65bbdae02328ae957c9b" target="_blank">dda9d85</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3661a2e11475b2b827b70a86800c1e939966510dtargetblank3661a2ea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreedda9d85bb9e9c9117d4f65bbdae02328ae957c9btargetblankdda9d85a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/3661a2e11475b2b827b70a86800c1e939966510d" target="_blank">3661a2e</a>.
+<a href="https://github.com/davetang/muse/tree/dda9d85bb9e9c9117d4f65bbdae02328ae957c9b" target="_blank">dda9d85</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -606,6 +606,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/dda9d85bb9e9c9117d4f65bbdae02328ae957c9b/analysis/edger_de.Rmd" target="_blank">dda9d85</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-22
+</td>
+<td>
+Visualise DEGs
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/6625ffc621574b3db7638f082be40db4d548d0c2/docs/edger_de.html" target="_blank">6625ffc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -692,7 +726,12 @@ BiocManager::install(&quot;edgeR&quot;)</code></pre>
 <p><a href="https://zenodo.org/records/13970886"
 class="uri">https://zenodo.org/records/13970886</a></p>
 <pre class="r"><code>my_url &lt;- &#39;https://zenodo.org/records/13970886/files/rsem.merged.gene_counts.tsv?download=1&#39;
-download.file(url = my_url, destfile = &quot;rsem.merged.gene_counts.tsv&quot;)
+my_file &lt;- &#39;rsem.merged.gene_counts.tsv&#39;
+
+if(file.exists(my_file) == FALSE){
+  download.file(url = my_url, destfile = my_file)
+}
+
 gene_counts &lt;- read_tsv(&quot;rsem.merged.gene_counts.tsv&quot;, show_col_types = FALSE)
 head(gene_counts)</code></pre>
 <pre><code># A tibble: 6 × 10
@@ -808,6 +847,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/6625ffc621574b3db7638f082be40db4d548d0c2/docs/figure/edger_de.Rmd/mds-1.png" target="_blank">6625ffc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-22
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/c9037d1312e24959a4f379125e2f1732175787f0/docs/figure/edger_de.Rmd/mds-1.png" target="_blank">c9037d1</a>
 </td>
 <td>
@@ -841,6 +891,45 @@ ENSG00000196778 -8.815389 4.237774  56.19864 2.296578e-06 0.003612063
 ENSG00000166091 -7.247200 2.881457  54.63510 2.658697e-06 0.003612063
 ENSG00000240890 -9.077199 4.702122  53.69560 3.074356e-06 0.003612063
 ENSG00000224781 -7.116543 2.556254  51.43346 3.645089e-06 0.003612063</code></pre>
+<p>CPM.</p>
+<pre class="r"><code>my_cpms &lt;- cpm(y, prior.count=2, log=TRUE)
+head(my_cpms)</code></pre>
+<pre><code>                  C2_norm    C3_norm    C5_norm   C1_norm C1_cancer C2_cancer
+ENSG00000000003 -1.159752 -0.1258585 -0.7121002  4.810340  6.485360  4.775676
+ENSG00000000005  1.635961  2.4187173  1.4850268 -2.893182 -2.401590 -2.893182
+ENSG00000000419  5.394869  5.1582110  5.3528004  5.195507  5.127070  5.209251
+ENSG00000000457  5.819453  5.8738922  5.7548326  4.763521  5.053005  4.898404
+ENSG00000000460  4.608265  4.5916439  4.6586766  2.696179  4.103099  3.344387
+ENSG00000000938  1.959920  1.6469490  1.9786359  6.464501  4.539243  7.133878
+                C3_cancer C5_cancer
+ENSG00000000003  5.649383  4.933136
+ENSG00000000005 -2.893182 -2.893182
+ENSG00000000419  5.837817  5.307028
+ENSG00000000457  4.968242  4.700693
+ENSG00000000460  2.884458  3.100561
+ENSG00000000938  5.947951  5.961622</code></pre>
+<p>Down-regulated genes with respect to the cancer group.</p>
+<pre class="r"><code>topTags(res, n = Inf) |&gt;
+  as.data.frame() |&gt;
+  dplyr::filter(FDR &lt; 0.01) |&gt;
+  dplyr::filter(logFC &lt; 0) |&gt;
+  dplyr::slice_min(order_by = FDR, n = 20, with_ties = FALSE) |&gt;
+  row.names() -&gt; down_genes
+
+my_cpms[down_genes, ] |&gt;
+  pheatmap()</code></pre>
+<p><img src="figure/edger_de.Rmd/down_regulated_genes-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Up-regulated genes with respect to the cancer group.</p>
+<pre class="r"><code>topTags(res, n = Inf) |&gt;
+  as.data.frame() |&gt;
+  dplyr::filter(FDR &lt; 0.01) |&gt;
+  dplyr::filter(logFC &gt; 0) |&gt;
+  dplyr::slice_min(order_by = FDR, n = 20, with_ties = FALSE) |&gt;
+  row.names() -&gt; up_genes
+
+my_cpms[up_genes, ] |&gt;
+  pheatmap()</code></pre>
+<p><img src="figure/edger_de.Rmd/up_regulated_genes-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -873,28 +962,29 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] ggrepel_0.9.5   edgeR_4.2.1     limma_3.60.4    lubridate_1.9.3
- [5] forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4     purrr_1.0.2    
- [9] readr_2.1.5     tidyr_1.3.1     tibble_3.2.1    ggplot2_3.5.1  
-[13] tidyverse_2.0.0 workflowr_1.7.1
+ [1] pheatmap_1.0.12 ggrepel_0.9.5   edgeR_4.2.1     limma_3.60.4   
+ [5] lubridate_1.9.3 forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4    
+ [9] purrr_1.0.2     readr_2.1.5     tidyr_1.3.1     tibble_3.2.1   
+[13] ggplot2_3.5.1   tidyverse_2.0.0 workflowr_1.7.1
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.5      xfun_0.44         bslib_0.7.0       processx_3.8.4   
- [5] lattice_0.22-6    callr_3.7.6       tzdb_0.4.0        vctrs_0.6.5      
- [9] tools_4.4.0       ps_1.7.6          generics_0.1.3    parallel_4.4.0   
-[13] fansi_1.0.6       highr_0.11        pkgconfig_2.0.3   lifecycle_1.0.4  
-[17] farver_2.1.2      compiler_4.4.0    git2r_0.33.0      statmod_1.5.0    
-[21] munsell_0.5.1     getPass_0.2-4     httpuv_1.6.15     htmltools_0.5.8.1
-[25] sass_0.4.9        yaml_2.3.8        later_1.3.2       pillar_1.9.0     
-[29] crayon_1.5.2      jquerylib_0.1.4   whisker_0.4.1     cachem_1.1.0     
-[33] tidyselect_1.2.1  locfit_1.5-9.9    digest_0.6.37     stringi_1.8.4    
-[37] splines_4.4.0     labeling_0.4.3    rprojroot_2.0.4   fastmap_1.2.0    
-[41] grid_4.4.0        colorspace_2.1-0  cli_3.6.3         magrittr_2.0.3   
-[45] utf8_1.2.4        withr_3.0.1       scales_1.3.0      promises_1.3.0   
-[49] bit64_4.0.5       timechange_0.3.0  rmarkdown_2.27    httr_1.4.7       
-[53] bit_4.0.5         hms_1.1.3         evaluate_0.24.0   knitr_1.47       
-[57] rlang_1.1.4       Rcpp_1.0.12       glue_1.7.0        rstudioapi_0.16.0
-[61] vroom_1.6.5       jsonlite_1.8.8    R6_2.5.1          fs_1.6.4         </code></pre>
+ [1] gtable_0.3.5       xfun_0.44          bslib_0.7.0        processx_3.8.4    
+ [5] lattice_0.22-6     callr_3.7.6        tzdb_0.4.0         vctrs_0.6.5       
+ [9] tools_4.4.0        ps_1.7.6           generics_0.1.3     parallel_4.4.0    
+[13] fansi_1.0.6        highr_0.11         pkgconfig_2.0.3    RColorBrewer_1.1-3
+[17] lifecycle_1.0.4    farver_2.1.2       compiler_4.4.0     git2r_0.33.0      
+[21] statmod_1.5.0      munsell_0.5.1      getPass_0.2-4      httpuv_1.6.15     
+[25] htmltools_0.5.8.1  sass_0.4.9         yaml_2.3.8         crayon_1.5.2      
+[29] later_1.3.2        pillar_1.9.0       jquerylib_0.1.4    whisker_0.4.1     
+[33] cachem_1.1.0       tidyselect_1.2.1   locfit_1.5-9.9     digest_0.6.37     
+[37] stringi_1.8.4      splines_4.4.0      labeling_0.4.3     rprojroot_2.0.4   
+[41] fastmap_1.2.0      grid_4.4.0         colorspace_2.1-0   cli_3.6.3         
+[45] magrittr_2.0.3     utf8_1.2.4         withr_3.0.1        scales_1.3.0      
+[49] promises_1.3.0     bit64_4.0.5        timechange_0.3.0   rmarkdown_2.27    
+[53] httr_1.4.7         bit_4.0.5          hms_1.1.3          evaluate_0.24.0   
+[57] knitr_1.47         rlang_1.1.4        Rcpp_1.0.12        glue_1.7.0        
+[61] rstudioapi_0.16.0  vroom_1.6.5        jsonlite_1.8.8     R6_2.5.1          
+[65] fs_1.6.4          </code></pre>
 </div>
 </div>
 </div>
