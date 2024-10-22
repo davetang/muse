@@ -32,10 +32,11 @@ BiocManager::install("edgeR")
 
 ## Data
 
-https://zenodo.org/records/13968456
+https://zenodo.org/records/13970886
 
 ```{r gene_counts}
-download.file(url = "https://zenodo.org/records/13968456/files/rsem.merged.gene_counts.tsv?download=1", destfile = "rsem.merged.gene_counts.tsv")
+my_url <- 'https://zenodo.org/records/13970886/files/rsem.merged.gene_counts.tsv?download=1'
+download.file(url = my_url, destfile = "rsem.merged.gene_counts.tsv")
 gene_counts <- read_tsv("rsem.merged.gene_counts.tsv", show_col_types = FALSE)
 head(gene_counts)
 ```
@@ -47,10 +48,12 @@ tibble::tribble(
   ~sample, ~run_id, ~group,
   "C2_norm", "ERR160122", "normal",
   "C3_norm", "ERR160123", "normal",
+  "C5_norm", "ERR160124", "normal",
   "C1_norm", "ERR164473", "normal",
   "C1_cancer", "ERR164550", "cancer",
   "C2_cancer", "ERR164551", "cancer",
-  "C3_cancer", "ERR164552", "cancer"
+  "C3_cancer", "ERR164552", "cancer",
+  "C5_cancer", "ERR164554", "cancer"
 ) -> my_metadata
 
 my_metadata$group <- factor(my_metadata$group, levels = c('normal', 'cancer'))
