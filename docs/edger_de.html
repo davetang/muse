@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef7369ced3bf60f895b1ed68e76165c2eb43a5c7etargetblankf7369cea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3661a2e11475b2b827b70a86800c1e939966510dtargetblank3661a2ea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/f7369ced3bf60f895b1ed68e76165c2eb43a5c7e" target="_blank">f7369ce</a>
+<a href="https://github.com/davetang/muse/tree/3661a2e11475b2b827b70a86800c1e939966510d" target="_blank">3661a2e</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef7369ced3bf60f895b1ed68e76165c2eb43a5c7etargetblankf7369cea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3661a2e11475b2b827b70a86800c1e939966510dtargetblank3661a2ea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/f7369ced3bf60f895b1ed68e76165c2eb43a5c7e" target="_blank">f7369ce</a>.
+<a href="https://github.com/davetang/muse/tree/3661a2e11475b2b827b70a86800c1e939966510d" target="_blank">3661a2e</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -611,6 +611,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/3661a2e11475b2b827b70a86800c1e939966510d/analysis/edger_de.Rmd" target="_blank">3661a2e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-22
+</td>
+<td>
+Additional sample
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/c9037d1312e24959a4f379125e2f1732175787f0/docs/edger_de.html" target="_blank">c9037d1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/f7369ced3bf60f895b1ed68e76165c2eb43a5c7e/analysis/edger_de.Rmd" target="_blank">f7369ce</a>
 </td>
 <td>
@@ -655,30 +689,33 @@ BiocManager::install(&quot;edgeR&quot;)</code></pre>
 </div>
 <div id="data" class="section level2">
 <h2>Data</h2>
-<p><a href="https://zenodo.org/records/13968456"
-class="uri">https://zenodo.org/records/13968456</a></p>
-<pre class="r"><code>download.file(url = &quot;https://zenodo.org/records/13968456/files/rsem.merged.gene_counts.tsv?download=1&quot;, destfile = &quot;rsem.merged.gene_counts.tsv&quot;)
+<p><a href="https://zenodo.org/records/13970886"
+class="uri">https://zenodo.org/records/13970886</a></p>
+<pre class="r"><code>my_url &lt;- &#39;https://zenodo.org/records/13970886/files/rsem.merged.gene_counts.tsv?download=1&#39;
+download.file(url = my_url, destfile = &quot;rsem.merged.gene_counts.tsv&quot;)
 gene_counts &lt;- read_tsv(&quot;rsem.merged.gene_counts.tsv&quot;, show_col_types = FALSE)
 head(gene_counts)</code></pre>
-<pre><code># A tibble: 6 × 8
-  gene_id   `transcript_id(s)` ERR160122 ERR160123 ERR164473 ERR164550 ERR164551
+<pre><code># A tibble: 6 × 10
+  gene_id   `transcript_id(s)` ERR160122 ERR160123 ERR160124 ERR164473 ERR164550
   &lt;chr&gt;     &lt;chr&gt;                  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
-1 ENSG0000… ENST00000373020,E…        2         6      374       1637       650 
-2 ENSG0000… ENST00000373031,E…       19        40        0          1         0 
-3 ENSG0000… ENST00000371582,E…      268.      274.     489        637       879 
-4 ENSG0000… ENST00000367770,E…      360.      449.     363.       606.      709.
-5 ENSG0000… ENST00000286031,E…      156.      185.      85.4      312.      239.
-6 ENSG0000… ENST00000374003,E…       24        23     1181        423      3346 
-# ℹ 1 more variable: ERR164552 &lt;dbl&gt;</code></pre>
+1 ENSG0000… ENST00000373020,E…        2         6         5      374       1637 
+2 ENSG0000… ENST00000373031,E…       19        40        28        0          1 
+3 ENSG0000… ENST00000371582,E…      268.      274.      429.     489        637 
+4 ENSG0000… ENST00000367770,E…      360.      449.      566.     363.       606.
+5 ENSG0000… ENST00000286031,E…      156.      185.      265.      85.4      312.
+6 ENSG0000… ENST00000374003,E…       24        23        40     1181        423 
+# ℹ 3 more variables: ERR164551 &lt;dbl&gt;, ERR164552 &lt;dbl&gt;, ERR164554 &lt;dbl&gt;</code></pre>
 <p>Metadata.</p>
 <pre class="r"><code>tibble::tribble(
   ~sample, ~run_id, ~group,
   &quot;C2_norm&quot;, &quot;ERR160122&quot;, &quot;normal&quot;,
   &quot;C3_norm&quot;, &quot;ERR160123&quot;, &quot;normal&quot;,
+  &quot;C5_norm&quot;, &quot;ERR160124&quot;, &quot;normal&quot;,
   &quot;C1_norm&quot;, &quot;ERR164473&quot;, &quot;normal&quot;,
   &quot;C1_cancer&quot;, &quot;ERR164550&quot;, &quot;cancer&quot;,
   &quot;C2_cancer&quot;, &quot;ERR164551&quot;, &quot;cancer&quot;,
-  &quot;C3_cancer&quot;, &quot;ERR164552&quot;, &quot;cancer&quot;
+  &quot;C3_cancer&quot;, &quot;ERR164552&quot;, &quot;cancer&quot;,
+  &quot;C5_cancer&quot;, &quot;ERR164554&quot;, &quot;cancer&quot;
 ) -&gt; my_metadata
 
 my_metadata$group &lt;- factor(my_metadata$group, levels = c(&#39;normal&#39;, &#39;cancer&#39;))</code></pre>
@@ -697,22 +734,30 @@ y &lt;- y[keep, , keep.lib.sizes=FALSE]
 y</code></pre>
 <pre><code>An object of class &quot;DGEList&quot;
 $counts
-                C2_norm C3_norm C1_norm C1_cancer C2_cancer C3_cancer
-ENSG00000000003       2       6     374      1637       650      1015
-ENSG00000000005      19      40       0         1         0         0
-ENSG00000000419     268     273     489       637       879      1157
-ENSG00000000457     360     449     362       605       708       632
-ENSG00000000460     155     184      85       312       239       147
-35001 more rows ...
+                C2_norm C3_norm C5_norm C1_norm C1_cancer C2_cancer C3_cancer
+ENSG00000000003       2       6       5     374      1637       650      1015
+ENSG00000000005      19      40      28       0         1         0         0
+ENSG00000000419     268     273     428     489       637       879      1157
+ENSG00000000457     360     449     566     362       605       708       632
+ENSG00000000460     155     184     264      85       312       239       147
+                C5_cancer
+ENSG00000000003       562
+ENSG00000000005         0
+ENSG00000000419       729
+ENSG00000000457       478
+ENSG00000000460       156
+37419 more rows ...
 
 $samples
            group lib.size norm.factors
-C2_norm   normal  4415649            1
-C3_norm   normal  5326875            1
-C1_norm   normal 15961581            1
-C1_cancer cancer 22314452            1
-C2_cancer cancer 29908600            1
-C3_cancer cancer 24872257            1</code></pre>
+C2_norm   normal  4431282            1
+C3_norm   normal  5337400            1
+C5_norm   normal  7594512            1
+C1_norm   normal 15964680            1
+C1_cancer cancer 22317658            1
+C2_cancer cancer 29912740            1
+C3_cancer cancer 24876336            1
+C5_cancer cancer 23693355            1</code></pre>
 </div>
 <div id="normalisation-for-composition-bias" class="section level2">
 <h2>Normalisation for composition bias</h2>
@@ -739,6 +784,43 @@ analyses</p>
   theme_minimal() +
   ggtitle(&quot;MDS plot&quot;)</code></pre>
 <p><img src="figure/edger_de.Rmd/mds-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-mds-1">
+Past versions of mds-1.png
+</button>
+</p>
+<div id="fig-mds-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/c9037d1312e24959a4f379125e2f1732175787f0/docs/figure/edger_de.Rmd/mds-1.png" target="_blank">c9037d1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-22
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="differential-expression" class="section level2">
 <h2>Differential expression</h2>
@@ -748,17 +830,17 @@ fit &lt;- glmQLFit(y, design, robust=TRUE)
 res &lt;- glmQLFTest(fit)
 topTags(res)</code></pre>
 <pre><code>Coefficient:  y$samples$groupcancer 
-                    logFC   logCPM        F       PValue        FDR
-ENSG00000100985  5.970692 5.990789 73.55648 2.690923e-05 0.07372405
-ENSG00000289381 -7.325570 2.197344 47.78707 5.721670e-05 0.07372405
-ENSG00000070601 -9.280195 4.481223 41.00090 7.330913e-05 0.07372405
-ENSG00000198183  7.916863 5.844195 41.62005 7.841906e-05 0.07372405
-ENSG00000229894 -8.996482 4.718492 32.85812 1.377647e-04 0.07372405
-ENSG00000151834 -7.764571 3.500301 32.77897 1.391503e-04 0.07372405
-ENSG00000241351  5.176813 5.765535 46.46008 1.539133e-04 0.07372405
-ENSG00000204961 -9.182288 4.898420 31.83417 1.572426e-04 0.07372405
-ENSG00000185972 -6.786526 3.568939 34.93787 1.689653e-04 0.07372405
-ENSG00000145934 -8.497381 6.014324 38.79728 1.892544e-04 0.07372405</code></pre>
+                    logFC   logCPM         F       PValue         FDR
+ENSG00000289381 -7.412756 2.341373 127.60623 2.767866e-08 0.001035846
+ENSG00000151834 -8.027915 3.644102  64.37842 1.049799e-06 0.003612063
+ENSG00000250696 -8.602174 3.809297  63.66033 1.249401e-06 0.003612063
+ENSG00000229894 -9.123230 4.910552  60.16361 1.751012e-06 0.003612063
+ENSG00000100985  5.735426 5.769059  99.70828 2.012691e-06 0.003612063
+ENSG00000167910 -8.022082 3.453041  56.63286 2.199494e-06 0.003612063
+ENSG00000196778 -8.815389 4.237774  56.19864 2.296578e-06 0.003612063
+ENSG00000166091 -7.247200 2.881457  54.63510 2.658697e-06 0.003612063
+ENSG00000240890 -9.077199 4.702122  53.69560 3.074356e-06 0.003612063
+ENSG00000224781 -7.116543 2.556254  51.43346 3.645089e-06 0.003612063</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
