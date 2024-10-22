@@ -10,6 +10,7 @@ output:
 library(tidyverse)
 library(edgeR)
 library(ggrepel)
+library(pheatmap)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -36,7 +37,12 @@ https://zenodo.org/records/13970886
 
 ```{r gene_counts}
 my_url <- 'https://zenodo.org/records/13970886/files/rsem.merged.gene_counts.tsv?download=1'
-download.file(url = my_url, destfile = "rsem.merged.gene_counts.tsv")
+my_file <- 'rsem.merged.gene_counts.tsv'
+
+if(file.exists(my_file) == FALSE){
+  download.file(url = my_url, destfile = my_file)
+}
+
 gene_counts <- read_tsv("rsem.merged.gene_counts.tsv", show_col_types = FALSE)
 head(gene_counts)
 ```
@@ -123,4 +129,39 @@ y <- estimateDisp(y, design, robust=TRUE)
 fit <- glmQLFit(y, design, robust=TRUE)
 res <- glmQLFTest(fit)
 topTags(res)
+```
+
+CPM.
+
+```{r my_cpms}
+my_cpms <- cpm(y, prior.count=2, log=TRUE)
+head(my_cpms)
+```
+
+Down-regulated genes with respect to the cancer group.
+
+```{r down_regulated_genes}
+topTags(res, n = Inf) |>
+  as.data.frame() |>
+  dplyr::filter(FDR < 0.01) |>
+  dplyr::filter(logFC < 0) |>
+  dplyr::slice_min(order_by = FDR, n = 20, with_ties = FALSE) |>
+  row.names() -> down_genes
+
+my_cpms[down_genes, ] |>
+  pheatmap()
+```
+
+Up-regulated genes with respect to the cancer group.
+
+```{r up_regulated_genes}
+topTags(res, n = Inf) |>
+  as.data.frame() |>
+  dplyr::filter(FDR < 0.01) |>
+  dplyr::filter(logFC > 0) |>
+  dplyr::slice_min(order_by = FDR, n = 20, with_ties = FALSE) |>
+  row.names() -> up_genes
+
+my_cpms[up_genes, ] |>
+  pheatmap()
 ```
