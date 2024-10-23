@@ -63,7 +63,7 @@ my_metadata$group <- factor(my_metadata$group, levels = c('normal', 'cancer'))
 
 Matrix.
 
-```{r dgelist_obj, include=FALSE}
+```{r dgelist_obj}
 gene_counts |>
   dplyr::select(starts_with("ERR")) |>
   mutate(across(everything(), as.integer)) |>
@@ -88,7 +88,7 @@ tail(gene_counts_mat)
 
 ## edgeR workflow
 
-```{r edger_wf, include=FALSE}
+```{r edger_wf}
 y <- DGEList(
   counts = gene_counts_mat,
   group = my_metadata$group
@@ -184,4 +184,36 @@ data.frame(n = ns, index = jis) |>
   geom_point() +
   theme_minimal() +
   labs(x = 'Subset size', y = 'Jaccard Index')
+```
+
+## Compare significances
+
+```{r my_signif}
+topTags(res, n = Inf, adjust.method = "BH") |>
+  as.data.frame() -> edger_signif
+
+lung_cancer_res |>
+  as.data.frame() -> deseq2_signif
+
+idx <- match(row.names(deseq2_signif), row.names(edger_signif))
+
+my_signif <- cbind(edger_signif, deseq2_signif[idx, ])
+
+my_signif |>
+  dplyr::filter(FDR < my_thres) |>
+  ggplot(aes(PValue, pvalue)) +
+  geom_point() +
+  theme_minimal() +
+  labs(x = "edgeR p-value", y = "DESeq2 p-value")
+```
+
+Small subset of highly significant genes using edgeR but not significant using DESeq2.
+
+```{r discordant}
+my_signif |>
+  dplyr::filter(FDR < my_thres) |>
+  dplyr::filter(padj > 0.95) |>
+  row.names() -> discordant
+  
+gene_counts_mat[discordant, ]
 ```
