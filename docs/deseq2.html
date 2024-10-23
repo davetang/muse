@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree43e93eec7601010ac35c5bfa4c438d7640379ed8targetblank43e93eea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea7171db654aab9b8ed6ca509209026925a1e6347targetblanka7171dba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/43e93eec7601010ac35c5bfa4c438d7640379ed8" target="_blank">43e93ee</a>
+<a href="https://github.com/davetang/muse/tree/a7171db654aab9b8ed6ca509209026925a1e6347" target="_blank">a7171db</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree43e93eec7601010ac35c5bfa4c438d7640379ed8targetblank43e93eea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea7171db654aab9b8ed6ca509209026925a1e6347targetblanka7171dba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/43e93eec7601010ac35c5bfa4c438d7640379ed8" target="_blank">43e93ee</a>.
+<a href="https://github.com/davetang/muse/tree/a7171db654aab9b8ed6ca509209026925a1e6347" target="_blank">a7171db</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -605,6 +605,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/a7171db654aab9b8ed6ca509209026925a1e6347/analysis/deseq2.Rmd" target="_blank">a7171db</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-23
+</td>
+<td>
+Update GSE40419 analysis
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/c87a7d43ff9635e724fba6b65c783bbfed95fa22/docs/deseq2.html" target="_blank">c87a7d4</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1473,7 +1507,7 @@ my_metadata</code></pre>
 6 C2_cancer ERR164551 cancer
 7 C3_cancer ERR164552 cancer
 8 C5_cancer ERR164554 cancer</code></pre>
-<p>Prepare DESeqDataSet.</p>
+<p>Filter out lowly expressed genes.</p>
 <pre class="r"><code>gene_counts |&gt;
   dplyr::select(starts_with(&quot;ERR&quot;)) |&gt;
   mutate(across(everything(), as.integer)) |&gt;
@@ -1484,7 +1518,14 @@ row.names(gene_counts_mat) &lt;- gene_counts$gene_id
 idx &lt;- match(colnames(gene_counts_mat), my_metadata$run_id)
 colnames(gene_counts_mat) &lt;- my_metadata$sample[idx]
 
-lung_cancer &lt;- DESeqDataSetFromMatrix(
+apply(gene_counts_mat, 2, function(x) x / sum(x) * 1000000) |&gt;
+  rowSums() &gt; 2 -&gt; wanted
+
+gene_counts_mat &lt;- gene_counts_mat[wanted, ]
+dim(gene_counts_mat)</code></pre>
+<pre><code>[1] 36900     8</code></pre>
+<p>Prepare DESeqDataSet.</p>
+<pre class="r"><code>lung_cancer &lt;- DESeqDataSetFromMatrix(
   countData = gene_counts_mat,
   colData   = my_metadata[idx, ],
   design    = ~ group
@@ -1492,10 +1533,10 @@ lung_cancer &lt;- DESeqDataSetFromMatrix(
 
 lung_cancer</code></pre>
 <pre><code>class: DESeqDataSet 
-dim: 63140 8 
+dim: 36900 8 
 metadata(1): version
 assays(1): counts
-rownames(63140): ENSG00000000003 ENSG00000000005 ... ENSG00000293599
+rownames(36900): ENSG00000000003 ENSG00000000005 ... ENSG00000293597
   ENSG00000293600
 rowData names(0):
 colnames(8): C2_norm C3_norm ... C3_cancer C5_cancer
@@ -1516,20 +1557,41 @@ Wald test p-value: group cancer vs normal
 DataFrame with 6 rows and 6 columns
                  baseMean log2FoldChange     lfcSE      stat      pvalue
                 &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;   &lt;numeric&gt;
-ENSG00000211893 13300.254        6.55285  0.585259  11.19649 4.24205e-29
-ENSG00000100985   629.132        5.36408  0.513718  10.44169 1.59941e-25
-ENSG00000211892  4183.252        5.10066  0.501574  10.16931 2.71832e-24
-ENSG00000236424  2169.213      -29.41729  3.052017  -9.63864 5.49116e-22
-ENSG00000172288   756.158      -27.97004  2.913459  -9.60029 7.97227e-22
-ENSG00000182415   512.135      -27.43124  2.915162  -9.40985 4.96849e-21
+ENSG00000211893 13277.584        6.54799  0.562406  11.64280 2.49672e-31
+ENSG00000100985   628.157        5.35768  0.491941  10.89089 1.27383e-27
+ENSG00000211892  4176.713        5.09335  0.480149  10.60785 2.73988e-26
+ENSG00000169385   214.621       -4.60366  0.483223  -9.52698 1.61933e-21
+ENSG00000172288   760.003      -27.98108  2.967092  -9.43047 4.08244e-21
+ENSG00000211897  6685.953        5.40443  0.572781   9.43543 3.89389e-21
                        padj
                   &lt;numeric&gt;
-ENSG00000211893 1.83333e-24
-ENSG00000100985 3.45618e-21
-ENSG00000211892 3.91601e-20
-ENSG00000236424 5.93292e-18
-ENSG00000172288 6.89091e-18
-ENSG00000182415 3.57880e-17</code></pre>
+ENSG00000211893 9.04462e-27
+ENSG00000100985 2.30729e-23
+ENSG00000211892 3.30849e-22
+ENSG00000169385 1.46654e-17
+ENSG00000172288 1.94159e-17
+ENSG00000211897 1.94159e-17</code></pre>
+<div id="exploring-the-results-1" class="section level3">
+<h3>Exploring the results</h3>
+<pre class="r"><code>ggplot(as(lung_cancer_res, &quot;data.frame&quot;), aes(x = pvalue)) +
+  geom_histogram(binwidth = 0.01, fill = &quot;Royalblue&quot;, boundary = 0) +
+  geom_hline(yintercept = 100, lty = 3) +
+  theme_minimal()</code></pre>
+<pre><code>Warning: Removed 674 rows containing non-finite outside the scale range
+(`stat_bin()`).</code></pre>
+<p><img src="figure/deseq2.Rmd/lung_pvalue_hist-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>table(lung_cancer_res$pvalue &lt; 0.01)</code></pre>
+<pre><code>
+FALSE  TRUE 
+16892 19334 </code></pre>
+<pre class="r"><code># transform using regularised logarithm
+plotPCA(rlogTransformation(lung_cancer), intgroup=&quot;group&quot;) +
+  coord_fixed() +
+  theme_minimal()</code></pre>
+<pre><code>using ntop=500 top features by variance</code></pre>
+<pre><code>Coordinate system already present. Adding new coordinate system, which will
+replace the existing one.</code></pre>
+<p><img src="figure/deseq2.Rmd/lung_deseq2_pca-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1613,6 +1675,7 @@ loaded via a namespace (and not attached):
  [94] blob_1.2.4              prettyunits_1.2.0       bitops_1.0-7           
  [97] scales_1.3.0            crayon_1.5.2            rlang_1.1.4            
 [100] KEGGREST_1.44.1        </code></pre>
+</div>
 </div>
 </div>
 </div>
