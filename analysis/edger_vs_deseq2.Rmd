@@ -217,3 +217,16 @@ my_signif |>
   
 gene_counts_mat[discordant, ]
 ```
+
+Small subset of highly significant genes using DESeq2 but not significant using edgeR.
+
+```{r discordant2}
+my_signif |>
+  dplyr::filter(padj < my_thres) |>
+  dplyr::filter(FDR > 0.99) |>
+  row.names() -> discordant2
+  
+gene_counts_mat[discordant2, ]
+```
+
+Seems I'm not running DESeq2 properly.
