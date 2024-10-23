@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-08-06" />
+<meta name="date" content="2024-10-23" />
 
 <title>Differential gene expression analysis with DESeq2</title>
 
@@ -360,7 +360,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Differential gene expression analysis with
 DESeq2</h1>
-<h4 class="date">2024-08-06</h4>
+<h4 class="date">2024-10-23</h4>
 
 </div>
 
@@ -389,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-08-06
+<strong>Last updated:</strong> 2024-10-23
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree665782bb8465a8773d6924849ed75eae1772f1b5targetblank665782ba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree43e93eec7601010ac35c5bfa4c438d7640379ed8targetblank43e93eea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/665782bb8465a8773d6924849ed75eae1772f1b5" target="_blank">665782b</a>
+<a href="https://github.com/davetang/muse/tree/43e93eec7601010ac35c5bfa4c438d7640379ed8" target="_blank">43e93ee</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree665782bb8465a8773d6924849ed75eae1772f1b5targetblank665782ba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree43e93eec7601010ac35c5bfa4c438d7640379ed8targetblank43e93eea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/665782bb8465a8773d6924849ed75eae1772f1b5" target="_blank">665782b</a>.
+<a href="https://github.com/davetang/muse/tree/43e93eec7601010ac35c5bfa4c438d7640379ed8" target="_blank">43e93ee</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -555,8 +555,13 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    r_packages_4.3.3/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k/
     Ignored:    r_packages_4.4.0/
+
+Untracked files:
+    Untracked:  rsem.merged.gene_counts.tsv
 
 </code></pre>
 <p>
@@ -600,6 +605,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/43e93eec7601010ac35c5bfa4c438d7640379ed8/analysis/deseq2.Rmd" target="_blank">43e93ee</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-23
+</td>
+<td>
+Analyse GSE40419
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4a637475b54f993583ced625f6d377a403017ea5/docs/deseq2.html" target="_blank">4a63747</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-08-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1383,6 +1422,114 @@ fluntuations around the mean between the replicates. This approach,
 which is called <strong>least sum of squares fitting</strong>, is
 mathematically convenient, since it can be achieved by straight-forward
 matrix algebra and it is what the <code>lm()</code> function does.</p>
+</div>
+<div id="gse40419" class="section level2">
+<h2>GSE40419</h2>
+<p>Processed data available at <a
+href="https://zenodo.org/records/13970886"
+class="uri">https://zenodo.org/records/13970886</a>.</p>
+<pre class="r"><code>my_url &lt;- &#39;https://zenodo.org/records/13970886/files/rsem.merged.gene_counts.tsv?download=1&#39;
+my_file &lt;- &#39;rsem.merged.gene_counts.tsv&#39;
+
+if(file.exists(my_file) == FALSE){
+  download.file(url = my_url, destfile = my_file)
+}
+
+gene_counts &lt;- read_tsv(&quot;rsem.merged.gene_counts.tsv&quot;, show_col_types = FALSE)
+head(gene_counts)</code></pre>
+<pre><code># A tibble: 6 × 10
+  gene_id   `transcript_id(s)` ERR160122 ERR160123 ERR160124 ERR164473 ERR164550
+  &lt;chr&gt;     &lt;chr&gt;                  &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 ENSG0000… ENST00000373020,E…        2         6         5      374       1637 
+2 ENSG0000… ENST00000373031,E…       19        40        28        0          1 
+3 ENSG0000… ENST00000371582,E…      268.      274.      429.     489        637 
+4 ENSG0000… ENST00000367770,E…      360.      449.      566.     363.       606.
+5 ENSG0000… ENST00000286031,E…      156.      185.      265.      85.4      312.
+6 ENSG0000… ENST00000374003,E…       24        23        40     1181        423 
+# ℹ 3 more variables: ERR164551 &lt;dbl&gt;, ERR164552 &lt;dbl&gt;, ERR164554 &lt;dbl&gt;</code></pre>
+<p>Metadata.</p>
+<pre class="r"><code>tibble::tribble(
+  ~sample, ~run_id, ~group,
+  &quot;C2_norm&quot;, &quot;ERR160122&quot;, &quot;normal&quot;,
+  &quot;C3_norm&quot;, &quot;ERR160123&quot;, &quot;normal&quot;,
+  &quot;C5_norm&quot;, &quot;ERR160124&quot;, &quot;normal&quot;,
+  &quot;C1_norm&quot;, &quot;ERR164473&quot;, &quot;normal&quot;,
+  &quot;C1_cancer&quot;, &quot;ERR164550&quot;, &quot;cancer&quot;,
+  &quot;C2_cancer&quot;, &quot;ERR164551&quot;, &quot;cancer&quot;,
+  &quot;C3_cancer&quot;, &quot;ERR164552&quot;, &quot;cancer&quot;,
+  &quot;C5_cancer&quot;, &quot;ERR164554&quot;, &quot;cancer&quot;
+) -&gt; my_metadata
+
+my_metadata$group &lt;- factor(my_metadata$group, levels = c(&#39;normal&#39;, &#39;cancer&#39;))
+my_metadata</code></pre>
+<pre><code># A tibble: 8 × 3
+  sample    run_id    group 
+  &lt;chr&gt;     &lt;chr&gt;     &lt;fct&gt; 
+1 C2_norm   ERR160122 normal
+2 C3_norm   ERR160123 normal
+3 C5_norm   ERR160124 normal
+4 C1_norm   ERR164473 normal
+5 C1_cancer ERR164550 cancer
+6 C2_cancer ERR164551 cancer
+7 C3_cancer ERR164552 cancer
+8 C5_cancer ERR164554 cancer</code></pre>
+<p>Prepare DESeqDataSet.</p>
+<pre class="r"><code>gene_counts |&gt;
+  dplyr::select(starts_with(&quot;ERR&quot;)) |&gt;
+  mutate(across(everything(), as.integer)) |&gt;
+  as.matrix() -&gt; gene_counts_mat
+
+row.names(gene_counts_mat) &lt;- gene_counts$gene_id
+
+idx &lt;- match(colnames(gene_counts_mat), my_metadata$run_id)
+colnames(gene_counts_mat) &lt;- my_metadata$sample[idx]
+
+lung_cancer &lt;- DESeqDataSetFromMatrix(
+  countData = gene_counts_mat,
+  colData   = my_metadata[idx, ],
+  design    = ~ group
+)
+
+lung_cancer</code></pre>
+<pre><code>class: DESeqDataSet 
+dim: 63140 8 
+metadata(1): version
+assays(1): counts
+rownames(63140): ENSG00000000003 ENSG00000000005 ... ENSG00000293599
+  ENSG00000293600
+rowData names(0):
+colnames(8): C2_norm C3_norm ... C3_cancer C5_cancer
+colData names(3): sample run_id group</code></pre>
+<p>Run <code>DESeq</code>.</p>
+<pre class="r"><code>lung_cancer &lt;- DESeq(lung_cancer)</code></pre>
+<pre><code>estimating size factors</code></pre>
+<pre><code>estimating dispersions</code></pre>
+<pre><code>gene-wise dispersion estimates</code></pre>
+<pre><code>mean-dispersion relationship</code></pre>
+<pre><code>final dispersion estimates</code></pre>
+<pre><code>fitting model and testing</code></pre>
+<p>DE results.</p>
+<pre class="r"><code>lung_cancer_res &lt;- results(lung_cancer)
+lung_cancer_res[order(lung_cancer_res$padj), ] |&gt; head()</code></pre>
+<pre><code>log2 fold change (MLE): group cancer vs normal 
+Wald test p-value: group cancer vs normal 
+DataFrame with 6 rows and 6 columns
+                 baseMean log2FoldChange     lfcSE      stat      pvalue
+                &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;   &lt;numeric&gt;
+ENSG00000211893 13300.254        6.55285  0.585259  11.19649 4.24205e-29
+ENSG00000100985   629.132        5.36408  0.513718  10.44169 1.59941e-25
+ENSG00000211892  4183.252        5.10066  0.501574  10.16931 2.71832e-24
+ENSG00000236424  2169.213      -29.41729  3.052017  -9.63864 5.49116e-22
+ENSG00000172288   756.158      -27.97004  2.913459  -9.60029 7.97227e-22
+ENSG00000182415   512.135      -27.43124  2.915162  -9.40985 4.96849e-21
+                       padj
+                  &lt;numeric&gt;
+ENSG00000211893 1.83333e-24
+ENSG00000100985 3.45618e-21
+ENSG00000211892 3.91601e-20
+ENSG00000236424 5.93292e-18
+ENSG00000172288 6.89091e-18
+ENSG00000182415 3.57880e-17</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1437,15 +1584,15 @@ loaded via a namespace (and not attached):
   [7] zlibbioc_1.50.0         vctrs_0.6.5             memoise_2.0.1          
  [10] Rsamtools_2.20.0        htmltools_0.5.8.1       S4Arrays_1.4.1         
  [13] progress_1.2.3          curl_5.2.1              SparseArray_1.4.8      
- [16] sass_0.4.9              bslib_0.7.0             httr2_1.0.1            
+ [16] sass_0.4.9              bslib_0.7.0             httr2_1.0.2            
  [19] cachem_1.1.0            whisker_0.4.1           lifecycle_1.0.4        
  [22] pkgconfig_2.0.3         Matrix_1.7-0            R6_2.5.1               
- [25] fastmap_1.2.0           GenomeInfoDbData_1.2.12 digest_0.6.35          
+ [25] fastmap_1.2.0           GenomeInfoDbData_1.2.12 digest_0.6.37          
  [28] colorspace_2.1-0        ps_1.7.6                rprojroot_2.0.4        
  [31] geneplotter_1.82.0      RSQLite_2.3.7           hwriter_1.3.2.1        
  [34] filelock_1.0.3          labeling_0.4.3          fansi_1.0.6            
  [37] timechange_0.3.0        httr_1.4.7              abind_1.4-5            
- [40] compiler_4.4.0          bit64_4.0.5             withr_3.0.0            
+ [40] compiler_4.4.0          bit64_4.0.5             withr_3.0.1            
  [43] DBI_1.2.3               highr_0.11              biomaRt_2.60.1         
  [46] rappdirs_0.3.3          DelayedArray_0.30.1     tools_4.4.0            
  [49] httpuv_1.6.15           glue_1.7.0              callr_3.7.6            
@@ -1459,7 +1606,7 @@ loaded via a namespace (and not attached):
  [73] locfit_1.5-9.9          Biostrings_2.72.1       knitr_1.47             
  [76] git2r_0.33.0            xfun_0.44               statmod_1.5.0          
  [79] stringi_1.8.4           UCSC.utils_1.0.0        yaml_2.3.8             
- [82] evaluate_0.24.0         codetools_0.2-20        cli_3.6.2              
+ [82] evaluate_0.24.0         codetools_0.2-20        cli_3.6.3              
  [85] xtable_1.8-4            munsell_0.5.1           processx_3.8.4         
  [88] jquerylib_0.1.4         Rcpp_1.0.12             dbplyr_2.5.0           
  [91] png_0.1-8               XML_3.99-0.16.1         parallel_4.4.0         
