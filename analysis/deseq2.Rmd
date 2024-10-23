@@ -324,9 +324,9 @@ my_metadata$group <- factor(my_metadata$group, levels = c('normal', 'cancer'))
 my_metadata
 ```
 
-Prepare DESeqDataSet.
+Filter out lowly expressed genes.
 
-```{r lung_cancer}
+```{r gene_counts_mat}
 gene_counts |>
   dplyr::select(starts_with("ERR")) |>
   mutate(across(everything(), as.integer)) |>
@@ -337,6 +337,16 @@ row.names(gene_counts_mat) <- gene_counts$gene_id
 idx <- match(colnames(gene_counts_mat), my_metadata$run_id)
 colnames(gene_counts_mat) <- my_metadata$sample[idx]
 
+apply(gene_counts_mat, 2, function(x) x / sum(x) * 1000000) |>
+  rowSums() > 2 -> wanted
+
+gene_counts_mat <- gene_counts_mat[wanted, ]
+dim(gene_counts_mat)
+```
+
+Prepare DESeqDataSet.
+
+```{r lung_cancer}
 lung_cancer <- DESeqDataSetFromMatrix(
   countData = gene_counts_mat,
   colData   = my_metadata[idx, ],
@@ -357,4 +367,24 @@ DE results.
 ```{r lung_cancer_res}
 lung_cancer_res <- results(lung_cancer)
 lung_cancer_res[order(lung_cancer_res$padj), ] |> head()
+```
+
+### Exploring the results
+
+```{r lung_pvalue_hist}
+ggplot(as(lung_cancer_res, "data.frame"), aes(x = pvalue)) +
+  geom_histogram(binwidth = 0.01, fill = "Royalblue", boundary = 0) +
+  geom_hline(yintercept = 100, lty = 3) +
+  theme_minimal()
+```
+
+```{r lung_fdr_est}
+table(lung_cancer_res$pvalue < 0.01)
+```
+
+```{r lung_deseq2_pca}
+# transform using regularised logarithm
+plotPCA(rlogTransformation(lung_cancer), intgroup="group") +
+  coord_fixed() +
+  theme_minimal()
 ```
