@@ -117,7 +117,34 @@ AnnotationDbi::select(
   keytype="ENTREZID"
 ) |>
   head()
-``` 
+```
+
+Note that Entrez Gene IDs are species-specific; TP53 in humans has Entrez Gene ID 7157 and TP53 in mice has Entrez Gene ID 22059.
+
+```{r species_specific}
+AnnotationDbi::select(
+  reactome.db,
+  keys = '7157',
+  columns=c("REACTOMEID", "PATHNAME"),
+  keytype="ENTREZID"
+) |>
+  head()
+
+AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = '7157',
+  columns=c("ENTREZID","SYMBOL","GENENAME"),
+  keytype="ENTREZID"
+)
+
+AnnotationDbi::select(
+  reactome.db,
+  keys = '22059',
+  columns=c("REACTOMEID", "PATHNAME"),
+  keytype="ENTREZID"
+) |>
+  head()
+```
 
 ## GO.db
 
