@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree250626520e1f74381d11320378fd180318793492targetblank2506265a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb3485f31832823d7392fdbe2d26dfa5825cc084dtargetblankb3485f3a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/250626520e1f74381d11320378fd180318793492" target="_blank">2506265</a>
+<a href="https://github.com/davetang/muse/tree/b3485f31832823d7392fdbe2d26dfa5825cc084d" target="_blank">b3485f3</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree250626520e1f74381d11320378fd180318793492targetblank2506265a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb3485f31832823d7392fdbe2d26dfa5825cc084dtargetblankb3485f3a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/250626520e1f74381d11320378fd180318793492" target="_blank">2506265</a>.
+<a href="https://github.com/davetang/muse/tree/b3485f31832823d7392fdbe2d26dfa5825cc084d" target="_blank">b3485f3</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -602,6 +602,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/b3485f31832823d7392fdbe2d26dfa5825cc084d/analysis/annotation_dbi.Rmd" target="_blank">b3485f3</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-23
+</td>
+<td>
+reactome.db
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/de5bf16b6fce3a65ad1497282f4df0d9bfb80bdd/docs/annotation_dbi.html" target="_blank">de5bf16</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -745,6 +779,48 @@ AnnotationDbi::select(
 <p>Using the annotation package {org.Hs.eg.db} we can easily convert
 different gene identifiers, obtain their gene symbols, and descriptions
 (as well as all other keytypes).</p>
+</div>
+<div id="reactome.db" class="section level2">
+<h2>reactome.db</h2>
+<p><a
+href="https://bioconductor.org/packages/release/data/annotation/html/reactome.db.html">reactome.db</a>
+is a set of annotation maps for Reactome, assembled using data from
+Reactome. This package has been created by a third-party developer, and
+is not affiliated with the Reactome team.</p>
+<p>To begin, install the {reactome.db} package.</p>
+<pre class="r"><code>BiocManager::install(&quot;reactome.db&quot;)</code></pre>
+<p>Load the package.</p>
+<pre class="r"><code>packageVersion(&#39;reactome.db&#39;)</code></pre>
+<pre><code>[1] &#39;1.88.0&#39;</code></pre>
+<pre class="r"><code>suppressPackageStartupMessages(library(reactome.db))
+class(reactome.db)</code></pre>
+<pre><code>[1] &quot;ReactomeDb&quot;
+attr(,&quot;package&quot;)
+[1] &quot;AnnotationDbi&quot;</code></pre>
+<p>Demo.</p>
+<pre class="r"><code>keytypes(reactome.db)</code></pre>
+<pre><code>[1] &quot;ENTREZID&quot;   &quot;GO&quot;         &quot;PATHID&quot;     &quot;PATHNAME&quot;   &quot;REACTOMEID&quot;</code></pre>
+<pre class="r"><code>columns(reactome.db)</code></pre>
+<pre><code>[1] &quot;ENTREZID&quot;   &quot;GO&quot;         &quot;PATHID&quot;     &quot;PATHNAME&quot;   &quot;REACTOMEID&quot;</code></pre>
+<pre class="r"><code>head(keys(reactome.db))</code></pre>
+<pre><code>[1] &quot;1&quot;         &quot;10&quot;        &quot;100&quot;       &quot;1000&quot;      &quot;10000&quot;     &quot;100000160&quot;</code></pre>
+<pre class="r"><code>my_keys &lt;- head(keys(reactome.db))
+
+AnnotationDbi::select(
+  reactome.db,
+  keys = my_keys,
+  columns=&quot;REACTOMEID&quot;,
+  keytype=&quot;ENTREZID&quot;
+) |&gt;
+  head()</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre><code>  ENTREZID    REACTOMEID
+1        1  R-HSA-109582
+2        1  R-HSA-114608
+3        1  R-HSA-168249
+4        1  R-HSA-168256
+5        1 R-HSA-6798695
+6        1   R-HSA-76002</code></pre>
 </div>
 <div id="go.db" class="section level2">
 <h2>GO.db</h2>
@@ -932,13 +1008,14 @@ other attached packages:
  [3] GenomicRanges_1.56.2                    
  [4] GenomeInfoDb_1.40.1                     
  [5] GO.db_3.19.1                            
- [6] org.Hs.eg.db_3.19.1                     
- [7] AnnotationDbi_1.66.0                    
- [8] IRanges_2.38.1                          
- [9] S4Vectors_0.42.1                        
-[10] Biobase_2.64.0                          
-[11] BiocGenerics_0.50.0                     
-[12] workflowr_1.7.1                         
+ [6] reactome.db_1.88.0                      
+ [7] org.Hs.eg.db_3.19.1                     
+ [8] AnnotationDbi_1.66.0                    
+ [9] IRanges_2.38.1                          
+[10] S4Vectors_0.42.1                        
+[11] Biobase_2.64.0                          
+[12] BiocGenerics_0.50.0                     
+[13] workflowr_1.7.1                         
 
 loaded via a namespace (and not attached):
  [1] blob_1.2.4                  Biostrings_2.72.1          
