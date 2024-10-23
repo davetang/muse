@@ -1,0 +1,187 @@
+---
+title: "edgeR versus DESeq2"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(edgeR)
+library(DESeq2)
+library(ggrepel)
+library(pheatmap)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Installation
+
+Install packages using `BiocManager::install()`.
+
+```{r install_edger, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("edgeR")
+BiocManager::install("DESeq2")
+```
+
+## Count table
+
+https://zenodo.org/records/13970886
+
+```{r gene_counts}
+my_url <- 'https://zenodo.org/records/13970886/files/rsem.merged.gene_counts.tsv?download=1'
+my_file <- 'rsem.merged.gene_counts.tsv'
+
+if(file.exists(my_file) == FALSE){
+  download.file(url = my_url, destfile = my_file)
+}
+
+gene_counts <- read_tsv("rsem.merged.gene_counts.tsv", show_col_types = FALSE)
+head(gene_counts)
+```
+
+Metadata.
+
+```{r metadata}
+tibble::tribble(
+  ~sample, ~run_id, ~group,
+  "C2_norm", "ERR160122", "normal",
+  "C3_norm", "ERR160123", "normal",
+  "C5_norm", "ERR160124", "normal",
+  "C1_norm", "ERR164473", "normal",
+  "C1_cancer", "ERR164550", "cancer",
+  "C2_cancer", "ERR164551", "cancer",
+  "C3_cancer", "ERR164552", "cancer",
+  "C5_cancer", "ERR164554", "cancer"
+) -> my_metadata
+
+my_metadata$group <- factor(my_metadata$group, levels = c('normal', 'cancer'))
+```
+
+Matrix.
+
+```{r dgelist_obj, include=FALSE}
+gene_counts |>
+  dplyr::select(starts_with("ERR")) |>
+  mutate(across(everything(), as.integer)) |>
+  as.matrix() -> gene_counts_mat
+
+row.names(gene_counts_mat) <- gene_counts$gene_id
+
+idx <- match(colnames(gene_counts_mat), my_metadata$run_id)
+colnames(gene_counts_mat) <- my_metadata$sample[idx]
+
+tail(gene_counts_mat)
+```
+
+Remove genes that are lowly expressed.
+
+```{r filter_low_counts}
+keep <- rowSums(cpm(gene_counts_mat) > 0.5) >= 2
+
+gene_counts_mat <- gene_counts_mat[keep, ]
+tail(gene_counts_mat)
+```
+
+## edgeR workflow
+
+```{r edger_wf, include=FALSE}
+y <- DGEList(
+  counts = gene_counts_mat,
+  group = my_metadata$group
+)
+
+y <- normLibSizes(y)
+
+design <- model.matrix(~y$samples$group)
+y <- estimateDisp(y, design, robust=TRUE)
+fit <- glmQLFit(y, design, robust=TRUE)
+res <- glmQLFTest(fit)
+
+topTags(res, adjust.method = "BH")
+```
+
+## DESeq2 workflow
+
+```{r deseq2_wf}
+lung_cancer <- DESeqDataSetFromMatrix(
+  countData = gene_counts_mat,
+  colData   = my_metadata,
+  design    = ~ group
+)
+
+lung_cancer <- DESeq(lung_cancer)
+lung_cancer_res <- results(lung_cancer, pAdjustMethod = "BH")
+lung_cancer_res[order(lung_cancer_res$padj), ] |> head(10)
+```
+
+## Compare differentially expressed genes
+
+```{r compare_degs}
+my_thres <- 0.01
+
+topTags(res, n = Inf, adjust.method = "BH") |>
+  as.data.frame() |>
+  dplyr::filter(FDR < my_thres) |>
+  row.names() -> edger_degs
+
+lung_cancer_res |>
+  as.data.frame() |>
+  dplyr::filter(padj < my_thres) |>
+  row.names() -> deseq2_degs
+
+jaccard_index <- function(set1, set2) {
+  length(intersect(set1, set2)) / length(union(set1, set2))
+}
+
+jaccard_index(edger_degs, deseq2_degs)
+```
+
+DESeq2 returns a lot more differentially expressed genes (DEGs) than edgeR.
+
+```{r length_degs}
+length(edger_degs)
+length(deseq2_degs)
+```
+
+Compare top subset.
+
+```{r compare_degs_topn}
+compare_degs <- function(my_topn){
+  topTags(res, n = Inf, adjust.method = "BH") |>
+    as.data.frame() |>
+    dplyr::filter(FDR < my_thres) |>
+    dplyr::slice_min(order_by = FDR, n = my_topn) |>
+    row.names() -> edger_degs_topn
+  
+  lung_cancer_res |>
+    as.data.frame() |>
+    dplyr::filter(padj < my_thres) |>
+    dplyr::slice_min(order_by = padj, n = my_topn) |>
+    row.names() -> deseq2_degs_topn
+  
+  jaccard_index(edger_degs_topn, deseq2_degs_topn)
+}
+
+compare_degs(500)
+```
+
+Jaccard indexes.
+
+```{r jaccard_indexes}
+ns <- seq(100, 3500, 100)
+jis <- sapply(ns, compare_degs)
+```
+
+Plot.
+
+```{r plot_jaccard_indexes}
+data.frame(n = ns, index = jis) |>
+  ggplot(aes(n, index)) +
+  geom_point() +
+  theme_minimal() +
+  labs(x = 'Subset size', y = 'Jaccard Index')
+```
