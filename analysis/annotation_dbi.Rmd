@@ -83,6 +83,42 @@ AnnotationDbi::select(
 
 Using the annotation package {org.Hs.eg.db} we can easily convert different gene identifiers, obtain their gene symbols, and descriptions (as well as all other keytypes).
 
+## reactome.db
+
+[reactome.db](https://bioconductor.org/packages/release/data/annotation/html/reactome.db.html) is a set of annotation maps for Reactome, assembled using data from Reactome. This package has been created by a third-party developer, and is not affiliated with the Reactome team. 
+
+To begin, install the {reactome.db} package.
+
+```{r install_reactomedb, eval=FALSE}
+BiocManager::install("reactome.db")
+```
+
+Load the package.
+
+```{r load_reactomedb}
+packageVersion('reactome.db')
+suppressPackageStartupMessages(library(reactome.db))
+class(reactome.db)
+```
+
+Demo.
+
+```{r reactomedb_demo}
+keytypes(reactome.db)
+columns(reactome.db)
+head(keys(reactome.db))
+
+my_keys <- head(keys(reactome.db))
+
+AnnotationDbi::select(
+  reactome.db,
+  keys = my_keys,
+  columns="REACTOMEID",
+  keytype="ENTREZID"
+) |>
+  head()
+``` 
+
 ## GO.db
 
 There are also other annotation packages, such as [GO.db](https://bioconductor.org/packages/release/data/annotation/html/GO.db.html), which contains a set of annotation maps describing the entire Gene Ontology that we can probe in the same manner.
