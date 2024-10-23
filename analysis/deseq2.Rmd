@@ -288,3 +288,73 @@ $$
 $$
 
 It turns out that with this requirement satisfied, the $\beta$s represent the _average_ effects of each of the experimental factors, while the residuals $\epsilon_j$ reflect the experimental fluntuations around the mean between the replicates. This approach, which is called **least sum of squares fitting**, is mathematically convenient, since it can be achieved by straight-forward matrix algebra and it is what the `lm()` function does.
+
+## GSE40419
+
+Processed data available at <https://zenodo.org/records/13970886>.
+
+```{r gene_counts}
+my_url <- 'https://zenodo.org/records/13970886/files/rsem.merged.gene_counts.tsv?download=1'
+my_file <- 'rsem.merged.gene_counts.tsv'
+
+if(file.exists(my_file) == FALSE){
+  download.file(url = my_url, destfile = my_file)
+}
+
+gene_counts <- read_tsv("rsem.merged.gene_counts.tsv", show_col_types = FALSE)
+head(gene_counts)
+```
+
+Metadata.
+
+```{r metadata}
+tibble::tribble(
+  ~sample, ~run_id, ~group,
+  "C2_norm", "ERR160122", "normal",
+  "C3_norm", "ERR160123", "normal",
+  "C5_norm", "ERR160124", "normal",
+  "C1_norm", "ERR164473", "normal",
+  "C1_cancer", "ERR164550", "cancer",
+  "C2_cancer", "ERR164551", "cancer",
+  "C3_cancer", "ERR164552", "cancer",
+  "C5_cancer", "ERR164554", "cancer"
+) -> my_metadata
+
+my_metadata$group <- factor(my_metadata$group, levels = c('normal', 'cancer'))
+my_metadata
+```
+
+Prepare DESeqDataSet.
+
+```{r lung_cancer}
+gene_counts |>
+  dplyr::select(starts_with("ERR")) |>
+  mutate(across(everything(), as.integer)) |>
+  as.matrix() -> gene_counts_mat
+
+row.names(gene_counts_mat) <- gene_counts$gene_id
+
+idx <- match(colnames(gene_counts_mat), my_metadata$run_id)
+colnames(gene_counts_mat) <- my_metadata$sample[idx]
+
+lung_cancer <- DESeqDataSetFromMatrix(
+  countData = gene_counts_mat,
+  colData   = my_metadata[idx, ],
+  design    = ~ group
+)
+
+lung_cancer
+```
+
+Run `DESeq`.
+
+```{r lung_cancer_deseq}
+lung_cancer <- DESeq(lung_cancer)
+```
+
+DE results.
+
+```{r lung_cancer_res}
+lung_cancer_res <- results(lung_cancer)
+lung_cancer_res[order(lung_cancer_res$padj), ] |> head()
+```
