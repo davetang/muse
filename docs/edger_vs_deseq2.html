@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee47113535de8730a0a58f5e9c24caae09e99ac6atargetblanke471135a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee0abadffe0234feff806d09c2df7e6456d0da320targetblanke0abadfa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/e47113535de8730a0a58f5e9c24caae09e99ac6a" target="_blank">e471135</a>
+<a href="https://github.com/davetang/muse/tree/e0abadffe0234feff806d09c2df7e6456d0da320" target="_blank">e0abadf</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee47113535de8730a0a58f5e9c24caae09e99ac6atargetblanke471135a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee0abadffe0234feff806d09c2df7e6456d0da320targetblanke0abadfa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/e47113535de8730a0a58f5e9c24caae09e99ac6a" target="_blank">e471135</a>.
+<a href="https://github.com/davetang/muse/tree/e0abadffe0234feff806d09c2df7e6456d0da320" target="_blank">e0abadf</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -558,10 +558,6 @@ Ignored files:
     Ignored:    data/pbmc3k.csv.gz
     Ignored:    data/pbmc3k/
     Ignored:    r_packages_4.4.0/
-
-Untracked files:
-    Untracked:  analysis/rsem.merged.gene_counts.tsv
-    Untracked:  rsem.merged.gene_counts.tsv
 
 </code></pre>
 <p>
@@ -606,6 +602,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/e0abadffe0234feff806d09c2df7e6456d0da320/analysis/edger_vs_deseq2.Rmd" target="_blank">e0abadf</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-23
+</td>
+<td>
+Compare significances
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/a658556e07da60a3cd5029503a3db430bd45428b/docs/edger_vs_deseq2.html" target="_blank">a658556</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -677,6 +707,31 @@ head(gene_counts)</code></pre>
 
 my_metadata$group &lt;- factor(my_metadata$group, levels = c(&#39;normal&#39;, &#39;cancer&#39;))</code></pre>
 <p>Matrix.</p>
+<pre class="r"><code>gene_counts |&gt;
+  dplyr::select(starts_with(&quot;ERR&quot;)) |&gt;
+  mutate(across(everything(), as.integer)) |&gt;
+  as.matrix() -&gt; gene_counts_mat
+
+row.names(gene_counts_mat) &lt;- gene_counts$gene_id
+
+idx &lt;- match(colnames(gene_counts_mat), my_metadata$run_id)
+colnames(gene_counts_mat) &lt;- my_metadata$sample[idx]
+
+tail(gene_counts_mat)</code></pre>
+<pre><code>                C2_norm C3_norm C5_norm C1_norm C1_cancer C2_cancer C3_cancer
+ENSG00000293594       0       0       0       0         0         0         0
+ENSG00000293595       3       5       3       0         0         0         0
+ENSG00000293596       0       0       0       0         0         0         0
+ENSG00000293597       1       2      11       1         2         3         1
+ENSG00000293599       2       0       1       0         1         2         0
+ENSG00000293600      45      59      85     561       789      1099       701
+                C5_cancer
+ENSG00000293594         0
+ENSG00000293595         0
+ENSG00000293596         0
+ENSG00000293597         2
+ENSG00000293599         0
+ENSG00000293600       845</code></pre>
 <p>Remove genes that are lowly expressed.</p>
 <pre class="r"><code>keep &lt;- rowSums(cpm(gene_counts_mat) &gt; 0.5) &gt;= 2
 
@@ -699,6 +754,31 @@ ENSG00000293600       845</code></pre>
 </div>
 <div id="edger-workflow" class="section level2">
 <h2>edgeR workflow</h2>
+<pre class="r"><code>y &lt;- DGEList(
+  counts = gene_counts_mat,
+  group = my_metadata$group
+)
+
+y &lt;- normLibSizes(y)
+
+design &lt;- model.matrix(~y$samples$group)
+y &lt;- estimateDisp(y, design, robust=TRUE)
+fit &lt;- glmQLFit(y, design, robust=TRUE)
+res &lt;- glmQLFTest(fit)
+
+topTags(res, adjust.method = &quot;BH&quot;)</code></pre>
+<pre><code>Coefficient:  y$samples$groupcancer 
+                    logFC   logCPM         F       PValue         FDR
+ENSG00000289381 -7.412756 2.341373 127.60623 2.767866e-08 0.001035846
+ENSG00000151834 -8.027915 3.644102  64.37842 1.049799e-06 0.003612063
+ENSG00000250696 -8.602174 3.809297  63.66033 1.249401e-06 0.003612063
+ENSG00000229894 -9.123230 4.910552  60.16361 1.751012e-06 0.003612063
+ENSG00000100985  5.735426 5.769059  99.70828 2.012691e-06 0.003612063
+ENSG00000167910 -8.022082 3.453041  56.63286 2.199494e-06 0.003612063
+ENSG00000196778 -8.815389 4.237774  56.19864 2.296578e-06 0.003612063
+ENSG00000166091 -7.247200 2.881457  54.63510 2.658697e-06 0.003612063
+ENSG00000240890 -9.077199 4.702122  53.69560 3.074356e-06 0.003612063
+ENSG00000224781 -7.116543 2.556254  51.43346 3.645089e-06 0.003612063</code></pre>
 </div>
 <div id="deseq2-workflow" class="section level2">
 <h2>DESeq2 workflow</h2>
@@ -800,6 +880,125 @@ jis &lt;- sapply(ns, compare_degs)</code></pre>
   theme_minimal() +
   labs(x = &#39;Subset size&#39;, y = &#39;Jaccard Index&#39;)</code></pre>
 <p><img src="figure/edger_vs_deseq2.Rmd/plot_jaccard_indexes-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_jaccard_indexes-1">
+Past versions of plot_jaccard_indexes-1.png
+</button>
+</p>
+<div id="fig-plot_jaccard_indexes-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/a658556e07da60a3cd5029503a3db430bd45428b/docs/figure/edger_vs_deseq2.Rmd/plot_jaccard_indexes-1.png" target="_blank">a658556</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-23
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="compare-significances" class="section level2">
+<h2>Compare significances</h2>
+<pre class="r"><code>topTags(res, n = Inf, adjust.method = &quot;BH&quot;) |&gt;
+  as.data.frame() -&gt; edger_signif
+
+lung_cancer_res |&gt;
+  as.data.frame() -&gt; deseq2_signif
+
+idx &lt;- match(row.names(deseq2_signif), row.names(edger_signif))
+
+my_signif &lt;- cbind(edger_signif, deseq2_signif[idx, ])
+
+my_signif |&gt;
+  dplyr::filter(FDR &lt; my_thres) |&gt;
+  ggplot(aes(PValue, pvalue)) +
+  geom_point() +
+  theme_minimal() +
+  labs(x = &quot;edgeR p-value&quot;, y = &quot;DESeq2 p-value&quot;)</code></pre>
+<pre><code>Warning: Removed 41 rows containing missing values or values outside the scale range
+(`geom_point()`).</code></pre>
+<p><img src="figure/edger_vs_deseq2.Rmd/my_signif-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Small subset of highly significant genes using edgeR but not
+significant using DESeq2.</p>
+<pre class="r"><code>my_signif |&gt;
+  dplyr::filter(FDR &lt; my_thres) |&gt;
+  dplyr::filter(padj &gt; 0.95) |&gt;
+  row.names() -&gt; discordant
+  
+gene_counts_mat[discordant, ]</code></pre>
+<pre><code>                C2_norm C3_norm C5_norm C1_norm C1_cancer C2_cancer C3_cancer
+ENSG00000229894     480     620     873       7         1         2         3
+ENSG00000237931      76     165     117       2         3         2         0
+ENSG00000236761    2682    3073    4410       8         9         2         9
+ENSG00000245205     199     195     315       0         2         1         5
+ENSG00000250130      30      36      47       2         2         3         1
+ENSG00000231292      51      53      66       1         0         3         2
+ENSG00000230445    2060    2282    3393      12         8        14         3
+ENSG00000235847      81     102     147       0         1         0         0
+ENSG00000155875     158     211     295       5         6         6        11
+ENSG00000184100     676     765    1046       9        14        13        14
+ENSG00000254042      26      21      31       0         2         1         1
+ENSG00000215241     174     314     325      13         7        18        20
+ENSG00000279058     892    1175    1370      13        26        20        14
+ENSG00000290655     210     169     368       0         0         0         0
+ENSG00000249077      16      27      19       0         1         1         1
+ENSG00000257818     110     140     192      10         4         3        14
+ENSG00000257225     236     337     532      11         0         2        17
+ENSG00000233771      21      37      71       0         0         0         1
+ENSG00000228960     201     485     665       0         0        14         0
+ENSG00000164743     290     337     399      21        14        44        31
+ENSG00000214184      47      33      56       0         4         4         3
+ENSG00000242199      17      18      36       0         0         2         1
+ENSG00000167941      11      17      37       1         1         0         3
+ENSG00000229492       9      47      76       1         0         1         1
+ENSG00000289604    2543    2097    3181      56       158       116        89
+                C5_cancer
+ENSG00000229894         2
+ENSG00000237931         1
+ENSG00000236761         5
+ENSG00000245205         4
+ENSG00000250130         4
+ENSG00000231292         0
+ENSG00000230445        18
+ENSG00000235847         3
+ENSG00000155875         7
+ENSG00000184100        20
+ENSG00000254042         0
+ENSG00000215241        12
+ENSG00000279058        31
+ENSG00000290655         2
+ENSG00000249077         0
+ENSG00000257818        12
+ENSG00000257225        10
+ENSG00000233771         2
+ENSG00000228960         0
+ENSG00000164743        26
+ENSG00000214184         0
+ENSG00000242199         0
+ENSG00000167941         0
+ENSG00000229492         0
+ENSG00000289604       123</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
