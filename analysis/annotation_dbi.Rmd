@@ -1,0 +1,187 @@
+---
+title: "Bioconductor annotation packages"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The [Bioconductor annotation packages](https://www.bioconductor.org/packages/release/data/annotation/) are an extensive collection of annotations. For this post I simply illustrate the basics of probing these annotation packages. For the first example I will use the [org.Hs.eg.db](https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html) package, which provides genome wide annotations for the human genome.
+
+## Installation
+
+To begin, install the {org.Hs.eg.db} package.
+
+```{r install_org, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("org.Hs.eg.db")
+```
+
+## Package
+
+Load package.
+
+```{r load_org}
+packageVersion("org.Hs.eg.db")
+suppressPackageStartupMessages(library(org.Hs.eg.db))
+class(org.Hs.eg.db)
+```
+
+## Getting started
+
+We can query the package by using the `AnnotationDbi::select()` function; to find out what we can select and return we can use the `keys()`, `columns()`, and `keytypes()` functions.
+
+```{r demo}
+head(keys(org.Hs.eg.db))
+ 
+#store the first six keys
+my_keys <- head(keys(org.Hs.eg.db))
+ 
+keytypes(org.Hs.eg.db)
+ 
+columns(org.Hs.eg.db)
+ 
+AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = my_keys,
+  columns=c("ENTREZID","SYMBOL","GENENAME"),
+  keytype="ENTREZID"
+)
+```
+
+Within the annotation package are many objects, which we can also probe.
+
+```{r list_objs}
+ls("package:org.Hs.eg.db")
+```
+
+Ensembl Gene IDs to Entrez Gene IDs.
+
+```{r ensembl2eg}
+class(org.Hs.egENSEMBL2EG)
+head(keys(org.Hs.egENSEMBL2EG))
+```
+
+Create a lookup table.
+
+```{r ensembl2eg_table}
+my_ensg_keys <- head(keys(org.Hs.egENSEMBL2EG))
+ 
+AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = my_ensg_keys,
+  columns=c("ENSEMBL","ENTREZID","SYMBOL","GENENAME"),
+  keytype="ENSEMBL"
+)
+```
+
+Using the annotation package {org.Hs.eg.db} we can easily convert different gene identifiers, obtain their gene symbols, and descriptions (as well as all other keytypes).
+
+## GO.db
+
+There are also other annotation packages, such as [GO.db](https://bioconductor.org/packages/release/data/annotation/html/GO.db.html), which contains a set of annotation maps describing the entire Gene Ontology that we can probe in the same manner.
+
+To begin, install the {GO.db} package.
+
+```{r install_godb, eval=FALSE}
+BiocManager::install("GO.db")
+```
+
+Load the package.
+
+```{r load_godb}
+packageVersion('GO.db')
+suppressPackageStartupMessages(library(GO.db))
+class(GO.db)
+```
+
+Use the same functions as before on the `AnnotationDbi` object.
+
+```{r godb_demo}
+keytypes(GO.db)
+my_go_keys <- head(keys(GO.db))
+my_go_keys
+
+AnnotationDbi::select(
+  GO.db,
+  keys = my_go_keys,
+  columns=c("GOID", "TERM", "ONTOLOGY"),
+  keytype="GOID"
+)
+```
+
+## GenomicFeatures
+
+For genome annotation purposes, one may be interested in the gene models, which are provided in the [TxDb.Hsapiens.UCSC.hg38.knownGene](https://www.bioconductor.org/packages/release/data/annotation/html/TxDb.Hsapiens.UCSC.hg38.knownGene.html) package.
+
+```{r install_txdb, eval=FALSE}
+BiocManager::install("TxDb.Hsapiens.UCSC.hg38.knownGene")
+```
+
+Load the package.
+
+```{r load_txdb}
+packageVersion('TxDb.Hsapiens.UCSC.hg38.knownGene')
+suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg38.knownGene))
+class(TxDb.Hsapiens.UCSC.hg38.knownGene)
+```
+
+To see what columns can be returned use the `columns()` function
+
+```{r txdb_columns}
+columns(TxDb.Hsapiens.UCSC.hg38.knownGene)
+```
+
+Selecting.
+
+```{r txdb_select}
+AnnotationDbi::select(
+  TxDb.Hsapiens.UCSC.hg38.knownGene,
+  keys = head(keys(TxDb.Hsapiens.UCSC.hg38.knownGene), 2),
+  columns=c('GENEID', 'TXCHROM', 'TXSTART', 'TXEND', 'TXID'),
+  keytype="GENEID"
+)
+```
+
+## Combining databases
+
+We can combine different annotation packages too; say I have two genes LRRK2 and PINK1, and I want their genomic locations as well as OMIM ids.
+
+```{r combine_dbs}
+my_genes <- c("LRRK2","PINK1")
+ 
+AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = my_genes,
+  columns=c("ENTREZID", "SYMBOL","OMIM"),
+  keytype="SYMBOL"
+) -> a
+a 
+ 
+# symbol and transcript location
+AnnotationDbi::select(
+  TxDb.Hsapiens.UCSC.hg38.knownGene,
+  keys = a$ENTREZID,
+  columns=c('GENEID', 'TXCHROM', 'TXSTART', 'TXEND', 'TXID'),
+  keytype="GENEID"
+) -> b
+ 
+head(b)
+
+# change GENEID column to ENTREZID for consistency and for merging
+names(b) <- c('ENTREZID', 'TXID', 'TXCHROM', 'TXSTART', 'TXEND')
+c <- merge(a, b, 'ENTREZID')
+head(c)
+```
+
+## Conclusions
+
+One important point to be aware of when using the Bioconductor annotation packages is to appreciate the lag between updates to the packages. From the [FAQ](https://master.bioconductor.org/help/faq/#annotation-faq) on the Bioconductor website:
+
+> Different sources take different approaches to managing annotations. The annotation packages in Bioconductor are based on downloads obtained shortly before each Bioconductor release, and so can lag by six months (at the end of the release cycle) compared to on-line resources. The advantage of this approach is that the annotations do not change unexpectedly during development of an analysis, while the disadvantage is that the resource is not quite up-to-date with current understanding.
