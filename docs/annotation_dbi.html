@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb3485f31832823d7392fdbe2d26dfa5825cc084dtargetblankb3485f3a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree58216aecf17a4080d377fa5748fb837eb700530atargetblank58216aea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/b3485f31832823d7392fdbe2d26dfa5825cc084d" target="_blank">b3485f3</a>
+<a href="https://github.com/davetang/muse/tree/58216aecf17a4080d377fa5748fb837eb700530a" target="_blank">58216ae</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb3485f31832823d7392fdbe2d26dfa5825cc084dtargetblankb3485f3a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree58216aecf17a4080d377fa5748fb837eb700530atargetblank58216aea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/b3485f31832823d7392fdbe2d26dfa5825cc084d" target="_blank">b3485f3</a>.
+<a href="https://github.com/davetang/muse/tree/58216aecf17a4080d377fa5748fb837eb700530a" target="_blank">58216ae</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -602,6 +602,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/58216aecf17a4080d377fa5748fb837eb700530a/analysis/annotation_dbi.Rmd" target="_blank">58216ae</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-23
+</td>
+<td>
+Entrez Gene IDs are species specific
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4ee2a0f17fa24ab59da9d467d85bbfd5157b5cb0/docs/annotation_dbi.html" target="_blank">4ee2a0f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -821,6 +855,61 @@ AnnotationDbi::select(
 4        1  R-HSA-168256
 5        1 R-HSA-6798695
 6        1   R-HSA-76002</code></pre>
+<p>Note that Entrez Gene IDs are species-specific; TP53 in humans has
+Entrez Gene ID 7157 and TP53 in mice has Entrez Gene ID 22059.</p>
+<pre class="r"><code>AnnotationDbi::select(
+  reactome.db,
+  keys = &#39;7157&#39;,
+  columns=c(&quot;REACTOMEID&quot;, &quot;PATHNAME&quot;),
+  keytype=&quot;ENTREZID&quot;
+) |&gt;
+  head()</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre><code>  ENTREZID    REACTOMEID
+1     7157  R-HSA-109581
+2     7157  R-HSA-109582
+3     7157  R-HSA-109606
+4     7157  R-HSA-111448
+5     7157  R-HSA-114452
+6     7157 R-HSA-1169410
+                                                            PATHNAME
+1                                            Homo sapiens: Apoptosis
+2                                           Homo sapiens: Hemostasis
+3                      Homo sapiens: Intrinsic Pathway for Apoptosis
+4 Homo sapiens: Activation of NOXA and translocation to mitochondria
+5                      Homo sapiens: Activation of BH3-only proteins
+6          Homo sapiens: Antiviral mechanism by IFN-stimulated genes</code></pre>
+<pre class="r"><code>AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = &#39;7157&#39;,
+  columns=c(&quot;ENTREZID&quot;,&quot;SYMBOL&quot;,&quot;GENENAME&quot;),
+  keytype=&quot;ENTREZID&quot;
+)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:1 mapping between keys and columns</code></pre>
+<pre><code>  ENTREZID SYMBOL          GENENAME
+1     7157   TP53 tumor protein p53</code></pre>
+<pre class="r"><code>AnnotationDbi::select(
+  reactome.db,
+  keys = &#39;22059&#39;,
+  columns=c(&quot;REACTOMEID&quot;, &quot;PATHNAME&quot;),
+  keytype=&quot;ENTREZID&quot;
+) |&gt;
+  head()</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre><code>  ENTREZID    REACTOMEID
+1    22059 R-MMU-1169410
+2    22059 R-MMU-1280215
+3    22059 R-MMU-1640170
+4    22059  R-MMU-168256
+5    22059  R-MMU-212436
+6    22059 R-MMU-2262752
+                                                   PATHNAME
+1 Mus musculus: Antiviral mechanism by IFN-stimulated genes
+2         Mus musculus: Cytokine Signaling in Immune system
+3                                  Mus musculus: Cell Cycle
+4                               Mus musculus: Immune System
+5               Mus musculus: Generic Transcription Pathway
+6                Mus musculus: Cellular responses to stress</code></pre>
 </div>
 <div id="go.db" class="section level2">
 <h2>GO.db</h2>
