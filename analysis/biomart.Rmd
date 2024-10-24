@@ -233,6 +233,95 @@ getBM(
 )
 ```
 
+### org.Hs.eg.db
+
+Bioconductor provides [annotation packages](annotation_dbi.html) such as {org.Hs.eg.db}; here we compare biomaRt results with results using {org.Hs.eg.db}.
+
+Install it if you haven't already.
+
+```{r install_org, eval=FALSE}
+BiocManager::install("org.Hs.eg.db")
+```
+
+Get 100 Entrez Gene IDs.
+
+```{r get_entrez_gene_ids}
+suppressPackageStartupMessages(library(org.Hs.eg.db))
+entrez_gene_ids <- head(keys(org.Hs.eg.db), 100)
+length(entrez_gene_ids)
+```
+
+Convert them to Ensembl gene IDs.
+
+```{r org_table}
+AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = entrez_gene_ids,
+  columns=c("ENSEMBL","ENTREZID","SYMBOL","GENENAME"),
+  keytype="ENTREZID"
+) -> org_table
+
+head(org_table)
+```
+
+Perform similar query using {biomaRt}.
+
+```{r biomart_table}
+getBM(
+  attributes=c('entrezgene_id', 'ensembl_gene_id', "hgnc_symbol", "description"),
+  filters = "entrezgene_id",
+  values=entrez_gene_ids,
+  mart=ensembl
+) -> biomart_table
+
+head(biomart_table)
+```
+
+Join tables.
+
+```{r join_tables}
+biomart_table <- dplyr::mutate(biomart_table, entrezgene_id = as.character(entrezgene_id))
+
+joint_table <- dplyr::full_join(x = org_table, y = biomart_table, by = dplyr::join_by(ENTREZID == entrezgene_id))
+
+head(joint_table)
+```
+
+Comparison table.
+
+```{r comp_table}
+joint_table |>
+  dplyr::filter(!is.na(ENSEMBL) & !is.na(ensembl_gene_id)) |>
+  dplyr::select(ENSEMBL, ensembl_gene_id) |>
+  dplyr::mutate(same = ENSEMBL == ensembl_gene_id) -> comp_table
+
+table(comp_table$same)
+```
+
+Check out the different IDs.
+
+```{r comp_table_diff}
+dplyr::filter(comp_table, same == FALSE) |>
+  head()
+```
+
+Check out some differences.
+
+```{r comp_table_diff_specific}
+dplyr::filter(comp_table, same == FALSE) |>
+  head() |>
+  dplyr::pull(ensembl_gene_id) -> my_ensembl_gene_ids
+
+AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = my_ensembl_gene_ids,
+  columns=c("ENSEMBL","ENTREZID","SYMBOL","GENENAME"),
+  keytype="ENSEMBL"
+)
+```
+
+{org.Hs.eg.db} matched an Entrez Gene ID to one Ensembl gene ID, whereas {biomaRt} matched an Entrez Gene ID to all possible Ensembl gene IDs.
+
 ## Older reference assemblies
 
 Last patch of hg19.
