@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeff049cdc029393b5f26021fcf627ff60d1cfea35targetblankff049cda">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee6a2c5888a45625b60d14479092cc0a2a19584e3targetblanke6a2c58a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/ff049cdc029393b5f26021fcf627ff60d1cfea35" target="_blank">ff049cd</a>
+<a href="https://github.com/davetang/muse/tree/e6a2c5888a45625b60d14479092cc0a2a19584e3" target="_blank">e6a2c58</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeff049cdc029393b5f26021fcf627ff60d1cfea35targetblankff049cda"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee6a2c5888a45625b60d14479092cc0a2a19584e3targetblanke6a2c58a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/ff049cdc029393b5f26021fcf627ff60d1cfea35" target="_blank">ff049cd</a>.
+<a href="https://github.com/davetang/muse/tree/e6a2c5888a45625b60d14479092cc0a2a19584e3" target="_blank">e6a2c58</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -602,6 +602,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/e6a2c5888a45625b60d14479092cc0a2a19584e3/analysis/biomart.Rmd" target="_blank">e6a2c58</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-24
+</td>
+<td>
+Compare with org.Hs.eg.db
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/6e8540e0aa50d0dd2aa33c711ee500f6256673e8/docs/biomart.html" target="_blank">6e8540e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -921,6 +955,131 @@ getBM(
                                                                 description
 1 SH3GL interacting endocytic adaptor 1 [Source:HGNC Symbol;Acc:HGNC:25412]
 2     solute carrier family 45 member 1 [Source:HGNC Symbol;Acc:HGNC:17939]</code></pre>
+<div id="org.hs.eg.db" class="section level3">
+<h3>org.Hs.eg.db</h3>
+<p>Bioconductor provides <a href="annotation_dbi.html">annotation
+packages</a> such as {org.Hs.eg.db}; here we compare biomaRt results
+with results using {org.Hs.eg.db}.</p>
+<p>Install it if you haven’t already.</p>
+<pre class="r"><code>BiocManager::install(&quot;org.Hs.eg.db&quot;)</code></pre>
+<p>Get 100 Entrez Gene IDs.</p>
+<pre class="r"><code>suppressPackageStartupMessages(library(org.Hs.eg.db))
+entrez_gene_ids &lt;- head(keys(org.Hs.eg.db), 100)
+length(entrez_gene_ids)</code></pre>
+<pre><code>[1] 100</code></pre>
+<p>Convert them to Ensembl gene IDs.</p>
+<pre class="r"><code>AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = entrez_gene_ids,
+  columns=c(&quot;ENSEMBL&quot;,&quot;ENTREZID&quot;,&quot;SYMBOL&quot;,&quot;GENENAME&quot;),
+  keytype=&quot;ENTREZID&quot;
+) -&gt; org_table</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>head(org_table)</code></pre>
+<pre><code>  ENTREZID         ENSEMBL SYMBOL                           GENENAME
+1        1 ENSG00000121410   A1BG             alpha-1-B glycoprotein
+2        2 ENSG00000175899    A2M              alpha-2-macroglobulin
+3        3 ENSG00000291190  A2MP1 alpha-2-macroglobulin pseudogene 1
+4        9 ENSG00000171428   NAT1              N-acetyltransferase 1
+5       10 ENSG00000156006   NAT2              N-acetyltransferase 2
+6       11            &lt;NA&gt;   NATP     N-acetyltransferase pseudogene</code></pre>
+<p>Perform similar query using {biomaRt}.</p>
+<pre class="r"><code>getBM(
+  attributes=c(&#39;entrezgene_id&#39;, &#39;ensembl_gene_id&#39;, &quot;hgnc_symbol&quot;, &quot;description&quot;),
+  filters = &quot;entrezgene_id&quot;,
+  values=entrez_gene_ids,
+  mart=ensembl
+) -&gt; biomart_table
+
+head(biomart_table)</code></pre>
+<pre><code>  entrezgene_id ensembl_gene_id hgnc_symbol
+1             1 ENSG00000121410        A1BG
+2            10 ENSG00000156006        NAT2
+3           100 ENSG00000196839         ADA
+4           101 ENSG00000151651       ADAM8
+5           102 ENSG00000137845      ADAM10
+6           103 ENSG00000160710        ADAR
+                                                         description
+1             alpha-1-B glycoprotein [Source:HGNC Symbol;Acc:HGNC:5]
+2           N-acetyltransferase 2 [Source:HGNC Symbol;Acc:HGNC:7646]
+3              adenosine deaminase [Source:HGNC Symbol;Acc:HGNC:186]
+4   ADAM metallopeptidase domain 8 [Source:HGNC Symbol;Acc:HGNC:215]
+5  ADAM metallopeptidase domain 10 [Source:HGNC Symbol;Acc:HGNC:188]
+6 adenosine deaminase RNA specific [Source:HGNC Symbol;Acc:HGNC:225]</code></pre>
+<p>Join tables.</p>
+<pre class="r"><code>biomart_table &lt;- dplyr::mutate(biomart_table, entrezgene_id = as.character(entrezgene_id))
+
+joint_table &lt;- dplyr::full_join(x = org_table, y = biomart_table, by = dplyr::join_by(ENTREZID == entrezgene_id))</code></pre>
+<pre><code>Warning in dplyr::full_join(x = org_table, y = biomart_table, by = dplyr::join_by(ENTREZID == : Detected an unexpected many-to-many relationship between `x` and `y`.
+ℹ Row 18 of `x` matches multiple rows in `y`.
+ℹ Row 31 of `y` matches multiple rows in `x`.
+ℹ If a many-to-many relationship is expected, set `relationship =
+  &quot;many-to-many&quot;` to silence this warning.</code></pre>
+<pre class="r"><code>head(joint_table)</code></pre>
+<pre><code>  ENTREZID         ENSEMBL SYMBOL                           GENENAME
+1        1 ENSG00000121410   A1BG             alpha-1-B glycoprotein
+2        2 ENSG00000175899    A2M              alpha-2-macroglobulin
+3        3 ENSG00000291190  A2MP1 alpha-2-macroglobulin pseudogene 1
+4        9 ENSG00000171428   NAT1              N-acetyltransferase 1
+5       10 ENSG00000156006   NAT2              N-acetyltransferase 2
+6       11            &lt;NA&gt;   NATP     N-acetyltransferase pseudogene
+  ensembl_gene_id hgnc_symbol
+1 ENSG00000121410        A1BG
+2 ENSG00000175899         A2M
+3 ENSG00000291190            
+4 ENSG00000171428        NAT1
+5 ENSG00000156006        NAT2
+6            &lt;NA&gt;        &lt;NA&gt;
+                                                                        description
+1                            alpha-1-B glycoprotein [Source:HGNC Symbol;Acc:HGNC:5]
+2                             alpha-2-macroglobulin [Source:HGNC Symbol;Acc:HGNC:7]
+3 alpha-2-macroglobulin pseudogene 1 [Source:NCBI gene (formerly Entrezgene);Acc:3]
+4                          N-acetyltransferase 1 [Source:HGNC Symbol;Acc:HGNC:7645]
+5                          N-acetyltransferase 2 [Source:HGNC Symbol;Acc:HGNC:7646]
+6                                                                              &lt;NA&gt;</code></pre>
+<p>Comparison table.</p>
+<pre class="r"><code>joint_table |&gt;
+  dplyr::filter(!is.na(ENSEMBL) &amp; !is.na(ensembl_gene_id)) |&gt;
+  dplyr::select(ENSEMBL, ensembl_gene_id) |&gt;
+  dplyr::mutate(same = ENSEMBL == ensembl_gene_id) -&gt; comp_table
+
+table(comp_table$same)</code></pre>
+<pre><code>
+FALSE  TRUE 
+   58    94 </code></pre>
+<p>Check out the different IDs.</p>
+<pre class="r"><code>dplyr::filter(comp_table, same == FALSE) |&gt;
+  head()</code></pre>
+<pre><code>          ENSEMBL ensembl_gene_id  same
+1 ENSG00000204574 ENSG00000236149 FALSE
+2 ENSG00000204574 ENSG00000225989 FALSE
+3 ENSG00000204574 ENSG00000232169 FALSE
+4 ENSG00000204574 ENSG00000236342 FALSE
+5 ENSG00000204574 ENSG00000206490 FALSE
+6 ENSG00000204574 ENSG00000231129 FALSE</code></pre>
+<p>Check out some differences.</p>
+<pre class="r"><code>dplyr::filter(comp_table, same == FALSE) |&gt;
+  head() |&gt;
+  dplyr::pull(ensembl_gene_id) -&gt; my_ensembl_gene_ids
+
+AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = my_ensembl_gene_ids,
+  columns=c(&quot;ENSEMBL&quot;,&quot;ENTREZID&quot;,&quot;SYMBOL&quot;,&quot;GENENAME&quot;),
+  keytype=&quot;ENSEMBL&quot;
+)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:1 mapping between keys and columns</code></pre>
+<pre><code>          ENSEMBL ENTREZID SYMBOL                                  GENENAME
+1 ENSG00000236149       23  ABCF1 ATP binding cassette subfamily F member 1
+2 ENSG00000225989       23  ABCF1 ATP binding cassette subfamily F member 1
+3 ENSG00000232169       23  ABCF1 ATP binding cassette subfamily F member 1
+4 ENSG00000236342       23  ABCF1 ATP binding cassette subfamily F member 1
+5 ENSG00000206490       23  ABCF1 ATP binding cassette subfamily F member 1
+6 ENSG00000231129       23  ABCF1 ATP binding cassette subfamily F member 1</code></pre>
+<p>{org.Hs.eg.db} matched an Entrez Gene ID to one Ensembl gene ID,
+whereas {biomaRt} matched an Entrez Gene ID to all possible Ensembl gene
+IDs.</p>
+</div>
 </div>
 <div id="older-reference-assemblies" class="section level2">
 <h2>Older reference assemblies</h2>
@@ -967,9 +1126,9 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] GO.db_3.19.1         AnnotationDbi_1.66.0 IRanges_2.38.1      
-[4] S4Vectors_0.42.1     Biobase_2.64.0       BiocGenerics_0.50.0 
-[7] biomaRt_2.60.1       workflowr_1.7.1     
+[1] org.Hs.eg.db_3.19.1  GO.db_3.19.1         AnnotationDbi_1.66.0
+[4] IRanges_2.38.1       S4Vectors_0.42.1     Biobase_2.64.0      
+[7] BiocGenerics_0.50.0  biomaRt_2.60.1       workflowr_1.7.1     
 
 loaded via a namespace (and not attached):
  [1] KEGGREST_1.44.1         xfun_0.44               bslib_0.7.0            
