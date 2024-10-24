@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2024-10-24" />
+
+<title>Learning to use biomaRt</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Learning to use biomaRt</h1>
+<h4 class="date">2024-10-24</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2024-10-24
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeff049cdc029393b5f26021fcf627ff60d1cfea35targetblankff049cda">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/ff049cdc029393b5f26021fcf627ff60d1cfea35" target="_blank">ff049cd</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeff049cdc029393b5f26021fcf627ff60d1cfea35targetblankff049cda"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/ff049cdc029393b5f26021fcf627ff60d1cfea35" target="_blank">ff049cd</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k/
+    Ignored:    r_packages_4.4.0/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/biomart.Rmd</code>) and HTML
+(<code>docs/biomart.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/ff049cdc029393b5f26021fcf627ff60d1cfea35/analysis/biomart.Rmd" target="_blank">ff049cd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-24
+</td>
+<td>
+Using biomaRt
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>The <a
+href="https://bioconductor.org/packages/release/bioc/html/biomaRt.html">biomaRt
+package</a> provides an interface to BioMart databases provided by
+Ensembl.</p>
+<blockquote>
+<p>biomaRt provides an interface to a growing collection of databases
+implementing the BioMart software suite. The package enables retrieval
+of large amounts of data in a uniform way without the need to know the
+underlying database schemas or write complex SQL queries. The most
+prominent examples of BioMart databases are maintain by Ensembl, which
+provides biomaRt users direct access to a diverse set of data and
+enables a wide range of powerful online queries from gene annotation to
+database mining.</p>
+</blockquote>
+<p>For more information, check out the <a
+href="https://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.html">Accessing
+Ensembl annotation with biomaRt</a> guide.</p>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>To begin, install the {biomaRt} package.</p>
+<pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+
+BiocManager::install(&quot;biomaRt&quot;)</code></pre>
+</div>
+<div id="package" class="section level2">
+<h2>Package</h2>
+<p>Load package.</p>
+<pre class="r"><code>packageVersion(&quot;biomaRt&quot;)</code></pre>
+<pre><code>[1] &#39;2.60.1&#39;</code></pre>
+<pre class="r"><code>suppressPackageStartupMessages(library(biomaRt))</code></pre>
+<p>If you are using Ubuntu and get a “Cannot find xml2-config” error
+while installing the {XML} package, a dependency of {biomaRt}, try
+installing (or asking the sysadmin to install)
+<code>libxml2-dev</code>:</p>
+<pre><code>sudo apt-get install libxml2-dev</code></pre>
+</div>
+<div id="getting-started" class="section level2">
+<h2>Getting started</h2>
+<p>List the available BioMart databases.</p>
+<pre class="r"><code>listMarts()</code></pre>
+<pre><code>               biomart                version
+1 ENSEMBL_MART_ENSEMBL      Ensembl Genes 113
+2   ENSEMBL_MART_MOUSE      Mouse strains 113
+3     ENSEMBL_MART_SNP  Ensembl Variation 113
+4 ENSEMBL_MART_FUNCGEN Ensembl Regulation 113</code></pre>
+<p>Connect to the selected BioMart database by using
+<code>useMart()</code>.</p>
+<pre class="r"><code>ensembl &lt;- useMart(&quot;ENSEMBL_MART_ENSEMBL&quot;)
+avail_datasets &lt;- listDatasets(ensembl)
+head(avail_datasets)</code></pre>
+<pre><code>                       dataset                           description
+1 abrachyrhynchus_gene_ensembl Pink-footed goose genes (ASM259213v1)
+2     acalliptera_gene_ensembl      Eastern happy genes (fAstCal1.3)
+3   acarolinensis_gene_ensembl       Green anole genes (AnoCar2.0v2)
+4    acchrysaetos_gene_ensembl       Golden eagle genes (bAquChr1.2)
+5    acitrinellus_gene_ensembl        Midas cichlid genes (Midas_v5)
+6    amelanoleuca_gene_ensembl       Giant panda genes (ASM200744v2)
+      version
+1 ASM259213v1
+2  fAstCal1.3
+3 AnoCar2.0v2
+4  bAquChr1.2
+5    Midas_v5
+6 ASM200744v2</code></pre>
+<p>Look for human datasets by searching the description column.</p>
+<pre class="r"><code>idx &lt;- grep(&#39;human&#39;, avail_datasets$description, ignore.case = TRUE)
+avail_datasets[idx, ]</code></pre>
+<pre><code>                 dataset              description    version
+80 hsapiens_gene_ensembl Human genes (GRCh38.p14) GRCh38.p14</code></pre>
+<p>Connect to the selected BioMart database and human dataset.</p>
+<pre class="r"><code>ensembl &lt;- useMart(&quot;ensembl&quot;, dataset=avail_datasets[idx, &#39;dataset&#39;])
+ensembl</code></pre>
+<pre><code>Object of class &#39;Mart&#39;:
+  Using the ENSEMBL_MART_ENSEMBL BioMart database
+  Using the hsapiens_gene_ensembl dataset</code></pre>
+<p>Building a query, requires three things:</p>
+<ol style="list-style-type: decimal">
+<li>filters</li>
+<li>attributes</li>
+<li>values</li>
+</ol>
+<p>Use <code>listFilters()</code> to show available filters.</p>
+<pre class="r"><code>avail_filters &lt;- listFilters(ensembl)
+head(avail_filters)</code></pre>
+<pre><code>             name              description
+1 chromosome_name Chromosome/scaffold name
+2           start                    Start
+3             end                      End
+4      band_start               Band Start
+5        band_end                 Band End
+6    marker_start             Marker Start</code></pre>
+<p>Use <code>listAttributes()</code> to show available attributes.</p>
+<pre class="r"><code>avail_attributes &lt;- listAttributes(ensembl)
+head(avail_attributes)</code></pre>
+<pre><code>                           name                  description         page
+1               ensembl_gene_id               Gene stable ID feature_page
+2       ensembl_gene_id_version       Gene stable ID version feature_page
+3         ensembl_transcript_id         Transcript stable ID feature_page
+4 ensembl_transcript_id_version Transcript stable ID version feature_page
+5            ensembl_peptide_id            Protein stable ID feature_page
+6    ensembl_peptide_id_version    Protein stable ID version feature_page</code></pre>
+<p>The <code>getBM()</code> function is the main query function in
+{biomaRt}; use it once you have identified your attributes of interest
+and filters to use. Here’s an example that converts Affymetrix
+microarray probe IDs for a specific platform into Entrez Gene IDs and
+their descriptions.</p>
+<pre class="r"><code>affyids &lt;- c(&quot;202763_at&quot;, &quot;209310_s_at&quot;, &quot;207500_at&quot;)
+
+getBM(
+  attributes=c(&#39;affy_hg_u133_plus_2&#39;, &#39;entrezgene_id&#39;, &#39;entrezgene_description&#39;),
+  filters = &#39;affy_hg_u133_plus_2&#39;,
+  values = affyids,
+  mart = ensembl
+)</code></pre>
+<pre><code>  affy_hg_u133_plus_2 entrezgene_id entrezgene_description
+1         209310_s_at           837              caspase 4
+2           207500_at           838              caspase 5
+3           202763_at           836              caspase 3</code></pre>
+</div>
+<div id="human-refseq-to-entrez" class="section level2">
+<h2>Human RefSeq to Entrez</h2>
+<p>Look for filters with RefSeq.</p>
+<pre class="r"><code>grep(&quot;refseq&quot;, avail_filters$name, ignore.case=TRUE, value=TRUE)</code></pre>
+<pre><code> [1] &quot;with_refseq_mrna&quot;              &quot;with_refseq_mrna_predicted&quot;   
+ [3] &quot;with_refseq_ncrna&quot;             &quot;with_refseq_ncrna_predicted&quot;  
+ [5] &quot;with_refseq_peptide&quot;           &quot;with_refseq_peptide_predicted&quot;
+ [7] &quot;refseq_mrna&quot;                   &quot;refseq_mrna_predicted&quot;        
+ [9] &quot;refseq_ncrna&quot;                  &quot;refseq_ncrna_predicted&quot;       
+[11] &quot;refseq_peptide&quot;                &quot;refseq_peptide_predicted&quot;     </code></pre>
+<p>RefSeq information for <a
+href="https://en.wikipedia.org/wiki/Beta-actin">ACTB</a>.</p>
+<pre class="r"><code>my_refseq &lt;- &#39;NM_001101&#39;
+
+getBM(
+  attributes = c(&#39;refseq_mrna&#39;, &#39;ensembl_gene_id&#39;, &#39;description&#39;),
+  filters = &#39;refseq_mrna&#39;,
+  values = my_refseq,
+  mart = ensembl
+)</code></pre>
+<pre><code>  refseq_mrna ensembl_gene_id                                  description
+1   NM_001101 ENSG00000075624 actin beta [Source:HGNC Symbol;Acc:HGNC:132]</code></pre>
+</div>
+<div id="gene-ontology-terms" class="section level2">
+<h2>Gene Ontology terms</h2>
+<p>Find GO attribute names.</p>
+<pre class="r"><code>grep(&quot;^go&quot;, avail_attributes$name, ignore.case=TRUE, value=TRUE)</code></pre>
+<pre><code>[1] &quot;go_id&quot;                  &quot;go_linkage_type&quot;        &quot;goslim_goa_accession&quot;  
+[4] &quot;goslim_goa_description&quot;</code></pre>
+<p>Find Ensembl filters.</p>
+<pre class="r"><code>grep(&quot;^ensembl&quot;, avail_filters$name, ignore.case=TRUE, value=TRUE)</code></pre>
+<pre><code>[1] &quot;ensembl_gene_id&quot;               &quot;ensembl_gene_id_version&quot;      
+[3] &quot;ensembl_transcript_id&quot;         &quot;ensembl_transcript_id_version&quot;
+[5] &quot;ensembl_peptide_id&quot;            &quot;ensembl_peptide_id_version&quot;   
+[7] &quot;ensembl_exon_id&quot;              </code></pre>
+<p>ENSG00000075624 is the Ensembl gene ID for DMD, which stands for
+Dystrophin; it encodes the dystrophin protein. Here’s a query that
+obtains the GO terms associated with DMD.</p>
+<pre class="r"><code>dmd &lt;- &#39;ENSG00000075624&#39;
+getBM(
+  attributes=c(&quot;go_id&quot;),
+  filters=&quot;ensembl_gene_id&quot;,
+  values = dmd,
+  mart = ensembl
+) -&gt; dmd_go
+tail(dmd_go)</code></pre>
+<pre><code>        go_id
+89 GO:0097433
+90 GO:1900242
+91 GO:0005903
+92 GO:0030863
+93 GO:0044305
+94 GO:0098685</code></pre>
+<p>Use <code>Term()</code> to get GO terms for the GO IDs.</p>
+<pre class="r"><code>suppressPackageStartupMessages(library(&quot;GO.db&quot;))
+AnnotationDbi::Term(dmd_go$go_id) |&gt;
+  as.data.frame() |&gt;
+  tail()</code></pre>
+<pre><code>                    AnnotationDbi::Term(dmd_go$go_id)
+GO:0097433                                 dense body
+GO:1900242 regulation of synaptic vesicle endocytosis
+GO:0005903                               brush border
+GO:0030863                      cortical cytoskeleton
+GO:0044305                              calyx of Held
+GO:0098685          Schaffer collateral - CA1 synapse</code></pre>
+<p>Use <code>GOTERM</code> to get more information on a term.</p>
+<pre class="r"><code>my_go_id &lt;- &#39;GO:0098685&#39;
+class(GOTERM)</code></pre>
+<pre><code>[1] &quot;GOTermsAnnDbBimap&quot;
+attr(,&quot;package&quot;)
+[1] &quot;AnnotationDbi&quot;</code></pre>
+<pre class="r"><code>GOTERM[[my_go_id]]</code></pre>
+<pre><code>GOID: GO:0098685
+Term: Schaffer collateral - CA1 synapse
+Ontology: CC
+Definition: A synapse between the Schaffer collateral axon of a CA3
+    pyramidal cell and a CA1 pyramidal cell.</code></pre>
+</div>
+<div id="snps" class="section level2">
+<h2>SNPs</h2>
+<p>Use the SNP database.</p>
+<pre class="r"><code>snp &lt;- useMart(&quot;ENSEMBL_MART_SNP&quot;)
+avail_snp_datasets &lt;- listDatasets(snp)
+head(avail_snp_datasets)</code></pre>
+<pre><code>            dataset
+1       btaurus_snp
+2 btaurus_structvar
+3       chircus_snp
+4        drerio_snp
+5  drerio_structvar
+6     ecaballus_snp
+                                                                     description
+1   Cow Short Variants (SNPs and indels excluding flagged variants) (ARS-UCD1.3)
+2                                           Cow Structural Variants (ARS-UCD1.3)
+3        Goat Short Variants (SNPs and indels excluding flagged variants) (ARS1)
+4 Zebrafish Short Variants (SNPs and indels excluding flagged variants) (GRCz11)
+5                                         Zebrafish Structural Variants (GRCz11)
+6  Horse Short Variants (SNPs and indels excluding flagged variants) (EquCab3.0)
+     version
+1 ARS-UCD1.3
+2 ARS-UCD1.3
+3       ARS1
+4     GRCz11
+5     GRCz11
+6  EquCab3.0</code></pre>
+<p>Look for human datasets.</p>
+<pre class="r"><code>idx &lt;- grep(&#39;human&#39;, avail_snp_datasets$description, ignore.case = TRUE)
+avail_snp_datasets[idx, ]</code></pre>
+<pre><code>                  dataset
+10           hsapiens_snp
+11       hsapiens_snp_som
+12     hsapiens_structvar
+13 hsapiens_structvar_som
+                                                                              description
+10         Human Short Variants (SNPs and indels excluding flagged variants) (GRCh38.p14)
+11 Human Somatic Short Variants (SNPs and indels excluding flagged variants) (GRCh38.p14)
+12                                                 Human Structural Variants (GRCh38.p14)
+13                                         Human Somatic Structural Variants (GRCh38.p14)
+      version
+10 GRCh38.p14
+11 GRCh38.p14
+12 GRCh38.p14
+13 GRCh38.p14</code></pre>
+<p>Get SNPs within a genomic location.</p>
+<pre class="r"><code>snp &lt;- useMart(&quot;ENSEMBL_MART_SNP&quot;, dataset=&quot;hsapiens_snp&quot;)
+
+my_snps &lt;- getBM(
+  attributes=c(&quot;refsnp_id&quot;,&quot;allele&quot;,&quot;chrom_start&quot;),
+  filters=c(&quot;chr_name&quot;,&quot;start&quot;,&quot;end&quot;),
+  values=list(8,148350, 149000),
+  mart=snp
+)
+
+rbind(
+  head(my_snps, 3),
+  tail(my_snps, 3)
+)</code></pre>
+<pre><code>       refsnp_id allele chrom_start
+1   rs1450830176    G/C      148350
+2   rs1360310185  C/A/T      148352
+3   rs1434776028    A/T      148353
+243 rs1435594779    C/G      148998
+244 rs1800825262  C/G/T      148999
+245 rs1800825282    G/A      149000</code></pre>
+<p>Get SNP information with SNP IDs.</p>
+<pre class="r"><code>my_snp_ids &lt;- c(&#39;rs547420070&#39;, &#39;rs77274555&#39;)
+ 
+getBM(
+  attributes=c(&quot;refsnp_id&quot;,&quot;allele&quot;,&quot;chrom_start&quot;),
+  filters=c(&quot;snp_filter&quot;),
+  values=my_snp_ids,
+  mart=snp
+)</code></pre>
+<pre><code>    refsnp_id  allele chrom_start
+1 rs547420070   A/C/G      148373
+2  rs77274555 G/A/C/T      148391</code></pre>
+</div>
+<div id="gene-symbols" class="section level2">
+<h2>Gene symbols</h2>
+<p>Convert Ensembl gene IDs to HUGO Gene Nomenclature Committee (HGNC)
+gene symbols.</p>
+<pre class="r"><code>my_genes &lt;- c(&#39;ENSG00000118473&#39;, &#39;ENSG00000162426&#39;)
+ 
+getBM(
+  attributes=c(&#39;ensembl_gene_id&#39;, &quot;hgnc_symbol&quot;, &quot;description&quot;),
+  filters = &quot;ensembl_gene_id&quot;,
+  values=my_genes,
+  mart=ensembl
+)</code></pre>
+<pre><code>  ensembl_gene_id hgnc_symbol
+1 ENSG00000118473       SGIP1
+2 ENSG00000162426     SLC45A1
+                                                                description
+1 SH3GL interacting endocytic adaptor 1 [Source:HGNC Symbol;Acc:HGNC:25412]
+2     solute carrier family 45 member 1 [Source:HGNC Symbol;Acc:HGNC:17939]</code></pre>
+</div>
+<div id="older-reference-assemblies" class="section level2">
+<h2>Older reference assemblies</h2>
+<p>Last patch of hg19.</p>
+<pre class="r"><code>grch37 &lt;- useMart(
+  biomart=&quot;ENSEMBL_MART_ENSEMBL&quot;,
+  host=&quot;https://grch37.ensembl.org&quot;,
+  path=&quot;/biomart/martservice&quot;
+)
+
+grch37</code></pre>
+<p>Database timed out and the code block below is not evaluated.</p>
+<pre class="r"><code>listDatasets(grch37)</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.0 (2024-04-24)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+[1] GO.db_3.19.1         AnnotationDbi_1.66.0 IRanges_2.38.1      
+[4] S4Vectors_0.42.1     Biobase_2.64.0       BiocGenerics_0.50.0 
+[7] biomaRt_2.60.1       workflowr_1.7.1     
+
+loaded via a namespace (and not attached):
+ [1] KEGGREST_1.44.1         xfun_0.44               bslib_0.7.0            
+ [4] httr2_1.0.2             processx_3.8.4          callr_3.7.6            
+ [7] generics_0.1.3          vctrs_0.6.5             tools_4.4.0            
+[10] ps_1.7.6                curl_5.2.1              tibble_3.2.1           
+[13] fansi_1.0.6             RSQLite_2.3.7           blob_1.2.4             
+[16] pkgconfig_2.0.3         dbplyr_2.5.0            lifecycle_1.0.4        
+[19] GenomeInfoDbData_1.2.12 compiler_4.4.0          stringr_1.5.1          
+[22] git2r_0.33.0            Biostrings_2.72.1       progress_1.2.3         
+[25] getPass_0.2-4           httpuv_1.6.15           GenomeInfoDb_1.40.1    
+[28] htmltools_0.5.8.1       sass_0.4.9              yaml_2.3.8             
+[31] later_1.3.2             pillar_1.9.0            crayon_1.5.2           
+[34] jquerylib_0.1.4         whisker_0.4.1           cachem_1.1.0           
+[37] tidyselect_1.2.1        digest_0.6.37           stringi_1.8.4          
+[40] purrr_1.0.2             dplyr_1.1.4             rprojroot_2.0.4        
+[43] fastmap_1.2.0           cli_3.6.3               magrittr_2.0.3         
+[46] utf8_1.2.4              withr_3.0.1             filelock_1.0.3         
+[49] prettyunits_1.2.0       UCSC.utils_1.0.0        promises_1.3.0         
+[52] rappdirs_0.3.3          bit64_4.0.5             rmarkdown_2.27         
+[55] XVector_0.44.0          httr_1.4.7              bit_4.0.5              
+[58] png_0.1-8               hms_1.1.3               memoise_2.0.1          
+[61] evaluate_0.24.0         knitr_1.47              BiocFileCache_2.12.0   
+[64] rlang_1.1.4             Rcpp_1.0.12             glue_1.7.0             
+[67] DBI_1.2.3               xml2_1.3.6              rstudioapi_0.16.0      
+[70] jsonlite_1.8.8          R6_2.5.1                fs_1.6.4               
+[73] zlibbioc_1.50.0        </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
