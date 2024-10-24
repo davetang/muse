@@ -1,0 +1,254 @@
+---
+title: "Learning to use biomaRt"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The [biomaRt package](https://bioconductor.org/packages/release/bioc/html/biomaRt.html) provides an interface to BioMart databases provided by Ensembl.
+
+> biomaRt provides an interface to a growing collection of databases implementing the BioMart software suite. The package enables retrieval of large amounts of data in a uniform way without the need to know the underlying database schemas or write complex SQL queries. The most prominent examples of BioMart databases are maintain by Ensembl, which provides biomaRt users direct access to a diverse set of data and enables a wide range of powerful online queries from gene annotation to database mining. 
+
+For more information, check out the [Accessing Ensembl annotation with biomaRt](https://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.html) guide.
+
+## Installation
+
+To begin, install the {biomaRt} package.
+
+```{r install_biomart, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("biomaRt")
+```
+
+## Package
+
+Load package.
+
+```{r load_biomart}
+packageVersion("biomaRt")
+suppressPackageStartupMessages(library(biomaRt))
+```
+
+If you are using Ubuntu and get a "Cannot find xml2-config" error while installing the {XML} package, a dependency of {biomaRt}, try installing (or asking the sysadmin to install) `libxml2-dev`:
+
+```
+sudo apt-get install libxml2-dev
+```
+
+## Getting started
+
+List the available BioMart databases.
+
+```{r list_marts}
+listMarts()
+```
+
+Connect to the selected BioMart database by using `useMart()`.
+
+```{r ensembl}
+ensembl <- useMart("ENSEMBL_MART_ENSEMBL")
+avail_datasets <- listDatasets(ensembl)
+head(avail_datasets)
+```
+
+Look for human datasets by searching the description column.
+
+```{r human}
+idx <- grep('human', avail_datasets$description, ignore.case = TRUE)
+avail_datasets[idx, ]
+```
+
+Connect to the selected BioMart database and human dataset.
+
+```{r usemart_with_dataset}
+ensembl <- useMart("ensembl", dataset=avail_datasets[idx, 'dataset'])
+ensembl
+```
+
+Building a query, requires three things:
+
+1. filters
+2. attributes
+3. values
+
+Use `listFilters()` to show available filters.
+
+```{r avail_filters}
+avail_filters <- listFilters(ensembl)
+head(avail_filters)
+```
+
+Use `listAttributes()` to show available attributes.
+
+```{r avail_attributes}
+avail_attributes <- listAttributes(ensembl)
+head(avail_attributes)
+```
+
+The `getBM()` function is the main query function in {biomaRt}; use it once you have identified your attributes of interest and filters to use. Here's an example that converts Affymetrix microarray probe IDs for a specific platform into Entrez Gene IDs and their descriptions.
+
+```{r affy_to_entrez_gene}
+affyids <- c("202763_at", "209310_s_at", "207500_at")
+
+getBM(
+  attributes=c('affy_hg_u133_plus_2', 'entrezgene_id', 'entrezgene_description'),
+  filters = 'affy_hg_u133_plus_2',
+  values = affyids,
+  mart = ensembl
+)
+```
+
+## Human RefSeq to Entrez
+
+Look for filters with RefSeq.
+
+```{r find_refseq}
+grep("refseq", avail_filters$name, ignore.case=TRUE, value=TRUE)
+```
+
+RefSeq information for [ACTB](https://en.wikipedia.org/wiki/Beta-actin).
+
+```{r refseq_to_entrez}
+my_refseq <- 'NM_001101'
+
+getBM(
+  attributes = c('refseq_mrna', 'ensembl_gene_id', 'description'),
+  filters = 'refseq_mrna',
+  values = my_refseq,
+  mart = ensembl
+)
+```
+
+## Gene Ontology terms
+
+Find GO attribute names.
+
+```{r find_go}
+grep("^go", avail_attributes$name, ignore.case=TRUE, value=TRUE)
+```
+
+Find Ensembl filters.
+
+```{r find_ensembl}
+grep("^ensembl", avail_filters$name, ignore.case=TRUE, value=TRUE)
+```
+
+ENSG00000075624 is the Ensembl gene ID for DMD, which stands for Dystrophin; it encodes the dystrophin protein. Here's a query that obtains the GO terms associated with DMD.
+
+```{r dmd}
+dmd <- 'ENSG00000075624'
+getBM(
+  attributes=c("go_id"),
+  filters="ensembl_gene_id",
+  values = dmd,
+  mart = ensembl
+) -> dmd_go
+tail(dmd_go)
+```
+
+Use `Term()` to get GO terms for the GO IDs.
+
+```{r get_go_terms}
+suppressPackageStartupMessages(library("GO.db"))
+AnnotationDbi::Term(dmd_go$go_id) |>
+  as.data.frame() |>
+  tail()
+```
+
+Use `GOTERM` to get more information on a term.
+
+```{r my_go_id}
+my_go_id <- 'GO:0098685'
+class(GOTERM)
+GOTERM[[my_go_id]]
+```
+
+## SNPs
+
+Use the SNP database.
+
+```{r mart_snp}
+snp <- useMart("ENSEMBL_MART_SNP")
+avail_snp_datasets <- listDatasets(snp)
+head(avail_snp_datasets)
+```
+
+Look for human datasets.
+
+```{r human_snp}
+idx <- grep('human', avail_snp_datasets$description, ignore.case = TRUE)
+avail_snp_datasets[idx, ]
+```
+
+Get SNPs within a genomic location.
+
+```{r get_snps_loci}
+snp <- useMart("ENSEMBL_MART_SNP", dataset="hsapiens_snp")
+
+my_snps <- getBM(
+  attributes=c("refsnp_id","allele","chrom_start"),
+  filters=c("chr_name","start","end"),
+  values=list(8,148350, 149000),
+  mart=snp
+)
+
+rbind(
+  head(my_snps, 3),
+  tail(my_snps, 3)
+)
+```
+
+Get SNP information with SNP IDs.
+
+```{r get_snps_ids}
+my_snp_ids <- c('rs547420070', 'rs77274555')
+ 
+getBM(
+  attributes=c("refsnp_id","allele","chrom_start"),
+  filters=c("snp_filter"),
+  values=my_snp_ids,
+  mart=snp
+)
+```
+
+## Gene symbols
+
+Convert Ensembl gene IDs to HUGO Gene Nomenclature Committee (HGNC) gene symbols.
+
+```{r ensembl_to_hugo}
+my_genes <- c('ENSG00000118473', 'ENSG00000162426')
+ 
+getBM(
+  attributes=c('ensembl_gene_id', "hgnc_symbol", "description"),
+  filters = "ensembl_gene_id",
+  values=my_genes,
+  mart=ensembl
+)
+```
+
+## Older reference assemblies
+
+Last patch of hg19.
+
+```{r grch37, eval=FALSE}
+grch37 <- useMart(
+  biomart="ENSEMBL_MART_ENSEMBL",
+  host="https://grch37.ensembl.org",
+  path="/biomart/martservice"
+)
+
+grch37
+```
+
+Database timed out and the code block below is not evaluated.
+
+```{r list_marts_grch37, eval=FALSE}
+listDatasets(grch37)
+```
