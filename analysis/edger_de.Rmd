@@ -69,7 +69,7 @@ my_metadata$group <- factor(my_metadata$group, levels = c('normal', 'cancer'))
 
 The input to `edgeR` is the `DGEList` object. The required inputs for creating a `DGEList` object is the count table and a grouping factor.
 
-```{r dgelist_obj, include=FALSE}
+```{r dgelist_obj}
 gene_counts |>
   dplyr::select(starts_with("ERR")) |>
   mutate(across(everything(), as.integer)) |>
@@ -102,7 +102,7 @@ y
 
 > The `normLibSizes()` function normalizes the library sizes in such a way to minimize the log-fold changes between the samples for most genes. The default method for computing these scale factors uses a trimmed mean of M-values (TMM) between each pair of samples. We call the product of the original library size and the scaling factor the effective library size, i.e., the normalized library size. The effective library size replaces the original library size in all downstream analyses
 
-```{r calc_norm_factors, include=FALSE}
+```{r calc_norm_factors}
 y <- normLibSizes(y)
 y
 ```
