@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree92b951ca79310340c50fbcf9d3d8a59c7278a96btargetblank92b951ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree04948c54e3d2024b33286d089cac99d0cfbb1173targetblank04948c5a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/92b951ca79310340c50fbcf9d3d8a59c7278a96b" target="_blank">92b951c</a>
+<a href="https://github.com/davetang/muse/tree/04948c54e3d2024b33286d089cac99d0cfbb1173" target="_blank">04948c5</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree92b951ca79310340c50fbcf9d3d8a59c7278a96btargetblank92b951ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree04948c54e3d2024b33286d089cac99d0cfbb1173targetblank04948c5a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/92b951ca79310340c50fbcf9d3d8a59c7278a96b" target="_blank">92b951c</a>.
+<a href="https://github.com/davetang/muse/tree/04948c54e3d2024b33286d089cac99d0cfbb1173" target="_blank">04948c5</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -559,10 +559,6 @@ Ignored files:
     Ignored:    data/pbmc3k.csv.gz
     Ignored:    data/pbmc3k/
     Ignored:    r_packages_4.4.0/
-
-Untracked files:
-    Untracked:  data/13970886_edger_res.csv
-    Untracked:  rsem.merged.gene_counts.tsv
 
 </code></pre>
 <p>
@@ -607,6 +603,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/04948c54e3d2024b33286d089cac99d0cfbb1173/analysis/edger_de.Rmd" target="_blank">04948c5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-31
+</td>
+<td>
+Export edgeR results
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/cfbb929582e7c0386338bce4e96900f406e7a447/docs/edger_de.html" target="_blank">cfbb929</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -799,6 +829,48 @@ my_metadata$group &lt;- factor(my_metadata$group, levels = c(&#39;normal&#39;, &
 <p>The input to <code>edgeR</code> is the <code>DGEList</code> object.
 The required inputs for creating a <code>DGEList</code> object is the
 count table and a grouping factor.</p>
+<pre class="r"><code>gene_counts |&gt;
+  dplyr::select(starts_with(&quot;ERR&quot;)) |&gt;
+  mutate(across(everything(), as.integer)) |&gt;
+  as.matrix() -&gt; gene_counts_mat
+
+row.names(gene_counts_mat) &lt;- gene_counts$gene_id
+
+idx &lt;- match(colnames(gene_counts_mat), my_metadata$run_id)
+colnames(gene_counts_mat) &lt;- my_metadata$sample[idx]
+
+y &lt;- DGEList(
+  counts = gene_counts_mat,
+  group = my_metadata$group[idx]
+)
+
+y</code></pre>
+<pre><code>An object of class &quot;DGEList&quot;
+$counts
+                C2_norm C3_norm C5_norm C1_norm C1_cancer C2_cancer C3_cancer
+ENSG00000000003       2       6       5     374      1637       650      1015
+ENSG00000000005      19      40      28       0         1         0         0
+ENSG00000000419     268     273     428     489       637       879      1157
+ENSG00000000457     360     449     566     362       605       708       632
+ENSG00000000460     155     184     264      85       312       239       147
+                C5_cancer
+ENSG00000000003       562
+ENSG00000000005         0
+ENSG00000000419       729
+ENSG00000000457       478
+ENSG00000000460       156
+63135 more rows ...
+
+$samples
+           group lib.size norm.factors
+C2_norm   normal  4441588            1
+C3_norm   normal  5349291            1
+C5_norm   normal  7613422            1
+C1_norm   normal 15972904            1
+C1_cancer cancer 22329493            1
+C2_cancer cancer 29928921            1
+C3_cancer cancer 24891206            1
+C5_cancer cancer 23703606            1</code></pre>
 </div>
 <div id="filtering-to-remove-low-counts" class="section level2">
 <h2>Filtering to remove low counts</h2>
@@ -845,6 +917,34 @@ effective library size, i.e., the normalized library size. The effective
 library size replaces the original library size in all downstream
 analyses</p>
 </blockquote>
+<pre class="r"><code>y &lt;- normLibSizes(y)
+y</code></pre>
+<pre><code>An object of class &quot;DGEList&quot;
+$counts
+                C2_norm C3_norm C5_norm C1_norm C1_cancer C2_cancer C3_cancer
+ENSG00000000003       2       6       5     374      1637       650      1015
+ENSG00000000005      19      40      28       0         1         0         0
+ENSG00000000419     268     273     428     489       637       879      1157
+ENSG00000000457     360     449     566     362       605       708       632
+ENSG00000000460     155     184     264      85       312       239       147
+                C5_cancer
+ENSG00000000003       562
+ENSG00000000005         0
+ENSG00000000419       729
+ENSG00000000457       478
+ENSG00000000460       156
+37419 more rows ...
+
+$samples
+           group lib.size norm.factors
+C2_norm   normal  4431282    1.4420477
+C3_norm   normal  5337400    1.4377942
+C5_norm   normal  7594512    1.3836402
+C1_norm   normal 15964680    0.8389637
+C1_cancer cancer 22317658    0.8199077
+C2_cancer cancer 29912740    0.7972139
+C3_cancer cancer 24876336    0.8151023
+C5_cancer cancer 23693355    0.7798397</code></pre>
 </div>
 <div id="mds" class="section level2">
 <h2>MDS</h2>
@@ -978,6 +1078,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/cfbb929582e7c0386338bce4e96900f406e7a447/docs/figure/edger_de.Rmd/down_regulated_genes-1.png" target="_blank">cfbb929</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-31
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/6aa4e2d485d9f744f1e0119c2d3a7aac934a1eee/docs/figure/edger_de.Rmd/down_regulated_genes-1.png" target="_blank">6aa4e2d</a>
 </td>
 <td>
@@ -1024,6 +1135,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/cfbb929582e7c0386338bce4e96900f406e7a447/docs/figure/edger_de.Rmd/up_regulated_genes-1.png" target="_blank">cfbb929</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-31
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/6aa4e2d485d9f744f1e0119c2d3a7aac934a1eee/docs/figure/edger_de.Rmd/up_regulated_genes-1.png" target="_blank">6aa4e2d</a>
