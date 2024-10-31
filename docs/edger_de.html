@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-10-22" />
+<meta name="date" content="2024-10-31" />
 
 <title>Differential gene expression analysis using edgeR</title>
 
@@ -360,7 +360,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Differential gene expression analysis using
 edgeR</h1>
-<h4 class="date">2024-10-22</h4>
+<h4 class="date">2024-10-31</h4>
 
 </div>
 
@@ -389,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-10-22
+<strong>Last updated:</strong> 2024-10-31
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreedda9d85bb9e9c9117d4f65bbdae02328ae957c9btargetblankdda9d85a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree92b951ca79310340c50fbcf9d3d8a59c7278a96btargetblank92b951ca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/dda9d85bb9e9c9117d4f65bbdae02328ae957c9b" target="_blank">dda9d85</a>
+<a href="https://github.com/davetang/muse/tree/92b951ca79310340c50fbcf9d3d8a59c7278a96b" target="_blank">92b951c</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreedda9d85bb9e9c9117d4f65bbdae02328ae957c9btargetblankdda9d85a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree92b951ca79310340c50fbcf9d3d8a59c7278a96btargetblank92b951ca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/dda9d85bb9e9c9117d4f65bbdae02328ae957c9b" target="_blank">dda9d85</a>.
+<a href="https://github.com/davetang/muse/tree/92b951ca79310340c50fbcf9d3d8a59c7278a96b" target="_blank">92b951c</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -561,6 +561,7 @@ Ignored files:
     Ignored:    r_packages_4.4.0/
 
 Untracked files:
+    Untracked:  data/13970886_edger_res.csv
     Untracked:  rsem.merged.gene_counts.tsv
 
 </code></pre>
@@ -606,6 +607,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/92b951ca79310340c50fbcf9d3d8a59c7278a96b/analysis/edger_de.Rmd" target="_blank">92b951c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-31
+</td>
+<td>
+Export edgeR results
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/6aa4e2d485d9f744f1e0119c2d3a7aac934a1eee/docs/edger_de.html" target="_blank">6aa4e2d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -723,8 +758,8 @@ BiocManager::install(&quot;edgeR&quot;)</code></pre>
 </div>
 <div id="data" class="section level2">
 <h2>Data</h2>
-<p><a href="https://zenodo.org/records/13970886"
-class="uri">https://zenodo.org/records/13970886</a></p>
+<p>Use data from <a href="https://zenodo.org/records/13970886">An
+example RNA-seq count table using nf-core/rnaseq</a>.</p>
 <pre class="r"><code>my_url &lt;- &#39;https://zenodo.org/records/13970886/files/rsem.merged.gene_counts.tsv?download=1&#39;
 my_file &lt;- &#39;rsem.merged.gene_counts.tsv&#39;
 
@@ -880,17 +915,17 @@ fit &lt;- glmQLFit(y, design, robust=TRUE)
 res &lt;- glmQLFTest(fit)
 topTags(res)</code></pre>
 <pre><code>Coefficient:  y$samples$groupcancer 
-                    logFC   logCPM         F       PValue         FDR
-ENSG00000289381 -7.412756 2.341373 127.60623 2.767866e-08 0.001035846
-ENSG00000151834 -8.027915 3.644102  64.37842 1.049799e-06 0.003612063
-ENSG00000250696 -8.602174 3.809297  63.66033 1.249401e-06 0.003612063
-ENSG00000229894 -9.123230 4.910552  60.16361 1.751012e-06 0.003612063
-ENSG00000100985  5.735426 5.769059  99.70828 2.012691e-06 0.003612063
-ENSG00000167910 -8.022082 3.453041  56.63286 2.199494e-06 0.003612063
-ENSG00000196778 -8.815389 4.237774  56.19864 2.296578e-06 0.003612063
-ENSG00000166091 -7.247200 2.881457  54.63510 2.658697e-06 0.003612063
-ENSG00000240890 -9.077199 4.702122  53.69560 3.074356e-06 0.003612063
-ENSG00000224781 -7.116543 2.556254  51.43346 3.645089e-06 0.003612063</code></pre>
+                    logFC    logCPM         F       PValue          FDR
+ENSG00000289381 -7.411609 2.3413727 156.14405 3.485881e-09 0.0001304556
+ENSG00000100985  5.744629 5.7690594 110.89086 1.418804e-06 0.0058527061
+ENSG00000275332 -7.648126 2.5721238  59.27705 1.721074e-06 0.0058527061
+ENSG00000220695 -9.132437 4.0374574  58.73122 1.982088e-06 0.0058527061
+ENSG00000256422 -5.529837 0.5541825  54.99786 2.395813e-06 0.0058527061
+ENSG00000151834 -8.035376 3.6441016  61.94292 2.733010e-06 0.0058527061
+ENSG00000167910 -8.018047 3.4530411  55.86149 3.928929e-06 0.0058527061
+ENSG00000226443 -5.742734 0.9948963  51.37638 4.209874e-06 0.0058527061
+ENSG00000250696 -8.580216 3.8092969  52.88815 4.376155e-06 0.0058527061
+ENSG00000196778 -8.809149 4.2377739  54.66541 4.439027e-06 0.0058527061</code></pre>
 <p>CPM.</p>
 <pre class="r"><code>my_cpms &lt;- cpm(y, prior.count=2, log=TRUE)
 head(my_cpms)</code></pre>
@@ -919,6 +954,43 @@ ENSG00000000938  5.947951  5.961622</code></pre>
 my_cpms[down_genes, ] |&gt;
   pheatmap()</code></pre>
 <p><img src="figure/edger_de.Rmd/down_regulated_genes-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-down_regulated_genes-1">
+Past versions of down_regulated_genes-1.png
+</button>
+</p>
+<div id="fig-down_regulated_genes-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/6aa4e2d485d9f744f1e0119c2d3a7aac934a1eee/docs/figure/edger_de.Rmd/down_regulated_genes-1.png" target="_blank">6aa4e2d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-22
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Up-regulated genes with respect to the cancer group.</p>
 <pre class="r"><code>topTags(res, n = Inf) |&gt;
   as.data.frame() |&gt;
@@ -930,6 +1002,65 @@ my_cpms[down_genes, ] |&gt;
 my_cpms[up_genes, ] |&gt;
   pheatmap()</code></pre>
 <p><img src="figure/edger_de.Rmd/up_regulated_genes-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-up_regulated_genes-1">
+Past versions of up_regulated_genes-1.png
+</button>
+</p>
+<div id="fig-up_regulated_genes-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/6aa4e2d485d9f744f1e0119c2d3a7aac934a1eee/docs/figure/edger_de.Rmd/up_regulated_genes-1.png" target="_blank">6aa4e2d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-22
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="export-results" class="section level2">
+<h2>Export results</h2>
+<p>Results are stored in <code>res</code>.</p>
+<pre class="r"><code>class(res)</code></pre>
+<pre><code>[1] &quot;DGELRT&quot;
+attr(,&quot;package&quot;)
+[1] &quot;edgeR&quot;</code></pre>
+<p>Specifically, in <code>res$table</code>.</p>
+<pre class="r"><code>head(res$table)</code></pre>
+<pre><code>                     logFC   logCPM          F      PValue
+ENSG00000000003  2.7275199 4.832838  4.2763383 0.068387013
+ENSG00000000005 -7.0023947 0.540980 17.6315738 0.002159975
+ENSG00000000419  0.1201226 5.339964  0.1140066 0.743147316
+ENSG00000000457 -0.7079087 5.306090  3.3541835 0.099292833
+ENSG00000000460 -0.8967285 3.947381  2.6625206 0.136187708
+ENSG00000000938  1.5368400 5.597107  1.8649388 0.205160993</code></pre>
+<p>Add adjusted p-values and export.</p>
+<pre class="r"><code>res$table |&gt;
+  dplyr::mutate(adjusted_pvalue = p.adjust(PValue, method = &quot;BH&quot;)) |&gt;
+  tibble::rownames_to_column(&quot;ensembl_gene_id&quot;) |&gt;
+  readr::write_csv(file = &quot;data/13970886_edger_res.csv&quot;)</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -962,7 +1093,7 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] pheatmap_1.0.12 ggrepel_0.9.5   edgeR_4.2.1     limma_3.60.4   
+ [1] pheatmap_1.0.12 ggrepel_0.9.5   edgeR_4.2.2     limma_3.60.6   
  [5] lubridate_1.9.3 forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4    
  [9] purrr_1.0.2     readr_2.1.5     tidyr_1.3.1     tibble_3.2.1   
 [13] ggplot2_3.5.1   tidyverse_2.0.0 workflowr_1.7.1
