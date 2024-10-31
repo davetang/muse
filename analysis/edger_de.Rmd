@@ -33,7 +33,7 @@ BiocManager::install("edgeR")
 
 ## Data
 
-https://zenodo.org/records/13970886
+Use data from [An example RNA-seq count table using nf-core/rnaseq](https://zenodo.org/records/13970886).
 
 ```{r gene_counts}
 my_url <- 'https://zenodo.org/records/13970886/files/rsem.merged.gene_counts.tsv?download=1'
@@ -164,4 +164,27 @@ topTags(res, n = Inf) |>
 
 my_cpms[up_genes, ] |>
   pheatmap()
+```
+
+## Export results
+
+Results are stored in `res`.
+
+```{r dgelrt}
+class(res)
+```
+
+Specifically, in `res$table`.
+
+```{r res_table}
+head(res$table)
+```
+
+Add adjusted p-values and export.
+
+```{r export_res_table}
+res$table |>
+  dplyr::mutate(adjusted_pvalue = p.adjust(PValue, method = "BH")) |>
+  tibble::rownames_to_column("ensembl_gene_id") |>
+  readr::write_csv(file = "data/13970886_edger_res.csv")
 ```
