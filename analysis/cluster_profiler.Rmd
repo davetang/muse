@@ -1,0 +1,178 @@
+---
+title: "Getting started with clusterProfiler"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggarchery))
+suppressPackageStartupMessages(library(clusterProfiler))
+suppressPackageStartupMessages(library(org.Hs.eg.db))
+```
+
+## Getting started
+
+Install.
+
+```{r install_cluster_profiler, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("clusterProfiler")
+BiocManager::install("org.Hs.eg.db")
+install.packages('ggarchery')
+```
+
+## Example data
+
+Use [An example differential gene expression results table](https://davetang.org/muse/2024/10/31/an-example-differential-gene-expression-results-table/).
+
+```{r de_res}
+de_res <- read_csv("https://raw.githubusercontent.com/davetang/muse/refs/heads/main/data/13970886_edger_res.csv", show_col_types = FALSE)
+head(de_res)
+```
+
+## Gene IDs
+
+The {clusterProfiler} package uses the `enrichGO()` function for performing a [Gene Ontology over-representation test](https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-go.html#clusterprofiler-go-ora). The input for `gene` is a vector of Entrez Gene IDs.
+
+Our example data uses Ensembl gene IDs, so we need to convert these into Entrez Gene IDs. We can use the {org.Hs.eg.db} package provided by [Bioconductor](https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html), which provides genome wide annotation for human, primarily based on mapping using Entrez Gene identifiers. 
+
+```{r ensembl_to_entrez}
+ensembl_to_entrez <- AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = de_res$ensembl_gene_id,
+  columns = c("ENSEMBL", "ENTREZID"), 
+  keytype = "ENSEMBL"
+)
+
+de_res |>
+  dplyr::inner_join(ensembl_to_entrez, by = dplyr::join_by(ensembl_gene_id == ENSEMBL)) |>
+  dplyr::select(ensembl_gene_id, ENTREZID, dplyr::everything()) -> de_res
+
+head(de_res)
+```
+
+## clusterProfiler
+
+The example data contains results of a comparison between cancer samples and normal samples; positive fold change indicates that genes were expressed higher in cancer. There are a lot of genes up-regulated in cancer.
+
+```{r up_regulated_in_cancer}
+de_res |>
+  dplyr::filter(logFC > 0, adjusted_pvalue < 0.05) |>
+  nrow()
+```
+
+Instead of examining the list of up-regulated genes individually, which would take a long time, we can see whether these genes have common Gene Ontology terms more often than expected.
+
+First we'll get the top 500 most significantly up-regulated genes.
+
+```{r sig_up_genes}
+de_res |>
+  dplyr::filter(logFC > 0, adjusted_pvalue < 0.05) |>
+  dplyr::slice_min(order_by = adjusted_pvalue, n = 500) |>
+  dplyr::filter(!is.na(ENTREZID)) |>
+  dplyr::pull(ENTREZID) -> sig_up_genes
+```
+
+Create the background, i.e., the universe, so we can test for over-representation.
+
+```{r the_universe}
+de_res |>
+  dplyr::filter(!is.na(ENTREZID)) |>
+  dplyr::pull(ENTREZID) -> the_universe
+```
+
+Gene Ontology terms are grouped into three ontologies:
+
+1. Molecular Function (MF)
+2. Biological Process (BP), and
+3. Cellular Component (CC)
+
+Here, we'll perform an over-representation analysis using biological processes.
+
+```{r ego_bp}
+ego_bp <- enrichGO(
+  gene          = sig_up_genes,
+  universe      = the_universe,
+  OrgDb         = org.Hs.eg.db,
+  ont           = "BP",
+  pAdjustMethod = "BH",
+  pvalueCutoff  = 0.01,
+  qvalueCutoff  = 0.05,
+  minGSSize     = 10,
+  maxGSSize     = 500,
+  readable      = TRUE
+)
+
+head(ego_bp)
+```
+
+Bar plot showing each enriched GO term coloured by the adjusted p-value.
+
+```{r barplot}
+barplot(ego_bp, showCategory=10)
+```
+
+Dot plot showing each enriched GO term with associated statistics.
+
+```{r dotplot}
+dotplot(ego_bp, showCategory=10)
+```
+
+Heat plot showing the enriched GO terms on the y-axis and the genes on the x-axis. Genes with the associated GO term are highlighted.
+
+```{r heatplot}
+heatplot(ego_bp, showCategory=10)
+```
+
+`goplot` shows the gene ontology graph with the enriched GO terms highlighted.
+
+```{r goplot, fig.height=10, fig.width=12}
+goplot(ego_bp)
+```
+
+Another nice feature of {clusterProfiler} is that you can plot multiple gene lists together. We can create a list of down-regulated genes.
+
+```{r sig_down_genes}
+de_res |>
+  dplyr::filter(logFC < 0, adjusted_pvalue < 0.05) |>
+  dplyr::slice_min(order_by = adjusted_pvalue, n = 500) |>
+  dplyr::filter(!is.na(ENTREZID)) |>
+  dplyr::pull(ENTREZID) -> sig_down_genes
+```
+
+Perform GO enrichment on two gene lists.
+
+```{r ego_bp_both}
+my_gene_list <- list(
+  up_gene = sig_up_genes,
+  down_gene = sig_down_genes
+)
+
+ego_bp_both <- compareCluster(
+  geneCluster = my_gene_list,
+  fun = "enrichGO",
+  universe = the_universe,
+  OrgDb = org.Hs.eg.db,
+  keyType = "ENTREZID",
+  ont = "BP",
+  pvalueCutoff = 0.01,
+  pAdjustMethod = "BH",
+  qvalueCutoff = 0.05,
+  minGSSize = 10,
+  maxGSSize = 500,
+  readable = TRUE
+)
+
+head(as.data.frame(ego_bp_both))
+```
+
+Dot plot with enriched GO terms by gene list.
+
+```{r dotplot_gene_list, fig.width=12, fig.height=12}
+dotplot(ego_bp_both, showCategory = 15)
+```
