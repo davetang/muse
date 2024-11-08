@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef5eef9941496db6e7f3d028ae979d75d5222307btargetblankf5eef99a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2993db0bd2266a77096c4bd4b83e2a31d1560c87targetblank2993db0a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/f5eef9941496db6e7f3d028ae979d75d5222307b" target="_blank">f5eef99</a>
+<a href="https://github.com/davetang/muse/tree/2993db0bd2266a77096c4bd4b83e2a31d1560c87" target="_blank">2993db0</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef5eef9941496db6e7f3d028ae979d75d5222307btargetblankf5eef99a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2993db0bd2266a77096c4bd4b83e2a31d1560c87targetblank2993db0a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/f5eef9941496db6e7f3d028ae979d75d5222307b" target="_blank">f5eef99</a>.
+<a href="https://github.com/davetang/muse/tree/2993db0bd2266a77096c4bd4b83e2a31d1560c87" target="_blank">2993db0</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -606,6 +606,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/2993db0bd2266a77096c4bd4b83e2a31d1560c87/analysis/annotation_dbi.Rmd" target="_blank">2993db0</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-11-08
+</td>
+<td>
+Mouse reference
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/c8bf5517aaeacc4678a673e8b989d6745ebe52d3/docs/annotation_dbi.html" target="_blank">c8bf551</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-11-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -885,6 +919,67 @@ AnnotationDbi::select(
 <p>Using the annotation package {org.Hs.eg.db} we can easily convert
 different gene identifiers, obtain their gene symbols, and descriptions
 (as well as all other keytypes).</p>
+</div>
+<div id="mouse" class="section level2">
+<h2>Mouse</h2>
+<p>Install {org.Mm.eg.db}.</p>
+<pre class="r"><code>BiocManager::install(&quot;org.Mm.eg.db&quot;)</code></pre>
+<p>Package info.</p>
+<pre class="r"><code>packageVersion(&quot;org.Mm.eg.db&quot;)</code></pre>
+<pre><code>[1] &#39;3.20.0&#39;</code></pre>
+<pre class="r"><code>suppressPackageStartupMessages(library(org.Mm.eg.db))
+class(org.Mm.eg.db)</code></pre>
+<pre><code>[1] &quot;OrgDb&quot;
+attr(,&quot;package&quot;)
+[1] &quot;AnnotationDbi&quot;</code></pre>
+<p>{org.Mm.eg.db} info.</p>
+<pre class="r"><code>org.Mm.eg.db</code></pre>
+<pre><code>OrgDb object:
+| DBSCHEMAVERSION: 2.1
+| Db type: OrgDb
+| Supporting package: AnnotationDbi
+| DBSCHEMA: MOUSE_DB
+| ORGANISM: Mus musculus
+| SPECIES: Mouse
+| EGSOURCEDATE: 2024-Sep20
+| EGSOURCENAME: Entrez Gene
+| EGSOURCEURL: ftp://ftp.ncbi.nlm.nih.gov/gene/DATA
+| CENTRALID: EG
+| TAXID: 10090
+| GOSOURCENAME: 
+| GOSOURCEURL: 
+| GOSOURCEDATE: 
+| GOEGSOURCEDATE: 2024-Sep20
+| GOEGSOURCENAME: Entrez Gene
+| GOEGSOURCEURL: ftp://ftp.ncbi.nlm.nih.gov/gene/DATA
+| KEGGSOURCENAME: KEGG GENOME
+| KEGGSOURCEURL: ftp://ftp.genome.jp/pub/kegg/genomes
+| KEGGSOURCEDATE: 2011-Mar15
+| GPSOURCENAME: UCSC Genome Bioinformatics (Mus musculus)
+| GPSOURCEURL: ftp://hgdownload.cse.ucsc.edu/goldenPath/mm39/database
+| GPSOURCEDATE: 2024-Sep22
+| ENSOURCEDATE: 2024-May14
+| ENSOURCENAME: Ensembl
+| ENSOURCEURL: ftp://ftp.ensembl.org/pub/current_fasta
+| UPSOURCENAME: Uniprot
+| UPSOURCEURL: http://www.UniProt.org/
+| UPSOURCEDATE: Mon Sep 23 16:04:35 2024</code></pre>
+<pre><code>
+Please see: help(&#39;select&#39;) for usage information</code></pre>
+<p>Mouse query.</p>
+<pre class="r"><code>AnnotationDbi::select(
+  org.Mm.eg.db,
+  keys = c(&#39;ENSMUSG00000121796&#39;, &#39;ENSMUSG00000121918&#39;, &#39;ENSMUSG00000121583&#39;, &#39;ENSMUSG00000121584&#39;),
+  columns=c(&quot;ENSEMBL&quot;,&quot;ENTREZID&quot;,&quot;SYMBOL&quot;,&quot;GENENAME&quot;),
+  keytype=&quot;ENSEMBL&quot;
+)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre><code>             ENSEMBL  ENTREZID  SYMBOL                           GENENAME
+1 ENSMUSG00000121796      &lt;NA&gt;    &lt;NA&gt;                               &lt;NA&gt;
+2 ENSMUSG00000121918      &lt;NA&gt;    &lt;NA&gt;                               &lt;NA&gt;
+3 ENSMUSG00000121583     54151 Zftraf1 zinc finger TRAF type containing 1
+4 ENSMUSG00000121583 125488414 Gm57852              predicted gene, 57852
+5 ENSMUSG00000121584 125480935 Tmem276          transmembrane protein 276</code></pre>
 </div>
 <div id="reactome.db" class="section level2">
 <h2>reactome.db</h2>
@@ -1170,13 +1265,14 @@ other attached packages:
  [4] GenomeInfoDb_1.42.0                     
  [5] GO.db_3.20.0                            
  [6] reactome.db_1.89.0                      
- [7] org.Hs.eg.db_3.20.0                     
- [8] AnnotationDbi_1.68.0                    
- [9] IRanges_2.40.0                          
-[10] S4Vectors_0.44.0                        
-[11] Biobase_2.66.0                          
-[12] BiocGenerics_0.52.0                     
-[13] workflowr_1.7.1                         
+ [7] org.Mm.eg.db_3.20.0                     
+ [8] org.Hs.eg.db_3.20.0                     
+ [9] AnnotationDbi_1.68.0                    
+[10] IRanges_2.40.0                          
+[11] S4Vectors_0.44.0                        
+[12] Biobase_2.66.0                          
+[13] BiocGenerics_0.52.0                     
+[14] workflowr_1.7.1                         
 
 loaded via a namespace (and not attached):
  [1] blob_1.2.4                  Biostrings_2.74.0          
@@ -1211,8 +1307,8 @@ loaded via a namespace (and not attached):
 [59] UCSC.utils_1.2.0            tibble_3.2.1               
 [61] pillar_1.9.0                htmltools_0.5.8.1          
 [63] GenomeInfoDbData_1.2.13     R6_2.5.1                   
-[65] rprojroot_2.0.4             evaluate_1.0.1             
-[67] lattice_0.22-6              png_0.1-8                  
+[65] rprojroot_2.0.4             lattice_0.22-6             
+[67] evaluate_1.0.1              png_0.1-8                  
 [69] Rsamtools_2.22.0            memoise_2.0.1              
 [71] httpuv_1.6.15               bslib_0.8.0                
 [73] Rcpp_1.0.13-1               SparseArray_1.6.0          
