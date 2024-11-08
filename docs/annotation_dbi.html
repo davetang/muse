@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2024-10-23" />
+<meta name="date" content="2024-11-08" />
 
 <title>Bioconductor annotation packages</title>
 
-<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Bioconductor annotation packages</h1>
-<h4 class="date">2024-10-23</h4>
+<h4 class="date">2024-11-08</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-10-23
+<strong>Last updated:</strong> 2024-11-08
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree58216aecf17a4080d377fa5748fb837eb700530atargetblank58216aea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef5eef9941496db6e7f3d028ae979d75d5222307btargetblankf5eef99a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/58216aecf17a4080d377fa5748fb837eb700530a" target="_blank">58216ae</a>
+<a href="https://github.com/davetang/muse/tree/f5eef9941496db6e7f3d028ae979d75d5222307b" target="_blank">f5eef99</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree58216aecf17a4080d377fa5748fb837eb700530atargetblank58216aea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef5eef9941496db6e7f3d028ae979d75d5222307btargetblankf5eef99a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/58216aecf17a4080d377fa5748fb837eb700530a" target="_blank">58216ae</a>.
+<a href="https://github.com/davetang/muse/tree/f5eef9941496db6e7f3d028ae979d75d5222307b" target="_blank">f5eef99</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -558,6 +558,10 @@ Ignored files:
     Ignored:    data/pbmc3k.csv.gz
     Ignored:    data/pbmc3k/
     Ignored:    r_packages_4.4.0/
+    Ignored:    r_packages_4.4.1/
+
+Untracked files:
+    Untracked:  Homo_sapiens.GRCh38.113.gtf.gz
 
 </code></pre>
 <p>
@@ -602,6 +606,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/f5eef9941496db6e7f3d028ae979d75d5222307b/analysis/annotation_dbi.Rmd" target="_blank">f5eef99</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-11-08
+</td>
+<td>
+Output info from org.Hs.eg.db
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/def5ab0e21099a06f653428581319601be1d65c5/docs/annotation_dbi.html" target="_blank">def5ab0</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -714,12 +752,46 @@ BiocManager::install(&quot;org.Hs.eg.db&quot;)</code></pre>
 <h2>Package</h2>
 <p>Load package.</p>
 <pre class="r"><code>packageVersion(&quot;org.Hs.eg.db&quot;)</code></pre>
-<pre><code>[1] &#39;3.19.1&#39;</code></pre>
+<pre><code>[1] &#39;3.20.0&#39;</code></pre>
 <pre class="r"><code>suppressPackageStartupMessages(library(org.Hs.eg.db))
 class(org.Hs.eg.db)</code></pre>
 <pre><code>[1] &quot;OrgDb&quot;
 attr(,&quot;package&quot;)
 [1] &quot;AnnotationDbi&quot;</code></pre>
+<p>{org.Hs.eg.db} info.</p>
+<pre class="r"><code>org.Hs.eg.db</code></pre>
+<pre><code>OrgDb object:
+| DBSCHEMAVERSION: 2.1
+| Db type: OrgDb
+| Supporting package: AnnotationDbi
+| DBSCHEMA: HUMAN_DB
+| ORGANISM: Homo sapiens
+| SPECIES: Human
+| EGSOURCEDATE: 2024-Sep20
+| EGSOURCENAME: Entrez Gene
+| EGSOURCEURL: ftp://ftp.ncbi.nlm.nih.gov/gene/DATA
+| CENTRALID: EG
+| TAXID: 9606
+| GOSOURCENAME: 
+| GOSOURCEURL: 
+| GOSOURCEDATE: 
+| GOEGSOURCEDATE: 2024-Sep20
+| GOEGSOURCENAME: Entrez Gene
+| GOEGSOURCEURL: ftp://ftp.ncbi.nlm.nih.gov/gene/DATA
+| KEGGSOURCENAME: KEGG GENOME
+| KEGGSOURCEURL: ftp://ftp.genome.jp/pub/kegg/genomes
+| KEGGSOURCEDATE: 2011-Mar15
+| GPSOURCENAME: UCSC Genome Bioinformatics (Homo sapiens)
+| GPSOURCEURL: ftp://hgdownload.cse.ucsc.edu/goldenPath/hg38/database
+| GPSOURCEDATE: 2024-Sep22
+| ENSOURCEDATE: 2024-May14
+| ENSOURCENAME: Ensembl
+| ENSOURCEURL: ftp://ftp.ensembl.org/pub/current_fasta
+| UPSOURCENAME: Uniprot
+| UPSOURCEURL: http://www.UniProt.org/
+| UPSOURCEDATE: Mon Sep 23 15:46:45 2024</code></pre>
+<pre><code>
+Please see: help(&#39;select&#39;) for usage information</code></pre>
 </div>
 <div id="getting-started" class="section level2">
 <h2>Getting started</h2>
@@ -825,7 +897,7 @@ is not affiliated with the Reactome team.</p>
 <pre class="r"><code>BiocManager::install(&quot;reactome.db&quot;)</code></pre>
 <p>Load the package.</p>
 <pre class="r"><code>packageVersion(&#39;reactome.db&#39;)</code></pre>
-<pre><code>[1] &#39;1.88.0&#39;</code></pre>
+<pre><code>[1] &#39;1.89.0&#39;</code></pre>
 <pre class="r"><code>suppressPackageStartupMessages(library(reactome.db))
 class(reactome.db)</code></pre>
 <pre><code>[1] &quot;ReactomeDb&quot;
@@ -921,7 +993,7 @@ Ontology that we can probe in the same manner.</p>
 <pre class="r"><code>BiocManager::install(&quot;GO.db&quot;)</code></pre>
 <p>Load the package.</p>
 <pre class="r"><code>packageVersion(&#39;GO.db&#39;)</code></pre>
-<pre><code>[1] &#39;3.19.1&#39;</code></pre>
+<pre><code>[1] &#39;3.20.0&#39;</code></pre>
 <pre class="r"><code>suppressPackageStartupMessages(library(GO.db))
 class(GO.db)</code></pre>
 <pre><code>[1] &quot;GODb&quot;
@@ -933,8 +1005,8 @@ object.</p>
 <pre><code>[1] &quot;DEFINITION&quot; &quot;GOID&quot;       &quot;ONTOLOGY&quot;   &quot;TERM&quot;      </code></pre>
 <pre class="r"><code>my_go_keys &lt;- head(keys(GO.db))
 my_go_keys</code></pre>
-<pre><code>[1] &quot;GO:0000001&quot; &quot;GO:0000002&quot; &quot;GO:0000003&quot; &quot;GO:0000006&quot; &quot;GO:0000007&quot;
-[6] &quot;GO:0000009&quot;</code></pre>
+<pre><code>[1] &quot;GO:0000001&quot; &quot;GO:0000002&quot; &quot;GO:0000006&quot; &quot;GO:0000007&quot; &quot;GO:0000009&quot;
+[6] &quot;GO:0000010&quot;</code></pre>
 <pre class="r"><code>AnnotationDbi::select(
   GO.db,
   keys = my_go_keys,
@@ -945,10 +1017,10 @@ my_go_keys</code></pre>
 <pre><code>        GOID                                                     TERM ONTOLOGY
 1 GO:0000001                                mitochondrion inheritance       BP
 2 GO:0000002                         mitochondrial genome maintenance       BP
-3 GO:0000003                                             reproduction       BP
-4 GO:0000006    high-affinity zinc transmembrane transporter activity       MF
-5 GO:0000007 low-affinity zinc ion transmembrane transporter activity       MF
-6 GO:0000009                   alpha-1,6-mannosyltransferase activity       MF</code></pre>
+3 GO:0000006    high-affinity zinc transmembrane transporter activity       MF
+4 GO:0000007 low-affinity zinc ion transmembrane transporter activity       MF
+5 GO:0000009                   alpha-1,6-mannosyltransferase activity       MF
+6 GO:0000010                heptaprenyl diphosphate synthase activity       MF</code></pre>
 </div>
 <div id="genomicfeatures" class="section level2">
 <h2>GenomicFeatures</h2>
@@ -959,7 +1031,7 @@ package.</p>
 <pre class="r"><code>BiocManager::install(&quot;TxDb.Hsapiens.UCSC.hg38.knownGene&quot;)</code></pre>
 <p>Load the package.</p>
 <pre class="r"><code>packageVersion(&#39;TxDb.Hsapiens.UCSC.hg38.knownGene&#39;)</code></pre>
-<pre><code>[1] &#39;3.18.0&#39;</code></pre>
+<pre><code>[1] &#39;3.20.0&#39;</code></pre>
 <pre class="r"><code>suppressPackageStartupMessages(library(TxDb.Hsapiens.UCSC.hg38.knownGene))
 class(TxDb.Hsapiens.UCSC.hg38.knownGene)</code></pre>
 <pre><code>[1] &quot;TxDb&quot;
@@ -982,17 +1054,17 @@ function</p>
 )</code></pre>
 <pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
 <pre><code>   GENEID   TXID TXCHROM  TXSTART    TXEND
-1       1 228947   chr19 58345178 58347634
-2       1 228948   chr19 58345183 58353492
-3       1 228949   chr19 58346854 58356225
-4       1 228950   chr19 58346858 58353491
-5       1 228951   chr19 58346860 58347657
-6       1 228952   chr19 58348466 58362751
-7       1 228953   chr19 58350594 58353129
-8       1 228954   chr19 58353021 58356083
-9      10 104459    chr8 18386311 18388323
-10     10 104461    chr8 18391282 18401218
-11     10 104462    chr8 18391287 18400993</code></pre>
+1       1 230133   chr19 58345178 58347634
+2       1 230134   chr19 58345183 58353492
+3       1 230135   chr19 58346854 58356225
+4       1 230136   chr19 58346858 58353491
+5       1 230137   chr19 58346860 58347657
+6       1 230138   chr19 58348466 58362751
+7       1 230139   chr19 58350594 58353129
+8       1 230140   chr19 58353021 58356083
+9      10 104998    chr8 18386311 18388323
+10     10 105000    chr8 18391282 18401218
+11     10 105001    chr8 18391287 18400993</code></pre>
 </div>
 <div id="combining-databases" class="section level2">
 <h2>Combining databases</h2>
@@ -1024,23 +1096,23 @@ AnnotationDbi::select(
 <pre><code>&#39;select()&#39; returned many:many mapping between keys and columns</code></pre>
 <pre class="r"><code>head(b)</code></pre>
 <pre><code>  GENEID   TXID TXCHROM  TXSTART    TXEND
-1 120892 148742   chr12 40196744 40283952
-2 120892 148744   chr12 40224977 40242782
-3 120892 148745   chr12 40224997 40367077
-4 120892 148746   chr12 40224997 40369285
-5 120892 148747   chr12 40225011 40304976
-6 120892 148748   chr12 40225080 40369259</code></pre>
+1 120892 149454   chr12 40196744 40283952
+2 120892 149456   chr12 40224977 40242782
+3 120892 149457   chr12 40224997 40367077
+4 120892 149458   chr12 40224997 40369285
+5 120892 149459   chr12 40225011 40304976
+6 120892 149460   chr12 40225080 40369259</code></pre>
 <pre class="r"><code># change GENEID column to ENTREZID for consistency and for merging
 names(b) &lt;- c(&#39;ENTREZID&#39;, &#39;TXID&#39;, &#39;TXCHROM&#39;, &#39;TXSTART&#39;, &#39;TXEND&#39;)
 c &lt;- merge(a, b, &#39;ENTREZID&#39;)
 head(c)</code></pre>
 <pre><code>  ENTREZID SYMBOL   OMIM   TXID TXCHROM  TXSTART    TXEND
-1   120892  LRRK2 607060 148742   chr12 40196744 40283952
-2   120892  LRRK2 607060 148744   chr12 40224977 40242782
-3   120892  LRRK2 607060 148745   chr12 40224997 40367077
-4   120892  LRRK2 607060 148746   chr12 40224997 40369285
-5   120892  LRRK2 607060 148747   chr12 40225011 40304976
-6   120892  LRRK2 607060 148748   chr12 40225080 40369259</code></pre>
+1   120892  LRRK2 607060 149454   chr12 40196744 40283952
+2   120892  LRRK2 607060 149456   chr12 40224977 40242782
+3   120892  LRRK2 607060 149457   chr12 40224997 40367077
+4   120892  LRRK2 607060 149458   chr12 40224997 40369285
+5   120892  LRRK2 607060 149459   chr12 40225011 40304976
+6   120892  LRRK2 607060 149460   chr12 40225080 40369259</code></pre>
 </div>
 <div id="conclusions" class="section level2">
 <h2>Conclusions</h2>
@@ -1068,9 +1140,9 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.4.0 (2024-04-24)
+<pre><code>R version 4.4.1 (2024-06-14)
 Platform: x86_64-pc-linux-gnu
-Running under: Ubuntu 22.04.4 LTS
+Running under: Ubuntu 22.04.5 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -1092,60 +1164,60 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] TxDb.Hsapiens.UCSC.hg38.knownGene_3.18.0
- [2] GenomicFeatures_1.56.0                  
- [3] GenomicRanges_1.56.2                    
- [4] GenomeInfoDb_1.40.1                     
- [5] GO.db_3.19.1                            
- [6] reactome.db_1.88.0                      
- [7] org.Hs.eg.db_3.19.1                     
- [8] AnnotationDbi_1.66.0                    
- [9] IRanges_2.38.1                          
-[10] S4Vectors_0.42.1                        
-[11] Biobase_2.64.0                          
-[12] BiocGenerics_0.50.0                     
+ [1] TxDb.Hsapiens.UCSC.hg38.knownGene_3.20.0
+ [2] GenomicFeatures_1.58.0                  
+ [3] GenomicRanges_1.58.0                    
+ [4] GenomeInfoDb_1.42.0                     
+ [5] GO.db_3.20.0                            
+ [6] reactome.db_1.89.0                      
+ [7] org.Hs.eg.db_3.20.0                     
+ [8] AnnotationDbi_1.68.0                    
+ [9] IRanges_2.40.0                          
+[10] S4Vectors_0.44.0                        
+[11] Biobase_2.66.0                          
+[12] BiocGenerics_0.52.0                     
 [13] workflowr_1.7.1                         
 
 loaded via a namespace (and not attached):
- [1] blob_1.2.4                  Biostrings_2.72.1          
- [3] bitops_1.0-7                fastmap_1.2.0              
- [5] RCurl_1.98-1.14             GenomicAlignments_1.40.0   
- [7] promises_1.3.0              XML_3.99-0.16.1            
+ [1] blob_1.2.4                  Biostrings_2.74.0          
+ [3] bitops_1.0-9                fastmap_1.2.0              
+ [5] RCurl_1.98-1.16             GenomicAlignments_1.42.0   
+ [7] promises_1.3.0              XML_3.99-0.17              
  [9] digest_0.6.37               lifecycle_1.0.4            
-[11] processx_3.8.4              KEGGREST_1.44.1            
+[11] processx_3.8.4              KEGGREST_1.46.0            
 [13] RSQLite_2.3.7               magrittr_2.0.3             
-[15] compiler_4.4.0              rlang_1.1.4                
-[17] sass_0.4.9                  tools_4.4.0                
-[19] utf8_1.2.4                  yaml_2.3.8                 
-[21] rtracklayer_1.64.0          knitr_1.47                 
-[23] S4Arrays_1.4.1              bit_4.0.5                  
-[25] curl_5.2.1                  DelayedArray_0.30.1        
-[27] abind_1.4-5                 BiocParallel_1.38.0        
-[29] grid_4.4.0                  fansi_1.0.6                
-[31] git2r_0.33.0                SummarizedExperiment_1.34.0
-[33] cli_3.6.3                   rmarkdown_2.27             
-[35] crayon_1.5.2                rstudioapi_0.16.0          
-[37] httr_1.4.7                  rjson_0.2.21               
+[15] compiler_4.4.1              rlang_1.1.4                
+[17] sass_0.4.9                  tools_4.4.1                
+[19] utf8_1.2.4                  yaml_2.3.10                
+[21] rtracklayer_1.66.0          knitr_1.48                 
+[23] S4Arrays_1.6.0              bit_4.5.0                  
+[25] curl_6.0.0                  DelayedArray_0.32.0        
+[27] abind_1.4-8                 BiocParallel_1.40.0        
+[29] grid_4.4.1                  fansi_1.0.6                
+[31] git2r_0.35.0                SummarizedExperiment_1.36.0
+[33] cli_3.6.3                   rmarkdown_2.29             
+[35] crayon_1.5.3                rstudioapi_0.17.1          
+[37] httr_1.4.7                  rjson_0.2.23               
 [39] DBI_1.2.3                   cachem_1.1.0               
-[41] stringr_1.5.1               zlibbioc_1.50.0            
-[43] parallel_4.4.0              XVector_0.44.0             
-[45] restfulr_0.0.15             matrixStats_1.3.0          
+[41] stringr_1.5.1               zlibbioc_1.52.0            
+[43] parallel_4.4.1              XVector_0.46.0             
+[45] restfulr_0.0.15             matrixStats_1.4.1          
 [47] vctrs_0.6.5                 Matrix_1.7-0               
-[49] jsonlite_1.8.8              callr_3.7.6                
-[51] bit64_4.0.5                 jquerylib_0.1.4            
-[53] glue_1.7.0                  codetools_0.2-20           
-[55] ps_1.7.6                    stringi_1.8.4              
-[57] later_1.3.2                 BiocIO_1.14.0              
-[59] UCSC.utils_1.0.0            tibble_3.2.1               
+[49] jsonlite_1.8.9              callr_3.7.6                
+[51] bit64_4.5.2                 jquerylib_0.1.4            
+[53] glue_1.8.0                  codetools_0.2-20           
+[55] ps_1.8.1                    stringi_1.8.4              
+[57] later_1.3.2                 BiocIO_1.16.0              
+[59] UCSC.utils_1.2.0            tibble_3.2.1               
 [61] pillar_1.9.0                htmltools_0.5.8.1          
-[63] GenomeInfoDbData_1.2.12     R6_2.5.1                   
-[65] rprojroot_2.0.4             evaluate_0.24.0            
+[63] GenomeInfoDbData_1.2.13     R6_2.5.1                   
+[65] rprojroot_2.0.4             evaluate_1.0.1             
 [67] lattice_0.22-6              png_0.1-8                  
-[69] Rsamtools_2.20.0            memoise_2.0.1              
-[71] httpuv_1.6.15               bslib_0.7.0                
-[73] Rcpp_1.0.12                 SparseArray_1.4.8          
-[75] whisker_0.4.1               xfun_0.44                  
-[77] fs_1.6.4                    MatrixGenerics_1.16.0      
+[69] Rsamtools_2.22.0            memoise_2.0.1              
+[71] httpuv_1.6.15               bslib_0.8.0                
+[73] Rcpp_1.0.13-1               SparseArray_1.6.0          
+[75] whisker_0.4.1               xfun_0.49                  
+[77] fs_1.6.5                    MatrixGenerics_1.18.0      
 [79] getPass_0.2-4               pkgconfig_2.0.3            </code></pre>
 </div>
 </div>
