@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2024-10-24" />
+<meta name="date" content="2024-11-08" />
 
 <title>Learning to use biomaRt</title>
 
-<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Learning to use biomaRt</h1>
-<h4 class="date">2024-10-24</h4>
+<h4 class="date">2024-11-08</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-10-24
+<strong>Last updated:</strong> 2024-11-08
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee6a2c5888a45625b60d14479092cc0a2a19584e3targetblanke6a2c58a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5391fccd990cc9e9d2f46eb4c4b363d04a1ab763targetblank5391fcca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/e6a2c5888a45625b60d14479092cc0a2a19584e3" target="_blank">e6a2c58</a>
+<a href="https://github.com/davetang/muse/tree/5391fccd990cc9e9d2f46eb4c4b363d04a1ab763" target="_blank">5391fcc</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee6a2c5888a45625b60d14479092cc0a2a19584e3targetblanke6a2c58a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5391fccd990cc9e9d2f46eb4c4b363d04a1ab763targetblank5391fcca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/e6a2c5888a45625b60d14479092cc0a2a19584e3" target="_blank">e6a2c58</a>.
+<a href="https://github.com/davetang/muse/tree/5391fccd990cc9e9d2f46eb4c4b363d04a1ab763" target="_blank">5391fcc</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -558,6 +558,7 @@ Ignored files:
     Ignored:    data/pbmc3k.csv.gz
     Ignored:    data/pbmc3k/
     Ignored:    r_packages_4.4.0/
+    Ignored:    r_packages_4.4.1/
 
 </code></pre>
 <p>
@@ -602,6 +603,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/5391fccd990cc9e9d2f46eb4c4b363d04a1ab763/analysis/biomart.Rmd" target="_blank">5391fcc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-11-08
+</td>
+<td>
+wflow_publish(files = "analysis/biomart.Rmd")
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/d6c949a66f1bac3d4d563083506bf5b339875166/docs/biomart.html" target="_blank">d6c949a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -689,7 +724,7 @@ BiocManager::install(&quot;biomaRt&quot;)</code></pre>
 <h2>Package</h2>
 <p>Load package.</p>
 <pre class="r"><code>packageVersion(&quot;biomaRt&quot;)</code></pre>
-<pre><code>[1] &#39;2.60.1&#39;</code></pre>
+<pre><code>[1] &#39;2.62.0&#39;</code></pre>
 <pre class="r"><code>suppressPackageStartupMessages(library(biomaRt))</code></pre>
 <p>If you are using Ubuntu and get a “Cannot find xml2-config” error
 while installing the {XML} package, a dependency of {biomaRt}, try
@@ -1083,6 +1118,103 @@ IDs.</p>
 </div>
 <div id="older-reference-assemblies" class="section level2">
 <h2>Older reference assemblies</h2>
+<div id="v112" class="section level3">
+<h3>v112</h3>
+<p>From the help page of <code>useMart()</code>:</p>
+<blockquote>
+<p>archive - Boolean to indicate if you want to access archived versions
+of BioMart databases. Note that this argument is now deprecated and will
+be removed in the future. A better alternative is to leave archive =
+FALSE and to specify the url of the archived BioMart you want to access.
+For Ensembl you can view the list of archives using
+listEnsemblArchives</p>
+</blockquote>
+<pre class="r"><code>listEnsemblArchives()</code></pre>
+<pre><code>             name     date                                 url version
+1  Ensembl GRCh37 Feb 2014          https://grch37.ensembl.org  GRCh37
+2     Ensembl 113 Oct 2024 https://oct2024.archive.ensembl.org     113
+3     Ensembl 112 May 2024 https://may2024.archive.ensembl.org     112
+4     Ensembl 111 Jan 2024 https://jan2024.archive.ensembl.org     111
+5     Ensembl 110 Jul 2023 https://jul2023.archive.ensembl.org     110
+6     Ensembl 109 Feb 2023 https://feb2023.archive.ensembl.org     109
+7     Ensembl 108 Oct 2022 https://oct2022.archive.ensembl.org     108
+8     Ensembl 107 Jul 2022 https://jul2022.archive.ensembl.org     107
+9     Ensembl 106 Apr 2022 https://apr2022.archive.ensembl.org     106
+10    Ensembl 105 Dec 2021 https://dec2021.archive.ensembl.org     105
+11    Ensembl 104 May 2021 https://may2021.archive.ensembl.org     104
+12    Ensembl 103 Feb 2021 https://feb2021.archive.ensembl.org     103
+13    Ensembl 102 Nov 2020 https://nov2020.archive.ensembl.org     102
+14    Ensembl 101 Aug 2020 https://aug2020.archive.ensembl.org     101
+15    Ensembl 100 Apr 2020 https://apr2020.archive.ensembl.org     100
+16     Ensembl 99 Jan 2020 https://jan2020.archive.ensembl.org      99
+17     Ensembl 98 Sep 2019 https://sep2019.archive.ensembl.org      98
+18     Ensembl 80 May 2015 https://may2015.archive.ensembl.org      80
+19     Ensembl 77 Oct 2014 https://oct2014.archive.ensembl.org      77
+20     Ensembl 75 Feb 2014 https://feb2014.archive.ensembl.org      75
+21     Ensembl 54 May 2009 https://may2009.archive.ensembl.org      54
+   current_release
+1                 
+2                *
+3                 
+4                 
+5                 
+6                 
+7                 
+8                 
+9                 
+10                
+11                
+12                
+13                
+14                
+15                
+16                
+17                
+18                
+19                
+20                
+21                </code></pre>
+<p>Use <code>https://may2024.archive.ensembl.org</code>.</p>
+<pre class="r"><code>ensembl &lt;- useMart(&quot;ENSEMBL_MART_ENSEMBL&quot;, host = &quot;https://may2024.archive.ensembl.org&quot;)
+avail_datasets_v112 &lt;- listDatasets(ensembl)
+grep(&#39;sapien&#39;, avail_datasets_v112$dataset, value = TRUE)</code></pre>
+<pre><code>[1] &quot;hsapiens_gene_ensembl&quot;</code></pre>
+<p>Use <code>hsapiens_gene_ensembl</code> dataset.</p>
+<pre class="r"><code>ensembl &lt;- useMart(
+  biomart = &quot;ENSEMBL_MART_ENSEMBL&quot;,
+  dataset = &quot;hsapiens_gene_ensembl&quot;,
+  host = &quot;https://may2024.archive.ensembl.org&quot;
+)</code></pre>
+<p>Convert Ensembl gene IDs to HUGO Gene Nomenclature Committee (HGNC)
+gene symbols.</p>
+<pre class="r"><code>my_genes &lt;- c(&#39;ENSG00000118473&#39;, &#39;ENSG00000162426&#39;)
+ 
+getBM(
+  attributes=c(&#39;ensembl_gene_id&#39;, &quot;hgnc_symbol&quot;, &quot;description&quot;),
+  filters = &quot;ensembl_gene_id&quot;,
+  values=my_genes,
+  mart=ensembl
+)</code></pre>
+<pre><code>Error in .processResults(postRes, mart = mart, hostURLsep = sep, fullXmlQuery = fullXmlQuery, : Query ERROR: caught BioMart::Exception::Database: Error during query execution: Table &#39;ensembl_mart_112.hsapiens_gene_ensembl__ox_hgnc__dm&#39; doesn&#39;t exist</code></pre>
+<p>From <a href="https://github.com/grimbough/biomaRt/issues/104"
+class="uri">https://github.com/grimbough/biomaRt/issues/104</a> but no
+dice.</p>
+<pre class="r"><code>ensembl_112 &lt;- useEnsembl(
+  biomart = &quot;genes&quot;,
+  dataset = &quot;hsapiens_gene_ensembl&quot;,
+  version = 112
+)
+
+getBM(
+  attributes=c(&#39;ensembl_gene_id&#39;, &quot;hgnc_symbol&quot;, &quot;description&quot;),
+  filters = &quot;ensembl_gene_id&quot;,
+  values=my_genes,
+  mart=ensembl_112
+)</code></pre>
+<pre><code>Error in .processResults(postRes, mart = mart, hostURLsep = sep, fullXmlQuery = fullXmlQuery, : Query ERROR: caught BioMart::Exception::Database: Error during query execution: Table &#39;ensembl_mart_112.hsapiens_gene_ensembl__ox_hgnc__dm&#39; doesn&#39;t exist</code></pre>
+</div>
+<div id="hg19" class="section level3">
+<h3>hg19</h3>
 <p>Last patch of hg19.</p>
 <pre class="r"><code>grch37 &lt;- useMart(
   biomart=&quot;ENSEMBL_MART_ENSEMBL&quot;,
@@ -1102,9 +1234,9 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.4.0 (2024-04-24)
+<pre><code>R version 4.4.1 (2024-06-14)
 Platform: x86_64-pc-linux-gnu
-Running under: Ubuntu 22.04.4 LTS
+Running under: Ubuntu 22.04.5 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -1126,36 +1258,37 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] org.Hs.eg.db_3.19.1  GO.db_3.19.1         AnnotationDbi_1.66.0
-[4] IRanges_2.38.1       S4Vectors_0.42.1     Biobase_2.64.0      
-[7] BiocGenerics_0.50.0  biomaRt_2.60.1       workflowr_1.7.1     
+[1] org.Hs.eg.db_3.20.0  GO.db_3.20.0         AnnotationDbi_1.68.0
+[4] IRanges_2.40.0       S4Vectors_0.44.0     Biobase_2.66.0      
+[7] BiocGenerics_0.52.0  biomaRt_2.62.0       workflowr_1.7.1     
 
 loaded via a namespace (and not attached):
- [1] KEGGREST_1.44.1         xfun_0.44               bslib_0.7.0            
- [4] httr2_1.0.2             processx_3.8.4          callr_3.7.6            
- [7] generics_0.1.3          vctrs_0.6.5             tools_4.4.0            
-[10] ps_1.7.6                curl_5.2.1              tibble_3.2.1           
+ [1] KEGGREST_1.46.0         xfun_0.49               bslib_0.8.0            
+ [4] httr2_1.0.6             processx_3.8.4          callr_3.7.6            
+ [7] generics_0.1.3          vctrs_0.6.5             tools_4.4.1            
+[10] ps_1.8.1                curl_6.0.0              tibble_3.2.1           
 [13] fansi_1.0.6             RSQLite_2.3.7           blob_1.2.4             
 [16] pkgconfig_2.0.3         dbplyr_2.5.0            lifecycle_1.0.4        
-[19] GenomeInfoDbData_1.2.12 compiler_4.4.0          stringr_1.5.1          
-[22] git2r_0.33.0            Biostrings_2.72.1       progress_1.2.3         
-[25] getPass_0.2-4           httpuv_1.6.15           GenomeInfoDb_1.40.1    
-[28] htmltools_0.5.8.1       sass_0.4.9              yaml_2.3.8             
-[31] later_1.3.2             pillar_1.9.0            crayon_1.5.2           
+[19] GenomeInfoDbData_1.2.13 compiler_4.4.1          stringr_1.5.1          
+[22] git2r_0.35.0            Biostrings_2.74.0       progress_1.2.3         
+[25] getPass_0.2-4           httpuv_1.6.15           GenomeInfoDb_1.42.0    
+[28] htmltools_0.5.8.1       sass_0.4.9              yaml_2.3.10            
+[31] later_1.3.2             pillar_1.9.0            crayon_1.5.3           
 [34] jquerylib_0.1.4         whisker_0.4.1           cachem_1.1.0           
 [37] tidyselect_1.2.1        digest_0.6.37           stringi_1.8.4          
 [40] purrr_1.0.2             dplyr_1.1.4             rprojroot_2.0.4        
 [43] fastmap_1.2.0           cli_3.6.3               magrittr_2.0.3         
-[46] utf8_1.2.4              withr_3.0.1             filelock_1.0.3         
-[49] prettyunits_1.2.0       UCSC.utils_1.0.0        promises_1.3.0         
-[52] rappdirs_0.3.3          bit64_4.0.5             rmarkdown_2.27         
-[55] XVector_0.44.0          httr_1.4.7              bit_4.0.5              
+[46] utf8_1.2.4              withr_3.0.2             filelock_1.0.3         
+[49] prettyunits_1.2.0       UCSC.utils_1.2.0        promises_1.3.0         
+[52] rappdirs_0.3.3          bit64_4.5.2             rmarkdown_2.29         
+[55] XVector_0.46.0          httr_1.4.7              bit_4.5.0              
 [58] png_0.1-8               hms_1.1.3               memoise_2.0.1          
-[61] evaluate_0.24.0         knitr_1.47              BiocFileCache_2.12.0   
-[64] rlang_1.1.4             Rcpp_1.0.12             glue_1.7.0             
-[67] DBI_1.2.3               xml2_1.3.6              rstudioapi_0.16.0      
-[70] jsonlite_1.8.8          R6_2.5.1                fs_1.6.4               
-[73] zlibbioc_1.50.0        </code></pre>
+[61] evaluate_1.0.1          knitr_1.48              BiocFileCache_2.14.0   
+[64] rlang_1.1.4             Rcpp_1.0.13-1           glue_1.8.0             
+[67] DBI_1.2.3               xml2_1.3.6              rstudioapi_0.17.1      
+[70] jsonlite_1.8.9          R6_2.5.1                fs_1.6.5               
+[73] zlibbioc_1.52.0        </code></pre>
+</div>
 </div>
 </div>
 </div>
