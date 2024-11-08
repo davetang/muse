@@ -89,6 +89,39 @@ AnnotationDbi::select(
 
 Using the annotation package {org.Hs.eg.db} we can easily convert different gene identifiers, obtain their gene symbols, and descriptions (as well as all other keytypes).
 
+## Mouse
+
+Install {org.Mm.eg.db}.
+
+```{r install_org_mm, eval=FALSE}
+BiocManager::install("org.Mm.eg.db")
+```
+
+Package info.
+
+```{r load_org_mm}
+packageVersion("org.Mm.eg.db")
+suppressPackageStartupMessages(library(org.Mm.eg.db))
+class(org.Mm.eg.db)
+```
+
+{org.Mm.eg.db} info.
+
+```{r org_mm_eg_db_info}
+org.Mm.eg.db
+```
+
+Mouse query.
+
+```{r mouse_query}
+AnnotationDbi::select(
+  org.Mm.eg.db,
+  keys = c('ENSMUSG00000121796', 'ENSMUSG00000121918', 'ENSMUSG00000121583', 'ENSMUSG00000121584'),
+  columns=c("ENSEMBL","ENTREZID","SYMBOL","GENENAME"),
+  keytype="ENSEMBL"
+)
+```
+
 ## reactome.db
 
 [reactome.db](https://bioconductor.org/packages/release/data/annotation/html/reactome.db.html) is a set of annotation maps for Reactome, assembled using data from Reactome. This package has been created by a third-party developer, and is not affiliated with the Reactome team. 
