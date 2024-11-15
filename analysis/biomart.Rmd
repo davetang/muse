@@ -322,6 +322,72 @@ AnnotationDbi::select(
 
 {org.Hs.eg.db} matched an Entrez Gene ID to one Ensembl gene ID, whereas {biomaRt} matched an Entrez Gene ID to all possible Ensembl gene IDs.
 
+## Database dump
+
+As I wrote in a blog post about converting [Ensembl Gene IDs to gene symbols](https://davetang.org/muse/2024/11/14/ensembl-gene-ids-to-gene-symbols/), I found the database dump that provides the lookup. Here we confirm whether the database dump generates the same results as using {biomaRt}.
+
+Download and load database dump.
+
+```{r download_db_dump}
+my_ensembl_ver <- '113'
+my_url <- paste0("https://ftp.ensembl.org/pub/release-", my_ensembl_ver, "/mysql/ensembl_mart_", my_ensembl_ver, "/hsapiens_gene_ensembl__gene__main.txt.gz")
+my_outfile <- paste0('/tmp/', basename(my_url))
+db_dump <- download.file(url = my_url, destfile = my_outfile)
+
+gene_db <- readr::read_tsv(file = my_outfile, col_names = FALSE, show_col_types = FALSE)
+
+gene_db |>
+  dplyr::select(X7, X8) |>
+  dplyr::rename(ensembl_gene_id = X7, hgnc_symbol = X8) -> gene_db
+
+head(gene_db)
+```
+
+Make a query.
+
+```{r gene_db_biomart}
+ensembl <- biomaRt::useMart("ensembl", dataset='hsapiens_gene_ensembl')
+
+gene_db_biomart <- biomaRt::getBM(
+  attributes=c('ensembl_gene_id', "hgnc_symbol"),
+  filters = "ensembl_gene_id",
+  values=gene_db$ensembl_gene_id,
+  mart=ensembl
+)
+```
+
+Join and compare!
+
+```{r join_and_compare}
+dplyr::inner_join(x = gene_db, y = gene_db_biomart, by = "ensembl_gene_id") |>
+  dplyr::mutate(same = hgnc_symbol.x == hgnc_symbol.y) |>
+  dplyr::filter(same == FALSE) |>
+  head()
+```
+
+Look for entries that are probably not gene symbols.
+
+```{r tabulate_gene_symbols}
+gene_db_table <- table(gene_db$hgnc_symbol)
+sort(gene_db_table[gene_db_table != 1], decreasing = TRUE) |> head()
+```
+
+Join and compare after removing '\\N'!
+
+```{r join_and_compare_remove_n}
+gene_db |>
+  dplyr::filter(hgnc_symbol != '\\N') |>
+  dplyr::inner_join(y = gene_db_biomart, by = "ensembl_gene_id") |>
+  dplyr::mutate(same = hgnc_symbol.x == hgnc_symbol.y) |>
+  dplyr::filter(same == FALSE) |>
+  dplyr::pull(hgnc_symbol.x) |>
+  table() |>
+  sort(decreasing = TRUE) |>
+  head()
+```
+
+Differences mostly for non-coding RNAs.
+
 ## Older reference assemblies
 
 ### v112
