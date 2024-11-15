@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2024-11-08" />
+<meta name="date" content="2024-11-15" />
 
 <title>Learning to use biomaRt</title>
 
-<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Learning to use biomaRt</h1>
-<h4 class="date">2024-11-08</h4>
+<h4 class="date">2024-11-15</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-11-08
+<strong>Last updated:</strong> 2024-11-15
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5391fccd990cc9e9d2f46eb4c4b363d04a1ab763targetblank5391fcca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecabd04751283224963c8c0f3898c66011855485dtargetblankcabd047a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/5391fccd990cc9e9d2f46eb4c4b363d04a1ab763" target="_blank">5391fcc</a>
+<a href="https://github.com/davetang/muse/tree/cabd04751283224963c8c0f3898c66011855485d" target="_blank">cabd047</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5391fccd990cc9e9d2f46eb4c4b363d04a1ab763targetblank5391fcca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecabd04751283224963c8c0f3898c66011855485dtargetblankcabd047a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/5391fccd990cc9e9d2f46eb4c4b363d04a1ab763" target="_blank">5391fcc</a>.
+<a href="https://github.com/davetang/muse/tree/cabd04751283224963c8c0f3898c66011855485d" target="_blank">cabd047</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -603,6 +603,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/cabd04751283224963c8c0f3898c66011855485d/analysis/biomart.Rmd" target="_blank">cabd047</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-11-15
+</td>
+<td>
+Compare with database dump
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/3cf092dcfb036fd920d83e46dec4187fcb39b9b2/docs/biomart.html" target="_blank">3cf092d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-11-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1116,6 +1150,79 @@ whereas {biomaRt} matched an Entrez Gene ID to all possible Ensembl gene
 IDs.</p>
 </div>
 </div>
+<div id="database-dump" class="section level2">
+<h2>Database dump</h2>
+<p>As I wrote in a blog post about converting <a
+href="https://davetang.org/muse/2024/11/14/ensembl-gene-ids-to-gene-symbols/">Ensembl
+Gene IDs to gene symbols</a>, I found the database dump that provides
+the lookup. Here we confirm whether the database dump generates the same
+results as using {biomaRt}.</p>
+<p>Download and load database dump.</p>
+<pre class="r"><code>my_ensembl_ver &lt;- &#39;113&#39;
+my_url &lt;- paste0(&quot;https://ftp.ensembl.org/pub/release-&quot;, my_ensembl_ver, &quot;/mysql/ensembl_mart_&quot;, my_ensembl_ver, &quot;/hsapiens_gene_ensembl__gene__main.txt.gz&quot;)
+my_outfile &lt;- paste0(&#39;/tmp/&#39;, basename(my_url))
+db_dump &lt;- download.file(url = my_url, destfile = my_outfile)
+
+gene_db &lt;- readr::read_tsv(file = my_outfile, col_names = FALSE, show_col_types = FALSE)
+
+gene_db |&gt;
+  dplyr::select(X7, X8) |&gt;
+  dplyr::rename(ensembl_gene_id = X7, hgnc_symbol = X8) -&gt; gene_db
+
+head(gene_db)</code></pre>
+<pre><code># A tibble: 6 × 2
+  ensembl_gene_id hgnc_symbol
+  &lt;chr&gt;           &lt;chr&gt;      
+1 ENSG00000210049 MT-TF      
+2 ENSG00000211459 MT-RNR1    
+3 ENSG00000210077 MT-TV      
+4 ENSG00000210082 MT-RNR2    
+5 ENSG00000209082 MT-TL1     
+6 ENSG00000198888 MT-ND1     </code></pre>
+<p>Make a query.</p>
+<pre class="r"><code>ensembl &lt;- biomaRt::useMart(&quot;ensembl&quot;, dataset=&#39;hsapiens_gene_ensembl&#39;)
+
+gene_db_biomart &lt;- biomaRt::getBM(
+  attributes=c(&#39;ensembl_gene_id&#39;, &quot;hgnc_symbol&quot;),
+  filters = &quot;ensembl_gene_id&quot;,
+  values=gene_db$ensembl_gene_id,
+  mart=ensembl
+)</code></pre>
+<p>Join and compare!</p>
+<pre class="r"><code>dplyr::inner_join(x = gene_db, y = gene_db_biomart, by = &quot;ensembl_gene_id&quot;) |&gt;
+  dplyr::mutate(same = hgnc_symbol.x == hgnc_symbol.y) |&gt;
+  dplyr::filter(same == FALSE) |&gt;
+  head()</code></pre>
+<pre><code># A tibble: 6 × 4
+  ensembl_gene_id hgnc_symbol.x hgnc_symbol.y same 
+  &lt;chr&gt;           &lt;chr&gt;         &lt;chr&gt;         &lt;lgl&gt;
+1 ENSG00000299200 &quot;\\N&quot;         &quot;&quot;            FALSE
+2 ENSG00000308964 &quot;\\N&quot;         &quot;&quot;            FALSE
+3 ENSG00000303867 &quot;\\N&quot;         &quot;&quot;            FALSE
+4 ENSG00000271254 &quot;\\N&quot;         &quot;&quot;            FALSE
+5 ENSG00000278625 &quot;U6&quot;          &quot;&quot;            FALSE
+6 ENSG00000278704 &quot;\\N&quot;         &quot;&quot;            FALSE</code></pre>
+<p>Look for entries that are probably not gene symbols.</p>
+<pre class="r"><code>gene_db_table &lt;- table(gene_db$hgnc_symbol)
+sort(gene_db_table[gene_db_table != 1], decreasing = TRUE) |&gt; head()</code></pre>
+<pre><code>
+        \\N       Y_RNA Metazoa_SRP          U6      LILRP2          U3 
+      38023         845         216         117          72          53 </code></pre>
+<p>Join and compare after removing ‘\N’!</p>
+<pre class="r"><code>gene_db |&gt;
+  dplyr::filter(hgnc_symbol != &#39;\\N&#39;) |&gt;
+  dplyr::inner_join(y = gene_db_biomart, by = &quot;ensembl_gene_id&quot;) |&gt;
+  dplyr::mutate(same = hgnc_symbol.x == hgnc_symbol.y) |&gt;
+  dplyr::filter(same == FALSE) |&gt;
+  dplyr::pull(hgnc_symbol.x) |&gt;
+  table() |&gt;
+  sort(decreasing = TRUE) |&gt;
+  head()</code></pre>
+<pre><code>
+      Y_RNA Metazoa_SRP          U6          U3          U1     SNORA70 
+        845         216         117          53          29          27 </code></pre>
+<p>Differences mostly for non-coding RNAs.</p>
+</div>
 <div id="older-reference-assemblies" class="section level2">
 <h2>Older reference assemblies</h2>
 <div id="v112" class="section level3">
@@ -1263,31 +1370,32 @@ other attached packages:
 [7] BiocGenerics_0.52.0  biomaRt_2.62.0       workflowr_1.7.1     
 
 loaded via a namespace (and not attached):
- [1] KEGGREST_1.46.0         xfun_0.49               bslib_0.8.0            
- [4] httr2_1.0.6             processx_3.8.4          callr_3.7.6            
- [7] generics_0.1.3          vctrs_0.6.5             tools_4.4.1            
-[10] ps_1.8.1                curl_6.0.0              tibble_3.2.1           
-[13] fansi_1.0.6             RSQLite_2.3.7           blob_1.2.4             
-[16] pkgconfig_2.0.3         dbplyr_2.5.0            lifecycle_1.0.4        
-[19] GenomeInfoDbData_1.2.13 compiler_4.4.1          stringr_1.5.1          
-[22] git2r_0.35.0            Biostrings_2.74.0       progress_1.2.3         
-[25] getPass_0.2-4           httpuv_1.6.15           GenomeInfoDb_1.42.0    
-[28] htmltools_0.5.8.1       sass_0.4.9              yaml_2.3.10            
-[31] later_1.3.2             pillar_1.9.0            crayon_1.5.3           
-[34] jquerylib_0.1.4         whisker_0.4.1           cachem_1.1.0           
-[37] tidyselect_1.2.1        digest_0.6.37           stringi_1.8.4          
-[40] purrr_1.0.2             dplyr_1.1.4             rprojroot_2.0.4        
-[43] fastmap_1.2.0           cli_3.6.3               magrittr_2.0.3         
-[46] utf8_1.2.4              withr_3.0.2             filelock_1.0.3         
-[49] prettyunits_1.2.0       UCSC.utils_1.2.0        promises_1.3.0         
-[52] rappdirs_0.3.3          bit64_4.5.2             rmarkdown_2.29         
-[55] XVector_0.46.0          httr_1.4.7              bit_4.5.0              
-[58] png_0.1-8               hms_1.1.3               memoise_2.0.1          
-[61] evaluate_1.0.1          knitr_1.48              BiocFileCache_2.14.0   
-[64] rlang_1.1.4             Rcpp_1.0.13-1           glue_1.8.0             
-[67] DBI_1.2.3               xml2_1.3.6              rstudioapi_0.17.1      
-[70] jsonlite_1.8.9          R6_2.5.1                fs_1.6.5               
-[73] zlibbioc_1.52.0        </code></pre>
+ [1] KEGGREST_1.46.0         xfun_0.48               bslib_0.8.0            
+ [4] httr2_1.0.6             processx_3.8.4          tzdb_0.4.0             
+ [7] callr_3.7.6             generics_0.1.3          vctrs_0.6.5            
+[10] tools_4.4.1             ps_1.8.1                parallel_4.4.1         
+[13] curl_5.2.3              tibble_3.2.1            fansi_1.0.6            
+[16] RSQLite_2.3.7           blob_1.2.4              pkgconfig_2.0.3        
+[19] dbplyr_2.5.0            lifecycle_1.0.4         GenomeInfoDbData_1.2.13
+[22] compiler_4.4.1          stringr_1.5.1           git2r_0.35.0           
+[25] Biostrings_2.74.0       progress_1.2.3          getPass_0.2-4          
+[28] httpuv_1.6.15           GenomeInfoDb_1.42.0     htmltools_0.5.8.1      
+[31] sass_0.4.9              yaml_2.3.10             later_1.3.2            
+[34] pillar_1.9.0            crayon_1.5.3            jquerylib_0.1.4        
+[37] whisker_0.4.1           cachem_1.1.0            tidyselect_1.2.1       
+[40] digest_0.6.37           stringi_1.8.4           purrr_1.0.2            
+[43] dplyr_1.1.4             rprojroot_2.0.4         fastmap_1.2.0          
+[46] cli_3.6.3               magrittr_2.0.3          utf8_1.2.4             
+[49] readr_2.1.5             withr_3.0.2             filelock_1.0.3         
+[52] prettyunits_1.2.0       UCSC.utils_1.2.0        promises_1.3.0         
+[55] rappdirs_0.3.3          bit64_4.5.2             rmarkdown_2.28         
+[58] XVector_0.46.0          httr_1.4.7              bit_4.5.0              
+[61] png_0.1-8               hms_1.1.3               memoise_2.0.1          
+[64] evaluate_1.0.1          knitr_1.48              BiocFileCache_2.14.0   
+[67] rlang_1.1.4             Rcpp_1.0.13             glue_1.8.0             
+[70] DBI_1.2.3               xml2_1.3.6              vroom_1.6.5            
+[73] rstudioapi_0.17.1       jsonlite_1.8.9          R6_2.5.1               
+[76] fs_1.6.4                zlibbioc_1.52.0        </code></pre>
 </div>
 </div>
 </div>
