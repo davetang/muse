@@ -1,0 +1,76 @@
+---
+title: "Benjamini-Hochberg correction"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Testing $m$ = 10 hypotheses, where:
+
+* $H_0$: Null hypothesis (no effect).
+* $H_1$: Alternative hypothesis (effect exists).
+
+The p-values are:
+
+```{r pvalues}
+pvalues <- c(0.001,0.004,0.020,0.030,0.050,0.060,0.070,0.100,0.150,0.200)
+pvalues
+```
+
+Apply the Benjamini-Hochberg (BH) procedure to control the FDR.
+
+```{r p_adjust}
+p.adjust(pvalues, method = 'BH')
+```
+
+Perform the calculations manually.
+
+$$
+p_i^{adjusted} = \min_{j > i} \left( \frac{m}{j} \cdot p_{(j)} \right)
+$$
+
+where:
+
+* $m$: Total number of hypotheses
+* $j$: Rank of the p-value in ascending order
+* $p_{(j)}$: the j-th smallest p-value
+
+```{r bh}
+bh <- function(pvalues) {
+  # Number of hypotheses
+  m <- length(pvalues)
+  
+  # Sort the p-values and keep track of the original indices
+  sorted_indices <- order(pvalues)
+  sorted_pvalues <- pvalues[sorted_indices]
+  
+  # Compute the adjusted p-values
+  adjusted_pvalues <- numeric(m)
+  for (i in m:1) {
+    if (i == m) {
+      adjusted_pvalues[i] <- sorted_pvalues[i]
+    } else {
+      adjusted_pvalues[i] <- min(adjusted_pvalues[i + 1], m / i * sorted_pvalues[i])
+    }
+  }
+  
+  # Return adjusted p-values in the original order
+  adjusted_pvalues[order(sorted_indices)]
+}
+
+all(bh(pvalues) == p.adjust(pvalues, method = "BH"))
+```
+
+Test.
+
+```{r random_pvalue}
+set.seed(1984)
+p <- runif(n = 1000, min = 0, max = 1)
+all(bh(p) == p.adjust(p, method = "BH"))
+```
