@@ -7,7 +7,7 @@ output:
 editor_options:
   chunk_output_type: console
 params:
-  threads: 8
+  threads: 4
 ---
 
 ```{r setup, include=FALSE}
@@ -27,6 +27,7 @@ There are several packages that make it easy to run tasks in parallel:
 * The [BiocParallel](https://bioconductor.org/packages/release/bioc/html/BiocParallel.html) package tailored for use with Bioconductor.
 * The [furrr](https://furrr.futureverse.org/) package parallelises mapping functions from the [purrr](https://purrr.tidyverse.org/) package.
 * The [pbapply](https://github.com/psolymos/pbapply#parallel-backends) package, which is a package for adding a progress bar, but supports parallel execution.
+* The [future](https://cran.r-project.org/web/packages/future/index.html) package, unified parallel and distributed processing in R for everyone
 
 ## Timing processes with `system.time`
 
@@ -278,6 +279,26 @@ system.time(
 )
 
 identical(my_sum_pur, my_sum_fur)
+```
+
+## `future`
+
+Load required libraries.
+
+```{r future}
+library(future)
+library(future.apply)
+```
+
+Map with parallelisation using `future_lapply()`.
+
+```{r future_lapply}
+plan(multisession, workers = params$threads)
+system.time(
+  my_sum_future_lapply <- future_lapply(my_list, summary)
+)
+
+identical(my_sum, my_sum_future_lapply)
 ```
 
 ## Summary
