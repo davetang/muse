@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2023-12-20" />
+<meta name="date" content="2024-12-24" />
 
 <title>Parallel computation in R</title>
 
-<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Parallel computation in R</h1>
-<h4 class="date">2023-12-20</h4>
+<h4 class="date">2024-12-24</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-12-20
+<strong>Last updated:</strong> 2024-12-24
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7df7cc713434bb24a2b0f3cd5b7d3d407a21a050targetblank7df7cc7a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5871c7c76ec94a96985e306e7bc151d3bfba9520targetblank5871c7ca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/7df7cc713434bb24a2b0f3cd5b7d3d407a21a050" target="_blank">7df7cc7</a>
+<a href="https://github.com/davetang/muse/tree/5871c7c76ec94a96985e306e7bc151d3bfba9520" target="_blank">5871c7c</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7df7cc713434bb24a2b0f3cd5b7d3d407a21a050targetblank7df7cc7a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5871c7c76ec94a96985e306e7bc151d3bfba9520targetblank5871c7ca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/7df7cc713434bb24a2b0f3cd5b7d3d407a21a050" target="_blank">7df7cc7</a>.
+<a href="https://github.com/davetang/muse/tree/5871c7c76ec94a96985e306e7bc151d3bfba9520" target="_blank">5871c7c</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -552,8 +552,13 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
+    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    r_packages_4.3.2/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k/
+    Ignored:    r_packages_4.4.0/
+    Ignored:    r_packages_4.4.1/
 
 </code></pre>
 <p>
@@ -568,7 +573,6 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
 These are the previous versions of the repository in which changes were
 made to the R Markdown (<code>analysis/parallel.Rmd</code>) and HTML
@@ -599,6 +603,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/5871c7c76ec94a96985e306e7bc151d3bfba9520/analysis/parallel.Rmd" target="_blank">5871c7c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-12-24
+</td>
+<td>
+Using future_lapply()
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/ebb6bb689bc4446e0293b141c6afb685ce506d71/docs/parallel.html" target="_blank">ebb6bb6</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-12-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -824,6 +862,10 @@ href="https://purrr.tidyverse.org/">purrr</a> package.</li>
 href="https://github.com/psolymos/pbapply#parallel-backends">pbapply</a>
 package, which is a package for adding a progress bar, but supports
 parallel execution.</li>
+<li>The <a
+href="https://cran.r-project.org/web/packages/future/index.html">future</a>
+package, unified parallel and distributed processing in R for
+everyone</li>
 </ul>
 </div>
 <div id="timing-processes-with-system.time" class="section level2">
@@ -842,7 +884,7 @@ to zero because the CPU is idly waiting and not executing anything.</p>
   Sys.sleep(5)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.000   0.000   5.005 </code></pre>
+  0.000   0.000   5.002 </code></pre>
 <p>More information is provided on <a
 href="https://stackoverflow.com/questions/5688949/what-are-user-and-system-times-measuring-in-r-system-timeexp-output">Stack
 Overflow</a>:</p>
@@ -878,9 +920,9 @@ length(my_list)</code></pre>
 <div id="number-of-threads-used" class="section level2">
 <h2>Number of threads used</h2>
 <p>This is a parameterised notebook; the number of threads used for the
-code examples is 8.</p>
+code examples is 4.</p>
 <pre class="r"><code>params$threads</code></pre>
-<pre><code>[1] 8</code></pre>
+<pre><code>[1] 4</code></pre>
 </div>
 <div id="parallel" class="section level2">
 <h2><code>parallel</code></h2>
@@ -892,7 +934,7 @@ parallelisation.</p>
   my_sum &lt;- lapply(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  3.988   0.078   4.075 </code></pre>
+  3.475   0.004   3.478 </code></pre>
 <p>The <code>mclapply</code> function can be used to process a list in
 parallel. Note that this function uses forking, which is not available
 on Windows.</p>
@@ -900,7 +942,7 @@ on Windows.</p>
   my_sum_mc &lt;- mclapply(my_list, summary, mc.cores = params$threads)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.040   0.119   0.681 </code></pre>
+  0.020   0.016   1.034 </code></pre>
 <p>Compare the two summaries.</p>
 <pre class="r"><code>identical(my_sum, my_sum_mc)</code></pre>
 <pre><code>[1] TRUE</code></pre>
@@ -913,7 +955,7 @@ system.time(
   my_sum_sock &lt;- parLapply(cl, my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.622   0.268   1.874 </code></pre>
+  0.388   0.098   2.029 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 identical(my_sum_mc, my_sum_sock)</code></pre>
@@ -943,7 +985,7 @@ system.time(
   })
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.002   0.000   0.042 </code></pre>
+  0.001   0.000   0.001 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 test2</code></pre>
@@ -971,7 +1013,7 @@ system.time(
   my_sum_pb &lt;- pblapply(my_list, summary, cl = cl)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.681   0.345   1.967 </code></pre>
+  0.409   0.076   2.039 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 identical(my_sum_mc, my_sum_pb)</code></pre>
@@ -981,7 +1023,7 @@ identical(my_sum_mc, my_sum_pb)</code></pre>
   my_sum_pb_fork &lt;- pblapply(my_list, summary, cl = params$threads)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.512   0.199   0.675 </code></pre>
+  0.013   0.020   1.038 </code></pre>
 <pre class="r"><code>identical(my_sum_pb, my_sum_pb_fork)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -1001,7 +1043,7 @@ system.time(
   }
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.851   0.386   2.282 </code></pre>
+  0.491   0.061   2.861 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 identical(my_sum_mc, my_sum_dopar)</code></pre>
@@ -1017,7 +1059,7 @@ system.time(
   my_sum_bp &lt;- bplapply(my_list, summary, BPPARAM = param)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.679   0.517   8.055 </code></pre>
+  0.488   0.088   4.636 </code></pre>
 <pre class="r"><code>identical(my_sum_mc, my_sum_bp)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <p>Forking.</p>
@@ -1026,7 +1068,7 @@ system.time(
   my_sum_bp_fork &lt;- bplapply(my_list, summary, BPPARAM = param)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.286   0.712   1.957 </code></pre>
+  0.148   0.119   1.678 </code></pre>
 <pre class="r"><code>identical(my_sum_bp, my_sum_bp_fork)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <p>Using <code>MulticoreParam</code>.</p>
@@ -1035,7 +1077,7 @@ system.time(
   my_sum_bp_mc &lt;- bplapply(my_list, summary, BPPARAM = param)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.949   0.353   0.734 </code></pre>
+  0.997   0.112   1.076 </code></pre>
 <pre class="r"><code>identical(my_sum_bp_fork, my_sum_bp_mc)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
@@ -1055,7 +1097,7 @@ Attaching package: &#39;purrr&#39;</code></pre>
   my_sum_pur &lt;- map(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  3.810   0.225   4.043 </code></pre>
+  3.521   0.027   3.548 </code></pre>
 <pre class="r"><code>identical(my_sum_mc, my_sum_pur)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <p>Map with parallelisation.</p>
@@ -1064,8 +1106,23 @@ system.time(
   my_sum_fur &lt;- future_map(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.750   0.632   3.138 </code></pre>
+  0.223   0.125   2.374 </code></pre>
 <pre class="r"><code>identical(my_sum_pur, my_sum_fur)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div id="future" class="section level2">
+<h2><code>future</code></h2>
+<p>Load required libraries.</p>
+<pre class="r"><code>library(future)
+library(future.apply)</code></pre>
+<p>Map with parallelisation using <code>future_lapply()</code>.</p>
+<pre class="r"><code>plan(multisession, workers = params$threads)
+system.time(
+  my_sum_future_lapply &lt;- future_lapply(my_list, summary)
+)</code></pre>
+<pre><code>   user  system elapsed 
+  0.200   0.139   2.199 </code></pre>
+<pre class="r"><code>identical(my_sum, my_sum_future_lapply)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
 <div id="summary" class="section level2">
@@ -1088,9 +1145,9 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.3.2 (2023-10-31)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 22.04.3 LTS
+<pre><code>R version 4.4.1 (2024-06-14)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.5 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -1112,23 +1169,29 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] purrr_1.0.2         furrr_0.3.1         future_1.33.0      
-[4] BiocParallel_1.36.0 doParallel_1.0.17   iterators_1.0.14   
-[7] foreach_1.5.2       pbapply_1.7-2       workflowr_1.7.1    
+ [1] future.apply_1.11.3 purrr_1.0.2         furrr_0.3.1        
+ [4] future_1.34.0       BiocParallel_1.40.0 doParallel_1.0.17  
+ [7] iterators_1.0.14    foreach_1.5.2       pbapply_1.7-2      
+[10] workflowr_1.7.1    
 
 loaded via a namespace (and not attached):
- [1] sass_0.4.8        utf8_1.2.4        stringi_1.8.3     listenv_0.9.0    
- [5] digest_0.6.33     magrittr_2.0.3    evaluate_0.23     fastmap_1.1.1    
- [9] rprojroot_2.0.4   jsonlite_1.8.8    processx_3.8.3    whisker_0.4.1    
-[13] ps_1.7.5          promises_1.2.1    httr_1.4.7        fansi_1.0.6      
-[17] codetools_0.2-19  jquerylib_0.1.4   cli_3.6.2         rlang_1.1.2      
-[21] parallelly_1.36.0 cachem_1.0.8      yaml_2.3.8        tools_4.3.2      
-[25] httpuv_1.6.13     globals_0.16.2    vctrs_0.6.5       R6_2.5.1         
-[29] lifecycle_1.0.4   git2r_0.33.0      stringr_1.5.1     fs_1.6.3         
-[33] pkgconfig_2.0.3   callr_3.7.3       pillar_1.9.0      bslib_0.6.1      
-[37] later_1.3.2       glue_1.6.2        Rcpp_1.0.11       xfun_0.41        
-[41] tibble_3.2.1      rstudioapi_0.15.0 knitr_1.45        htmltools_0.5.7  
-[45] snow_0.4-4        rmarkdown_2.25    compiler_4.3.2    getPass_0.2-4    </code></pre>
+ [1] sass_0.4.9        utf8_1.2.4        stringi_1.8.4     listenv_0.9.1    
+ [5] digest_0.6.37     magrittr_2.0.3    evaluate_1.0.1    fastmap_1.2.0    
+ [9] rprojroot_2.0.4   jsonlite_1.8.9    processx_3.8.4    whisker_0.4.1    
+[13] ps_1.8.1          promises_1.3.0    httr_1.4.7        fansi_1.0.6      
+[17] codetools_0.2-20  jquerylib_0.1.4   cli_3.6.3         rlang_1.1.4      
+[21] parallelly_1.38.0 cachem_1.1.0      yaml_2.3.10       tools_4.4.1      
+[25] httpuv_1.6.15     globals_0.16.3    vctrs_0.6.5       R6_2.5.1         
+[29] lifecycle_1.0.4   git2r_0.35.0      stringr_1.5.1     fs_1.6.4         
+[33] pkgconfig_2.0.3   callr_3.7.6       pillar_1.9.0      bslib_0.8.0      
+[37] later_1.3.2       glue_1.8.0        Rcpp_1.0.13       xfun_0.48        
+[41] tibble_3.2.1      rstudioapi_0.17.1 knitr_1.48        htmltools_0.5.8.1
+[45] snow_0.4-4        rmarkdown_2.28    compiler_4.4.1    getPass_0.2-4    </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 
