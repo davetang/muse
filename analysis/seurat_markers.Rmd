@@ -1,0 +1,142 @@
+---
+title: "Finding Markers with Seurat"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+Use the Peripheral Blood Mononuclear Cells (PBMCs) 2,700 cells dataset to test finding markers with Seurat.
+
+Install the following packages, if necessary.
+
+```{r install_seurat, eval=FALSE}
+install.packages("remotes")
+remotes::install_github("immunogenomics/presto")
+install.packages("Seurat")
+install.packages("bench")
+```
+
+Load `Seurat` and `bench` for some benchmarking.
+
+```{r load_seurat}
+suppressPackageStartupMessages(library("Seurat"))
+suppressPackageStartupMessages(library("bench"))
+suppressPackageStartupMessages(library("presto"))
+```
+
+## Data
+
+To follow the tutorial, you'll need the 10X data, which can be download from AWS.
+
+```{bash, eval=FALSE}
+mkdir -p data/pbmc3k && cd data/pbmc3k
+wget -c https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz
+tar -xzf pbmc3k_filtered_gene_bc_matrices.tar.gz
+```
+
+## Seurat object
+
+Load 10x data into a matrix using `Read10X()`.
+
+```{r read_10x}
+pbmc.data <- Read10X(
+  data.dir = "data/pbmc3k/filtered_gene_bc_matrices/hg19/"
+)
+```
+
+Create the Seurat object using `CreateSeuratObject`; see `?SeuratObject` for more information on the class.
+
+```{r create_seurat_object}
+seurat_obj <- CreateSeuratObject(
+  counts = pbmc.data,
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k"
+)
+
+class(seurat_obj)
+```
+
+## Seurat workflow
+
+Run the workflow as separate steps; they can be piped together but sometimes errors occur, so it is useful to split up the steps.
+
+```{r seurat_workflow}
+debug_flag <- FALSE
+seurat_obj <- NormalizeData(seurat_obj, normalization.method = "LogNormalize", scale.factor = 1e4, verbose = debug_flag)
+seurat_obj <- FindVariableFeatures(seurat_obj, selection.method = 'vst', nfeatures = 2000, verbose = debug_flag)
+seurat_obj <- ScaleData(seurat_obj, verbose = debug_flag)
+seurat_obj <- RunPCA(seurat_obj, verbose = debug_flag)
+seurat_obj <- RunUMAP(seurat_obj, dims = 1:30, verbose = debug_flag)
+seurat_obj <- FindNeighbors(seurat_obj, dims = 1:30, verbose = debug_flag)
+seurat_obj <- FindClusters(seurat_obj, resolution = 0.5, verbose = debug_flag)
+
+seurat_obj
+```
+
+## Find all markers
+
+`FindAllMarkers()` will find markers (differentially expressed genes) for each of the identity classes in a dataset.
+
+```{r ident_levels}
+levels(Idents(seurat_obj))
+```
+
+Find all markers.
+
+```{r seurat_markers}
+all_markers <- FindAllMarkers(seurat_obj, verbose = debug_flag)
+dim(all_markers)
+```
+
+## Find markers
+
+`FindMarkers()` finds markers (differentially expressed genes) for identity classes.
+
+```{r cluster_0_markers}
+cluster_0_markers <- FindMarkers(seurat_obj, ident.1 = "0")
+dim(cluster_0_markers)
+```
+
+Cluster 0 markers from `FindAllMarkers()`.
+
+```{r all_markers_cluster_0}
+all_markers |>
+  dplyr::filter(cluster == 0) |>
+  dim()
+```
+
+The start of the results are the same.
+
+```{r compare_head_of_results}
+head(cluster_0_markers)
+
+all_markers |>
+  dplyr::filter(cluster == 0) |>
+  dplyr::select(-cluster, -gene) |>
+  head()
+```
+
+The tail of the results are the same too, except that in `FindAllMarkers()` results have been trimmed.
+
+```{r compare_tail_of_results}
+cluster_0_markers[3134:3139, ]
+
+all_markers |>
+  dplyr::filter(cluster == 0) |>
+  dplyr::select(-cluster, -gene) |>
+  tail()
+```
+
+Trimming seems to be from `p_val < 0.01`
+
+```{r trim_mark}
+cluster_0_markers[3139:3142, ]
+```
