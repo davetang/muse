@@ -140,3 +140,42 @@ Trimming seems to be from `p_val < 0.01`
 ```{r trim_mark}
 cluster_0_markers[3139:3142, ]
 ```
+
+Find markers in parallel to speed up `FindAllMarkers()`. Use `imap()` to get the name of each list (`.y`); `.x` is each element of the list.
+
+```{r find_markers_parallel}
+library(future)
+library(future.apply)
+
+clusters <- levels(Idents(seurat_obj))
+plan(multisession, workers = 4)
+markers <- future_lapply(
+  clusters,
+  function(x){
+    FindMarkers(seurat_obj, ident.1 = x)
+  },
+  future.seed = TRUE
+)
+
+names(markers) <- clusters
+
+purrr::map(
+  markers,
+  \(x) tibble::rownames_to_column(.data = x, var = "gene") |> tibble::remove_rownames()
+) |>
+  purrr::imap(~ dplyr::mutate(.x, cluster = .y)) |>
+  purrr::list_rbind() |>
+  dplyr::filter(p_val < 0.01) |>
+  dplyr::mutate(cluster = factor(cluster, levels = clusters)) |>
+  dplyr::select(p_val, avg_log2FC, pct.1, pct.2, p_val_adj, cluster, gene) -> all_markers_parallel
+
+all.equal(
+  all_markers_parallel,
+  tibble::remove_rownames(all_markers)
+)
+```
+
+
+
+
+
