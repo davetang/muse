@@ -1,0 +1,228 @@
+---
+title: "Manual linear regression analysis using R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+On [Wikipedia](https://en.wikipedia.org/wiki/Linear_regression), linear regression is described as:
+
+> In statistics, linear regression is a linear approach for modelling the relationship between a scalar response and one or more explanatory variables (also known as dependent and independent variables). The case of one explanatory variable is called simple linear regression; for more than one, the process is called multiple linear regression.
+
+Linear simply means a straight-line, regression in this context means relationship, and modelling means fitting. Therefore, simple linear regression modelling can be interpreted as trying to find the equation of the straight-line that fits the data points the best and captures the relationship between the variables; the best line is the one that minimises the sum of squared residuals of the linear regression model. The [equation of a straight line](https://www.mathsisfun.com/equation_of_line.html) is:
+
+$$y = mx + b$$
+
+where $m$ is the slope/gradient and $b$ is the y-intercept.
+
+Here's a quick example using the "women" dataset that comes with R. I will be using {ggplot2} for plotting, so install it if you want to follow along.
+
+```{r install_ggplot2, eval=FALSE}
+install.packages('ggplot2')
+```
+
+The `women` dataset gives the average heights and weights for American women aged 30–39.
+
+```{r women}
+library(ggplot2)
+head(women)
+```
+
+Plot height vs. weight and fit a linear model.
+
+```{r women_lm}
+ggplot(women, aes(height, weight)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_minimal()
+```
+
+There is a clear relationship between height and weight. How do we figure out this line of best fit manually? We can work out $m$ for the women dataset using the following [formula](https://en.wikipedia.org/wiki/Simple_linear_regression#Simple_linear_regression_without_the_intercept_term_(single_regressor)):
+
+$$m = \frac{\sum_{i=1}^{n}(x_i - \overline{x})(y_i - \overline{y})}{\sum_{i=1}^{n}(x_i - \overline{x})^2}$$
+
+where $n$ is the number of observations in the dataset, $\sum_{i=1}^n$ means the sum of all the observations, $x_i$ and $y_i$ are the $i$th observation of $x$ and $y$, and $\overline{x}$ and $\overline{y}$ are the means of $x$ and $y$, respectively.
+
+Once we have $m$, we can work out $b$ with:
+
+$$b = \overline{y} - m\overline{x}$$
+
+which is just a rearrangement of:
+
+$$y = mx + b$$
+
+but using the mean values.
+
+We can express these functions in R as:
+
+```{r calculate_slope}
+slope <- function(x, y){
+  mean_x <- mean(x)
+  mean_y <- mean(y)
+  top <- sum((x - mean_x)*(y-mean_y))
+  bottom <- sum((x - mean_x)^2)
+  top / bottom
+}
+
+# the slope formula is just
+# covariance(x, y) / variance(x)
+slope2 <- function(x, y){
+  cov(x, y)/var(x)
+}
+
+intercept <- function(x, y, m){
+  mean(y) - (m * mean(x))
+}
+```
+
+Before we work out $m$ and $b$, a word on [dependent and independent variables](https://en.wikipedia.org/wiki/Dependent_and_independent_variables#Modeling). When modelling, we want to work out the dependent variable from an independent variable (or variables). For this post, we would like to work out weight from height, therefore our independent variable is height and dependent variable is weight. It can be the other way around too. When plotting, the independent variable is usually on the x-axis, while the dependent variable is on the y-axis (as I have done above). Now to use our `slope()` and `intercept()` functions.
+
+```{r slope_and_intercept}
+(my_slope <- slope(women$height, women$weight))
+(my_intercept <- intercept(women$height, women$weight, my_slope))
+
+```
+
+Let's plot this using base R functions
+
+```{r manual_linear_regression}
+plot(women$height, women$weight, pch=16, xlab = "Height", ylab = "Weight", main = "Manual linear regression!")
+abline(my_intercept, my_slope)
+```
+
+The `lm()` function (used for fitting linear models) in R can work out the intercept and slope for us (and other things too). The arguments for `lm()` are a formula and the data; the formula starts with the dependent variable followed by a tilde `~` and followed with the independent variable.
+
+```{r lm_fit}
+(fit <- lm(weight ~ height, women))
+```
+
+Note that the coefficients `(Intercept)` and `height` are the same as what we calculated manually for the intercept and slope.
+
+There are other values stored in `fit` object.
+
+```{r fit_names}
+names(fit)
+```
+
+The residuals data is the difference between the observed data of the dependent variable and the fitted values. We can plot our observed values against the fitted values to see how well the regression model fits.
+
+```{r}
+plot(women$weight, fit$residuals, pch=16)
+abline(h = 0, lty = 2)
+```
+
+The fourth point from the left has a residual that is close to zero; this is because the fitted weight (122.9333 pounds) is almost the same as the real weight (123 pounds) for someone who is 61 inches tall.
+
+We can use the `predict()` function to predict someone's weight based on their height. Below we predict someone's weight when they are 61 and 80 inches tall.
+
+```{r predict_weight}
+predict(fit, data.frame(height = 61))
+
+predict(fit, data.frame(height = 80))
+```
+
+## Statistics for Dummies
+
+There's a nice example on linear regression in the "Statistics For Dummies" book that also demonstrates how you can manually calculate the slope and intercept. Here I'll perform the analysis using R and the data containing the number of cricket (the insect) chirps versus temperature. First we will create the vectors containing the chirps and temperature.
+
+```{r cricket_data}
+chirp <- c(18,20,21,23,27,30,34,39)
+temp <- c(57,60,64,65,68,71,74,77)
+```
+
+The five summaries required for calculating the slope and intercept of the best fitting line are:
+
+1. The mean of x
+2. The mean of y
+3. The sd of x
+4. The sd of y
+5. The r between x and y
+
+We can work out the five summarises using built-in functions in R.
+
+```{r five_summaries}
+mean(chirp)
+mean(temp)
+sd(chirp)
+sd(temp)
+cor(chirp,temp)
+```
+
+Note that in the "Statistics For Dummies" book, dependent variables are referred to as response variables and independent variables are referred to as explanatory variables. You can think of the response variable as the variable that responds on a set of variables (explanatory variables) that explains the response.
+
+```{r slope_and_intercept_dummies}
+# formula for the slope m, response variable first
+# m = r(sd(x) / sd(y))
+(m <- cor(chirp,temp) * (sd(chirp)/sd(temp)))
+
+# formula for intercept as above
+# b = mean(y) - (m * mean(x))
+mean(chirp) - (m * mean(temp))
+```
+
+We can use the `lm()` function in R to check our calculation. Models for `lm()` are specified symbolically and a typical model has the form `response ~ terms`, where `response` is the response vector and `terms` is a series of terms which specifies a linear predictor for response.
+
+We'll make chirps the response (dependent variable) and temperature the explanatory variable (independent variable), i.e. predicting the number of chirps from the temperature.
+
+```{r cricket_lm}
+lm(chirp~temp)
+```
+
+We see that the coefficients are the same as what we had calculated. We can use the slope and intercept to write a function to predict the number of chirps based on temperature.
+
+```{r predict_chirps}
+# in the form y = mx + b
+# y = 1.055x - 44.177
+model <- function(x){
+   1.055 * x - 44.177
+}
+
+# how many chirps at 68 Fahrenheit using our linear model?
+model(68)
+model(77)
+```
+
+We can check our function using the built-in R function called `predict()`.
+
+```{r reg}
+reg <- lm(chirp~temp)
+predict(reg, data.frame(temp=68))
+predict(reg, data.frame(temp=77))
+```
+
+The linear model generated by R contains some useful information such as the coefficient of determination (i.e. R-square).
+
+```{r}
+summary(reg)$r.squared
+```
+
+Use the `summary()` function to get a full summary.
+
+```{r summary_reg}
+summary(reg)
+```
+
+Finally, we can plot the data and add the line of best fit. As per convention, the response variable is on the y-axis and the explanatory variable is on the x-axis.
+
+```{r cricket_lm_plot}
+plot(temp, chirp, pch=16)
+abline(reg)
+```
+
+The same plot can be generated using `ggplot2`.
+
+```{r cricket_lm_ggplot2}
+library(ggplot2)
+
+data.frame(temp = temp, chirp = chirp) |>
+  ggplot(aes(temp, chirp)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  theme_minimal()
+```
