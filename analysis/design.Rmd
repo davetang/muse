@@ -1,0 +1,43 @@
+---
+title: "Design matrices for gene expression experiments"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[A guide to creating design matrices for gene expression experiments](https://f1000research.com/articles/9-1444).
+
+## Motivation
+
+Understand:
+
+1. How to set up an appropriate model via **design matrices** and
+2. How to set up comparisons of interest via **contrast matrices**.
+
+## Introduction
+
+Gene expression will be the response variable, i.e., dependent variable, which is the variable that we are trying to predict or explain. The variables that influence the expression will be the explanatory variables, i.e., independent variables.
+ 
+The modelling process requires the use of a design matrix (or model matrix) that has two roles:
+
+1. It defines the form of the model, or structure of the relationship between genes and explanatory variables, and
+2. It is used to store values of the explanatory variable(s).
+
+In the modelling process, a single design matrix is defined and then simultaneously applied to each and every gene in the dataset.
+
+## Dependencies
+
+Install {limma} using `BiocManager::install()`.
+
+```{r install_edger, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("limma")
+```
