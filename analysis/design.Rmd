@@ -31,6 +31,16 @@ The modelling process requires the use of a design matrix (or model matrix) that
 
 In the modelling process, a single design matrix is defined and then simultaneously applied to each and every gene in the dataset.
 
+## Regression model for covariates
+
+Consider two types of explanatory variables: "covariates" and "factors". Covariates contain numerical values that are quantitative measurements associated with samples in the experiment. These can be the age or weight of an individual. For covariates, it is generally of interest to know the rate of change between the response and the covariate, such as "how much does the expression of a particular gene increase/decrease per unit increase in age?". We can use a straight line to model, or describe, this relationship, which takes the form of
+
+$$expression = \beta_0 + \beta_1age$$
+
+where the line is defined by $\beta_0$ the y-intercept and $\beta_1$ the slope. In this model, the age covariate takes continuous, numerical values such as 0.8, 1.3, 2.0, 5.6, and so on. We refer to this model generally as a regression model, where the **slope indicates the rate of change**, or how much gene expression is expected to increase/decrease by per unit increase of the covariate.
+
+The y-intercept and slope of the line, or the $\beta$s ($\beta_0$ and $\beta_1$), are referred to as the model parameters. The true values of the parameters are unknown, but are estimated in the modelling process. A positive estimate of a model parameter indicates that an explanatory variable has a positive influence on gene expression (an increasing slope), whilst a negative value indicates that the explanatory variable has a negative influence on gene expression (a decreasing slope). In some cases, one may convert the age covariate into a factor by categorising the smaller values as "young" and larger values as "mature", and instead use the models described below.
+
 ## Dependencies
 
 Install {limma} using `BiocManager::install()`.
