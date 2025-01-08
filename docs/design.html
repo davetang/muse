@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeabe2d863d1b99d94dac7cab50d3572ebcc21e678targetblankabe2d86a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2e3db9aa5a870e861128a0cc733533116a4b340dtargetblank2e3db9aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/abe2d863d1b99d94dac7cab50d3572ebcc21e678" target="_blank">abe2d86</a>
+<a href="https://github.com/davetang/muse/tree/2e3db9aa5a870e861128a0cc733533116a4b340d" target="_blank">2e3db9a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeabe2d863d1b99d94dac7cab50d3572ebcc21e678targetblankabe2d86a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2e3db9aa5a870e861128a0cc733533116a4b340dtargetblank2e3db9aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/abe2d863d1b99d94dac7cab50d3572ebcc21e678" target="_blank">abe2d86</a>.
+<a href="https://github.com/davetang/muse/tree/2e3db9aa5a870e861128a0cc733533116a4b340d" target="_blank">2e3db9a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -608,6 +608,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/2e3db9aa5a870e861128a0cc733533116a4b340d/analysis/design.Rmd" target="_blank">2e3db9a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-08
+</td>
+<td>
+Regression model for covariates
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/6dfb7951d9025a340263b46cb54693991bd003fa/docs/design.html" target="_blank">6dfb795</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/abe2d863d1b99d94dac7cab50d3572ebcc21e678/analysis/design.Rmd" target="_blank">abe2d86</a>
 </td>
 <td>
@@ -654,6 +688,40 @@ between genes and explanatory variables, and</li>
 </ol>
 <p>In the modelling process, a single design matrix is defined and then
 simultaneously applied to each and every gene in the dataset.</p>
+</div>
+<div id="regression-model-for-covariates" class="section level2">
+<h2>Regression model for covariates</h2>
+<p>Consider two types of explanatory variables: “covariates” and
+“factors”. Covariates contain numerical values that are quantitative
+measurements associated with samples in the experiment. These can be the
+age or weight of an individual. For covariates, it is generally of
+interest to know the rate of change between the response and the
+covariate, such as “how much does the expression of a particular gene
+increase/decrease per unit increase in age?”. We can use a straight line
+to model, or describe, this relationship, which takes the form of</p>
+<p><span class="math display">\[expression = \beta_0 +
+\beta_1age\]</span></p>
+<p>where the line is defined by <span
+class="math inline">\(\beta_0\)</span> the y-intercept and <span
+class="math inline">\(\beta_1\)</span> the slope. In this model, the age
+covariate takes continuous, numerical values such as 0.8, 1.3, 2.0, 5.6,
+and so on. We refer to this model generally as a regression model, where
+the <strong>slope indicates the rate of change</strong>, or how much
+gene expression is expected to increase/decrease by per unit increase of
+the covariate.</p>
+<p>The y-intercept and slope of the line, or the <span
+class="math inline">\(\beta\)</span>s (<span
+class="math inline">\(\beta_0\)</span> and <span
+class="math inline">\(\beta_1\)</span>), are referred to as the model
+parameters. The true values of the parameters are unknown, but are
+estimated in the modelling process. A positive estimate of a model
+parameter indicates that an explanatory variable has a positive
+influence on gene expression (an increasing slope), whilst a negative
+value indicates that the explanatory variable has a negative influence
+on gene expression (a decreasing slope). In some cases, one may convert
+the age covariate into a factor by categorising the smaller values as
+“young” and larger values as “mature”, and instead use the models
+described below.</p>
 </div>
 <div id="dependencies" class="section level2">
 <h2>Dependencies</h2>
