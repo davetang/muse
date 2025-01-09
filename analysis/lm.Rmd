@@ -253,3 +253,27 @@ fit <- lm(y ~ x, my_df)
 with(data = my_df, plot(x, y, pch=16))
 abline(fit)
 ```
+
+## Perfect fit
+
+What happens if there's a perfect fit?
+
+```{r perfect_fit}
+n <- 10
+my_df <- data.frame(
+  x = 1:n,
+  y = 1:n
+)
+
+fit <- lm(x ~ y, my_df)
+with(data = my_df, plot(x, y, pch=16))
+abline(fit)
+```
+
+Summary.
+
+```{r summary_perfect_fit}
+summary(fit)
+```
+
+Floating-point precision errors with the residuals, which should be zero, and the intercept, which should also be zero. The slope is correct in that when y increases in 1, x increases in 1.
