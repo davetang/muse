@@ -277,3 +277,22 @@ summary(fit)
 ```
 
 Floating-point precision errors with the residuals, which should be zero, and the intercept, which should also be zero. The slope is correct in that when y increases in 1, x increases in 1.
+
+## Multiple linear regression
+
+Predict `x` using `y` and `z`.
+
+```{r predict_x_using_y_and_z}
+n <- 10
+set.seed(1984)
+my_df <- data.frame(
+  x = (1:n),
+  y = (1:n) + rnorm(n, sd = 0.5),
+  z = rnorm(n)
+)
+
+fit <- lm(x ~ y + z, my_df)
+summary(fit)
+```
+
+The intercept represents the predicted value of `x` when `y` and `z` (the predictors) are equal to zero. The intercept is often a baseline or reference point for the model. For example, suppose we are modelling house prices based on area and number of bedrooms. If both predictors are zero (a house with zero area and zero bedrooms), the intercept represents the baseline price of a property.
