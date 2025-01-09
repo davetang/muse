@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0981d281b49bf0db08aae4bd8e9ba7c7cb99f548targetblank0981d28a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4d7cdb8727fea4a6e285c83d829273731bce7fcatargetblank4d7cdb8a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/0981d281b49bf0db08aae4bd8e9ba7c7cb99f548" target="_blank">0981d28</a>
+<a href="https://github.com/davetang/muse/tree/4d7cdb8727fea4a6e285c83d829273731bce7fca" target="_blank">4d7cdb8</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0981d281b49bf0db08aae4bd8e9ba7c7cb99f548targetblank0981d28a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4d7cdb8727fea4a6e285c83d829273731bce7fcatargetblank4d7cdb8a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/0981d281b49bf0db08aae4bd8e9ba7c7cb99f548" target="_blank">0981d28</a>.
+<a href="https://github.com/davetang/muse/tree/4d7cdb8727fea4a6e285c83d829273731bce7fca" target="_blank">4d7cdb8</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -603,6 +603,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/4d7cdb8727fea4a6e285c83d829273731bce7fca/analysis/lm.Rmd" target="_blank">4d7cdb8</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-09
+</td>
+<td>
+Multiple linear regression
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/243642ce13435b9dc59ef7257ad0a1a9fabd0adf/docs/lm.html" target="_blank">243642c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1260,6 +1294,43 @@ fit &lt;- lm(x ~ y, my_df)
 with(data = my_df, plot(x, y, pch=16))
 abline(fit)</code></pre>
 <p><img src="figure/lm.Rmd/perfect_fit-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-perfect_fit-1">
+Past versions of perfect_fit-1.png
+</button>
+</p>
+<div id="fig-perfect_fit-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/243642ce13435b9dc59ef7257ad0a1a9fabd0adf/docs/figure/lm.Rmd/perfect_fit-1.png" target="_blank">243642c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-09
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Summary.</p>
 <pre class="r"><code>summary(fit)</code></pre>
 <pre><code>Warning in summary.lm(fit): essentially perfect fit: summary may be unreliable</code></pre>
@@ -1284,6 +1355,46 @@ F-statistic: 6.374e+32 on 1 and 8 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Floating-point precision errors with the residuals, which should be
 zero, and the intercept, which should also be zero. The slope is correct
 in that when y increases in 1, x increases in 1.</p>
+</div>
+<div id="multiple-linear-regression" class="section level2">
+<h2>Multiple linear regression</h2>
+<p>Predict <code>x</code> using <code>y</code> and <code>z</code>.</p>
+<pre class="r"><code>n &lt;- 10
+set.seed(1984)
+my_df &lt;- data.frame(
+  x = (1:n),
+  y = (1:n) + rnorm(n, sd = 0.5),
+  z = rnorm(n)
+)
+
+fit &lt;- lm(x ~ y + z, my_df)
+summary(fit)</code></pre>
+<pre><code>
+Call:
+lm(formula = x ~ y + z, data = my_df)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.4473 -0.3698 -0.1993  0.3606  0.9200 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  0.28067    0.43138   0.651    0.536    
+y            0.93656    0.06898  13.577 2.77e-06 ***
+z           -0.08051    0.19662  -0.409    0.694    
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 0.5473 on 7 degrees of freedom
+Multiple R-squared:  0.9746,    Adjusted R-squared:  0.9673 
+F-statistic: 134.2 on 2 and 7 DF,  p-value: 2.618e-06</code></pre>
+<p>The intercept represents the predicted value of <code>x</code> when
+<code>y</code> and <code>z</code> (the predictors) are equal to zero.
+The intercept is often a baseline or reference point for the model. For
+example, suppose we are modelling house prices based on area and number
+of bedrooms. If both predictors are zero (a house with zero area and
+zero bedrooms), the intercept represents the baseline price of a
+property.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
