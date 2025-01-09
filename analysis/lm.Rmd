@@ -226,3 +226,30 @@ data.frame(temp = temp, chirp = chirp) |>
   geom_smooth(method = "lm") +
   theme_minimal()
 ```
+
+## Vertical line
+
+What happens if you try to perform linear regression on points that form a vertical line?
+
+Predict `x` using `y`.
+
+```{r predict_x_using_y}
+n <- 10
+my_df <- data.frame(
+  x = rep(5, n),
+  y = 1:n
+)
+
+fit <- lm(x ~ y, my_df)
+with(data = my_df, plot(x, y, pch=16))
+abline(fit)
+```
+
+
+Predict `y` using `x`.
+
+```{r predict_y_using_x, error=TRUE}
+fit <- lm(y ~ x, my_df)
+with(data = my_df, plot(x, y, pch=16))
+abline(fit)
+```
