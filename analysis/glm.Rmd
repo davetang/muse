@@ -1,0 +1,44 @@
+---
+title: "Fitting Generalised Linear Models"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+On [Wikipedia](https://en.wikipedia.org/wiki/Linear_regression), a Generalised Linear Model is described as follows:
+
+> In statistics, a generalized linear model (GLM) is a flexible generalization of ordinary linear regression. The GLM generalizes linear regression by allowing the linear model to be related to the response variable via a link function and by allowing the magnitude of the variance of each measurement to be a function of its predicted value.
+
+## Quick start
+
+Predicting a the miles per gallon (`mpg`) of cars based on their weight (`wt`) using the `mtcars` dataset.
+
+The `glm()` function can handle a variety of models by specifying a family (e.g., Gaussian, binomial, Poisson). For a basic linear regression, the `family = gaussian()` is used.
+
+```{r glm_model}
+glm_model <- glm(mpg ~ wt, data = mtcars, family = gaussian())
+summary(glm_model)
+```
+
+Miles per gallon decreases -5.3445 for a unit gained in weight. In order words, the heavier the car, the less distance travelled per gallon of fuel.
+
+The `lm()` function performs linear regression.
+
+```{r lm_model}
+lm_model <- lm(mpg ~ wt, data = mtcars)
+summary(lm_model)
+```
+
+Both functions produce similar results for simple linear regression because `lm()` is essentially a special case of `glm()` with `family = gaussian()`.
+
+`glm()` provides supports for various distributions and link functions but requires specifying the family (e.g., Gaussian, binomial).
+
+`lm()` is designed specifically for linear regression and assumes the Gaussian distribution and identity link by default.
+
+Use `glm()` when working with non-normal response variables or when needing other link functions. A link function is a mathematical function that connects the linear predictor of a generalised linear model (GLM) to the mean of the response variable's distribution. It allows the model to handle a wide range of response variable types (e.g., binary, count, continuous) by transforming the expected value of the response variable to a scale that matches the linear predictor.
