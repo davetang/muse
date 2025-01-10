@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree28f42c0ff66378ad7cce4be232a24b4c1e0f0bb2targetblank28f42c0a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree803a1f59d31157c5827217e3ab63b9cf7c9214e5targetblank803a1f5a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/28f42c0ff66378ad7cce4be232a24b4c1e0f0bb2" target="_blank">28f42c0</a>
+<a href="https://github.com/davetang/muse/tree/803a1f59d31157c5827217e3ab63b9cf7c9214e5" target="_blank">803a1f5</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree28f42c0ff66378ad7cce4be232a24b4c1e0f0bb2targetblank28f42c0a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree803a1f59d31157c5827217e3ab63b9cf7c9214e5targetblank803a1f5a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/28f42c0ff66378ad7cce4be232a24b4c1e0f0bb2" target="_blank">28f42c0</a>.
+<a href="https://github.com/davetang/muse/tree/803a1f59d31157c5827217e3ab63b9cf7c9214e5" target="_blank">803a1f5</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -603,6 +603,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/803a1f59d31157c5827217e3ab63b9cf7c9214e5/analysis/miloR.Rmd" target="_blank">803a1f5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-10
+</td>
+<td>
+Mouse gastrulation example
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/5477e4983a50e1c11c45e07e8118243e51bc45de/docs/miloR.html" target="_blank">5477e49</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -687,6 +721,7 @@ BiocManager::install(&quot;SingleCellExperiment&quot;)
 BiocManager::install(&quot;scran&quot;)
 BiocManager::install(&quot;scater&quot;)
 BiocManager::install(&quot;miloR&quot;)
+BiocManager::install(&quot;MouseGastrulationData&quot;)
 
 install.packages(&#39;dplyr&#39;)
 install.packages(&#39;patchwork&#39;)</code></pre>
@@ -697,10 +732,16 @@ suppressPackageStartupMessages(library(scater))
 suppressPackageStartupMessages(library(scran))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(patchwork))
-suppressPackageStartupMessages(library(ggplot2))</code></pre>
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(MouseGastrulationData))</code></pre>
 </div>
-<div id="data" class="section level2">
-<h2>Data</h2>
+<div id="differential-abundance-testing-with-milo"
+class="section level2">
+<h2>Differential abundance testing with Milo</h2>
+<p><a
+href="https://www.bioconductor.org/packages/release/bioc/vignettes/miloR/inst/doc/milo_demo.html">Vignette</a>.</p>
+<div id="data" class="section level3">
+<h3>Data</h3>
 <p>Load testing data.</p>
 <pre class="r"><code>data(&quot;sim_trajectory&quot;, package = &quot;miloR&quot;)
 
@@ -723,8 +764,8 @@ reducedDim(traj_sce, &quot;PCA&quot;) &lt;- redim </code></pre>
 A_R1 A_R2 A_R3 B_R1 B_R2 B_R3 
   46   42   58  103  107  144 </code></pre>
 </div>
-<div id="pre-processing" class="section level2">
-<h2>Pre-processing</h2>
+<div id="pre-processing" class="section level3">
+<h3>Pre-processing</h3>
 <pre class="r"><code>set.seed(1984)
 logcounts(traj_sce) &lt;- log(counts(traj_sce) + 1)
 traj_sce &lt;- runPCA(traj_sce, ncomponents=30)
@@ -764,6 +805,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/5477e4983a50e1c11c45e07e8118243e51bc45de/docs/figure/miloR.Rmd/preprocessing-1.png" target="_blank">5477e49</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-10
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/710ddf2891f0a47d8d2dd84b33303810e8c605ef/docs/figure/miloR.Rmd/preprocessing-1.png" target="_blank">710ddf2</a>
 </td>
 <td>
@@ -778,8 +830,8 @@ Dave Tang
 </div>
 </div>
 </div>
-<div id="milo-object" class="section level2">
-<h2>Milo object</h2>
+<div id="milo-object" class="section level3">
+<h3>Milo object</h3>
 <pre class="r"><code>traj_milo &lt;- Milo(traj_sce)
 reducedDim(traj_milo, &quot;UMAP&quot;) &lt;- reducedDim(traj_sce, &quot;UMAP&quot;)
 
@@ -805,13 +857,13 @@ nhoodReducedDim names(0):
 nhoodGraph names(0):
 nhoodAdjacency dimension(2): 1 1</code></pre>
 </div>
-<div id="construct-knn-graph" class="section level2">
-<h2>Construct KNN graph</h2>
+<div id="construct-knn-graph" class="section level3">
+<h3>Construct KNN graph</h3>
 <pre class="r"><code>traj_milo &lt;- buildGraph(traj_milo, k = 10, d = 30)</code></pre>
 <pre><code>Constructing kNN graph with k:10</code></pre>
 </div>
-<div id="defining-representative-neighbourhoods" class="section level2">
-<h2>Defining representative neighbourhoods</h2>
+<div id="defining-representative-neighbourhoods" class="section level3">
+<h3>Defining representative neighbourhoods</h3>
 <pre class="r"><code>traj_milo &lt;- makeNhoods(traj_milo, prop = 0.1, k = 10, d=30, refined = TRUE)</code></pre>
 <pre><code>Checking valid object</code></pre>
 <pre><code>Running refined sampling with reduced_dim</code></pre>
@@ -841,6 +893,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/5477e4983a50e1c11c45e07e8118243e51bc45de/docs/figure/miloR.Rmd/make_neighbourhoods-1.png" target="_blank">5477e49</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-10
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/710ddf2891f0a47d8d2dd84b33303810e8c605ef/docs/figure/miloR.Rmd/make_neighbourhoods-1.png" target="_blank">710ddf2</a>
 </td>
 <td>
@@ -855,8 +918,8 @@ Dave Tang
 </div>
 </div>
 </div>
-<div id="counting-cells-in-neighbourhoods" class="section level2">
-<h2>Counting cells in neighbourhoods</h2>
+<div id="counting-cells-in-neighbourhoods" class="section level3">
+<h3>Counting cells in neighbourhoods</h3>
 <pre class="r"><code>traj_milo &lt;- countCells(traj_milo, meta.data = data.frame(colData(traj_milo)), samples=&quot;Sample&quot;)</code></pre>
 <pre><code>Checking meta.data validity</code></pre>
 <pre><code>Counting cells in neighbourhoods</code></pre>
@@ -870,8 +933,8 @@ Dave Tang
 5    5    6    4    8    6    7
 6    6    7    5   12    8   11</code></pre>
 </div>
-<div id="differential-abundance-testing" class="section level2">
-<h2>Differential abundance testing</h2>
+<div id="differential-abundance-testing" class="section level3">
+<h3>Differential abundance testing</h3>
 <pre class="r"><code>traj_design &lt;- data.frame(colData(traj_milo))[,c(&quot;Sample&quot;, &quot;Condition&quot;)]
 traj_design &lt;- distinct(traj_design)
 rownames(traj_design) &lt;- traj_design$Sample
@@ -905,8 +968,8 @@ See help(&quot;Deprecated&quot;) and help(&quot;Matrix-deprecated&quot;).</code>
 24 -1.527532 15.73713 29.71687 5.308236e-04 2.866447e-03    24 2.872952e-03
 23  2.278126 15.50551 10.21171 1.830055e-03 8.235247e-03    23 8.283248e-03</code></pre>
 </div>
-<div id="visualise-neighbourhoods-displaying-da" class="section level2">
-<h2>Visualise neighbourhoods displaying DA</h2>
+<div id="visualise-neighbourhoods-displaying-da" class="section level3">
+<h3>Visualise neighbourhoods displaying DA</h3>
 <pre class="r"><code>traj_milo &lt;- buildNhoodGraph(traj_milo)
 
 my_umap + plotNhoodGraphDA(traj_milo, da_results, alpha=0.05) +
@@ -937,6 +1000,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/5477e4983a50e1c11c45e07e8118243e51bc45de/docs/figure/miloR.Rmd/plot_neighbourhood-1.png" target="_blank">5477e49</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-10
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/710ddf2891f0a47d8d2dd84b33303810e8c605ef/docs/figure/miloR.Rmd/plot_neighbourhood-1.png" target="_blank">710ddf2</a>
 </td>
 <td>
@@ -950,6 +1024,420 @@ Dave Tang
 </table>
 </div>
 </div>
+</div>
+</div>
+<div id="mouse-gastrulation-example" class="section level2">
+<h2>Mouse gastrulation example</h2>
+<p><a
+href="https://www.bioconductor.org/packages/release/bioc/vignettes/miloR/inst/doc/milo_gastrulation.html">Vignette</a>.</p>
+<div id="data-1" class="section level3">
+<h3>Data</h3>
+<pre class="r"><code>select_samples &lt;- c(2,  3,  6, 4, #15,
+                    # 19, 
+                    10, 14#, 20 #30
+                    #31, 32
+                    )
+embryo_data = EmbryoAtlasData(samples = select_samples)</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre><code>see ?MouseGastrulationData and browseVignettes(&#39;MouseGastrulationData&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<pre class="r"><code>embryo_data</code></pre>
+<pre><code>class: SingleCellExperiment 
+dim: 29452 7558 
+metadata(0):
+assays(1): counts
+rownames(29452): ENSMUSG00000051951 ENSMUSG00000089699 ...
+  ENSMUSG00000096730 ENSMUSG00000095742
+rowData names(2): ENSEMBL SYMBOL
+colnames(7558): cell_361 cell_362 ... cell_29013 cell_29014
+colData names(17): cell barcode ... colour sizeFactor
+reducedDimNames(2): pca.corrected umap
+mainExpName: NULL
+altExpNames(0):</code></pre>
+</div>
+<div id="visualize-the-data" class="section level3">
+<h3>Visualize the data</h3>
+<pre class="r"><code>embryo_data &lt;- embryo_data[,apply(reducedDim(embryo_data, &quot;pca.corrected&quot;), 1, function(x) !all(is.na(x)))]
+embryo_data &lt;- runUMAP(embryo_data, dimred = &quot;pca.corrected&quot;, name = &#39;umap&#39;)
+
+plotReducedDim(embryo_data, colour_by=&quot;stage&quot;, dimred = &quot;umap&quot;) </code></pre>
+<p><img src="figure/miloR.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="create-a-milo-object" class="section level3">
+<h3>Create a Milo object</h3>
+<pre class="r"><code>embryo_milo &lt;- Milo(embryo_data)
+embryo_milo</code></pre>
+<pre><code>class: Milo 
+dim: 29452 6875 
+metadata(0):
+assays(1): counts
+rownames(29452): ENSMUSG00000051951 ENSMUSG00000089699 ...
+  ENSMUSG00000096730 ENSMUSG00000095742
+rowData names(2): ENSEMBL SYMBOL
+colnames(6875): cell_361 cell_362 ... cell_29013 cell_29014
+colData names(17): cell barcode ... colour sizeFactor
+reducedDimNames(2): pca.corrected umap
+mainExpName: NULL
+altExpNames(0):
+nhoods dimensions(2): 1 1
+nhoodCounts dimensions(2): 1 1
+nhoodDistances dimension(1): 0
+graph names(0):
+nhoodIndex names(1): 0
+nhoodExpression dimension(2): 1 1
+nhoodReducedDim names(0):
+nhoodGraph names(0):
+nhoodAdjacency dimension(2): 1 1</code></pre>
+</div>
+<div id="construct-knn-graph-1" class="section level3">
+<h3>Construct KNN graph</h3>
+<pre class="r"><code>embryo_milo &lt;- buildGraph(embryo_milo, k = 30, d = 30, reduced.dim = &quot;pca.corrected&quot;)</code></pre>
+<pre><code>Constructing kNN graph with k:30</code></pre>
+</div>
+<div id="defining-representative-neighbourhoods-on-the-knn-graph"
+class="section level3">
+<h3>Defining representative neighbourhoods on the KNN graph</h3>
+<pre class="r"><code>embryo_milo &lt;- makeNhoods(embryo_milo, prop = 0.1, k = 30, d=30, refined = TRUE, reduced_dims = &quot;pca.corrected&quot;)</code></pre>
+<pre><code>Checking valid object</code></pre>
+<pre><code>Running refined sampling with reduced_dim</code></pre>
+<pre class="r"><code>plotNhoodSizeHist(embryo_milo)</code></pre>
+<p><img src="figure/miloR.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="counting-cells-in-neighbourhoods-1" class="section level3">
+<h3>Counting cells in neighbourhoods</h3>
+<pre class="r"><code>embryo_milo &lt;- countCells(embryo_milo, meta.data = as.data.frame(colData(embryo_milo)), sample=&quot;sample&quot;)</code></pre>
+<pre><code>Checking meta.data validity</code></pre>
+<pre><code>Counting cells in neighbourhoods</code></pre>
+<pre class="r"><code>head(nhoodCounts(embryo_milo))</code></pre>
+<pre><code>6 x 6 sparse Matrix of class &quot;dgCMatrix&quot;
+   2 3  6 4 10 14
+1  . 2 24 2 11  .
+2  1 4 48 7 25  6
+3  3 4 87 5 15 11
+4  . .  5 . 90 19
+5  . . 27 . 47  7
+6 11 5 26 2  .  .</code></pre>
+</div>
+<div id="defining-experimental-design" class="section level3">
+<h3>Defining experimental design</h3>
+<pre class="r"><code>embryo_design &lt;- data.frame(colData(embryo_milo))[,c(&quot;sample&quot;, &quot;stage&quot;, &quot;sequencing.batch&quot;)]
+
+## Convert batch info from integer to factor
+embryo_design$sequencing.batch &lt;- as.factor(embryo_design$sequencing.batch) 
+embryo_design &lt;- distinct(embryo_design)
+rownames(embryo_design) &lt;- embryo_design$sample
+
+embryo_design</code></pre>
+<pre><code>   sample stage sequencing.batch
+2       2  E7.5                1
+3       3  E7.5                1
+6       6  E7.5                1
+4       4  E7.5                1
+10     10  E7.0                1
+14     14  E7.0                2</code></pre>
+</div>
+<div id="computing-neighbourhood-connectivity" class="section level3">
+<h3>Computing neighbourhood connectivity</h3>
+<pre class="r"><code>embryo_milo &lt;- calcNhoodDistance(embryo_milo, d=30, reduced.dim = &quot;pca.corrected&quot;)</code></pre>
+</div>
+<div id="testing" class="section level3">
+<h3>Testing</h3>
+<pre class="r"><code>da_results &lt;- testNhoods(embryo_milo, design = ~ sequencing.batch + stage, design.df = embryo_design, reduced.dim=&quot;pca.corrected&quot;)</code></pre>
+<pre><code>Using TMM normalisation</code></pre>
+<pre><code>Running with model contrasts</code></pre>
+<pre><code>Performing spatial FDR correction with k-distance weighting</code></pre>
+<pre class="r"><code>da_results %&gt;%
+  arrange(SpatialFDR) %&gt;%
+  head() </code></pre>
+<pre><code>        logFC   logCPM        F       PValue          FDR Nhood   SpatialFDR
+36  -8.702572 11.38854 51.62516 1.091251e-12 5.063407e-10    36 3.911834e-10
+377 -8.791174 11.72929 47.66587 7.658840e-12 1.776851e-09   377 1.394183e-09
+314 -7.170721 11.85656 45.98225 1.758371e-11 2.039710e-09   314 1.593529e-09
+347 -8.426464 11.27041 46.53411 1.338823e-11 2.039710e-09   347 1.593529e-09
+52  -7.838842 12.18774 44.65865 3.383398e-11 3.139793e-09    52 2.453204e-09
+223 -6.168287 11.96552 42.75561 8.685459e-11 6.566003e-09   223 5.087165e-09</code></pre>
+</div>
+<div id="inspecting-da-testing-results" class="section level3">
+<h3>Inspecting DA testing results</h3>
+<pre class="r"><code>ggplot(da_results, aes(PValue)) + geom_histogram(bins=50)</code></pre>
+<p><img src="figure/miloR.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>ggplot(da_results, aes(logFC, -log10(SpatialFDR))) + 
+  geom_point() +
+  geom_hline(yintercept = 1) ## Mark significance threshold (10% FDR)</code></pre>
+<p><img src="figure/miloR.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>embryo_milo &lt;- buildNhoodGraph(embryo_milo)
+
+## Plot single-cell UMAP
+umap_pl &lt;- plotReducedDim(embryo_milo, dimred = &quot;umap&quot;, colour_by=&quot;stage&quot;, text_by = &quot;celltype&quot;, 
+                          text_size = 3, point_size=0.5) +
+  guides(fill=&quot;none&quot;)
+
+## Plot neighbourhood graph
+nh_graph_pl &lt;- plotNhoodGraphDA(embryo_milo, da_results, layout=&quot;umap&quot;,alpha=0.1) </code></pre>
+<pre><code>Adding nhood effect sizes to neighbourhood graph attributes</code></pre>
+<pre class="r"><code>umap_pl + nh_graph_pl +
+  plot_layout(guides=&quot;collect&quot;)</code></pre>
+<pre><code>Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+increasing max.overlaps</code></pre>
+<p><img src="figure/miloR.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>da_results &lt;- annotateNhoods(embryo_milo, da_results, coldata_col = &quot;celltype&quot;)</code></pre>
+<pre><code>Converting celltype to factor...</code></pre>
+<pre class="r"><code>head(da_results)</code></pre>
+<pre><code>       logFC   logCPM          F       PValue          FDR Nhood   SpatialFDR
+1 -0.7073196 10.38623  0.5596000 4.545478e-01 5.131635e-01     1 5.170902e-01
+2 -0.6852005 11.51879  0.6659869 4.145939e-01 4.749915e-01     2 4.773720e-01
+3  0.4505361 11.73195  0.2354735 6.275710e-01 6.694091e-01     3 6.705023e-01
+4 -6.0397103 12.02021 38.5362677 7.078557e-10 2.189634e-08     4 1.690890e-08
+5 -3.1492070 11.32228 16.2297553 5.913724e-05 1.932372e-04     5 1.756735e-04
+6  6.7795549 10.89194 10.2510770 1.396926e-03 2.842866e-03     6 2.831445e-03
+           celltype celltype_fraction
+1 Parietal endoderm          1.000000
+2  Primitive Streak          0.956044
+3      ExE ectoderm          1.000000
+4          Epiblast          0.754386
+5      ExE ectoderm          1.000000
+6   Caudal epiblast          0.750000</code></pre>
+<pre class="r"><code>ggplot(da_results, aes(celltype_fraction)) + geom_histogram(bins=50)</code></pre>
+<p><img src="figure/miloR.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>da_results$celltype &lt;- ifelse(da_results$celltype_fraction &lt; 0.7, &quot;Mixed&quot;, da_results$celltype)</code></pre>
+<pre class="r"><code>plotDAbeeswarm(da_results, group.by = &quot;celltype&quot;)</code></pre>
+<pre><code>Converting group_by to factor...</code></pre>
+<p><img src="figure/miloR.Rmd/unnamed-chunk-15-1.png" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="finding-markers-of-da-populations" class="section level3">
+<h3>Finding markers of DA populations</h3>
+<pre class="r"><code>## Add log normalized count to Milo object
+embryo_milo &lt;- logNormCounts(embryo_milo)
+
+da_results$NhoodGroup &lt;- as.numeric(da_results$SpatialFDR &lt; 0.1 &amp; da_results$logFC &lt; 0)
+da_nhood_markers &lt;- findNhoodGroupMarkers(embryo_milo, da_results, subset.row = rownames(embryo_milo)[1:10])</code></pre>
+<pre><code>Warning: Zero sample variances detected, have been offset away from zero
+Warning: Zero sample variances detected, have been offset away from zero</code></pre>
+<pre class="r"><code>head(da_nhood_markers)</code></pre>
+<pre><code>              GeneID       logFC_0  adj.P.Val_0       logFC_1  adj.P.Val_1
+1 ENSMUSG00000025900  9.299023e-05 1.000000e+00 -9.299023e-05 1.000000e+00
+2 ENSMUSG00000025902  1.130534e-01 9.610514e-06 -1.130534e-01 9.610514e-06
+3 ENSMUSG00000025903 -6.605353e-02 4.487599e-03  6.605353e-02 4.487599e-03
+4 ENSMUSG00000033813 -6.175050e-02 8.928182e-03  6.175050e-02 8.928182e-03
+5 ENSMUSG00000033845 -6.025957e-02 1.563741e-02  6.025957e-02 1.563741e-02
+6 ENSMUSG00000051951  0.000000e+00 1.000000e+00  0.000000e+00 1.000000e+00</code></pre>
+<pre class="r"><code>da_nhood_markers &lt;- findNhoodGroupMarkers(embryo_milo, da_results, subset.row = rownames(embryo_milo)[1:10], 
+                                          aggregate.samples = TRUE, sample_col = &quot;sample&quot;)</code></pre>
+<pre><code>Warning: Zero sample variances detected, have been offset away from zero
+Warning: Zero sample variances detected, have been offset away from zero</code></pre>
+<pre class="r"><code>head(da_nhood_markers)</code></pre>
+<pre><code>              GeneID      logFC_0 adj.P.Val_0      logFC_1 adj.P.Val_1
+1 ENSMUSG00000025900  0.001765224           1 -0.001765224           1
+2 ENSMUSG00000025902 -0.205886718           1  0.205886718           1
+3 ENSMUSG00000025903 -0.010020237           1  0.010020237           1
+4 ENSMUSG00000033813 -0.050052716           1  0.050052716           1
+5 ENSMUSG00000033845 -0.168226202           1  0.168226202           1
+6 ENSMUSG00000051951  0.000000000           1  0.000000000           1</code></pre>
+</div>
+<div id="automatic-grouping-of-neighbourhoods" class="section level3">
+<h3>Automatic grouping of neighbourhoods</h3>
+<pre class="r"><code>## Run buildNhoodGraph to store nhood adjacency matrix
+embryo_milo &lt;- buildNhoodGraph(embryo_milo)
+
+## Find groups
+da_results &lt;- groupNhoods(embryo_milo, da_results, max.lfc.delta = 10)</code></pre>
+<pre><code>Found 332 DA neighbourhoods at FDR 10%</code></pre>
+<pre><code>nhoodAdjacency found - using for nhood grouping</code></pre>
+<pre class="r"><code>head(da_results)</code></pre>
+<pre><code>       logFC   logCPM          F       PValue          FDR Nhood   SpatialFDR
+1 -0.7073196 10.38623  0.5596000 4.545478e-01 5.131635e-01     1 5.170902e-01
+2 -0.6852005 11.51879  0.6659869 4.145939e-01 4.749915e-01     2 4.773720e-01
+3  0.4505361 11.73195  0.2354735 6.275710e-01 6.694091e-01     3 6.705023e-01
+4 -6.0397103 12.02021 38.5362677 7.078557e-10 2.189634e-08     4 1.690890e-08
+5 -3.1492070 11.32228 16.2297553 5.913724e-05 1.932372e-04     5 1.756735e-04
+6  6.7795549 10.89194 10.2510770 1.396926e-03 2.842866e-03     6 2.831445e-03
+           celltype celltype_fraction NhoodGroup
+1 Parietal endoderm          1.000000          1
+2  Primitive Streak          0.956044          2
+3      ExE ectoderm          1.000000          3
+4          Epiblast          0.754386          4
+5      ExE ectoderm          1.000000          3
+6   Caudal epiblast          0.750000          5</code></pre>
+<pre class="r"><code>plotNhoodGroups(embryo_milo, da_results, layout=&quot;umap&quot;) </code></pre>
+<p><img src="figure/miloR.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plotDAbeeswarm(da_results, &quot;NhoodGroup&quot;)</code></pre>
+<pre><code>Converting group_by to factor...</code></pre>
+<p><img src="figure/miloR.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>set.seed(42)
+da_results &lt;- groupNhoods(embryo_milo, da_results, max.lfc.delta = 10, overlap=1)</code></pre>
+<pre><code>Found 332 DA neighbourhoods at FDR 10%</code></pre>
+<pre><code>nhoodAdjacency found - using for nhood grouping</code></pre>
+<pre class="r"><code>plotNhoodGroups(embryo_milo, da_results, layout=&quot;umap&quot;)</code></pre>
+<p><img src="figure/miloR.Rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="finding-gene-signatures-for-neighbourhoods"
+class="section level3">
+<h3>Finding gene signatures for neighbourhoods</h3>
+<pre class="r"><code>## Exclude zero counts genes
+keep.rows &lt;- rowSums(logcounts(embryo_milo)) != 0
+embryo_milo &lt;- embryo_milo[keep.rows, ]
+
+## Find HVGs
+set.seed(101)
+dec &lt;- modelGeneVar(embryo_milo)
+hvgs &lt;- getTopHVGs(dec, n=2000)
+
+# this vignette randomly fails to identify HVGs for some reason
+if(!length(hvgs)){
+    set.seed(42)
+    dec &lt;- modelGeneVar(embryo_milo)
+    hvgs &lt;- getTopHVGs(dec, n=2000)
+}
+
+head(hvgs)</code></pre>
+<pre><code>[1] &quot;ENSMUSG00000032083&quot; &quot;ENSMUSG00000095180&quot; &quot;ENSMUSG00000061808&quot;
+[4] &quot;ENSMUSG00000002985&quot; &quot;ENSMUSG00000024990&quot; &quot;ENSMUSG00000024391&quot;</code></pre>
+<pre class="r"><code>set.seed(42)
+nhood_markers &lt;- findNhoodGroupMarkers(embryo_milo, da_results, subset.row = hvgs, 
+                                       aggregate.samples = TRUE, sample_col = &quot;sample&quot;)
+
+head(nhood_markers)</code></pre>
+<pre><code>              GeneID    logFC_1  adj.P.Val_1    logFC_2 adj.P.Val_2    logFC_3
+1 ENSMUSG00000000031 -0.1957851 9.023691e-01 -1.6227811 0.131661210  1.0818991
+2 ENSMUSG00000000078  1.3761092 4.763130e-07 -0.7577163 0.027746376 -0.1254065
+3 ENSMUSG00000000088  0.8440478 1.708425e-02 -0.2230027 0.542175995 -0.2398095
+4 ENSMUSG00000000125 -0.3215022 1.333035e-01  0.4961217 0.006035858 -0.1759920
+5 ENSMUSG00000000149  0.1267912 5.214792e-01 -0.0666690 0.674509763 -0.1369532
+6 ENSMUSG00000000184 -0.9431346 1.760344e-01  0.6236021 0.330231952 -0.9388169
+  adj.P.Val_3    logFC_4 adj.P.Val_4     logFC_5 adj.P.Val_5     logFC_6
+1  0.23946003 -1.6554796   0.1458825 -1.80398024   0.1388493 -0.89469039
+2  0.67224856 -0.1319154   0.6784129 -0.15102950   0.6054605  0.02395376
+3  0.41954806 -0.3931160   0.3057337 -0.32144387   0.3363805 -0.43803782
+4  0.28562140 -0.1463749   0.4448630  0.06021375   0.7152295  0.13762273
+5  0.28861385 -0.1423463   0.3819111 -0.10926021   0.4165005 -0.05889050
+6  0.06449184 -0.3613323   0.5274175  0.97209298   0.1673039  1.77682169
+   adj.P.Val_6      logFC_7  adj.P.Val_7    logFC_8 adj.P.Val_8
+1 4.170448e-01  3.064364566 8.723146e-07  1.3586017   0.1234551
+2 9.538828e-01  0.021188483 9.356372e-01  0.2273650   0.4628588
+3 2.394639e-01  0.708399915 1.668138e-03  0.3362223   0.2712942
+4 4.999481e-01 -0.006688093 9.634529e-01 -0.1069250   0.5488718
+5 7.417181e-01  0.278006093 5.600597e-03  0.1330199   0.3244233
+6 1.769196e-05 -0.941127033 2.679463e-02 -0.4483902   0.4263436</code></pre>
+<pre class="r"><code>gr5_markers &lt;- nhood_markers[c(&quot;logFC_5&quot;, &quot;adj.P.Val_5&quot;)] 
+colnames(gr5_markers) &lt;- c(&quot;logFC&quot;, &quot;adj.P.Val&quot;)
+
+head(gr5_markers[order(gr5_markers$adj.P.Val), ])</code></pre>
+<pre><code>         logFC    adj.P.Val
+979  0.4954478 3.303464e-07
+363  0.2585361 1.623317e-06
+1737 0.3048098 1.623317e-06
+832  0.3793630 4.815722e-06
+974  0.2832659 6.186392e-06
+478  0.4508483 2.593135e-05</code></pre>
+<pre class="r"><code>nhood_markers &lt;- findNhoodGroupMarkers(embryo_milo, da_results, subset.row = hvgs, 
+                                       aggregate.samples = TRUE, sample_col = &quot;sample&quot;,
+                                       subset.groups = c(&quot;5&quot;)
+                                       )
+
+head(nhood_markers)</code></pre>
+<pre><code>                     logFC_5  adj.P.Val_5             GeneID
+ENSMUSG00000029838 0.4954478 3.303464e-07 ENSMUSG00000029838
+ENSMUSG00000059246 0.3048098 1.623317e-06 ENSMUSG00000059246
+ENSMUSG00000020427 0.2585361 1.623317e-06 ENSMUSG00000020427
+ENSMUSG00000027996 0.3793630 4.815722e-06 ENSMUSG00000027996
+ENSMUSG00000029755 0.2832659 6.186392e-06 ENSMUSG00000029755
+ENSMUSG00000022054 0.4508483 2.593135e-05 ENSMUSG00000022054</code></pre>
+<pre class="r"><code>nhood_markers &lt;- findNhoodGroupMarkers(embryo_milo, da_results, subset.row = hvgs,
+                                       subset.nhoods = da_results$NhoodGroup %in% c(&#39;5&#39;,&#39;6&#39;),
+                                       aggregate.samples = TRUE, sample_col = &quot;sample&quot;)</code></pre>
+<pre class="r"><code>head(nhood_markers)</code></pre>
+<pre><code>              GeneID     logFC_5 adj.P.Val_5     logFC_6 adj.P.Val_6
+1 ENSMUSG00000000031 -0.98660033  0.01729991  0.98660033  0.01729991
+2 ENSMUSG00000000078  0.09373713  0.74682071 -0.09373713  0.74682071
+3 ENSMUSG00000000088  0.19162019  0.53797687 -0.19162019  0.53797687
+4 ENSMUSG00000000125 -0.04908371  0.82997598  0.04908371  0.82997598
+5 ENSMUSG00000000149 -0.03932969  0.44348577  0.03932969  0.44348577
+6 ENSMUSG00000000184 -0.73167698  0.13642895  0.73167698  0.13642895</code></pre>
+</div>
+<div id="visualize-detected-markers" class="section level3">
+<h3>Visualize detected markers</h3>
+<pre class="r"><code>ggplot(nhood_markers, aes(logFC_5, -log10(adj.P.Val_5 ))) + 
+  geom_point(alpha=0.5, size=0.5) +
+  geom_hline(yintercept = 3)</code></pre>
+<p><img src="figure/miloR.Rmd/unnamed-chunk-30-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>markers &lt;- nhood_markers$GeneID[nhood_markers$adj.P.Val_5 &lt; 0.01 &amp; nhood_markers$logFC_5 &gt; 0]</code></pre>
+<pre class="r"><code>set.seed(42)
+plotNhoodExpressionGroups(embryo_milo, da_results, features=intersect(rownames(embryo_milo), markers[1:10]),
+                          subset.nhoods = da_results$NhoodGroup %in% c(&#39;6&#39;,&#39;5&#39;), 
+                          scale=TRUE,
+                          grid.space = &quot;fixed&quot;)</code></pre>
+<pre><code>Warning in plotNhoodExpressionGroups(embryo_milo, da_results, features =
+intersect(rownames(embryo_milo), : Nothing in nhoodExpression(x): computing for
+requested features...</code></pre>
+<p><img src="figure/miloR.Rmd/unnamed-chunk-32-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="dge-testing-within-a-group" class="section level3">
+<h3>DGE testing within a group</h3>
+<pre class="r"><code>dge_6 &lt;- testDiffExp(embryo_milo, da_results, design = ~ stage, meta.data = data.frame(colData(embryo_milo)),
+                     subset.row = rownames(embryo_milo)[1:5], subset.nhoods=da_results$NhoodGroup==&quot;6&quot;)</code></pre>
+<pre><code>Warning in fitFDist(var, df1 = df, covariate = covariate): More than half of
+residual variances are exactly zero: eBayes unreliable</code></pre>
+<pre class="r"><code>dge_6</code></pre>
+<pre><code>$`6`
+                          logFC   AveExpr         t    P.Value adj.P.Val
+ENSMUSG00000025902 -0.080567087 0.3520449 -2.023978 0.04314914 0.2157457
+ENSMUSG00000033845 -0.009033338 2.2775883 -0.209271 0.83426503 1.0000000
+ENSMUSG00000051951  0.000000000 0.0000000  0.000000 1.00000000 1.0000000
+ENSMUSG00000102343  0.000000000 0.0000000  0.000000 1.00000000 1.0000000
+ENSMUSG00000025900  0.000000000 0.0000000  0.000000 1.00000000 1.0000000
+                            B Nhood.Group
+ENSMUSG00000025902  -9.440543           6
+ENSMUSG00000033845 -11.465446           6
+ENSMUSG00000051951 -11.487357           6
+ENSMUSG00000102343 -11.487357           6
+ENSMUSG00000025900 -11.487357           6</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -983,54 +1471,63 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] patchwork_1.3.0             dplyr_1.1.4                
- [3] scran_1.34.0                scater_1.34.0              
- [5] ggplot2_3.5.1               scuttle_1.16.0             
- [7] SingleCellExperiment_1.28.1 SummarizedExperiment_1.36.0
- [9] Biobase_2.66.0              GenomicRanges_1.58.0       
-[11] GenomeInfoDb_1.42.1         IRanges_2.40.1             
-[13] S4Vectors_0.44.0            BiocGenerics_0.52.0        
-[15] MatrixGenerics_1.18.0       matrixStats_1.4.1          
-[17] miloR_2.2.0                 edgeR_4.4.1                
-[19] limma_3.62.1                workflowr_1.7.1            
+ [1] MouseGastrulationData_1.20.0 SpatialExperiment_1.16.0    
+ [3] patchwork_1.3.0              dplyr_1.1.4                 
+ [5] scran_1.34.0                 scater_1.34.0               
+ [7] ggplot2_3.5.1                scuttle_1.16.0              
+ [9] SingleCellExperiment_1.28.1  SummarizedExperiment_1.36.0 
+[11] Biobase_2.66.0               GenomicRanges_1.58.0        
+[13] GenomeInfoDb_1.42.1          IRanges_2.40.1              
+[15] S4Vectors_0.44.0             BiocGenerics_0.52.0         
+[17] MatrixGenerics_1.18.0        matrixStats_1.4.1           
+[19] miloR_2.2.0                  edgeR_4.4.1                 
+[21] limma_3.62.1                 workflowr_1.7.1             
 
 loaded via a namespace (and not attached):
   [1] RColorBrewer_1.1-3      rstudioapi_0.17.1       jsonlite_1.8.9         
-  [4] magrittr_2.0.3          ggbeeswarm_0.7.2        farver_2.1.2           
-  [7] rmarkdown_2.28          fs_1.6.4                zlibbioc_1.52.0        
- [10] vctrs_0.6.5             memoise_2.0.1           htmltools_0.5.8.1      
- [13] S4Arrays_1.6.0          BiocNeighbors_2.0.1     SparseArray_1.6.0      
- [16] sass_0.4.9              pracma_2.4.4            bslib_0.8.0            
- [19] cachem_1.1.0            whisker_0.4.1           igraph_2.1.2           
- [22] lifecycle_1.0.4         pkgconfig_2.0.3         rsvd_1.0.5             
- [25] Matrix_1.7-0            R6_2.5.1                fastmap_1.2.0          
- [28] GenomeInfoDbData_1.2.13 digest_0.6.37           numDeriv_2016.8-1.1    
- [31] colorspace_2.1-1        ps_1.8.1                rprojroot_2.0.4        
- [34] dqrng_0.4.1             irlba_2.3.5.1           beachmat_2.22.0        
- [37] labeling_0.4.3          fansi_1.0.6             httr_1.4.7             
- [40] polyclip_1.10-7         abind_1.4-8             compiler_4.4.1         
- [43] withr_3.0.2             BiocParallel_1.40.0     viridis_0.6.5          
- [46] highr_0.11              ggforce_0.4.2           MASS_7.3-60.2          
- [49] DelayedArray_0.32.0     bluster_1.16.0          gtools_3.9.5           
- [52] tools_4.4.1             vipor_0.4.7             beeswarm_0.4.0         
- [55] httpuv_1.6.15           glue_1.8.0              callr_3.7.6            
- [58] promises_1.3.0          grid_4.4.1              getPass_0.2-4          
- [61] cluster_2.1.6           generics_0.1.3          gtable_0.3.6           
- [64] tidyr_1.3.1             BiocSingular_1.22.0     tidygraph_1.3.1        
- [67] ScaledMatrix_1.14.0     metapod_1.14.0          utf8_1.2.4             
- [70] XVector_0.46.0          ggrepel_0.9.6           pillar_1.9.0           
- [73] stringr_1.5.1           later_1.3.2             splines_4.4.1          
- [76] tweenr_2.0.3            lattice_0.22-6          FNN_1.1.4.1            
- [79] tidyselect_1.2.1        locfit_1.5-9.10         knitr_1.48             
- [82] git2r_0.35.0            gridExtra_2.3           xfun_0.48              
- [85] graphlayouts_1.2.0      statmod_1.5.0           stringi_1.8.4          
- [88] UCSC.utils_1.2.0        yaml_2.3.10             evaluate_1.0.1         
- [91] codetools_0.2-20        ggraph_2.2.1            tibble_3.2.1           
- [94] cli_3.6.3               uwot_0.2.2              munsell_0.5.1          
- [97] processx_3.8.4          jquerylib_0.1.4         Rcpp_1.0.13            
-[100] parallel_4.4.1          viridisLite_0.4.2       scales_1.3.0           
-[103] purrr_1.0.2             crayon_1.5.3            rlang_1.1.4            
-[106] cowplot_1.1.3          </code></pre>
+  [4] magrittr_2.0.3          ggbeeswarm_0.7.2        magick_2.8.5           
+  [7] farver_2.1.2            rmarkdown_2.28          fs_1.6.4               
+ [10] zlibbioc_1.52.0         vctrs_0.6.5             memoise_2.0.1          
+ [13] htmltools_0.5.8.1       S4Arrays_1.6.0          curl_6.0.1             
+ [16] AnnotationHub_3.14.0    BiocNeighbors_2.0.1     SparseArray_1.6.0      
+ [19] sass_0.4.9              pracma_2.4.4            bslib_0.8.0            
+ [22] cachem_1.1.0            whisker_0.4.1           igraph_2.1.2           
+ [25] mime_0.12               lifecycle_1.0.4         pkgconfig_2.0.3        
+ [28] rsvd_1.0.5              Matrix_1.7-0            R6_2.5.1               
+ [31] fastmap_1.2.0           GenomeInfoDbData_1.2.13 digest_0.6.37          
+ [34] numDeriv_2016.8-1.1     colorspace_2.1-1        AnnotationDbi_1.68.0   
+ [37] ps_1.8.1                rprojroot_2.0.4         dqrng_0.4.1            
+ [40] irlba_2.3.5.1           ExperimentHub_2.14.0    RSQLite_2.3.9          
+ [43] beachmat_2.22.0         labeling_0.4.3          filelock_1.0.3         
+ [46] fansi_1.0.6             httr_1.4.7              polyclip_1.10-7        
+ [49] abind_1.4-8             compiler_4.4.1          bit64_4.5.2            
+ [52] withr_3.0.2             BiocParallel_1.40.0     DBI_1.2.3              
+ [55] viridis_0.6.5           highr_0.11              ggforce_0.4.2          
+ [58] MASS_7.3-60.2           rappdirs_0.3.3          DelayedArray_0.32.0    
+ [61] rjson_0.2.23            bluster_1.16.0          gtools_3.9.5           
+ [64] tools_4.4.1             vipor_0.4.7             beeswarm_0.4.0         
+ [67] httpuv_1.6.15           glue_1.8.0              callr_3.7.6            
+ [70] promises_1.3.0          grid_4.4.1              getPass_0.2-4          
+ [73] cluster_2.1.6           generics_0.1.3          gtable_0.3.6           
+ [76] tidyr_1.3.1             BiocSingular_1.22.0     tidygraph_1.3.1        
+ [79] ScaledMatrix_1.14.0     metapod_1.14.0          utf8_1.2.4             
+ [82] XVector_0.46.0          RcppAnnoy_0.0.22        BiocVersion_3.20.0     
+ [85] ggrepel_0.9.6           pillar_1.9.0            stringr_1.5.1          
+ [88] BumpyMatrix_1.14.0      later_1.3.2             splines_4.4.1          
+ [91] tweenr_2.0.3            BiocFileCache_2.14.0    lattice_0.22-6         
+ [94] FNN_1.1.4.1             bit_4.5.0               tidyselect_1.2.1       
+ [97] locfit_1.5-9.10         Biostrings_2.74.1       knitr_1.48             
+[100] git2r_0.35.0            gridExtra_2.3           xfun_0.48              
+[103] graphlayouts_1.2.0      statmod_1.5.0           stringi_1.8.4          
+[106] UCSC.utils_1.2.0        yaml_2.3.10             evaluate_1.0.1         
+[109] codetools_0.2-20        ggraph_2.2.1            tibble_3.2.1           
+[112] BiocManager_1.30.25     cli_3.6.3               uwot_0.2.2             
+[115] munsell_0.5.1           processx_3.8.4          jquerylib_0.1.4        
+[118] Rcpp_1.0.13             dbplyr_2.5.0            png_0.1-8              
+[121] parallel_4.4.1          blob_1.2.4              viridisLite_0.4.2      
+[124] scales_1.3.0            purrr_1.0.2             crayon_1.5.3           
+[127] rlang_1.1.4             KEGGREST_1.46.0         cowplot_1.1.3          </code></pre>
+</div>
 </div>
 </div>
 </div>
