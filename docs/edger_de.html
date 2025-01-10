@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2024-10-31" />
+<meta name="date" content="2025-01-10" />
 
 <title>Differential gene expression analysis using edgeR</title>
 
-<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -360,7 +360,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Differential gene expression analysis using
 edgeR</h1>
-<h4 class="date">2024-10-31</h4>
+<h4 class="date">2025-01-10</h4>
 
 </div>
 
@@ -389,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-10-31
+<strong>Last updated:</strong> 2025-01-10
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree04948c54e3d2024b33286d089cac99d0cfbb1173targetblank04948c5a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8aed68157ddb1b9eab76ef5b73b4394b9d76a6a7targetblank8aed681a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/04948c54e3d2024b33286d089cac99d0cfbb1173" target="_blank">04948c5</a>
+<a href="https://github.com/davetang/muse/tree/8aed68157ddb1b9eab76ef5b73b4394b9d76a6a7" target="_blank">8aed681</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree04948c54e3d2024b33286d089cac99d0cfbb1173targetblank04948c5a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8aed68157ddb1b9eab76ef5b73b4394b9d76a6a7targetblank8aed681a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/04948c54e3d2024b33286d089cac99d0cfbb1173" target="_blank">04948c5</a>.
+<a href="https://github.com/davetang/muse/tree/8aed68157ddb1b9eab76ef5b73b4394b9d76a6a7" target="_blank">8aed681</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -559,6 +559,10 @@ Ignored files:
     Ignored:    data/pbmc3k.csv.gz
     Ignored:    data/pbmc3k/
     Ignored:    r_packages_4.4.0/
+    Ignored:    r_packages_4.4.1/
+
+Untracked files:
+    Untracked:  analysis/rsem.merged.gene_counts.tsv
 
 </code></pre>
 <p>
@@ -603,6 +607,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/8aed68157ddb1b9eab76ef5b73b4394b9d76a6a7/analysis/edger_de.Rmd" target="_blank">8aed681</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-10
+</td>
+<td>
+Add TL;DR section
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/c4e09b75308d3fc57063ffb49b626a4771affeaf/docs/edger_de.html" target="_blank">c4e09b7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-10-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -778,6 +816,31 @@ ChIP-seq, ATAC-seq, Bisulfite-seq, SAGE and CAGE.</p>
 <p><a
 href="https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf">edgeR
 Manual</a>.</p>
+<div id="tldr" class="section level2">
+<h2>TL;DR</h2>
+<blockquote>
+<p>edgeR offers many variants on analyses. The glm approach is more
+popular than the classic approach as it offers great flexibilities.
+There are two testing methods under the glm framework: likelihood ratio
+tests and quasi-likelihood F-tests. The quasi-likelihood (QL) method is
+highly recommended for differential expression analyses of bulk RNA-seq
+data as it gives stricter error rate control by accounting for the
+uncertainty in dispersion estimation. The likelihood ratio test can be
+useful in some special cases such as single cell RNA-seq and datasets
+with no replicates.</p>
+</blockquote>
+<ol style="list-style-type: decimal">
+<li>Create <code>DGEList</code> object using a count table and a
+grouping factor.</li>
+<li>Remove genes that are lowly expressed.</li>
+<li>Normalise data using <code>normLibSizes()</code>.</li>
+<li>Create <a href="design.html">design matrix</a> using
+<code>model.matrix()</code>.</li>
+<li>Estimate dispersions using <code>estimateDisp()</code>.</li>
+<li>Fit model using the read counts using <code>glmQLFit()</code>.</li>
+<li>Conduct F-tests using <code>glmQLFTest()</code>.</li>
+</ol>
+</div>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
 <p>Install using <code>BiocManager::install()</code>.</p>
@@ -1009,23 +1072,26 @@ Dave Tang
 </div>
 <div id="differential-expression" class="section level2">
 <h2>Differential expression</h2>
+<p>Follow {edgeR} Quick start guide, which recommends using the
+quasi-likelihood (QL) method for differential expression analyses of
+bulk RNA-seq data.</p>
 <pre class="r"><code>design &lt;- model.matrix(~y$samples$group)
 y &lt;- estimateDisp(y, design, robust=TRUE)
 fit &lt;- glmQLFit(y, design, robust=TRUE)
 res &lt;- glmQLFTest(fit)
 topTags(res)</code></pre>
 <pre><code>Coefficient:  y$samples$groupcancer 
-                    logFC    logCPM         F       PValue          FDR
-ENSG00000289381 -7.411609 2.3413727 156.14405 3.485881e-09 0.0001304556
-ENSG00000100985  5.744629 5.7690594 110.89086 1.418804e-06 0.0058527061
-ENSG00000275332 -7.648126 2.5721238  59.27705 1.721074e-06 0.0058527061
-ENSG00000220695 -9.132437 4.0374574  58.73122 1.982088e-06 0.0058527061
-ENSG00000256422 -5.529837 0.5541825  54.99786 2.395813e-06 0.0058527061
-ENSG00000151834 -8.035376 3.6441016  61.94292 2.733010e-06 0.0058527061
-ENSG00000167910 -8.018047 3.4530411  55.86149 3.928929e-06 0.0058527061
-ENSG00000226443 -5.742734 0.9948963  51.37638 4.209874e-06 0.0058527061
-ENSG00000250696 -8.580216 3.8092969  52.88815 4.376155e-06 0.0058527061
-ENSG00000196778 -8.809149 4.2377739  54.66541 4.439027e-06 0.0058527061</code></pre>
+                     logFC   logCPM         F       PValue          FDR
+ENSG00000289381  -7.412407 2.341373 103.05773 1.227198e-08 0.0004592667
+ENSG00000151834  -8.032643 3.644102  61.61545 9.204327e-07 0.0026899249
+ENSG00000220695  -9.133225 4.037457  57.74371 1.112720e-06 0.0026899249
+ENSG00000250696  -8.589695 3.809297  57.58050 1.144570e-06 0.0026899249
+ENSG00000100985   5.741912 5.769059  80.27623 1.152096e-06 0.0026899249
+ENSG00000275332  -7.647863 2.572124  53.65708 1.231408e-06 0.0026899249
+ENSG00000196778  -8.811912 4.237774  56.53459 1.463195e-06 0.0026899249
+ENSG00000167910  -8.020138 3.453041  55.90088 1.468063e-06 0.0026899249
+ENSG00000229894  -9.124263 4.910552  58.92704 1.618181e-06 0.0026899249
+ENSG00000243978 -11.487799 6.384022  53.46913 1.802654e-06 0.0026899249</code></pre>
 <p>CPM.</p>
 <pre class="r"><code>my_cpms &lt;- cpm(y, prior.count=2, log=TRUE)
 head(my_cpms)</code></pre>
@@ -1171,13 +1237,13 @@ attr(,&quot;package&quot;)
 [1] &quot;edgeR&quot;</code></pre>
 <p>Specifically, in <code>res$table</code>.</p>
 <pre class="r"><code>head(res$table)</code></pre>
-<pre><code>                     logFC   logCPM          F      PValue
-ENSG00000000003  2.7275199 4.832838  4.2763383 0.068387013
-ENSG00000000005 -7.0023947 0.540980 17.6315738 0.002159975
-ENSG00000000419  0.1201226 5.339964  0.1140066 0.743147316
-ENSG00000000457 -0.7079087 5.306090  3.3541835 0.099292833
-ENSG00000000460 -0.8967285 3.947381  2.6625206 0.136187708
-ENSG00000000938  1.5368400 5.597107  1.8649388 0.205160993</code></pre>
+<pre><code>                     logFC   logCPM           F      PValue
+ENSG00000000003  2.7217550 4.832838  4.83066709 0.051010174
+ENSG00000000005 -7.0014768 0.540980 18.88444244 0.001429757
+ENSG00000000419  0.1201527 5.339964  0.06819814 0.798505091
+ENSG00000000457 -0.7077471 5.306090  2.17156913 0.166893688
+ENSG00000000460 -0.8962715 3.947381  2.20362195 0.164041956
+ENSG00000000938  1.5352102 5.597107  2.02000277 0.183879584</code></pre>
 <p>Add adjusted p-values and export.</p>
 <pre class="r"><code>res$table |&gt;
   dplyr::mutate(adjusted_pvalue = p.adjust(PValue, method = &quot;BH&quot;)) |&gt;
@@ -1192,9 +1258,9 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.4.0 (2024-04-24)
+<pre><code>R version 4.4.1 (2024-06-14)
 Platform: x86_64-pc-linux-gnu
-Running under: Ubuntu 22.04.4 LTS
+Running under: Ubuntu 22.04.5 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -1215,29 +1281,28 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] pheatmap_1.0.12 ggrepel_0.9.5   edgeR_4.2.2     limma_3.60.6   
+ [1] pheatmap_1.0.12 ggrepel_0.9.6   edgeR_4.4.1     limma_3.62.1   
  [5] lubridate_1.9.3 forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4    
  [9] purrr_1.0.2     readr_2.1.5     tidyr_1.3.1     tibble_3.2.1   
 [13] ggplot2_3.5.1   tidyverse_2.0.0 workflowr_1.7.1
 
 loaded via a namespace (and not attached):
- [1] gtable_0.3.5       xfun_0.44          bslib_0.7.0        processx_3.8.4    
+ [1] gtable_0.3.6       xfun_0.48          bslib_0.8.0        processx_3.8.4    
  [5] lattice_0.22-6     callr_3.7.6        tzdb_0.4.0         vctrs_0.6.5       
- [9] tools_4.4.0        ps_1.7.6           generics_0.1.3     parallel_4.4.0    
+ [9] tools_4.4.1        ps_1.8.1           generics_0.1.3     parallel_4.4.1    
 [13] fansi_1.0.6        highr_0.11         pkgconfig_2.0.3    RColorBrewer_1.1-3
-[17] lifecycle_1.0.4    farver_2.1.2       compiler_4.4.0     git2r_0.33.0      
+[17] lifecycle_1.0.4    farver_2.1.2       compiler_4.4.1     git2r_0.35.0      
 [21] statmod_1.5.0      munsell_0.5.1      getPass_0.2-4      httpuv_1.6.15     
-[25] htmltools_0.5.8.1  sass_0.4.9         yaml_2.3.8         crayon_1.5.2      
+[25] htmltools_0.5.8.1  sass_0.4.9         yaml_2.3.10        crayon_1.5.3      
 [29] later_1.3.2        pillar_1.9.0       jquerylib_0.1.4    whisker_0.4.1     
-[33] cachem_1.1.0       tidyselect_1.2.1   locfit_1.5-9.9     digest_0.6.37     
-[37] stringi_1.8.4      splines_4.4.0      labeling_0.4.3     rprojroot_2.0.4   
-[41] fastmap_1.2.0      grid_4.4.0         colorspace_2.1-0   cli_3.6.3         
-[45] magrittr_2.0.3     utf8_1.2.4         withr_3.0.1        scales_1.3.0      
-[49] promises_1.3.0     bit64_4.0.5        timechange_0.3.0   rmarkdown_2.27    
-[53] httr_1.4.7         bit_4.0.5          hms_1.1.3          evaluate_0.24.0   
-[57] knitr_1.47         rlang_1.1.4        Rcpp_1.0.12        glue_1.7.0        
-[61] rstudioapi_0.16.0  vroom_1.6.5        jsonlite_1.8.8     R6_2.5.1          
-[65] fs_1.6.4          </code></pre>
+[33] cachem_1.1.0       tidyselect_1.2.1   locfit_1.5-9.10    digest_0.6.37     
+[37] stringi_1.8.4      labeling_0.4.3     rprojroot_2.0.4    fastmap_1.2.0     
+[41] grid_4.4.1         colorspace_2.1-1   cli_3.6.3          magrittr_2.0.3    
+[45] utf8_1.2.4         withr_3.0.2        scales_1.3.0       promises_1.3.0    
+[49] bit64_4.5.2        timechange_0.3.0   rmarkdown_2.28     httr_1.4.7        
+[53] bit_4.5.0          hms_1.1.3          evaluate_1.0.1     knitr_1.48        
+[57] rlang_1.1.4        Rcpp_1.0.13        glue_1.8.0         rstudioapi_0.17.1 
+[61] vroom_1.6.5        jsonlite_1.8.9     R6_2.5.1           fs_1.6.4          </code></pre>
 </div>
 </div>
 </div>
