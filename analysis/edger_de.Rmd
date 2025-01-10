@@ -20,6 +20,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 [edgeR Manual](https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf).
 
+## TL;DR
+
+> edgeR offers many variants on analyses. The glm approach is more popular than the classic approach as it offers great flexibilities. There are two testing methods under the glm framework: likelihood ratio tests and quasi-likelihood F-tests. The quasi-likelihood (QL) method is highly recommended for differential expression analyses of bulk RNA-seq data as it gives stricter error rate control by accounting for the uncertainty in dispersion estimation. The likelihood ratio test can be useful in some special cases such as single cell RNA-seq and datasets with no replicates.
+
+1. Create `DGEList` object using a count table and a grouping factor.
+2. Remove genes that are lowly expressed.
+3. Normalise data using `normLibSizes()`.
+4. Create [design matrix](design.html) using `model.matrix()`.
+5. Estimate dispersions using `estimateDisp()`.
+6. Fit model using the read counts using `glmQLFit()`.
+7. Conduct F-tests using `glmQLFTest()`.
+
 ## Installation
 
 Install using `BiocManager::install()`.
@@ -123,7 +135,9 @@ plotMDS(y, plot = FALSE)$eigen.vectors[, 1:2] |>
 
 ## Differential expression
 
-```{r de}
+Follow {edgeR} Quick start guide, which recommends using the quasi-likelihood (QL) method for differential expression analyses of bulk RNA-seq data.
+
+```{r edger_quick_start}
 design <- model.matrix(~y$samples$group)
 y <- estimateDisp(y, design, robust=TRUE)
 fit <- glmQLFit(y, design, robust=TRUE)
