@@ -32,6 +32,7 @@ BiocManager::install("SingleCellExperiment")
 BiocManager::install("scran")
 BiocManager::install("scater")
 BiocManager::install("miloR")
+BiocManager::install("MouseGastrulationData")
 
 install.packages('dplyr')
 install.packages('patchwork')
@@ -47,9 +48,14 @@ suppressPackageStartupMessages(library(scran))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(patchwork))
 suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(MouseGastrulationData))
 ```
 
-## Data
+## Differential abundance testing with Milo
+
+[Vignette](https://www.bioconductor.org/packages/release/bioc/vignettes/miloR/inst/doc/milo_demo.html).
+
+### Data
 
 Load testing data.
 
@@ -77,7 +83,7 @@ Sample and conditions.
 table(colData(traj_sce)$Sample)
 ```
 
-## Pre-processing
+### Pre-processing
 
 ```{r preprocessing}
 set.seed(1984)
@@ -96,7 +102,7 @@ cbind(
 my_umap
 ```
 
-## Milo object
+### Milo object
 
 ```{r traj_milo}
 traj_milo <- Milo(traj_sce)
@@ -105,27 +111,27 @@ reducedDim(traj_milo, "UMAP") <- reducedDim(traj_sce, "UMAP")
 traj_milo
 ```
 
-## Construct KNN graph
+### Construct KNN graph
 
 ```{r knn_graph}
 traj_milo <- buildGraph(traj_milo, k = 10, d = 30)
 ```
 
-## Defining representative neighbourhoods
+### Defining representative neighbourhoods
 
 ```{r make_neighbourhoods}
 traj_milo <- makeNhoods(traj_milo, prop = 0.1, k = 10, d=30, refined = TRUE)
 plotNhoodSizeHist(traj_milo)
 ```
 
-## Counting cells in neighbourhoods
+### Counting cells in neighbourhoods
 
 ```{r count_cells}
 traj_milo <- countCells(traj_milo, meta.data = data.frame(colData(traj_milo)), samples="Sample")
 head(nhoodCounts(traj_milo))
 ```
 
-## Differential abundance testing
+### Differential abundance testing
 
 ```{r design}
 traj_design <- data.frame(colData(traj_milo))[,c("Sample", "Condition")]
@@ -148,11 +154,269 @@ da_results %>%
   head() 
 ```
 
-## Visualise neighbourhoods displaying DA
+### Visualise neighbourhoods displaying DA
 
 ```{r plot_neighbourhood}
 traj_milo <- buildNhoodGraph(traj_milo)
 
 my_umap + plotNhoodGraphDA(traj_milo, da_results, alpha=0.05) +
   plot_layout(guides="collect")
+```
+
+## Mouse gastrulation example
+
+[Vignette](https://www.bioconductor.org/packages/release/bioc/vignettes/miloR/inst/doc/milo_gastrulation.html).
+
+### Data
+
+```{r embryo_data}
+select_samples <- c(2,  3,  6, 4, #15,
+                    # 19, 
+                    10, 14#, 20 #30
+                    #31, 32
+                    )
+embryo_data = EmbryoAtlasData(samples = select_samples)
+embryo_data
+```
+
+### Visualize the data
+
+```{r}
+embryo_data <- embryo_data[,apply(reducedDim(embryo_data, "pca.corrected"), 1, function(x) !all(is.na(x)))]
+embryo_data <- runUMAP(embryo_data, dimred = "pca.corrected", name = 'umap')
+
+plotReducedDim(embryo_data, colour_by="stage", dimred = "umap") 
+```
+
+### Create a Milo object
+
+```{r}
+embryo_milo <- Milo(embryo_data)
+embryo_milo
+```
+
+### Construct KNN graph
+
+```{r}
+embryo_milo <- buildGraph(embryo_milo, k = 30, d = 30, reduced.dim = "pca.corrected")
+```
+
+### Defining representative neighbourhoods on the KNN graph
+
+```{r}
+embryo_milo <- makeNhoods(embryo_milo, prop = 0.1, k = 30, d=30, refined = TRUE, reduced_dims = "pca.corrected")
+plotNhoodSizeHist(embryo_milo)
+```
+
+### Counting cells in neighbourhoods
+
+```{r}
+embryo_milo <- countCells(embryo_milo, meta.data = as.data.frame(colData(embryo_milo)), sample="sample")
+head(nhoodCounts(embryo_milo))
+```
+
+### Defining experimental design
+
+```{r}
+embryo_design <- data.frame(colData(embryo_milo))[,c("sample", "stage", "sequencing.batch")]
+
+## Convert batch info from integer to factor
+embryo_design$sequencing.batch <- as.factor(embryo_design$sequencing.batch) 
+embryo_design <- distinct(embryo_design)
+rownames(embryo_design) <- embryo_design$sample
+
+embryo_design
+```
+
+### Computing neighbourhood connectivity
+
+```{r}
+embryo_milo <- calcNhoodDistance(embryo_milo, d=30, reduced.dim = "pca.corrected")
+```
+
+### Testing
+
+```{r}
+da_results <- testNhoods(embryo_milo, design = ~ sequencing.batch + stage, design.df = embryo_design, reduced.dim="pca.corrected")
+
+da_results %>%
+  arrange(SpatialFDR) %>%
+  head() 
+```
+
+### Inspecting DA testing results
+
+```{r}
+ggplot(da_results, aes(PValue)) + geom_histogram(bins=50)
+```
+
+```{r}
+ggplot(da_results, aes(logFC, -log10(SpatialFDR))) + 
+  geom_point() +
+  geom_hline(yintercept = 1) ## Mark significance threshold (10% FDR)
+```
+
+```{r}
+embryo_milo <- buildNhoodGraph(embryo_milo)
+
+## Plot single-cell UMAP
+umap_pl <- plotReducedDim(embryo_milo, dimred = "umap", colour_by="stage", text_by = "celltype", 
+                          text_size = 3, point_size=0.5) +
+  guides(fill="none")
+
+## Plot neighbourhood graph
+nh_graph_pl <- plotNhoodGraphDA(embryo_milo, da_results, layout="umap",alpha=0.1) 
+  
+umap_pl + nh_graph_pl +
+  plot_layout(guides="collect")
+```
+
+```{r}
+da_results <- annotateNhoods(embryo_milo, da_results, coldata_col = "celltype")
+head(da_results)
+```
+
+```{r}
+ggplot(da_results, aes(celltype_fraction)) + geom_histogram(bins=50)
+```
+
+```{r}
+da_results$celltype <- ifelse(da_results$celltype_fraction < 0.7, "Mixed", da_results$celltype)
+```
+
+```{r, fig.height=10, fig.width=8}
+plotDAbeeswarm(da_results, group.by = "celltype")
+```
+
+### Finding markers of DA populations
+
+```{r}
+## Add log normalized count to Milo object
+embryo_milo <- logNormCounts(embryo_milo)
+
+da_results$NhoodGroup <- as.numeric(da_results$SpatialFDR < 0.1 & da_results$logFC < 0)
+da_nhood_markers <- findNhoodGroupMarkers(embryo_milo, da_results, subset.row = rownames(embryo_milo)[1:10])
+```
+
+```{r}
+head(da_nhood_markers)
+```
+
+```{r}
+da_nhood_markers <- findNhoodGroupMarkers(embryo_milo, da_results, subset.row = rownames(embryo_milo)[1:10], 
+                                          aggregate.samples = TRUE, sample_col = "sample")
+```
+
+```{r}
+head(da_nhood_markers)
+```
+
+### Automatic grouping of neighbourhoods
+
+```{r}
+## Run buildNhoodGraph to store nhood adjacency matrix
+embryo_milo <- buildNhoodGraph(embryo_milo)
+
+## Find groups
+da_results <- groupNhoods(embryo_milo, da_results, max.lfc.delta = 10)
+head(da_results)
+```
+
+```{r}
+plotNhoodGroups(embryo_milo, da_results, layout="umap") 
+```
+
+```{r}
+plotDAbeeswarm(da_results, "NhoodGroup")
+```
+
+```{r}
+set.seed(42)
+da_results <- groupNhoods(embryo_milo, da_results, max.lfc.delta = 10, overlap=1)
+plotNhoodGroups(embryo_milo, da_results, layout="umap")
+```
+
+### Finding gene signatures for neighbourhoods
+
+```{r}
+## Exclude zero counts genes
+keep.rows <- rowSums(logcounts(embryo_milo)) != 0
+embryo_milo <- embryo_milo[keep.rows, ]
+
+## Find HVGs
+set.seed(101)
+dec <- modelGeneVar(embryo_milo)
+hvgs <- getTopHVGs(dec, n=2000)
+
+# this vignette randomly fails to identify HVGs for some reason
+if(!length(hvgs)){
+    set.seed(42)
+    dec <- modelGeneVar(embryo_milo)
+    hvgs <- getTopHVGs(dec, n=2000)
+}
+
+head(hvgs)
+```
+
+```{r}
+set.seed(42)
+nhood_markers <- findNhoodGroupMarkers(embryo_milo, da_results, subset.row = hvgs, 
+                                       aggregate.samples = TRUE, sample_col = "sample")
+
+head(nhood_markers)
+```
+
+```{r}
+gr5_markers <- nhood_markers[c("logFC_5", "adj.P.Val_5")] 
+colnames(gr5_markers) <- c("logFC", "adj.P.Val")
+
+head(gr5_markers[order(gr5_markers$adj.P.Val), ])
+```
+
+```{r}
+nhood_markers <- findNhoodGroupMarkers(embryo_milo, da_results, subset.row = hvgs, 
+                                       aggregate.samples = TRUE, sample_col = "sample",
+                                       subset.groups = c("5")
+                                       )
+
+head(nhood_markers)
+```
+
+```{r}
+nhood_markers <- findNhoodGroupMarkers(embryo_milo, da_results, subset.row = hvgs,
+                                       subset.nhoods = da_results$NhoodGroup %in% c('5','6'),
+                                       aggregate.samples = TRUE, sample_col = "sample")
+```
+
+```{r}
+head(nhood_markers)
+```
+
+### Visualize detected markers
+
+```{r}
+ggplot(nhood_markers, aes(logFC_5, -log10(adj.P.Val_5 ))) + 
+  geom_point(alpha=0.5, size=0.5) +
+  geom_hline(yintercept = 3)
+```
+
+```{r}
+markers <- nhood_markers$GeneID[nhood_markers$adj.P.Val_5 < 0.01 & nhood_markers$logFC_5 > 0]
+```
+
+```{r}
+set.seed(42)
+plotNhoodExpressionGroups(embryo_milo, da_results, features=intersect(rownames(embryo_milo), markers[1:10]),
+                          subset.nhoods = da_results$NhoodGroup %in% c('6','5'), 
+                          scale=TRUE,
+                          grid.space = "fixed")
+```
+
+### DGE testing within a group
+
+```{r}
+dge_6 <- testDiffExp(embryo_milo, da_results, design = ~ stage, meta.data = data.frame(colData(embryo_milo)),
+                     subset.row = rownames(embryo_milo)[1:5], subset.nhoods=da_results$NhoodGroup=="6")
+
+dge_6
 ```
