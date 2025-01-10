@@ -20,6 +20,27 @@ Understand:
 1. How to set up an appropriate model via **design matrices** and
 2. How to set up comparisons of interest via **contrast matrices**.
 
+## TL;DR
+
+A design matrix	is used to define the form of a statistical model and to store observed values of the explanatory variable(s). It is used in the computation process to estimate model parameters. The `model.matrix()` function from the base R {stats} package can be used to construct design matrices.
+
+```{r tldr_design}
+group <- as.factor(c(1,1,1,2,2,2))
+design <- model.matrix(~0+group)
+design
+```
+
+In the design matrix, rows are associated with samples and columns are associated with model parameters.
+
+Contrasts can be created using `limma::makeContrasts()`.
+
+```{r tldr_contrasts}
+contrasts <- limma::makeContrasts(group1-group2, levels=colnames(design)) 
+contrasts
+```
+
+In the matrix, rows are associated with model parameters and columns represent a contrast of interest. A contrast matrix is used in conjunction with a design matrix to calculate specific values of interest between estimated parameters.
+
 ## Introduction
 
 Gene expression will be the response variable, i.e., dependent variable, which is the variable that we are trying to predict or explain. The variables that influence the expression will be the explanatory variables, i.e., independent variables.
