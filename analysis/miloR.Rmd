@@ -9,7 +9,6 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -41,12 +40,13 @@ install.packages('patchwork')
 Load libraries.
 
 ```{r load_dependencies}
-library(miloR)
-library(SingleCellExperiment)
-library(scater)
-library(scran)
-library(dplyr)
-library(patchwork)
+suppressPackageStartupMessages(library(miloR))
+suppressPackageStartupMessages(library(SingleCellExperiment))
+suppressPackageStartupMessages(library(scater))
+suppressPackageStartupMessages(library(scran))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(patchwork))
+suppressPackageStartupMessages(library(ggplot2))
 ```
 
 ## Data
@@ -71,14 +71,29 @@ dimnames(redim) <- list(colnames(traj_sce), paste0("PC", c(1:50)))
 reducedDim(traj_sce, "PCA") <- redim 
 ```
 
+Sample and conditions.
+
+```{r sample}
+table(colData(traj_sce)$Sample)
+```
+
 ## Pre-processing
 
 ```{r preprocessing}
+set.seed(1984)
 logcounts(traj_sce) <- log(counts(traj_sce) + 1)
 traj_sce <- runPCA(traj_sce, ncomponents=30)
 traj_sce <- runUMAP(traj_sce)
 
-plotUMAP(traj_sce)
+cbind(
+  colData(traj_sce),
+  reducedDim(traj_sce, "UMAP")
+) |>
+  ggplot(aes(UMAP1, UMAP2, colour = Condition)) +
+  geom_point() +
+  theme_minimal() -> my_umap
+
+my_umap
 ```
 
 ## Milo object
@@ -138,6 +153,6 @@ da_results %>%
 ```{r plot_neighbourhood}
 traj_milo <- buildNhoodGraph(traj_milo)
 
-plotUMAP(traj_milo) + plotNhoodGraphDA(traj_milo, da_results, alpha=0.05) +
+my_umap + plotNhoodGraphDA(traj_milo, da_results, alpha=0.05) +
   plot_layout(guides="collect")
 ```
