@@ -1,0 +1,143 @@
+---
+title: "Differential abundance testing with Milo"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[miloR](https://www.bioconductor.org/packages/release/bioc/html/miloR.html):
+
+> Milo is a tool for analysis of complex single cell datasets generated from replicated multi-condition experiments, which detects changes in composition between conditions. While differential abundance (DA) is commonly quantified in discrete cell clusters, Milo uses partially overlapping neighbourhoods of cells on a KNN graph. Starting from a graph that faithfully recapitulates the biology of the cell population, Milo analysis consists of 3 steps:
+>
+> Sampling of representative neighbourhoods
+> Testing for differential abundance of conditions in all neighbourhoods
+> Accounting for multiple hypothesis testing using a weighted FDR procedure that accounts for the overlap of neighbourhoods
+
+## Dependencies
+
+Install Bioconductor packages using `BiocManager::install()`.
+
+```{r install_dependencies, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("SingleCellExperiment")
+BiocManager::install("scran")
+BiocManager::install("scater")
+BiocManager::install("miloR")
+
+install.packages('dplyr')
+install.packages('patchwork')
+```
+
+Load libraries.
+
+```{r load_dependencies}
+library(miloR)
+library(SingleCellExperiment)
+library(scater)
+library(scran)
+library(dplyr)
+library(patchwork)
+```
+
+## Data
+
+Load testing data.
+
+```{r testing_data}
+data("sim_trajectory", package = "miloR")
+
+## Extract SingleCellExperiment object
+traj_sce <- sim_trajectory[['SCE']]
+
+## Extract sample metadata to use for testing
+traj_meta <- sim_trajectory[["meta"]]
+
+## Add metadata to colData slot
+colData(traj_sce) <- DataFrame(traj_meta)
+colnames(traj_sce) <- colData(traj_sce)$cell_id
+
+redim <- reducedDim(traj_sce, "PCA")
+dimnames(redim) <- list(colnames(traj_sce), paste0("PC", c(1:50)))
+reducedDim(traj_sce, "PCA") <- redim 
+```
+
+## Pre-processing
+
+```{r preprocessing}
+logcounts(traj_sce) <- log(counts(traj_sce) + 1)
+traj_sce <- runPCA(traj_sce, ncomponents=30)
+traj_sce <- runUMAP(traj_sce)
+
+plotUMAP(traj_sce)
+```
+
+## Milo object
+
+```{r traj_milo}
+traj_milo <- Milo(traj_sce)
+reducedDim(traj_milo, "UMAP") <- reducedDim(traj_sce, "UMAP")
+
+traj_milo
+```
+
+## Construct KNN graph
+
+```{r knn_graph}
+traj_milo <- buildGraph(traj_milo, k = 10, d = 30)
+```
+
+## Defining representative neighbourhoods
+
+```{r make_neighbourhoods}
+traj_milo <- makeNhoods(traj_milo, prop = 0.1, k = 10, d=30, refined = TRUE)
+plotNhoodSizeHist(traj_milo)
+```
+
+## Counting cells in neighbourhoods
+
+```{r count_cells}
+traj_milo <- countCells(traj_milo, meta.data = data.frame(colData(traj_milo)), samples="Sample")
+head(nhoodCounts(traj_milo))
+```
+
+## Differential abundance testing
+
+```{r design}
+traj_design <- data.frame(colData(traj_milo))[,c("Sample", "Condition")]
+traj_design <- distinct(traj_design)
+rownames(traj_design) <- traj_design$Sample
+## Reorder rownames to match columns of nhoodCounts(milo)
+traj_design <- traj_design[colnames(nhoodCounts(traj_milo)), , drop=FALSE]
+
+traj_design
+```
+
+```{r calc_neighbourhood_distance}
+traj_milo <- calcNhoodDistance(traj_milo, d=30)
+```
+
+```{r da_test}
+da_results <- testNhoods(traj_milo, design = ~ Condition, design.df = traj_design)
+da_results %>%
+  dplyr::arrange(SpatialFDR) %>%
+  head() 
+```
+
+## Visualise neighbourhoods displaying DA
+
+```{r plot_neighbourhood}
+traj_milo <- buildNhoodGraph(traj_milo)
+
+plotUMAP(traj_milo) + plotNhoodGraphDA(traj_milo, da_results, alpha=0.05) +
+  plot_layout(guides="collect")
+```
