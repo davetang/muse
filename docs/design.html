@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-01-08" />
+<meta name="date" content="2025-01-10" />
 
 <title>Design matrices for gene expression experiments</title>
 
@@ -360,7 +360,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Design matrices for gene expression
 experiments</h1>
-<h4 class="date">2025-01-08</h4>
+<h4 class="date">2025-01-10</h4>
 
 </div>
 
@@ -389,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-01-08
+<strong>Last updated:</strong> 2025-01-10
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2e3db9aa5a870e861128a0cc733533116a4b340dtargetblank2e3db9aa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree565210c160377ff5dcd9ad1293cb0be8491f9e37targetblank565210ca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/2e3db9aa5a870e861128a0cc733533116a4b340d" target="_blank">2e3db9a</a>
+<a href="https://github.com/davetang/muse/tree/565210c160377ff5dcd9ad1293cb0be8491f9e37" target="_blank">565210c</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2e3db9aa5a870e861128a0cc733533116a4b340dtargetblank2e3db9aa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree565210c160377ff5dcd9ad1293cb0be8491f9e37targetblank565210ca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/2e3db9aa5a870e861128a0cc733533116a4b340d" target="_blank">2e3db9a</a>.
+<a href="https://github.com/davetang/muse/tree/565210c160377ff5dcd9ad1293cb0be8491f9e37" target="_blank">565210c</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -560,6 +560,9 @@ Ignored files:
     Ignored:    data/pbmc3k/
     Ignored:    r_packages_4.4.0/
     Ignored:    r_packages_4.4.1/
+
+Untracked files:
+    Untracked:  analysis/glm.Rmd
 
 </code></pre>
 <p>
@@ -603,6 +606,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/565210c160377ff5dcd9ad1293cb0be8491f9e37/analysis/design.Rmd" target="_blank">565210c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-10
+</td>
+<td>
+TL;DR section
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/cc5ada7a81504791311c300413f39293a78b8414/docs/design.html" target="_blank">cc5ada7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -672,6 +709,43 @@ matrices</strong> and</li>
 <li>How to set up comparisons of interest via <strong>contrast
 matrices</strong>.</li>
 </ol>
+</div>
+<div id="tldr" class="section level2">
+<h2>TL;DR</h2>
+<p>A design matrix is used to define the form of a statistical model and
+to store observed values of the explanatory variable(s). It is used in
+the computation process to estimate model parameters. The
+<code>model.matrix()</code> function from the base R {stats} package can
+be used to construct design matrices.</p>
+<pre class="r"><code>group &lt;- as.factor(c(1,1,1,2,2,2))
+design &lt;- model.matrix(~0+group)
+design</code></pre>
+<pre><code>  group1 group2
+1      1      0
+2      1      0
+3      1      0
+4      0      1
+5      0      1
+6      0      1
+attr(,&quot;assign&quot;)
+[1] 1 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$group
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>In the design matrix, rows are associated with samples and columns
+are associated with model parameters.</p>
+<p>Contrasts can be created using
+<code>limma::makeContrasts()</code>.</p>
+<pre class="r"><code>contrasts &lt;- limma::makeContrasts(group1-group2, levels=colnames(design)) 
+contrasts</code></pre>
+<pre><code>        Contrasts
+Levels   group1 - group2
+  group1               1
+  group2              -1</code></pre>
+<p>In the matrix, rows are associated with model parameters and columns
+represent a contrast of interest. A contrast matrix is used in
+conjunction with a design matrix to calculate specific values of
+interest between estimated parameters.</p>
 </div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
@@ -770,16 +844,17 @@ loaded via a namespace (and not attached):
  [1] sass_0.4.9        utf8_1.2.4        generics_0.1.3    stringi_1.8.4    
  [5] hms_1.1.3         digest_0.6.37     magrittr_2.0.3    timechange_0.3.0 
  [9] evaluate_1.0.1    grid_4.4.1        fastmap_1.2.0     rprojroot_2.0.4  
-[13] jsonlite_1.8.9    processx_3.8.4    whisker_0.4.1     ps_1.8.1         
-[17] promises_1.3.0    httr_1.4.7        fansi_1.0.6       scales_1.3.0     
-[21] jquerylib_0.1.4   cli_3.6.3         rlang_1.1.4       munsell_0.5.1    
-[25] withr_3.0.2       cachem_1.1.0      yaml_2.3.10       tools_4.4.1      
-[29] tzdb_0.4.0        colorspace_2.1-1  httpuv_1.6.15     vctrs_0.6.5      
-[33] R6_2.5.1          lifecycle_1.0.4   git2r_0.35.0      fs_1.6.4         
-[37] pkgconfig_2.0.3   callr_3.7.6       pillar_1.9.0      bslib_0.8.0      
-[41] later_1.3.2       gtable_0.3.6      glue_1.8.0        Rcpp_1.0.13      
-[45] xfun_0.48         tidyselect_1.2.1  rstudioapi_0.17.1 knitr_1.48       
-[49] htmltools_0.5.8.1 rmarkdown_2.28    compiler_4.4.1    getPass_0.2-4    </code></pre>
+[13] jsonlite_1.8.9    processx_3.8.4    whisker_0.4.1     limma_3.62.1     
+[17] ps_1.8.1          promises_1.3.0    httr_1.4.7        fansi_1.0.6      
+[21] scales_1.3.0      jquerylib_0.1.4   cli_3.6.3         rlang_1.1.4      
+[25] munsell_0.5.1     withr_3.0.2       cachem_1.1.0      yaml_2.3.10      
+[29] tools_4.4.1       tzdb_0.4.0        colorspace_2.1-1  httpuv_1.6.15    
+[33] vctrs_0.6.5       R6_2.5.1          lifecycle_1.0.4   git2r_0.35.0     
+[37] fs_1.6.4          pkgconfig_2.0.3   callr_3.7.6       pillar_1.9.0     
+[41] bslib_0.8.0       later_1.3.2       gtable_0.3.6      glue_1.8.0       
+[45] Rcpp_1.0.13       statmod_1.5.0     xfun_0.48         tidyselect_1.2.1 
+[49] rstudioapi_0.17.1 knitr_1.48        htmltools_0.5.8.1 rmarkdown_2.28   
+[53] compiler_4.4.1    getPass_0.2-4    </code></pre>
 </div>
 </div>
 </div>
