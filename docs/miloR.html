@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree46e86bc0b3f67c938dbea73ddde9aea9a78fe6a0targetblank46e86bca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb9d0f871a8ea096723e06bfe3cc7d5daa49a9ba3targetblankb9d0f87a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/46e86bc0b3f67c938dbea73ddde9aea9a78fe6a0" target="_blank">46e86bc</a>
+<a href="https://github.com/davetang/muse/tree/b9d0f871a8ea096723e06bfe3cc7d5daa49a9ba3" target="_blank">b9d0f87</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree46e86bc0b3f67c938dbea73ddde9aea9a78fe6a0targetblank46e86bca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb9d0f871a8ea096723e06bfe3cc7d5daa49a9ba3targetblankb9d0f87a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/46e86bc0b3f67c938dbea73ddde9aea9a78fe6a0" target="_blank">46e86bc</a>.
+<a href="https://github.com/davetang/muse/tree/b9d0f871a8ea096723e06bfe3cc7d5daa49a9ba3" target="_blank">b9d0f87</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -603,6 +603,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/b9d0f871a8ea096723e06bfe3cc7d5daa49a9ba3/analysis/miloR.Rmd" target="_blank">b9d0f87</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-11
+</td>
+<td>
+Plot cells in most significant neighbourhood
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/e38718eead55354cc408c86dedcf12583a79cd65/docs/miloR.html" target="_blank">e38718e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1451,6 +1485,46 @@ purrr::map_int(n_dists, nrow) -&gt; b
 
 all(a == b)</code></pre>
 <pre><code>[1] TRUE</code></pre>
+<p>Most significant neighbourhood is that is composed of cells entirely
+in one stage.</p>
+<pre class="r"><code>da_results |&gt;
+  dplyr::slice_min(order_by = SpatialFDR, n = 1) |&gt;
+  rownames() |&gt;
+  as.numeric() -&gt; most_signif_nhood
+
+n_dists[[most_signif_nhood]] |&gt;
+  rownames() -&gt; most_signif_nhood_cells
+
+my_subset &lt;- embryo_data[, most_signif_nhood_cells]
+
+aggregateAcrossCells(my_subset, ids = colData(my_subset)$stage)</code></pre>
+<pre><code>class: SingleCellExperiment 
+dim: 29452 1 
+metadata(0):
+assays(1): counts
+rownames(29452): ENSMUSG00000051951 ENSMUSG00000089699 ...
+  ENSMUSG00000096730 ENSMUSG00000095742
+rowData names(2): ENSEMBL SYMBOL
+colnames(1): E7.0
+colData names(19): cell barcode ... ids ncells
+reducedDimNames(2): pca.corrected umap
+mainExpName: NULL
+altExpNames(0):</code></pre>
+<pre class="r"><code>table(colData(my_subset)$stage)</code></pre>
+<pre><code>
+E7.0 
+  70 </code></pre>
+<p>Plot most significant.</p>
+<pre class="r"><code>reducedDim(embryo_data, &quot;umap&quot;) |&gt;
+  as.data.frame() -&gt; umap_coords
+
+umap_coords$most_signif &lt;- rownames(umap_coords) %in% most_signif_nhood_cells
+
+ggplot(umap_coords, aes(UMAP1, UMAP2)) +
+  geom_point() +
+  theme_minimal() +
+  facet_grid(~most_signif)</code></pre>
+<p><img src="figure/miloR.Rmd/umap_most_signif-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="inspecting-da-testing-results" class="section level3">
 <h3>Inspecting DA testing results</h3>
