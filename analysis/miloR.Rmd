@@ -4,8 +4,6 @@ date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
     toc: true
-editor_options:
-  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -281,9 +279,45 @@ This calculates a Fold-change and corrected P-value for each neighbourhood, whic
 ```{r embryo_milo_da_results}
 da_results <- testNhoods(embryo_milo, design = ~ sequencing.batch + stage, design.df = embryo_design, reduced.dim="pca.corrected")
 
-da_results %>%
-  arrange(SpatialFDR) %>%
+da_results |>
+  arrange(SpatialFDR) |>
   head() 
+```
+
+Confirming that each test was on the number of neighbourhoods.
+
+```{r check_nhoods}
+nrow(nhoodCounts(embryo_milo)) == nrow(da_results)
+```
+
+Returns a list of the single-cells that are the neighbourhood indices.
+
+```{r embryo_milo_nhood_index}
+unlist(nhoodIndex(embryo_milo))
+```
+
+Returns a sparse matrix of $C \times N$ mapping of $C$ single-cells to $N$ neighbourhoods.
+
+```{r embryo_milo_nhoods}
+dim(nhoods(embryo_milo))
+```
+
+Returns a list of sparse matrix of cell-to-cell distances between nearest neighbours, one list entry per neighbourhood. Largely used internally for computing the k-distance weighting in graphSpatialFDR.
+
+Can be used to get the cells that belong to a neighbourhood.
+
+```{r embryo_milo_nhood_dists}
+n_dists <- nhoodDistances(embryo_milo)
+rownames(n_dists[[1]])
+```
+
+Check.
+
+```{r compare_counts_with_n_dists}
+nhoodCounts(embryo_milo) |> Matrix::rowSums() -> a
+purrr::map_int(n_dists, nrow) -> b
+
+all(a == b)
 ```
 
 ### Inspecting DA testing results
