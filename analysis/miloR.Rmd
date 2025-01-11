@@ -320,6 +320,38 @@ purrr::map_int(n_dists, nrow) -> b
 all(a == b)
 ```
 
+Most significant neighbourhood is that is composed of cells entirely in one stage.
+
+```{r most_signif_neighbour}
+da_results |>
+  dplyr::slice_min(order_by = SpatialFDR, n = 1) |>
+  rownames() |>
+  as.numeric() -> most_signif_nhood
+
+n_dists[[most_signif_nhood]] |>
+  rownames() -> most_signif_nhood_cells
+
+my_subset <- embryo_data[, most_signif_nhood_cells]
+
+aggregateAcrossCells(my_subset, ids = colData(my_subset)$stage)
+
+table(colData(my_subset)$stage)
+```
+
+Plot most significant.
+
+```{r umap_most_signif}
+reducedDim(embryo_data, "umap") |>
+  as.data.frame() -> umap_coords
+
+umap_coords$most_signif <- rownames(umap_coords) %in% most_signif_nhood_cells
+
+ggplot(umap_coords, aes(UMAP1, UMAP2)) +
+  geom_point() +
+  theme_minimal() +
+  facet_grid(~most_signif)
+```
+
 ### Inspecting DA testing results
 
 We can start inspecting the results of our DA analysis from a couple of standard diagnostic plots. We first inspect the distribution of uncorrected P values, to verify that the test was balanced.
