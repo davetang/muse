@@ -169,19 +169,26 @@ my_umap + plotNhoodGraphDA(traj_milo, da_results, alpha=0.05) +
 
 ### Data
 
+4 samples at stage E7 and 4 samples at stage E7.5.
+
 ```{r embryo_data}
 select_samples <- c(2,  3,  6, 4, #15,
                     # 19, 
                     10, 14#, 20 #30
                     #31, 32
                     )
-embryo_data = EmbryoAtlasData(samples = select_samples)
+EmbryoAtlasData(samples = select_samples) |>
+  suppressMessages() |>
+  suppressWarnings() -> embryo_data
+
 embryo_data
 ```
 
-### Visualize the data
+### Visualise the data
 
-```{r}
+We will test for significant differences in abundance of cells between two stages of development.
+
+```{r embryo_data_umap}
 embryo_data <- embryo_data[,apply(reducedDim(embryo_data, "pca.corrected"), 1, function(x) !all(is.na(x)))]
 embryo_data <- runUMAP(embryo_data, dimred = "pca.corrected", name = 'umap')
 
@@ -190,34 +197,59 @@ plotReducedDim(embryo_data, colour_by="stage", dimred = "umap")
 
 ### Create a Milo object
 
-```{r}
+For differential abundance analysis on graph neighbourhoods we first construct a `Milo` object. This extends the `SingleCellExperiment` class to store information about neighbourhoods on the KNN graph.
+
+```{r embryo_milo}
 embryo_milo <- Milo(embryo_data)
 embryo_milo
 ```
 
 ### Construct KNN graph
 
-```{r}
+The {miloR} package includes functionality to build and store the graph from the PCA dimensions stored in the `reducedDim` slot. For graph building you need to define a few parameters:
+
+* `d`: the number of reduced dimensions to use for KNN refinement. We recommend using the same d used for KNN graph building, or to select PCs by inspecting the scree plot.
+* `k`: this affects the power of DA testing, since we need to have enough cells from each sample represented in a neighbourhood to estimate the variance between replicates. On the other side, increasing `k`
+too much might lead to over-smoothing. We suggest to start by using the same value for `k` used for KNN graph building for clustering and UMAP visualization. We will later use some heuristics to evaluate whether the value of `k` should be increased.
+
+```{r embryo_milo_knn}
 embryo_milo <- buildGraph(embryo_milo, k = 30, d = 30, reduced.dim = "pca.corrected")
 ```
 
 ### Defining representative neighbourhoods on the KNN graph
 
-```{r}
+We define the neighbourhood of a cell, the index, as the group of cells connected by an edge in the KNN graph to the index cell. For efficiency, DA testing is performed on a sample of indices containing a subset of representative cells, using a KNN sampling algorithm used by Gut et al. 2015.
+
+As well as `d` and `k`, for sampling we need to define a few additional parameters:
+
+* `prop`: the proportion of cells to randomly sample to start with. We suggest using `prop=0.1` for datasets of less than 30k cells. For bigger datasets using `prop=0.05` should be sufficient (and makes computation faster).
+* `refined`: indicates whether you want to use the sampling refinement algorithm, or just pick cells at random. The default and recommended way to go is to use refinement. The only situation in which you might consider using random instead, is if you have batch corrected your data with a graph based correction algorithm, such as BBKNN, but the results of DA testing will be suboptimal.
+
+Once we have defined neighbourhoods, we plot the distribution of neighbourhood sizes (i.e. how many cells form each neighbourhood) to evaluate whether the value of `k` used for graph building was appropriate. We can check this out using the `plotNhoodSizeHist()` function.
+
+**As a rule of thumb we want to have an average neighbourhood size over 5 x N_samples**.
+
+```{r embryo_milo_make_nhoods}
 embryo_milo <- makeNhoods(embryo_milo, prop = 0.1, k = 30, d=30, refined = TRUE, reduced_dims = "pca.corrected")
 plotNhoodSizeHist(embryo_milo)
 ```
 
 ### Counting cells in neighbourhoods
 
-```{r}
+Milo leverages the variation in cell numbers between replicates for the same experimental condition to test for differential abundance. Therefore we have to count how many cells from each sample are in each neighbourhood. We need to use the cell metadata and specify which column contains the sample information.
+
+This adds to the Milo object a $n \times m$ matrix, where $n$ is the number of neighbourhoods and $m$ is the number of experimental samples. Values indicate the number of cells from each sample counted in a neighbourhood. This count matrix will be used for DA testing.
+
+```{r embryo_milo_count_cells}
 embryo_milo <- countCells(embryo_milo, meta.data = as.data.frame(colData(embryo_milo)), sample="sample")
 head(nhoodCounts(embryo_milo))
 ```
 
 ### Defining experimental design
 
-```{r}
+Now we are all set to test for differential abundance in neighbourhoods. We implement this hypothesis testing in a generalized linear model (GLM) framework, specifically using the Negative Binomial GLM implementation in {edgeR}.
+
+```{r embryo_design}
 embryo_design <- data.frame(colData(embryo_milo))[,c("sample", "stage", "sequencing.batch")]
 
 ## Convert batch info from integer to factor
@@ -230,13 +262,23 @@ embryo_design
 
 ### Computing neighbourhood connectivity
 
-```{r}
+Milo uses an adaptation of the Spatial FDR correction introduced by cydar, where we correct p-values accounting for the amount of overlap between neighbourhoods. Specifically, each hypothesis test P-value is weighted by the reciprocal of the $k$th nearest neighbour distance. To use this statistic we first need to store the distances between nearest neighbors in the Milo object. This is done by the `calcNhoodDistance()` function (N.B. this step is the most time consuming of the analysis workflow and might take a couple of minutes for large datasets).
+
+```{r embryo_milo_calc_nhood_dist}
 embryo_milo <- calcNhoodDistance(embryo_milo, d=30, reduced.dim = "pca.corrected")
 ```
 
 ### Testing
 
-```{r}
+Now we can do the DA test, explicitly defining our experimental design. In this case, we want to test for differences between experimental stages, while accounting for the variability between technical batches.
+
+This calculates a Fold-change and corrected P-value for each neighbourhood, which indicates whether there is significant differential abundance between developmental stages. The main statistics we consider here are:
+
+* `logFC`: indicates the log-Fold change in cell numbers between samples from E7.5 and samples from E7.0.
+* `PValue`: reports P-values before FDR correction.
+* `SpatialFDR`: reports P-values corrected for multiple testing accounting for overlap between neighbourhoods.
+
+```{r embryo_milo_da_results}
 da_results <- testNhoods(embryo_milo, design = ~ sequencing.batch + stage, design.df = embryo_design, reduced.dim="pca.corrected")
 
 da_results %>%
@@ -246,17 +288,23 @@ da_results %>%
 
 ### Inspecting DA testing results
 
-```{r}
+We can start inspecting the results of our DA analysis from a couple of standard diagnostic plots. We first inspect the distribution of uncorrected P values, to verify that the test was balanced.
+
+```{r embryo_milo_pvalues}
 ggplot(da_results, aes(PValue)) + geom_histogram(bins=50)
 ```
 
-```{r}
+Then we visualize the test results with a volcano plot (remember that each point here represents a neighbourhood, not a cell).
+
+```{r embryo_milo_volcano}
 ggplot(da_results, aes(logFC, -log10(SpatialFDR))) + 
   geom_point() +
   geom_hline(yintercept = 1) ## Mark significance threshold (10% FDR)
 ```
 
-```{r}
+To visualise DA results relating them to the embedding of single cells, we can build an abstracted graph of neighbourhoods that we can superimpose on the single-cell embedding. Here each node represents a neighbourhood, while edges indicate how many cells two neighbourhoods have in common. Here the layout of nodes is determined by the position of the index cell in the UMAP embedding of all single-cells. The neighbourhoods displaying significant DA are colored by their log-Fold Change.
+
+```{r da_results_on_umap}
 embryo_milo <- buildNhoodGraph(embryo_milo)
 
 ## Plot single-cell UMAP
@@ -271,26 +319,34 @@ umap_pl + nh_graph_pl +
   plot_layout(guides="collect")
 ```
 
-```{r}
+We might also be interested in visualising whether DA is particularly evident in certain cell types. To do this, we assign a cell type label to each neighbourhood by finding the most abundant cell type within cells in each neighbourhood. We can label neighbourhoods in the results `data.frame` using the function `annotateNhoods`. This also saves the fraction of cells harbouring the label.
+
+```{r embryo_milo_annotate_nhoods}
 da_results <- annotateNhoods(embryo_milo, da_results, coldata_col = "celltype")
 head(da_results)
 ```
 
-```{r}
+While neighbourhoods tend to be homogeneous, we can define a threshold for celltype_fraction to exclude neighbourhoods that are a mix of cell types.
+
+```{r embryo_milo_celltype_fraction}
 ggplot(da_results, aes(celltype_fraction)) + geom_histogram(bins=50)
 ```
 
-```{r}
-da_results$celltype <- ifelse(da_results$celltype_fraction < 0.7, "Mixed", da_results$celltype)
-```
+Now we can visualise the distribution of DA Fold Changes in different cell types.
 
-```{r, fig.height=10, fig.width=8}
+```{r embryo_milo_fc_by_celltype, fig.height=10, fig.width=8}
+da_results$celltype <- ifelse(da_results$celltype_fraction < 0.7, "Mixed", da_results$celltype)
+
 plotDAbeeswarm(da_results, group.by = "celltype")
 ```
 
+This is already quite informative: we can see that certain early development cell types, such as epiblast and primitive streak, are enriched in the earliest time stage, while others are enriched later in development, such as ectoderm cells. Interestingly, we also see plenty of DA neighbourhood with a mixed label. This could indicate that transitional states show changes in abundance in time.
+
 ### Finding markers of DA populations
 
-```{r}
+Once you have found your neighbourhoods showing significant DA between conditions, you might want to find gene signatures specific to the cells in those neighbourhoods. The function `findNhoodGroupMarkers()` runs a one-VS-all differential gene expression test to identify marker genes for a group of neighbourhoods of interest. Before running this function you will need to define your neighbourhood groups depending on your biological question, that need to be stored as a `NhoodGroup` column in the `da_results` data.frame.
+
+```{r da_markers}
 ## Add log normalized count to Milo object
 embryo_milo <- logNormCounts(embryo_milo)
 
