@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecb2011ab18b5aee8b8057368593b06c98dbff131targetblankcb2011aa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree240ee629d7f2345359d323556c1f846d84e64e4dtargetblank240ee62a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/cb2011ab18b5aee8b8057368593b06c98dbff131" target="_blank">cb2011a</a>
+<a href="https://github.com/davetang/muse/tree/240ee629d7f2345359d323556c1f846d84e64e4d" target="_blank">240ee62</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecb2011ab18b5aee8b8057368593b06c98dbff131targetblankcb2011aa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree240ee629d7f2345359d323556c1f846d84e64e4dtargetblank240ee62a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/cb2011ab18b5aee8b8057368593b06c98dbff131" target="_blank">cb2011a</a>.
+<a href="https://github.com/davetang/muse/tree/240ee629d7f2345359d323556c1f846d84e64e4d" target="_blank">240ee62</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -603,6 +603,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/240ee629d7f2345359d323556c1f846d84e64e4d/analysis/seurat_markers.Rmd" target="_blank">240ee62</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-15
+</td>
+<td>
+Compare p-value calculations
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/50fef6c6c38d8b96fc5aa61ea9f626a3069d589e/docs/seurat_markers.html" target="_blank">50fef6c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -790,6 +824,8 @@ class prior to performing differential expression</li>
 <li><code>subset.ident</code> - Subset a particular identity class prior
 to regrouping. Only relevant if group.by is set</li>
 </ul>
+<div id="pbmc_small" class="section level3">
+<h3>pbmc_small</h3>
 <p><code>pbmc_small</code> dataset.</p>
 <pre class="r"><code>pbmc_small</code></pre>
 <pre><code>An object of class Seurat 
@@ -819,7 +855,7 @@ LGALS2    0.04515259   7.403075   0.4 0.000         1
 IFI30     0.04515259   7.794332   0.4 0.000         1
 RHOC      0.04515259   7.016294   0.4 0.000         1</code></pre>
 <p>Perform some sanity checks.</p>
-<pre class="r"><code>plot_gene &lt;- function(gene){
+<pre class="r"><code>get_exp &lt;- function(gene){
   gene_exp &lt;- pbmc_small[[&#39;RNA&#39;]][&#39;data&#39;][gene, ]
 
   pbmc_small@meta.data |&gt;
@@ -835,7 +871,11 @@ RHOC      0.04515259   7.016294   0.4 0.000         1</code></pre>
   rbind(
     data.frame(exp = g1, group = &quot;g1&quot;),
     data.frame(exp = g2, group = &quot;g2&quot;)
-  ) -&gt; my_df
+  )
+}
+
+plot_gene &lt;- function(gene){
+  my_df &lt;- get_exp(gene)
   
   boxplot(
     exp~group,
@@ -848,7 +888,143 @@ head(markers, 3) |&gt;
   row.names() -&gt; genes_to_check
 
 sapply(genes_to_check, plot_gene) -&gt; dev_null</code></pre>
-<p><img src="figure/seurat_markers.Rmd/plot_gene-1.png" width="672" style="display: block; margin: auto;" /><img src="figure/seurat_markers.Rmd/plot_gene-2.png" width="672" style="display: block; margin: auto;" /><img src="figure/seurat_markers.Rmd/plot_gene-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/seurat_markers.Rmd/plot_gene-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_gene-1">
+Past versions of plot_gene-1.png
+</button>
+</p>
+<div id="fig-plot_gene-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/50fef6c6c38d8b96fc5aa61ea9f626a3069d589e/docs/figure/seurat_markers.Rmd/plot_gene-1.png" target="_blank">50fef6c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/seurat_markers.Rmd/plot_gene-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_gene-2">
+Past versions of plot_gene-2.png
+</button>
+</p>
+<div id="fig-plot_gene-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/50fef6c6c38d8b96fc5aa61ea9f626a3069d589e/docs/figure/seurat_markers.Rmd/plot_gene-2.png" target="_blank">50fef6c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><img src="figure/seurat_markers.Rmd/plot_gene-3.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_gene-3">
+Past versions of plot_gene-3.png
+</button>
+</p>
+<div id="fig-plot_gene-3" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/50fef6c6c38d8b96fc5aa61ea9f626a3069d589e/docs/figure/seurat_markers.Rmd/plot_gene-3.png" target="_blank">50fef6c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Perform Wilcoxon Rank Sum and Signed Rank Tests using
+<code>wilcox.test</code> and compare results.</p>
+<pre class="r"><code>purrr::map_dbl(row.names(markers), \(x){
+  wilcox.test(exp~group, data = get_exp(x))$p.value
+}) |&gt;
+  suppressWarnings() -&gt; manual_p_values
+
+plot(markers$p_val, manual_p_values, pch = 16)
+abline(a = 0, b = 1, lty = 2, col = 2)</code></pre>
+<p><img src="figure/seurat_markers.Rmd/compare_pvalues-1.png" width="672" style="display: block; margin: auto;" /></p>
+<blockquote>
+<p>p-value adjustment is performed using bonferroni correction based on
+the total number of genes in the dataset. Other correction methods are
+not recommended, as Seurat pre-filters genes using the arguments above,
+reducing the number of tests performed. Lastly, as Aaron Lun has pointed
+out, p-values should be interpreted cautiously, as the genes used for
+clustering are the same genes tested for differential expression.</p>
+</blockquote>
+<pre class="r"><code>all(p.adjust(manual_p_values, method = &quot;bonferroni&quot;) == markers$p_val_adj)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div id="pbmc3k" class="section level3">
+<h3>pbmc3k</h3>
 <p>Find markers for cluster 0 in pbmc3k.</p>
 <pre class="r"><code>cluster_0_markers &lt;- FindMarkers(seurat_obj, ident.1 = &quot;0&quot;)
 dim(cluster_0_markers)</code></pre>
@@ -1019,6 +1195,7 @@ loaded via a namespace (and not attached):
 [118] dotCall64_1.2          listenv_0.9.1          viridisLite_0.4.2     
 [121] scales_1.3.0           ggridges_0.5.6         leiden_0.4.3.1        
 [124] purrr_1.0.2            rlang_1.1.4            cowplot_1.1.3         </code></pre>
+</div>
 </div>
 </div>
 </div>
