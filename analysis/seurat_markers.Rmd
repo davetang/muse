@@ -180,6 +180,32 @@ plot(markers$p_val, manual_p_values, pch = 16)
 abline(a = 0, b = 1, lty = 2, col = 2)
 ```
 
+Fast Wilcoxon rank sum test and auROC using `presto::wilcoxauc()`.
+
+```{r run_presto_wilcox}
+run_presto_wilcox <- function(gene){
+  wanted <- pbmc_small@meta.data$RNA_snn_res.1 == "2"
+  seurat_obj <- pbmc_small[, wanted]
+  
+  seurat_obj[['RNA']]$data |>
+    as.matrix() -> data_mat
+  
+  my_exp <- data_mat[gene, ]
+  my_mat <- matrix(my_exp, nrow = 1)
+  colnames(my_mat) <- names(my_exp)
+  rownames(my_mat) <- gene
+  y <- factor(seurat_obj@meta.data$groups)
+  res <- presto::wilcoxauc(my_mat, y)
+  res <- res[1:(nrow(x = res)/2),]
+  res$pval
+}
+
+purrr::map_dbl(row.names(markers), run_presto_wilcox) -> presto_p_values
+
+plot(markers$p_val, presto_p_values, pch = 16)
+abline(a = 0, b = 1, lty = 2, col = 2)
+```
+
 > p-value adjustment is performed using bonferroni correction based on the total number of genes in the dataset. Other correction methods are not recommended, as Seurat pre-filters genes using the arguments above, reducing the number of tests performed. Lastly, as Aaron Lun has pointed out, p-values should be interpreted cautiously, as the genes used for clustering are the same genes tested for differential expression.
 
 ```{r compare_pvalue_adj}
