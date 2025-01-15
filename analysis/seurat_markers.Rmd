@@ -106,6 +106,8 @@ dim(all_markers)
 * `group.by` - Regroup cells into a different identity class prior to performing differential expression
 * `subset.ident` - Subset a particular identity class prior to regrouping. Only relevant if group.by is set
 
+### pbmc_small
+
 `pbmc_small` dataset.
 
 ```{r pbmc_small}
@@ -131,7 +133,7 @@ head(markers)
 Perform some sanity checks.
 
 ```{r plot_gene}
-plot_gene <- function(gene){
+get_exp <- function(gene){
   gene_exp <- pbmc_small[['RNA']]['data'][gene, ]
 
   pbmc_small@meta.data |>
@@ -147,7 +149,11 @@ plot_gene <- function(gene){
   rbind(
     data.frame(exp = g1, group = "g1"),
     data.frame(exp = g2, group = "g2")
-  ) -> my_df
+  )
+}
+
+plot_gene <- function(gene){
+  my_df <- get_exp(gene)
   
   boxplot(
     exp~group,
@@ -161,6 +167,26 @@ head(markers, 3) |>
 
 sapply(genes_to_check, plot_gene) -> dev_null
 ```
+
+Perform Wilcoxon Rank Sum and Signed Rank Tests using `wilcox.test` and compare results.
+
+```{r compare_pvalues}
+purrr::map_dbl(row.names(markers), \(x){
+  wilcox.test(exp~group, data = get_exp(x))$p.value
+}) |>
+  suppressWarnings() -> manual_p_values
+
+plot(markers$p_val, manual_p_values, pch = 16)
+abline(a = 0, b = 1, lty = 2, col = 2)
+```
+
+> p-value adjustment is performed using bonferroni correction based on the total number of genes in the dataset. Other correction methods are not recommended, as Seurat pre-filters genes using the arguments above, reducing the number of tests performed. Lastly, as Aaron Lun has pointed out, p-values should be interpreted cautiously, as the genes used for clustering are the same genes tested for differential expression.
+
+```{r compare_pvalue_adj}
+all(p.adjust(manual_p_values, method = "bonferroni") == markers$p_val_adj)
+```
+
+### pbmc3k
 
 Find markers for cluster 0 in pbmc3k.
 
