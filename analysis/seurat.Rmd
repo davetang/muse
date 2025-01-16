@@ -305,14 +305,30 @@ hist(
 
 The global-scaling normalisation method known as "LogNormalize" normalises the feature expression measurements for each barcode by its total expression, multiplies this value by a scale factor (10,000 by default), and finally log-transforms the result. In Seurat v5, normalised values are stored in the data layer, i.e., `pbmc[["RNA"]]$data`.
 
+Manually perform log-normalisation as I interpret it above.
+
+```{r manual_normalisation}
+raw_counts <- as.matrix(pbmc[['RNA']]$counts)
+norm_counts <- apply(raw_counts, 2, function(x) x / sum(x) * 10000)
+norm_counts <- log1p(norm_counts)
+dim(norm_counts)
+```
+
 For clarity, in this previous line of code (and in future commands), we provide the default values for certain parameters in the function call. However, this isn’t required and the same behavior can be achieved with:
 
 ```{r normalise_data}
 # the code below is the same as
 # pbmc <- NormalizeData(pbmc)
 # since the two arguments are the default
-pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000)
+pbmc <- NormalizeData(pbmc, normalization.method = "LogNormalize", scale.factor = 10000, verbose = FALSE)
 pbmc
+```
+
+Compare `NormalizeData` results with results from my implementation.
+
+```{r norm_counts_seurat}
+norm_counts_seurat <- as.matrix(pbmc[['RNA']]$data)
+identical(norm_counts_seurat, norm_counts)
 ```
 
 While this method of normalisation is standard and widely used in scRNA-seq analysis, global-scaling relies on an assumption that **each cell originally contains the same number of RNA molecules**. Alternative workflows for the single cell pre-processing are available that do not make these assumptions. For example the `SCTransform()` normalisation workflow is an alternative method and its replaces the need to run `NormalizeData`, `FindVariableFeatures`, or `ScaleData`.
