@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-01-15" />
+<meta name="date" content="2025-01-16" />
 
 <title>Finding Markers with Seurat</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Finding Markers with Seurat</h1>
-<h4 class="date">2025-01-15</h4>
+<h4 class="date">2025-01-16</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-01-15
+<strong>Last updated:</strong> 2025-01-16
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebcb5c7bd851bdf7f9150c7e90ee7375e40174a2dtargetblankbcb5c7ba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecd0f44f04d826d26c6da10d326e342a8cd6e0030targetblankcd0f44fa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/bcb5c7bd851bdf7f9150c7e90ee7375e40174a2d" target="_blank">bcb5c7b</a>
+<a href="https://github.com/davetang/muse/tree/cd0f44f04d826d26c6da10d326e342a8cd6e0030" target="_blank">cd0f44f</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebcb5c7bd851bdf7f9150c7e90ee7375e40174a2dtargetblankbcb5c7ba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecd0f44f04d826d26c6da10d326e342a8cd6e0030targetblankcd0f44fa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/bcb5c7bd851bdf7f9150c7e90ee7375e40174a2d" target="_blank">bcb5c7b</a>.
+<a href="https://github.com/davetang/muse/tree/cd0f44f04d826d26c6da10d326e342a8cd6e0030" target="_blank">cd0f44f</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -603,6 +603,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/cd0f44f04d826d26c6da10d326e342a8cd6e0030/analysis/seurat_markers.Rmd" target="_blank">cd0f44f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-16
+</td>
+<td>
+Module scores
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/72b0d6d6b746aecc0afd46ba0663364e5631d4be/docs/seurat_markers.html" target="_blank">72b0d6d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -774,7 +808,8 @@ install.packages(&quot;bench&quot;)</code></pre>
 benchmarking.</p>
 <pre class="r"><code>suppressPackageStartupMessages(library(&quot;Seurat&quot;))
 suppressPackageStartupMessages(library(&quot;bench&quot;))
-suppressPackageStartupMessages(library(&quot;presto&quot;))</code></pre>
+suppressPackageStartupMessages(library(&quot;presto&quot;))
+suppressPackageStartupMessages(library(&quot;ggplot2&quot;))</code></pre>
 <div id="data" class="section level2">
 <h2>Data</h2>
 <p>To follow the tutorial, you’ll need the 10X data, which can be
@@ -861,7 +896,8 @@ to regrouping. Only relevant if group.by is set</li>
 <div id="pbmc_small" class="section level3">
 <h3>pbmc_small</h3>
 <p><code>pbmc_small</code> dataset.</p>
-<pre class="r"><code>pbmc_small</code></pre>
+<pre class="r"><code>data(pbmc_small)
+pbmc_small</code></pre>
 <pre><code>An object of class Seurat 
 230 features across 80 samples within 1 assay 
 Active assay: RNA (230 features, 20 variable features)
@@ -879,8 +915,8 @@ Active assay: RNA (230 features, 20 variable features)
   2 10  9</code></pre>
 <p>Take all cells in cluster 2, and find markers that separate cells in
 the ‘g1’ group (metadata variable ‘group’).</p>
-<pre class="r"><code>markers &lt;- FindMarkers(pbmc_small, ident.1 = &quot;g1&quot;, group.by = &#39;groups&#39;, subset.ident = &quot;2&quot;)
-head(markers)</code></pre>
+<pre class="r"><code>pbmc_small_markers &lt;- FindMarkers(pbmc_small, ident.1 = &quot;g1&quot;, group.by = &#39;groups&#39;, subset.ident = &quot;2&quot;)
+head(pbmc_small_markers)</code></pre>
 <pre><code>               p_val avg_log2FC pct.1 pct.2 p_val_adj
 GSTP1     0.01601528   2.603521   0.7 0.111         1
 LINC00936 0.02048683   7.182496   0.5 0.000         1
@@ -918,7 +954,7 @@ plot_gene &lt;- function(gene){
   )
 }
 
-head(markers, 3) |&gt;
+head(pbmc_small_markers, 3) |&gt;
   row.names() -&gt; genes_to_check
 
 sapply(genes_to_check, plot_gene) -&gt; dev_null</code></pre>
@@ -1038,12 +1074,12 @@ Dave Tang
 </div>
 <p>Perform Wilcoxon Rank Sum and Signed Rank Tests using
 <code>wilcox.test</code> and compare results.</p>
-<pre class="r"><code>purrr::map_dbl(row.names(markers), \(x){
+<pre class="r"><code>purrr::map_dbl(row.names(pbmc_small_markers), \(x){
   wilcox.test(exp~group, data = get_exp(x))$p.value
 }) |&gt;
   suppressWarnings() -&gt; manual_p_values
 
-plot(markers$p_val, manual_p_values, pch = 16)
+plot(pbmc_small_markers$p_val, manual_p_values, pch = 16)
 abline(a = 0, b = 1, lty = 2, col = 2)</code></pre>
 <p><img src="figure/seurat_markers.Rmd/compare_pvalues-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
@@ -1102,11 +1138,48 @@ Dave Tang
   res$pval
 }
 
-purrr::map_dbl(row.names(markers), run_presto_wilcox) -&gt; presto_p_values
+purrr::map_dbl(row.names(pbmc_small_markers), run_presto_wilcox) -&gt; presto_p_values
 
-plot(markers$p_val, presto_p_values, pch = 16)
+plot(pbmc_small_markers$p_val, presto_p_values, pch = 16)
 abline(a = 0, b = 1, lty = 2, col = 2)</code></pre>
 <p><img src="figure/seurat_markers.Rmd/run_presto_wilcox-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-run_presto_wilcox-1">
+Past versions of run_presto_wilcox-1.png
+</button>
+</p>
+<div id="fig-run_presto_wilcox-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/72b0d6d6b746aecc0afd46ba0663364e5631d4be/docs/figure/seurat_markers.Rmd/run_presto_wilcox-1.png" target="_blank">72b0d6d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-15
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <blockquote>
 <p>p-value adjustment is performed using bonferroni correction based on
 the total number of genes in the dataset. Other correction methods are
@@ -1115,7 +1188,7 @@ reducing the number of tests performed. Lastly, as Aaron Lun has pointed
 out, p-values should be interpreted cautiously, as the genes used for
 clustering are the same genes tested for differential expression.</p>
 </blockquote>
-<pre class="r"><code>all(p.adjust(manual_p_values, method = &quot;bonferroni&quot;) == markers$p_val_adj)</code></pre>
+<pre class="r"><code>all(p.adjust(manual_p_values, method = &quot;bonferroni&quot;) == pbmc_small_markers$p_val_adj)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
 <div id="pbmc3k" class="section level3">
@@ -1210,6 +1283,232 @@ all.equal(
   tibble::remove_rownames(all_markers)
 )</code></pre>
 <pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<div id="calculate-module-scores" class="section level2">
+<h2>Calculate module scores</h2>
+<p>The function <a
+href="https://satijalab.org/seurat/reference/addmodulescore">AddModuleScore()</a>:</p>
+<blockquote>
+<p>Calculate the average expression levels of each program (cluster) on
+single cell level, subtracted by the aggregated expression of control
+feature sets. All analyzed features are binned based on averaged
+expression, and the control features are randomly selected from each
+bin.</p>
+</blockquote>
+<ul>
+<li><code>ctrl</code> - Number of control features selected from the
+same bin per analyzed feature</li>
+</ul>
+<pre class="r"><code>pbmc_small_markers |&gt;
+  head(10) |&gt;
+  row.names() -&gt; my_features
+feature_list &lt;- list(my_features)  
+
+AddModuleScore(
+  object = pbmc_small,
+  features = feature_list,
+  ctrl = 5,
+  name = &#39;cluster_2_markers&#39;
+) -&gt; pbmc_small
+
+pbmc_small@meta.data</code></pre>
+<pre><code>                  orig.ident nCount_RNA nFeature_RNA RNA_snn_res.0.8
+ATGCCAGAACGACT SeuratProject         70           47               0
+CATGGCCTGTGCAT SeuratProject         85           52               0
+GAACCTGATGAACC SeuratProject         87           50               1
+TGACTGGATTCTCA SeuratProject        127           56               0
+AGTCAGACTGCACA SeuratProject        173           53               0
+TCTGATACACGTGT SeuratProject         70           48               0
+TGGTATCTAAACAG SeuratProject         64           36               0
+GCAGCTCTGTTTCT SeuratProject         72           45               0
+GATATAACACGCAT SeuratProject         52           36               0
+AATGTTGACAGTCA SeuratProject        100           41               0
+AGGTCATGAGTGTC SeuratProject         62           31               0
+AGAGATGATCTCGC SeuratProject        191           61               0
+GGGTAACTCTAGTG SeuratProject        101           41               0
+CATGAGACACGGGA SeuratProject         51           26               0
+TACGCCACTCCGAA SeuratProject         99           45               0
+CTAAACCTGTGCAT SeuratProject        168           44               0
+GTAAGCACTCATTC SeuratProject         67           33               0
+TTGGTACTGAATCC SeuratProject        135           45               0
+CATCATACGGAGCA SeuratProject         79           43               0
+TACATCACGCTAAC SeuratProject        109           41               0
+TTACCATGAATCGC SeuratProject        298           65               1
+ATAGGAGAAACAGA SeuratProject        406           74               1
+GCGCACGACTTTAC SeuratProject        213           48               1
+ACTCGCACGAAAGT SeuratProject        231           49               1
+ATTACCTGCCTTAT SeuratProject        463           77               1
+CCCAACTGCAATCG SeuratProject         87           42               1
+AAATTCGAATCACG SeuratProject        327           62               1
+CCATCCGATTCGCC SeuratProject        224           50               1
+TCCACTCTGAGCTT SeuratProject        361           76               1
+CATCAGGATGCACA SeuratProject        353           80               1
+CTAAACCTCTGACA SeuratProject        246           59               0
+GATAGAGAAGGGTG SeuratProject        115           51               0
+CTAACGGAACCGAT SeuratProject        189           53               0
+AGATATACCCGTAA SeuratProject        187           61               0
+TACTCTGAATCGAC SeuratProject        156           48               0
+GCGCATCTTGCTCC SeuratProject        164           47               0
+GTTGACGATATCGG SeuratProject        221           67               0
+ACAGGTACTGGTGT SeuratProject        151           59               0
+GGCATATGCTTATC SeuratProject        126           53               0
+CATTACACCAACTG SeuratProject        316           65               0
+TAGGGACTGAACTC SeuratProject        156           60               0
+GCTCCATGAGAAGT SeuratProject        139           61               0
+TACAATGATGCTAG SeuratProject        108           44               0
+CTTCATGACCGAAT SeuratProject         41           32               0
+CTGCCAACAGGAGC SeuratProject        146           47               0
+TTGCATTGAGCTAC SeuratProject        104           40               0
+AAGCAAGAGCTTAG SeuratProject        126           48               0
+CGGCACGAACTCAG SeuratProject         94           55               0
+GGTGGAGATTACTC SeuratProject        204           52               0
+GGCCGATGTACTCT SeuratProject         99           45               0
+CGTAGCCTGTATGC SeuratProject        371           75               1
+TGAGCTGAATGCTG SeuratProject        387           83               1
+CCTATAACGAGACG SeuratProject        139           50               1
+ATAAGTTGGTACGT SeuratProject         99           42               1
+AAGCGACTTTGACG SeuratProject        443           77               1
+ACCAGTGAATACCG SeuratProject        417           75               0
+ATTGCACTTGCTTT SeuratProject        502           81               1
+CTAGGTGATGGTTG SeuratProject        324           76               1
+GCACTAGACCTTTA SeuratProject        292           71               1
+CATGCGCTAGTCAC SeuratProject        443           81               0
+TTGAGGACTACGCA SeuratProject        787           88               0
+ATACCACTCTAAGC SeuratProject        612           69               1
+CATATAGACTAAGC SeuratProject        286           68               0
+TTTAGCTGTACTCT SeuratProject        462           86               1
+GACATTCTCCACCT SeuratProject        872           96               1
+ACGTGATGCCATGA SeuratProject        709           94               1
+ATTGTAGATTCCCG SeuratProject        745           84               1
+GATAGAGATCACGA SeuratProject        328           72               1
+AATGCGTGGACGGA SeuratProject        389           73               1
+GCGTAAACACGGTT SeuratProject        754           83               0
+ATTCAGCTCATTGG SeuratProject        212           38               0
+GGCATATGGGGAGT SeuratProject        172           29               0
+ATCATCTGACACCA SeuratProject        168           37               0
+GTCATACTTCGCCT SeuratProject        210           33               0
+TTACGTACGTTCAG SeuratProject        228           39               0
+GAGTTGTGGTAGCT SeuratProject        527           47               0
+GACGCTCTCTCTCG SeuratProject        202           30               0
+AGTCTTACTTCGGA SeuratProject        157           29               0
+GGAACACTTCAGAC SeuratProject        150           30               0
+CTTGATTGATCTTC SeuratProject        233           76               1
+               letter.idents groups RNA_snn_res.1 cluster_2_markers1
+ATGCCAGAACGACT             A     g2             0        -1.33722664
+CATGGCCTGTGCAT             A     g1             0        -0.50364216
+GAACCTGATGAACC             B     g2             0        -0.11497629
+TGACTGGATTCTCA             A     g2             0         0.17070415
+AGTCAGACTGCACA             A     g2             0         0.45524703
+TCTGATACACGTGT             A     g1             0        -0.74228782
+TGGTATCTAAACAG             A     g1             0        -0.32057176
+GCAGCTCTGTTTCT             A     g1             0         0.43854514
+GATATAACACGCAT             A     g1             0         0.33480306
+AATGTTGACAGTCA             A     g1             0        -0.13294010
+AGGTCATGAGTGTC             A     g2             2        -0.11576571
+AGAGATGATCTCGC             A     g1             2         0.03312215
+GGGTAACTCTAGTG             A     g2             2        -0.46989681
+CATGAGACACGGGA             A     g2             2         0.06461428
+TACGCCACTCCGAA             A     g2             2        -0.71578377
+CTAAACCTGTGCAT             A     g1             2         1.74821041
+GTAAGCACTCATTC             A     g2             2        -0.51715398
+TTGGTACTGAATCC             A     g1             2         1.11666693
+CATCATACGGAGCA             A     g1             2        -0.36919951
+TACATCACGCTAAC             A     g2             2        -0.31473220
+TTACCATGAATCGC             B     g1             1         0.18808088
+ATAGGAGAAACAGA             B     g1             1         0.02324997
+GCGCACGACTTTAC             B     g2             1         0.17251111
+ACTCGCACGAAAGT             B     g2             1        -0.20030815
+ATTACCTGCCTTAT             B     g1             1         0.90448669
+CCCAACTGCAATCG             B     g2             1        -0.32371672
+AAATTCGAATCACG             B     g2             1        -0.31797461
+CCATCCGATTCGCC             B     g2             1        -0.32290368
+TCCACTCTGAGCTT             B     g2             1         0.30717082
+CATCAGGATGCACA             B     g1             1         0.36639313
+CTAAACCTCTGACA             A     g1             0         0.28303109
+GATAGAGAAGGGTG             A     g1             2         0.41631402
+CTAACGGAACCGAT             A     g1             0        -0.16063845
+AGATATACCCGTAA             A     g2             0        -0.79839288
+TACTCTGAATCGAC             A     g1             0         0.02501654
+GCGCATCTTGCTCC             A     g1             0        -1.05801258
+GTTGACGATATCGG             A     g2             0         0.01909060
+ACAGGTACTGGTGT             A     g1             0         0.05357335
+GGCATATGCTTATC             A     g1             0        -0.55180166
+CATTACACCAACTG             A     g2             0         0.15809224
+TAGGGACTGAACTC             A     g1             0         0.16762845
+GCTCCATGAGAAGT             A     g2             2        -1.07316109
+TACAATGATGCTAG             A     g2             0        -0.87825328
+CTTCATGACCGAAT             A     g2             0        -0.96000395
+CTGCCAACAGGAGC             A     g1             2        -0.86055830
+TTGCATTGAGCTAC             A     g2             2        -0.42909202
+AAGCAAGAGCTTAG             A     g1             0        -0.59622949
+CGGCACGAACTCAG             A     g2             0        -0.66099116
+GGTGGAGATTACTC             A     g1             0        -0.04225170
+GGCCGATGTACTCT             A     g2             0        -0.72243718
+CGTAGCCTGTATGC             B     g1             1         0.99311443
+TGAGCTGAATGCTG             B     g2             1        -0.36480818
+CCTATAACGAGACG             B     g2             2        -0.13022704
+ATAAGTTGGTACGT             B     g2             1         0.17692520
+AAGCGACTTTGACG             B     g1             1        -0.14086788
+ACCAGTGAATACCG             A     g1             1         0.17023860
+ATTGCACTTGCTTT             B     g1             1        -0.26933878
+CTAGGTGATGGTTG             B     g1             1         0.08355725
+GCACTAGACCTTTA             B     g2             1         0.53324431
+CATGCGCTAGTCAC             A     g1             0        -0.28413974
+TTGAGGACTACGCA             A     g1             2         1.06270210
+ATACCACTCTAAGC             B     g1             1        -0.17493615
+CATATAGACTAAGC             A     g1             2         1.31511823
+TTTAGCTGTACTCT             B     g1             1         0.12989081
+GACATTCTCCACCT             B     g1             2         0.45770873
+ACGTGATGCCATGA             B     g2             1         0.09650469
+ATTGTAGATTCCCG             B     g2             1         0.46572139
+GATAGAGATCACGA             B     g1             1         0.77577411
+AATGCGTGGACGGA             B     g1             1         0.70095876
+GCGTAAACACGGTT             A     g1             2         0.99945792
+ATTCAGCTCATTGG             A     g2             0        -0.10901099
+GGCATATGGGGAGT             A     g1             0         0.11826827
+ATCATCTGACACCA             A     g2             0        -0.51384812
+GTCATACTTCGCCT             A     g2             0         0.20837912
+TTACGTACGTTCAG             A     g1             0        -0.27993443
+GAGTTGTGGTAGCT             A     g1             0         0.15675206
+GACGCTCTCTCTCG             A     g2             0         0.28180439
+AGTCTTACTTCGGA             A     g1             0         0.01625193
+GGAACACTTCAGAC             A     g2             0         0.36041270
+CTTGATTGATCTTC             B     g1             1         0.72434944</code></pre>
+<p>Plot module scores; <code>feature_list</code> contains genes that are
+markers for <code>g1</code> within cluster 2. The boxplot confirms the
+results by showing higher module scores in cluster 2 of g1.</p>
+<pre class="r"><code>ggplot(pbmc_small@meta.data, aes(RNA_snn_res.1, cluster_2_markers1)) +
+  geom_boxplot() +
+  theme_minimal() +
+  facet_grid(~groups)</code></pre>
+<p><img src="figure/seurat_markers.Rmd/plot_module_score-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Visualise module scores on the UMAP.</p>
+<pre class="r"><code>pbmc_small &lt;- RunUMAP(object = pbmc_small, dims = 1:19)</code></pre>
+<pre><code>03:35:17 UMAP embedding parameters a = 0.9922 b = 1.112</code></pre>
+<pre><code>03:35:17 Read 80 rows and found 19 numeric columns</code></pre>
+<pre><code>03:35:17 Using Annoy for neighbor search, n_neighbors = 30</code></pre>
+<pre><code>03:35:17 Building Annoy index with metric = cosine, n_trees = 50</code></pre>
+<pre><code>0%   10   20   30   40   50   60   70   80   90   100%</code></pre>
+<pre><code>[----|----|----|----|----|----|----|----|----|----|</code></pre>
+<pre><code>**************************************************|
+03:35:17 Writing NN index file to temp file /tmp/RtmplGp79N/file8b7960248475
+03:35:17 Searching Annoy index using 4 threads, search_k = 3000
+03:35:17 Annoy recall = 100%
+03:35:17 Commencing smooth kNN distance calibration using 4 threads with target n_neighbors = 30
+03:35:17 7 smooth knn distance failures
+03:35:17 Initializing from normalized Laplacian + noise (using RSpectra)
+03:35:17 Commencing optimization for 500 epochs, with 2664 positive edges
+03:35:17 Optimization finished</code></pre>
+<pre class="r"><code>cbind(
+  pbmc_small@meta.data,
+  pbmc_small@reductions$umap@cell.embeddings[, 1:2]
+) |&gt;
+  ggplot(aes(umap_1, umap_2, colour = cluster_2_markers1, shape = RNA_snn_res.1)) +
+  geom_point() +
+  theme_minimal() +
+  facet_grid(~groups)</code></pre>
+<p><img src="figure/seurat_markers.Rmd/plot_module_score_umap-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1242,10 +1541,10 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] future.apply_1.11.3 future_1.34.0       presto_1.0.0       
- [4] data.table_1.16.2   Rcpp_1.0.13         bench_1.1.3        
- [7] Seurat_5.1.0        SeuratObject_5.0.2  sp_2.1-4           
-[10] workflowr_1.7.1    
+ [1] future.apply_1.11.3 future_1.34.0       ggplot2_3.5.1      
+ [4] presto_1.0.0        data.table_1.16.2   Rcpp_1.0.13        
+ [7] bench_1.1.3         Seurat_5.1.0        SeuratObject_5.0.2 
+[10] sp_2.1-4            workflowr_1.7.1    
 
 loaded via a namespace (and not attached):
   [1] RColorBrewer_1.1-3     rstudioapi_0.17.1      jsonlite_1.8.9        
@@ -1261,36 +1560,35 @@ loaded via a namespace (and not attached):
  [31] fastmap_1.2.0          fitdistrplus_1.2-1     shiny_1.9.1           
  [34] digest_0.6.37          colorspace_2.1-1       patchwork_1.3.0       
  [37] ps_1.8.1               rprojroot_2.0.4        tensor_1.5            
- [40] RSpectra_0.16-2        irlba_2.3.5.1          progressr_0.15.0      
- [43] fansi_1.0.6            spatstat.sparse_3.1-0  httr_1.4.7            
- [46] polyclip_1.10-7        abind_1.4-8            compiler_4.4.1        
- [49] withr_3.0.2            fastDummies_1.7.4      highr_0.11            
- [52] R.utils_2.12.3         MASS_7.3-60.2          tools_4.4.1           
- [55] lmtest_0.9-40          httpuv_1.6.15          goftest_1.2-3         
- [58] R.oo_1.27.0            glue_1.8.0             callr_3.7.6           
- [61] nlme_3.1-164           promises_1.3.0         grid_4.4.1            
- [64] Rtsne_0.17             getPass_0.2-4          cluster_2.1.6         
- [67] reshape2_1.4.4         generics_0.1.3         gtable_0.3.6          
- [70] spatstat.data_3.1-2    R.methodsS3_1.8.2      tidyr_1.3.1           
- [73] utf8_1.2.4             spatstat.geom_3.3-3    RcppAnnoy_0.0.22      
- [76] ggrepel_0.9.6          RANN_2.6.2             pillar_1.9.0          
- [79] stringr_1.5.1          limma_3.62.1           spam_2.11-0           
- [82] RcppHNSW_0.6.0         later_1.3.2            splines_4.4.1         
- [85] dplyr_1.1.4            lattice_0.22-6         survival_3.6-4        
- [88] deldir_2.0-4           tidyselect_1.2.1       miniUI_0.1.1.1        
- [91] pbapply_1.7-2          knitr_1.48             git2r_0.35.0          
- [94] gridExtra_2.3          scattermore_1.2        xfun_0.48             
- [97] statmod_1.5.0          matrixStats_1.4.1      stringi_1.8.4         
-[100] lazyeval_0.2.2         yaml_2.3.10            evaluate_1.0.1        
-[103] codetools_0.2-20       tibble_3.2.1           cli_3.6.3             
-[106] uwot_0.2.2             xtable_1.8-4           reticulate_1.39.0     
-[109] munsell_0.5.1          processx_3.8.4         jquerylib_0.1.4       
-[112] globals_0.16.3         spatstat.random_3.3-2  png_0.1-8             
-[115] spatstat.univar_3.0-1  parallel_4.4.1         ggplot2_3.5.1         
+ [40] RSpectra_0.16-2        irlba_2.3.5.1          labeling_0.4.3        
+ [43] progressr_0.15.0       fansi_1.0.6            spatstat.sparse_3.1-0 
+ [46] httr_1.4.7             polyclip_1.10-7        abind_1.4-8           
+ [49] compiler_4.4.1         withr_3.0.2            fastDummies_1.7.4     
+ [52] highr_0.11             R.utils_2.12.3         MASS_7.3-60.2         
+ [55] tools_4.4.1            lmtest_0.9-40          httpuv_1.6.15         
+ [58] goftest_1.2-3          R.oo_1.27.0            glue_1.8.0            
+ [61] callr_3.7.6            nlme_3.1-164           promises_1.3.0        
+ [64] grid_4.4.1             Rtsne_0.17             getPass_0.2-4         
+ [67] cluster_2.1.6          reshape2_1.4.4         generics_0.1.3        
+ [70] gtable_0.3.6           spatstat.data_3.1-2    R.methodsS3_1.8.2     
+ [73] tidyr_1.3.1            utf8_1.2.4             spatstat.geom_3.3-3   
+ [76] RcppAnnoy_0.0.22       ggrepel_0.9.6          RANN_2.6.2            
+ [79] pillar_1.9.0           stringr_1.5.1          limma_3.62.1          
+ [82] spam_2.11-0            RcppHNSW_0.6.0         later_1.3.2           
+ [85] splines_4.4.1          dplyr_1.1.4            lattice_0.22-6        
+ [88] survival_3.6-4         deldir_2.0-4           tidyselect_1.2.1      
+ [91] miniUI_0.1.1.1         pbapply_1.7-2          knitr_1.48            
+ [94] git2r_0.35.0           gridExtra_2.3          scattermore_1.2       
+ [97] xfun_0.48              statmod_1.5.0          matrixStats_1.4.1     
+[100] stringi_1.8.4          lazyeval_0.2.2         yaml_2.3.10           
+[103] evaluate_1.0.1         codetools_0.2-20       tibble_3.2.1          
+[106] cli_3.6.3              uwot_0.2.2             xtable_1.8-4          
+[109] reticulate_1.39.0      munsell_0.5.1          processx_3.8.4        
+[112] jquerylib_0.1.4        globals_0.16.3         spatstat.random_3.3-2 
+[115] png_0.1-8              spatstat.univar_3.0-1  parallel_4.4.1        
 [118] dotCall64_1.2          listenv_0.9.1          viridisLite_0.4.2     
 [121] scales_1.3.0           ggridges_0.5.6         leiden_0.4.3.1        
 [124] purrr_1.0.2            rlang_1.1.4            cowplot_1.1.3         </code></pre>
-</div>
 </div>
 </div>
 </div>
