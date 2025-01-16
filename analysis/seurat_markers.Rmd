@@ -313,8 +313,6 @@ AddModuleScore(
   ctrl = 5,
   name = 'cluster_2_markers'
 ) -> pbmc_small
-
-pbmc_small@meta.data
 ```
 
 Plot module scores; `feature_list` contains genes that are markers for `g1` within cluster 2. The boxplot confirms the results by showing higher module scores in cluster 2 of g1.
@@ -329,7 +327,7 @@ ggplot(pbmc_small@meta.data, aes(RNA_snn_res.1, cluster_2_markers1)) +
 Visualise module scores on the UMAP.
 
 ```{r plot_module_score_umap}
-pbmc_small <- RunUMAP(object = pbmc_small, dims = 1:19)
+pbmc_small <- RunUMAP(object = pbmc_small, dims = 1:19, verbose = FALSE)
 
 cbind(
   pbmc_small@meta.data,
