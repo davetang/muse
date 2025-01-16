@@ -29,6 +29,7 @@ Load `Seurat` and `bench` for some benchmarking.
 suppressPackageStartupMessages(library("Seurat"))
 suppressPackageStartupMessages(library("bench"))
 suppressPackageStartupMessages(library("presto"))
+suppressPackageStartupMessages(library("ggplot2"))
 ```
 
 ## Data
@@ -111,6 +112,7 @@ dim(all_markers)
 `pbmc_small` dataset.
 
 ```{r pbmc_small}
+data(pbmc_small)
 pbmc_small
 ```
 
@@ -126,8 +128,8 @@ table(
 Take all cells in cluster 2, and find markers that separate cells in the 'g1' group (metadata variable 'group').
 
 ```{r find_markers_ex}
-markers <- FindMarkers(pbmc_small, ident.1 = "g1", group.by = 'groups', subset.ident = "2")
-head(markers)
+pbmc_small_markers <- FindMarkers(pbmc_small, ident.1 = "g1", group.by = 'groups', subset.ident = "2")
+head(pbmc_small_markers)
 ```
 
 Perform some sanity checks.
@@ -162,7 +164,7 @@ plot_gene <- function(gene){
   )
 }
 
-head(markers, 3) |>
+head(pbmc_small_markers, 3) |>
   row.names() -> genes_to_check
 
 sapply(genes_to_check, plot_gene) -> dev_null
@@ -171,12 +173,12 @@ sapply(genes_to_check, plot_gene) -> dev_null
 Perform Wilcoxon Rank Sum and Signed Rank Tests using `wilcox.test` and compare results.
 
 ```{r compare_pvalues}
-purrr::map_dbl(row.names(markers), \(x){
+purrr::map_dbl(row.names(pbmc_small_markers), \(x){
   wilcox.test(exp~group, data = get_exp(x))$p.value
 }) |>
   suppressWarnings() -> manual_p_values
 
-plot(markers$p_val, manual_p_values, pch = 16)
+plot(pbmc_small_markers$p_val, manual_p_values, pch = 16)
 abline(a = 0, b = 1, lty = 2, col = 2)
 ```
 
@@ -200,16 +202,16 @@ run_presto_wilcox <- function(gene){
   res$pval
 }
 
-purrr::map_dbl(row.names(markers), run_presto_wilcox) -> presto_p_values
+purrr::map_dbl(row.names(pbmc_small_markers), run_presto_wilcox) -> presto_p_values
 
-plot(markers$p_val, presto_p_values, pch = 16)
+plot(pbmc_small_markers$p_val, presto_p_values, pch = 16)
 abline(a = 0, b = 1, lty = 2, col = 2)
 ```
 
 > p-value adjustment is performed using bonferroni correction based on the total number of genes in the dataset. Other correction methods are not recommended, as Seurat pre-filters genes using the arguments above, reducing the number of tests performed. Lastly, as Aaron Lun has pointed out, p-values should be interpreted cautiously, as the genes used for clustering are the same genes tested for differential expression.
 
 ```{r compare_pvalue_adj}
-all(p.adjust(manual_p_values, method = "bonferroni") == markers$p_val_adj)
+all(p.adjust(manual_p_values, method = "bonferroni") == pbmc_small_markers$p_val_adj)
 ```
 
 ### pbmc3k
@@ -290,6 +292,55 @@ all.equal(
   tibble::remove_rownames(all_markers)
 )
 ```
+
+## Calculate module scores
+
+The function [AddModuleScore()](https://satijalab.org/seurat/reference/addmodulescore):
+
+> Calculate the average expression levels of each program (cluster) on single cell level, subtracted by the aggregated expression of control feature sets. All analyzed features are binned based on averaged expression, and the control features are randomly selected from each bin.
+
+* `ctrl` - Number of control features selected from the same bin per analyzed feature
+
+```{r add_module_score}
+pbmc_small_markers |>
+  head(10) |>
+  row.names() -> my_features
+feature_list <- list(my_features)  
+
+AddModuleScore(
+  object = pbmc_small,
+  features = feature_list,
+  ctrl = 5,
+  name = 'cluster_2_markers'
+) -> pbmc_small
+
+pbmc_small@meta.data
+```
+
+Plot module scores; `feature_list` contains genes that are markers for `g1` within cluster 2. The boxplot confirms the results by showing higher module scores in cluster 2 of g1.
+
+```{r plot_module_score}
+ggplot(pbmc_small@meta.data, aes(RNA_snn_res.1, cluster_2_markers1)) +
+  geom_boxplot() +
+  theme_minimal() +
+  facet_grid(~groups)
+```
+
+Visualise module scores on the UMAP.
+
+```{r plot_module_score_umap}
+pbmc_small <- RunUMAP(object = pbmc_small, dims = 1:19)
+
+cbind(
+  pbmc_small@meta.data,
+  pbmc_small@reductions$umap@cell.embeddings[, 1:2]
+) |>
+  ggplot(aes(umap_1, umap_2, colour = cluster_2_markers1, shape = RNA_snn_res.1)) +
+  geom_point() +
+  theme_minimal() +
+  facet_grid(~groups)
+```
+
 
 
 
