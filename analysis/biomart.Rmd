@@ -322,6 +322,55 @@ AnnotationDbi::select(
 
 {org.Hs.eg.db} matched an Entrez Gene ID to one Ensembl gene ID, whereas {biomaRt} matched an Entrez Gene ID to all possible Ensembl gene IDs.
 
+## Ensembl Gene IDs to Entrez IDs
+
+Get Ensembl Gene IDs from [An example differential gene expression results table](https://davetang.org/muse/2024/10/31/an-example-differential-gene-expression-results-table/).
+
+```{r edger_results}
+edger_res <- readr::read_csv("https://raw.githubusercontent.com/davetang/muse/refs/heads/main/data/13970886_edger_res.csv", show_col_types = FALSE)
+head(edger_res)
+```
+
+Convert to Entrez Gene IDs.
+
+```{r ensembl_to_entrez}
+ensembl_to_entrez <- getBM(
+  attributes=c('ensembl_gene_id', "entrezgene_id"),
+  filters = "ensembl_gene_id",
+  values = edger_res$ensembl_gene_id,
+  mart = ensembl
+)
+
+head(ensembl_to_entrez)
+```
+
+Number of missing Entrez Gene IDs.
+
+```{r missing_entrez_gene_ids}
+sum(grepl(pattern = "^$", x = ensembl_to_entrez$entrezgene_id))
+table(is.na(ensembl_to_entrez$entrezgene_id))
+```
+
+Use {org.Hs.eg.db}.
+
+```{r ensembl_to_entrez_org}
+AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = edger_res$ensembl_gene_id,
+  columns=c("ENSEMBL","ENTREZID"),
+  keytype="ENSEMBL"
+) -> ensembl_to_entrez_org
+
+head(ensembl_to_entrez_org)
+```
+
+Number of missing Entrez Gene IDs using {org.Hs.eg.db}.
+
+```{r missing_entrez_gene_ids_org}
+sum(grepl(pattern = "^$", x = ensembl_to_entrez_org$ENTREZID))
+table(is.na(ensembl_to_entrez_org$ENTREZID))
+```
+
 ## Database dump
 
 As I wrote in a blog post about converting [Ensembl Gene IDs to gene symbols](https://davetang.org/muse/2024/11/14/ensembl-gene-ids-to-gene-symbols/), I found the database dump that provides the lookup. Here we confirm whether the database dump generates the same results as using {biomaRt}.
