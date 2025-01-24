@@ -1,0 +1,37 @@
+---
+title: "Using the GSEA GUI tool"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[GSEA](https://www.gsea-msigdb.org/gsea/index.jsp):
+
+> Gene Set Enrichment Analysis (GSEA) is a computational method that determines whether an a priori defined set of genes shows statistically significant, concordant differences between two biological states
+(e.g. phenotypes). 
+
+## Download
+
+[Download page](https://www.gsea-msigdb.org/gsea/login.jsp) that requires your email address. For this post, I will download [GSEA v4.3.3 for Windows](https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/gsea/software/desktop/4.3/GSEA_Win_4.3.3-installer.exe).
+
+## GSEA input data
+
+[Text file format for expression dataset](https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#TXT:_Text_file_format_for_expression_dataset_.28.2A.txt.29).
+
+* The TXT format is a tab delimited file format that describes an expression dataset.
+* The first line contains the labels Name and Description followed by the identifiers for each sample in the dataset.
+* The Description column is intended to be optional, but there is currently a bug such that it is treated as required. We hope to fix this in a future release. If you have no descriptions available, a value of NA will suffice.
+
+    Name(tab)Description(tab)(sample 1 name)(tab)(sample 2 name) (tab) ... (sample N name)
+    Name Description DLBC1_1 DLBC2_1 ... DLBC58_0
+    
+Download some example data [Lung_Michigan_collapsed.gct](https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/gsea/dataset_files/Lung_Michigan_collapsed_symbols.gct).
+
+> `Collapsed` refers to datasets whose identifiers (i.e Affymetrix probe set ids) have been replaced with symbols. In this process, all probe sets that map to a particular gene are summarized into a single expression vector by picking the maximum expression value in each sample. A utility to do this is included in the GSEA java software.
