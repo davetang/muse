@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2023-02-13" />
+<meta name="date" content="2025-01-24" />
 
 <title>Using the Fast preranked Gene Set Enrichment Analysis (fgsea) package</title>
 
-<script src="site_libs/header-attrs-2.20/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -30,14 +30,14 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
-<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -360,7 +360,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Using the Fast preranked Gene Set
 Enrichment Analysis (fgsea) package</h1>
-<h4 class="date">2023-02-13</h4>
+<h4 class="date">2025-01-24</h4>
 
 </div>
 
@@ -389,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-02-13
+<strong>Last updated:</strong> 2025-01-24
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -407,7 +407,7 @@ title="This is the local directory in which the code in this file was executed."
 This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
 analysis was created with <a
   href="https://github.com/workflowr/workflowr">workflowr</a> (version
-1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
 that were applied when the results were created. The <em>Past
 versions</em> tab lists the development history.
 </p>
@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree380c988691bee78a82f4c4a98a08b027c56d3fe0targetblank380c988a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree88fe3ebee1f7fd64561004b08b0a0ffc973df0c9targetblank88fe3eba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/380c988691bee78a82f4c4a98a08b027c56d3fe0" target="_blank">380c988</a>
+<a href="https://github.com/davetang/muse/tree/88fe3ebee1f7fd64561004b08b0a0ffc973df0c9" target="_blank">88fe3eb</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree380c988691bee78a82f4c4a98a08b027c56d3fe0targetblank380c988a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree88fe3ebee1f7fd64561004b08b0a0ffc973df0c9targetblank88fe3eba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/380c988691bee78a82f4c4a98a08b027c56d3fe0" target="_blank">380c988</a>.
+<a href="https://github.com/davetang/muse/tree/88fe3ebee1f7fd64561004b08b0a0ffc973df0c9" target="_blank">88fe3eb</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -555,19 +555,14 @@ were generated:
 Ignored files:
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    r_packages_4.1.2/
-    Ignored:    r_packages_4.2.0/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k/
+    Ignored:    r_packages_4.4.0/
+    Ignored:    r_packages_4.4.1/
 
 Untracked files:
-    Untracked:  analysis/cell_ranger.Rmd
-    Untracked:  analysis/tss_xgboost.Rmd
-    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
-    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
-    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
-    Untracked:  data/ncrna_noncode_v3.fa
-
-Unstaged changes:
-    Modified:   analysis/graph.Rmd
+    Untracked:  analysis/fgsea_edger.Rmd
 
 </code></pre>
 <p>
@@ -582,7 +577,6 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
 These are the previous versions of the repository in which changes were
 made to the R Markdown (<code>analysis/fgsea.Rmd</code>) and HTML
@@ -612,6 +606,23 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/a24419ba7e6d4b09e1345f9a62f696dc138b7b29/docs/fgsea.html" target="_blank">a24419b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-02-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -785,8 +796,22 @@ install_pac &lt;- function(x, repo){
 }
 
 sapply(bioc_pac, install_pac, repo = &quot;bioc&quot;)</code></pre>
+<pre><code>&#39;getOption(&quot;repos&quot;)&#39; replaces Bioconductor standard repositories, see
+&#39;help(&quot;repositories&quot;, package = &quot;BiocManager&quot;)&#39; for details.
+Replacement repositories:
+    CRAN: https://p3m.dev/cran/__linux__/jammy/2024-10-30</code></pre>
+<pre><code>Bioconductor version 3.20 (BiocManager 1.30.25), R 4.4.1 (2024-06-14)</code></pre>
+<pre><code>Installing package(s) &#39;GEOquery&#39;</code></pre>
+<pre><code>also installing the dependency &#39;rentrez&#39;</code></pre>
+<pre><code>Installation paths not writeable, unable to update packages
+  path: /usr/local/lib/R/library
+  packages:
+    boot, foreign, MASS, Matrix, nlme, survival</code></pre>
 <pre><code>
 Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:limma&#39;:
+
+    plotMA</code></pre>
 <pre><code>The following objects are masked from &#39;package:stats&#39;:
 
     IQR, mad, sd, var, xtabs</code></pre>
@@ -796,28 +821,24 @@ Attaching package: &#39;BiocGenerics&#39;</code></pre>
     colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
     get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
     match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
-    Position, rank, rbind, Reduce, rownames, sapply, setdiff, sort,
+    Position, rank, rbind, Reduce, rownames, sapply, saveRDS, setdiff,
     table, tapply, union, unique, unsplit, which.max, which.min</code></pre>
 <pre><code>Welcome to Bioconductor
 
     Vignettes contain introductory material; view with
     &#39;browseVignettes()&#39;. To cite Bioconductor, see
     &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
-<pre><code>Setting options(&#39;download.file.method.GEOquery&#39;=&#39;auto&#39;)</code></pre>
-<pre><code>Setting options(&#39;GEOquery.inmemory.gpl&#39;=FALSE)</code></pre>
-<pre><code>
-Attaching package: &#39;limma&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:BiocGenerics&#39;:
-
-    plotMA</code></pre>
 <pre><code>
 Attaching package: &#39;S4Vectors&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:utils&#39;:
+
+    findMatches</code></pre>
 <pre><code>The following objects are masked from &#39;package:base&#39;:
 
     expand.grid, I, unname</code></pre>
 <pre><code></code></pre>
 <pre><code>$GEOquery
-NULL
+[1] &quot;GEOquery&quot;
 
 $limma
 NULL
@@ -842,8 +863,10 @@ NULL
 $pheatmap
 NULL</code></pre>
 <p>Load packages.</p>
-<pre class="r"><code>library(GEOquery)
-library(limma)
+<pre class="r"><code>library(GEOquery)</code></pre>
+<pre><code>Setting options(&#39;download.file.method.GEOquery&#39;=&#39;auto&#39;)</code></pre>
+<pre><code>Setting options(&#39;GEOquery.inmemory.gpl&#39;=FALSE)</code></pre>
+<pre class="r"><code>library(limma)
 library(org.Mm.eg.db)
 library(data.table)
 # for collapseBy
@@ -1235,6 +1258,7 @@ names(topTable(fit2, adjust.method=&quot;BH&quot;, number=12000, sort.by = &quot
 ranks &lt;- de[order(t), list(rn, t)]
 ranks</code></pre>
 <pre><code>           rn         t
+       &lt;char&gt;     &lt;num&gt;
     1: 170942 -62.22877
     2: 109711 -49.47829
     3:  18124 -43.40540
@@ -1258,6 +1282,7 @@ the rank metric.</p>
 
 ranks[rn %in% wanted]</code></pre>
 <pre><code>       rn         t
+   &lt;char&gt;     &lt;num&gt;
 1: 170942 -62.22877
 2: 109711 -49.47829
 3:  18124 -43.40540
@@ -1341,7 +1366,7 @@ system.time(
   )
 ) </code></pre>
 <pre><code>   user  system elapsed 
- 19.765  19.232   8.883 </code></pre>
+  4.436   0.138   3.372 </code></pre>
 <pre class="r"><code>class(fgseaRes)</code></pre>
 <pre><code>[1] &quot;data.table&quot; &quot;data.frame&quot;</code></pre>
 <p>Top 6 enriched pathways; see the <a
@@ -1349,19 +1374,21 @@ href="https://github.com/Rdatatable/data.table/wiki">data.table Wiki</a>
 for more information on the <code>data.table</code> package.</p>
 <pre class="r"><code>head(fgseaRes[order(pval), ])</code></pre>
 <pre><code>                                           pathway         pval         padj
+                                            &lt;char&gt;        &lt;num&gt;        &lt;num&gt;
 1:                     5990979_Cell_Cycle,_Mitotic 6.690481e-27 3.920622e-24
 2:                              5990980_Cell_Cycle 3.312565e-26 9.705816e-24
 3:                    5991851_Mitotic_Prometaphase 8.470173e-19 1.654507e-16
 4: 5992217_Resolution_of_Sister_Chromatid_Cohesion 2.176649e-18 3.188791e-16
 5:                                 5991454_M_Phase 1.873997e-14 2.196325e-12
 6:         5991599_Separation_of_Sister_Chromatids 8.733223e-14 8.529448e-12
-     log2err        ES      NES size                              leadingEdge
-1: 1.3422338 0.5594755 2.769070  317 66336,66977,12442,107995,66442,12571,...
-2: 1.3267161 0.5388497 2.705894  369 66336,66977,12442,107995,66442,19361,...
-3: 1.1239150 0.7253270 2.972690   82 66336,66977,12442,107995,66442,52276,...
-4: 1.1053366 0.7347987 2.957518   74 66336,66977,12442,107995,66442,52276,...
-5: 0.9759947 0.5576247 2.554076  173 66336,66977,12442,107995,66442,52276,...
-6: 0.9545416 0.6164600 2.670030  116 66336,66977,107995,66442,52276,67629,...</code></pre>
+     log2err        ES      NES  size  leadingEdge
+       &lt;num&gt;     &lt;num&gt;    &lt;num&gt; &lt;int&gt;       &lt;list&gt;
+1: 1.3422338 0.5594755 2.769070   317 66336, 6....
+2: 1.3267161 0.5388497 2.705894   369 66336, 6....
+3: 1.1239150 0.7253270 2.972690    82 66336, 6....
+4: 1.1053366 0.7347987 2.957518    74 66336, 6....
+5: 0.9759947 0.5576247 2.554076   173 66336, 6....
+6: 0.9545416 0.6164600 2.670030   116 66336, 6....</code></pre>
 <p>Number of significant pathways at padj &lt; 0.01.</p>
 <pre class="r"><code>sum(fgseaRes[, padj &lt; 0.01])</code></pre>
 <pre><code>[1] 76</code></pre>
@@ -1483,7 +1510,7 @@ vector.</p>
 pathways.</p>
 <pre class="r"><code>summary(sapply(my_pathways, length))</code></pre>
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-   1.00    4.00   11.00   30.83   30.00 1259.00 </code></pre>
+   1.00    4.00   10.00   30.68   29.00 1261.00 </code></pre>
 <p>The results are very similar to the example pathways, where the
 pathways are related to the cell cycle and mitosis.</p>
 <pre class="r"><code>set.seed(42)
@@ -1497,22 +1524,24 @@ system.time(
   )
 )</code></pre>
 <pre><code>   user  system elapsed 
- 17.238  14.202   4.482 </code></pre>
+  4.196   0.160   2.372 </code></pre>
 <pre class="r"><code>head(fgsea_reactome[order(pval), ])</code></pre>
 <pre><code>                                   pathway         pval         padj   log2err
-1:                     Cell Cycle, Mitotic 9.197580e-27 6.318737e-24 1.3422338
-2:                              Cell Cycle 2.728253e-26 9.371549e-24 1.3267161
-3:                  Cell Cycle Checkpoints 5.199802e-21 1.190755e-18 1.1866510
-4: Resolution of Sister Chromatid Cohesion 1.016111e-15 1.745171e-13 1.0175448
-5:                    Mitotic Prometaphase 4.945771e-15 6.795490e-13 0.9969862
-6:                                 S Phase 8.047505e-14 9.214393e-12 0.9545416
-          ES      NES size                              leadingEdge
-1: 0.5402875 2.696019  362 66336,66977,15366,12442,107995,66442,...
-2: 0.5182161 2.625451  426 66336,66977,15366,12442,107995,66442,...
-3: 0.5986002 2.816356  200 66336,66977,12442,107995,66442,12428,...
-4: 0.6781403 2.790455   90 66336,66977,12442,107995,66442,52276,...
-5: 0.5863302 2.636189  149 66336,66977,12442,107995,66442,52276,...
-6: 0.6160483 2.629359  115  12428,54124,57441,67849,17219,69270,...</code></pre>
+                                    &lt;char&gt;        &lt;num&gt;        &lt;num&gt;     &lt;num&gt;
+1:                              Cell Cycle 4.153686e-28 2.949117e-25 1.3727430
+2:                     Cell Cycle, Mitotic 3.944662e-26 1.400355e-23 1.3267161
+3:                  Cell Cycle Checkpoints 3.693033e-21 8.740177e-19 1.1866510
+4: Resolution of Sister Chromatid Cohesion 3.827468e-16 6.793755e-14 1.0376962
+5:                    Mitotic Prometaphase 1.110433e-15 1.576815e-13 1.0175448
+6:                                 S Phase 4.777872e-14 5.653815e-12 0.9653278
+          ES      NES  size  leadingEdge
+       &lt;num&gt;    &lt;num&gt; &lt;int&gt;       &lt;list&gt;
+1: 0.5226639 2.659352   430 66336, 6....
+2: 0.5409376 2.712810   363 66336, 6....
+3: 0.6022241 2.823320   199 66336, 6....
+4: 0.6806110 2.834239    91 66336, 6....
+5: 0.5948613 2.678654   149 66336, 6....
+6: 0.6182229 2.651952   116 12428, 5....</code></pre>
 </div>
 <div id="leading-edge" class="section level2">
 <h2>Leading edge</h2>
@@ -1530,38 +1559,44 @@ contains the genes that contributed to the enrichment score. To
 illustrate, let’s take the leader edge genes from the most significant
 Reactome pathway.</p>
 <pre class="r"><code>fgsea_reactome[order(pval),][1,]</code></pre>
-<pre><code>               pathway        pval         padj  log2err        ES      NES
-1: Cell Cycle, Mitotic 9.19758e-27 6.318737e-24 1.342234 0.5402875 2.696019
-   size                              leadingEdge
-1:  362 66336,66977,15366,12442,107995,66442,...</code></pre>
-<p>The set of leading edge genes is made up of 164 genes.</p>
+<pre><code>      pathway         pval         padj  log2err        ES      NES  size
+       &lt;char&gt;        &lt;num&gt;        &lt;num&gt;    &lt;num&gt;     &lt;num&gt;    &lt;num&gt; &lt;int&gt;
+1: Cell Cycle 4.153686e-28 2.949117e-25 1.372743 0.5226639 2.659352   430
+    leadingEdge
+         &lt;list&gt;
+1: 66336, 6....</code></pre>
+<p>The set of leading edge genes is made up of 198 genes.</p>
 <pre class="r"><code>fgsea_reactome[order(pval),][1,]$leadingEdge[[1]]</code></pre>
-<pre><code>  [1] &quot;66336&quot;  &quot;66977&quot;  &quot;15366&quot;  &quot;12442&quot;  &quot;107995&quot; &quot;66442&quot;  &quot;12571&quot;  &quot;12428&quot; 
-  [9] &quot;52276&quot;  &quot;54392&quot;  &quot;215387&quot; &quot;67629&quot;  &quot;54124&quot;  &quot;72415&quot;  &quot;56150&quot;  &quot;57441&quot; 
- [17] &quot;20877&quot;  &quot;67121&quot;  &quot;12615&quot;  &quot;66468&quot;  &quot;67849&quot;  &quot;19053&quot;  &quot;73804&quot;  &quot;76044&quot; 
- [25] &quot;20878&quot;  &quot;15270&quot;  &quot;13555&quot;  &quot;60411&quot;  &quot;17219&quot;  &quot;69270&quot;  &quot;12575&quot;  &quot;69263&quot; 
- [33] &quot;12448&quot;  &quot;14211&quot;  &quot;20873&quot;  &quot;18005&quot;  &quot;72119&quot;  &quot;71988&quot;  &quot;17215&quot;  &quot;12534&quot; 
- [41] &quot;66156&quot;  &quot;208628&quot; &quot;22390&quot;  &quot;68240&quot;  &quot;228421&quot; &quot;68014&quot;  &quot;19348&quot;  &quot;12236&quot; 
- [49] &quot;72151&quot;  &quot;18817&quot;  &quot;21781&quot;  &quot;18968&quot;  &quot;66934&quot;  &quot;272551&quot; &quot;227613&quot; &quot;67141&quot; 
- [57] &quot;67951&quot;  &quot;68612&quot;  &quot;68298&quot;  &quot;108000&quot; &quot;23834&quot;  &quot;106344&quot; &quot;242705&quot; &quot;18141&quot; 
- [65] &quot;223921&quot; &quot;26886&quot;  &quot;13557&quot;  &quot;72787&quot;  &quot;268697&quot; &quot;72155&quot;  &quot;56371&quot;  &quot;12531&quot; 
- [73] &quot;327762&quot; &quot;12567&quot;  &quot;229841&quot; &quot;67052&quot;  &quot;16319&quot;  &quot;66634&quot;  &quot;26931&quot;  &quot;67203&quot; 
- [81] &quot;12235&quot;  &quot;74470&quot;  &quot;72083&quot;  &quot;66570&quot;  &quot;17216&quot;  &quot;76308&quot;  &quot;19687&quot;  &quot;17218&quot; 
- [89] &quot;102920&quot; &quot;29870&quot;  &quot;18973&quot;  &quot;16881&quot;  &quot;17463&quot;  &quot;75786&quot;  &quot;19645&quot;  &quot;19075&quot; 
- [97] &quot;26417&quot;  &quot;69736&quot;  &quot;19357&quot;  &quot;76816&quot;  &quot;70385&quot;  &quot;22628&quot;  &quot;22627&quot;  &quot;52683&quot; 
-[105] &quot;19076&quot;  &quot;18972&quot;  &quot;26932&quot;  &quot;12544&quot;  &quot;17997&quot;  &quot;51788&quot;  &quot;26440&quot;  &quot;68549&quot; 
-[113] &quot;12445&quot;  &quot;19088&quot;  &quot;269113&quot; &quot;26444&quot;  &quot;19324&quot;  &quot;103733&quot; &quot;59001&quot;  &quot;19179&quot; 
-[121] &quot;12579&quot;  &quot;232987&quot; &quot;17420&quot;  &quot;228769&quot; &quot;219072&quot; &quot;26445&quot;  &quot;105988&quot; &quot;69745&quot; 
-[129] &quot;18538&quot;  &quot;69928&quot;  &quot;11651&quot;  &quot;68097&quot;  &quot;57296&quot;  &quot;63955&quot;  &quot;19170&quot;  &quot;17220&quot; 
-[137] &quot;50793&quot;  &quot;77605&quot;  &quot;18392&quot;  &quot;236930&quot; &quot;67151&quot;  &quot;70024&quot;  &quot;66296&quot;  &quot;16906&quot; 
-[145] &quot;109145&quot; &quot;71819&quot;  &quot;67733&quot;  &quot;12447&quot;  &quot;75430&quot;  &quot;12532&quot;  &quot;68942&quot;  &quot;26442&quot; 
-[153] &quot;19177&quot;  &quot;230376&quot; &quot;229776&quot; &quot;16563&quot;  &quot;16328&quot;  &quot;18971&quot;  &quot;225659&quot; &quot;68953&quot; 
-[161] &quot;100088&quot; &quot;66671&quot;  &quot;19718&quot;  &quot;78177&quot; </code></pre>
-<p>The Cell Cycle, Mitotic contains 362 genes, which was indicated in
-the <code>fgsea</code> result as size (but it’s always good to
+<pre><code>  [1] &quot;66336&quot;  &quot;66977&quot;  &quot;15366&quot;  &quot;12442&quot;  &quot;107995&quot; &quot;66442&quot;  &quot;19361&quot;  &quot;12571&quot; 
+  [9] &quot;12428&quot;  &quot;52276&quot;  &quot;54392&quot;  &quot;66311&quot;  &quot;215387&quot; &quot;67629&quot;  &quot;54124&quot;  &quot;12649&quot; 
+ [17] &quot;72415&quot;  &quot;56150&quot;  &quot;57441&quot;  &quot;20877&quot;  &quot;67121&quot;  &quot;12615&quot;  &quot;66468&quot;  &quot;67849&quot; 
+ [25] &quot;19053&quot;  &quot;73804&quot;  &quot;76044&quot;  &quot;20878&quot;  &quot;15270&quot;  &quot;13555&quot;  &quot;60411&quot;  &quot;60530&quot; 
+ [33] &quot;17219&quot;  &quot;69270&quot;  &quot;12575&quot;  &quot;69263&quot;  &quot;12448&quot;  &quot;14211&quot;  &quot;20873&quot;  &quot;18005&quot; 
+ [41] &quot;72119&quot;  &quot;71988&quot;  &quot;12189&quot;  &quot;72107&quot;  &quot;17215&quot;  &quot;12534&quot;  &quot;66156&quot;  &quot;208628&quot;
+ [49] &quot;237911&quot; &quot;22390&quot;  &quot;68240&quot;  &quot;228421&quot; &quot;68014&quot;  &quot;269582&quot; &quot;19348&quot;  &quot;12236&quot; 
+ [57] &quot;72151&quot;  &quot;18817&quot;  &quot;21781&quot;  &quot;18968&quot;  &quot;217653&quot; &quot;66934&quot;  &quot;272551&quot; &quot;227613&quot;
+ [65] &quot;67141&quot;  &quot;67951&quot;  &quot;68612&quot;  &quot;68298&quot;  &quot;108000&quot; &quot;23834&quot;  &quot;106344&quot; &quot;242705&quot;
+ [73] &quot;18141&quot;  &quot;223921&quot; &quot;26886&quot;  &quot;13557&quot;  &quot;26909&quot;  &quot;72787&quot;  &quot;268697&quot; &quot;72155&quot; 
+ [81] &quot;56371&quot;  &quot;17535&quot;  &quot;107823&quot; &quot;12531&quot;  &quot;327762&quot; &quot;12567&quot;  &quot;229841&quot; &quot;67052&quot; 
+ [89] &quot;16319&quot;  &quot;66634&quot;  &quot;171567&quot; &quot;26931&quot;  &quot;67203&quot;  &quot;381306&quot; &quot;12235&quot;  &quot;19891&quot; 
+ [97] &quot;74470&quot;  &quot;72083&quot;  &quot;66570&quot;  &quot;17216&quot;  &quot;76308&quot;  &quot;19687&quot;  &quot;17218&quot;  &quot;102920&quot;
+[105] &quot;29870&quot;  &quot;18973&quot;  &quot;16881&quot;  &quot;17463&quot;  &quot;68964&quot;  &quot;75786&quot;  &quot;19645&quot;  &quot;19075&quot; 
+[113] &quot;26417&quot;  &quot;69736&quot;  &quot;19357&quot;  &quot;76816&quot;  &quot;70385&quot;  &quot;70645&quot;  &quot;22628&quot;  &quot;225182&quot;
+[121] &quot;22627&quot;  &quot;52683&quot;  &quot;19076&quot;  &quot;18972&quot;  &quot;26932&quot;  &quot;12544&quot;  &quot;17997&quot;  &quot;26440&quot; 
+[129] &quot;68549&quot;  &quot;12445&quot;  &quot;269113&quot; &quot;26444&quot;  &quot;19324&quot;  &quot;93765&quot;  &quot;103733&quot; &quot;59001&quot; 
+[137] &quot;107976&quot; &quot;19179&quot;  &quot;12579&quot;  &quot;232987&quot; &quot;17420&quot;  &quot;228769&quot; &quot;219072&quot; &quot;26445&quot; 
+[145] &quot;105988&quot; &quot;69745&quot;  &quot;18538&quot;  &quot;69928&quot;  &quot;11651&quot;  &quot;235559&quot; &quot;68097&quot;  &quot;57296&quot; 
+[153] &quot;63955&quot;  &quot;19170&quot;  &quot;17246&quot;  &quot;17220&quot;  &quot;12144&quot;  &quot;208084&quot; &quot;50793&quot;  &quot;77605&quot; 
+[161] &quot;18392&quot;  &quot;236930&quot; &quot;67151&quot;  &quot;70024&quot;  &quot;66296&quot;  &quot;16906&quot;  &quot;109145&quot; &quot;71819&quot; 
+[169] &quot;67733&quot;  &quot;50883&quot;  &quot;12447&quot;  &quot;75430&quot;  &quot;12532&quot;  &quot;68942&quot;  &quot;26442&quot;  &quot;19177&quot; 
+[177] &quot;230376&quot; &quot;245688&quot; &quot;229776&quot; &quot;214901&quot; &quot;16563&quot;  &quot;16328&quot;  &quot;18971&quot;  &quot;225659&quot;
+[185] &quot;68953&quot;  &quot;100088&quot; &quot;66671&quot;  &quot;19718&quot;  &quot;78177&quot;  &quot;66578&quot;  &quot;59046&quot;  &quot;22194&quot; 
+[193] &quot;52530&quot;  &quot;23996&quot;  &quot;101565&quot; &quot;16475&quot;  &quot;381280&quot; &quot;235661&quot;</code></pre>
+<p>The Cell Cycle contains 430 genes, which was indicated in the
+<code>fgsea</code> result as size (but it’s always good to
 double-check).</p>
 <pre class="r"><code>length(my_pathways[[fgsea_reactome[order(pval),][1,]$pathway]])</code></pre>
-<pre><code>[1] 362</code></pre>
+<pre><code>[1] 430</code></pre>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
@@ -1604,13 +1639,13 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.2.0 (2022-04-22)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 20.04.4 LTS
+<pre><code>R version 4.4.1 (2024-06-14)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.5 LTS
 
 Matrix products: default
-BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3
-LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
 
 locale:
  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -1620,49 +1655,77 @@ locale:
  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
 [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
 attached base packages:
 [1] stats4    stats     graphics  grDevices utils     datasets  methods  
 [8] base     
 
 other attached packages:
- [1] pheatmap_1.0.12      data.table_1.14.6    reactome.db_1.82.0  
- [4] org.Mm.eg.db_3.16.0  AnnotationDbi_1.60.0 IRanges_2.32.0      
- [7] S4Vectors_0.36.1     limma_3.54.1         GEOquery_2.66.0     
-[10] Biobase_2.58.0       BiocGenerics_0.44.0  fgsea_1.24.0        
-[13] BiocManager_1.30.19  workflowr_1.7.0     
+ [1] GEOquery_2.74.0      pheatmap_1.0.12      data.table_1.16.2   
+ [4] reactome.db_1.89.0   org.Mm.eg.db_3.20.0  AnnotationDbi_1.68.0
+ [7] IRanges_2.40.1       S4Vectors_0.44.0     Biobase_2.66.0      
+[10] BiocGenerics_0.52.0  limma_3.62.2         fgsea_1.32.2        
+[13] BiocManager_1.30.25  workflowr_1.7.1     
 
 loaded via a namespace (and not attached):
- [1] bitops_1.0-7           fs_1.6.1               bit64_4.0.5           
- [4] RColorBrewer_1.1-3     httr_1.4.4             rprojroot_2.0.3       
- [7] GenomeInfoDb_1.34.9    tools_4.2.0            bslib_0.4.2           
-[10] utf8_1.2.3             R6_2.5.1               DBI_1.1.3             
-[13] colorspace_2.1-0       withr_2.5.0            tidyselect_1.2.0      
-[16] processx_3.8.0         curl_5.0.0             bit_4.0.5             
-[19] compiler_4.2.0         git2r_0.31.0           cli_3.6.0             
-[22] xml2_1.3.3             labeling_0.4.2         sass_0.4.5            
-[25] scales_1.2.1           readr_2.1.3            callr_3.7.3           
-[28] stringr_1.5.0          digest_0.6.31          R.utils_2.12.2        
-[31] rmarkdown_2.20         XVector_0.38.0         pkgconfig_2.0.3       
-[34] htmltools_0.5.4        highr_0.10             fastmap_1.1.0         
-[37] rlang_1.0.6            rstudioapi_0.14        RSQLite_2.2.20        
-[40] farver_2.1.1           jquerylib_0.1.4        generics_0.1.3        
-[43] jsonlite_1.8.4         BiocParallel_1.32.5    R.oo_1.25.0           
-[46] dplyr_1.1.0            RCurl_1.98-1.10        magrittr_2.0.3        
-[49] GenomeInfoDbData_1.2.9 Matrix_1.5-3           Rcpp_1.0.10           
-[52] munsell_0.5.0          fansi_1.0.4            R.methodsS3_1.8.2     
-[55] lifecycle_1.0.3        stringi_1.7.12         whisker_0.4.1         
-[58] yaml_2.3.7             zlibbioc_1.44.0        grid_4.2.0            
-[61] blob_1.2.3             parallel_4.2.0         promises_1.2.0.1      
-[64] crayon_1.5.2           lattice_0.20-45        Biostrings_2.66.0     
-[67] cowplot_1.1.1          hms_1.1.2              KEGGREST_1.38.0       
-[70] knitr_1.42             ps_1.7.2               pillar_1.8.1          
-[73] codetools_0.2-18       fastmatch_1.1-3        glue_1.6.2            
-[76] evaluate_0.20          getPass_0.2-2          png_0.1-8             
-[79] vctrs_0.5.2            tzdb_0.3.0             httpuv_1.6.8          
-[82] gtable_0.3.1           purrr_1.0.1            tidyr_1.3.0           
-[85] cachem_1.0.6           ggplot2_3.4.0          xfun_0.37             
-[88] later_1.3.0            tibble_3.1.8           memoise_2.0.1         
-[91] ellipsis_0.3.2        </code></pre>
+  [1] DBI_1.2.3                   httr2_1.0.7                
+  [3] rlang_1.1.4                 magrittr_2.0.3             
+  [5] git2r_0.35.0                matrixStats_1.4.1          
+  [7] compiler_4.4.1              RSQLite_2.3.9              
+  [9] getPass_0.2-4               png_0.1-8                  
+ [11] callr_3.7.6                 vctrs_0.6.5                
+ [13] stringr_1.5.1               pkgconfig_2.0.3            
+ [15] crayon_1.5.3                fastmap_1.2.0              
+ [17] XVector_0.46.0              labeling_0.4.3             
+ [19] utf8_1.2.4                  promises_1.3.0             
+ [21] rmarkdown_2.28              tzdb_0.4.0                 
+ [23] UCSC.utils_1.2.0            ps_1.8.1                   
+ [25] purrr_1.0.2                 bit_4.5.0                  
+ [27] xfun_0.48                   zlibbioc_1.52.0            
+ [29] cachem_1.1.0                GenomeInfoDb_1.42.1        
+ [31] jsonlite_1.8.9              blob_1.2.4                 
+ [33] highr_0.11                  later_1.3.2                
+ [35] DelayedArray_0.32.0         BiocParallel_1.40.0        
+ [37] parallel_4.4.1              R6_2.5.1                   
+ [39] bslib_0.8.0                 stringi_1.8.4              
+ [41] RColorBrewer_1.1-3          GenomicRanges_1.58.0       
+ [43] jquerylib_0.1.4             Rcpp_1.0.13                
+ [45] SummarizedExperiment_1.36.0 knitr_1.48                 
+ [47] R.utils_2.12.3              readr_2.1.5                
+ [49] httpuv_1.6.15               rentrez_1.2.3              
+ [51] Matrix_1.7-0                tidyselect_1.2.1           
+ [53] rstudioapi_0.17.1           abind_1.4-8                
+ [55] yaml_2.3.10                 codetools_0.2-20           
+ [57] curl_6.0.1                  processx_3.8.4             
+ [59] lattice_0.22-6              tibble_3.2.1               
+ [61] withr_3.0.2                 KEGGREST_1.46.0            
+ [63] evaluate_1.0.1              xml2_1.3.6                 
+ [65] Biostrings_2.74.1           pillar_1.9.0               
+ [67] MatrixGenerics_1.18.1       whisker_0.4.1              
+ [69] generics_0.1.3              rprojroot_2.0.4            
+ [71] hms_1.1.3                   ggplot2_3.5.1              
+ [73] munsell_0.5.1               scales_1.3.0               
+ [75] glue_1.8.0                  tools_4.4.1                
+ [77] XML_3.99-0.17               fs_1.6.4                   
+ [79] fastmatch_1.1-4             cowplot_1.1.3              
+ [81] grid_4.4.1                  tidyr_1.3.1                
+ [83] colorspace_2.1-1            GenomeInfoDbData_1.2.13    
+ [85] cli_3.6.3                   rappdirs_0.3.3             
+ [87] fansi_1.0.6                 S4Arrays_1.6.0             
+ [89] dplyr_1.1.4                 gtable_0.3.6               
+ [91] R.methodsS3_1.8.2           sass_0.4.9                 
+ [93] digest_0.6.37               SparseArray_1.6.1          
+ [95] farver_2.1.2                R.oo_1.27.0                
+ [97] memoise_2.0.1               htmltools_0.5.8.1          
+ [99] lifecycle_1.0.4             httr_1.4.7                 
+[101] statmod_1.5.0               bit64_4.5.2                </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 
