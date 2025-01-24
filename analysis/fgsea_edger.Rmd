@@ -1,0 +1,187 @@
+---
+title: "Using fgsea with edgeR results"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Installation
+
+First install [fgsea](https://bioconductor.org/packages/release/bioc/html/fgsea.html).
+
+```{r install_fgsea, message=FALSE, warning=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+if (!require("fgsea", quietly = TRUE))
+  BiocManager::install("fgsea")
+
+library(fgsea)
+```
+
+## edgeR results
+
+[An example differential gene expression results table](https://davetang.org/muse/2024/10/31/an-example-differential-gene-expression-results-table/).
+
+```{r edger_results}
+edger_res <- readr::read_csv("https://raw.githubusercontent.com/davetang/muse/refs/heads/main/data/13970886_edger_res.csv", show_col_types = FALSE)
+head(edger_res)
+```
+
+Add ranking metric.
+
+```{r rank_metric}
+edger_res |>
+  dplyr::mutate(rank_metric = logFC * -log10(PValue)) -> edger_res
+```
+
+## Convert to Entrez Gene IDs
+
+Use {org.Hs.eg.db}.
+
+```{r install_org_hs_eg_db}
+if (!require("org.Hs.eg.db", quietly = TRUE))
+  BiocManager::install("org.Hs.eg.db")
+
+suppressPackageStartupMessages(library(org.Hs.eg.db))
+```
+
+Convert to Entrez Gene IDs.
+
+```{r ensembl_to_entrez}
+AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = edger_res$ensembl_gene_id,
+  columns=c("ENSEMBL","ENTREZID"),
+  keytype="ENSEMBL"
+) -> ensembl_to_entrez
+
+ensembl_to_entrez <- dplyr::rename(ensembl_to_entrez, "ensembl_gene_id" = ENSEMBL)
+
+head(ensembl_to_entrez)
+```
+
+Number of NAs.
+
+```{r na_entrez_id}
+table(is.na(ensembl_to_entrez$ENTREZID))
+```
+
+## Hallmark gene sets
+
+Use {msigdb}.
+
+```{r install_msigdb}
+if (!require("msigdb", quietly = TRUE))
+  BiocManager::install("msigdb")
+
+if (!require("ExperimentHub", quietly = TRUE))
+  BiocManager::install("ExperimentHub")
+
+if (!require("GSEABase", quietly = TRUE))
+  BiocManager::install("GSEABase")
+
+suppressPackageStartupMessages(library(msigdb))
+suppressPackageStartupMessages(library(ExperimentHub))
+suppressPackageStartupMessages(library(GSEABase))
+```
+
+Query an `ExperimentHub` object.
+
+```{r query_eh}
+eh <- ExperimentHub(ask = FALSE)
+AnnotationHub::query(x = eh, pattern = 'msigdb')
+```
+
+Latest version.
+
+```{r msigdb_hs_latest}
+AnnotationHub::query(x = eh, pattern = 'msigdb.*hs.EZID') |>
+  tail(1) -> msigdb_hs_latest
+msigdb_hs_latest
+```
+
+Download.
+
+```{r download_msigdb}
+msigdb_hs_ezid <- eh[[names(msigdb_hs_latest)]]
+```
+
+Collections.
+
+```{r table_of_collections}
+table(sapply(lapply(msigdb_hs_ezid, collectionType), bcCategory))
+```
+
+Create gene lists from the Hallmark collection.
+
+```{r hallmark_gs_list}
+wanted <- sapply(lapply(msigdb_hs_ezid, collectionType), bcCategory) == "h"
+hallmark_gs <- msigdb_hs_ezid[wanted]
+
+hallmark_gs_list <- lapply(hallmark_gs, geneIds)
+class(hallmark_gs_list)
+names(hallmark_gs_list) <- names(hallmark_gs)
+head(hallmark_gs_list)
+```
+
+## fgsea analysis
+
+Rank metric distribution.
+
+```{r rank_metric_dist}
+plot(hist(edger_res$rank_metric, breaks = 50))
+```
+
+Create ranks vector.
+
+```{r my_ranks}
+edger_res |>
+  dplyr::inner_join(y = ensembl_to_entrez, by = "ensembl_gene_id", relationship = "many-to-many") |>
+  dplyr::filter(!is.na(ENTREZID)) |>
+  dplyr::group_by(ENTREZID) |>
+  dplyr::mutate(ambiguous = ifelse(dplyr::n()>1, TRUE, FALSE)) |>
+  dplyr::filter(!ambiguous) -> res
+  
+my_ranks <- res$rank_metric
+my_names <- as.character(res$ENTREZID)
+names(my_ranks) <- my_names
+plot(hist(my_ranks, breaks = 50))
+```
+
+The `fgsea()` function runs the pre-ranked gene set enrichment analysis.
+
+```{r fgsea}
+set.seed(1984)
+
+fgseaRes <- fgsea(
+  pathways = hallmark_gs_list, 
+  stats = my_ranks,
+  minSize=15,
+  maxSize=500,
+  nPermSimple = 200000
+)
+```
+
+Top 6 enriched pathways.
+
+```{r fgsea_result}
+head(fgseaRes[order(pval), ])
+```
+
+Plot the most significantly enriched pathway.
+
+```{r plot_sign_pathway}
+plotEnrichment(
+  hallmark_gs_list[[head(fgseaRes[order(pval), ], 1)$pathway]],
+  my_ranks
+) +
+  ggplot2::labs(title=head(fgseaRes[order(pval), ], 1)$pathway)
+```
