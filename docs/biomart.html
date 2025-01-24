@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2024-11-15" />
+<meta name="date" content="2025-01-24" />
 
 <title>Learning to use biomaRt</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Learning to use biomaRt</h1>
-<h4 class="date">2024-11-15</h4>
+<h4 class="date">2025-01-24</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2024-11-15
+<strong>Last updated:</strong> 2025-01-24
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecabd04751283224963c8c0f3898c66011855485dtargetblankcabd047a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6a84acc7af8c75a6c5c52be955583b1bcde3fc0ctargetblank6a84acca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/cabd04751283224963c8c0f3898c66011855485d" target="_blank">cabd047</a>
+<a href="https://github.com/davetang/muse/tree/6a84acc7af8c75a6c5c52be955583b1bcde3fc0c" target="_blank">6a84acc</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecabd04751283224963c8c0f3898c66011855485dtargetblankcabd047a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6a84acc7af8c75a6c5c52be955583b1bcde3fc0ctargetblank6a84acca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/cabd04751283224963c8c0f3898c66011855485d" target="_blank">cabd047</a>.
+<a href="https://github.com/davetang/muse/tree/6a84acc7af8c75a6c5c52be955583b1bcde3fc0c" target="_blank">6a84acc</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -559,6 +559,9 @@ Ignored files:
     Ignored:    data/pbmc3k/
     Ignored:    r_packages_4.4.0/
     Ignored:    r_packages_4.4.1/
+
+Untracked files:
+    Untracked:  analysis/fgsea_edger.Rmd
 
 </code></pre>
 <p>
@@ -603,6 +606,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/6a84acc7af8c75a6c5c52be955583b1bcde3fc0c/analysis/biomart.Rmd" target="_blank">6a84acc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-24
+</td>
+<td>
+Ensembl gene ID to Entrez gene ID
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/ce560e1b007f501271197dde8edca536378552b0/docs/biomart.html" target="_blank">ce560e1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-11-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -933,45 +970,45 @@ Definition: A synapse between the Schaffer collateral axon of a CA3
 <pre class="r"><code>snp &lt;- useMart(&quot;ENSEMBL_MART_SNP&quot;)
 avail_snp_datasets &lt;- listDatasets(snp)
 head(avail_snp_datasets)</code></pre>
-<pre><code>            dataset
-1       btaurus_snp
-2 btaurus_structvar
-3       chircus_snp
-4        drerio_snp
-5  drerio_structvar
-6     ecaballus_snp
+<pre><code>                 dataset
+1            btaurus_snp
+2      btaurus_structvar
+3            chircus_snp
+4       clfamiliaris_snp
+5 clfamiliaris_structvar
+6             drerio_snp
                                                                      description
 1   Cow Short Variants (SNPs and indels excluding flagged variants) (ARS-UCD1.3)
 2                                           Cow Structural Variants (ARS-UCD1.3)
 3        Goat Short Variants (SNPs and indels excluding flagged variants) (ARS1)
-4 Zebrafish Short Variants (SNPs and indels excluding flagged variants) (GRCz11)
-5                                         Zebrafish Structural Variants (GRCz11)
-6  Horse Short Variants (SNPs and indels excluding flagged variants) (EquCab3.0)
-     version
-1 ARS-UCD1.3
-2 ARS-UCD1.3
-3       ARS1
-4     GRCz11
-5     GRCz11
-6  EquCab3.0</code></pre>
+4 Dog Short Variants (SNPs and indels excluding flagged variants) (ROS_Cfam_1.0)
+5                                         Dog Structural Variants (ROS_Cfam_1.0)
+6 Zebrafish Short Variants (SNPs and indels excluding flagged variants) (GRCz11)
+       version
+1   ARS-UCD1.3
+2   ARS-UCD1.3
+3         ARS1
+4 ROS_Cfam_1.0
+5 ROS_Cfam_1.0
+6       GRCz11</code></pre>
 <p>Look for human datasets.</p>
 <pre class="r"><code>idx &lt;- grep(&#39;human&#39;, avail_snp_datasets$description, ignore.case = TRUE)
 avail_snp_datasets[idx, ]</code></pre>
 <pre><code>                  dataset
-10           hsapiens_snp
-11       hsapiens_snp_som
-12     hsapiens_structvar
-13 hsapiens_structvar_som
+12           hsapiens_snp
+13       hsapiens_snp_som
+14     hsapiens_structvar
+15 hsapiens_structvar_som
                                                                               description
-10         Human Short Variants (SNPs and indels excluding flagged variants) (GRCh38.p14)
-11 Human Somatic Short Variants (SNPs and indels excluding flagged variants) (GRCh38.p14)
-12                                                 Human Structural Variants (GRCh38.p14)
-13                                         Human Somatic Structural Variants (GRCh38.p14)
+12         Human Short Variants (SNPs and indels excluding flagged variants) (GRCh38.p14)
+13 Human Somatic Short Variants (SNPs and indels excluding flagged variants) (GRCh38.p14)
+14                                                 Human Structural Variants (GRCh38.p14)
+15                                         Human Somatic Structural Variants (GRCh38.p14)
       version
-10 GRCh38.p14
-11 GRCh38.p14
 12 GRCh38.p14
-13 GRCh38.p14</code></pre>
+13 GRCh38.p14
+14 GRCh38.p14
+15 GRCh38.p14</code></pre>
 <p>Get SNPs within a genomic location.</p>
 <pre class="r"><code>snp &lt;- useMart(&quot;ENSEMBL_MART_SNP&quot;, dataset=&quot;hsapiens_snp&quot;)
 
@@ -1149,6 +1186,69 @@ AnnotationDbi::select(
 whereas {biomaRt} matched an Entrez Gene ID to all possible Ensembl gene
 IDs.</p>
 </div>
+</div>
+<div id="ensembl-gene-ids-to-entrez-ids" class="section level2">
+<h2>Ensembl Gene IDs to Entrez IDs</h2>
+<p>Get Ensembl Gene IDs from <a
+href="https://davetang.org/muse/2024/10/31/an-example-differential-gene-expression-results-table/">An
+example differential gene expression results table</a>.</p>
+<pre class="r"><code>edger_res &lt;- readr::read_csv(&quot;https://raw.githubusercontent.com/davetang/muse/refs/heads/main/data/13970886_edger_res.csv&quot;, show_col_types = FALSE)
+head(edger_res)</code></pre>
+<pre><code># A tibble: 6 × 6
+  ensembl_gene_id  logFC logCPM      F  PValue adjusted_pvalue
+  &lt;chr&gt;            &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;           &lt;dbl&gt;
+1 ENSG00000000003  2.73   4.83   4.28  0.0684           0.109 
+2 ENSG00000000005 -7.00   0.541 17.6   0.00216          0.0138
+3 ENSG00000000419  0.120  5.34   0.114 0.743            0.776 
+4 ENSG00000000457 -0.708  5.31   3.35  0.0993           0.145 
+5 ENSG00000000460 -0.897  3.95   2.66  0.136            0.186 
+6 ENSG00000000938  1.54   5.60   1.86  0.205            0.258 </code></pre>
+<p>Convert to Entrez Gene IDs.</p>
+<pre class="r"><code>ensembl_to_entrez &lt;- getBM(
+  attributes=c(&#39;ensembl_gene_id&#39;, &quot;entrezgene_id&quot;),
+  filters = &quot;ensembl_gene_id&quot;,
+  values = edger_res$ensembl_gene_id,
+  mart = ensembl
+)
+
+head(ensembl_to_entrez)</code></pre>
+<pre><code>  ensembl_gene_id entrezgene_id
+1 ENSG00000000003          7105
+2 ENSG00000000005         64102
+3 ENSG00000000419          8813
+4 ENSG00000000457         57147
+5 ENSG00000000460         55732
+6 ENSG00000000938          2268</code></pre>
+<p>Number of missing Entrez Gene IDs.</p>
+<pre class="r"><code>sum(grepl(pattern = &quot;^$&quot;, x = ensembl_to_entrez$entrezgene_id))</code></pre>
+<pre><code>[1] 0</code></pre>
+<pre class="r"><code>table(is.na(ensembl_to_entrez$entrezgene_id))</code></pre>
+<pre><code>
+FALSE  TRUE 
+24340 15000 </code></pre>
+<p>Use {org.Hs.eg.db}.</p>
+<pre class="r"><code>AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = edger_res$ensembl_gene_id,
+  columns=c(&quot;ENSEMBL&quot;,&quot;ENTREZID&quot;),
+  keytype=&quot;ENSEMBL&quot;
+) -&gt; ensembl_to_entrez_org</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>head(ensembl_to_entrez_org)</code></pre>
+<pre><code>          ENSEMBL ENTREZID
+1 ENSG00000000003     7105
+2 ENSG00000000005    64102
+3 ENSG00000000419     8813
+4 ENSG00000000457    57147
+5 ENSG00000000460    55732
+6 ENSG00000000938     2268</code></pre>
+<p>Number of missing Entrez Gene IDs using {org.Hs.eg.db}.</p>
+<pre class="r"><code>sum(grepl(pattern = &quot;^$&quot;, x = ensembl_to_entrez_org$ENTREZID))</code></pre>
+<pre><code>[1] 0</code></pre>
+<pre class="r"><code>table(is.na(ensembl_to_entrez_org$ENTREZID))</code></pre>
+<pre><code>
+FALSE  TRUE 
+28722 10968 </code></pre>
 </div>
 <div id="database-dump" class="section level2">
 <h2>Database dump</h2>
@@ -1366,20 +1466,20 @@ attached base packages:
 
 other attached packages:
 [1] org.Hs.eg.db_3.20.0  GO.db_3.20.0         AnnotationDbi_1.68.0
-[4] IRanges_2.40.0       S4Vectors_0.44.0     Biobase_2.66.0      
+[4] IRanges_2.40.1       S4Vectors_0.44.0     Biobase_2.66.0      
 [7] BiocGenerics_0.52.0  biomaRt_2.62.0       workflowr_1.7.1     
 
 loaded via a namespace (and not attached):
  [1] KEGGREST_1.46.0         xfun_0.48               bslib_0.8.0            
- [4] httr2_1.0.6             processx_3.8.4          tzdb_0.4.0             
+ [4] httr2_1.0.7             processx_3.8.4          tzdb_0.4.0             
  [7] callr_3.7.6             generics_0.1.3          vctrs_0.6.5            
 [10] tools_4.4.1             ps_1.8.1                parallel_4.4.1         
-[13] curl_5.2.3              tibble_3.2.1            fansi_1.0.6            
-[16] RSQLite_2.3.7           blob_1.2.4              pkgconfig_2.0.3        
+[13] curl_6.0.1              tibble_3.2.1            fansi_1.0.6            
+[16] RSQLite_2.3.9           blob_1.2.4              pkgconfig_2.0.3        
 [19] dbplyr_2.5.0            lifecycle_1.0.4         GenomeInfoDbData_1.2.13
 [22] compiler_4.4.1          stringr_1.5.1           git2r_0.35.0           
-[25] Biostrings_2.74.0       progress_1.2.3          getPass_0.2-4          
-[28] httpuv_1.6.15           GenomeInfoDb_1.42.0     htmltools_0.5.8.1      
+[25] Biostrings_2.74.1       progress_1.2.3          getPass_0.2-4          
+[28] httpuv_1.6.15           GenomeInfoDb_1.42.1     htmltools_0.5.8.1      
 [31] sass_0.4.9              yaml_2.3.10             later_1.3.2            
 [34] pillar_1.9.0            crayon_1.5.3            jquerylib_0.1.4        
 [37] whisker_0.4.1           cachem_1.1.0            tidyselect_1.2.1       
