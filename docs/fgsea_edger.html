@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2025-01-24" />
+
+<title>Using fgsea with edgeR results</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Using fgsea with edgeR results</h1>
+<h4 class="date">2025-01-24</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2025-01-24
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeeef0287a9006c4c0275395ff2bc85e6c94502f5etargetblankeef0287a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/eef0287a9006c4c0275395ff2bc85e6c94502f5e" target="_blank">eef0287</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeeef0287a9006c4c0275395ff2bc85e6c94502f5etargetblankeef0287a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/eef0287a9006c4c0275395ff2bc85e6c94502f5e" target="_blank">eef0287</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k/
+    Ignored:    r_packages_4.4.0/
+    Ignored:    r_packages_4.4.1/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/fgsea_edger.Rmd</code>) and HTML
+(<code>docs/fgsea_edger.html</code>) files. If you’ve configured a
+remote Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/eef0287a9006c4c0275395ff2bc85e6c94502f5e/analysis/fgsea_edger.Rmd" target="_blank">eef0287</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-24
+</td>
+<td>
+Using fgsea with edgeR results
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>First install <a
+href="https://bioconductor.org/packages/release/bioc/html/fgsea.html">fgsea</a>.</p>
+<pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+  install.packages(&quot;BiocManager&quot;)
+
+if (!require(&quot;fgsea&quot;, quietly = TRUE))
+  BiocManager::install(&quot;fgsea&quot;)
+
+library(fgsea)</code></pre>
+</div>
+<div id="edger-results" class="section level2">
+<h2>edgeR results</h2>
+<p><a
+href="https://davetang.org/muse/2024/10/31/an-example-differential-gene-expression-results-table/">An
+example differential gene expression results table</a>.</p>
+<pre class="r"><code>edger_res &lt;- readr::read_csv(&quot;https://raw.githubusercontent.com/davetang/muse/refs/heads/main/data/13970886_edger_res.csv&quot;, show_col_types = FALSE)
+head(edger_res)</code></pre>
+<pre><code># A tibble: 6 × 6
+  ensembl_gene_id  logFC logCPM      F  PValue adjusted_pvalue
+  &lt;chr&gt;            &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;           &lt;dbl&gt;
+1 ENSG00000000003  2.73   4.83   4.28  0.0684           0.109 
+2 ENSG00000000005 -7.00   0.541 17.6   0.00216          0.0138
+3 ENSG00000000419  0.120  5.34   0.114 0.743            0.776 
+4 ENSG00000000457 -0.708  5.31   3.35  0.0993           0.145 
+5 ENSG00000000460 -0.897  3.95   2.66  0.136            0.186 
+6 ENSG00000000938  1.54   5.60   1.86  0.205            0.258 </code></pre>
+<p>Add ranking metric.</p>
+<pre class="r"><code>edger_res |&gt;
+  dplyr::mutate(rank_metric = logFC * -log10(PValue)) -&gt; edger_res</code></pre>
+</div>
+<div id="convert-to-entrez-gene-ids" class="section level2">
+<h2>Convert to Entrez Gene IDs</h2>
+<p>Use {org.Hs.eg.db}.</p>
+<pre class="r"><code>if (!require(&quot;org.Hs.eg.db&quot;, quietly = TRUE))
+  BiocManager::install(&quot;org.Hs.eg.db&quot;)</code></pre>
+<pre><code>
+Attaching package: &#39;BiocGenerics&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    IQR, mad, sd, var, xtabs</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, intersect, is.unsorted, lapply, Map, mapply,
+    match, mget, order, paste, pmax, pmax.int, pmin, pmin.int,
+    Position, rank, rbind, Reduce, rownames, sapply, saveRDS, setdiff,
+    table, tapply, union, unique, unsplit, which.max, which.min</code></pre>
+<pre><code>Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    &#39;browseVignettes()&#39;. To cite Bioconductor, see
+    &#39;citation(&quot;Biobase&quot;)&#39;, and for packages &#39;citation(&quot;pkgname&quot;)&#39;.</code></pre>
+<pre><code>
+Attaching package: &#39;S4Vectors&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:utils&#39;:
+
+    findMatches</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    expand.grid, I, unname</code></pre>
+<pre><code></code></pre>
+<pre class="r"><code>suppressPackageStartupMessages(library(org.Hs.eg.db))</code></pre>
+<p>Convert to Entrez Gene IDs.</p>
+<pre class="r"><code>AnnotationDbi::select(
+  org.Hs.eg.db,
+  keys = edger_res$ensembl_gene_id,
+  columns=c(&quot;ENSEMBL&quot;,&quot;ENTREZID&quot;),
+  keytype=&quot;ENSEMBL&quot;
+) -&gt; ensembl_to_entrez</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>ensembl_to_entrez &lt;- dplyr::rename(ensembl_to_entrez, &quot;ensembl_gene_id&quot; = ENSEMBL)
+
+head(ensembl_to_entrez)</code></pre>
+<pre><code>  ensembl_gene_id ENTREZID
+1 ENSG00000000003     7105
+2 ENSG00000000005    64102
+3 ENSG00000000419     8813
+4 ENSG00000000457    57147
+5 ENSG00000000460    55732
+6 ENSG00000000938     2268</code></pre>
+<p>Number of NAs.</p>
+<pre class="r"><code>table(is.na(ensembl_to_entrez$ENTREZID))</code></pre>
+<pre><code>
+FALSE  TRUE 
+28722 10968 </code></pre>
+</div>
+<div id="hallmark-gene-sets" class="section level2">
+<h2>Hallmark gene sets</h2>
+<p>Use {msigdb}.</p>
+<pre class="r"><code>if (!require(&quot;msigdb&quot;, quietly = TRUE))
+  BiocManager::install(&quot;msigdb&quot;)
+
+if (!require(&quot;ExperimentHub&quot;, quietly = TRUE))
+  BiocManager::install(&quot;ExperimentHub&quot;)</code></pre>
+<pre><code>
+Attaching package: &#39;AnnotationHub&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:Biobase&#39;:
+
+    cache</code></pre>
+<pre class="r"><code>if (!require(&quot;GSEABase&quot;, quietly = TRUE))
+  BiocManager::install(&quot;GSEABase&quot;)</code></pre>
+<pre><code>
+Attaching package: &#39;graph&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:XML&#39;:
+
+    addNode</code></pre>
+<pre class="r"><code>suppressPackageStartupMessages(library(msigdb))
+suppressPackageStartupMessages(library(ExperimentHub))
+suppressPackageStartupMessages(library(GSEABase))</code></pre>
+<p>Query an <code>ExperimentHub</code> object.</p>
+<pre class="r"><code>eh &lt;- ExperimentHub(ask = FALSE)
+AnnotationHub::query(x = eh, pattern = &#39;msigdb&#39;)</code></pre>
+<pre><code>ExperimentHub with 49 records
+# snapshotDate(): 2024-10-24
+# $dataprovider: Broad Institute, Emory University, EBI
+# $species: Homo sapiens, Mus musculus
+# $rdataclass: GSEABase::GeneSetCollection, list, data.frame
+# additional mcols(): taxonomyid, genome, description,
+#   coordinate_1_based, maintainer, rdatadateadded, preparerclass, tags,
+#   rdatapath, sourceurl, sourcetype 
+# retrieve records with, e.g., &#39;object[[&quot;EH5421&quot;]]&#39; 
+
+           title                   
+  EH5421 | msigdb.v7.2.hs.SYM      
+  EH5422 | msigdb.v7.2.hs.EZID     
+  EH5423 | msigdb.v7.2.mm.SYM      
+  EH5424 | msigdb.v7.2.mm.EZID     
+  EH6727 | MSigDB C8 MANNO MIDBRAIN
+  ...      ...                     
+  EH8296 | msigdb.v7.5.1.hs.SYM    
+  EH8297 | msigdb.v7.5.1.mm.EZID   
+  EH8298 | msigdb.v7.5.1.mm.idf    
+  EH8299 | msigdb.v7.5.1.mm.SYM    
+  EH8300 | imex_hsmm_0722          </code></pre>
+<p>Latest version.</p>
+<pre class="r"><code>AnnotationHub::query(x = eh, pattern = &#39;msigdb.*hs.EZID&#39;) |&gt;
+  tail(1) -&gt; msigdb_hs_latest
+msigdb_hs_latest</code></pre>
+<pre><code>ExperimentHub with 1 record
+# snapshotDate(): 2024-10-24
+# names(): EH8294
+# package(): msigdb
+# $dataprovider: Broad Institute
+# $species: Homo sapiens
+# $rdataclass: GSEABase::GeneSetCollection
+# $rdatadateadded: 2023-07-03
+# $title: msigdb.v7.5.1.hs.EZID
+# $description: Gene expression signatures (Homo sapiens) from the Molecular...
+# $taxonomyid: 9606
+# $genome: NA
+# $sourcetype: XML
+# $sourceurl: https://data.broadinstitute.org/gsea-msigdb/msigdb/release/7.5...
+# $sourcesize: NA
+# $tags: c(&quot;Homo_sapiens_Data&quot;, &quot;Mus_musculus_Data&quot;) 
+# retrieve record with &#39;object[[&quot;EH8294&quot;]]&#39; </code></pre>
+<p>Download.</p>
+<pre class="r"><code>msigdb_hs_ezid &lt;- eh[[names(msigdb_hs_latest)]]</code></pre>
+<pre><code>see ?msigdb and browseVignettes(&#39;msigdb&#39;) for documentation</code></pre>
+<pre><code>loading from cache</code></pre>
+<p>Collections.</p>
+<pre class="r"><code>table(sapply(lapply(msigdb_hs_ezid, collectionType), bcCategory))</code></pre>
+<pre><code>
+   c1    c2    c3    c4    c5    c6    c7    c8     h 
+  299  6180  3726   858 28005   189  5219   700    50 </code></pre>
+<p>Create gene lists from the Hallmark collection.</p>
+<pre class="r"><code>wanted &lt;- sapply(lapply(msigdb_hs_ezid, collectionType), bcCategory) == &quot;h&quot;
+hallmark_gs &lt;- msigdb_hs_ezid[wanted]
+
+hallmark_gs_list &lt;- lapply(hallmark_gs, geneIds)
+class(hallmark_gs_list)</code></pre>
+<pre><code>[1] &quot;list&quot;</code></pre>
+<pre class="r"><code>names(hallmark_gs_list) &lt;- names(hallmark_gs)
+head(hallmark_gs_list)</code></pre>
+<pre><code>$HALLMARK_TNFA_SIGNALING_VIA_NFKB
+  [1] &quot;3726&quot;   &quot;2920&quot;   &quot;467&quot;    &quot;4792&quot;   &quot;7128&quot;   &quot;5743&quot;   &quot;2919&quot;   &quot;8870&quot;  
+  [9] &quot;9308&quot;   &quot;6364&quot;   &quot;2921&quot;   &quot;23764&quot;  &quot;4791&quot;   &quot;7127&quot;   &quot;1839&quot;   &quot;1316&quot;  
+ [17] &quot;330&quot;    &quot;5329&quot;   &quot;7538&quot;   &quot;3383&quot;   &quot;3725&quot;   &quot;1960&quot;   &quot;3553&quot;   &quot;597&quot;   
+ [25] &quot;23645&quot;  &quot;80149&quot;  &quot;6648&quot;   &quot;4929&quot;   &quot;3552&quot;   &quot;5971&quot;   &quot;7185&quot;   &quot;7832&quot;  
+ [33] &quot;1843&quot;   &quot;1326&quot;   &quot;2114&quot;   &quot;2152&quot;   &quot;6385&quot;   &quot;1958&quot;   &quot;3569&quot;   &quot;7124&quot;  
+ [41] &quot;23135&quot;  &quot;4790&quot;   &quot;3976&quot;   &quot;5806&quot;   &quot;8061&quot;   &quot;3164&quot;   &quot;182&quot;    &quot;6351&quot;  
+ [49] &quot;2643&quot;   &quot;6347&quot;   &quot;1827&quot;   &quot;1844&quot;   &quot;10938&quot;  &quot;9592&quot;   &quot;5966&quot;   &quot;8837&quot;  
+ [57] &quot;8767&quot;   &quot;4794&quot;   &quot;8013&quot;   &quot;22822&quot;  &quot;51278&quot;  &quot;8744&quot;   &quot;2669&quot;   &quot;1647&quot;  
+ [65] &quot;3627&quot;   &quot;10769&quot;  &quot;8553&quot;   &quot;1959&quot;   &quot;9021&quot;   &quot;11182&quot;  &quot;5734&quot;   &quot;1847&quot;  
+ [73] &quot;5055&quot;   &quot;4783&quot;   &quot;5054&quot;   &quot;10221&quot;  &quot;25976&quot;  &quot;5970&quot;   &quot;329&quot;    &quot;6372&quot;  
+ [81] &quot;9516&quot;   &quot;7130&quot;   &quot;960&quot;    &quot;3624&quot;   &quot;5328&quot;   &quot;4609&quot;   &quot;3604&quot;   &quot;6446&quot;  
+ [89] &quot;10318&quot;  &quot;10135&quot;  &quot;2355&quot;   &quot;10957&quot;  &quot;3398&quot;   &quot;969&quot;    &quot;3575&quot;   &quot;1942&quot;  
+ [97] &quot;7262&quot;   &quot;5209&quot;   &quot;6352&quot;   &quot;79693&quot;  &quot;3460&quot;   &quot;8878&quot;   &quot;10950&quot;  &quot;4616&quot;  
+[105] &quot;8942&quot;   &quot;50486&quot;  &quot;694&quot;    &quot;4170&quot;   &quot;7422&quot;   &quot;5606&quot;   &quot;1026&quot;   &quot;3491&quot;  
+[113] &quot;10010&quot;  &quot;3433&quot;   &quot;3606&quot;   &quot;7280&quot;   &quot;3659&quot;   &quot;2353&quot;   &quot;4973&quot;   &quot;388&quot;   
+[121] &quot;374&quot;    &quot;4814&quot;   &quot;65986&quot;  &quot;8613&quot;   &quot;9314&quot;   &quot;6373&quot;   &quot;6303&quot;   &quot;1435&quot;  
+[129] &quot;1880&quot;   &quot;56937&quot;  &quot;5791&quot;   &quot;7097&quot;   &quot;57007&quot;  &quot;7071&quot;   &quot;4082&quot;   &quot;3914&quot;  
+[137] &quot;1051&quot;   &quot;9322&quot;   &quot;2150&quot;   &quot;687&quot;    &quot;3949&quot;   &quot;7050&quot;   &quot;127544&quot; &quot;55332&quot; 
+[145] &quot;2683&quot;   &quot;11080&quot;  &quot;1437&quot;   &quot;5142&quot;   &quot;8303&quot;   &quot;5341&quot;   &quot;6776&quot;   &quot;23258&quot; 
+[153] &quot;595&quot;    &quot;23586&quot;  &quot;8877&quot;   &quot;941&quot;    &quot;25816&quot;  &quot;57018&quot;  &quot;2526&quot;   &quot;9034&quot;  
+[161] &quot;80176&quot;  &quot;8848&quot;   &quot;9334&quot;   &quot;150094&quot; &quot;23529&quot;  &quot;4780&quot;   &quot;2354&quot;   &quot;5187&quot;  
+[169] &quot;10725&quot;  &quot;490&quot;    &quot;3593&quot;   &quot;3572&quot;   &quot;9120&quot;   &quot;19&quot;     &quot;3280&quot;   &quot;604&quot;   
+[177] &quot;8660&quot;   &quot;6515&quot;   &quot;1052&quot;   &quot;51561&quot;  &quot;4088&quot;   &quot;6890&quot;   &quot;9242&quot;   &quot;64135&quot; 
+[185] &quot;3601&quot;   &quot;79155&quot;  &quot;602&quot;    &quot;24145&quot;  &quot;24147&quot;  &quot;1906&quot;   &quot;10209&quot;  &quot;650&quot;   
+[193] &quot;1846&quot;   &quot;10611&quot;  &quot;23308&quot;  &quot;9945&quot;   &quot;10365&quot;  &quot;3371&quot;   &quot;5271&quot;   &quot;4084&quot;  
+
+$HALLMARK_HYPOXIA
+  [1] &quot;5230&quot;   &quot;5163&quot;   &quot;2632&quot;   &quot;5211&quot;   &quot;226&quot;    &quot;2026&quot;   &quot;5236&quot;   &quot;10397&quot; 
+  [9] &quot;3099&quot;   &quot;230&quot;    &quot;2821&quot;   &quot;4601&quot;   &quot;6513&quot;   &quot;5033&quot;   &quot;133&quot;    &quot;8974&quot;  
+ [17] &quot;2023&quot;   &quot;5214&quot;   &quot;205&quot;    &quot;26355&quot;  &quot;5209&quot;   &quot;7422&quot;   &quot;665&quot;    &quot;7167&quot;  
+ [25] &quot;30001&quot;  &quot;55818&quot;  &quot;901&quot;    &quot;3939&quot;   &quot;2997&quot;   &quot;2597&quot;   &quot;8553&quot;   &quot;51129&quot; 
+ [33] &quot;3725&quot;   &quot;5054&quot;   &quot;4015&quot;   &quot;2645&quot;   &quot;8497&quot;   &quot;23764&quot;  &quot;54541&quot;  &quot;6515&quot;  
+ [41] &quot;3486&quot;   &quot;4783&quot;   &quot;2353&quot;   &quot;3516&quot;   &quot;3098&quot;   &quot;10370&quot;  &quot;3669&quot;   &quot;2584&quot;  
+ [49] &quot;26118&quot;  &quot;5837&quot;   &quot;6781&quot;   &quot;23036&quot;  &quot;694&quot;    &quot;123&quot;    &quot;1466&quot;   &quot;7436&quot;  
+ [57] &quot;23210&quot;  &quot;2131&quot;   &quot;2152&quot;   &quot;5165&quot;   &quot;55139&quot;  &quot;7360&quot;   &quot;229&quot;    &quot;8614&quot;  
+ [65] &quot;54206&quot;  &quot;2027&quot;   &quot;10957&quot;  &quot;3162&quot;   &quot;5228&quot;   &quot;26330&quot;  &quot;9435&quot;   &quot;55076&quot; 
+ [73] &quot;63827&quot;  &quot;467&quot;    &quot;857&quot;    &quot;272&quot;    &quot;2719&quot;   &quot;3340&quot;   &quot;8660&quot;   &quot;8819&quot;  
+ [81] &quot;2548&quot;   &quot;6385&quot;   &quot;8987&quot;   &quot;8870&quot;   &quot;5313&quot;   &quot;3484&quot;   &quot;5329&quot;   &quot;112464&quot;
+ [89] &quot;8839&quot;   &quot;9215&quot;   &quot;25819&quot;  &quot;6275&quot;   &quot;58528&quot;  &quot;7538&quot;   &quot;1956&quot;   &quot;1907&quot;  
+ [97] &quot;3423&quot;   &quot;1026&quot;   &quot;6095&quot;   &quot;1843&quot;   &quot;4282&quot;   &quot;5507&quot;   &quot;10570&quot;  &quot;11015&quot; 
+[105] &quot;1837&quot;   &quot;136&quot;    &quot;9957&quot;   &quot;284119&quot; &quot;2908&quot;   &quot;1316&quot;   &quot;2239&quot;   &quot;3491&quot;  
+[113] &quot;7128&quot;   &quot;771&quot;    &quot;3073&quot;   &quot;633&quot;    &quot;23645&quot;  &quot;55276&quot;  &quot;5292&quot;   &quot;25824&quot; 
+[121] &quot;55577&quot;  &quot;1027&quot;   &quot;680&quot;    &quot;8277&quot;   &quot;4493&quot;   &quot;538&quot;    &quot;4502&quot;   &quot;9672&quot;  
+[129] &quot;25976&quot;  &quot;5317&quot;   &quot;302&quot;    &quot;5224&quot;   &quot;1649&quot;   &quot;5578&quot;   &quot;2542&quot;   &quot;7852&quot;  
+[137] &quot;1944&quot;   &quot;1356&quot;   &quot;8609&quot;   &quot;1490&quot;   &quot;9469&quot;   &quot;7163&quot;   &quot;56925&quot;  &quot;124872&quot;
+[145] &quot;10891&quot;  &quot;596&quot;    &quot;2651&quot;   &quot;3036&quot;   &quot;54800&quot;  &quot;949&quot;    &quot;6576&quot;   &quot;6383&quot;  
+[153] &quot;839&quot;    &quot;7428&quot;   &quot;2309&quot;   &quot;5155&quot;   &quot;126792&quot; &quot;6518&quot;   &quot;8406&quot;   &quot;1942&quot;  
+[161] &quot;2745&quot;   &quot;57007&quot;  &quot;5066&quot;   &quot;7045&quot;   &quot;1634&quot;   &quot;6478&quot;   &quot;51316&quot;  &quot;2203&quot;  
+[169] &quot;8459&quot;   &quot;5260&quot;   &quot;4627&quot;   &quot;1028&quot;   &quot;9380&quot;   &quot;5105&quot;   &quot;3623&quot;   &quot;3309&quot;  
+[177] &quot;8509&quot;   &quot;23327&quot;  &quot;7162&quot;   &quot;7511&quot;   &quot;3569&quot;   &quot;6533&quot;   &quot;4214&quot;   &quot;3948&quot;  
+[185] &quot;9590&quot;   &quot;26136&quot;  &quot;3798&quot;   &quot;3906&quot;   &quot;1289&quot;   &quot;2817&quot;   &quot;3069&quot;   &quot;10994&quot; 
+[193] &quot;1463&quot;   &quot;7052&quot;   &quot;2113&quot;   &quot;3219&quot;   &quot;8991&quot;   &quot;2355&quot;   &quot;6820&quot;   &quot;7043&quot;  
+
+$HALLMARK_CHOLESTEROL_HOMEOSTASIS
+ [1] &quot;2224&quot;   &quot;1595&quot;   &quot;3422&quot;   &quot;2222&quot;   &quot;1717&quot;   &quot;6713&quot;   &quot;3157&quot;   &quot;50814&quot; 
+ [9] &quot;4047&quot;   &quot;4597&quot;   &quot;3949&quot;   &quot;7108&quot;   &quot;230&quot;    &quot;10682&quot;  &quot;6319&quot;   &quot;10654&quot; 
+[17] &quot;4598&quot;   &quot;4023&quot;   &quot;6309&quot;   &quot;9415&quot;   &quot;3156&quot;   &quot;51478&quot;  &quot;312&quot;    &quot;6721&quot;  
+[25] &quot;5833&quot;   &quot;55902&quot;  &quot;467&quot;    &quot;127&quot;    &quot;23474&quot;  &quot;1891&quot;   &quot;875&quot;    &quot;2990&quot;  
+[33] &quot;2194&quot;   &quot;3958&quot;   &quot;22809&quot;  &quot;308&quot;    &quot;94241&quot;  &quot;1119&quot;   &quot;2946&quot;   &quot;39&quot;    
+[41] &quot;552&quot;    &quot;5359&quot;   &quot;1191&quot;   &quot;54206&quot;  &quot;57761&quot;  &quot;58191&quot;  &quot;51330&quot;  &quot;71&quot;    
+[49] &quot;182&quot;    &quot;5641&quot;   &quot;26270&quot;  &quot;493869&quot; &quot;10957&quot;  &quot;118429&quot; &quot;114569&quot; &quot;928&quot;   
+[57] &quot;5468&quot;   &quot;2731&quot;   &quot;6811&quot;   &quot;134429&quot; &quot;1499&quot;   &quot;27346&quot;  &quot;116496&quot; &quot;5165&quot;  
+[65] &quot;5329&quot;   &quot;7869&quot;   &quot;2770&quot;   &quot;20&quot;     &quot;6311&quot;   &quot;4783&quot;   &quot;214&quot;    &quot;2171&quot;  
+[73] &quot;6282&quot;   &quot;132864&quot;
+
+$HALLMARK_MITOTIC_SPINDLE
+  [1] &quot;9181&quot;   &quot;23332&quot;  &quot;3832&quot;   &quot;9493&quot;   &quot;57679&quot;  &quot;382&quot;    &quot;4650&quot;   &quot;4627&quot;  
+  [9] &quot;10426&quot;  &quot;9793&quot;   &quot;29127&quot;  &quot;57580&quot;  &quot;50650&quot;  &quot;4926&quot;   &quot;6711&quot;   &quot;11004&quot; 
+ [17] &quot;3799&quot;   &quot;7272&quot;   &quot;324&quot;    &quot;11190&quot;  &quot;5048&quot;   &quot;10435&quot;  &quot;9371&quot;   &quot;55704&quot; 
+ [25] &quot;56992&quot;  &quot;332&quot;    &quot;116840&quot; &quot;4763&quot;   &quot;7248&quot;   &quot;996&quot;    &quot;11064&quot;  &quot;114791&quot;
+ [33] &quot;24137&quot;  &quot;22919&quot;  &quot;55785&quot;  &quot;675&quot;    &quot;5347&quot;   &quot;5921&quot;   &quot;4751&quot;   &quot;8936&quot;  
+ [41] &quot;7153&quot;   &quot;7204&quot;   &quot;9826&quot;   &quot;10300&quot;  &quot;9055&quot;   &quot;54443&quot;  &quot;55755&quot;  &quot;9126&quot;  
+ [49] &quot;10844&quot;  &quot;9700&quot;   &quot;55201&quot;  &quot;201176&quot; &quot;9732&quot;   &quot;29901&quot;  &quot;3619&quot;   &quot;394&quot;   
+ [57] &quot;2934&quot;   &quot;10276&quot;  &quot;10128&quot;  &quot;23637&quot;  &quot;2317&quot;   &quot;64411&quot;  &quot;121512&quot; &quot;29&quot;    
+ [65] &quot;55835&quot;  &quot;4690&quot;   &quot;1063&quot;   &quot;9585&quot;   &quot;10163&quot;  &quot;4628&quot;   &quot;1062&quot;   &quot;9266&quot;  
+ [73] &quot;4281&quot;   &quot;3831&quot;   &quot;57787&quot;  &quot;127829&quot; &quot;9702&quot;   &quot;8409&quot;   &quot;393&quot;    &quot;23580&quot; 
+ [81] &quot;163786&quot; &quot;9113&quot;   &quot;4983&quot;   &quot;8976&quot;   &quot;4296&quot;   &quot;6654&quot;   &quot;25&quot;     &quot;7074&quot;  
+ [89] &quot;23095&quot;  &quot;6453&quot;   &quot;134549&quot; &quot;8440&quot;   &quot;9787&quot;   &quot;613&quot;    &quot;10048&quot;  &quot;2037&quot;  
+ [97] &quot;10801&quot;  &quot;11104&quot;  &quot;51174&quot;  &quot;22974&quot;  &quot;3797&quot;   &quot;357&quot;    &quot;85378&quot;  &quot;6709&quot;  
+[105] &quot;23022&quot;  &quot;23647&quot;  &quot;9735&quot;   &quot;84376&quot;  &quot;25777&quot;  &quot;58526&quot;  &quot;1739&quot;   &quot;2316&quot;  
+[113] &quot;79658&quot;  &quot;8476&quot;   &quot;23365&quot;  &quot;4082&quot;   &quot;51199&quot;  &quot;5108&quot;   &quot;10928&quot;  &quot;7430&quot;  
+[121] &quot;85464&quot;  &quot;983&quot;    &quot;22930&quot;  &quot;10160&quot;  &quot;11346&quot;  &quot;54509&quot;  &quot;1894&quot;   &quot;2035&quot;  
+[129] &quot;51735&quot;  &quot;3835&quot;   &quot;84333&quot;  &quot;6780&quot;   &quot;396&quot;    &quot;6790&quot;   &quot;26271&quot;  &quot;51203&quot; 
+[137] &quot;5829&quot;   &quot;9564&quot;   &quot;23607&quot;  &quot;11214&quot;  &quot;10013&quot;  &quot;22994&quot;  &quot;3996&quot;   &quot;23192&quot; 
+[145] &quot;5116&quot;   &quot;7840&quot;   &quot;11133&quot;  &quot;667&quot;    &quot;22920&quot;  &quot;151987&quot; &quot;9411&quot;   &quot;9462&quot;  
+[153] &quot;9133&quot;   &quot;80119&quot;  &quot;5922&quot;   &quot;4739&quot;   &quot;8243&quot;   &quot;81&quot;     &quot;5311&quot;   &quot;7461&quot;  
+[161] &quot;998&quot;    &quot;10403&quot;  &quot;9874&quot;   &quot;9344&quot;   &quot;6904&quot;   &quot;832&quot;    &quot;1794&quot;   &quot;2017&quot;  
+[169] &quot;10051&quot;  &quot;10565&quot;  &quot;7277&quot;   &quot;4001&quot;   &quot;10006&quot;  &quot;6093&quot;   &quot;55125&quot;  &quot;699&quot;   
+[177] &quot;50628&quot;  &quot;64857&quot;  &quot;253260&quot; &quot;10018&quot;  &quot;1778&quot;   &quot;6624&quot;   &quot;8874&quot;   &quot;140735&quot;
+[185] &quot;4643&quot;   &quot;274&quot;    &quot;4853&quot;   &quot;5981&quot;   &quot;10611&quot;  &quot;89941&quot;  &quot;8470&quot;   &quot;11135&quot; 
+[193] &quot;7414&quot;   &quot;6249&quot;   &quot;23012&quot;  &quot;7531&quot;   &quot;9771&quot;   &quot;55722&quot;  &quot;1453&quot;  
+
+$HALLMARK_WNT_BETA_CATENIN_SIGNALING
+ [1] &quot;4609&quot;  &quot;1499&quot;  &quot;3714&quot;  &quot;4851&quot;  &quot;28514&quot; &quot;8313&quot;  &quot;5664&quot;  &quot;8321&quot;  &quot;4855&quot; 
+[10] &quot;51176&quot; &quot;8312&quot;  &quot;85407&quot; &quot;81029&quot; &quot;8454&quot;  &quot;182&quot;   &quot;9794&quot;  &quot;2648&quot;  &quot;2770&quot; 
+[19] &quot;7475&quot;  &quot;5727&quot;  &quot;9612&quot;  &quot;27121&quot; &quot;3066&quot;  &quot;22943&quot; &quot;6932&quot;  &quot;7471&quot;  &quot;8650&quot; 
+[28] &quot;6868&quot;  &quot;1856&quot;  &quot;5467&quot;  &quot;23385&quot; &quot;10014&quot; &quot;894&quot;   &quot;10023&quot; &quot;1454&quot;  &quot;3516&quot; 
+[37] &quot;8325&quot;  &quot;7157&quot;  &quot;6502&quot;  &quot;23493&quot; &quot;23462&quot; &quot;79885&quot;
+
+$HALLMARK_TGF_BETA_SIGNALING
+ [1] &quot;7046&quot;  &quot;4092&quot;  &quot;7040&quot;  &quot;64750&quot; &quot;57154&quot; &quot;659&quot;   &quot;6498&quot;  &quot;6497&quot;  &quot;90&quot;   
+[10] &quot;56937&quot; &quot;9612&quot;  &quot;5054&quot;  &quot;3726&quot;  &quot;4086&quot;  &quot;4091&quot;  &quot;23645&quot; &quot;7050&quot;  &quot;5045&quot; 
+[19] &quot;4088&quot;  &quot;2280&quot;  &quot;6885&quot;  &quot;657&quot;   &quot;1499&quot;  &quot;28996&quot; &quot;7071&quot;  &quot;650&quot;   &quot;2022&quot; 
+[28] &quot;324&quot;   &quot;5494&quot;  &quot;331&quot;   &quot;999&quot;   &quot;3397&quot;  &quot;7044&quot;  &quot;1028&quot;  &quot;51592&quot; &quot;11031&quot;
+[37] &quot;7082&quot;  &quot;6574&quot;  &quot;1025&quot;  &quot;3399&quot;  &quot;9241&quot;  &quot;51742&quot; &quot;3460&quot;  &quot;3398&quot;  &quot;5499&quot; 
+[46] &quot;6711&quot;  &quot;25937&quot; &quot;8412&quot;  &quot;7057&quot;  &quot;2339&quot;  &quot;3065&quot;  &quot;7323&quot;  &quot;4053&quot;  &quot;387&quot;  </code></pre>
+</div>
+<div id="fgsea-analysis" class="section level2">
+<h2>fgsea analysis</h2>
+<p>Rank metric distribution.</p>
+<pre class="r"><code>plot(hist(edger_res$rank_metric, breaks = 50))</code></pre>
+<p><img src="figure/fgsea_edger.Rmd/rank_metric_dist-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Create ranks vector.</p>
+<pre class="r"><code>edger_res |&gt;
+  dplyr::inner_join(y = ensembl_to_entrez, by = &quot;ensembl_gene_id&quot;, relationship = &quot;many-to-many&quot;) |&gt;
+  dplyr::filter(!is.na(ENTREZID)) |&gt;
+  dplyr::group_by(ENTREZID) |&gt;
+  dplyr::mutate(ambiguous = ifelse(dplyr::n()&gt;1, TRUE, FALSE)) |&gt;
+  dplyr::filter(!ambiguous) -&gt; res
+  
+my_ranks &lt;- res$rank_metric
+my_names &lt;- as.character(res$ENTREZID)
+names(my_ranks) &lt;- my_names
+plot(hist(my_ranks, breaks = 50))</code></pre>
+<p><img src="figure/fgsea_edger.Rmd/my_ranks-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The <code>fgsea()</code> function runs the pre-ranked gene set
+enrichment analysis.</p>
+<pre class="r"><code>set.seed(1984)
+
+fgseaRes &lt;- fgsea(
+  pathways = hallmark_gs_list, 
+  stats = my_ranks,
+  minSize=15,
+  maxSize=500,
+  nPermSimple = 200000
+)</code></pre>
+<pre><code>Warning in preparePathwaysAndStats(pathways, stats, minSize, maxSize, gseaParam, : There are ties in the preranked stats (2.44% of the list).
+The order of those tied genes will be arbitrary, which may produce unexpected results.</code></pre>
+<pre><code>Warning in fgseaMultilevel(pathways = pathways, stats = stats, minSize =
+minSize, : There were 36 pathways for which P-values were not calculated
+properly due to unbalanced (positive and negative) gene-level statistic values.
+For such pathways pval, padj, NES, log2err are set to NA. You can try to
+increase the value of the argument nPermSimple (for example set it nPermSimple
+= 2000000)</code></pre>
+<p>Top 6 enriched pathways.</p>
+<pre class="r"><code>head(fgseaRes[order(pval), ])</code></pre>
+<pre><code>                        pathway         pval         padj      log2err
+                         &lt;char&gt;        &lt;num&gt;        &lt;num&gt;        &lt;num&gt;
+1:     HALLMARK_NOTCH_SIGNALING 3.559469e-05 0.0004983257 5.573322e-01
+2:        HALLMARK_ANGIOGENESIS 1.063389e-03 0.0074437263 4.550599e-01
+3:     HALLMARK_SPERMATOGENESIS 3.347883e-01 1.0000000000 4.547319e-03
+4: HALLMARK_PANCREAS_BETA_CELLS 4.714677e-01 1.0000000000 3.415898e-03
+5:   HALLMARK_KRAS_SIGNALING_DN 8.693607e-01 1.0000000000 1.250537e-03
+6:      HALLMARK_APICAL_SURFACE 9.995800e-01 1.0000000000 6.844827e-05
+           ES        NES  size  leadingEdge
+        &lt;num&gt;      &lt;num&gt; &lt;int&gt;       &lt;list&gt;
+1:  0.6388199  2.4231911    31 2648, 11....
+2:  0.4445579  1.7490871    35 6696, 70....
+3: -0.5487978 -1.0257935   135 56903, 8....
+4: -0.5614137 -1.0146014    40 5080, 47....
+5: -0.5031756 -0.9463782   194 56154, 2....
+6: -0.2987335 -0.5417546    44 116085, ....</code></pre>
+<p>Plot the most significantly enriched pathway.</p>
+<pre class="r"><code>plotEnrichment(
+  hallmark_gs_list[[head(fgseaRes[order(pval), ], 1)$pathway]],
+  my_ranks
+) +
+  ggplot2::labs(title=head(fgseaRes[order(pval), ], 1)$pathway)</code></pre>
+<p><img src="figure/fgsea_edger.Rmd/plot_sign_pathway-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.1 (2024-06-14)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.5 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] GSEABase_1.68.0      graph_1.84.1         annotate_1.84.0     
+ [4] XML_3.99-0.17        ExperimentHub_2.14.0 AnnotationHub_3.14.0
+ [7] BiocFileCache_2.14.0 dbplyr_2.5.0         msigdb_1.14.0       
+[10] org.Hs.eg.db_3.20.0  AnnotationDbi_1.68.0 IRanges_2.40.1      
+[13] S4Vectors_0.44.0     Biobase_2.66.0       BiocGenerics_0.52.0 
+[16] fgsea_1.32.2         BiocManager_1.30.25  workflowr_1.7.1     
+
+loaded via a namespace (and not attached):
+ [1] DBI_1.2.3               rlang_1.1.4             magrittr_2.0.3         
+ [4] git2r_0.35.0            compiler_4.4.1          RSQLite_2.3.9          
+ [7] getPass_0.2-4           png_0.1-8               callr_3.7.6            
+[10] vctrs_0.6.5             stringr_1.5.1           pkgconfig_2.0.3        
+[13] crayon_1.5.3            fastmap_1.2.0           XVector_0.46.0         
+[16] labeling_0.4.3          utf8_1.2.4              promises_1.3.0         
+[19] rmarkdown_2.28          tzdb_0.4.0              UCSC.utils_1.2.0       
+[22] ps_1.8.1                purrr_1.0.2             bit_4.5.0              
+[25] xfun_0.48               zlibbioc_1.52.0         cachem_1.1.0           
+[28] GenomeInfoDb_1.42.1     jsonlite_1.8.9          blob_1.2.4             
+[31] highr_0.11              later_1.3.2             BiocParallel_1.40.0    
+[34] parallel_4.4.1          R6_2.5.1                bslib_0.8.0            
+[37] stringi_1.8.4           jquerylib_0.1.4         Rcpp_1.0.13            
+[40] knitr_1.48              readr_2.1.5             httpuv_1.6.15          
+[43] Matrix_1.7-0            tidyselect_1.2.1        rstudioapi_0.17.1      
+[46] yaml_2.3.10             codetools_0.2-20        curl_6.0.1             
+[49] processx_3.8.4          lattice_0.22-6          tibble_3.2.1           
+[52] withr_3.0.2             KEGGREST_1.46.0         evaluate_1.0.1         
+[55] Biostrings_2.74.1       pillar_1.9.0            filelock_1.0.3         
+[58] whisker_0.4.1           generics_0.1.3          vroom_1.6.5            
+[61] rprojroot_2.0.4         BiocVersion_3.20.0      hms_1.1.3              
+[64] ggplot2_3.5.1           munsell_0.5.1           scales_1.3.0           
+[67] xtable_1.8-4            glue_1.8.0              tools_4.4.1            
+[70] data.table_1.16.2       fs_1.6.4                fastmatch_1.1-4        
+[73] cowplot_1.1.3           grid_4.4.1              colorspace_2.1-1       
+[76] GenomeInfoDbData_1.2.13 cli_3.6.3               rappdirs_0.3.3         
+[79] fansi_1.0.6             dplyr_1.1.4             gtable_0.3.6           
+[82] sass_0.4.9              digest_0.6.37           farver_2.1.2           
+[85] memoise_2.0.1           htmltools_0.5.8.1       lifecycle_1.0.4        
+[88] httr_1.4.7              mime_0.12               bit64_4.5.2            </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
