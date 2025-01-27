@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-01-24" />
+<meta name="date" content="2025-01-27" />
 
 <title>Using the GSEA GUI tool</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Using the GSEA GUI tool</h1>
-<h4 class="date">2025-01-24</h4>
+<h4 class="date">2025-01-27</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-01-24
+<strong>Last updated:</strong> 2025-01-27
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree954f4bff9ee9dcbf540ea6a5407b88da3dc20bactargetblank954f4bfa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeab9aeabca47526dd342403dac301c74689c1b754targetblankab9aeaba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/954f4bff9ee9dcbf540ea6a5407b88da3dc20bac" target="_blank">954f4bf</a>
+<a href="https://github.com/davetang/muse/tree/ab9aeabca47526dd342403dac301c74689c1b754" target="_blank">ab9aeab</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree954f4bff9ee9dcbf540ea6a5407b88da3dc20bactargetblank954f4bfa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeab9aeabca47526dd342403dac301c74689c1b754targetblankab9aeaba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/954f4bff9ee9dcbf540ea6a5407b88da3dc20bac" target="_blank">954f4bf</a>.
+<a href="https://github.com/davetang/muse/tree/ab9aeabca47526dd342403dac301c74689c1b754" target="_blank">ab9aeab</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -559,6 +559,9 @@ Ignored files:
     Ignored:    data/pbmc3k/
     Ignored:    r_packages_4.4.0/
     Ignored:    r_packages_4.4.1/
+
+Untracked files:
+    Untracked:  rsem.merged.gene_counts.tsv
 
 </code></pre>
 <p>
@@ -602,6 +605,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/ab9aeabca47526dd342403dac301c74689c1b754/analysis/gsea.Rmd" target="_blank">ab9aeab</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-27
+</td>
+<td>
+RNA-seq expression data
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/415653c45d72f1dbcb19936ba5ea4d43dc188fd0/docs/gsea.html" target="_blank">415653c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-01-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -668,6 +705,77 @@ into a single expression vector by picking the maximum expression value
 in each sample. A utility to do this is included in the GSEA java
 software.</p>
 </blockquote>
+<div id="expression-datasets" class="section level3">
+<h3>Expression datasets</h3>
+<p><a
+href="https://docs.gsea-msigdb.org/#GSEA/GSEA_User_Guide/#expression-datasets">Preparing
+RNA-seq data</a>:</p>
+<blockquote>
+<p>RNA-seq data. GSEA does not normalize RNA-seq data. RNA-seq data must
+be normalized for between-sample comparisons using an external
+normalization procedure (e.g. those in DESeq2 or Voom).</p>
+</blockquote>
+<p>Use {edgeR} to perform “between-sample” normalisation; there are two
+main types of normalisation in RNA-seq:</p>
+<ol style="list-style-type: decimal">
+<li>Between-sample normalisation to compare gene expression across
+samples and</li>
+<li>Within-sample normalisation to account for differences in sequencing
+depth or gene length within a single sample.</li>
+</ol>
+<p>If <code>count_mat</code> contains the raw counts. Note that for
+<code>calcNormFactors()</code> and <code>cpm()</code> the defaults are
+TMM and <code>normalized.lib.sizes = TRUE</code>, respectively.</p>
+<p>Use example data from <a href="https://zenodo.org/records/13970886"
+class="uri">https://zenodo.org/records/13970886</a>.</p>
+<pre class="r"><code>library(edgeR)</code></pre>
+<pre><code>Loading required package: limma</code></pre>
+<pre class="r"><code>my_url &lt;- &#39;https://zenodo.org/records/13970886/files/rsem.merged.gene_counts.tsv?download=1&#39;
+my_file &lt;- &#39;rsem.merged.gene_counts.tsv&#39;
+if(file.exists(my_file) == FALSE){
+  download.file(url = my_url, destfile = my_file)
+}
+gene_counts &lt;- readr::read_tsv(&quot;rsem.merged.gene_counts.tsv&quot;, show_col_types = FALSE)
+gene_counts |&gt;
+  dplyr::select(-gene_id, -`transcript_id(s)`) |&gt;
+  as.matrix() -&gt; count_mat
+row.names(count_mat) &lt;- gene_counts$gene_id
+
+dge &lt;- DGEList(counts = count_mat)
+dge &lt;- normLibSizes(dge, method = &quot;TMM&quot;)
+count_mat_norm &lt;- cpm(dge, normalized.lib.sizes = TRUE)</code></pre>
+<p>Raw matrix.</p>
+<pre class="r"><code>head(count_mat)</code></pre>
+<pre><code>                ERR160122 ERR160123 ERR160124 ERR164473 ERR164550 ERR164551
+ENSG00000000003      2.00      6.00      5.00    374.00   1637.00    650.00
+ENSG00000000005     19.00     40.00     28.00      0.00      1.00      0.00
+ENSG00000000419    268.24    273.78    428.81    489.00    637.00    879.00
+ENSG00000000457    360.34    449.07    566.05    362.61    605.96    708.87
+ENSG00000000460    155.66    184.93    264.95     85.39    312.04    239.13
+ENSG00000000938     24.00     23.00     40.00   1181.00    423.00   3346.00
+                ERR164552 ERR164554
+ENSG00000000003   1015.00    562.00
+ENSG00000000005      0.00      0.00
+ENSG00000000419   1157.00    729.00
+ENSG00000000457    632.16    478.93
+ENSG00000000460    147.84    156.07
+ENSG00000000938   1249.00   1149.00</code></pre>
+<p>Between-sample normalised values.</p>
+<pre class="r"><code>head(count_mat_norm)</code></pre>
+<pre><code>                 ERR160122  ERR160123  ERR160124 ERR164473   ERR164550
+ENSG00000000003  0.2950283  0.7356763  0.4523046 27.751783 93.60454585
+ENSG00000000005  2.8027686  4.9045087  2.5329056  0.000000  0.05718054
+ENSG00000000419 39.5691916 33.5689100 38.7905451 36.285085 36.42400471
+ENSG00000000457 53.1552434 55.0616934 51.2054012 26.906615 34.64912071
+ENSG00000000460 22.9620503 22.6747700 23.9676195  6.336162 17.84261606
+ENSG00000000938  3.5403392  2.8200925  3.6184366 87.633304 24.18736890
+                ERR164551 ERR164552 ERR164554
+ENSG00000000003  28.74003 51.906072 31.316431
+ENSG00000000005   0.00000  0.000000  0.000000
+ENSG00000000419  38.86536 59.167808 40.622203
+ENSG00000000457  31.34299 32.328022 26.687505
+ENSG00000000460  10.57323  7.560388  8.696718
+ENSG00000000938 147.94481 63.872595 64.025941</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -700,20 +808,25 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] workflowr_1.7.1
+[1] edgeR_4.4.1     limma_3.62.2    workflowr_1.7.1
 
 loaded via a namespace (and not attached):
- [1] vctrs_0.6.5       httr_1.4.7        cli_3.6.3         knitr_1.48       
- [5] rlang_1.1.4       xfun_0.48         stringi_1.8.4     processx_3.8.4   
- [9] promises_1.3.0    jsonlite_1.8.9    glue_1.8.0        rprojroot_2.0.4  
-[13] git2r_0.35.0      htmltools_0.5.8.1 httpuv_1.6.15     ps_1.8.1         
-[17] sass_0.4.9        fansi_1.0.6       rmarkdown_2.28    jquerylib_0.1.4  
-[21] tibble_3.2.1      evaluate_1.0.1    fastmap_1.2.0     yaml_2.3.10      
-[25] lifecycle_1.0.4   whisker_0.4.1     stringr_1.5.1     compiler_4.4.1   
-[29] fs_1.6.4          pkgconfig_2.0.3   Rcpp_1.0.13       rstudioapi_0.17.1
-[33] later_1.3.2       digest_0.6.37     R6_2.5.1          utf8_1.2.4       
-[37] pillar_1.9.0      callr_3.7.6       magrittr_2.0.3    bslib_0.8.0      
-[41] tools_4.4.1       cachem_1.1.0      getPass_0.2-4    </code></pre>
+ [1] generics_0.1.3    sass_0.4.9        utf8_1.2.4        stringi_1.8.4    
+ [5] lattice_0.22-6    hms_1.1.3         digest_0.6.37     magrittr_2.0.3   
+ [9] evaluate_1.0.1    grid_4.4.1        fastmap_1.2.0     rprojroot_2.0.4  
+[13] jsonlite_1.8.9    processx_3.8.4    whisker_0.4.1     ps_1.8.1         
+[17] promises_1.3.0    httr_1.4.7        fansi_1.0.6       jquerylib_0.1.4  
+[21] cli_3.6.3         rlang_1.1.4       crayon_1.5.3      bit64_4.5.2      
+[25] withr_3.0.2       cachem_1.1.0      yaml_2.3.10       parallel_4.4.1   
+[29] tools_4.4.1       tzdb_0.4.0        dplyr_1.1.4       locfit_1.5-9.10  
+[33] httpuv_1.6.15     vctrs_0.6.5       R6_2.5.1          lifecycle_1.0.4  
+[37] git2r_0.35.0      stringr_1.5.1     fs_1.6.4          bit_4.5.0        
+[41] vroom_1.6.5       pkgconfig_2.0.3   callr_3.7.6       pillar_1.9.0     
+[45] bslib_0.8.0       later_1.3.2       glue_1.8.0        Rcpp_1.0.13      
+[49] statmod_1.5.0     xfun_0.48         tibble_3.2.1      tidyselect_1.2.1 
+[53] rstudioapi_0.17.1 knitr_1.48        htmltools_0.5.8.1 rmarkdown_2.28   
+[57] readr_2.1.5       compiler_4.4.1    getPass_0.2-4    </code></pre>
+</div>
 </div>
 </div>
 </div>
