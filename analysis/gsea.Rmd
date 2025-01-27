@@ -35,3 +35,49 @@ knitr::opts_chunk$set(echo = TRUE)
 Download some example data [Lung_Michigan_collapsed.gct](https://www.gsea-msigdb.org/gsea/msigdb/download_file.jsp?filePath=/gsea/dataset_files/Lung_Michigan_collapsed_symbols.gct).
 
 > `Collapsed` refers to datasets whose identifiers (i.e Affymetrix probe set ids) have been replaced with symbols. In this process, all probe sets that map to a particular gene are summarized into a single expression vector by picking the maximum expression value in each sample. A utility to do this is included in the GSEA java software.
+
+### Expression datasets
+
+[Preparing RNA-seq data](https://docs.gsea-msigdb.org/#GSEA/GSEA_User_Guide/#expression-datasets):
+
+> RNA-seq data. GSEA does not normalize RNA-seq data. RNA-seq data must be normalized for between-sample comparisons using an external normalization procedure (e.g. those in DESeq2 or Voom).
+
+Use {edgeR} to perform "between-sample" normalisation; there are two main types of normalisation in RNA-seq:
+
+1. Between-sample normalisation to compare gene expression across samples and
+2. Within-sample normalisation to account for differences in sequencing depth or gene length within a single sample.
+
+If `count_mat` contains the raw counts. Note that for `calcNormFactors()` and `cpm()` the defaults are TMM and `normalized.lib.sizes = TRUE`, respectively. 
+
+Use example data from <https://zenodo.org/records/13970886>.
+
+```{r betwaeen_sample_normalisation}
+library(edgeR)
+
+my_url <- 'https://zenodo.org/records/13970886/files/rsem.merged.gene_counts.tsv?download=1'
+my_file <- 'rsem.merged.gene_counts.tsv'
+if(file.exists(my_file) == FALSE){
+  download.file(url = my_url, destfile = my_file)
+}
+gene_counts <- readr::read_tsv("rsem.merged.gene_counts.tsv", show_col_types = FALSE)
+gene_counts |>
+  dplyr::select(-gene_id, -`transcript_id(s)`) |>
+  as.matrix() -> count_mat
+row.names(count_mat) <- gene_counts$gene_id
+
+dge <- DGEList(counts = count_mat)
+dge <- normLibSizes(dge, method = "TMM")
+count_mat_norm <- cpm(dge, normalized.lib.sizes = TRUE)
+```
+
+Raw matrix.
+
+```{r count_mat}
+head(count_mat)
+```
+
+Between-sample normalised values.
+
+```{r count_mat_norm}
+head(count_mat_norm)
+```
