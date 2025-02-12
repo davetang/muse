@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefa1564d72fc18e9b1b8337dedec5f291bd57faaftargetblankfa1564da">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed106cded59fab5e1dbe51cd45fade56bd23ad420targetblankd106cdea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/fa1564d72fc18e9b1b8337dedec5f291bd57faaf" target="_blank">fa1564d</a>
+<a href="https://github.com/davetang/muse/tree/d106cded59fab5e1dbe51cd45fade56bd23ad420" target="_blank">d106cde</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefa1564d72fc18e9b1b8337dedec5f291bd57faaftargetblankfa1564da"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed106cded59fab5e1dbe51cd45fade56bd23ad420targetblankd106cdea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/fa1564d72fc18e9b1b8337dedec5f291bd57faaf" target="_blank">fa1564d</a>.
+<a href="https://github.com/davetang/muse/tree/d106cded59fab5e1dbe51cd45fade56bd23ad420" target="_blank">d106cde</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -553,12 +553,10 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/brain_counts/
+    Ignored:    data/seurat_1m_neuron.rds
     Ignored:    r_packages_4.4.1/
-
-Untracked files:
-    Untracked:  data/1M_neurons_filtered_gene_bc_matrices_h5.h5
-    Untracked:  data/brain_counts/
-    Untracked:  data/seurat_1m_neuron.rds
 
 </code></pre>
 <p>
@@ -603,6 +601,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/d106cded59fab5e1dbe51cd45fade56bd23ad420/analysis/seurat_bpcells.Rmd" target="_blank">d106cde</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-12
+</td>
+<td>
+Seurat workflow
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/c5e8ee1e053c29b70b894d715c59d2ef159ada74/docs/seurat_bpcells.html" target="_blank">c5e8ee1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -731,13 +763,37 @@ obj[[&quot;RNA&quot;]]$counts &lt;- counts.mat</code></pre>
 <p>Once this conversion is done, you can perform typical Seurat
 functions on the object. For example, we can normalize data and
 visualize features by automatically accessing the on-disk counts.</p>
-<pre class="r"><code>brain &lt;- NormalizeData(brain, normalization.method = &quot;LogNormalize&quot;)</code></pre>
+<pre class="r"><code>debug_flag &lt;- FALSE
+start_time &lt;- Sys.time()
+
+brain &lt;- NormalizeData(brain, normalization.method = &quot;LogNormalize&quot;)</code></pre>
 <pre><code>Normalizing layer: counts</code></pre>
+<pre class="r"><code>brain &lt;- FindVariableFeatures(brain, selection.method = &#39;vst&#39;, nfeatures = 2000, verbose = debug_flag)
+brain &lt;- ScaleData(brain, verbose = debug_flag)
+brain &lt;- RunPCA(brain, verbose = debug_flag)</code></pre>
+<pre><code>Warning: Converting to a dense matrix may use excessive memory
+This message is displayed once every 8 hours.</code></pre>
+<pre><code>Error in (function (cond) : error in evaluating the argument &#39;x&#39; in selecting a method for function &#39;as.matrix&#39;: Error converting IterableMatrix to dgCMatrix
+• dgCMatrix objects cannot hold more than 2^31 non-zero entries
+• Input matrix has 2612254000 entries</code></pre>
+<pre class="r"><code>brain &lt;- RunUMAP(brain, dims = 1:30, verbose = debug_flag)</code></pre>
+<pre><code>Error in `object[[reduction]]`:
+! &#39;pca&#39; not found in this Seurat object
+ </code></pre>
+<pre class="r"><code>brain &lt;- FindNeighbors(brain, dims = 1:30, verbose = debug_flag)</code></pre>
+<pre><code>Error in `object[[reduction]]`:
+! &#39;pca&#39; not found in this Seurat object
+ </code></pre>
+<pre class="r"><code>brain &lt;- FindClusters(brain, resolution = 0.5, verbose = debug_flag)</code></pre>
+<pre><code>Error in FindClusters.Seurat(brain, resolution = 0.5, verbose = debug_flag): Provided graph.name not present in Seurat object</code></pre>
 <pre class="r"><code>brain</code></pre>
 <pre><code>An object of class Seurat 
 27998 features across 1306127 samples within 1 assay 
-Active assay: RNA (27998 features, 0 variable features)
- 2 layers present: counts, data</code></pre>
+Active assay: RNA (27998 features, 2000 variable features)
+ 3 layers present: counts, data, scale.data</code></pre>
+<pre class="r"><code>end_time &lt;- Sys.time()
+end_time - start_time</code></pre>
+<pre><code>Time difference of 2.374657 mins</code></pre>
 </div>
 <div id="saving-seurat-objects-with-on-disk-layers"
 class="section level3">
@@ -758,6 +814,8 @@ BPCells directory.</p>
 <pre><code>Warning: Trying to move &#39;/home/rstudio/muse/data/brain_counts&#39; to itself,
 skipping
 Trying to move &#39;/home/rstudio/muse/data/brain_counts&#39; to itself,
+skipping
+Trying to move &#39;/home/rstudio/muse/data/brain_counts&#39; to itself,
 skipping</code></pre>
 <p>If needed, a layer with an on-disk matrix can be converted to an
 in-memory matrix using the <code>as()</code> function. For the purposes
@@ -768,8 +826,8 @@ brain_subset[[&quot;RNA&quot;]]$counts &lt;- as(object = brain_subset[[&quot;RNA
 brain_subset</code></pre>
 <pre><code>An object of class Seurat 
 27998 features across 1000 samples within 1 assay 
-Active assay: RNA (27998 features, 0 variable features)
- 2 layers present: counts, data</code></pre>
+Active assay: RNA (27998 features, 2000 variable features)
+ 3 layers present: counts, data, scale.data</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
