@@ -1,0 +1,119 @@
+---
+title: "Using BPCells with Seurat"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<https://github.com/satijalab/seurat/blob/9755c164d99828dbc5dd9c8364389766cd4ff7fd/vignettes/seurat5_bpcells_interaction_vignette.Rmd>
+
+BPCells is an [R package](https://github.com/bnprks/BPCells) that allows for computationally efficient single-cell analysis. It utilizes bit-packing compression to store counts matrices on disk and C++ code to cache operations. 
+
+We leverage the high performance capabilities of BPCells to work with Seurat objects in memory while accessing the counts on disk. In this vignette, we show how to use BPCells to load data, work with a Seurat objects in a more memory-efficient way, and write out Seurat objects with BPCells matrices.
+
+We will show the methods for interacting with both a single dataset in one file or multiple datasets across multiple files using BPCells. BPCells allows us to easily analyze these large datasets in memory, and we encourage users to check out some of our other vignettes [here]() and [here]() to see further applications. 
+
+```{r install_bpcells, eval=FALSE}
+remotes::install_github("bnprks/BPCells/r")
+```
+
+```{r load_libraries}
+suppressPackageStartupMessages(library(BPCells))
+suppressPackageStartupMessages(library(Seurat))
+```
+
+We use BPCells functionality to both load in our data and write the counts layers to bitpacked compressed binary files on disk to improve computation speeds. BPCells has multiple functions for reading in files.
+
+# Load Data
+
+Download [1.3 Million Brain Cells from E18 Mice](https://support.10xgenomics.com/single-cell-gene-expression/datasets/1.3.0/1M_neurons?) (3.93 GB).
+
+```{r download_1m_neurons}
+my_url <- 'https://cf.10xgenomics.com/samples/cell-exp/1.3.0/1M_neurons/1M_neurons_filtered_gene_bc_matrices_h5.h5'
+my_file <- paste0("data/", basename(my_url))
+
+if(!file.exists(my_file)){
+  options(timeout = 10000)
+  download.file(url = my_url, destfile = my_file)
+}
+```
+
+## Load Data from one h5 file 
+
+In this section, we will load the 1.3 million brain cells dataset. We will use `BPCells::open_matrix_10x_hdf5()` that reads in feature matrices from 10x data. We then write a matrix directory, load the matrix, and create a Seurat object. 
+
+```{r brain_data}
+brain.data <- BPCells::open_matrix_10x_hdf5(path = my_file)
+brain.data
+
+# Write the matrix to a directory
+my_outdir <- "data/brain_counts"
+if(!dir.exists(my_outdir)){
+  BPCells::write_matrix_dir(
+    mat = brain.data,
+    dir = my_outdir
+  )
+}
+
+# Now that we have the matrix on disk, we can load it
+brain.mat <- open_matrix_dir(dir = my_outdir)
+brain.mat
+
+# Create Seurat Object
+brain <- CreateSeuratObject(
+  counts = brain.mat,
+  project = '1m_neurons'
+)
+brain
+```
+
+**What if I already have a Seurat Object?**
+
+You can use BPCells to convert the matrices in your already created Seurat objects to on-disk matrices. Note, that this is only possible for V5 assays. As an example, if you'd like to convert the counts matrix of your RNA assay to a BPCells matrix, you can use the following: 
+
+```{r, message=FALSE, warning=FALSE, eval=FALSE}
+obj <- readRDS("/path/to/reference.rds")
+
+# Write the counts layer to a directory
+write_matrix_dir(mat = obj[["RNA"]]$counts, dir = '/brahms/hartmana/vignette_data/bpcells/brain_counts')
+counts.mat <- open_matrix_dir(dir = "/brahms/hartmana/vignette_data/bpcells/brain_counts")
+
+obj[["RNA"]]$counts <- counts.mat
+```
+
+### Example Analysis
+
+Once this conversion is done, you can perform typical Seurat functions on the object. For example, we can normalize data and visualize features by automatically accessing the on-disk counts. 
+
+```{r normalise_data}
+brain <- NormalizeData(brain, normalization.method = "LogNormalize")
+brain
+```
+
+### Saving Seurat objects with on-disk layers
+
+If you save your object and load it in in the future, Seurat will access the on-disk matrices by their path, which is stored in the assay level data. To make it easy to ensure these are saved in the same place, we provide new functionality to the `SaveSeuratRds()` function. In this function, you specify your filename. The pointer to the path in the Seurat object will change to the current directory.
+
+This also makes it easy to share your Seurat objects with BPCells matrices by sharing a folder that contains both the object and the BPCells directory.
+
+```{r save_seurat_rds}
+SaveSeuratRds(
+  object = brain,
+  file = "data/seurat_1m_neuron.rds"
+)
+```
+
+If needed, a layer with an on-disk matrix can be converted to an in-memory matrix using the `as()` function. For the purposes of this demo, we'll subset the object so that it takes up less space in memory. 
+
+```{r brain_subset}
+brain_subset <- subset(brain, downsample = 1000)
+brain_subset[["RNA"]]$counts <- as(object = brain_subset[["RNA"]]$counts, Class = "dgCMatrix")
+brain_subset
+```
