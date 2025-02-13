@@ -1,0 +1,35 @@
+---
+title: "Pokedex for Cell Types"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+> The celldex package provides convenient access to several cell type reference datasets. Most of these references are derived from bulk RNA-seq or microarray data of cell populations that (hopefully) consist of a pure cell type after sorting and/or culturing. The aim is to provide a common resource for further analysis like cell type annotation of single cell expression data or deconvolution of cell type proportions in bulk expression datasets.
+
+## Installation
+
+Install [celldex](https://bioconductor.org/packages/3.20/data/experiment/html/celldex.html).
+
+```{r install_celldex, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("celldex")
+```
+
+## References
+
+We can examine the available references using the `surveyReferences()` function. This returns a DataFrame of the reference's name and version, along with additional information like the title, description, species, number of samples, available labels, and so on.
+
+```{r survey_references}
+suppressPackageStartupMessages(library(celldex))
+surveyReferences()
+```
