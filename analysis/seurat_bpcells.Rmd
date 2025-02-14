@@ -90,10 +90,72 @@ obj[["RNA"]]$counts <- counts.mat
 
 ### Example Analysis
 
+[Use fix](https://github.com/bnprks/BPCells/issues/78#issuecomment-2294319947) by Ben Parks, author of BPCells to overcome the error [Cannot convert BPcells matrix to dgcMatrix](https://github.com/bnprks/BPCells/issues/95).
+
+```
+Error in (function (cond) : error in evaluating the argument 'x' in selecting a method for function 'as.matrix': Error converting IterableMatrix to dgCMatrix
+* dgCMatrix objects cannot hold more than 2^31 non-zero entries
+* Input matrix has 2612254000 entries
+```
+
+```{r fixed_prep_dr5}
+fixed_PrepDR5 <- function(object, features = NULL, layer = 'scale.data', verbose = TRUE) {
+  layer <- layer[1L]
+  olayer <- layer
+  layer <- SeuratObject::Layers(object = object, search = layer)
+  if (is.null(layer)) {
+    abort(paste0("No layer matching pattern '", olayer, "' not found. Please run ScaleData and retry"))
+  }
+  data.use <- SeuratObject::LayerData(object = object, layer = layer)
+  features <- features %||% VariableFeatures(object = object)
+  if (!length(x = features)) {
+    stop("No variable features, run FindVariableFeatures() or provide a vector of features", call. = FALSE)
+  }
+  if (is(data.use, "IterableMatrix")) {
+    features.var <- BPCells::matrix_stats(matrix=data.use, row_stats="variance")$row_stats["variance",]
+  } else {
+    features.var <- apply(X = data.use, MARGIN = 1L, FUN = var)
+  }
+  features.keep <- features[features.var > 0]
+  if (!length(x = features.keep)) {
+    stop("None of the requested features have any variance", call. = FALSE)
+  } else if (length(x = features.keep) < length(x = features)) {
+    exclude <- setdiff(x = features, y = features.keep)
+    if (isTRUE(x = verbose)) {
+      warning(
+        "The following ",
+        length(x = exclude),
+        " features requested have zero variance; running reduction without them: ",
+        paste(exclude, collapse = ', '),
+        call. = FALSE,
+        immediate. = TRUE
+      )
+    }
+  }
+  features <- features.keep
+  features <- features[!is.na(x = features)]
+  features.use <- features[features %in% rownames(data.use)]
+  if(!isTRUE(all.equal(features, features.use))) {
+    missing_features <- setdiff(features, features.use)
+    if(length(missing_features) > 0) {
+    warning_message <- paste("The following features were not available: ",
+                             paste(missing_features, collapse = ", "),
+                             ".", sep = "")
+    warning(warning_message, immediate. = TRUE)
+    }
+  }
+  data.use <- data.use[features.use, ]
+  return(data.use)
+}
+
+assignInNamespace('PrepDR5', fixed_PrepDR5, 'Seurat')
+```
+
 Once this conversion is done, you can perform typical Seurat functions on the object. For example, we can normalize data and visualize features by automatically accessing the on-disk counts. 
 
-```{r seurat_workflow, error=TRUE}
+```{r seurat_workflow}
 debug_flag <- FALSE
+options(future.globals.maxSize = 1.5 * 1024^3)
 start_time <- Sys.time()
 
 brain <- NormalizeData(brain, normalization.method = "LogNormalize")
