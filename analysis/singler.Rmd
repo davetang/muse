@@ -1,0 +1,137 @@
+---
+title: "Reference-Based Single-Cell RNA-Seq Annotation"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+> Performs unbiased cell type recognition from single-cell RNA sequencing data, by leveraging reference transcriptomic datasets of pure cell types to infer the cell of origin of each single cell independently. 
+
+## Installation
+
+Install [SingleR](https://www.bioconductor.org/packages/release/bioc/html/SingleR.html).
+
+```{r install_packages, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("SingleR")
+BiocManager::install("scRNAseq")
+BiocManager::install("scuttle")
+BiocManager::install("scran")
+install.packages("viridis")
+install.packages("pheatmap")
+```
+
+## Vignette
+
+Following [Using SingleR to annotate single-cell RNA-seq data](https://www.bioconductor.org/packages/release/bioc/vignettes/SingleR/inst/doc/SingleR.html).
+
+> SingleR is an automatic annotation method for single-cell RNA sequencing (scRNAseq) data (Aran et al. 2019). Given a reference dataset of samples (single-cell or bulk) with known labels, it labels new cells from a test dataset based on similarity to the reference. Thus, the burden of manually interpreting clusters and defining marker genes only has to be done once, for the reference dataset, and this biological knowledge can be propagated to new datasets in an automated manner.
+
+> The easiest way to use SingleR is to annotate cells against built-in references. In particular, the celldex package provides access to several reference datasets (mostly derived from bulk RNA-seq or microarray data) through dedicated retrieval functions. Here, we will use the Human Primary Cell Atlas (Mabbott et al. 2013), represented as a SummarizedExperiment object containing a matrix of log-expression values with sample-level labels.
+
+```{r hpca_se}
+suppressPackageStartupMessages(library(celldex))
+hpca.se <- HumanPrimaryCellAtlasData()
+hpca.se
+```
+
+## Human Embryonic Stem Cells
+
+Our test dataset consists of some human embryonic stem cells (La Manno et al. 2016) from the scRNAseq package. For the sake of speed, we will only label the first 100 cells from this dataset.
+
+```{r hescs}
+suppressPackageStartupMessages(library(scRNAseq))
+hESCs <- LaMannoBrainData('human-es')
+hESCs <- hESCs[,1:100]
+```
+
+We use our hpca.se reference to annotate each cell in hESCs via the SingleR() function. This identifies marker genes from the reference and uses them to compute assignment scores (based on the Spearman correlation across markers) for each cell in the test dataset against each label in the reference. The label with the highest score is the assigned to the test cell, possibly with further fine-tuning to resolve closely related labels.
+
+```{r hesc_pred}
+suppressPackageStartupMessages(library(SingleR))
+pred.hesc <- SingleR(
+  test = hESCs,
+  ref = hpca.se,
+  assay.type.test=1,
+  labels = hpca.se$label.main
+)
+```
+
+Each row of the output DataFrame contains prediction results for a single cell. Labels are shown before (labels) and after pruning (pruned.labels), along with the associated scores.
+
+```{r glimpse_pred_hesc}
+pred.hesc
+```
+
+SingleR is workflow/package agnostic. The above example uses `SummarizedExperiment` objects, but the same functions will accept any (log-)normalized expression matrix.
+
+## Human pancreas
+
+Here, we will use two human pancreas datasets from the scRNAseq package. The aim is to use one pre-labelled dataset to annotate the other unlabelled dataset. First, we set up the Muraro et al. (2016) dataset to be our reference.
+
+```{r scem}
+suppressPackageStartupMessages(library(scuttle))
+sceM <- MuraroPancreasData()
+
+# One should normally do cell-based quality control at this point, but for
+# brevity's sake, we will just remove the unlabelled libraries here.
+sceM <- sceM[,!is.na(sceM$label)]
+
+# SingleR() expects reference datasets to be normalized and log-transformed.
+sceM <- logNormCounts(sceM)
+```
+
+We then set up our test dataset from Grun et al. (2016). To speed up this demonstration, we will subset to the first 100 cells.
+
+```{r sceg}
+sceG <- GrunPancreasData()
+sceG <- sceG[,colSums(counts(sceG)) > 0] # Remove libraries with no counts.
+sceG <- logNormCounts(sceG) 
+```
+
+We then run SingleR() as described previously but with a marker detection mode that considers the variance of expression across cells. Here, we will use the Wilcoxon ranked sum test to identify the top markers for each pairwise comparison between labels. This is slower but more appropriate for single-cell data compared to the default marker detection algorithm (which may fail for low-coverage data where the median is frequently zero).
+
+```{r grun_pred}
+pred.grun <- SingleR(
+  test=sceG,
+  ref=sceM,
+  labels=sceM$label,
+  de.method="wilcox"
+)
+table(pred.grun$labels)
+```
+
+## Annotation diagnostics
+
+`plotScoreHeatmap()` displays the scores for all cells across all reference labels, which allows users to inspect the confidence of the predicted labels across the dataset. Ideally, each cell (i.e., column of the heatmap) should have one score that is obviously larger than the rest, indicating that it is unambiguously assigned to a single label. A spread of similar scores for a given cell indicates that the assignment is uncertain, though this may be acceptable if the uncertainty is distributed across similar cell types that cannot be easily resolved.
+
+```{r plot_score_heatmap}
+plotScoreHeatmap(pred.grun)
+```
+
+Another diagnostic is based on the per-cell “deltas”, i.e., the difference between the score for the assigned label and the median across all labels for each cell. Low deltas indicate that the assignment is uncertain, which is especially relevant if the cell’s true label does not exist in the reference. We can inspect these deltas across cells for each label using the plotDeltaDistribution() function.
+
+```{r plot_delta_dist}
+plotDeltaDistribution(pred.grun, ncol = 3)
+```
+
+The `pruneScores()` function will remove potentially poor-quality or ambiguous assignments based on the deltas. The minimum threshold on the deltas is defined using an outlier-based approach that accounts for differences in the scale of the correlations in various contexts - see ?pruneScores for more details. SingleR() will also report the pruned scores automatically in the pruned.labels field where low-quality assignments are replaced with NA.
+
+```{r}
+summary(is.na(pred.grun$pruned.labels))
+```
+
+Finally, a simple yet effective diagnostic is to examine the expression of the marker genes for each label in the test dataset. We extract the identity of the markers from the metadata of the SingleR() results and use them in the plotMarkerHeatmap() function, as shown below for beta cell markers. If a cell in the test dataset is confidently assigned to a particular label, we would expect it to have strong expression of that label’s markers. At the very least, it should exhibit upregulation of those markers relative to cells assigned to other labels.
+
+```{r plot_marker_heatmap}
+plotMarkerHeatmap(pred.grun, sceG, label="beta")
+```
