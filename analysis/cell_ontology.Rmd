@@ -1,0 +1,73 @@
+---
+title: "Cell Ontology"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+From [Cell Ontology](https://obofoundry.org/ontology/cl.html) (CL):
+
+> Cell Ontology (CL) is an ontology designed to classify and describe cell types across different organisms. It serves as a resource for model organism and bioinformatics databases. The ontology covers a broad range of cell types in animal cells, with over 2700 cell type classes, and provides high-level cell type classes as mapping points for cell type classes in ontologies representing other species, such as the Plant Ontology or Drosophila Anatomy Ontology. Integration with other ontologies such as Uberon, GO, CHEBI, PR, and PATO enables linking cell types to anatomical structures, biological processes, and other relevant concepts.
+
+> The Cell Ontology was created in 2004 and has been a core OBO Foundry ontology since the start of the Foundry. Since then, CL has been adopted by various efforts, including the HuBMAP project, Human Cell Atlas (HCA), cellxgene platform, Single Cell Expression Atlas, BRAIN Initiative Cell Census Network (BICCN), ArrayExpress, The Cell Image Library, ENCODE, and FANTOM5, for annotating cell types and facilitating cellular reference mapping, as documented through various publications and examples.
+
+## Main CL OWL edition
+
+Complete ontology, plus inter-ontology axioms, and imports modules.
+
+```{r cl_owl}
+cl_url <- 'https://purl.obolibrary.org/obo/cl.obo'
+cl_obo <- paste0("data/", basename(cl_url))
+if(!file.exists(cl_obo)){
+  download.file(url = cl_url, destfile = cl_obo)
+}
+```
+
+## ontologyIndex
+
+Use {ontologyIndex} a package for reading Ontologies into R.
+
+```{r install_ontology_index, eval=FALSE}
+install.packages("ontologyIndex")
+```
+
+Load library.
+
+```{r load_ontology_index}
+suppressPackageStartupMessages(library(ontologyIndex))
+```
+
+### Reading in an OBO file
+
+The function `get_ontology()` can [read ontologies](https://cran.r-project.org/web/packages/ontologyIndex/vignettes/reading-ontologies.html) encoded in OBO format into R as `ontology_index` objects. By default, the properties id, name, obsolete, parents, children and ancestors are populated.
+
+```{r cl}
+cl <- get_ontology(cl_obo)
+cl
+```
+
+Structure.
+
+```{r cl_str}
+str(cl, max.level = 1)
+```
+
+Name.
+
+```{r cl_name}
+as.data.frame(cl$name) |>
+  head()
+```
+
+Look for T-cell.
+
+```{r t_cell}
+grep(pattern = "^t[- ]cell$", x = cl$name, ignore.case = TRUE, value = TRUE)
+```
