@@ -53,6 +53,21 @@ seurat_object@meta.data |>
   tail()
 ```
 
+## Merging
+
+Create one count layer.
+
+```{r join_layer}
+seurat_object_joined <- JoinLayers(seurat_object)
+seurat_object_joined
+```
+
+Tail of metadata.
+
+```{r joined_tail}
+seurat_object_joined@meta.data |>
+  tail()
+```
 
 ## Integration
 
