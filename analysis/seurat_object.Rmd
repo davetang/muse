@@ -26,7 +26,12 @@ Read HDF5 files into a list.
 
 ```{r hdf5_files}
 hdf5_files <- list.files(path = "data", pattern = "5k_Human", full.names = TRUE)
-mats <- purrr::map(hdf5_files, \(x) Seurat::Read10X_h5(x))
+
+mats <- purrr::map(seq_along(hdf5_files), function(x){
+  my_mat <- Seurat::Read10X_h5(hdf5_files[x])
+  colnames(my_mat) <- paste0('donor', x, '_', colnames(my_mat))
+  my_mat
+})
 str(mats, max.level = 1)
 ```
 
@@ -35,11 +40,54 @@ Create Seurat object using a list of matrices.
 ```{r seurat_object}
 seurat_object <- CreateSeuratObject(
   counts = mats,
-  project = "pbmc20k",
   min.cells = 3,
   min.features = 200
 )
 seurat_object
 ```
 
-Note the four different layers.
+Somehow `orig.ident` now has the donor information.
+
+```{r metadata}
+seurat_object@meta.data |>
+  tail()
+```
+
+
+## Integration
+
+[Integrative analysis in Seurat v5](https://satijalab.org/seurat/articles/seurat5_integration):
+
+> Integration of single-cell sequencing datasets, for example across experimental batches, donors, or conditions, is often an important step in scRNA-seq workflows. Integrative analysis can help to match shared cell types and states across datasets, which can boost statistical power, and most importantly, facilitate accurate comparative analysis across datasets.
+
+Process.
+
+```{r seurat_wf}
+verbose_mode <- FALSE
+seurat_object <- NormalizeData(seurat_object, verbose = verbose_mode)
+seurat_object <- FindVariableFeatures(seurat_object, verbose = verbose_mode)
+seurat_object <- ScaleData(seurat_object, verbose = verbose_mode)
+seurat_object <- RunPCA(seurat_object, verbose = verbose_mode)
+seurat_object <- FindNeighbors(seurat_object, dims = 1:30, reduction = "pca", verbose = verbose_mode)
+seurat_object <- FindClusters(seurat_object, resolution = 0.5, cluster.name = "unintegrated_clusters", verbose = verbose_mode)
+seurat_object <- RunUMAP(seurat_object, dims = 1:30, reduction = "pca", reduction.name = "umap.unintegrated", verbose = verbose_mode)
+DimPlot(seurat_object, reduction = "umap.unintegrated", group.by = "orig.ident")
+```
+
+Harmony integration.
+
+```{r harmony}
+seurat_object <- IntegrateLayers(
+  object = seurat_object,
+  method = HarmonyIntegration,
+  orig.reduction = "pca",
+  new.reduction = "harmony",
+  verbose = verbose_mode
+)
+
+seurat_object <- FindNeighbors(seurat_object, reduction = "harmony", dims = 1:30, verbose = verbose_mode)
+seurat_object <- FindClusters(seurat_object, resolution = 0.5, cluster.name = "harmony_clusters", verbose = verbose_mode)
+seurat_object <- RunUMAP(seurat_object, reduction = "harmony", dims = 1:30, reduction.name = "umap.harmony", verbose = verbose_mode)
+
+DimPlot(seurat_object, reduction = "umap.harmony", group.by = "orig.ident")
+```
