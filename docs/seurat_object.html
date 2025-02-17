@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebef6e9800e69abecf8988468d2a7139d85457e60targetblankbef6e98a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree58b172f4a48f4c8a8e468b369315236b18494cc5targetblank58b172fa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/bef6e9800e69abecf8988468d2a7139d85457e60" target="_blank">bef6e98</a>
+<a href="https://github.com/davetang/muse/tree/58b172f4a48f4c8a8e468b369315236b18494cc5" target="_blank">58b172f</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebef6e9800e69abecf8988468d2a7139d85457e60targetblankbef6e98a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree58b172f4a48f4c8a8e468b369315236b18494cc5targetblank58b172fa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/bef6e9800e69abecf8988468d2a7139d85457e60" target="_blank">bef6e98</a>.
+<a href="https://github.com/davetang/muse/tree/58b172f4a48f4c8a8e468b369315236b18494cc5" target="_blank">58b172f</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -618,6 +618,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/58b172f4a48f4c8a8e468b369315236b18494cc5/analysis/seurat_object.Rmd" target="_blank">58b172f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-17
+</td>
+<td>
+Join layers
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/30a9f5e59155034dde520ea19bdd02ab9b1843ea/docs/seurat_object.html" target="_blank">30a9f5e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -719,6 +753,26 @@ donor4_TGTGTACGTCAGCATT-1     donor4       8910         3003
 donor4_TGTGTTGAGATTGCTG-1     donor4      14597         3977
 donor4_TGTGTTGAGTTACGGC-1     donor4      12983         3316</code></pre>
 </div>
+<div id="merging" class="section level2">
+<h2>Merging</h2>
+<p>Create one count layer.</p>
+<pre class="r"><code>seurat_object_joined &lt;- JoinLayers(seurat_object)
+seurat_object_joined</code></pre>
+<pre><code>An object of class Seurat 
+27385 features across 22061 samples within 1 assay 
+Active assay: RNA (27385 features, 0 variable features)
+ 1 layer present: counts</code></pre>
+<p>Tail of metadata.</p>
+<pre class="r"><code>seurat_object_joined@meta.data |&gt;
+  tail()</code></pre>
+<pre><code>                          orig.ident nCount_RNA nFeature_RNA
+donor4_TGTGGTTGTGCGCAAG-1     donor4      13490         3701
+donor4_TGTGGTTGTTCGCACA-1     donor4       4686         1683
+donor4_TGTGGTTGTTGAGGCG-1     donor4       8545         2748
+donor4_TGTGTACGTCAGCATT-1     donor4       8910         3003
+donor4_TGTGTTGAGATTGCTG-1     donor4      14597         3977
+donor4_TGTGTTGAGTTACGGC-1     donor4      12983         3316</code></pre>
+</div>
 <div id="integration" class="section level2">
 <h2>Integration</h2>
 <p><a
@@ -746,6 +800,43 @@ To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and m
 This message will be shown once per session</code></pre>
 <pre class="r"><code>DimPlot(seurat_object, reduction = &quot;umap.unintegrated&quot;, group.by = &quot;orig.ident&quot;)</code></pre>
 <p><img src="figure/seurat_object.Rmd/seurat_wf-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-seurat_wf-1">
+Past versions of seurat_wf-1.png
+</button>
+</p>
+<div id="fig-seurat_wf-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/30a9f5e59155034dde520ea19bdd02ab9b1843ea/docs/figure/seurat_object.Rmd/seurat_wf-1.png" target="_blank">30a9f5e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-17
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Harmony integration.</p>
 <pre class="r"><code>seurat_object &lt;- IntegrateLayers(
   object = seurat_object,
@@ -777,6 +868,43 @@ seurat_object &lt;- RunUMAP(seurat_object, reduction = &quot;harmony&quot;, dims
 
 DimPlot(seurat_object, reduction = &quot;umap.harmony&quot;, group.by = &quot;orig.ident&quot;)</code></pre>
 <p><img src="figure/seurat_object.Rmd/harmony-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-harmony-1">
+Past versions of harmony-1.png
+</button>
+</p>
+<div id="fig-harmony-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/30a9f5e59155034dde520ea19bdd02ab9b1843ea/docs/figure/seurat_object.Rmd/harmony-1.png" target="_blank">30a9f5e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-17
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
