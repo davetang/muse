@@ -336,6 +336,8 @@ seurat_obj@meta.data$dataset <- c(
   rep("half", ncol(half))
 )
 
+options(future.globals.maxSize = 1.5 * 1024^3)
+
 seurat_obj <- SCTransform(seurat_obj) |>
   RunPCA(npcs = 20, verbose = FALSE)
 
