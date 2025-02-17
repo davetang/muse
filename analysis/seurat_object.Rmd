@@ -1,0 +1,45 @@
+---
+title: "Creating a Seurat object"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+Load {Seurat} and {hdf5r}.
+
+```{r load_seurat}
+suppressPackageStartupMessages(library("Seurat"))
+suppressPackageStartupMessages(library("hdf5r"))
+packageVersion("Seurat")
+```
+
+## Data
+
+Read HDF5 files into a list.
+
+```{r hdf5_files}
+hdf5_files <- list.files(path = "data", pattern = "5k_Human", full.names = TRUE)
+mats <- purrr::map(hdf5_files, \(x) Seurat::Read10X_h5(x))
+str(mats, max.level = 1)
+```
+
+Create Seurat object using a list of matrices.
+
+```{r seurat_object}
+seurat_object <- CreateSeuratObject(
+  counts = mats,
+  project = "pbmc20k",
+  min.cells = 3,
+  min.features = 200
+)
+seurat_object
+```
+
+Note the four different layers.
