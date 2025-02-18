@@ -30,7 +30,7 @@ suppressPackageStartupMessages(library(biomaRt))
 packageVersion("biomaRt")
 ```
 
-## Quick start
+## biomaRt
 
 Adapted from <https://www.biostars.org/p/446641/>.
 
@@ -49,12 +49,12 @@ rat_us_mart <- useEnsembl(
   dataset = "rnorvegicus_gene_ensembl"
 )
 
-my_genes <- c("Tll1", "Tlx3")
+rat_genes <- c("Tll1", "Tlx3")
 
 rat_to_human <- getLDS(
   attributes = c("rgd_symbol"), 
   filters = "rgd_symbol", 
-  values = my_genes, 
+  values = rat_genes, 
   mart = rat_us_mart, 
   attributesL = c("hgnc_symbol"), 
   martL = human_us_mart, 
@@ -62,4 +62,37 @@ rat_to_human <- getLDS(
 )
 
 rat_to_human
+```
+
+Expected output:
+
+```
+#>   RGD.symbol HGNC.symbol
+#> 1       Tll1        TLL1
+#> 2       Tlx3        TLX3
+```
+
+## homologene
+
+Install package.
+
+```{r install_homologene, eval=FALSE}
+install.packages("homologene")
+```
+
+Convert.
+
+```{r homologene_convert}
+suppressPackageStartupMessages(library(homologene))
+
+# Convert human genes to rat genes
+# 9606 = human
+# 10116 = rat
+human_genes <- homologene(
+  rat_genes,
+  inTax = 10116,
+  outTax = 9606
+)
+
+human_genes
 ```
