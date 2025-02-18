@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8edc91cae7e7dcc6e7bcc781267b1f4d926c43d8targetblank8edc91ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4aeedcb3fbac493d5e72a848a2192a6c8720ea16targetblank4aeedcba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/8edc91cae7e7dcc6e7bcc781267b1f4d926c43d8" target="_blank">8edc91c</a>
+<a href="https://github.com/davetang/muse/tree/4aeedcb3fbac493d5e72a848a2192a6c8720ea16" target="_blank">4aeedcb</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8edc91cae7e7dcc6e7bcc781267b1f4d926c43d8targetblank8edc91ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4aeedcb3fbac493d5e72a848a2192a6c8720ea16targetblank4aeedcba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/8edc91cae7e7dcc6e7bcc781267b1f4d926c43d8" target="_blank">8edc91c</a>.
+<a href="https://github.com/davetang/muse/tree/4aeedcb3fbac493d5e72a848a2192a6c8720ea16" target="_blank">4aeedcb</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -618,6 +618,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/4aeedcb3fbac493d5e72a848a2192a6c8720ea16/analysis/cross_species.Rmd" target="_blank">4aeedcb</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-18
+</td>
+<td>
+CD4 and CD8 markers
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/102d48a7e52157c8b04be838e540010352191b84/docs/cross_species.html" target="_blank">102d48a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -737,11 +771,9 @@ this translates to homology mapping.</p>
   biomart = &quot;ensembl&quot;,
   mirror = &quot;useast&quot;,
   dataset = &quot;hsapiens_gene_ensembl&quot;
-)</code></pre>
-<pre><code>Ensembl site unresponsive, trying asia mirror</code></pre>
-<pre><code>Ensembl site unresponsive, trying www mirror</code></pre>
-<pre><code>Error in .chooseEnsemblMirror(mirror = mirror, http_config = http_config): Unable to query any Ensembl site</code></pre>
-<pre class="r"><code>rat_us_mart &lt;- useEnsembl(
+)
+
+rat_us_mart &lt;- useEnsembl(
   biomart = &quot;ensembl&quot;,
   mirror = &quot;useast&quot;,
   dataset = &quot;rnorvegicus_gene_ensembl&quot;
@@ -758,7 +790,8 @@ rat_to_human &lt;- getLDS(
   martL = human_us_mart, 
   uniqueRows = TRUE
 )</code></pre>
-<pre><code>Error: object &#39;human_us_mart&#39; not found</code></pre>
+<pre><code>Error in `httr2::req_perform()`:
+! HTTP 502 Bad Gateway.</code></pre>
 <pre class="r"><code>rat_to_human</code></pre>
 <pre><code>Error: object &#39;rat_to_human&#39; not found</code></pre>
 <p>Expected output:</p>
@@ -801,6 +834,41 @@ human_genes</code></pre>
 <pre><code>  10116 10090 10116_ID 10090_ID
 1  Tll1  Tll1   678743    21892
 2  Tlx3  Tlx3   497881    27140</code></pre>
+<div id="marker-genes" class="section level3">
+<h3>Marker genes</h3>
+<p>Human CD4+ T cell markers.</p>
+<pre class="r"><code>cd4_markers &lt;- c(&quot;IL7R&quot;, &quot;MAL&quot;, &quot;LTB&quot;, &quot;CD4&quot;, &quot;LDHB&quot;, &quot;TPT1&quot;, &quot;TRAC&quot;, &quot;TMSB10&quot;, &quot;CD3D&quot;, &quot;CD3G&quot;)
+
+homologene(
+  cd4_markers,
+  outTax = 10116,
+  inTax = 9606
+)</code></pre>
+<pre><code>  9606 10116 9606_ID 10116_ID
+1 IL7R  Il7r    3575   294797
+2  MAL   Mal    4118    25263
+3  LTB   Ltb    4050   361795
+4  CD4   Cd4     920    24932
+5 LDHB  Ldhb    3945    24534
+6 TPT1  Tpt1    7178   116646
+7 CD3D  Cd3d     915    25710
+8 CD3G  Cd3g     917   300678</code></pre>
+<p>Human CD8+ T cell markers.</p>
+<pre class="r"><code>cd8_markers &lt;- c(&quot;CD8B&quot;, &quot;CD8A&quot;, &quot;CD3D&quot;, &quot;TMSB10&quot;, &quot;HCST&quot;, &quot;CD3G&quot;, &quot;LINC02446&quot;, &quot;CTSW&quot;, &quot;CD3E&quot;, &quot;TRAC&quot;)
+
+homologene(
+  cd8_markers,
+  outTax = 10116,
+  inTax = 9606
+)</code></pre>
+<pre><code>  9606 10116 9606_ID 10116_ID
+1 CD8B  Cd8b     926    24931
+2 CD8A  Cd8a     925    24930
+3 CD3D  Cd3d     915    25710
+4 HCST  Hcst   10870   474146
+5 CD3G  Cd3g     917   300678
+6 CTSW  Ctsw    1521   293676
+7 CD3E  Cd3e     916   315609</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -864,6 +932,7 @@ loaded via a namespace (and not attached):
 [73] xml2_1.3.6              BiocGenerics_0.52.0     rstudioapi_0.17.1      
 [76] jsonlite_1.8.9          R6_2.5.1                fs_1.6.4               
 [79] zlibbioc_1.52.0        </code></pre>
+</div>
 </div>
 </div>
 </div>
