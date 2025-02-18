@@ -80,9 +80,15 @@ Install package.
 install.packages("homologene")
 ```
 
-Convert.
+NCBI Taxonomy IDs:
 
-```{r homologene_convert}
+* Human: 9606
+* Mouse: 10090
+* Rat: 10116
+
+Convert from rat to human.
+
+```{r rat_to_human}
 suppressPackageStartupMessages(library(homologene))
 
 # Convert human genes to rat genes
@@ -95,4 +101,14 @@ human_genes <- homologene(
 )
 
 human_genes
+```
+
+Convert from rat to mouse.
+
+```{r rat_to_mouse}
+homologene(
+  rat_genes,
+  inTax = 10116,
+  outTax = 10090
+)
 ```
