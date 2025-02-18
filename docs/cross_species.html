@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree150017715c091fd49784e01d84894dab0df4d1eetargetblank1500177a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6edbb51db0fa505e955a652f7d283ee14356a8c3targetblank6edbb51a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/150017715c091fd49784e01d84894dab0df4d1ee" target="_blank">1500177</a>
+<a href="https://github.com/davetang/muse/tree/6edbb51db0fa505e955a652f7d283ee14356a8c3" target="_blank">6edbb51</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree150017715c091fd49784e01d84894dab0df4d1eetargetblank1500177a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6edbb51db0fa505e955a652f7d283ee14356a8c3targetblank6edbb51a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/150017715c091fd49784e01d84894dab0df4d1ee" target="_blank">1500177</a>.
+<a href="https://github.com/davetang/muse/tree/6edbb51db0fa505e955a652f7d283ee14356a8c3" target="_blank">6edbb51</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -623,6 +623,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/6edbb51db0fa505e955a652f7d283ee14356a8c3/analysis/cross_species.Rmd" target="_blank">6edbb51</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-18
+</td>
+<td>
+Use homologene
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/576dac1111bf4f631adaf931e9ca19d95f54140f/docs/cross_species.html" target="_blank">576dac1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-18
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/150017715c091fd49784e01d84894dab0df4d1ee/analysis/cross_species.Rmd" target="_blank">1500177</a>
 </td>
 <td>
@@ -657,8 +691,8 @@ BiocManager::install(&quot;biomaRt&quot;)</code></pre>
 packageVersion(&quot;biomaRt&quot;)</code></pre>
 <pre><code>[1] &#39;2.62.1&#39;</code></pre>
 </div>
-<div id="quick-start" class="section level2">
-<h2>Quick start</h2>
+<div id="biomart" class="section level2">
+<h2>biomaRt</h2>
 <p>Adapted from <a href="https://www.biostars.org/p/446641/"
 class="uri">https://www.biostars.org/p/446641/</a>.</p>
 <p><code>getLDS()</code> retrieves information from two linked datasets;
@@ -679,12 +713,12 @@ this translates to homology mapping.</p>
   dataset = &quot;rnorvegicus_gene_ensembl&quot;
 )
 
-my_genes &lt;- c(&quot;Tll1&quot;, &quot;Tlx3&quot;)
+rat_genes &lt;- c(&quot;Tll1&quot;, &quot;Tlx3&quot;)
 
 rat_to_human &lt;- getLDS(
   attributes = c(&quot;rgd_symbol&quot;), 
   filters = &quot;rgd_symbol&quot;, 
-  values = my_genes, 
+  values = rat_genes, 
   mart = rat_us_mart, 
   attributesL = c(&quot;hgnc_symbol&quot;), 
   martL = human_us_mart, 
@@ -693,6 +727,31 @@ rat_to_human &lt;- getLDS(
 <pre><code>Error: object &#39;human_us_mart&#39; not found</code></pre>
 <pre class="r"><code>rat_to_human</code></pre>
 <pre><code>Error: object &#39;rat_to_human&#39; not found</code></pre>
+<p>Expected output:</p>
+<pre><code>#&gt;   RGD.symbol HGNC.symbol
+#&gt; 1       Tll1        TLL1
+#&gt; 2       Tlx3        TLX3</code></pre>
+</div>
+<div id="homologene" class="section level2">
+<h2>homologene</h2>
+<p>Install package.</p>
+<pre class="r"><code>install.packages(&quot;homologene&quot;)</code></pre>
+<p>Convert.</p>
+<pre class="r"><code>suppressPackageStartupMessages(library(homologene))
+
+# Convert human genes to rat genes
+# 9606 = human
+# 10116 = rat
+human_genes &lt;- homologene(
+  rat_genes,
+  inTax = 10116,
+  outTax = 9606
+)
+
+human_genes</code></pre>
+<pre><code>  10116 9606 10116_ID 9606_ID
+1  Tll1 TLL1   678743    7092
+2  Tlx3 TLX3   497881   30012</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -725,7 +784,8 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] biomaRt_2.62.1  workflowr_1.7.1
+[1] homologene_1.4.68.19.3.27 biomaRt_2.62.1           
+[3] workflowr_1.7.1          
 
 loaded via a namespace (and not attached):
  [1] KEGGREST_1.46.0         xfun_0.48               bslib_0.8.0            
