@@ -1,0 +1,65 @@
+---
+title: "Convert gene symbols across species"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Installation
+
+To begin, install the {biomaRt} package.
+
+```{r install_biomart, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("biomaRt")
+```
+
+## Package
+
+Load package.
+
+```{r load_biomart}
+suppressPackageStartupMessages(library(biomaRt))
+packageVersion("biomaRt")
+```
+
+## Quick start
+
+Adapted from <https://www.biostars.org/p/446641/>.
+
+`getLDS()` retrieves information from two linked datasets; this function is the main {biomaRt} query function that links 2 datasets and retrieves information from these linked BioMart datasets. In Ensembl this translates to homology mapping.
+
+```{r quick_start, error=TRUE}
+human_us_mart <- useEnsembl(
+  biomart = "ensembl",
+  mirror = "useast",
+  dataset = "hsapiens_gene_ensembl"
+)
+
+rat_us_mart <- useEnsembl(
+  biomart = "ensembl",
+  mirror = "useast",
+  dataset = "rnorvegicus_gene_ensembl"
+)
+
+my_genes <- c("Tll1", "Tlx3")
+
+rat_to_human <- getLDS(
+  attributes = c("rgd_symbol"), 
+  filters = "rgd_symbol", 
+  values = my_genes, 
+  mart = rat_us_mart, 
+  attributesL = c("hgnc_symbol"), 
+  martL = human_us_mart, 
+  uniqueRows = TRUE
+)
+
+rat_to_human
+```
