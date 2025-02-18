@@ -112,3 +112,29 @@ homologene(
   outTax = 10090
 )
 ```
+
+### Marker genes
+
+Human CD4+ T cell markers.
+
+```{r cd4_markers}
+cd4_markers <- c("IL7R", "MAL", "LTB", "CD4", "LDHB", "TPT1", "TRAC", "TMSB10", "CD3D", "CD3G")
+
+homologene(
+  cd4_markers,
+  outTax = 10116,
+  inTax = 9606
+)
+```
+
+Human CD8+ T cell markers.
+
+```{r cd8_markers}
+cd8_markers <- c("CD8B", "CD8A", "CD3D", "TMSB10", "HCST", "CD3G", "LINC02446", "CTSW", "CD3E", "TRAC")
+
+homologene(
+  cd8_markers,
+  outTax = 10116,
+  inTax = 9606
+)
+```
