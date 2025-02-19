@@ -400,7 +400,7 @@ cd8_markers_found <- cd8_markers[cd8_markers %in% row.names(seurat_obj@assays$RN
 
 AddModuleScore(
   object = seurat_obj,
-  features = cd8_markers_found,
+  features = list(cd8_markers_found),
   name = 'cd8_markers'
 ) -> seurat_obj
 
