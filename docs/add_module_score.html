@@ -443,15 +443,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree640394d4757f152a8c82c492a70bd7ae3ccee149targetblank640394da">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea18365d2f729bcef2631f3875a2aae0a1b1bc21atargetblanka18365da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/640394d4757f152a8c82c492a70bd7ae3ccee149" target="_blank">640394d</a>
+<a href="https://github.com/davetang/muse/tree/a18365d2f729bcef2631f3875a2aae0a1b1bc21a" target="_blank">a18365d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree640394d4757f152a8c82c492a70bd7ae3ccee149targetblank640394da"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea18365d2f729bcef2631f3875a2aae0a1b1bc21atargetblanka18365da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +461,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/640394d4757f152a8c82c492a70bd7ae3ccee149" target="_blank">640394d</a>.
+<a href="https://github.com/davetang/muse/tree/a18365d2f729bcef2631f3875a2aae0a1b1bc21a" target="_blank">a18365d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -543,6 +543,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/a18365d2f729bcef2631f3875a2aae0a1b1bc21a/analysis/add_module_score.Rmd" target="_blank">a18365d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-19
+</td>
+<td>
+Remove clusters and check module scores
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/15d797cf48ba25e25b7c06f60f83d81261435d6a/docs/add_module_score.html" target="_blank">15d797c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -984,8 +1018,87 @@ rownames(x = features.scores.use) &lt;- colnames(x = object)
 object[[colnames(x = features.scores.use)]] &lt;- features.scores.use
 
 # Voila!
-FeaturePlot(object, features = &quot;cluster_4_markers1&quot;)</code></pre>
+FeaturePlot(object, features = &quot;cluster_4_markers1&quot;, label = TRUE)</code></pre>
 <p><img src="figure/add_module_score.Rmd/calculate_scores-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-calculate_scores-1">
+Past versions of calculate_scores-1.png
+</button>
+</p>
+<div id="fig-calculate_scores-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/15d797cf48ba25e25b7c06f60f83d81261435d6a/docs/figure/add_module_score.Rmd/calculate_scores-1.png" target="_blank">15d797c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-19
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Remove cluster 3 and 4.</p>
+<pre class="r"><code>seurat_obj@meta.data |&gt;
+  dplyr::filter(seurat_clusters != &quot;4&quot;, seurat_clusters != &quot;3&quot;) |&gt;
+  row.names() -&gt; wanted_cells
+
+seurat_obj_subset &lt;- CreateSeuratObject(
+  counts = pbmc.data[, wanted_cells],
+  min.cells = 3,
+  min.features = 200,
+  project = &quot;pbmc3k_subset&quot;
+)</code></pre>
+<pre><code>Warning: Feature names cannot have underscores (&#39;_&#39;), replacing with dashes
+(&#39;-&#39;)</code></pre>
+<pre class="r"><code>debug_flag &lt;- FALSE
+seurat_obj_subset &lt;- NormalizeData(seurat_obj_subset, normalization.method = &quot;LogNormalize&quot;, scale.factor = 1e4, verbose = debug_flag)
+seurat_obj_subset &lt;- FindVariableFeatures(seurat_obj_subset, selection.method = &#39;vst&#39;, nfeatures = 2000, verbose = debug_flag)
+seurat_obj_subset &lt;- ScaleData(seurat_obj_subset, verbose = debug_flag)
+seurat_obj_subset &lt;- RunPCA(seurat_obj_subset, verbose = debug_flag)
+seurat_obj_subset &lt;- RunUMAP(seurat_obj_subset, dims = 1:30, verbose = debug_flag)
+seurat_obj_subset &lt;- FindNeighbors(seurat_obj_subset, dims = 1:30, verbose = debug_flag)
+seurat_obj_subset &lt;- FindClusters(seurat_obj_subset, resolution = 0.5, verbose = debug_flag)
+
+seurat_obj_subset</code></pre>
+<pre><code>An object of class Seurat 
+13305 features across 2236 samples within 1 assay 
+Active assay: RNA (13305 features, 2000 variable features)
+ 3 layers present: counts, data, scale.data
+ 2 dimensional reductions calculated: pca, umap</code></pre>
+<p>Add module score.</p>
+<pre class="r"><code>AddModuleScore(
+  seurat_obj_subset,
+  features = list(cluster_4_markers),
+  name = &quot;cluster_4_markers&quot;
+) -&gt; seurat_obj_subset
+
+FeaturePlot(
+  seurat_obj_subset,
+  features = &quot;cluster_4_markers1&quot;,
+  label = TRUE,
+  repel = TRUE
+)</code></pre>
+<p><img src="figure/add_module_score.Rmd/add_module_score_subset-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Summary:</p>
 <ol style="list-style-type: decimal">
 <li>For all genes, get the average expression across all cells</li>
