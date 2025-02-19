@@ -3,7 +3,7 @@ title: "Seurat's AddModuleScore function"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
-    toc: true
+    toc: false
 ---
 
 ```{r setup, include=FALSE}
@@ -127,6 +127,7 @@ length(data.avg)
 
 # Order genes from lowest average expression to highest average expression
 data.avg <- data.avg[order(data.avg)]
+head(data.avg)
 
 # Use ggplot2's cut_number function to make n groups with (approximately) equal numbers of observations.
 # The 'rnorm(n = length(data.avg))/1e+30' part adds a tiny bit of noise to the data, presumably to break ties.
@@ -143,18 +144,20 @@ table(data.cut)
 names(x = data.cut) <- names(x = data.avg)
 head(data.cut)
 
-# Create an empty list the same length as the number of input gene sets. This will contain the names of the control genes
+# Create an empty list the same length as the number of input gene sets.
+# This will contain the names of the control genes
 ctrl.use <- vector(mode = "list", length = cluster.length)
-length(ctrl.use)
 
 # For each of the input gene lists:
 for (i in 1:cluster.length) {
   # Get the gene names from the input gene set as a character vector  
   features.use <- features[[i]]
   
-  # Loop through the provided genes (1:num_genes) and for each gene, find ctrl (default=100) genes from the same expression bin (by looking in data.cut):
+  # Loop through the provided genes (1:num_genes)
+  # for each gene, find ctrl (default=100) genes from the same expression bin (by looking in data.cut):
   for (j in 1:length(x = features.use)) {
-    # Within this loop, 'data.cut[features.use[j]]' gives us the expression bin number. We then sample `ctrl` genes from that bin without replacement and add the gene names to ctrl.use.
+    # Within this loop, 'data.cut[features.use[j]]' gives us the expression bin number.
+    # We then sample `ctrl` genes from that bin without replacement and add the gene names to ctrl.use.
     ctrl.use[[i]] <- c(
       ctrl.use[[i]],
       names(x = sample(
@@ -175,6 +178,8 @@ class(ctrl.use[[1]])
 
 # There should be length(features.use)*ctrl genes (i.e. 20*100):
 length(ctrl.use[[1]])
+
+head(ctrl.use[[1]])
 ```
 
 Explanatory plot.
@@ -211,15 +216,17 @@ Note how control genes are only selected from the bins in which the genes in our
 # Remove any repeated gene names - even though we set replace=FALSE when we sampled genes from the same expression bin, there may be more than two genes in our input gene list that fall in the same expression bin, so we can end up sampling the same gene more than once.
 ctrl.use <- lapply(X = ctrl.use, FUN = unique)
 
-
 ## Get control gene scores
 
-# Create an empty matrix with dimensions;
-  # number of rows equal to the number of gene sets (just one here)
-  # number of columns equal to number of cells in input Seurat object
-ctrl.scores <- matrix(data = numeric(length = 1L),
-                      nrow = length(x = ctrl.use),
-                      ncol = ncol(x = object))
+# Create an empty matrix with dimensions:
+#     number of rows equal to the number of gene sets (just one here)
+#     number of columns equal to number of cells in input Seurat object
+ctrl.scores <- matrix(
+  data = numeric(length = 1L),
+  nrow = length(x = ctrl.use),
+  ncol = ncol(x = object)
+)
+dim(ctrl.scores)
 
 # Loop through each provided gene set and add to the empty matrix the mean expression of the control genes in each cell
 for (i in 1:length(ctrl.use)) {
@@ -229,29 +236,34 @@ for (i in 1:length(ctrl.use)) {
   ctrl.scores[i, ] <- Matrix::colMeans(x = assay.data[features.use,])
 }
 
-
 ## Get scores for input gene sets
 
 # Similar to the above, create an empty matrix
-features.scores <- matrix(data = numeric(length = 1L),
-                          nrow = cluster.length,
-                          ncol = ncol(x = object))
+features.scores <- matrix(
+  data = numeric(length = 1L),
+  nrow = cluster.length,
+  ncol = ncol(x = object)
+)
+dim(features.scores)
 
 # Loop through input gene sets and calculate the mean expression of these genes for each cell
 for (i in 1:cluster.length) {
-    features.use <- features[[i]]
-    data.use <- assay.data[features.use, , drop = FALSE]
-    features.scores[i, ] <- Matrix::colMeans(x = data.use)
+  features.use <- features[[i]]
+  data.use <- assay.data[features.use, , drop = FALSE]
+  features.scores[i, ] <- Matrix::colMeans(x = data.use)
 }
 ```
 
-Now we have two matrices;
+Now we have two matrices:
 
 * `ctrl.scores` - contains the mean expression of the control genes for each cell
 * `features.scores` - contains the mean expression of the genes in the input gene set for each cell
 
-```{r}
-# Subtract the control scores from the feature scores - the idea is that if there is no enrichment of the genes in the geneset in a cell, then the result of this subtraction should be ~ 0
+Now to calculate the scores.
+
+```{r calculate_scores}
+# Subtract the control scores from the feature scores
+# the idea is that if there is no enrichment of the genes in the geneset in a cell, then the result of this subtraction should be ~ 0
 features.scores.use <- features.scores - ctrl.scores
 
 # Name the result the "name" variable + whatever the position the geneset was in the input list, e.g. "Cluster1"
@@ -269,3 +281,15 @@ object[[colnames(x = features.scores.use)]] <- features.scores.use
 # Voila!
 FeaturePlot(object, features = "cluster_4_markers1")
 ```
+
+Summary:
+
+1. For all genes, get the average expression across all cells
+2. Order genes from lowest average expression to highest average expression
+3. Create bins using `ggplot2::cut_number()`
+4. Create a control set by going through each gene in a gene set, and selecting 100 (default) genes that below in the same bin
+5. For each cell, calculate the mean expression of *all* of the control genes 
+6. For each cell, calculate the mean expression of *all* of the genes in a gene set
+7. Subtract the control means from the gene set means
+
+The idea is that if there is no enrichment of the genes in the geneset in a cell, then the score should be around 0.
