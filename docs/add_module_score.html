@@ -30,9 +30,6 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
-<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
-<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
-<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -235,69 +232,6 @@ $(document).ready(function () {
 
 
 
-<style type="text/css">
-
-#TOC {
-  margin: 25px 0px 20px 0px;
-}
-@media (max-width: 768px) {
-#TOC {
-  position: relative;
-  width: 100%;
-}
-}
-
-@media print {
-.toc-content {
-  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
-  float: right;
-}
-}
-
-.toc-content {
-  padding-left: 30px;
-  padding-right: 40px;
-}
-
-div.main-container {
-  max-width: 1200px;
-}
-
-div.tocify {
-  width: 20%;
-  max-width: 260px;
-  max-height: 85%;
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  div.tocify {
-    width: 25%;
-  }
-}
-
-@media (max-width: 767px) {
-  div.tocify {
-    width: 100%;
-    max-width: none;
-  }
-}
-
-.tocify ul, .tocify li {
-  line-height: 20px;
-}
-
-.tocify-subheader .tocify-item {
-  font-size: 0.90em;
-}
-
-.tocify .list-group-item {
-  border-radius: 0px;
-}
-
-
-</style>
-
-
 
 </head>
 
@@ -305,16 +239,6 @@ div.tocify {
 
 
 <div class="container-fluid main-container">
-
-
-<!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row">
-<div class="col-xs-12 col-sm-4 col-md-3">
-<div id="TOC" class="tocify">
-</div>
-</div>
-
-<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -519,15 +443,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree55128f25a5530080e9f5409d92b72668f4debddctargetblank55128f2a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree640394d4757f152a8c82c492a70bd7ae3ccee149targetblank640394da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/55128f25a5530080e9f5409d92b72668f4debddc" target="_blank">55128f2</a>
+<a href="https://github.com/davetang/muse/tree/640394d4757f152a8c82c492a70bd7ae3ccee149" target="_blank">640394d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree55128f25a5530080e9f5409d92b72668f4debddctargetblank55128f2a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree640394d4757f152a8c82c492a70bd7ae3ccee149targetblank640394da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +461,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/55128f25a5530080e9f5409d92b72668f4debddc" target="_blank">55128f2</a>.
+<a href="https://github.com/davetang/muse/tree/640394d4757f152a8c82c492a70bd7ae3ccee149" target="_blank">640394d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -624,6 +548,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/640394d4757f152a8c82c492a70bd7ae3ccee149/analysis/add_module_score.Rmd" target="_blank">640394d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-19
+</td>
+<td>
+Include a summary
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/99e85e12285d07661043d70d3271782c991e0071/docs/add_module_score.html" target="_blank">99e85e1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/55128f25a5530080e9f5409d92b72668f4debddc/analysis/add_module_score.Rmd" target="_blank">55128f2</a>
 </td>
 <td>
@@ -691,6 +649,43 @@ Active assay: RNA (13714 features, 2000 variable features)
 <p>UMAP.</p>
 <pre class="r"><code>DimPlot(seurat_obj, label = TRUE, repel = TRUE) + NoLegend()</code></pre>
 <p><img src="figure/add_module_score.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/99e85e12285d07661043d70d3271782c991e0071/docs/figure/add_module_score.Rmd/unnamed-chunk-2-1.png" target="_blank">99e85e1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-19
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Get top 20 genes enriched in cluster 4.</p>
 <pre class="r"><code>FindMarkers(seurat_obj, ident.1 = &quot;4&quot;, verbose = FALSE) |&gt;
   tibble::rownames_to_column(var = &quot;gene_symbol&quot;) |&gt;
@@ -711,6 +706,43 @@ FeaturePlot(
   repel = TRUE
 )</code></pre>
 <p><img src="figure/add_module_score.Rmd/add_module_score-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-add_module_score-1">
+Past versions of add_module_score-1.png
+</button>
+</p>
+<div id="fig-add_module_score-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/99e85e12285d07661043d70d3271782c991e0071/docs/figure/add_module_score.Rmd/add_module_score-1.png" target="_blank">99e85e1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-19
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p><a href="https://doi.org/10.1126/science.aad0501">Details of
 method</a> in the supplementary materials:</p>
 <ul>
@@ -764,8 +796,10 @@ length(data.avg)</code></pre>
 <pre><code>[1] 13714</code></pre>
 <pre class="r"><code># Order genes from lowest average expression to highest average expression
 data.avg &lt;- data.avg[order(data.avg)]
-
-# Use ggplot2&#39;s cut_number function to make n groups with (approximately) equal numbers of observations.
+head(data.avg)</code></pre>
+<pre><code>        CDC6       SHCBP1       VPREB1        ESCO2         LHFP          PBK 
+0.0007395302 0.0010637455 0.0010654207 0.0010927958 0.0011109484 0.0011122871 </code></pre>
+<pre class="r"><code># Use ggplot2&#39;s cut_number function to make n groups with (approximately) equal numbers of observations.
 # The &#39;rnorm(n = length(data.avg))/1e+30&#39; part adds a tiny bit of noise to the data, presumably to break ties.
 # similar to base R&#39;s cut function
 data.cut &lt;- ggplot2::cut_number(
@@ -785,18 +819,20 @@ names(x = data.cut) &lt;- names(x = data.avg)
 head(data.cut)</code></pre>
 <pre><code>  CDC6 SHCBP1 VPREB1  ESCO2   LHFP    PBK 
      1      1      1      1      1      1 </code></pre>
-<pre class="r"><code># Create an empty list the same length as the number of input gene sets. This will contain the names of the control genes
+<pre class="r"><code># Create an empty list the same length as the number of input gene sets.
+# This will contain the names of the control genes
 ctrl.use &lt;- vector(mode = &quot;list&quot;, length = cluster.length)
-length(ctrl.use)</code></pre>
-<pre><code>[1] 1</code></pre>
-<pre class="r"><code># For each of the input gene lists:
+
+# For each of the input gene lists:
 for (i in 1:cluster.length) {
   # Get the gene names from the input gene set as a character vector  
   features.use &lt;- features[[i]]
   
-  # Loop through the provided genes (1:num_genes) and for each gene, find ctrl (default=100) genes from the same expression bin (by looking in data.cut):
+  # Loop through the provided genes (1:num_genes)
+  # for each gene, find ctrl (default=100) genes from the same expression bin (by looking in data.cut):
   for (j in 1:length(x = features.use)) {
-    # Within this loop, &#39;data.cut[features.use[j]]&#39; gives us the expression bin number. We then sample `ctrl` genes from that bin without replacement and add the gene names to ctrl.use.
+    # Within this loop, &#39;data.cut[features.use[j]]&#39; gives us the expression bin number.
+    # We then sample `ctrl` genes from that bin without replacement and add the gene names to ctrl.use.
     ctrl.use[[i]] &lt;- c(
       ctrl.use[[i]],
       names(x = sample(
@@ -818,6 +854,8 @@ class(ctrl.use)</code></pre>
 <pre class="r"><code># There should be length(features.use)*ctrl genes (i.e. 20*100):
 length(ctrl.use[[1]])</code></pre>
 <pre><code>[1] 2000</code></pre>
+<pre class="r"><code>head(ctrl.use[[1]])</code></pre>
+<pre><code>[1] &quot;NOL7&quot;     &quot;SDHC&quot;     &quot;TNFRSF14&quot; &quot;RNPS1&quot;    &quot;SUPT4H1&quot;  &quot;CHMP2A&quot;  </code></pre>
 <p>Explanatory plot.</p>
 <pre class="r"><code># Plot the bins that have been created to split genes based on their average expression
 plot(data.avg, pch=16, ylab=&quot;Average expression across all cells&quot;, xlab=&quot;All genes, ranked&quot;)
@@ -843,22 +881,61 @@ legend(x = &quot;topleft&quot;,
        col = c(&quot;black&quot;, &quot;red&quot;, &quot;blue&quot;),
        pch = 16)</code></pre>
 <p><img src="figure/add_module_score.Rmd/explanatory_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-explanatory_plot-1">
+Past versions of explanatory_plot-1.png
+</button>
+</p>
+<div id="fig-explanatory_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/99e85e12285d07661043d70d3271782c991e0071/docs/figure/add_module_score.Rmd/explanatory_plot-1.png" target="_blank">99e85e1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-19
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Note how control genes are only selected from the bins in which the
 genes in our input list fall.</p>
 <pre class="r"><code># Remove any repeated gene names - even though we set replace=FALSE when we sampled genes from the same expression bin, there may be more than two genes in our input gene list that fall in the same expression bin, so we can end up sampling the same gene more than once.
 ctrl.use &lt;- lapply(X = ctrl.use, FUN = unique)
 
-
 ## Get control gene scores
 
-# Create an empty matrix with dimensions;
-  # number of rows equal to the number of gene sets (just one here)
-  # number of columns equal to number of cells in input Seurat object
-ctrl.scores &lt;- matrix(data = numeric(length = 1L),
-                      nrow = length(x = ctrl.use),
-                      ncol = ncol(x = object))
-
-# Loop through each provided gene set and add to the empty matrix the mean expression of the control genes in each cell
+# Create an empty matrix with dimensions:
+#     number of rows equal to the number of gene sets (just one here)
+#     number of columns equal to number of cells in input Seurat object
+ctrl.scores &lt;- matrix(
+  data = numeric(length = 1L),
+  nrow = length(x = ctrl.use),
+  ncol = ncol(x = object)
+)
+dim(ctrl.scores)</code></pre>
+<pre><code>[1]    1 2700</code></pre>
+<pre class="r"><code># Loop through each provided gene set and add to the empty matrix the mean expression of the control genes in each cell
 for (i in 1:length(ctrl.use)) {
   # Get control gene names as a vector  
   features.use &lt;- ctrl.use[[i]]
@@ -866,28 +943,32 @@ for (i in 1:length(ctrl.use)) {
   ctrl.scores[i, ] &lt;- Matrix::colMeans(x = assay.data[features.use,])
 }
 
-
 ## Get scores for input gene sets
 
 # Similar to the above, create an empty matrix
-features.scores &lt;- matrix(data = numeric(length = 1L),
-                          nrow = cluster.length,
-                          ncol = ncol(x = object))
-
-# Loop through input gene sets and calculate the mean expression of these genes for each cell
+features.scores &lt;- matrix(
+  data = numeric(length = 1L),
+  nrow = cluster.length,
+  ncol = ncol(x = object)
+)
+dim(features.scores)</code></pre>
+<pre><code>[1]    1 2700</code></pre>
+<pre class="r"><code># Loop through input gene sets and calculate the mean expression of these genes for each cell
 for (i in 1:cluster.length) {
-    features.use &lt;- features[[i]]
-    data.use &lt;- assay.data[features.use, , drop = FALSE]
-    features.scores[i, ] &lt;- Matrix::colMeans(x = data.use)
+  features.use &lt;- features[[i]]
+  data.use &lt;- assay.data[features.use, , drop = FALSE]
+  features.scores[i, ] &lt;- Matrix::colMeans(x = data.use)
 }</code></pre>
-<p>Now we have two matrices;</p>
+<p>Now we have two matrices:</p>
 <ul>
 <li><code>ctrl.scores</code> - contains the mean expression of the
 control genes for each cell</li>
 <li><code>features.scores</code> - contains the mean expression of the
 genes in the input gene set for each cell</li>
 </ul>
-<pre class="r"><code># Subtract the control scores from the feature scores - the idea is that if there is no enrichment of the genes in the geneset in a cell, then the result of this subtraction should be ~ 0
+<p>Now to calculate the scores.</p>
+<pre class="r"><code># Subtract the control scores from the feature scores
+# the idea is that if there is no enrichment of the genes in the geneset in a cell, then the result of this subtraction should be ~ 0
 features.scores.use &lt;- features.scores - ctrl.scores
 
 # Name the result the &quot;name&quot; variable + whatever the position the geneset was in the input list, e.g. &quot;Cluster1&quot;
@@ -904,7 +985,23 @@ object[[colnames(x = features.scores.use)]] &lt;- features.scores.use
 
 # Voila!
 FeaturePlot(object, features = &quot;cluster_4_markers1&quot;)</code></pre>
-<p><img src="figure/add_module_score.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/add_module_score.Rmd/calculate_scores-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Summary:</p>
+<ol style="list-style-type: decimal">
+<li>For all genes, get the average expression across all cells</li>
+<li>Order genes from lowest average expression to highest average
+expression</li>
+<li>Create bins using <code>ggplot2::cut_number()</code></li>
+<li>Create a control set by going through each gene in a gene set, and
+selecting 100 (default) genes that below in the same bin</li>
+<li>For each cell, calculate the mean expression of <em>all</em> of the
+control genes</li>
+<li>For each cell, calculate the mean expression of <em>all</em> of the
+genes in a gene set</li>
+<li>Subtract the control means from the gene set means</li>
+</ol>
+<p>The idea is that if there is no enrichment of the genes in the
+geneset in a cell, then the score should be around 0.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1008,8 +1105,6 @@ footer is added to webpages before the MathJax javascript. -->
 
 
 
-</div>
-</div>
 
 </div>
 
@@ -1042,35 +1137,6 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
-<script>
-$(document).ready(function ()  {
-
-    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
-    $('.unlisted.unnumbered').addClass('toc-ignore')
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = true;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
-</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
