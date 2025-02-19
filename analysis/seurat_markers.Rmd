@@ -47,8 +47,11 @@ tar -xzf pbmc3k_filtered_gene_bc_matrices.tar.gz
 Load 10x data into a matrix using `Read10X()`.
 
 ```{r read_10x}
+work_dir <- rprojroot::find_rstudio_root_file()
+data_dir <- paste0(work_dir, "/data/pbmc3k/filtered_gene_bc_matrices/hg19/")
+stopifnot(dir.exists(data_dir))
 pbmc.data <- Read10X(
-  data.dir = "data/pbmc3k/filtered_gene_bc_matrices/hg19/"
+  data.dir = data_dir
 )
 ```
 
@@ -80,6 +83,43 @@ seurat_obj <- FindNeighbors(seurat_obj, dims = 1:30, verbose = debug_flag)
 seurat_obj <- FindClusters(seurat_obj, resolution = 0.5, verbose = debug_flag)
 
 seurat_obj
+```
+
+## Known markers
+
+UMAP.
+
+```{r umap}
+DimPlot(seurat_obj, label = TRUE)
+```
+
+Known markers.
+
+```{r known_markers}
+known_markers <- tibble::tribble(
+  ~Label, ~`Expanded Label`, ~`OBO Ontology ID`, ~Markers,
+  "Mono", "Monocyte", "CL:0000576", "CTSS, FCN1, NEAT1, LYZ, PSAP, S100A9, AIF1, MNDA, SERPINA1, TYROBP",
+  "CD4 T", "CD4+ T cell", "CL:0000624", "IL7R, MAL, LTB, CD4, LDHB, TPT1, TRAC, TMSB10, CD3D, CD3G",
+  "CD8 T", "CD8+ T cell", "CL:0000625", "CD8B, CD8A, CD3D, TMSB10, HCST, CD3G, LINC02446, CTSW, CD3E, TRAC",
+  "NK", "natural killer cell", "CL:0000623", "NKG7, KLRD1, TYROBP, GNLY, FCER1G, PRF1, CD247, KLRF1, CST7, GZMB",
+  "B", "B cell", "CL:0000785", "CD79A, RALGPS2, CD79B, MS4A1, BANK1, CD74, TNFRSF13C, HLA-DQA1, IGHM, MEF2C",
+  "other T", "other T cell", "CL:0002419", "CD3D, TRDC, GZMK, KLRB1, NKG7, TRGC2, CST7, LYAR, KLRG1, GZMA",
+  "DC", "dendritic cell", "CL:0000451", "CD74, HLA-DPA1, HLA-DPB1, HLA-DQA1, CCDC88A, HLA-DRA, HLA-DMA, CST3, HLA-DQB1, HLA-DRB1"
+)
+
+known_markers
+```
+
+Plot CD8 markers.
+
+```{r cd8_markers, fig.width=8, fig.height=8}
+known_markers |>
+  dplyr::filter(Label == "CD8 T") |>
+  dplyr::pull(Markers) |>
+  stringr::str_split(pattern = ", ") |>
+  unlist() -> cd8_markers
+
+Seurat::FeaturePlot(seurat_obj, features = cd8_markers)
 ```
 
 ## Find all markers
@@ -299,7 +339,19 @@ The function [AddModuleScore()](https://satijalab.org/seurat/reference/addmodule
 
 > Calculate the average expression levels of each program (cluster) on single cell level, subtracted by the aggregated expression of control feature sets. All analyzed features are binned based on averaged expression, and the control features are randomly selected from each bin.
 
+Arguments:
+
+* `object` - Seurat object
+* `features` - A list of vectors of features for expression programs; each entry should be a vector of feature names
+* `pool` - List of features to check expression levels against, defaults to rownames(x = object)
+* `nbin` - Number of bins of aggregate expression levels for all analyzed features
 * `ctrl` - Number of control features selected from the same bin per analyzed feature
+* `k` - Use feature clusters returned from DoKMeans
+* `assay` - Name of assay to use
+* `name` - Name for the expression programs; will append a number to the end for each entry in features (eg. if features has three programs, the results will be stored as name1, name2, name3, respectively)
+* `seed` - Set a random seed. If NULL, seed is not set.
+* `search` - Search for symbol synonyms for features in features that don't match features in object? Searches the HGNC's gene names database; see UpdateSymbolList for more details
+* `slot` - Slot to calculate score values off of. Defaults to data slot (i.e log-normalized counts)
 
 ```{r add_module_score}
 pbmc_small_markers |>
@@ -339,8 +391,21 @@ cbind(
   facet_grid(~groups)
 ```
 
+### CD 8
 
+Add module score for CD 8 markers.
 
+```{r add_module_score_cd8}
+cd8_markers_found <- cd8_markers[cd8_markers %in% row.names(seurat_obj@assays$RNA$data)]
 
+AddModuleScore(
+  object = seurat_obj,
+  features = cd8_markers_found,
+  name = 'cd8_markers'
+) -> seurat_obj
 
-
+FeaturePlot(
+  seurat_obj,
+  features = "cd8_markers1", label = TRUE, repel = TRUE
+)
+```
