@@ -279,7 +279,50 @@ rownames(x = features.scores.use) <- colnames(x = object)
 object[[colnames(x = features.scores.use)]] <- features.scores.use
 
 # Voila!
-FeaturePlot(object, features = "cluster_4_markers1")
+FeaturePlot(object, features = "cluster_4_markers1", label = TRUE)
+```
+
+Remove cluster 3 and 4.
+
+```{r seurat_obj_subset}
+seurat_obj@meta.data |>
+  dplyr::filter(seurat_clusters != "4", seurat_clusters != "3") |>
+  row.names() -> wanted_cells
+
+seurat_obj_subset <- CreateSeuratObject(
+  counts = pbmc.data[, wanted_cells],
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k_subset"
+)
+
+debug_flag <- FALSE
+seurat_obj_subset <- NormalizeData(seurat_obj_subset, normalization.method = "LogNormalize", scale.factor = 1e4, verbose = debug_flag)
+seurat_obj_subset <- FindVariableFeatures(seurat_obj_subset, selection.method = 'vst', nfeatures = 2000, verbose = debug_flag)
+seurat_obj_subset <- ScaleData(seurat_obj_subset, verbose = debug_flag)
+seurat_obj_subset <- RunPCA(seurat_obj_subset, verbose = debug_flag)
+seurat_obj_subset <- RunUMAP(seurat_obj_subset, dims = 1:30, verbose = debug_flag)
+seurat_obj_subset <- FindNeighbors(seurat_obj_subset, dims = 1:30, verbose = debug_flag)
+seurat_obj_subset <- FindClusters(seurat_obj_subset, resolution = 0.5, verbose = debug_flag)
+
+seurat_obj_subset
+```
+
+Add module score.
+
+```{r add_module_score_subset}
+AddModuleScore(
+  seurat_obj_subset,
+  features = list(cluster_4_markers),
+  name = "cluster_4_markers"
+) -> seurat_obj_subset
+
+FeaturePlot(
+  seurat_obj_subset,
+  features = "cluster_4_markers1",
+  label = TRUE,
+  repel = TRUE
+)
 ```
 
 Summary:
