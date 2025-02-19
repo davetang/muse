@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2025-02-19" />
+
+<title>Seurat’s AddModuleScore function</title>
+
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Seurat’s AddModuleScore function</h1>
+<h4 class="date">2025-02-19</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2025-02-19
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree55128f25a5530080e9f5409d92b72668f4debddctargetblank55128f2a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/55128f25a5530080e9f5409d92b72668f4debddc" target="_blank">55128f2</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree55128f25a5530080e9f5409d92b72668f4debddctargetblank55128f2a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/55128f25a5530080e9f5409d92b72668f4debddc" target="_blank">55128f2</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.4.1/
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/add_module_score.Rmd</code>) and
+HTML (<code>docs/add_module_score.html</code>) files. If you’ve
+configured a remote Git repository (see <code>?wflow_git_remote</code>),
+click on the hyperlinks in the table below to view the files as they
+were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/55128f25a5530080e9f5409d92b72668f4debddc/analysis/add_module_score.Rmd" target="_blank">55128f2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-19
+</td>
+<td>
+Seurat’s add module score
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>A bastardisation of Walter Muskovic’s blog post <a
+href="https://www.waltermuskovic.com/2021/04/15/seurat-s-addmodulescore-function/">Seurat’s
+AddModuleScore function</a> (my apologies).</p>
+<p>Load packages.</p>
+<pre class="r"><code>suppressPackageStartupMessages(library(&quot;Seurat&quot;))
+suppressPackageStartupMessages(library(&quot;ggplot2&quot;))</code></pre>
+<p>Download the Peripheral Blood Mononuclear Cells (PBMCs) 2,700 cells
+dataset.</p>
+<pre class="bash"><code>mkdir -p data/pbmc3k &amp;&amp; cd data/pbmc3k
+wget -c https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz
+tar -xzf pbmc3k_filtered_gene_bc_matrices.tar.gz</code></pre>
+<p>Create Seurat object.</p>
+<pre class="r"><code>work_dir &lt;- rprojroot::find_rstudio_root_file()
+data_dir &lt;- paste0(work_dir, &quot;/data/pbmc3k/filtered_gene_bc_matrices/hg19/&quot;)
+stopifnot(dir.exists(data_dir))
+pbmc.data &lt;- Read10X(
+  data.dir = data_dir
+)
+
+seurat_obj &lt;- CreateSeuratObject(
+  counts = pbmc.data,
+  min.cells = 3,
+  min.features = 200,
+  project = &quot;pbmc3k&quot;
+)</code></pre>
+<pre><code>Warning: Feature names cannot have underscores (&#39;_&#39;), replacing with dashes
+(&#39;-&#39;)</code></pre>
+<pre class="r"><code>debug_flag &lt;- FALSE
+seurat_obj &lt;- NormalizeData(seurat_obj, normalization.method = &quot;LogNormalize&quot;, scale.factor = 1e4, verbose = debug_flag)
+seurat_obj &lt;- FindVariableFeatures(seurat_obj, selection.method = &#39;vst&#39;, nfeatures = 2000, verbose = debug_flag)
+seurat_obj &lt;- ScaleData(seurat_obj, verbose = debug_flag)
+seurat_obj &lt;- RunPCA(seurat_obj, verbose = debug_flag)
+seurat_obj &lt;- RunUMAP(seurat_obj, dims = 1:30, verbose = debug_flag)</code></pre>
+<pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
+This message will be shown once per session</code></pre>
+<pre class="r"><code>seurat_obj &lt;- FindNeighbors(seurat_obj, dims = 1:30, verbose = debug_flag)
+seurat_obj &lt;- FindClusters(seurat_obj, resolution = 0.5, verbose = debug_flag)
+
+seurat_obj</code></pre>
+<pre><code>An object of class Seurat 
+13714 features across 2700 samples within 1 assay 
+Active assay: RNA (13714 features, 2000 variable features)
+ 3 layers present: counts, data, scale.data
+ 2 dimensional reductions calculated: pca, umap</code></pre>
+<p>UMAP.</p>
+<pre class="r"><code>DimPlot(seurat_obj, label = TRUE, repel = TRUE) + NoLegend()</code></pre>
+<p><img src="figure/add_module_score.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Get top 20 genes enriched in cluster 4.</p>
+<pre class="r"><code>FindMarkers(seurat_obj, ident.1 = &quot;4&quot;, verbose = FALSE) |&gt;
+  tibble::rownames_to_column(var = &quot;gene_symbol&quot;) |&gt;
+  head(20) |&gt;
+  dplyr::pull(gene_symbol) -&gt; cluster_4_markers</code></pre>
+<p>Add module score; <strong>it is very important that features are
+provided as a list</strong>.</p>
+<pre class="r"><code>AddModuleScore(
+  seurat_obj,
+  features = list(cluster_4_markers),
+  name = &quot;cluster_4_markers&quot;
+) -&gt; seurat_obj
+
+FeaturePlot(
+  seurat_obj,
+  features = &quot;cluster_4_markers1&quot;,
+  label = TRUE,
+  repel = TRUE
+)</code></pre>
+<p><img src="figure/add_module_score.Rmd/add_module_score-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><a href="https://doi.org/10.1126/science.aad0501">Details of
+method</a> in the supplementary materials:</p>
+<ul>
+<li>The top 100 MITF-correlated genes across the entire set of malignant
+cells were defined as the MITF program, and their average relative
+expression as the MITF-program cell score.</li>
+<li>The average expression of the top 100 genes that negatively
+correlate with the MITF program scores were defined as the AXL program
+and used to define AXL program cell score.</li>
+<li>To decrease the effect that the quality and complexity of each
+cell’s data might have on its MITF/AXL scores we defined control
+gene-sets and their average relative expression as control scores, for
+both the MITF and AXL programs.</li>
+<li>These control cell scores were subtracted from the respective
+MITF/AXL cell scores.</li>
+<li>The control gene-sets were defined by first binning all analyzed
+genes into 25 bins of aggregate expression levels and then, for each
+gene in the MITF/AXL gene-set, randomly selecting 100 genes from the
+same expression bin as that gene.</li>
+<li>In this way, a control gene-sets have a comparable distribution of
+expression levels to that of the MITF/AXL gene-set and the control gene
+set is 100-fold larger, such that its average expression is analogous to
+averaging over 100 randomly-selected gene-sets of the same size as the
+MITF/AXL gene-set.</li>
+</ul>
+<p>Implementation in Seurat.</p>
+<pre class="r"><code>object &lt;- seurat_obj
+features &lt;- list(cluster_4_markers)
+pool &lt;- rownames(seurat_obj)
+nbin &lt;- 24
+ctrl &lt;- 100
+k &lt;- FALSE
+name = &quot;cluster_4_markers&quot;
+seed = 1
+
+# Find how many gene lists were provided. In this case just one.
+cluster.length &lt;- length(x = features)
+cluster.length</code></pre>
+<pre><code>[1] 1</code></pre>
+<pre class="r"><code># Pull the expression data from the provided Seurat object
+# uses DefaultAssay()
+# default is the data layer, by order
+assay.data &lt;- GetAssayData(object = object)
+class(assay.data)</code></pre>
+<pre><code>[1] &quot;dgCMatrix&quot;
+attr(,&quot;package&quot;)
+[1] &quot;Matrix&quot;</code></pre>
+<pre class="r"><code># For all genes, get the average expression across all cells (named vector)
+data.avg &lt;- Matrix::rowMeans(x = assay.data[pool, ])
+length(data.avg)</code></pre>
+<pre><code>[1] 13714</code></pre>
+<pre class="r"><code># Order genes from lowest average expression to highest average expression
+data.avg &lt;- data.avg[order(data.avg)]
+
+# Use ggplot2&#39;s cut_number function to make n groups with (approximately) equal numbers of observations.
+# The &#39;rnorm(n = length(data.avg))/1e+30&#39; part adds a tiny bit of noise to the data, presumably to break ties.
+# similar to base R&#39;s cut function
+data.cut &lt;- ggplot2::cut_number(
+  x = data.avg + rnorm(n = length(data.avg))/1e+30,
+  n = nbin,
+  labels = FALSE,
+  right = FALSE
+)
+table(data.cut)</code></pre>
+<pre><code>data.cut
+  1   2   3   4   5   6   7   8   9  10  11  12  13  14  15  16  17  18  19  20 
+572 571 572 571 571 572 571 571 572 571 572 571 571 572 571 571 572 571 572 571 
+ 21  22  23  24 
+571 572 571 572 </code></pre>
+<pre class="r"><code># Set the names of the cuts as the gene names
+names(x = data.cut) &lt;- names(x = data.avg)
+head(data.cut)</code></pre>
+<pre><code>  CDC6 SHCBP1 VPREB1  ESCO2   LHFP    PBK 
+     1      1      1      1      1      1 </code></pre>
+<pre class="r"><code># Create an empty list the same length as the number of input gene sets. This will contain the names of the control genes
+ctrl.use &lt;- vector(mode = &quot;list&quot;, length = cluster.length)
+length(ctrl.use)</code></pre>
+<pre><code>[1] 1</code></pre>
+<pre class="r"><code># For each of the input gene lists:
+for (i in 1:cluster.length) {
+  # Get the gene names from the input gene set as a character vector  
+  features.use &lt;- features[[i]]
+  
+  # Loop through the provided genes (1:num_genes) and for each gene, find ctrl (default=100) genes from the same expression bin (by looking in data.cut):
+  for (j in 1:length(x = features.use)) {
+    # Within this loop, &#39;data.cut[features.use[j]]&#39; gives us the expression bin number. We then sample `ctrl` genes from that bin without replacement and add the gene names to ctrl.use.
+    ctrl.use[[i]] &lt;- c(
+      ctrl.use[[i]],
+      names(x = sample(
+        x = data.cut[which(x = data.cut == data.cut[features.use[j]])],
+        size = ctrl,
+        replace = FALSE)
+      )
+    )
+  }
+}
+
+# Have a quick look at what&#39;s in ctrl.use:
+class(ctrl.use)</code></pre>
+<pre><code>[1] &quot;list&quot;</code></pre>
+<pre class="r"><code>length(ctrl.use)</code></pre>
+<pre><code>[1] 1</code></pre>
+<pre class="r"><code>class(ctrl.use[[1]])</code></pre>
+<pre><code>[1] &quot;character&quot;</code></pre>
+<pre class="r"><code># There should be length(features.use)*ctrl genes (i.e. 20*100):
+length(ctrl.use[[1]])</code></pre>
+<pre><code>[1] 2000</code></pre>
+<p>Explanatory plot.</p>
+<pre class="r"><code># Plot the bins that have been created to split genes based on their average expression
+plot(data.avg, pch=16, ylab=&quot;Average expression across all cells&quot;, xlab=&quot;All genes, ranked&quot;)
+
+for(i in unique(data.cut)){
+  cut_pos &lt;- which(data.cut==i)
+  if(i%%2==0){
+    rect(xleft = cut_pos[1], ybottom = min(data.avg), xright = cut_pos[length(cut_pos)], ytop = max(data.avg), col=scales::alpha(&quot;grey&quot;, 0.3))
+  } else {
+    rect(xleft = cut_pos[1], ybottom = min(data.avg), xright = cut_pos[length(cut_pos)], ytop = max(data.avg), col=scales::alpha(&quot;white&quot;, 0.3))
+  }
+}
+
+# Add red points for selected control genes
+points(which(names(data.avg)%in%ctrl.use[[1]]), data.avg[which(names(data.avg)%in%ctrl.use[[1]])], pch=16, col=&quot;red&quot;)
+
+# Add blue points for genes in the input gene list
+points(which(names(data.avg)%in%features[[1]]), data.avg[which(names(data.avg)%in%features[[1]])], pch=16, col=&quot;blue&quot;)
+
+# Add a legend
+legend(x = &quot;topleft&quot;,
+       legend = c(&quot;gene&quot;, &quot;selected control gene&quot;, &quot;gene in geneset&quot;),
+       col = c(&quot;black&quot;, &quot;red&quot;, &quot;blue&quot;),
+       pch = 16)</code></pre>
+<p><img src="figure/add_module_score.Rmd/explanatory_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Note how control genes are only selected from the bins in which the
+genes in our input list fall.</p>
+<pre class="r"><code># Remove any repeated gene names - even though we set replace=FALSE when we sampled genes from the same expression bin, there may be more than two genes in our input gene list that fall in the same expression bin, so we can end up sampling the same gene more than once.
+ctrl.use &lt;- lapply(X = ctrl.use, FUN = unique)
+
+
+## Get control gene scores
+
+# Create an empty matrix with dimensions;
+  # number of rows equal to the number of gene sets (just one here)
+  # number of columns equal to number of cells in input Seurat object
+ctrl.scores &lt;- matrix(data = numeric(length = 1L),
+                      nrow = length(x = ctrl.use),
+                      ncol = ncol(x = object))
+
+# Loop through each provided gene set and add to the empty matrix the mean expression of the control genes in each cell
+for (i in 1:length(ctrl.use)) {
+  # Get control gene names as a vector  
+  features.use &lt;- ctrl.use[[i]]
+  # For each cell, calculate the mean expression of *all* of the control genes 
+  ctrl.scores[i, ] &lt;- Matrix::colMeans(x = assay.data[features.use,])
+}
+
+
+## Get scores for input gene sets
+
+# Similar to the above, create an empty matrix
+features.scores &lt;- matrix(data = numeric(length = 1L),
+                          nrow = cluster.length,
+                          ncol = ncol(x = object))
+
+# Loop through input gene sets and calculate the mean expression of these genes for each cell
+for (i in 1:cluster.length) {
+    features.use &lt;- features[[i]]
+    data.use &lt;- assay.data[features.use, , drop = FALSE]
+    features.scores[i, ] &lt;- Matrix::colMeans(x = data.use)
+}</code></pre>
+<p>Now we have two matrices;</p>
+<ul>
+<li><code>ctrl.scores</code> - contains the mean expression of the
+control genes for each cell</li>
+<li><code>features.scores</code> - contains the mean expression of the
+genes in the input gene set for each cell</li>
+</ul>
+<pre class="r"><code># Subtract the control scores from the feature scores - the idea is that if there is no enrichment of the genes in the geneset in a cell, then the result of this subtraction should be ~ 0
+features.scores.use &lt;- features.scores - ctrl.scores
+
+# Name the result the &quot;name&quot; variable + whatever the position the geneset was in the input list, e.g. &quot;Cluster1&quot;
+rownames(x = features.scores.use) &lt;- paste0(name, 1:cluster.length)
+
+# Change the matrix from wide to long
+features.scores.use &lt;- as.data.frame(x = t(x = features.scores.use))
+
+# Give the rows of the matrix, the names of the cells
+rownames(x = features.scores.use) &lt;- colnames(x = object)
+
+# Add the result as a metadata column to the input Seurat object 
+object[[colnames(x = features.scores.use)]] &lt;- features.scores.use
+
+# Voila!
+FeaturePlot(object, features = &quot;cluster_4_markers1&quot;)</code></pre>
+<p><img src="figure/add_module_score.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.4.1 (2024-06-14)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.5 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggplot2_3.5.1      Seurat_5.1.0       SeuratObject_5.0.2 sp_2.1-4          
+[5] workflowr_1.7.1   
+
+loaded via a namespace (and not attached):
+  [1] RColorBrewer_1.1-3     rstudioapi_0.17.1      jsonlite_1.8.9        
+  [4] magrittr_2.0.3         spatstat.utils_3.1-0   farver_2.1.2          
+  [7] rmarkdown_2.28         fs_1.6.4               vctrs_0.6.5           
+ [10] ROCR_1.0-11            spatstat.explore_3.3-3 htmltools_0.5.8.1     
+ [13] sass_0.4.9             sctransform_0.4.1      parallelly_1.38.0     
+ [16] KernSmooth_2.23-24     bslib_0.8.0            htmlwidgets_1.6.4     
+ [19] ica_1.0-3              plyr_1.8.9             plotly_4.10.4         
+ [22] zoo_1.8-12             cachem_1.1.0           whisker_0.4.1         
+ [25] igraph_2.1.1           mime_0.12              lifecycle_1.0.4       
+ [28] pkgconfig_2.0.3        Matrix_1.7-0           R6_2.5.1              
+ [31] fastmap_1.2.0          fitdistrplus_1.2-1     future_1.34.0         
+ [34] shiny_1.9.1            digest_0.6.37          colorspace_2.1-1      
+ [37] patchwork_1.3.0        ps_1.8.1               rprojroot_2.0.4       
+ [40] tensor_1.5             RSpectra_0.16-2        irlba_2.3.5.1         
+ [43] labeling_0.4.3         progressr_0.15.0       fansi_1.0.6           
+ [46] spatstat.sparse_3.1-0  httr_1.4.7             polyclip_1.10-7       
+ [49] abind_1.4-8            compiler_4.4.1         withr_3.0.2           
+ [52] fastDummies_1.7.4      highr_0.11             R.utils_2.12.3        
+ [55] MASS_7.3-60.2          tools_4.4.1            lmtest_0.9-40         
+ [58] httpuv_1.6.15          future.apply_1.11.3    goftest_1.2-3         
+ [61] R.oo_1.26.0            glue_1.8.0             callr_3.7.6           
+ [64] nlme_3.1-164           promises_1.3.0         grid_4.4.1            
+ [67] Rtsne_0.17             getPass_0.2-4          cluster_2.1.6         
+ [70] reshape2_1.4.4         generics_0.1.3         gtable_0.3.6          
+ [73] spatstat.data_3.1-2    R.methodsS3_1.8.2      tidyr_1.3.1           
+ [76] data.table_1.16.2      utf8_1.2.4             spatstat.geom_3.3-3   
+ [79] RcppAnnoy_0.0.22       ggrepel_0.9.6          RANN_2.6.2            
+ [82] pillar_1.9.0           stringr_1.5.1          limma_3.62.2          
+ [85] spam_2.11-0            RcppHNSW_0.6.0         later_1.3.2           
+ [88] splines_4.4.1          dplyr_1.1.4            lattice_0.22-6        
+ [91] survival_3.6-4         deldir_2.0-4           tidyselect_1.2.1      
+ [94] miniUI_0.1.1.1         pbapply_1.7-2          knitr_1.48            
+ [97] git2r_0.35.0           gridExtra_2.3          scattermore_1.2       
+[100] xfun_0.48              statmod_1.5.0          matrixStats_1.4.1     
+[103] stringi_1.8.4          lazyeval_0.2.2         yaml_2.3.10           
+[106] evaluate_1.0.1         codetools_0.2-20       tibble_3.2.1          
+[109] cli_3.6.3              uwot_0.2.2             xtable_1.8-4          
+[112] reticulate_1.39.0      munsell_0.5.1          processx_3.8.4        
+[115] jquerylib_0.1.4        Rcpp_1.0.13            globals_0.16.3        
+[118] spatstat.random_3.3-2  png_0.1-8              spatstat.univar_3.0-1 
+[121] parallel_4.4.1         presto_1.0.0           dotCall64_1.2         
+[124] listenv_0.9.1          viridisLite_0.4.2      scales_1.3.0          
+[127] ggridges_0.5.6         leiden_0.4.3.1         purrr_1.0.2           
+[130] rlang_1.1.4            cowplot_1.1.3         </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
