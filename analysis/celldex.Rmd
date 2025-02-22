@@ -33,3 +33,15 @@ We can examine the available references using the `surveyReferences()` function.
 suppressPackageStartupMessages(library(celldex))
 surveyReferences()
 ```
+
+### Monaco reference
+
+The [Monaco reference](https://bioconductor.org/packages/3.20/data/experiment/vignettes/celldex/inst/doc/userguide.html#44_Monaco_immune_data) consists of bulk RNA-seq samples of sorted immune cell populations from GSE107011 (Monaco et al. 2019).
+
+This is the human immune reference that best covers all of the bases for a typical PBMC sample. It provides expansive B and T cell subsets, differentiates between classical and non-classical monocytes, includes basic dendritic cell subsets, and also includes neutrophil and basophil samples to help identify small contaminating populations that may have slipped into a PBMC preparation.
+
+```{r monaco_immune}
+monaco_immune <- fetchReference("monaco_immune", "2024-02-26")
+colData(monaco_immune) |>
+  as.data.frame()
+```
