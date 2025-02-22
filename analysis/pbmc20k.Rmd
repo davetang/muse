@@ -1,0 +1,153 @@
+---
+title: "Analysing 20k cells"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+library(tidyverse)
+library(patchwork)
+library(harmony)
+library(Seurat)
+library(BPCells)
+```
+
+Read HDF5 files into a list.
+
+```{r hdf5_files}
+hdf5_files <- list.files(path = "data", pattern = "5k_Human", full.names = TRUE)
+hdf5_files
+```
+
+Read raw counts into a list of matrices.
+
+```{r mats}
+mats <- purrr::map(seq_along(hdf5_files), function(x){
+  my_mat <- Seurat::Read10X_h5(hdf5_files[x])
+  colnames(my_mat) <- paste0('donor', x, '_', colnames(my_mat))
+  my_mat
+})
+str(mats, max.level = 1)
+```
+
+Create Seurat object from the list of matrices.
+
+```{r seurat_object}
+pbmc20k <- CreateSeuratObject(
+  counts = mats,
+  min.cells = 3,
+  min.features = 200
+)
+pbmc20k
+```
+
+Create one count layer.
+
+```{r join_layer}
+pbmc20k <- JoinLayers(pbmc20k)
+pbmc20k
+```
+
+Donor information in `orig.ident`.
+
+```{r metadata}
+head(pbmc20k@meta.data)
+```
+
+Use {BPCells} to convert the matrices in your already created Seurat objects to on-disk matrices. Note, that this is only possible for V5 assays. Convert the counts matrix of the RNA assay to a BPCells matrix.
+
+```{r write_matrix}
+BPCells::write_matrix_dir(
+  mat = pbmc20k[["RNA"]]$counts,
+  dir = 'data/pbmc20k',
+  overwrite = TRUE
+)
+
+pbmc20k.mat <- open_matrix_dir(dir = "data/pbmc20k")
+pbmc20k.mat <- BPCells::convert_matrix_type(matrix = pbmc20k.mat, type = 'uint32_t')
+
+pbmc20k[["RNA"]]$counts <- pbmc20k.mat
+pbmc20k@assays$RNA$counts
+```
+
+Process.
+
+```{r seurat_wf_v4}
+options(future.globals.maxSize = 2 * 1024^3)
+
+fixed_PrepDR5 <- function(object, features = NULL, layer = 'scale.data', verbose = TRUE) {
+  layer <- layer[1L]
+  olayer <- layer
+  layer <- SeuratObject::Layers(object = object, search = layer)
+  if (is.null(layer)) {
+    abort(paste0("No layer matching pattern '", olayer, "' not found. Please run ScaleData and retry"))
+  }
+  data.use <- SeuratObject::LayerData(object = object, layer = layer)
+  features <- features %||% VariableFeatures(object = object)
+  if (!length(x = features)) {
+    stop("No variable features, run FindVariableFeatures() or provide a vector of features", call. = FALSE)
+  }
+  if (is(data.use, "IterableMatrix")) {
+    features.var <- BPCells::matrix_stats(matrix=data.use, row_stats="variance")$row_stats["variance",]
+  } else {
+    features.var <- apply(X = data.use, MARGIN = 1L, FUN = var)
+  }
+  features.keep <- features[features.var > 0]
+  if (!length(x = features.keep)) {
+    stop("None of the requested features have any variance", call. = FALSE)
+  } else if (length(x = features.keep) < length(x = features)) {
+    exclude <- setdiff(x = features, y = features.keep)
+    if (isTRUE(x = verbose)) {
+      warning(
+        "The following ",
+        length(x = exclude),
+        " features requested have zero variance; running reduction without them: ",
+        paste(exclude, collapse = ', '),
+        call. = FALSE,
+        immediate. = TRUE
+      )
+    }
+  }
+  features <- features.keep
+  features <- features[!is.na(x = features)]
+  features.use <- features[features %in% rownames(data.use)]
+  if(!isTRUE(all.equal(features, features.use))) {
+    missing_features <- setdiff(features, features.use)
+    if(length(missing_features) > 0) {
+    warning_message <- paste("The following features were not available: ",
+                             paste(missing_features, collapse = ", "),
+                             ".", sep = "")
+    warning(warning_message, immediate. = TRUE)
+    }
+  }
+  data.use <- data.use[features.use, ]
+  return(data.use)
+}
+
+assignInNamespace('PrepDR5', fixed_PrepDR5, 'Seurat')
+
+seurat_wf_v4 <- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
+  
+  seurat_obj <- NormalizeData(seurat_obj, normalization.method = "LogNormalize", scale.factor = scale_factor, verbose = debug_flag)
+  seurat_obj <- FindVariableFeatures(seurat_obj, selection.method = 'vst', nfeatures = num_features, verbose = debug_flag)
+  seurat_obj <- ScaleData(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunPCA(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunHarmony(seurat_obj, "orig.ident")
+  seurat_obj <- RunUMAP(seurat_obj, reduction = "harmony",  dims = 1:num_pcs, verbose = debug_flag)
+  
+  seurat_obj
+}
+
+pbmc20k <- seurat_wf_v4(pbmc20k)
+```
+
+UMAP.
+
+```{r umap}
+DimPlot(pbmc20k, reduction = "umap", group.by = "orig.ident", pt.size = .1)
+```
