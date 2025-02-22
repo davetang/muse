@@ -63,15 +63,14 @@ Use {BPCells} to convert the matrices in your already created Seurat objects to 
 
 ```{r write_matrix}
 BPCells::write_matrix_dir(
-  mat = pbmc20k[["RNA"]]$counts,
+  mat = BPCells::convert_matrix_type(matrix = pbmc20k@assays$RNA$counts, type = "uint32_t"),
   dir = 'data/pbmc20k',
   overwrite = TRUE
 )
 
 pbmc20k.mat <- open_matrix_dir(dir = "data/pbmc20k")
-pbmc20k.mat <- BPCells::convert_matrix_type(matrix = pbmc20k.mat, type = 'uint32_t')
 
-pbmc20k[["RNA"]]$counts <- pbmc20k.mat
+pbmc20k@assays$RNA$counts <- pbmc20k.mat
 pbmc20k@assays$RNA$counts
 ```
 
