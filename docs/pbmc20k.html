@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree22af89ef64cdc42c4ea523f0117e73a62549db6dtargetblank22af89ea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6c0d4f07a8aabb1139023320fe899e7205fe5f1atargetblank6c0d4f0a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/22af89ef64cdc42c4ea523f0117e73a62549db6d" target="_blank">22af89e</a>
+<a href="https://github.com/davetang/muse/tree/6c0d4f07a8aabb1139023320fe899e7205fe5f1a" target="_blank">6c0d4f0</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree22af89ef64cdc42c4ea523f0117e73a62549db6dtargetblank22af89ea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6c0d4f07a8aabb1139023320fe899e7205fe5f1atargetblank6c0d4f0a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/22af89ef64cdc42c4ea523f0117e73a62549db6d" target="_blank">22af89e</a>.
+<a href="https://github.com/davetang/muse/tree/6c0d4f07a8aabb1139023320fe899e7205fe5f1a" target="_blank">6c0d4f0</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -569,15 +569,13 @@ Ignored files:
     Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
     Ignored:    data/jurkat_293t/
     Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
     Ignored:    data/pbmc3k/
     Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
     Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
     Ignored:    data/seurat_1m_neuron.rds
     Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
     Ignored:    r_packages_4.4.1/
-
-Untracked files:
-    Untracked:  data/pbmc20k/
 
 </code></pre>
 <p>
@@ -622,6 +620,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/6c0d4f07a8aabb1139023320fe899e7205fe5f1a/analysis/pbmc20k.Rmd" target="_blank">6c0d4f0</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-22
+</td>
+<td>
+Convert sparse matrix to iterable matrix
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/f6301ec4aab53c2a50a1e5721194d992bd10cfb7/docs/pbmc20k.html" target="_blank">f6301ec</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -697,27 +729,23 @@ objects to on-disk matrices. Note, that this is only possible for V5
 assays. Convert the counts matrix of the RNA assay to a BPCells
 matrix.</p>
 <pre class="r"><code>BPCells::write_matrix_dir(
-  mat = pbmc20k[[&quot;RNA&quot;]]$counts,
+  mat = BPCells::convert_matrix_type(matrix = pbmc20k@assays$RNA$counts, type = &quot;uint32_t&quot;),
   dir = &#39;data/pbmc20k&#39;,
   overwrite = TRUE
 )</code></pre>
-<pre><code>Warning: Matrix compression performs poorly with non-integers.
-• Consider calling convert_matrix_type if a compressed integer matrix is intended.
-This message is displayed once every 8 hours.</code></pre>
 <pre><code>27385 x 22061 IterableMatrix object with class MatrixDir
 
 Row names: ENSG00000238009, ENSG00000239945 ... AMELY
 Col names: donor1_AAACCAAAGGTGACGA-1, donor1_AAACCCTGTGACGAGT-1 ... donor4_TGTGTTGAGTTACGGC-1
 
-Data type: double
+Data type: uint32_t
 Storage order: column major
 
 Queued Operations:
 1. Load compressed matrix from directory /home/rstudio/muse/data/pbmc20k</code></pre>
 <pre class="r"><code>pbmc20k.mat &lt;- open_matrix_dir(dir = &quot;data/pbmc20k&quot;)
-pbmc20k.mat &lt;- BPCells::convert_matrix_type(matrix = pbmc20k.mat, type = &#39;uint32_t&#39;)
 
-pbmc20k[[&quot;RNA&quot;]]$counts &lt;- pbmc20k.mat
+pbmc20k@assays$RNA$counts &lt;- pbmc20k.mat
 pbmc20k@assays$RNA$counts</code></pre>
 <pre><code>27385 x 22061 IterableMatrix object with class RenameDims
 
@@ -729,8 +757,7 @@ Storage order: column major
 
 Queued Operations:
 1. Load compressed matrix from directory /home/rstudio/muse/data/pbmc20k
-2. Convert type from double to uint32_t
-3. Reset dimnames</code></pre>
+2. Reset dimnames</code></pre>
 <p>Process.</p>
 <pre class="r"><code>options(future.globals.maxSize = 2 * 1024^3)
 
@@ -810,6 +837,43 @@ This message will be shown once per session</code></pre>
 <p>UMAP.</p>
 <pre class="r"><code>DimPlot(pbmc20k, reduction = &quot;umap&quot;, group.by = &quot;orig.ident&quot;, pt.size = .1)</code></pre>
 <p><img src="figure/pbmc20k.Rmd/umap-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-umap-1">
+Past versions of umap-1.png
+</button>
+</p>
+<div id="fig-umap-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/f6301ec4aab53c2a50a1e5721194d992bd10cfb7/docs/figure/pbmc20k.Rmd/umap-1.png" target="_blank">f6301ec</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-22
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
