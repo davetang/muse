@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0e6715c7743c00ab91665b4c00d109ffde945255targetblank0e6715ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9e472aa8760568b9acbe79b3ca76be57838f6b60targetblank9e472aaa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/0e6715c7743c00ab91665b4c00d109ffde945255" target="_blank">0e6715c</a>
+<a href="https://github.com/davetang/muse/tree/9e472aa8760568b9acbe79b3ca76be57838f6b60" target="_blank">9e472aa</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0e6715c7743c00ab91665b4c00d109ffde945255targetblank0e6715ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9e472aa8760568b9acbe79b3ca76be57838f6b60targetblank9e472aaa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/0e6715c7743c00ab91665b4c00d109ffde945255" target="_blank">0e6715c</a>.
+<a href="https://github.com/davetang/muse/tree/9e472aa8760568b9acbe79b3ca76be57838f6b60" target="_blank">9e472aa</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -620,6 +620,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/9e472aa8760568b9acbe79b3ca76be57838f6b60/analysis/pbmc20k.Rmd" target="_blank">9e472aa</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-23
+</td>
+<td>
+Convert to sparse matrix for annotation
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/ffad125be72f023f4df60f1a3c21468d0163a3b7/docs/pbmc20k.html" target="_blank">ffad125</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1009,7 +1043,7 @@ colnames(114): DZQV_CD8_naive DZQV_CD8_CM ... G4YW_Neutrophils
   G4YW_Basophils
 colData names(3): label.main label.fine label.ont</code></pre>
 <pre class="r"><code>pbmc20k.anno &lt;- SingleR(
-  test=as.matrix(pbmc20k@assays$RNA$data),
+  test=as(pbmc20k@assays$RNA$data, &quot;sparseMatrix&quot;),
   ref=monaco_immune,
   labels=colData(monaco_immune)$label.main
 )</code></pre>
@@ -1043,6 +1077,43 @@ donor1_AAACGATGTGCGCGAA-1  0.1458069       B cells</code></pre>
 <p>UMAP with annotations.</p>
 <pre class="r"><code>DimPlot(pbmc20k, reduction = &quot;umap&quot;, group.by = &quot;labels&quot;, pt.size = .1, label = TRUE, repel = TRUE)</code></pre>
 <p><img src="figure/pbmc20k.Rmd/umap_with_labels-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-umap_with_labels-1">
+Past versions of umap_with_labels-1.png
+</button>
+</p>
+<div id="fig-umap_with_labels-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/ffad125be72f023f4df60f1a3c21468d0163a3b7/docs/figure/pbmc20k.Rmd/umap_with_labels-1.png" target="_blank">ffad125</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-23
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
