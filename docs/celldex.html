@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-02-22" />
+<meta name="date" content="2025-02-23" />
 
 <title>Pokedex for Cell Types</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Pokedex for Cell Types</h1>
-<h4 class="date">2025-02-22</h4>
+<h4 class="date">2025-02-23</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-02-22
+<strong>Last updated:</strong> 2025-02-23
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5b60bcc40a66867f511050f70a3c71621244c6c4targetblank5b60bcca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3b7d52a9ead799f9529b0084954e725c1905bc6ftargetblank3b7d52aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/5b60bcc40a66867f511050f70a3c71621244c6c4" target="_blank">5b60bcc</a>
+<a href="https://github.com/davetang/muse/tree/3b7d52a9ead799f9529b0084954e725c1905bc6f" target="_blank">3b7d52a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree5b60bcc40a66867f511050f70a3c71621244c6c4targetblank5b60bcca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3b7d52a9ead799f9529b0084954e725c1905bc6ftargetblank3b7d52aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/5b60bcc40a66867f511050f70a3c71621244c6c4" target="_blank">5b60bcc</a>.
+<a href="https://github.com/davetang/muse/tree/3b7d52a9ead799f9529b0084954e725c1905bc6f" target="_blank">3b7d52a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -620,6 +620,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/3b7d52a9ead799f9529b0084954e725c1905bc6f/analysis/celldex.Rmd" target="_blank">3b7d52a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-23
+</td>
+<td>
+Human primary cell atlas
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/1c8436b386472477d6bab7d669603a6894933608/docs/celldex.html" target="_blank">1c8436b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-22
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -742,6 +776,82 @@ surveyReferences()</code></pre>
 5 PubMed:24053356:NA,PubMed:30643263:NA,GitHub:dviraran/SingleR:adc4a0e4d5cfa79db18f..
 6                           PubMed:21241896:NA,GEO:GSE24759:NA,ExperimentHub:EH3490:NA
 7                          PubMed:30726743:NA,GEO:GSE107011:NA,ExperimentHub:EH3496:NA</code></pre>
+<p>Alternatively, users can search the text of each reference’s metadata
+to identify relevant datasets. This may require some experimentation as
+it depends on the level of detail in the metadata supplied by the
+uploader.</p>
+<pre class="r"><code>searchReferences(
+    defineTextQuery(&quot;immun%&quot;, partial=TRUE) &amp; 
+    defineTextQuery(&quot;9606&quot;, field=&quot;taxonomy_id&quot;)
+)</code></pre>
+<pre><code>DataFrame with 2 rows and 10 columns
+              name     version        path                  title
+       &lt;character&gt; &lt;character&gt; &lt;character&gt;            &lt;character&gt;
+1             dice  2024-02-26          NA Human bulk RNA-seq d..
+2 blueprint_encode  2024-02-26          NA Human bulk RNA-seq d..
+             description taxonomy_id genome   samples
+             &lt;character&gt;      &lt;List&gt; &lt;List&gt; &lt;integer&gt;
+1 Human bulk RNA-seq d..        9606             1561
+2 Human bulk RNA-seq d..        9606              259
+                           labels
+                           &lt;List&gt;
+1 label.main,label.fine,label.ont
+2 label.main,label.fine,label.ont
+                                                             sources
+                                                &lt;SplitDataFrameList&gt;
+1 PubMed:30449622:NA,ExperimentHub:EH3488:NA,ExperimentHub:EH3489:NA
+2           PubMed:22955616:NA,PubMed:24091925:NA,PubMed:30643263:NA</code></pre>
+<div id="human-primary-cell-atlas" class="section level3">
+<h3>Human primary cell atlas</h3>
+<p>The HPCA reference consists of publicly available microarray datasets
+derived from human primary cells (Mabbott et al. 2013). Most of the
+labels refer to blood subpopulations but cell types from other tissues
+are also available.</p>
+<pre class="r"><code>hpca &lt;- fetchReference(&quot;hpca&quot;, &quot;2024-02-26&quot;)
+colData(hpca) |&gt;
+  as.data.frame() |&gt;
+  dplyr::pull(&quot;label.main&quot;) |&gt;
+  table() |&gt;
+  as.data.frame() |&gt;
+  dplyr::arrange(-Freq)</code></pre>
+<pre><code>                   Var1 Freq
+1            Macrophage   90
+2                    DC   88
+3               T_cells   68
+4     Endothelial_cells   64
+5              Monocyte   60
+6     Tissue_stem_cells   55
+7             iPS_cells   42
+8                B_cell   26
+9         Keratinocytes   25
+10          Neutrophils   21
+11 Embryonic_stem_cells   17
+12     Epithelial_cells   16
+13              Neurons   16
+14  Smooth_muscle_cells   16
+15          Osteoblasts   15
+16          Fibroblasts   10
+17           HSC_-G-CSF   10
+18                  MSC    9
+19         Chondrocytes    8
+20         Erythroblast    8
+21                   BM    7
+22            HSC_CD34+    6
+23          Gametocytes    5
+24              NK_cell    5
+25            Platelets    5
+26          Hepatocytes    3
+27            Astrocyte    2
+28                  CMP    2
+29                  GMP    2
+30                  MEP    2
+31            Myelocyte    2
+32     Pre-B_cell_CD34-    2
+33     Pro-B_cell_CD34+    2
+34        Pro-Myelocyte    2
+35           BM &amp; Prog.    1
+36 Neuroepithelial_cell    1</code></pre>
+</div>
 <div id="monaco-reference" class="section level3">
 <h3>Monaco reference</h3>
 <p>The <a
@@ -928,37 +1038,37 @@ loaded via a namespace (and not attached):
 [25] S4Arrays_1.6.0            bit_4.5.0                
 [27] curl_5.2.3                DelayedArray_0.32.0      
 [29] abind_1.4-8               HDF5Array_1.34.0         
-[31] gypsum_1.2.0              grid_4.4.1               
-[33] fansi_1.0.6               ExperimentHub_2.14.0     
-[35] git2r_0.35.0              Rhdf5lib_1.28.0          
-[37] cli_3.6.3                 rmarkdown_2.28           
-[39] crayon_1.5.3              generics_0.1.3           
-[41] rstudioapi_0.17.1         httr_1.4.7               
-[43] DelayedMatrixStats_1.28.1 rhdf5_2.50.2             
-[45] DBI_1.2.3                 cachem_1.1.0             
-[47] stringr_1.5.1             zlibbioc_1.52.0          
-[49] parallel_4.4.1            AnnotationDbi_1.68.0     
-[51] BiocManager_1.30.25       XVector_0.46.0           
-[53] alabaster.schemas_1.6.0   vctrs_0.6.5              
-[55] Matrix_1.7-0              jsonlite_1.8.9           
-[57] callr_3.7.6               bit64_4.5.2              
-[59] alabaster.ranges_1.6.0    jquerylib_0.1.4          
-[61] glue_1.8.0                ps_1.8.1                 
-[63] stringi_1.8.4             BiocVersion_3.20.0       
-[65] later_1.3.2               UCSC.utils_1.2.0         
-[67] tibble_3.2.1              pillar_1.9.0             
-[69] rhdf5filters_1.18.0       rappdirs_0.3.3           
-[71] htmltools_0.5.8.1         GenomeInfoDbData_1.2.13  
-[73] httr2_1.0.5               R6_2.5.1                 
-[75] dbplyr_2.5.0              sparseMatrixStats_1.18.0 
-[77] rprojroot_2.0.4           evaluate_1.0.1           
-[79] lattice_0.22-6            AnnotationHub_3.14.0     
-[81] png_0.1-8                 memoise_2.0.1            
-[83] httpuv_1.6.15             bslib_0.8.0              
-[85] Rcpp_1.0.13               SparseArray_1.6.1        
-[87] whisker_0.4.1             xfun_0.48                
-[89] fs_1.6.4                  getPass_0.2-4            
-[91] pkgconfig_2.0.3          </code></pre>
+[31] gypsum_1.2.0              withr_3.0.2              
+[33] grid_4.4.1                fansi_1.0.6              
+[35] ExperimentHub_2.14.0      git2r_0.35.0             
+[37] Rhdf5lib_1.28.0           cli_3.6.3                
+[39] rmarkdown_2.28            crayon_1.5.3             
+[41] generics_0.1.3            rstudioapi_0.17.1        
+[43] httr_1.4.7                DelayedMatrixStats_1.28.1
+[45] rhdf5_2.50.2              DBI_1.2.3                
+[47] cachem_1.1.0              stringr_1.5.1            
+[49] zlibbioc_1.52.0           parallel_4.4.1           
+[51] AnnotationDbi_1.68.0      BiocManager_1.30.25      
+[53] XVector_0.46.0            alabaster.schemas_1.6.0  
+[55] vctrs_0.6.5               Matrix_1.7-0             
+[57] jsonlite_1.8.9            callr_3.7.6              
+[59] bit64_4.5.2               alabaster.ranges_1.6.0   
+[61] jquerylib_0.1.4           glue_1.8.0               
+[63] ps_1.8.1                  stringi_1.8.4            
+[65] BiocVersion_3.20.0        later_1.3.2              
+[67] UCSC.utils_1.2.0          tibble_3.2.1             
+[69] pillar_1.9.0              rhdf5filters_1.18.0      
+[71] rappdirs_0.3.3            htmltools_0.5.8.1        
+[73] GenomeInfoDbData_1.2.13   httr2_1.0.5              
+[75] R6_2.5.1                  dbplyr_2.5.0             
+[77] sparseMatrixStats_1.18.0  rprojroot_2.0.4          
+[79] evaluate_1.0.1            lattice_0.22-6           
+[81] AnnotationHub_3.14.0      png_0.1-8                
+[83] memoise_2.0.1             httpuv_1.6.15            
+[85] bslib_0.8.0               Rcpp_1.0.13              
+[87] SparseArray_1.6.1         whisker_0.4.1            
+[89] xfun_0.48                 fs_1.6.4                 
+[91] getPass_0.2-4             pkgconfig_2.0.3          </code></pre>
 </div>
 </div>
 </div>
