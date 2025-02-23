@@ -175,7 +175,7 @@ monaco_immune <- fetchReference("monaco_immune", "2024-02-26")
 monaco_immune
 
 pbmc20k.anno <- SingleR(
-  test=as.matrix(pbmc20k@assays$RNA$data),
+  test=as(pbmc20k@assays$RNA$data, "sparseMatrix"),
   ref=monaco_immune,
   labels=colData(monaco_immune)$label.main
 )
