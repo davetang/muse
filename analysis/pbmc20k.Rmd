@@ -145,6 +145,13 @@ seurat_wf_v4 <- function(seurat_obj, scale_factor = 1e4, num_features = 2000, nu
 pbmc20k <- seurat_wf_v4(pbmc20k)
 ```
 
+Normalised and scaled data are stored as `IterableMatrix` objects.
+
+```{r iterable_matrices}
+pbmc20k@assays$RNA$data
+pbmc20k@assays$RNA$scale.data
+```
+
 UMAP.
 
 ```{r umap}
