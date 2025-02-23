@@ -1,0 +1,42 @@
+---
+title: "Trajectory Analysis"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Installation
+
+Install [scRNAseq](https://bioconductor.org/packages/release/data/experiment/html/scRNAseq.html).
+
+```{r install_scrnaseq, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("scRNAseq")
+BiocManager::install("AnnotationHub")
+```
+
+## Data
+
+[Mouse haematopoietic stem cell](https://bioconductor.org/books/3.14/OSCA.workflows/nestorowa-mouse-hsc-smart-seq2.html) (HSC) dataset generated with Smart-seq2 (Nestorowa et al. 2016).
+
+```{r sce_nest}
+suppressPackageStartupMessages(library(scRNAseq))
+sce.nest <- NestorowaHSCData()
+
+suppressPackageStartupMessages(library(AnnotationHub))
+ens.mm.v97 <- AnnotationHub()[["AH73905"]]
+anno <- select(ens.mm.v97, keys=rownames(sce.nest), 
+    keytype="GENEID", columns=c("SYMBOL", "SEQNAME"))
+rowData(sce.nest) <- anno[match(rownames(sce.nest), anno$GENEID),]
+
+sce.nest
+```
