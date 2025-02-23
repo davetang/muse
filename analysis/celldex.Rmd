@@ -34,6 +34,29 @@ suppressPackageStartupMessages(library(celldex))
 surveyReferences()
 ```
 
+Alternatively, users can search the text of each reference's metadata to identify relevant datasets. This may require some experimentation as it depends on the level of detail in the metadata supplied by the uploader.
+
+```{r search_references}
+searchReferences(
+    defineTextQuery("immun%", partial=TRUE) & 
+    defineTextQuery("9606", field="taxonomy_id")
+)
+```
+
+### Human primary cell atlas
+
+The HPCA reference consists of publicly available microarray datasets derived from human primary cells (Mabbott et al. 2013). Most of the labels refer to blood subpopulations but cell types from other tissues are also available.
+
+```{r hpca}
+hpca <- fetchReference("hpca", "2024-02-26")
+colData(hpca) |>
+  as.data.frame() |>
+  dplyr::pull("label.main") |>
+  table() |>
+  as.data.frame() |>
+  dplyr::arrange(-Freq)
+```
+
 ### Monaco reference
 
 The [Monaco reference](https://bioconductor.org/packages/3.20/data/experiment/vignettes/celldex/inst/doc/userguide.html#44_Monaco_immune_data) consists of bulk RNA-seq samples of sorted immune cell populations from GSE107011 (Monaco et al. 2019).
