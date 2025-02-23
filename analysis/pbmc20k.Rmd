@@ -15,7 +15,11 @@ library(patchwork)
 library(harmony)
 library(Seurat)
 library(BPCells)
+library(SingleR)
+library(celldex)
 ```
+
+## Data
 
 Read HDF5 files into a list.
 
@@ -34,6 +38,8 @@ mats <- purrr::map(seq_along(hdf5_files), function(x){
 })
 str(mats, max.level = 1)
 ```
+
+## Seurat object
 
 Create Seurat object from the list of matrices.
 
@@ -74,7 +80,9 @@ pbmc20k@assays$RNA$counts <- pbmc20k.mat
 pbmc20k@assays$RNA$counts
 ```
 
-Process.
+## Seurat workflow
+
+Process with the Seurat 4 workflow.
 
 ```{r seurat_wf_v4}
 options(future.globals.maxSize = 2 * 1024^3)
@@ -156,4 +164,36 @@ UMAP.
 
 ```{r umap}
 DimPlot(pbmc20k, reduction = "umap", group.by = "orig.ident", pt.size = .1)
+```
+
+## Annotation
+
+Annotate using {SingleR}.
+
+```{r singler}
+monaco_immune <- fetchReference("monaco_immune", "2024-02-26")
+monaco_immune
+
+pbmc20k.anno <- SingleR(
+  test=as.matrix(pbmc20k@assays$RNA$data),
+  ref=monaco_immune,
+  labels=colData(monaco_immune)$label.main
+)
+
+head(pbmc20k.anno)
+```
+
+Add annotations to metadata.
+
+```{r add_anno}
+cbind(
+  pbmc20k@meta.data,
+  as.data.frame(pbmc20k.anno)
+) -> pbmc20k@meta.data
+```
+
+UMAP with annotations.
+
+```{r umap_with_labels}
+DimPlot(pbmc20k, reduction = "umap", group.by = "labels", pt.size = .1, label = TRUE, repel = TRUE)
 ```
