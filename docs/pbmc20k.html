@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeaad6fa29e5c98a30d39ece9c49052bccf8d79d71targetblankaad6fa2a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0e6715c7743c00ab91665b4c00d109ffde945255targetblank0e6715ca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/aad6fa29e5c98a30d39ece9c49052bccf8d79d71" target="_blank">aad6fa2</a>
+<a href="https://github.com/davetang/muse/tree/0e6715c7743c00ab91665b4c00d109ffde945255" target="_blank">0e6715c</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeaad6fa29e5c98a30d39ece9c49052bccf8d79d71targetblankaad6fa2a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0e6715c7743c00ab91665b4c00d109ffde945255targetblank0e6715ca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/aad6fa29e5c98a30d39ece9c49052bccf8d79d71" target="_blank">aad6fa2</a>.
+<a href="https://github.com/davetang/muse/tree/0e6715c7743c00ab91665b4c00d109ffde945255" target="_blank">0e6715c</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -620,6 +620,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/0e6715c7743c00ab91665b4c00d109ffde945255/analysis/pbmc20k.Rmd" target="_blank">0e6715c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-23
+</td>
+<td>
+Annotate using SingleR
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/3a0e769dc84e3c017dc44b5bd53656794ee5597c/docs/pbmc20k.html" target="_blank">3a0e769</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -712,6 +746,8 @@ Analysing 20k cells
 </div>
 </div>
 </div>
+<div id="data" class="section level2">
+<h2>Data</h2>
 <p>Read HDF5 files into a list.</p>
 <pre class="r"><code>hdf5_files &lt;- list.files(path = &quot;data&quot;, pattern = &quot;5k_Human&quot;, full.names = TRUE)
 hdf5_files</code></pre>
@@ -731,6 +767,9 @@ str(mats, max.level = 1)</code></pre>
  $ :Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots
  $ :Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots
  $ :Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots</code></pre>
+</div>
+<div id="seurat-object" class="section level2">
+<h2>Seurat object</h2>
 <p>Create Seurat object from the list of matrices.</p>
 <pre class="r"><code>pbmc20k &lt;- CreateSeuratObject(
   counts = mats,
@@ -792,7 +831,10 @@ Storage order: column major
 Queued Operations:
 1. Load compressed matrix from directory /home/rstudio/muse/data/pbmc20k
 2. Reset dimnames</code></pre>
-<p>Process.</p>
+</div>
+<div id="seurat-workflow" class="section level2">
+<h2>Seurat workflow</h2>
+<p>Process with the Seurat 4 workflow.</p>
 <pre class="r"><code>options(future.globals.maxSize = 2 * 1024^3)
 
 fixed_PrepDR5 &lt;- function(object, features = NULL, layer = &#39;scale.data&#39;, verbose = TRUE) {
@@ -951,6 +993,56 @@ Dave Tang
 </table>
 </div>
 </div>
+</div>
+<div id="annotation" class="section level2">
+<h2>Annotation</h2>
+<p>Annotate using {SingleR}.</p>
+<pre class="r"><code>monaco_immune &lt;- fetchReference(&quot;monaco_immune&quot;, &quot;2024-02-26&quot;)
+monaco_immune</code></pre>
+<pre><code>class: SummarizedExperiment 
+dim: 46077 114 
+metadata(0):
+assays(1): logcounts
+rownames(46077): A1BG A1BG-AS1 ... ZYX ZZEF1
+rowData names(0):
+colnames(114): DZQV_CD8_naive DZQV_CD8_CM ... G4YW_Neutrophils
+  G4YW_Basophils
+colData names(3): label.main label.fine label.ont</code></pre>
+<pre class="r"><code>pbmc20k.anno &lt;- SingleR(
+  test=as.matrix(pbmc20k@assays$RNA$data),
+  ref=monaco_immune,
+  labels=colData(monaco_immune)$label.main
+)</code></pre>
+<pre><code>Warning: Converting to a dense matrix may use excessive memory
+This message is displayed once every 8 hours.</code></pre>
+<pre><code>Warning in asMethod(object): sparse-&gt;dense coercion: allocating vector of size
+4.5 GiB</code></pre>
+<pre class="r"><code>head(pbmc20k.anno)</code></pre>
+<pre><code>DataFrame with 6 rows and 4 columns
+                                                  scores       labels
+                                                &lt;matrix&gt;  &lt;character&gt;
+donor1_AAACCAAAGGTGACGA-1 0.324853:0.258408:0.483121:...      T cells
+donor1_AAACCCTGTGACGAGT-1 0.151325:0.124804:0.304293:... CD4+ T cells
+donor1_AAACGAATCAGGCTAC-1 0.252303:0.235463:0.436783:... CD4+ T cells
+donor1_AAACGACAGATTGACT-1 0.318234:0.338696:0.122619:...    Monocytes
+donor1_AAACGATGTCTTGAAC-1 0.230288:0.199487:0.418062:... CD4+ T cells
+donor1_AAACGATGTGCGCGAA-1 0.470569:0.243399:0.252875:...      B cells
+                          delta.next pruned.labels
+                           &lt;numeric&gt;   &lt;character&gt;
+donor1_AAACCAAAGGTGACGA-1  0.0820203       T cells
+donor1_AAACCCTGTGACGAGT-1  0.0984110  CD4+ T cells
+donor1_AAACGAATCAGGCTAC-1  0.0642314  CD4+ T cells
+donor1_AAACGACAGATTGACT-1  0.1762658     Monocytes
+donor1_AAACGATGTCTTGAAC-1  0.0913007  CD4+ T cells
+donor1_AAACGATGTGCGCGAA-1  0.1458069       B cells</code></pre>
+<p>Add annotations to metadata.</p>
+<pre class="r"><code>cbind(
+  pbmc20k@meta.data,
+  as.data.frame(pbmc20k.anno)
+) -&gt; pbmc20k@meta.data</code></pre>
+<p>UMAP with annotations.</p>
+<pre class="r"><code>DimPlot(pbmc20k, reduction = &quot;umap&quot;, group.by = &quot;labels&quot;, pt.size = .1, label = TRUE, repel = TRUE)</code></pre>
+<p><img src="figure/pbmc20k.Rmd/umap_with_labels-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -980,58 +1072,112 @@ time zone: Etc/UTC
 tzcode source: system (glibc)
 
 attached base packages:
-[1] stats     graphics  grDevices utils     datasets  methods   base     
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
 
 other attached packages:
- [1] BPCells_0.3.0      Seurat_5.1.0       SeuratObject_5.0.2 sp_2.1-4          
- [5] harmony_1.2.1      Rcpp_1.0.13        patchwork_1.3.0    lubridate_1.9.3   
- [9] forcats_1.0.0      stringr_1.5.1      dplyr_1.1.4        purrr_1.0.2       
-[13] readr_2.1.5        tidyr_1.3.1        tibble_3.2.1       ggplot2_3.5.1     
-[17] tidyverse_2.0.0    workflowr_1.7.1   
+ [1] celldex_1.16.0              SingleR_2.8.0              
+ [3] SummarizedExperiment_1.36.0 Biobase_2.66.0             
+ [5] GenomicRanges_1.58.0        GenomeInfoDb_1.42.3        
+ [7] IRanges_2.40.1              S4Vectors_0.44.0           
+ [9] BiocGenerics_0.52.0         MatrixGenerics_1.18.1      
+[11] matrixStats_1.4.1           BPCells_0.3.0              
+[13] Seurat_5.1.0                SeuratObject_5.0.2         
+[15] sp_2.1-4                    harmony_1.2.1              
+[17] Rcpp_1.0.13                 patchwork_1.3.0            
+[19] lubridate_1.9.3             forcats_1.0.0              
+[21] stringr_1.5.1               dplyr_1.1.4                
+[23] purrr_1.0.2                 readr_2.1.5                
+[25] tidyr_1.3.1                 tibble_3.2.1               
+[27] ggplot2_3.5.1               tidyverse_2.0.0            
+[29] workflowr_1.7.1            
 
 loaded via a namespace (and not attached):
-  [1] RColorBrewer_1.1-3     rstudioapi_0.17.1      jsonlite_1.8.9        
-  [4] magrittr_2.0.3         spatstat.utils_3.1-0   farver_2.1.2          
-  [7] rmarkdown_2.28         fs_1.6.4               vctrs_0.6.5           
- [10] ROCR_1.0-11            spatstat.explore_3.3-3 htmltools_0.5.8.1     
- [13] sass_0.4.9             sctransform_0.4.1      parallelly_1.38.0     
- [16] KernSmooth_2.23-24     bslib_0.8.0            htmlwidgets_1.6.4     
- [19] ica_1.0-3              plyr_1.8.9             plotly_4.10.4         
- [22] zoo_1.8-12             cachem_1.1.0           whisker_0.4.1         
- [25] igraph_2.1.1           mime_0.12              lifecycle_1.0.4       
- [28] pkgconfig_2.0.3        Matrix_1.7-0           R6_2.5.1              
- [31] fastmap_1.2.0          MatrixGenerics_1.18.1  fitdistrplus_1.2-1    
- [34] future_1.34.0          shiny_1.9.1            digest_0.6.37         
- [37] colorspace_2.1-1       ps_1.8.1               rprojroot_2.0.4       
- [40] tensor_1.5             RSpectra_0.16-2        irlba_2.3.5.1         
- [43] labeling_0.4.3         progressr_0.15.0       fansi_1.0.6           
- [46] spatstat.sparse_3.1-0  timechange_0.3.0       httr_1.4.7            
- [49] polyclip_1.10-7        abind_1.4-8            compiler_4.4.1        
- [52] bit64_4.5.2            withr_3.0.2            fastDummies_1.7.4     
- [55] highr_0.11             MASS_7.3-60.2          tools_4.4.1           
- [58] lmtest_0.9-40          httpuv_1.6.15          future.apply_1.11.3   
- [61] goftest_1.2-3          glue_1.8.0             callr_3.7.6           
- [64] nlme_3.1-164           promises_1.3.0         grid_4.4.1            
- [67] Rtsne_0.17             getPass_0.2-4          cluster_2.1.6         
- [70] reshape2_1.4.4         generics_0.1.3         hdf5r_1.3.11          
- [73] gtable_0.3.6           spatstat.data_3.1-2    tzdb_0.4.0            
- [76] data.table_1.16.2      hms_1.1.3              utf8_1.2.4            
- [79] spatstat.geom_3.3-3    RcppAnnoy_0.0.22       ggrepel_0.9.6         
- [82] RANN_2.6.2             pillar_1.9.0           spam_2.11-0           
- [85] RcppHNSW_0.6.0         later_1.3.2            splines_4.4.1         
- [88] lattice_0.22-6         bit_4.5.0              deldir_2.0-4          
- [91] survival_3.6-4         tidyselect_1.2.1       miniUI_0.1.1.1        
- [94] pbapply_1.7-2          knitr_1.48             git2r_0.35.0          
- [97] gridExtra_2.3          scattermore_1.2        RhpcBLASctl_0.23-42   
-[100] xfun_0.48              matrixStats_1.4.1      stringi_1.8.4         
-[103] lazyeval_0.2.2         yaml_2.3.10            evaluate_1.0.1        
-[106] codetools_0.2-20       cli_3.6.3              uwot_0.2.2            
-[109] xtable_1.8-4           reticulate_1.39.0      munsell_0.5.1         
-[112] processx_3.8.4         jquerylib_0.1.4        spatstat.random_3.3-2 
-[115] globals_0.16.3         png_0.1-8              spatstat.univar_3.0-1 
-[118] parallel_4.4.1         dotCall64_1.2          listenv_0.9.1         
-[121] viridisLite_0.4.2      scales_1.3.0           ggridges_0.5.6        
-[124] leiden_0.4.3.1         rlang_1.1.4            cowplot_1.1.3         </code></pre>
+  [1] fs_1.6.4                  spatstat.sparse_3.1-0    
+  [3] httr_1.4.7                RColorBrewer_1.1-3       
+  [5] tools_4.4.1               sctransform_0.4.1        
+  [7] alabaster.base_1.6.1      utf8_1.2.4               
+  [9] R6_2.5.1                  HDF5Array_1.34.0         
+ [11] lazyeval_0.2.2            uwot_0.2.2               
+ [13] rhdf5filters_1.18.0       withr_3.0.2              
+ [15] gridExtra_2.3             progressr_0.15.0         
+ [17] cli_3.6.3                 spatstat.explore_3.3-3   
+ [19] fastDummies_1.7.4         labeling_0.4.3           
+ [21] alabaster.se_1.6.0        sass_0.4.9               
+ [23] spatstat.data_3.1-2       ggridges_0.5.6           
+ [25] pbapply_1.7-2             parallelly_1.38.0        
+ [27] rstudioapi_0.17.1         RSQLite_2.3.7            
+ [29] generics_0.1.3            ica_1.0-3                
+ [31] spatstat.random_3.3-2     Matrix_1.7-0             
+ [33] fansi_1.0.6               abind_1.4-8              
+ [35] lifecycle_1.0.4           whisker_0.4.1            
+ [37] yaml_2.3.10               rhdf5_2.50.2             
+ [39] SparseArray_1.6.1         BiocFileCache_2.14.0     
+ [41] Rtsne_0.17                grid_4.4.1               
+ [43] blob_1.2.4                promises_1.3.0           
+ [45] ExperimentHub_2.14.0      crayon_1.5.3             
+ [47] miniUI_0.1.1.1            lattice_0.22-6           
+ [49] beachmat_2.22.0           cowplot_1.1.3            
+ [51] KEGGREST_1.46.0           pillar_1.9.0             
+ [53] knitr_1.48                future.apply_1.11.3      
+ [55] codetools_0.2-20          leiden_0.4.3.1           
+ [57] glue_1.8.0                getPass_0.2-4            
+ [59] spatstat.univar_3.0-1     data.table_1.16.2        
+ [61] vctrs_0.6.5               png_0.1-8                
+ [63] gypsum_1.2.0              spam_2.11-0              
+ [65] gtable_0.3.6              cachem_1.1.0             
+ [67] xfun_0.48                 S4Arrays_1.6.0           
+ [69] mime_0.12                 survival_3.6-4           
+ [71] fitdistrplus_1.2-1        ROCR_1.0-11              
+ [73] nlme_3.1-164              bit64_4.5.2              
+ [75] alabaster.ranges_1.6.0    filelock_1.0.3           
+ [77] RcppAnnoy_0.0.22          rprojroot_2.0.4          
+ [79] bslib_0.8.0               irlba_2.3.5.1            
+ [81] KernSmooth_2.23-24        colorspace_2.1-1         
+ [83] DBI_1.2.3                 tidyselect_1.2.1         
+ [85] processx_3.8.4            bit_4.5.0                
+ [87] compiler_4.4.1            curl_5.2.3               
+ [89] git2r_0.35.0              httr2_1.0.5              
+ [91] BiocNeighbors_2.0.1       hdf5r_1.3.11             
+ [93] DelayedArray_0.32.0       plotly_4.10.4            
+ [95] scales_1.3.0              lmtest_0.9-40            
+ [97] callr_3.7.6               rappdirs_0.3.3           
+ [99] digest_0.6.37             goftest_1.2-3            
+[101] spatstat.utils_3.1-0      alabaster.matrix_1.6.1   
+[103] rmarkdown_2.28            RhpcBLASctl_0.23-42      
+[105] XVector_0.46.0            htmltools_0.5.8.1        
+[107] pkgconfig_2.0.3           sparseMatrixStats_1.18.0 
+[109] highr_0.11                dbplyr_2.5.0             
+[111] fastmap_1.2.0             rlang_1.1.4              
+[113] htmlwidgets_1.6.4         UCSC.utils_1.2.0         
+[115] shiny_1.9.1               DelayedMatrixStats_1.28.1
+[117] farver_2.1.2              jquerylib_0.1.4          
+[119] zoo_1.8-12                jsonlite_1.8.9           
+[121] BiocParallel_1.40.0       BiocSingular_1.22.0      
+[123] magrittr_2.0.3            GenomeInfoDbData_1.2.13  
+[125] dotCall64_1.2             Rhdf5lib_1.28.0          
+[127] munsell_0.5.1             reticulate_1.39.0        
+[129] stringi_1.8.4             alabaster.schemas_1.6.0  
+[131] zlibbioc_1.52.0           MASS_7.3-60.2            
+[133] AnnotationHub_3.14.0      plyr_1.8.9               
+[135] parallel_4.4.1            listenv_0.9.1            
+[137] ggrepel_0.9.6             deldir_2.0-4             
+[139] Biostrings_2.74.1         splines_4.4.1            
+[141] tensor_1.5                hms_1.1.3                
+[143] ps_1.8.1                  igraph_2.1.1             
+[145] spatstat.geom_3.3-3       RcppHNSW_0.6.0           
+[147] reshape2_1.4.4            ScaledMatrix_1.14.0      
+[149] BiocVersion_3.20.0        evaluate_1.0.1           
+[151] BiocManager_1.30.25       tzdb_0.4.0               
+[153] httpuv_1.6.15             RANN_2.6.2               
+[155] polyclip_1.10-7           future_1.34.0            
+[157] scattermore_1.2           rsvd_1.0.5               
+[159] xtable_1.8-4              RSpectra_0.16-2          
+[161] later_1.3.2               viridisLite_0.4.2        
+[163] memoise_2.0.1             AnnotationDbi_1.68.0     
+[165] cluster_2.1.6             timechange_0.3.0         
+[167] globals_0.16.3           </code></pre>
+</div>
 </div>
 </div>
 </div>
