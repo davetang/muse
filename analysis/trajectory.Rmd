@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Installation
 
-Install [scRNAseq](https://bioconductor.org/packages/release/data/experiment/html/scRNAseq.html).
+Install dependencies.
 
 ```{r install_scrnaseq, eval=FALSE}
 if (!require("BiocManager", quietly = TRUE))
@@ -22,6 +22,7 @@ if (!require("BiocManager", quietly = TRUE))
 
 BiocManager::install("scRNAseq")
 BiocManager::install("AnnotationHub")
+BiocManager::install("scater")
 ```
 
 ## Data
@@ -40,3 +41,124 @@ rowData(sce.nest) <- anno[match(rownames(sce.nest), anno$GENEID),]
 
 sce.nest
 ```
+
+### Quality control
+
+```{r unfiltered}
+unfiltered <- sce.nest
+```
+
+For some reason, no mitochondrial transcripts are available, so we will perform quality control using the spike-in proportions only.
+
+```{r qc}
+suppressPackageStartupMessages(library(scater))
+
+stats <- perCellQCMetrics(sce.nest)
+qc <- quickPerCellQC(stats, percent_subsets="altexps_ERCC_percent")
+sce.nest <- sce.nest[,!qc$discard]
+```
+
+We examine the number of cells discarded for each reason.
+
+```{r qc_reasons}
+colSums(as.matrix(qc))
+```
+
+We create some diagnostic plots for each metric.
+
+```{r}
+colData(unfiltered) <- cbind(colData(unfiltered), stats)
+unfiltered$discard <- qc$discard
+
+gridExtra::grid.arrange(
+    plotColData(unfiltered, y="sum", colour_by="discard") +
+        scale_y_log10() + ggtitle("Total count"),
+    plotColData(unfiltered, y="detected", colour_by="discard") +
+        scale_y_log10() + ggtitle("Detected features"),
+    plotColData(unfiltered, y="altexps_ERCC_percent",
+        colour_by="discard") + ggtitle("ERCC percent"),
+    ncol=2
+)
+```
+
+### Normalisation
+
+```{r normalisation}
+suppressPackageStartupMessages(library(scran))
+set.seed(101000110)
+clusters <- quickCluster(sce.nest)
+sce.nest <- computeSumFactors(sce.nest, clusters=clusters)
+sce.nest <- logNormCounts(sce.nest)
+```
+
+We examine some key metrics for the distribution of size factors, and compare it to the library sizes as a sanity check.
+
+```{r size_factors}
+summary(sizeFactors(sce.nest))
+plot(librarySizeFactors(sce.nest), sizeFactors(sce.nest), pch=16,
+    xlab="Library size factors", ylab="Deconvolution factors", log="xy")
+```
+
+### Variance modelling
+
+We use the spike-in transcripts to model the technical noise as a function of the mean.
+
+```{r model_noise}
+set.seed(00010101)
+dec.nest <- modelGeneVarWithSpikes(sce.nest, "ERCC")
+top.nest <- getTopHVGs(dec.nest, prop=0.1)
+```
+
+Per-gene variance as a function of the mean for the log-expression values in the Nestorowa HSC dataset. Each point represents a gene (black) with the mean-variance trend (blue) fitted to the spike-ins (red). 
+
+```{r per_gene_variance_plot}
+plot(dec.nest$mean, dec.nest$total, pch=16, cex=0.5,
+    xlab="Mean of log-expression", ylab="Variance of log-expression")
+curfit <- metadata(dec.nest)
+curve(curfit$trend(x), col='dodgerblue', add=TRUE, lwd=2)
+points(curfit$mean, curfit$var, col="red")
+```
+
+### Dimensionality reduction
+
+```{r dim_reduc}
+set.seed(101010011)
+sce.nest <- denoisePCA(sce.nest, technical=dec.nest, subset.row=top.nest)
+sce.nest <- runTSNE(sce.nest, dimred="PCA")
+```
+
+We check that the number of retained PCs is sensible.
+
+```{r reduced_dim}
+ncol(reducedDim(sce.nest, "PCA"))
+```
+
+### Clustering
+
+```{r snn_graph}
+snn.gr <- buildSNNGraph(sce.nest, use.dimred="PCA")
+colLabels(sce.nest) <- factor(igraph::cluster_walktrap(snn.gr)$membership)
+table(colLabels(sce.nest))
+plotTSNE(sce.nest, colour_by="label")
+```
+
+### Marker gene detection
+
+```{r find_markers}
+markers <- findMarkers(sce.nest, colLabels(sce.nest), 
+    test.type="wilcox", direction="up", lfc=0.5,
+    row.data=rowData(sce.nest)[,"SYMBOL",drop=FALSE])
+```
+
+To illustrate the manual annotation process, we examine the marker genes for one of the clusters. Upregulation of Car2, Hebp1 amd hemoglobins indicates that cluster 8 contains erythroid precursors.
+
+```{r heatmap}
+chosen <- markers[['8']]
+best <- chosen[chosen$Top <= 10,]
+aucs <- getMarkerEffects(best, prefix="AUC")
+rownames(aucs) <- best$SYMBOL
+
+suppressPackageStartupMessages(library(pheatmap))
+pheatmap(aucs, color=viridis::plasma(100))
+```
+
