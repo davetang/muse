@@ -1,0 +1,66 @@
+---
+title: "Access the AnnotationHub Web Service"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<https://bioconductor.org/packages/release/bioc/vignettes/AnnotationHub/inst/doc/AnnotationHub.html>
+
+> The AnnotationHub package provides a client interface to resources stored at the AnnotationHub web service.
+
+## Installation
+
+```{r install, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("AnnotationHub")
+```
+
+## Load
+
+```{r load}
+suppressPackageStartupMessages(library(AnnotationHub))
+packageVersion("AnnotationHub")
+```
+
+## Getting started
+
+The AnnotationHub package is straightforward to use. Create an `AnnotationHub` object.
+
+```{r ah}
+ah <- AnnotationHub()
+```
+
+Now at this point you have already done everything you need in order to start retrieving annotations. For most operations, using the `AnnotationHub` object should feel a lot like working with a familiar list or data.frame.
+
+```{r ah_obj}
+ah
+```
+
+You can see that it gives you an idea about the different types of data that are present inside the hub. You can see where the data is coming from (dataprovider), as well as what species have samples present (species), what kinds of R data objects could be returned (rdataclass). We can take a closer look at all the kinds of data providers that are available by simply looking at the contents of dataprovider as if it were the column of a data.frame object like this:
+
+```{r data_provider}
+unique(ah$dataprovider)
+```
+
+In the same way, you can also see data from different species inside the hub by looking at the contents of species.
+
+```{r ah_species}
+head(unique(ah$species))
+```
+
+One can get chain files for Drosophila melanogaster from UCSC with:
+
+```{r dm_chain}
+dm <- query(ah, c("ChainFile", "UCSC", "Drosophila melanogaster"))
+dm
+```
