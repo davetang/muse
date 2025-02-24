@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-02-23" />
+<meta name="date" content="2025-02-24" />
 
 <title>Trajectory Analysis</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Trajectory Analysis</h1>
-<h4 class="date">2025-02-23</h4>
+<h4 class="date">2025-02-24</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-02-23
+<strong>Last updated:</strong> 2025-02-24
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4a2d928173449b59b376fb377e0aa21f92b8a855targetblank4a2d928a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8c9397f8f2208c4bfa28655e7834441c49e9fcc6targetblank8c9397fa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/4a2d928173449b59b376fb377e0aa21f92b8a855" target="_blank">4a2d928</a>
+<a href="https://github.com/davetang/muse/tree/8c9397f8f2208c4bfa28655e7834441c49e9fcc6" target="_blank">8c9397f</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4a2d928173449b59b376fb377e0aa21f92b8a855targetblank4a2d928a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8c9397f8f2208c4bfa28655e7834441c49e9fcc6targetblank8c9397fa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/4a2d928173449b59b376fb377e0aa21f92b8a855" target="_blank">4a2d928</a>.
+<a href="https://github.com/davetang/muse/tree/8c9397f8f2208c4bfa28655e7834441c49e9fcc6" target="_blank">8c9397f</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -570,6 +570,7 @@ Ignored files:
     Ignored:    data/jurkat_293t/
     Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
     Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
     Ignored:    data/pbmc3k/
     Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
     Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
@@ -625,6 +626,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/8c9397f8f2208c4bfa28655e7834441c49e9fcc6/analysis/trajectory.Rmd" target="_blank">8c9397f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-24
+</td>
+<td>
+Downstream processing
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/fcd8cb2633d8962a5f0328760178508f542865fa/docs/trajectory.html" target="_blank">fcd8cb2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/4a2d928173449b59b376fb377e0aa21f92b8a855/analysis/trajectory.Rmd" target="_blank">4a2d928</a>
 </td>
 <td>
@@ -646,13 +681,13 @@ Trajectory analysis
 </div>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
-<p>Install <a
-href="https://bioconductor.org/packages/release/data/experiment/html/scRNAseq.html">scRNAseq</a>.</p>
+<p>Install dependencies.</p>
 <pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
     install.packages(&quot;BiocManager&quot;)
 
 BiocManager::install(&quot;scRNAseq&quot;)
-BiocManager::install(&quot;AnnotationHub&quot;)</code></pre>
+BiocManager::install(&quot;AnnotationHub&quot;)
+BiocManager::install(&quot;scater&quot;)</code></pre>
 </div>
 <div id="data" class="section level2">
 <h2>Data</h2>
@@ -684,6 +719,107 @@ colData names(9): gate broad ... projected metrics
 reducedDimNames(1): diffusion
 mainExpName: endogenous
 altExpNames(2): ERCC FACS</code></pre>
+<div id="quality-control" class="section level3">
+<h3>Quality control</h3>
+<pre class="r"><code>unfiltered &lt;- sce.nest</code></pre>
+<p>For some reason, no mitochondrial transcripts are available, so we
+will perform quality control using the spike-in proportions only.</p>
+<pre class="r"><code>suppressPackageStartupMessages(library(scater))
+
+stats &lt;- perCellQCMetrics(sce.nest)
+qc &lt;- quickPerCellQC(stats, percent_subsets=&quot;altexps_ERCC_percent&quot;)
+sce.nest &lt;- sce.nest[,!qc$discard]</code></pre>
+<p>We examine the number of cells discarded for each reason.</p>
+<pre class="r"><code>colSums(as.matrix(qc))</code></pre>
+<pre><code>             low_lib_size            low_n_features high_altexps_ERCC_percent 
+                      146                        28                       241 
+                  discard 
+                      264 </code></pre>
+<p>We create some diagnostic plots for each metric.</p>
+<pre class="r"><code>colData(unfiltered) &lt;- cbind(colData(unfiltered), stats)
+unfiltered$discard &lt;- qc$discard
+
+gridExtra::grid.arrange(
+    plotColData(unfiltered, y=&quot;sum&quot;, colour_by=&quot;discard&quot;) +
+        scale_y_log10() + ggtitle(&quot;Total count&quot;),
+    plotColData(unfiltered, y=&quot;detected&quot;, colour_by=&quot;discard&quot;) +
+        scale_y_log10() + ggtitle(&quot;Detected features&quot;),
+    plotColData(unfiltered, y=&quot;altexps_ERCC_percent&quot;,
+        colour_by=&quot;discard&quot;) + ggtitle(&quot;ERCC percent&quot;),
+    ncol=2
+)</code></pre>
+<p><img src="figure/trajectory.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="normalisation" class="section level3">
+<h3>Normalisation</h3>
+<pre class="r"><code>suppressPackageStartupMessages(library(scran))
+set.seed(101000110)
+clusters &lt;- quickCluster(sce.nest)
+sce.nest &lt;- computeSumFactors(sce.nest, clusters=clusters)
+sce.nest &lt;- logNormCounts(sce.nest)</code></pre>
+<p>We examine some key metrics for the distribution of size factors, and
+compare it to the library sizes as a sanity check.</p>
+<pre class="r"><code>summary(sizeFactors(sce.nest))</code></pre>
+<pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
+ 0.03876  0.42023  0.74297  1.00000  1.24900 16.78896 </code></pre>
+<pre class="r"><code>plot(librarySizeFactors(sce.nest), sizeFactors(sce.nest), pch=16,
+    xlab=&quot;Library size factors&quot;, ylab=&quot;Deconvolution factors&quot;, log=&quot;xy&quot;)</code></pre>
+<p><img src="figure/trajectory.Rmd/size_factors-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="variance-modelling" class="section level3">
+<h3>Variance modelling</h3>
+<p>We use the spike-in transcripts to model the technical noise as a
+function of the mean.</p>
+<pre class="r"><code>set.seed(00010101)
+dec.nest &lt;- modelGeneVarWithSpikes(sce.nest, &quot;ERCC&quot;)
+top.nest &lt;- getTopHVGs(dec.nest, prop=0.1)</code></pre>
+<p>Per-gene variance as a function of the mean for the log-expression
+values in the Nestorowa HSC dataset. Each point represents a gene
+(black) with the mean-variance trend (blue) fitted to the spike-ins
+(red).</p>
+<pre class="r"><code>plot(dec.nest$mean, dec.nest$total, pch=16, cex=0.5,
+    xlab=&quot;Mean of log-expression&quot;, ylab=&quot;Variance of log-expression&quot;)
+curfit &lt;- metadata(dec.nest)
+curve(curfit$trend(x), col=&#39;dodgerblue&#39;, add=TRUE, lwd=2)
+points(curfit$mean, curfit$var, col=&quot;red&quot;)</code></pre>
+<p><img src="figure/trajectory.Rmd/per_gene_variance_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="dimensionality-reduction" class="section level3">
+<h3>Dimensionality reduction</h3>
+<pre class="r"><code>set.seed(101010011)
+sce.nest &lt;- denoisePCA(sce.nest, technical=dec.nest, subset.row=top.nest)
+sce.nest &lt;- runTSNE(sce.nest, dimred=&quot;PCA&quot;)</code></pre>
+<p>We check that the number of retained PCs is sensible.</p>
+<pre class="r"><code>ncol(reducedDim(sce.nest, &quot;PCA&quot;))</code></pre>
+<pre><code>[1] 9</code></pre>
+</div>
+<div id="clustering" class="section level3">
+<h3>Clustering</h3>
+<pre class="r"><code>snn.gr &lt;- buildSNNGraph(sce.nest, use.dimred=&quot;PCA&quot;)
+colLabels(sce.nest) &lt;- factor(igraph::cluster_walktrap(snn.gr)$membership)
+table(colLabels(sce.nest))</code></pre>
+<pre><code>
+  1   2   3   4   5   6   7   8   9  10 
+198 319 208 147 221 182  21 209  74  77 </code></pre>
+<pre class="r"><code>plotTSNE(sce.nest, colour_by=&quot;label&quot;)</code></pre>
+<p><img src="figure/trajectory.Rmd/snn_graph-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="marker-gene-detection" class="section level3">
+<h3>Marker gene detection</h3>
+<pre class="r"><code>markers &lt;- findMarkers(sce.nest, colLabels(sce.nest), 
+    test.type=&quot;wilcox&quot;, direction=&quot;up&quot;, lfc=0.5,
+    row.data=rowData(sce.nest)[,&quot;SYMBOL&quot;,drop=FALSE])</code></pre>
+<p>To illustrate the manual annotation process, we examine the marker
+genes for one of the clusters. Upregulation of Car2, Hebp1 amd
+hemoglobins indicates that cluster 8 contains erythroid precursors.</p>
+<pre class="r"><code>chosen &lt;- markers[[&#39;8&#39;]]
+best &lt;- chosen[chosen$Top &lt;= 10,]
+aucs &lt;- getMarkerEffects(best, prefix=&quot;AUC&quot;)
+rownames(aucs) &lt;- best$SYMBOL
+
+suppressPackageStartupMessages(library(pheatmap))
+pheatmap(aucs, color=viridis::plasma(100))</code></pre>
+<p><img src="figure/trajectory.Rmd/heatmap-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -717,52 +853,66 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] AnnotationHub_3.14.0        BiocFileCache_2.14.0       
- [3] dbplyr_2.5.0                ensembldb_2.30.0           
- [5] AnnotationFilter_1.30.0     GenomicFeatures_1.58.0     
- [7] AnnotationDbi_1.68.0        scRNAseq_2.20.0            
- [9] SingleCellExperiment_1.28.1 SummarizedExperiment_1.36.0
-[11] Biobase_2.66.0              GenomicRanges_1.58.0       
-[13] GenomeInfoDb_1.42.3         IRanges_2.40.1             
-[15] S4Vectors_0.44.0            BiocGenerics_0.52.0        
-[17] MatrixGenerics_1.18.1       matrixStats_1.4.1          
-[19] workflowr_1.7.1            
+ [1] pheatmap_1.0.12             scran_1.34.0               
+ [3] scater_1.34.0               ggplot2_3.5.1              
+ [5] scuttle_1.16.0              AnnotationHub_3.14.0       
+ [7] BiocFileCache_2.14.0        dbplyr_2.5.0               
+ [9] ensembldb_2.30.0            AnnotationFilter_1.30.0    
+[11] GenomicFeatures_1.58.0      AnnotationDbi_1.68.0       
+[13] scRNAseq_2.20.0             SingleCellExperiment_1.28.1
+[15] SummarizedExperiment_1.36.0 Biobase_2.66.0             
+[17] GenomicRanges_1.58.0        GenomeInfoDb_1.42.3        
+[19] IRanges_2.40.1              S4Vectors_0.44.0           
+[21] BiocGenerics_0.52.0         MatrixGenerics_1.18.1      
+[23] matrixStats_1.4.1           workflowr_1.7.1            
 
 loaded via a namespace (and not attached):
-  [1] DBI_1.2.3                bitops_1.0-9             httr2_1.0.5             
-  [4] rlang_1.1.4              magrittr_2.0.3           git2r_0.35.0            
-  [7] gypsum_1.2.0             compiler_4.4.1           RSQLite_2.3.7           
- [10] getPass_0.2-4            png_0.1-8                callr_3.7.6             
- [13] vctrs_0.6.5              ProtGenerics_1.38.0      stringr_1.5.1           
- [16] pkgconfig_2.0.3          crayon_1.5.3             fastmap_1.2.0           
- [19] XVector_0.46.0           utf8_1.2.4               Rsamtools_2.22.0        
- [22] promises_1.3.0           rmarkdown_2.28           UCSC.utils_1.2.0        
- [25] ps_1.8.1                 purrr_1.0.2              bit_4.5.0               
- [28] xfun_0.48                zlibbioc_1.52.0          cachem_1.1.0            
- [31] jsonlite_1.8.9           blob_1.2.4               later_1.3.2             
- [34] rhdf5filters_1.18.0      DelayedArray_0.32.0      Rhdf5lib_1.28.0         
- [37] BiocParallel_1.40.0      parallel_4.4.1           R6_2.5.1                
- [40] bslib_0.8.0              stringi_1.8.4            rtracklayer_1.66.0      
- [43] jquerylib_0.1.4          Rcpp_1.0.13              knitr_1.48              
- [46] httpuv_1.6.15            Matrix_1.7-0             tidyselect_1.2.1        
- [49] rstudioapi_0.17.1        abind_1.4-8              yaml_2.3.10             
- [52] codetools_0.2-20         curl_5.2.3               processx_3.8.4          
- [55] alabaster.sce_1.6.0      lattice_0.22-6           tibble_3.2.1            
- [58] withr_3.0.2              KEGGREST_1.46.0          evaluate_1.0.1          
- [61] alabaster.schemas_1.6.0  ExperimentHub_2.14.0     Biostrings_2.74.1       
- [64] pillar_1.9.0             BiocManager_1.30.25      filelock_1.0.3          
- [67] whisker_0.4.1            generics_0.1.3           rprojroot_2.0.4         
- [70] RCurl_1.98-1.16          BiocVersion_3.20.0       alabaster.base_1.6.1    
- [73] alabaster.ranges_1.6.0   glue_1.8.0               lazyeval_0.2.2          
- [76] alabaster.matrix_1.6.1   tools_4.4.1              BiocIO_1.16.0           
- [79] GenomicAlignments_1.42.0 fs_1.6.4                 XML_3.99-0.17           
- [82] rhdf5_2.50.2             grid_4.4.1               GenomeInfoDbData_1.2.13 
- [85] HDF5Array_1.34.0         restfulr_0.0.15          cli_3.6.3               
- [88] rappdirs_0.3.3           fansi_1.0.6              S4Arrays_1.6.0          
- [91] dplyr_1.1.4              alabaster.se_1.6.0       sass_0.4.9              
- [94] digest_0.6.37            SparseArray_1.6.1        rjson_0.2.23            
- [97] memoise_2.0.1            htmltools_0.5.8.1        lifecycle_1.0.4         
-[100] httr_1.4.7               mime_0.12                bit64_4.5.2             </code></pre>
+  [1] later_1.3.2              BiocIO_1.16.0            bitops_1.0-9            
+  [4] filelock_1.0.3           tibble_3.2.1             XML_3.99-0.17           
+  [7] lifecycle_1.0.4          httr2_1.0.5              edgeR_4.4.2             
+ [10] rprojroot_2.0.4          processx_3.8.4           lattice_0.22-6          
+ [13] alabaster.base_1.6.1     magrittr_2.0.3           limma_3.62.2            
+ [16] sass_0.4.9               rmarkdown_2.28           jquerylib_0.1.4         
+ [19] yaml_2.3.10              metapod_1.14.0           httpuv_1.6.15           
+ [22] RColorBrewer_1.1-3       cowplot_1.1.3            DBI_1.2.3               
+ [25] abind_1.4-8              zlibbioc_1.52.0          Rtsne_0.17              
+ [28] purrr_1.0.2              RCurl_1.98-1.16          rappdirs_0.3.3          
+ [31] git2r_0.35.0             GenomeInfoDbData_1.2.13  ggrepel_0.9.6           
+ [34] irlba_2.3.5.1            alabaster.sce_1.6.0      dqrng_0.4.1             
+ [37] codetools_0.2-20         DelayedArray_0.32.0      tidyselect_1.2.1        
+ [40] UCSC.utils_1.2.0         farver_2.1.2             ScaledMatrix_1.14.0     
+ [43] viridis_0.6.5            GenomicAlignments_1.42.0 jsonlite_1.8.9          
+ [46] BiocNeighbors_2.0.1      tools_4.4.1              Rcpp_1.0.13             
+ [49] glue_1.8.0               gridExtra_2.3            SparseArray_1.6.1       
+ [52] xfun_0.48                dplyr_1.1.4              HDF5Array_1.34.0        
+ [55] gypsum_1.2.0             withr_3.0.2              BiocManager_1.30.25     
+ [58] fastmap_1.2.0            rhdf5filters_1.18.0      bluster_1.16.0          
+ [61] fansi_1.0.6              callr_3.7.6              digest_0.6.37           
+ [64] rsvd_1.0.5               R6_2.5.1                 mime_0.12               
+ [67] colorspace_2.1-1         RSQLite_2.3.7            utf8_1.2.4              
+ [70] generics_0.1.3           rtracklayer_1.66.0       httr_1.4.7              
+ [73] S4Arrays_1.6.0           whisker_0.4.1            pkgconfig_2.0.3         
+ [76] gtable_0.3.6             blob_1.2.4               XVector_0.46.0          
+ [79] htmltools_0.5.8.1        ProtGenerics_1.38.0      scales_1.3.0            
+ [82] alabaster.matrix_1.6.1   png_0.1-8                knitr_1.48              
+ [85] rstudioapi_0.17.1        rjson_0.2.23             curl_5.2.3              
+ [88] cachem_1.1.0             rhdf5_2.50.2             stringr_1.5.1           
+ [91] BiocVersion_3.20.0       parallel_4.4.1           vipor_0.4.7             
+ [94] restfulr_0.0.15          pillar_1.9.0             grid_4.4.1              
+ [97] alabaster.schemas_1.6.0  vctrs_0.6.5              promises_1.3.0          
+[100] BiocSingular_1.22.0      beachmat_2.22.0          cluster_2.1.6           
+[103] beeswarm_0.4.0           evaluate_1.0.1           cli_3.6.3               
+[106] locfit_1.5-9.10          compiler_4.4.1           Rsamtools_2.22.0        
+[109] rlang_1.1.4              crayon_1.5.3             labeling_0.4.3          
+[112] ps_1.8.1                 getPass_0.2-4            fs_1.6.4                
+[115] ggbeeswarm_0.7.2         stringi_1.8.4            alabaster.se_1.6.0      
+[118] viridisLite_0.4.2        BiocParallel_1.40.0      munsell_0.5.1           
+[121] Biostrings_2.74.1        lazyeval_0.2.2           Matrix_1.7-0            
+[124] ExperimentHub_2.14.0     bit64_4.5.2              Rhdf5lib_1.28.0         
+[127] KEGGREST_1.46.0          statmod_1.5.0            alabaster.ranges_1.6.0  
+[130] highr_0.11               igraph_2.1.1             memoise_2.0.1           
+[133] bslib_0.8.0              bit_4.5.0               </code></pre>
+</div>
 </div>
 </div>
 </div>
