@@ -197,3 +197,33 @@ UMAP with annotations.
 ```{r umap_with_labels}
 DimPlot(pbmc20k, reduction = "umap", group.by = "labels", pt.size = .1, label = TRUE, repel = TRUE)
 ```
+
+## Saving and loading
+
+If you save your object and load it in in the future, Seurat will access the on-disk matrices by their path, which is stored in the assay level data. To make it easy to ensure these are saved in the same place, we provide new functionality to the `SaveSeuratRds()` function. In this function, you specify your filename. The pointer to the path in the Seurat object will change to the current directory.
+
+This also makes it easy to share your Seurat objects with BPCells matrices by sharing a folder that contains both the object and the BPCells directory.
+
+Make sure you use a different directory than where the on-disk matrices are stored or they will be recursively copied.
+
+```{r export_seurat}
+output_dir <- "data/pbmc20k_seurat"
+if(!dir.exists(output_dir)){
+  dir.create(output_dir)
+}
+
+SaveSeuratRds(
+  object = pbmc20k,
+  file = paste0(output_dir, "/pbmc20k.rds")
+)
+list.files(output_dir)
+list.files(paste0(output_dir, "/pbmc20k"))
+```
+
+Need to use `LoadSeuratRds()` to load or else none of the layers will be imported.
+
+```{r import_seurat}
+pbmc20k_import <- LoadSeuratRds(paste0(output_dir, '/pbmc20k.rds'))
+pbmc20k_import
+pbmc20k_import@assays$RNA$counts
+```
