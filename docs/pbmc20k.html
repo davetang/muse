@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-02-23" />
+<meta name="date" content="2025-02-24" />
 
 <title>Analysing 20k cells</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Analysing 20k cells</h1>
-<h4 class="date">2025-02-23</h4>
+<h4 class="date">2025-02-24</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-02-23
+<strong>Last updated:</strong> 2025-02-24
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9e472aa8760568b9acbe79b3ca76be57838f6b60targetblank9e472aaa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6daf5ce50813de852e253f829b9d4a001e03e6dbtargetblank6daf5cea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/9e472aa8760568b9acbe79b3ca76be57838f6b60" target="_blank">9e472aa</a>
+<a href="https://github.com/davetang/muse/tree/6daf5ce50813de852e253f829b9d4a001e03e6db" target="_blank">6daf5ce</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9e472aa8760568b9acbe79b3ca76be57838f6b60targetblank9e472aaa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6daf5ce50813de852e253f829b9d4a001e03e6dbtargetblank6daf5cea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/9e472aa8760568b9acbe79b3ca76be57838f6b60" target="_blank">9e472aa</a>.
+<a href="https://github.com/davetang/muse/tree/6daf5ce50813de852e253f829b9d4a001e03e6db" target="_blank">6daf5ce</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -576,6 +576,9 @@ Ignored files:
     Ignored:    data/seurat_1m_neuron.rds
     Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
     Ignored:    r_packages_4.4.1/
+
+Untracked files:
+    Untracked:  data/pbmc20k_seurat/
 
 </code></pre>
 <p>
@@ -620,6 +623,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/6daf5ce50813de852e253f829b9d4a001e03e6db/analysis/pbmc20k.Rmd" target="_blank">6daf5ce</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-24
+</td>
+<td>
+Saving and loading on-disk backed Seurat objects
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4dc6978982a566178f3ceac5e4997237106bacba/docs/pbmc20k.html" target="_blank">4dc6978</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1114,6 +1151,61 @@ Dave Tang
 </table>
 </div>
 </div>
+</div>
+<div id="saving-and-loading" class="section level2">
+<h2>Saving and loading</h2>
+<p>If you save your object and load it in in the future, Seurat will
+access the on-disk matrices by their path, which is stored in the assay
+level data. To make it easy to ensure these are saved in the same place,
+we provide new functionality to the <code>SaveSeuratRds()</code>
+function. In this function, you specify your filename. The pointer to
+the path in the Seurat object will change to the current directory.</p>
+<p>This also makes it easy to share your Seurat objects with BPCells
+matrices by sharing a folder that contains both the object and the
+BPCells directory.</p>
+<p>Make sure you use a different directory than where the on-disk
+matrices are stored or they will be recursively copied.</p>
+<pre class="r"><code>output_dir &lt;- &quot;data/pbmc20k_seurat&quot;
+if(!dir.exists(output_dir)){
+  dir.create(output_dir)
+}
+
+SaveSeuratRds(
+  object = pbmc20k,
+  file = paste0(output_dir, &quot;/pbmc20k.rds&quot;)
+)</code></pre>
+<pre><code>Warning: Trying to move &#39;/home/rstudio/muse/data/pbmc20k&#39; to itself, skipping
+Trying to move &#39;/home/rstudio/muse/data/pbmc20k&#39; to itself, skipping
+Trying to move &#39;/home/rstudio/muse/data/pbmc20k&#39; to itself, skipping</code></pre>
+<pre class="r"><code>list.files(output_dir)</code></pre>
+<pre><code>[1] &quot;pbmc20k&quot;     &quot;pbmc20k.rds&quot;</code></pre>
+<pre class="r"><code>list.files(paste0(output_dir, &quot;/pbmc20k&quot;))</code></pre>
+<pre><code> [1] &quot;col_names&quot;         &quot;idxptr&quot;            &quot;index_data&quot;       
+ [4] &quot;index_idx&quot;         &quot;index_idx_offsets&quot; &quot;index_starts&quot;     
+ [7] &quot;row_names&quot;         &quot;shape&quot;             &quot;storage_order&quot;    
+[10] &quot;val_data&quot;          &quot;val_idx&quot;           &quot;val_idx_offsets&quot;  
+[13] &quot;version&quot;          </code></pre>
+<p>Need to use <code>LoadSeuratRds()</code> to load or else none of the
+layers will be imported.</p>
+<pre class="r"><code>pbmc20k_import &lt;- LoadSeuratRds(paste0(output_dir, &#39;/pbmc20k.rds&#39;))
+pbmc20k_import</code></pre>
+<pre><code>An object of class Seurat 
+27385 features across 22061 samples within 1 assay 
+Active assay: RNA (27385 features, 2000 variable features)
+ 3 layers present: counts, data, scale.data
+ 3 dimensional reductions calculated: pca, harmony, umap</code></pre>
+<pre class="r"><code>pbmc20k_import@assays$RNA$counts</code></pre>
+<pre><code>27385 x 22061 IterableMatrix object with class RenameDims
+
+Row names: ENSG00000238009, ENSG00000239945 ... AMELY
+Col names: donor1_AAACCAAAGGTGACGA-1, donor1_AAACCCTGTGACGAGT-1 ... donor4_TGTGTTGAGTTACGGC-1
+
+Data type: uint32_t
+Storage order: column major
+
+Queued Operations:
+1. Load compressed matrix from directory /home/rstudio/muse/data/pbmc20k
+2. Reset dimnames</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
