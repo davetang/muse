@@ -74,7 +74,7 @@ pred.hesc
 
 SingleR is workflow/package agnostic. The above example uses `SummarizedExperiment` objects, but the same functions will accept any (log-)normalized expression matrix.
 
-## Human pancreas
+## Using single-cell references
 
 Here, we will use two human pancreas datasets from the scRNAseq package. The aim is to use one pre-labelled dataset to annotate the other unlabelled dataset. First, we set up the Muraro et al. (2016) dataset to be our reference.
 
@@ -88,14 +88,22 @@ sceM <- sceM[,!is.na(sceM$label)]
 
 # SingleR() expects reference datasets to be normalized and log-transformed.
 sceM <- logNormCounts(sceM)
+sceM
 ```
 
-We then set up our test dataset from Grun et al. (2016). To speed up this demonstration, we will subset to the first 100 cells.
+Label tally.
+
+```{r scem_label}
+table(colData(sceM)$label)
+```
+
+We then set up our test dataset from Grun et al. (2016).
 
 ```{r sceg}
 sceG <- GrunPancreasData()
 sceG <- sceG[,colSums(counts(sceG)) > 0] # Remove libraries with no counts.
 sceG <- logNormCounts(sceG) 
+sceG
 ```
 
 We then run SingleR() as described previously but with a marker detection mode that considers the variance of expression across cells. Here, we will use the Wilcoxon ranked sum test to identify the top markers for each pairwise comparison between labels. This is slower but more appropriate for single-cell data compared to the default marker detection algorithm (which may fail for low-coverage data where the median is frequently zero).
@@ -107,6 +115,7 @@ pred.grun <- SingleR(
   labels=sceM$label,
   de.method="wilcox"
 )
+
 table(pred.grun$labels)
 ```
 
