@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree690145ce2a5bf1f4ee9c1dc43e65d00fbfa9e0cdtargetblank690145ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8a3ad8c0f280f9e0b88f80d70989e7ce1430785btargetblank8a3ad8ca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/690145ce2a5bf1f4ee9c1dc43e65d00fbfa9e0cd" target="_blank">690145c</a>
+<a href="https://github.com/davetang/muse/tree/8a3ad8c0f280f9e0b88f80d70989e7ce1430785b" target="_blank">8a3ad8c</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree690145ce2a5bf1f4ee9c1dc43e65d00fbfa9e0cdtargetblank690145ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8a3ad8c0f280f9e0b88f80d70989e7ce1430785btargetblank8a3ad8ca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/690145ce2a5bf1f4ee9c1dc43e65d00fbfa9e0cd" target="_blank">690145c</a>.
+<a href="https://github.com/davetang/muse/tree/8a3ad8c0f280f9e0b88f80d70989e7ce1430785b" target="_blank">8a3ad8c</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -625,6 +625,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/8a3ad8c0f280f9e0b88f80d70989e7ce1430785b/analysis/singler.Rmd" target="_blank">8a3ad8c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-26
+</td>
+<td>
+pbmc3k
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/5c7a2bac70dc999545105e753a4ae784475afd4a/docs/singler.html" target="_blank">5c7a2ba</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1028,6 +1062,148 @@ Dave Tang
 </table>
 </div>
 </div>
+</div>
+<div id="pbmc3k" class="section level2">
+<h2>pbmc3k</h2>
+<p>pbmc3k.</p>
+<pre class="r"><code>suppressPackageStartupMessages(library(Seurat))
+pbmc.data &lt;- Read10X(data.dir = &quot;data/pbmc3k/filtered_gene_bc_matrices/hg19/&quot;)
+
+pbmc3k &lt;- CreateSeuratObject(
+  counts = pbmc.data,
+  min.cells = 3,
+  min.features = 200,
+  project = &quot;pbmc3k&quot;
+)</code></pre>
+<pre><code>Warning: Feature names cannot have underscores (&#39;_&#39;), replacing with dashes
+(&#39;-&#39;)</code></pre>
+<pre class="r"><code>pbmc3k &lt;- NormalizeData(pbmc3k)</code></pre>
+<pre><code>Normalizing layer: counts</code></pre>
+<p>Use Monaco.</p>
+<pre class="r"><code>suppressPackageStartupMessages(library(celldex))
+monaco_immune &lt;- fetchReference(&quot;monaco_immune&quot;, &quot;2024-02-26&quot;)
+monaco_immune</code></pre>
+<pre><code>class: SummarizedExperiment 
+dim: 46077 114 
+metadata(0):
+assays(1): logcounts
+rownames(46077): A1BG A1BG-AS1 ... ZYX ZZEF1
+rowData names(0):
+colnames(114): DZQV_CD8_naive DZQV_CD8_CM ... G4YW_Neutrophils
+  G4YW_Basophils
+colData names(3): label.main label.fine label.ont</code></pre>
+<p>Annotate.</p>
+<pre class="r"><code>pbmc3k.anno &lt;- SingleR(
+  test=pbmc3k@assays$RNA$data,
+  ref=monaco_immune,
+  labels=colData(monaco_immune)$label.main
+)
+
+cbind(
+  pbmc3k@meta.data,
+  as.data.frame(pbmc3k.anno)
+) -&gt; pbmc3k@meta.data
+
+head(pbmc3k@meta.data)</code></pre>
+<pre><code>                 orig.ident nCount_RNA nFeature_RNA scores.B.cells
+AAACATACAACCAC-1     pbmc3k       2419          779      0.2180441
+AAACATTGAGCTAC-1     pbmc3k       4903         1352      0.3757485
+AAACATTGATCAGC-1     pbmc3k       3147         1129      0.2021054
+AAACCGTGCTTCCG-1     pbmc3k       2639          960      0.2612174
+AAACCGTGTATGCG-1     pbmc3k        980          521      0.1354756
+AAACGCACTGGTAC-1     pbmc3k       2163          781      0.2428544
+                 scores.Basophils scores.CD4..T.cells scores.CD8..T.cells
+AAACATACAACCAC-1        0.1383833           0.3191626           0.3271229
+AAACATTGAGCTAC-1        0.1595869           0.2226758           0.2314824
+AAACATTGATCAGC-1        0.1398993           0.3603814           0.3381419
+AAACCGTGCTTCCG-1        0.1925995           0.1409225           0.1433708
+AAACCGTGTATGCG-1        0.1062113           0.1834073           0.2328461
+AAACGCACTGGTAC-1        0.1773750           0.3236777           0.3062542
+                 scores.Dendritic.cells scores.Monocytes scores.Neutrophils
+AAACATACAACCAC-1              0.1813302        0.1823273         0.10993201
+AAACATTGAGCTAC-1              0.2636019        0.2165097         0.12052022
+AAACATTGATCAGC-1              0.1654294        0.1732526         0.12294480
+AAACCGTGCTTCCG-1              0.3438019        0.3694793         0.23698599
+AAACCGTGTATGCG-1              0.1082860        0.1210741         0.07931607
+AAACGCACTGGTAC-1              0.2057659        0.2115375         0.10881833
+                 scores.NK.cells scores.Progenitors scores.T.cells       labels
+AAACATACAACCAC-1       0.2818949          0.2027839      0.3311532      T cells
+AAACATTGAGCTAC-1       0.2137517          0.2441976      0.2270059      B cells
+AAACATTGATCAGC-1       0.2701806          0.1943829      0.3374040 CD4+ T cells
+AAACCGTGCTTCCG-1       0.1803712          0.2258147      0.1466077    Monocytes
+AAACCGTGTATGCG-1       0.2725055          0.1577020      0.2524348     NK cells
+AAACGCACTGGTAC-1       0.2690438          0.2098472      0.3002346 CD4+ T cells
+                   delta.next pruned.labels
+AAACATACAACCAC-1 0.0009944445       T cells
+AAACATTGAGCTAC-1 0.1121465835       B cells
+AAACATTGATCAGC-1 0.0850874976  CD4+ T cells
+AAACCGTGCTTCCG-1 0.1135955003     Monocytes
+AAACCGTGTATGCG-1 0.0623907247      NK cells
+AAACGCACTGGTAC-1 0.0574108543  CD4+ T cells</code></pre>
+<div id="reference" class="section level3">
+<h3>Reference</h3>
+<p>Split in half.</p>
+<pre class="r"><code>total &lt;- nrow(pbmc3k@meta.data)
+half &lt;- floor(total / 2)
+first_half &lt;- row.names(pbmc3k@meta.data)[1:half]
+second_half &lt;- row.names(pbmc3k@meta.data)[(half+1):total]</code></pre>
+<p>Create reference.</p>
+<pre class="r"><code>sce_ref &lt;- SingleCellExperiment(
+  assays = list(counts = pbmc3k@assays$RNA$counts[, first_half])
+)
+colLabels(sce_ref) &lt;- pbmc3k@meta.data[first_half, &#39;labels&#39;]
+sce_ref &lt;- logNormCounts(sce_ref)
+sce_ref</code></pre>
+<pre><code>class: SingleCellExperiment 
+dim: 13714 1350 
+metadata(0):
+assays(2): counts logcounts
+rownames(13714): AL627309.1 AP006222.2 ... PNRC2.1 SRSF10.1
+rowData names(0):
+colnames(1350): AAACATACAACCAC-1 AAACATTGAGCTAC-1 ... CTATAGCTTCGCTC-1
+  CTATAGCTTGCCTC-1
+colData names(2): label sizeFactor
+reducedDimNames(0):
+mainExpName: NULL
+altExpNames(0):</code></pre>
+<p>Create query.</p>
+<pre class="r"><code>sce_query &lt;- SingleCellExperiment(
+  assays = list(counts = pbmc3k@assays$RNA$counts[, first_half])
+)
+sce_query &lt;- logNormCounts(sce_query)
+sce_query</code></pre>
+<pre><code>class: SingleCellExperiment 
+dim: 13714 1350 
+metadata(0):
+assays(2): counts logcounts
+rownames(13714): AL627309.1 AP006222.2 ... PNRC2.1 SRSF10.1
+rowData names(0):
+colnames(1350): AAACATACAACCAC-1 AAACATTGAGCTAC-1 ... CTATAGCTTCGCTC-1
+  CTATAGCTTGCCTC-1
+colData names(1): sizeFactor
+reducedDimNames(0):
+mainExpName: NULL
+altExpNames(0):</code></pre>
+<p>Annotate.</p>
+<pre class="r"><code>sce.pred &lt;- SingleR(
+  test=sce_query,
+  ref=sce_ref,
+  labels=sce_ref$label,
+  de.method=&quot;wilcox&quot;
+)
+
+table(sce_ref$label)</code></pre>
+<pre><code>
+        B cells    CD4+ T cells    CD8+ T cells Dendritic cells       Monocytes 
+            179             455             160              23             317 
+       NK cells     Progenitors         T cells 
+             87               6             123 </code></pre>
+<pre class="r"><code>table(sce.pred$labels)</code></pre>
+<pre><code>
+        B cells    CD4+ T cells    CD8+ T cells Dendritic cells       Monocytes 
+            179             501             139              34             307 
+       NK cells     Progenitors         T cells 
+             79               6             105 </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1061,85 +1237,117 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] scuttle_1.16.0              SingleR_2.8.0              
- [3] scRNAseq_2.20.0             SingleCellExperiment_1.28.1
- [5] celldex_1.16.0              SummarizedExperiment_1.36.0
- [7] Biobase_2.66.0              GenomicRanges_1.58.0       
- [9] GenomeInfoDb_1.42.3         IRanges_2.40.1             
-[11] S4Vectors_0.44.0            BiocGenerics_0.52.0        
-[13] MatrixGenerics_1.18.1       matrixStats_1.4.1          
-[15] workflowr_1.7.1            
+ [1] Seurat_5.1.0                SeuratObject_5.0.2         
+ [3] sp_2.1-4                    scuttle_1.16.0             
+ [5] SingleR_2.8.0               scRNAseq_2.20.0            
+ [7] SingleCellExperiment_1.28.1 celldex_1.16.0             
+ [9] SummarizedExperiment_1.36.0 Biobase_2.66.0             
+[11] GenomicRanges_1.58.0        GenomeInfoDb_1.42.3        
+[13] IRanges_2.40.1              S4Vectors_0.44.0           
+[15] BiocGenerics_0.52.0         MatrixGenerics_1.18.1      
+[17] matrixStats_1.4.1           workflowr_1.7.1            
 
 loaded via a namespace (and not attached):
-  [1] RColorBrewer_1.1-3        rstudioapi_0.17.1        
-  [3] jsonlite_1.8.9            magrittr_2.0.3           
-  [5] GenomicFeatures_1.58.0    gypsum_1.2.0             
-  [7] farver_2.1.2              rmarkdown_2.28           
-  [9] fs_1.6.4                  BiocIO_1.16.0            
- [11] zlibbioc_1.52.0           vctrs_0.6.5              
- [13] memoise_2.0.1             Rsamtools_2.22.0         
- [15] DelayedMatrixStats_1.28.1 RCurl_1.98-1.16          
- [17] htmltools_0.5.8.1         S4Arrays_1.6.0           
- [19] AnnotationHub_3.14.0      curl_5.2.3               
- [21] BiocNeighbors_2.0.1       Rhdf5lib_1.28.0          
- [23] SparseArray_1.6.1         rhdf5_2.50.2             
- [25] sass_0.4.9                alabaster.base_1.6.1     
- [27] bslib_0.8.0               alabaster.sce_1.6.0      
- [29] httr2_1.0.5               cachem_1.1.0             
- [31] GenomicAlignments_1.42.0  igraph_2.1.1             
- [33] whisker_0.4.1             lifecycle_1.0.4          
- [35] pkgconfig_2.0.3           rsvd_1.0.5               
- [37] Matrix_1.7-0              R6_2.5.1                 
- [39] fastmap_1.2.0             GenomeInfoDbData_1.2.13  
- [41] digest_0.6.37             colorspace_2.1-1         
- [43] AnnotationDbi_1.68.0      ps_1.8.1                 
- [45] rprojroot_2.0.4           dqrng_0.4.1              
- [47] irlba_2.3.5.1             ExperimentHub_2.14.0     
- [49] RSQLite_2.3.7             beachmat_2.22.0          
- [51] labeling_0.4.3            filelock_1.0.3           
- [53] fansi_1.0.6               httr_1.4.7               
- [55] abind_1.4-8               compiler_4.4.1           
- [57] withr_3.0.2               bit64_4.5.2              
- [59] BiocParallel_1.40.0       viridis_0.6.5            
- [61] DBI_1.2.3                 highr_0.11               
- [63] HDF5Array_1.34.0          alabaster.ranges_1.6.0   
- [65] alabaster.schemas_1.6.0   rappdirs_0.3.3           
- [67] DelayedArray_0.32.0       bluster_1.16.0           
- [69] rjson_0.2.23              tools_4.4.1              
- [71] httpuv_1.6.15             glue_1.8.0               
- [73] restfulr_0.0.15           callr_3.7.6              
- [75] rhdf5filters_1.18.0       promises_1.3.0           
- [77] grid_4.4.1                getPass_0.2-4            
- [79] cluster_2.1.6             generics_0.1.3           
- [81] gtable_0.3.6              ensembldb_2.30.0         
- [83] metapod_1.14.0            BiocSingular_1.22.0      
- [85] ScaledMatrix_1.14.0       utf8_1.2.4               
- [87] XVector_0.46.0            BiocVersion_3.20.0       
- [89] pillar_1.9.0              stringr_1.5.1            
- [91] limma_3.62.2              later_1.3.2              
- [93] dplyr_1.1.4               BiocFileCache_2.14.0     
- [95] lattice_0.22-6            rtracklayer_1.66.0       
- [97] bit_4.5.0                 tidyselect_1.2.1         
- [99] locfit_1.5-9.10           Biostrings_2.74.1        
-[101] knitr_1.48                git2r_0.35.0             
-[103] gridExtra_2.3             ProtGenerics_1.38.0      
-[105] edgeR_4.4.2               xfun_0.48                
-[107] statmod_1.5.0             pheatmap_1.0.12          
-[109] stringi_1.8.4             UCSC.utils_1.2.0         
-[111] lazyeval_0.2.2            yaml_2.3.10              
-[113] evaluate_1.0.1            codetools_0.2-20         
-[115] tibble_3.2.1              alabaster.matrix_1.6.1   
-[117] BiocManager_1.30.25       cli_3.6.3                
-[119] munsell_0.5.1             processx_3.8.4           
-[121] jquerylib_0.1.4           Rcpp_1.0.13              
-[123] dbplyr_2.5.0              png_0.1-8                
-[125] XML_3.99-0.17             parallel_4.4.1           
-[127] ggplot2_3.5.1             blob_1.2.4               
-[129] scran_1.34.0              AnnotationFilter_1.30.0  
-[131] sparseMatrixStats_1.18.0  bitops_1.0-9             
-[133] viridisLite_0.4.2         alabaster.se_1.6.0       
-[135] scales_1.3.0              crayon_1.5.3             
-[137] rlang_1.1.4               KEGGREST_1.46.0          </code></pre>
+  [1] spatstat.sparse_3.1-0     fs_1.6.4                 
+  [3] ProtGenerics_1.38.0       bitops_1.0-9             
+  [5] httr_1.4.7                RColorBrewer_1.1-3       
+  [7] sctransform_0.4.1         tools_4.4.1              
+  [9] alabaster.base_1.6.1      utf8_1.2.4               
+ [11] R6_2.5.1                  HDF5Array_1.34.0         
+ [13] uwot_0.2.2                lazyeval_0.2.2           
+ [15] rhdf5filters_1.18.0       withr_3.0.2              
+ [17] gridExtra_2.3             progressr_0.15.0         
+ [19] cli_3.6.3                 spatstat.explore_3.3-3   
+ [21] fastDummies_1.7.4         alabaster.se_1.6.0       
+ [23] labeling_0.4.3            sass_0.4.9               
+ [25] spatstat.data_3.1-2       ggridges_0.5.6           
+ [27] pbapply_1.7-2             Rsamtools_2.22.0         
+ [29] R.utils_2.12.3            parallelly_1.38.0        
+ [31] limma_3.62.2              rstudioapi_0.17.1        
+ [33] RSQLite_2.3.7             generics_0.1.3           
+ [35] BiocIO_1.16.0             spatstat.random_3.3-2    
+ [37] ica_1.0-3                 dplyr_1.1.4              
+ [39] Matrix_1.7-0              fansi_1.0.6              
+ [41] abind_1.4-8               R.methodsS3_1.8.2        
+ [43] lifecycle_1.0.4           whisker_0.4.1            
+ [45] yaml_2.3.10               edgeR_4.4.2              
+ [47] rhdf5_2.50.2              SparseArray_1.6.1        
+ [49] BiocFileCache_2.14.0      Rtsne_0.17               
+ [51] grid_4.4.1                blob_1.2.4               
+ [53] promises_1.3.0            dqrng_0.4.1              
+ [55] ExperimentHub_2.14.0      crayon_1.5.3             
+ [57] miniUI_0.1.1.1            lattice_0.22-6           
+ [59] beachmat_2.22.0           cowplot_1.1.3            
+ [61] GenomicFeatures_1.58.0    KEGGREST_1.46.0          
+ [63] pillar_1.9.0              knitr_1.48               
+ [65] metapod_1.14.0            rjson_0.2.23             
+ [67] future.apply_1.11.3       codetools_0.2-20         
+ [69] leiden_0.4.3.1            glue_1.8.0               
+ [71] getPass_0.2-4             spatstat.univar_3.0-1    
+ [73] data.table_1.16.2         vctrs_0.6.5              
+ [75] png_0.1-8                 gypsum_1.2.0             
+ [77] spam_2.11-0               gtable_0.3.6             
+ [79] cachem_1.1.0              xfun_0.48                
+ [81] S4Arrays_1.6.0            mime_0.12                
+ [83] survival_3.6-4            pheatmap_1.0.12          
+ [85] statmod_1.5.0             bluster_1.16.0           
+ [87] fitdistrplus_1.2-1        ROCR_1.0-11              
+ [89] nlme_3.1-164              bit64_4.5.2              
+ [91] alabaster.ranges_1.6.0    filelock_1.0.3           
+ [93] RcppAnnoy_0.0.22          rprojroot_2.0.4          
+ [95] bslib_0.8.0               irlba_2.3.5.1            
+ [97] KernSmooth_2.23-24        colorspace_2.1-1         
+ [99] DBI_1.2.3                 tidyselect_1.2.1         
+[101] processx_3.8.4            bit_4.5.0                
+[103] compiler_4.4.1            curl_5.2.3               
+[105] git2r_0.35.0              httr2_1.0.5              
+[107] BiocNeighbors_2.0.1       DelayedArray_0.32.0      
+[109] plotly_4.10.4             rtracklayer_1.66.0       
+[111] scales_1.3.0              lmtest_0.9-40            
+[113] callr_3.7.6               rappdirs_0.3.3           
+[115] goftest_1.2-3             stringr_1.5.1            
+[117] digest_0.6.37             spatstat.utils_3.1-0     
+[119] alabaster.matrix_1.6.1    rmarkdown_2.28           
+[121] XVector_0.46.0            htmltools_0.5.8.1        
+[123] pkgconfig_2.0.3           sparseMatrixStats_1.18.0 
+[125] highr_0.11                dbplyr_2.5.0             
+[127] fastmap_1.2.0             ensembldb_2.30.0         
+[129] htmlwidgets_1.6.4         rlang_1.1.4              
+[131] UCSC.utils_1.2.0          shiny_1.9.1              
+[133] DelayedMatrixStats_1.28.1 farver_2.1.2             
+[135] jquerylib_0.1.4           zoo_1.8-12               
+[137] jsonlite_1.8.9            BiocParallel_1.40.0      
+[139] R.oo_1.26.0               BiocSingular_1.22.0      
+[141] RCurl_1.98-1.16           magrittr_2.0.3           
+[143] GenomeInfoDbData_1.2.13   dotCall64_1.2            
+[145] patchwork_1.3.0           Rhdf5lib_1.28.0          
+[147] munsell_0.5.1             Rcpp_1.0.13              
+[149] viridis_0.6.5             reticulate_1.39.0        
+[151] stringi_1.8.4             alabaster.schemas_1.6.0  
+[153] zlibbioc_1.52.0           MASS_7.3-60.2            
+[155] plyr_1.8.9                AnnotationHub_3.14.0     
+[157] parallel_4.4.1            listenv_0.9.1            
+[159] ggrepel_0.9.6             deldir_2.0-4             
+[161] Biostrings_2.74.1         splines_4.4.1            
+[163] tensor_1.5                locfit_1.5-9.10          
+[165] ps_1.8.1                  igraph_2.1.1             
+[167] spatstat.geom_3.3-3       RcppHNSW_0.6.0           
+[169] reshape2_1.4.4            ScaledMatrix_1.14.0      
+[171] BiocVersion_3.20.0        XML_3.99-0.17            
+[173] evaluate_1.0.1            scran_1.34.0             
+[175] BiocManager_1.30.25       httpuv_1.6.15            
+[177] polyclip_1.10-7           tidyr_1.3.1              
+[179] purrr_1.0.2               RANN_2.6.2               
+[181] scattermore_1.2           future_1.34.0            
+[183] alabaster.sce_1.6.0       ggplot2_3.5.1            
+[185] rsvd_1.0.5                xtable_1.8-4             
+[187] restfulr_0.0.15           AnnotationFilter_1.30.0  
+[189] RSpectra_0.16-2           later_1.3.2              
+[191] viridisLite_0.4.2         tibble_3.2.1             
+[193] memoise_2.0.1             AnnotationDbi_1.68.0     
+[195] GenomicAlignments_1.42.0  cluster_2.1.6            
+[197] globals_0.16.3           </code></pre>
+</div>
 </div>
 </div>
 </div>
