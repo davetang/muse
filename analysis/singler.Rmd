@@ -144,3 +144,92 @@ Finally, a simple yet effective diagnostic is to examine the expression of the m
 ```{r plot_marker_heatmap}
 plotMarkerHeatmap(pred.grun, sceG, label="beta")
 ```
+
+## pbmc3k
+
+pbmc3k.
+
+```{r pbmc3k}
+suppressPackageStartupMessages(library(Seurat))
+pbmc.data <- Read10X(data.dir = "data/pbmc3k/filtered_gene_bc_matrices/hg19/")
+
+pbmc3k <- CreateSeuratObject(
+  counts = pbmc.data,
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k"
+)
+
+pbmc3k <- NormalizeData(pbmc3k)
+```
+
+Use Monaco.
+
+```{r monaco_immune}
+suppressPackageStartupMessages(library(celldex))
+monaco_immune <- fetchReference("monaco_immune", "2024-02-26")
+monaco_immune
+```
+
+Annotate.
+
+```{r pbmc3k_anno}
+pbmc3k.anno <- SingleR(
+  test=pbmc3k@assays$RNA$data,
+  ref=monaco_immune,
+  labels=colData(monaco_immune)$label.main
+)
+
+cbind(
+  pbmc3k@meta.data,
+  as.data.frame(pbmc3k.anno)
+) -> pbmc3k@meta.data
+
+head(pbmc3k@meta.data)
+```
+
+### Reference
+
+Split in half.
+
+```{r split_cells}
+total <- nrow(pbmc3k@meta.data)
+half <- floor(total / 2)
+first_half <- row.names(pbmc3k@meta.data)[1:half]
+second_half <- row.names(pbmc3k@meta.data)[(half+1):total]
+```
+
+Create reference.
+
+```{r pbmc3k_ref}
+sce_ref <- SingleCellExperiment(
+  assays = list(counts = pbmc3k@assays$RNA$counts[, first_half])
+)
+colLabels(sce_ref) <- pbmc3k@meta.data[first_half, 'labels']
+sce_ref <- logNormCounts(sce_ref)
+sce_ref
+```
+
+Create query.
+
+```{r pbmc3k_query}
+sce_query <- SingleCellExperiment(
+  assays = list(counts = pbmc3k@assays$RNA$counts[, first_half])
+)
+sce_query <- logNormCounts(sce_query)
+sce_query
+```
+
+Annotate.
+
+```{r sce_pred}
+sce.pred <- SingleR(
+  test=sce_query,
+  ref=sce_ref,
+  labels=sce_ref$label,
+  de.method="wilcox"
+)
+
+table(sce_ref$label)
+table(sce.pred$labels)
+```
