@@ -1,0 +1,87 @@
+---
+title: "Exporting files out of R"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Matrices
+
+Create matrix with 99% zeros.
+
+```{r my_mat}
+ngenes <- 16000
+ncells <- 10000
+
+matrix(
+  data = rbinom(n = ngenes*ncells, size = 1, prob = 0.01),
+  nrow = ngenes,
+  ncol = ncells
+) -> my_mat
+
+# theoretical number of zeros
+ngenes*ncells*0.99
+
+# number of zeros
+sum(my_mat == 0)
+```
+
+Dense matrix object size.
+
+```{r my_mat_size}
+object.size(my_mat)
+```
+
+Export dense matrix as rds.
+
+```{r save_my_mat}
+dense_matrix <- "my_mat.rds"
+saveRDS(object = my_mat, file = dense_matrix)
+```
+
+Size of dense matrix file.
+
+```{r dense_matrix_size}
+paste0(file.size(dense_matrix) / 1024 / 1024, " MBs")
+```
+
+Convert to sparse matrix.
+
+```{r my_mat_sparse}
+suppressPackageStartupMessages(library(Matrix))
+my_mat_sparse <- as(my_mat, "sparseMatrix")
+class(my_mat_sparse)
+```
+
+Sparse matrix object size.
+
+```{r my_mat_sparse_size}
+object.size(my_mat_sparse)
+```
+
+Export sparse matrix as rds.
+
+```{r save_my_mat_sparse}
+sparse_matrix <- "my_mat_sparse.rds"
+saveRDS(object = my_mat_sparse, file = sparse_matrix)
+```
+
+Size of sparse matrix file.
+
+```{r sparse_matrix_size}
+paste0(file.size(sparse_matrix) / 1024 / 1024, " MBs")
+```
+
+Clean up.
+
+```{r clean_up}
+file.remove(dense_matrix)
+file.remove(sparse_matrix)
+```
