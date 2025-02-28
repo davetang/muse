@@ -14,6 +14,8 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 
 ## Matrices
 
+### RDS
+
 Create matrix with 99% zeros.
 
 ```{r my_mat}
@@ -86,10 +88,58 @@ file.remove(dense_matrix)
 file.remove(sparse_matrix)
 ```
 
+
+### HDF5
+
+Export as HDF5.
+
+```{r hdf5}
+suppressPackageStartupMessages(library(hdf5r))
+
+hdf5_file <- "my_mat.h5"
+file.h5 <- H5File$new(hdf5_file, mode="w")
+
+file.h5$create_group("data")
+file.h5[["data/matrix"]] <- my_mat
+
+## Close the file at the end
+## the 'close' method closes only the file-id, but leaves object inside the file open
+## This may prevent re-opening of the file. 'close_all' closes the file and all objects in it
+file.h5$close_all()
+```
+
+Size of HDF5 file.
+
+```{r hdf5_size}
+paste0(file.size(hdf5_file) / 1024 / 1024, " MBs")
+```
+
+Load.
+
+```{r hdf5_load}
+## now re-open it
+file.h5 <- H5File$new(hdf5_file, mode="r+")
+
+my_mat_import <- file.h5[["data/matrix"]][,]
+class(my_mat_import)
+identical(my_mat, my_mat_import)
+
+file.h5$close_all()
+```
+
+Clean up.
+
+```{r clean_up_hdf5}
+file.remove(hdf5_file)
+```
+
+### Workflow
+
 As a workflow to check file sizes as we change the number of zeros.
 
-```{r}
+```{r file_size_wf}
 file_size_wf <- function(prob, ngenes = 16000, ncells = 10000){
+  
   matrix(
     data = rbinom(n = ngenes*ncells, size = 1, prob = prob),
     nrow = ngenes,
@@ -104,14 +154,22 @@ file_size_wf <- function(prob, ngenes = 16000, ncells = 10000){
   sparse_matrix <- paste0("my_mat_sparse_", prob, ".rds")
   saveRDS(object = my_mat_sparse, file = sparse_matrix)
   
+  hdf5_file <- paste0("my_mat_", prob, ".h5")
+  file.h5 <- H5File$new(hdf5_file, mode="w")
+  file.h5$create_group("data")
+  file.h5[["data/matrix"]] <- my_mat
+  file.h5$close_all()
+  
   list(
     prob = prob,
     dense_size = paste0(file.size(dense_matrix) / 1024 / 1024, " MBs"),
-    sparse_size = paste0(file.size(sparse_matrix) / 1024 / 1024, " MBs")
+    sparse_size = paste0(file.size(sparse_matrix) / 1024 / 1024, " MBs"),
+    hdf5_size = paste0(file.size(hdf5_file) / 1024 / 1024, " MBs")
   ) -> res
   
   file.remove(dense_matrix)
   file.remove(sparse_matrix)
+  file.remove(hdf5_file)
   
   return(res)
   
