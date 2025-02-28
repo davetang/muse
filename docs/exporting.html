@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8c6e5d67473515611bc206bf7830852bb5708ecbtargetblank8c6e5d6a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef179c68885c50dc2a7cf05a037ddf87f494aa119targetblankf179c68a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/8c6e5d67473515611bc206bf7830852bb5708ecb" target="_blank">8c6e5d6</a>
+<a href="https://github.com/davetang/muse/tree/f179c68885c50dc2a7cf05a037ddf87f494aa119" target="_blank">f179c68</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8c6e5d67473515611bc206bf7830852bb5708ecbtargetblank8c6e5d6a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef179c68885c50dc2a7cf05a037ddf87f494aa119targetblankf179c68a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/8c6e5d67473515611bc206bf7830852bb5708ecb" target="_blank">8c6e5d6</a>.
+<a href="https://github.com/davetang/muse/tree/f179c68885c50dc2a7cf05a037ddf87f494aa119" target="_blank">f179c68</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -629,6 +629,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/f179c68885c50dc2a7cf05a037ddf87f494aa119/analysis/exporting.Rmd" target="_blank">f179c68</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-28
+</td>
+<td>
+File sizes with different distribution of zeros
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/2574e2eb41d0c33ca323c656e836386de74f6d46/docs/exporting.html" target="_blank">2574e2e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-28
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/8c6e5d67473515611bc206bf7830852bb5708ecb/analysis/exporting.Rmd" target="_blank">8c6e5d6</a>
 </td>
 <td>
@@ -696,6 +730,44 @@ saveRDS(object = my_mat_sparse, file = sparse_matrix)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <pre class="r"><code>file.remove(sparse_matrix)</code></pre>
 <pre><code>[1] TRUE</code></pre>
+<p>As a workflow to check file sizes as we change the number of
+zeros.</p>
+<pre class="r"><code>file_size_wf &lt;- function(prob, ngenes = 16000, ncells = 10000){
+  matrix(
+    data = rbinom(n = ngenes*ncells, size = 1, prob = prob),
+    nrow = ngenes,
+    ncol = ncells
+  ) -&gt; my_mat
+  
+  my_mat_sparse &lt;- as(my_mat, &quot;sparseMatrix&quot;)
+  
+  dense_matrix &lt;- paste0(&quot;my_mat_&quot;, prob, &quot;.rds&quot;)
+  saveRDS(object = my_mat, file = dense_matrix)
+
+  sparse_matrix &lt;- paste0(&quot;my_mat_sparse_&quot;, prob, &quot;.rds&quot;)
+  saveRDS(object = my_mat_sparse, file = sparse_matrix)
+  
+  list(
+    prob = prob,
+    dense_size = paste0(file.size(dense_matrix) / 1024 / 1024, &quot; MBs&quot;),
+    sparse_size = paste0(file.size(sparse_matrix) / 1024 / 1024, &quot; MBs&quot;)
+  ) -&gt; res
+  
+  file.remove(dense_matrix)
+  file.remove(sparse_matrix)
+  
+  return(res)
+  
+}
+
+purrr::map_df(.x = c(0.01, 0.05, 0.25, 0.5), \(x) file_size_wf(x))</code></pre>
+<pre><code># A tibble: 4 × 3
+   prob dense_size           sparse_size         
+  &lt;dbl&gt; &lt;chr&gt;                &lt;chr&gt;               
+1  0.01 4.30162048339844 MBs 3.50793647766113 MBs
+2  0.05 12.7624349594116 MBs 16.807599067688 MBs 
+3  0.25 32.0998592376709 MBs 79.5521965026855 MBs
+4  0.5  38.3305673599243 MBs 144.26503276825 MBs </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -731,18 +803,19 @@ other attached packages:
 [1] Matrix_1.7-0    workflowr_1.7.1
 
 loaded via a namespace (and not attached):
- [1] jsonlite_1.8.9    compiler_4.4.1    promises_1.3.0    Rcpp_1.0.13      
- [5] stringr_1.5.1     git2r_0.35.0      callr_3.7.6       later_1.3.2      
- [9] jquerylib_0.1.4   yaml_2.3.10       fastmap_1.2.0     lattice_0.22-6   
-[13] R6_2.5.1          knitr_1.48        tibble_3.2.1      rprojroot_2.0.4  
-[17] bslib_0.8.0       pillar_1.9.0      rlang_1.1.4       utf8_1.2.4       
-[21] cachem_1.1.0      stringi_1.8.4     httpuv_1.6.15     xfun_0.48        
-[25] getPass_0.2-4     fs_1.6.4          sass_0.4.9        cli_3.6.3        
-[29] magrittr_2.0.3    ps_1.8.1          grid_4.4.1        digest_0.6.37    
-[33] processx_3.8.4    rstudioapi_0.17.1 lifecycle_1.0.4   vctrs_0.6.5      
-[37] evaluate_1.0.1    glue_1.8.0        whisker_0.4.1     fansi_1.0.6      
-[41] rmarkdown_2.28    httr_1.4.7        tools_4.4.1       pkgconfig_2.0.3  
-[45] htmltools_0.5.8.1</code></pre>
+ [1] jsonlite_1.8.9    dplyr_1.1.4       compiler_4.4.1    promises_1.3.0   
+ [5] tidyselect_1.2.1  Rcpp_1.0.13       stringr_1.5.1     git2r_0.35.0     
+ [9] callr_3.7.6       later_1.3.2       jquerylib_0.1.4   yaml_2.3.10      
+[13] fastmap_1.2.0     lattice_0.22-6    R6_2.5.1          generics_0.1.3   
+[17] knitr_1.48        tibble_3.2.1      rprojroot_2.0.4   bslib_0.8.0      
+[21] pillar_1.9.0      rlang_1.1.4       utf8_1.2.4        cachem_1.1.0     
+[25] stringi_1.8.4     httpuv_1.6.15     xfun_0.48         getPass_0.2-4    
+[29] fs_1.6.4          sass_0.4.9        cli_3.6.3         magrittr_2.0.3   
+[33] ps_1.8.1          grid_4.4.1        digest_0.6.37     processx_3.8.4   
+[37] rstudioapi_0.17.1 lifecycle_1.0.4   vctrs_0.6.5       evaluate_1.0.1   
+[41] glue_1.8.0        whisker_0.4.1     fansi_1.0.6       purrr_1.0.2      
+[45] rmarkdown_2.28    httr_1.4.7        tools_4.4.1       pkgconfig_2.0.3  
+[49] htmltools_0.5.8.1</code></pre>
 </div>
 </div>
 </div>
