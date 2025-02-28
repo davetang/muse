@@ -85,3 +85,37 @@ Clean up.
 file.remove(dense_matrix)
 file.remove(sparse_matrix)
 ```
+
+As a workflow to check file sizes as we change the number of zeros.
+
+```{r}
+file_size_wf <- function(prob, ngenes = 16000, ncells = 10000){
+  matrix(
+    data = rbinom(n = ngenes*ncells, size = 1, prob = prob),
+    nrow = ngenes,
+    ncol = ncells
+  ) -> my_mat
+  
+  my_mat_sparse <- as(my_mat, "sparseMatrix")
+  
+  dense_matrix <- paste0("my_mat_", prob, ".rds")
+  saveRDS(object = my_mat, file = dense_matrix)
+
+  sparse_matrix <- paste0("my_mat_sparse_", prob, ".rds")
+  saveRDS(object = my_mat_sparse, file = sparse_matrix)
+  
+  list(
+    prob = prob,
+    dense_size = paste0(file.size(dense_matrix) / 1024 / 1024, " MBs"),
+    sparse_size = paste0(file.size(sparse_matrix) / 1024 / 1024, " MBs")
+  ) -> res
+  
+  file.remove(dense_matrix)
+  file.remove(sparse_matrix)
+  
+  return(res)
+  
+}
+
+purrr::map_df(.x = c(0.01, 0.05, 0.25, 0.5), \(x) file_size_wf(x))
+```
