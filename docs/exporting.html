@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef179c68885c50dc2a7cf05a037ddf87f494aa119targetblankf179c68a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9db5d316b90b9503908503d1eadc8bb7140374adtargetblank9db5d31a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/f179c68885c50dc2a7cf05a037ddf87f494aa119" target="_blank">f179c68</a>
+<a href="https://github.com/davetang/muse/tree/9db5d316b90b9503908503d1eadc8bb7140374ad" target="_blank">9db5d31</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef179c68885c50dc2a7cf05a037ddf87f494aa119targetblankf179c68a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree9db5d316b90b9503908503d1eadc8bb7140374adtargetblank9db5d31a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/f179c68885c50dc2a7cf05a037ddf87f494aa119" target="_blank">f179c68</a>.
+<a href="https://github.com/davetang/muse/tree/9db5d316b90b9503908503d1eadc8bb7140374ad" target="_blank">9db5d31</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -629,6 +629,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/9db5d316b90b9503908503d1eadc8bb7140374ad/analysis/exporting.Rmd" target="_blank">9db5d31</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-28
+</td>
+<td>
+HDF5 format
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/f8dcdf783ad8404ec4443a8f7f74bd6325d6f2dc/docs/exporting.html" target="_blank">f8dcdf7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-28
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/f179c68885c50dc2a7cf05a037ddf87f494aa119/analysis/exporting.Rmd" target="_blank">f179c68</a>
 </td>
 <td>
@@ -684,6 +718,8 @@ Exporting files out of R
 </div>
 <div id="matrices" class="section level2">
 <h2>Matrices</h2>
+<div id="rds" class="section level3">
+<h3>RDS</h3>
 <p>Create matrix with 99% zeros.</p>
 <pre class="r"><code>ngenes &lt;- 16000
 ncells &lt;- 10000
@@ -730,9 +766,48 @@ saveRDS(object = my_mat_sparse, file = sparse_matrix)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <pre class="r"><code>file.remove(sparse_matrix)</code></pre>
 <pre><code>[1] TRUE</code></pre>
+</div>
+<div id="hdf5" class="section level3">
+<h3>HDF5</h3>
+<p>Export as HDF5.</p>
+<pre class="r"><code>suppressPackageStartupMessages(library(hdf5r))
+
+hdf5_file &lt;- &quot;my_mat.h5&quot;
+file.h5 &lt;- H5File$new(hdf5_file, mode=&quot;w&quot;)
+
+file.h5$create_group(&quot;data&quot;)</code></pre>
+<pre><code>Class: H5Group
+Filename: /home/rstudio/muse/my_mat.h5
+Group: /data</code></pre>
+<pre class="r"><code>file.h5[[&quot;data/matrix&quot;]] &lt;- my_mat
+
+## Close the file at the end
+## the &#39;close&#39; method closes only the file-id, but leaves object inside the file open
+## This may prevent re-opening of the file. &#39;close_all&#39; closes the file and all objects in it
+file.h5$close_all()</code></pre>
+<p>Size of HDF5 file.</p>
+<pre class="r"><code>paste0(file.size(hdf5_file) / 1024 / 1024, &quot; MBs&quot;)</code></pre>
+<pre><code>[1] &quot;10.5204658508301 MBs&quot;</code></pre>
+<p>Load.</p>
+<pre class="r"><code>## now re-open it
+file.h5 &lt;- H5File$new(hdf5_file, mode=&quot;r+&quot;)
+
+my_mat_import &lt;- file.h5[[&quot;data/matrix&quot;]][,]
+class(my_mat_import)</code></pre>
+<pre><code>[1] &quot;matrix&quot; &quot;array&quot; </code></pre>
+<pre class="r"><code>identical(my_mat, my_mat_import)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<pre class="r"><code>file.h5$close_all()</code></pre>
+<p>Clean up.</p>
+<pre class="r"><code>file.remove(hdf5_file)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div id="workflow" class="section level3">
+<h3>Workflow</h3>
 <p>As a workflow to check file sizes as we change the number of
 zeros.</p>
 <pre class="r"><code>file_size_wf &lt;- function(prob, ngenes = 16000, ncells = 10000){
+  
   matrix(
     data = rbinom(n = ngenes*ncells, size = 1, prob = prob),
     nrow = ngenes,
@@ -747,27 +822,35 @@ zeros.</p>
   sparse_matrix &lt;- paste0(&quot;my_mat_sparse_&quot;, prob, &quot;.rds&quot;)
   saveRDS(object = my_mat_sparse, file = sparse_matrix)
   
+  hdf5_file &lt;- paste0(&quot;my_mat_&quot;, prob, &quot;.h5&quot;)
+  file.h5 &lt;- H5File$new(hdf5_file, mode=&quot;w&quot;)
+  file.h5$create_group(&quot;data&quot;)
+  file.h5[[&quot;data/matrix&quot;]] &lt;- my_mat
+  file.h5$close_all()
+  
   list(
     prob = prob,
     dense_size = paste0(file.size(dense_matrix) / 1024 / 1024, &quot; MBs&quot;),
-    sparse_size = paste0(file.size(sparse_matrix) / 1024 / 1024, &quot; MBs&quot;)
+    sparse_size = paste0(file.size(sparse_matrix) / 1024 / 1024, &quot; MBs&quot;),
+    hdf5_size = paste0(file.size(hdf5_file) / 1024 / 1024, &quot; MBs&quot;)
   ) -&gt; res
   
   file.remove(dense_matrix)
   file.remove(sparse_matrix)
+  file.remove(hdf5_file)
   
   return(res)
   
 }
 
 purrr::map_df(.x = c(0.01, 0.05, 0.25, 0.5), \(x) file_size_wf(x))</code></pre>
-<pre><code># A tibble: 4 × 3
-   prob dense_size           sparse_size         
-  &lt;dbl&gt; &lt;chr&gt;                &lt;chr&gt;               
-1  0.01 4.30162048339844 MBs 3.50793647766113 MBs
-2  0.05 12.7624349594116 MBs 16.807599067688 MBs 
-3  0.25 32.0998592376709 MBs 79.5521965026855 MBs
-4  0.5  38.3305673599243 MBs 144.26503276825 MBs </code></pre>
+<pre><code># A tibble: 4 × 4
+   prob dense_size           sparse_size          hdf5_size           
+  &lt;dbl&gt; &lt;chr&gt;                &lt;chr&gt;                &lt;chr&gt;               
+1  0.01 4.30162048339844 MBs 3.50793647766113 MBs 10.5156774520874 MBs
+2  0.05 12.7624349594116 MBs 16.807599067688 MBs  23.2547760009766 MBs
+3  0.25 32.0998592376709 MBs 79.5521965026855 MBs 46.7966976165771 MBs
+4  0.5  38.3305673599243 MBs 144.26503276825 MBs  51.6437215805054 MBs</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -800,22 +883,23 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] Matrix_1.7-0    workflowr_1.7.1
+[1] hdf5r_1.3.11    Matrix_1.7-0    workflowr_1.7.1
 
 loaded via a namespace (and not attached):
- [1] jsonlite_1.8.9    dplyr_1.1.4       compiler_4.4.1    promises_1.3.0   
- [5] tidyselect_1.2.1  Rcpp_1.0.13       stringr_1.5.1     git2r_0.35.0     
- [9] callr_3.7.6       later_1.3.2       jquerylib_0.1.4   yaml_2.3.10      
-[13] fastmap_1.2.0     lattice_0.22-6    R6_2.5.1          generics_0.1.3   
-[17] knitr_1.48        tibble_3.2.1      rprojroot_2.0.4   bslib_0.8.0      
-[21] pillar_1.9.0      rlang_1.1.4       utf8_1.2.4        cachem_1.1.0     
-[25] stringi_1.8.4     httpuv_1.6.15     xfun_0.48         getPass_0.2-4    
-[29] fs_1.6.4          sass_0.4.9        cli_3.6.3         magrittr_2.0.3   
-[33] ps_1.8.1          grid_4.4.1        digest_0.6.37     processx_3.8.4   
-[37] rstudioapi_0.17.1 lifecycle_1.0.4   vctrs_0.6.5       evaluate_1.0.1   
-[41] glue_1.8.0        whisker_0.4.1     fansi_1.0.6       purrr_1.0.2      
-[45] rmarkdown_2.28    httr_1.4.7        tools_4.4.1       pkgconfig_2.0.3  
-[49] htmltools_0.5.8.1</code></pre>
+ [1] bit_4.5.0         jsonlite_1.8.9    dplyr_1.1.4       compiler_4.4.1   
+ [5] promises_1.3.0    tidyselect_1.2.1  Rcpp_1.0.13       stringr_1.5.1    
+ [9] git2r_0.35.0      callr_3.7.6       later_1.3.2       jquerylib_0.1.4  
+[13] yaml_2.3.10       fastmap_1.2.0     lattice_0.22-6    R6_2.5.1         
+[17] generics_0.1.3    knitr_1.48        tibble_3.2.1      rprojroot_2.0.4  
+[21] bslib_0.8.0       pillar_1.9.0      rlang_1.1.4       utf8_1.2.4       
+[25] cachem_1.1.0      stringi_1.8.4     httpuv_1.6.15     xfun_0.48        
+[29] getPass_0.2-4     fs_1.6.4          sass_0.4.9        bit64_4.5.2      
+[33] cli_3.6.3         magrittr_2.0.3    ps_1.8.1          grid_4.4.1       
+[37] digest_0.6.37     processx_3.8.4    rstudioapi_0.17.1 lifecycle_1.0.4  
+[41] vctrs_0.6.5       evaluate_1.0.1    glue_1.8.0        whisker_0.4.1    
+[45] fansi_1.0.6       purrr_1.0.2       rmarkdown_2.28    httr_1.4.7       
+[49] tools_4.4.1       pkgconfig_2.0.3   htmltools_0.5.8.1</code></pre>
+</div>
 </div>
 </div>
 </div>
