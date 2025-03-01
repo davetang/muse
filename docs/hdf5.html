@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2023-07-21" />
+<meta name="date" content="2025-03-01" />
 
 <title>Working with HDF5 data in R</title>
 
-<script src="site_libs/header-attrs-2.22/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -33,8 +33,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-6.4.0/css/all.min.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -283,7 +283,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Working with HDF5 data in R</h1>
-<h4 class="date">2023-07-21</h4>
+<h4 class="date">2025-03-01</h4>
 
 </div>
 
@@ -312,7 +312,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-07-21
+<strong>Last updated:</strong> 2025-03-01
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -330,7 +330,7 @@ title="This is the local directory in which the code in this file was executed."
 This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
 analysis was created with <a
   href="https://github.com/workflowr/workflowr">workflowr</a> (version
-1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
 that were applied when the results were created. The <em>Past
 versions</em> tab lists the development history.
 </p>
@@ -443,15 +443,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee5a16afc4824b70109ce517b478ddb0214aab07atargetblanke5a16afa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef3c325ea5d27f13806703cec404cf530ea49880dtargetblankf3c325ea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/e5a16afc4824b70109ce517b478ddb0214aab07a" target="_blank">e5a16af</a>
+<a href="https://github.com/davetang/muse/tree/f3c325ea5d27f13806703cec404cf530ea49880d" target="_blank">f3c325e</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee5a16afc4824b70109ce517b478ddb0214aab07atargetblanke5a16afa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef3c325ea5d27f13806703cec404cf530ea49880dtargetblankf3c325ea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +461,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/e5a16afc4824b70109ce517b478ddb0214aab07a" target="_blank">e5a16af</a>.
+<a href="https://github.com/davetang/muse/tree/f3c325ea5d27f13806703cec404cf530ea49880d" target="_blank">f3c325e</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -476,26 +476,34 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
-    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    r_packages_4.3.0/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.4.1/
 
 Untracked files:
-    Untracked:  analysis/cell_ranger.Rmd
-    Untracked:  analysis/tss_xgboost.Rmd
-    Untracked:  code/multiz100way/
-    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
-    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
-    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
-    Untracked:  data/ncrna_noncode_v3.fa
-    Untracked:  data/netmhciipan.out.gz
-    Untracked:  data/test
-    Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
-    Untracked:  export/output/
-    Untracked:  women.json
-
-Unstaged changes:
-    Modified:   analysis/graph.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
 
 </code></pre>
 <p>
@@ -510,7 +518,6 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
 These are the previous versions of the repository in which changes were
 made to the R Markdown (<code>analysis/hdf5.Rmd</code>) and HTML
@@ -540,6 +547,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/f3c325ea5d27f13806703cec404cf530ea49880d/analysis/hdf5.Rmd" target="_blank">f3c325e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-01
+</td>
+<td>
+10x gene expression HDF5 file
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/f706b109b93ff78ad7a60d8d226ffb65531a2e38/docs/hdf5.html" target="_blank">f706b10</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-07-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -584,15 +625,55 @@ and the Java-based HDF Viewer (HDFView).</p>
 <p>The current version, HDF5, differs significantly in design and API
 from the major legacy version HDF4.</p>
 </blockquote>
-<div id="data" class="section level2">
-<h2>Data</h2>
+</div>
+<div id="x-hdf5" class="section level1">
+<h1>10x HDF5</h1>
+<div id="gene-expression-data" class="section level2">
+<h2>Gene expression data</h2>
+<p>Download <a
+href="https://support.10xgenomics.com/single-cell-gene-expression/datasets/1.3.0/1M_neurons?">1.3
+Million Brain Cells from E18 Mice</a> (3.93 GB).</p>
+<pre class="r"><code>my_url &lt;- &#39;https://cf.10xgenomics.com/samples/cell-exp/1.3.0/1M_neurons/1M_neurons_filtered_gene_bc_matrices_h5.h5&#39;
+my_file &lt;- paste0(&quot;data/&quot;, basename(my_url))
+
+if(!file.exists(my_file)){
+  options(timeout = 10000)
+  download.file(url = my_url, destfile = my_file)
+}</code></pre>
+<p>New <code>H5File</code> object.</p>
+<pre class="r"><code>gex_feat_mat &lt;- H5File$new(filename = my_file, mode = &quot;r&quot;)
+gex_feat_mat</code></pre>
+<pre><code>Class: H5File
+Filename: /home/rstudio/muse/data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+Access type: H5F_ACC_RDONLY
+Attributes: TITLE, CLASS, VERSION, FILTERS, PYTABLES_FORMAT_VERSION, filetype, chemistry_description, library_ids, original_gem_groups
+Listing:
+ name  obj_type dataset.dims dataset.type_class
+ mm10 H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;</code></pre>
+<p>List datasets.</p>
+<pre class="r"><code>hdf5r::list.datasets(gex_feat_mat)</code></pre>
+<pre><code>[1] &quot;mm10/barcodes&quot;   &quot;mm10/data&quot;       &quot;mm10/gene_names&quot; &quot;mm10/genes&quot;     
+[5] &quot;mm10/indices&quot;    &quot;mm10/indptr&quot;     &quot;mm10/shape&quot;     </code></pre>
+<p>Get gene names.</p>
+<pre class="r"><code>gene_names_h5 &lt;- gex_feat_mat[[&quot;mm10/gene_names&quot;]]
+gene_names &lt;- gene_names_h5[]
+class(gene_names)</code></pre>
+<pre><code>[1] &quot;character&quot;</code></pre>
+<pre class="r"><code>length(gene_names)</code></pre>
+<pre><code>[1] 27998</code></pre>
+<pre class="r"><code>head(gene_names)</code></pre>
+<pre><code>[1] &quot;Xkr4&quot;    &quot;Gm1992&quot;  &quot;Gm37381&quot; &quot;Rp1&quot;     &quot;Rp1&quot;     &quot;Sox17&quot;  </code></pre>
+</div>
+</div>
+<div id="archs4" class="section level1">
+<h1>ARCHS4</h1>
 <p><a href="https://maayanlab.cloud/archs4/download.html">Download
 ARCHS4 HDF5 data</a> and load using the <a
 href="https://github.com/hhoeflin/hdf5r">hdf5r</a> package.</p>
-<pre class="r"><code>human &lt;- H5File$new(filename = &quot;/data/archs4/human_gene_v2.2.h5&quot;, mode = &quot;r&quot;)
+<pre class="r"><code>human &lt;- H5File$new(filename = &quot;/data2/archs4/human_gene_v2.5.h5&quot;, mode = &quot;r&quot;)
 human</code></pre>
 <pre><code>Class: H5File
-Filename: /data/archs4/human_gene_v2.2.h5
+Filename: /data2/archs4/human_gene_v2.5.h5
 Access type: H5F_ACC_RDONLY
 Listing:
  name  obj_type dataset.dims dataset.type_class
@@ -601,21 +682,20 @@ Listing:
 <p>Different groups.</p>
 <pre class="r"><code>human[[&quot;data&quot;]]</code></pre>
 <pre><code>Class: H5Group
-Filename: /data/archs4/human_gene_v2.2.h5
+Filename: /data2/archs4/human_gene_v2.5.h5
 Group: /data
 Listing:
        name    obj_type   dataset.dims dataset.type_class
- expression H5I_DATASET 722425 x 67186        H5T_INTEGER</code></pre>
+ expression H5I_DATASET 888821 x 67186        H5T_INTEGER</code></pre>
 <pre class="r"><code>human[[&quot;meta&quot;]]</code></pre>
 <pre><code>Class: H5Group
-Filename: /data/archs4/human_gene_v2.2.h5
+Filename: /data2/archs4/human_gene_v2.5.h5
 Group: /meta
 Listing:
     name  obj_type dataset.dims dataset.type_class
    genes H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
     info H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
  samples H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;</code></pre>
-</div>
 <div id="getting-information-about-objects" class="section level2">
 <h2>Getting information about objects</h2>
 <p>Use the <code>names()</code> function to get all names of
@@ -638,7 +718,7 @@ objects.</p>
 <pre><code>character(0)</code></pre>
 <pre class="r"><code>hdf5r::list.datasets(human)</code></pre>
 <pre><code> [1] &quot;data/expression&quot;                    &quot;meta/genes/biotype&quot;                
- [3] &quot;meta/genes/ensembl_gene_id&quot;         &quot;meta/genes/symbol&quot;                 
+ [3] &quot;meta/genes/ensembl_gene&quot;            &quot;meta/genes/symbol&quot;                 
  [5] &quot;meta/info/author&quot;                   &quot;meta/info/contact&quot;                 
  [7] &quot;meta/info/creation-date&quot;            &quot;meta/info/laboratory&quot;              
  [9] &quot;meta/info/version&quot;                  &quot;meta/samples/channel_count&quot;        
@@ -651,18 +731,17 @@ objects.</p>
 [23] &quot;meta/samples/library_selection&quot;     &quot;meta/samples/library_source&quot;       
 [25] &quot;meta/samples/library_strategy&quot;      &quot;meta/samples/molecule_ch1&quot;         
 [27] &quot;meta/samples/organism_ch1&quot;          &quot;meta/samples/platform_id&quot;          
-[29] &quot;meta/samples/readsaligned&quot;          &quot;meta/samples/relation&quot;             
-[31] &quot;meta/samples/sample&quot;                &quot;meta/samples/series_id&quot;            
-[33] &quot;meta/samples/singlecellprobability&quot; &quot;meta/samples/source_name_ch1&quot;      
-[35] &quot;meta/samples/status&quot;                &quot;meta/samples/submission_date&quot;      
-[37] &quot;meta/samples/taxid_ch1&quot;             &quot;meta/samples/title&quot;                
-[39] &quot;meta/samples/type&quot;                 </code></pre>
+[29] &quot;meta/samples/relation&quot;              &quot;meta/samples/sample&quot;               
+[31] &quot;meta/samples/series_id&quot;             &quot;meta/samples/singlecellprobability&quot;
+[33] &quot;meta/samples/source_name_ch1&quot;       &quot;meta/samples/status&quot;               
+[35] &quot;meta/samples/submission_date&quot;       &quot;meta/samples/taxid_ch1&quot;            
+[37] &quot;meta/samples/title&quot;                 &quot;meta/samples/type&quot;                 </code></pre>
 <pre class="r"><code>hdf5r::list.groups(human)</code></pre>
 <pre><code>[1] &quot;data&quot;         &quot;meta&quot;         &quot;meta/genes&quot;   &quot;meta/info&quot;    &quot;meta/samples&quot;</code></pre>
 <pre class="r"><code>hdf5r::list.objects(human)</code></pre>
 <pre><code> [1] &quot;data&quot;                               &quot;data/expression&quot;                   
  [3] &quot;meta&quot;                               &quot;meta/genes&quot;                        
- [5] &quot;meta/genes/biotype&quot;                 &quot;meta/genes/ensembl_gene_id&quot;        
+ [5] &quot;meta/genes/biotype&quot;                 &quot;meta/genes/ensembl_gene&quot;           
  [7] &quot;meta/genes/symbol&quot;                  &quot;meta/info&quot;                         
  [9] &quot;meta/info/author&quot;                   &quot;meta/info/contact&quot;                 
 [11] &quot;meta/info/creation-date&quot;            &quot;meta/info/laboratory&quot;              
@@ -676,12 +755,12 @@ objects.</p>
 [27] &quot;meta/samples/last_update_date&quot;      &quot;meta/samples/library_selection&quot;    
 [29] &quot;meta/samples/library_source&quot;        &quot;meta/samples/library_strategy&quot;     
 [31] &quot;meta/samples/molecule_ch1&quot;          &quot;meta/samples/organism_ch1&quot;         
-[33] &quot;meta/samples/platform_id&quot;           &quot;meta/samples/readsaligned&quot;         
-[35] &quot;meta/samples/relation&quot;              &quot;meta/samples/sample&quot;               
-[37] &quot;meta/samples/series_id&quot;             &quot;meta/samples/singlecellprobability&quot;
-[39] &quot;meta/samples/source_name_ch1&quot;       &quot;meta/samples/status&quot;               
-[41] &quot;meta/samples/submission_date&quot;       &quot;meta/samples/taxid_ch1&quot;            
-[43] &quot;meta/samples/title&quot;                 &quot;meta/samples/type&quot;                 </code></pre>
+[33] &quot;meta/samples/platform_id&quot;           &quot;meta/samples/relation&quot;             
+[35] &quot;meta/samples/sample&quot;                &quot;meta/samples/series_id&quot;            
+[37] &quot;meta/samples/singlecellprobability&quot; &quot;meta/samples/source_name_ch1&quot;      
+[39] &quot;meta/samples/status&quot;                &quot;meta/samples/submission_date&quot;      
+[41] &quot;meta/samples/taxid_ch1&quot;             &quot;meta/samples/title&quot;                
+[43] &quot;meta/samples/type&quot;                 </code></pre>
 </div>
 <div id="get-data" class="section level2">
 <h2>Get data</h2>
@@ -725,7 +804,7 @@ get_data &lt;- function(obj, ds, ...){
 <pre class="r"><code>human[[&#39;meta&#39;]][[&#39;genes&#39;]][[&#39;symbol&#39;]]</code></pre>
 <pre><code>Class: H5D
 Dataset: /meta/genes/symbol
-Filename: /data/archs4/human_gene_v2.2.h5
+Filename: /data2/archs4/human_gene_v2.5.h5
 Access type: H5F_ACC_RDONLY
 Datatype: H5T_STRING {
       STRSIZE H5T_VARIABLE;
@@ -748,32 +827,33 @@ head(my_gene_sym)</code></pre>
 <pre><code> [1] &quot;Human DLBCL cel line&quot;                          
  [2] &quot;placenta&quot;                                      
  [3] &quot;HeLa&quot;                                          
- [4] &quot;RNA-seq H1-hESC-48hr-Activin&quot;                  
- [5] &quot;Primary Human Umbilical Vein Endothelial Cells&quot;
- [6] &quot;Myeloid Leukemia&quot;                              
- [7] &quot;HT29 treated with 0 Î¼M of 5-Aza&quot;              
- [8] &quot;HT29 treated with 5 Î¼M of 5-Aza&quot;              
- [9] &quot;HT29 treated with 10 Î¼M of 5-Aza&quot;             
-[10] &quot;corneal endothelial cells&quot;                     
-[11] &quot;fibroblast&quot;                                    
-[12] &quot;iPS&quot;                                           
-[13] &quot;Immortalized primary fibroblasts&quot;              
-[14] &quot;NTera2/D1 cells&quot;                               
-[15] &quot;gastric adenocarcinoma cells&quot;                  
-[16] &quot;CNE1-MOCK_RNA-seq&quot;                             
-[17] &quot;CNE1-BART1_RNA-seq&quot;                            
-[18] &quot;CNE1-BART3_RNA-seq&quot;                            
-[19] &quot;CNE1-BART7_RNA-seq&quot;                            
-[20] &quot;iPSC&quot;                                          
-[21] &quot;NPC&quot;                                           
-[22] &quot;cells in culture&quot;                              
-[23] &quot;mammary tumor xenograft&quot;                       
-[24] &quot;Bone Marrow&quot;                                   
-[25] &quot;Foreskin fibroblasts&quot;                          
-[26] &quot;Human Fib X Human Fib Homokaryons&quot;             
-[27] &quot;Fertile mature sperm&quot;                          
-[28] &quot;bone marrow mononuclear cells&quot;                 
-[29] &quot;HEK293&quot;                                        </code></pre>
+ [4] &quot;RNA-seq H1-hESC&quot;                               
+ [5] &quot;RNA-seq H1-hESC-48hr-Activin&quot;                  
+ [6] &quot;Primary Human Umbilical Vein Endothelial Cells&quot;
+ [7] &quot;Myeloid Leukemia&quot;                              
+ [8] &quot;HT29 treated with 0 Î¼M of 5-Aza&quot;              
+ [9] &quot;HT29 treated with 5 Î¼M of 5-Aza&quot;              
+[10] &quot;HT29 treated with 10 Î¼M of 5-Aza&quot;             
+[11] &quot;corneal endothelial cells&quot;                     
+[12] &quot;fibroblast&quot;                                    
+[13] &quot;iPS&quot;                                           
+[14] &quot;Human Stem Derived Motor Neurons GFP high&quot;     
+[15] &quot;Human Stem Derived Motor Neurons no GFP&quot;       
+[16] &quot;Immortalized primary fibroblasts&quot;              
+[17] &quot;NTera2/D1 cells&quot;                               
+[18] &quot;gastric adenocarcinoma cells&quot;                  
+[19] &quot;CNE1-MOCK_RNA-seq&quot;                             
+[20] &quot;CNE1-BART1_RNA-seq&quot;                            
+[21] &quot;CNE1-BART3_RNA-seq&quot;                            
+[22] &quot;CNE1-BART7_RNA-seq&quot;                            
+[23] &quot;iPSC&quot;                                          
+[24] &quot;NPC&quot;                                           
+[25] &quot;cells in culture&quot;                              
+[26] &quot;mammary tumor xenograft&quot;                       
+[27] &quot;Bone Marrow&quot;                                   
+[28] &quot;Foreskin fibroblasts&quot;                          
+[29] &quot;Human Fib X Human Fib Homokaryons&quot;             
+[30] &quot;Fertile mature sperm&quot;                          </code></pre>
 <p>Store all sources.</p>
 <pre class="r"><code>my_idx &lt;- 1:human[[&#39;meta&#39;]][[&#39;samples&#39;]][[&#39;source_name_ch1&#39;]]$maxdims
 my_source &lt;- human[[&#39;meta&#39;]][[&#39;samples&#39;]][[&#39;source_name_ch1&#39;]][my_idx]
@@ -782,9 +862,9 @@ head(my_source)</code></pre>
 [4] &quot;Human DLBCL cel line&quot; &quot;Human DLBCL cel line&quot; &quot;Human DLBCL cel line&quot;</code></pre>
 <p>Search.</p>
 <pre class="r"><code>length(my_source[grepl(&quot;immune&quot;, my_source, ignore.case = TRUE)])</code></pre>
-<pre><code>[1] 115</code></pre>
+<pre><code>[1] 234</code></pre>
 <pre class="r"><code>length(my_source[grepl(&quot;dendritic&quot;, my_source, ignore.case = TRUE)])</code></pre>
-<pre><code>[1] 1631</code></pre>
+<pre><code>[1] 1799</code></pre>
 </div>
 <div id="expression" class="section level2">
 <h2>Expression</h2>
@@ -793,15 +873,15 @@ head(my_source)</code></pre>
 exp_data</code></pre>
 <pre><code>Class: H5D
 Dataset: /data/expression
-Filename: /data/archs4/human_gene_v2.2.h5
+Filename: /data2/archs4/human_gene_v2.5.h5
 Access type: H5F_ACC_RDONLY
 Datatype: H5T_STD_U32LE
-Space: Type=Simple     Dims=722425 x 67186     Maxdims=Inf x 67186
+Space: Type=Simple     Dims=888821 x 67186     Maxdims=Inf x 67186
 Chunk: 1 x 2000</code></pre>
 <p>Sum across first ten samples.</p>
 <pre class="r"><code>apply(exp_data[1:10, ], 1, sum)</code></pre>
-<pre><code> [1] 102963402  85980162 109810687 105304785  97274296  83557921    468037
- [8]    519638    599381    621721</code></pre>
+<pre><code> [1] 70714473 58300222 65226925 72034813 66846773 59968330   468037   519638
+ [9]   599381   621721</code></pre>
 <p>TP53 position.</p>
 <pre class="r"><code>tp53_idx &lt;- match(&quot;TP53&quot;, my_gene_sym)
 tp53_idx</code></pre>
@@ -829,9 +909,9 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.3.0 (2023-04-21)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 22.04.2 LTS
+<pre><code>R version 4.4.1 (2024-06-14)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 22.04.5 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -852,25 +932,30 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] hdf5r_1.3.8     lubridate_1.9.2 forcats_1.0.0   stringr_1.5.0  
- [5] dplyr_1.1.2     purrr_1.0.1     readr_2.1.4     tidyr_1.3.0    
- [9] tibble_3.2.1    ggplot2_3.4.2   tidyverse_2.0.0 workflowr_1.7.0
+ [1] hdf5r_1.3.11    lubridate_1.9.3 forcats_1.0.0   stringr_1.5.1  
+ [5] dplyr_1.1.4     purrr_1.0.2     readr_2.1.5     tidyr_1.3.1    
+ [9] tibble_3.2.1    ggplot2_3.5.1   tidyverse_2.0.0 workflowr_1.7.1
 
 loaded via a namespace (and not attached):
- [1] sass_0.4.6       utf8_1.2.3       generics_0.1.3   stringi_1.7.12  
- [5] hms_1.1.3        digest_0.6.31    magrittr_2.0.3   timechange_0.2.0
- [9] evaluate_0.21    grid_4.3.0       fastmap_1.1.1    rprojroot_2.0.3 
-[13] jsonlite_1.8.5   processx_3.8.1   whisker_0.4.1    ps_1.7.5        
-[17] promises_1.2.0.1 httr_1.4.6       fansi_1.0.4      scales_1.2.1    
-[21] jquerylib_0.1.4  cli_3.6.1        rlang_1.1.1      bit64_4.0.5     
-[25] munsell_0.5.0    withr_2.5.0      cachem_1.0.8     yaml_2.3.7      
-[29] tools_4.3.0      tzdb_0.4.0       colorspace_2.1-0 httpuv_1.6.11   
-[33] vctrs_0.6.2      R6_2.5.1         lifecycle_1.0.3  git2r_0.32.0    
-[37] bit_4.0.5        fs_1.6.2         pkgconfig_2.0.3  callr_3.7.3     
-[41] pillar_1.9.0     bslib_0.5.0      later_1.3.1      gtable_0.3.3    
-[45] glue_1.6.2       Rcpp_1.0.10      xfun_0.39        tidyselect_1.2.0
-[49] rstudioapi_0.14  knitr_1.43       htmltools_0.5.5  rmarkdown_2.22  
-[53] compiler_4.3.0   getPass_0.2-2   </code></pre>
+ [1] sass_0.4.9        utf8_1.2.4        generics_0.1.3    stringi_1.8.4    
+ [5] hms_1.1.3         digest_0.6.37     magrittr_2.0.3    timechange_0.3.0 
+ [9] evaluate_1.0.1    grid_4.4.1        fastmap_1.2.0     rprojroot_2.0.4  
+[13] jsonlite_1.8.9    processx_3.8.4    whisker_0.4.1     ps_1.8.1         
+[17] promises_1.3.0    httr_1.4.7        fansi_1.0.6       scales_1.3.0     
+[21] jquerylib_0.1.4   cli_3.6.3         rlang_1.1.4       bit64_4.5.2      
+[25] munsell_0.5.1     withr_3.0.2       cachem_1.1.0      yaml_2.3.10      
+[29] tools_4.4.1       tzdb_0.4.0        colorspace_2.1-1  httpuv_1.6.15    
+[33] vctrs_0.6.5       R6_2.5.1          lifecycle_1.0.4   git2r_0.35.0     
+[37] bit_4.5.0         fs_1.6.4          pkgconfig_2.0.3   callr_3.7.6      
+[41] pillar_1.9.0      bslib_0.8.0       later_1.3.2       gtable_0.3.6     
+[45] glue_1.8.0        Rcpp_1.0.13       xfun_0.48         tidyselect_1.2.1 
+[49] rstudioapi_0.17.1 knitr_1.48        htmltools_0.5.8.1 rmarkdown_2.28   
+[53] compiler_4.4.1    getPass_0.2-4    </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
