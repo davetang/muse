@@ -21,7 +21,7 @@ library(celldex)
 
 ## Data
 
-Read HDF5 files into a list.
+Read HDF5 file paths into a list.
 
 ```{r hdf5_files}
 hdf5_files <- list.files(path = "data", pattern = "5k_Human", full.names = TRUE)
@@ -32,11 +32,29 @@ Read raw counts into a list of matrices.
 
 ```{r mats}
 mats <- purrr::map(seq_along(hdf5_files), function(x){
-  my_mat <- Seurat::Read10X_h5(hdf5_files[x])
+  my_mat <- BPCells::open_matrix_10x_hdf5(hdf5_files[x])
   colnames(my_mat) <- paste0('donor', x, '_', colnames(my_mat))
   my_mat
 })
 str(mats, max.level = 1)
+```
+
+Get gene names.
+
+```{r mat_tmp}
+mat_tmp <- Seurat::Read10X_h5(hdf5_files[1])
+my_genes <- row.names(mat_tmp)
+rm(mat_tmp)
+gc()
+```
+
+
+Combine the matrices.
+
+```{r combined_matrix}
+combined_matrix <- do.call(cbind, mats)
+row.names(combined_matrix) <- my_genes
+combined_matrix
 ```
 
 ## Seurat object
@@ -45,18 +63,17 @@ Create Seurat object from the list of matrices.
 
 ```{r seurat_object}
 pbmc20k <- CreateSeuratObject(
-  counts = mats,
+  counts = combined_matrix,
   min.cells = 3,
   min.features = 200
 )
 pbmc20k
 ```
 
-Create one count layer.
+Counts layer.
 
-```{r join_layer}
-pbmc20k <- JoinLayers(pbmc20k)
-pbmc20k
+```{r pbmc20k_counts_layer}
+pbmc20k@assays$RNA$counts
 ```
 
 Donor information in `orig.ident`.
@@ -65,11 +82,11 @@ Donor information in `orig.ident`.
 head(pbmc20k@meta.data)
 ```
 
-Use {BPCells} to convert the matrices in your already created Seurat objects to on-disk matrices. Note, that this is only possible for V5 assays. Convert the counts matrix of the RNA assay to a BPCells matrix.
+Use {BPCells} to store the matrix in the Seurat object to on-disk matrices. Note, that this is only possible for V5 assays.
 
 ```{r write_matrix}
 BPCells::write_matrix_dir(
-  mat = BPCells::convert_matrix_type(matrix = pbmc20k@assays$RNA$counts, type = "uint32_t"),
+  mat = pbmc20k@assays$RNA$counts,
   dir = 'data/pbmc20k',
   overwrite = TRUE
 )
