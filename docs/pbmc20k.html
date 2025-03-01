@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-02-24" />
+<meta name="date" content="2025-03-01" />
 
 <title>Analysing 20k cells</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Analysing 20k cells</h1>
-<h4 class="date">2025-02-24</h4>
+<h4 class="date">2025-03-01</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-02-24
+<strong>Last updated:</strong> 2025-03-01
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6daf5ce50813de852e253f829b9d4a001e03e6dbtargetblank6daf5cea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6550d2d754f6ccb33bed339fa86367b05f3ddd9ftargetblank6550d2da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/6daf5ce50813de852e253f829b9d4a001e03e6db" target="_blank">6daf5ce</a>
+<a href="https://github.com/davetang/muse/tree/6550d2d754f6ccb33bed339fa86367b05f3ddd9f" target="_blank">6550d2d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6daf5ce50813de852e253f829b9d4a001e03e6dbtargetblank6daf5cea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6550d2d754f6ccb33bed339fa86367b05f3ddd9ftargetblank6550d2da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/6daf5ce50813de852e253f829b9d4a001e03e6db" target="_blank">6daf5ce</a>.
+<a href="https://github.com/davetang/muse/tree/6550d2d754f6ccb33bed339fa86367b05f3ddd9f" target="_blank">6550d2d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -553,6 +553,7 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
     Ignored:    data/293t/
     Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
@@ -570,6 +571,7 @@ Ignored files:
     Ignored:    data/jurkat_293t/
     Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
     Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
     Ignored:    data/pbmc3k/
     Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
     Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
@@ -578,7 +580,7 @@ Ignored files:
     Ignored:    r_packages_4.4.1/
 
 Untracked files:
-    Untracked:  data/pbmc20k_seurat/
+    Untracked:  analysis/bioc_scrnaseq.Rmd
 
 </code></pre>
 <p>
@@ -623,6 +625,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/6550d2d754f6ccb33bed339fa86367b05f3ddd9f/analysis/pbmc20k.Rmd" target="_blank">6550d2d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-01
+</td>
+<td>
+Use BPCells matrices from the start
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/607fc5d595889782ae4239851d2e92057d9a83e4/docs/pbmc20k.html" target="_blank">607fc5d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -819,7 +855,7 @@ Analysing 20k cells
 </div>
 <div id="data" class="section level2">
 <h2>Data</h2>
-<p>Read HDF5 files into a list.</p>
+<p>Read HDF5 file paths into a list.</p>
 <pre class="r"><code>hdf5_files &lt;- list.files(path = &quot;data&quot;, pattern = &quot;5k_Human&quot;, full.names = TRUE)
 hdf5_files</code></pre>
 <pre><code>[1] &quot;data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5&quot;
@@ -828,58 +864,85 @@ hdf5_files</code></pre>
 [4] &quot;data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5&quot;</code></pre>
 <p>Read raw counts into a list of matrices.</p>
 <pre class="r"><code>mats &lt;- purrr::map(seq_along(hdf5_files), function(x){
-  my_mat &lt;- Seurat::Read10X_h5(hdf5_files[x])
+  my_mat &lt;- BPCells::open_matrix_10x_hdf5(hdf5_files[x])
   colnames(my_mat) &lt;- paste0(&#39;donor&#39;, x, &#39;_&#39;, colnames(my_mat))
   my_mat
 })
 str(mats, max.level = 1)</code></pre>
 <pre><code>List of 4
- $ :Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots
- $ :Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots
- $ :Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots
- $ :Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots</code></pre>
+ $ :Formal class &#39;RenameDims&#39; [package &quot;BPCells&quot;] with 4 slots
+ $ :Formal class &#39;RenameDims&#39; [package &quot;BPCells&quot;] with 4 slots
+ $ :Formal class &#39;RenameDims&#39; [package &quot;BPCells&quot;] with 4 slots
+ $ :Formal class &#39;RenameDims&#39; [package &quot;BPCells&quot;] with 4 slots</code></pre>
+<p>Get gene names.</p>
+<pre class="r"><code>mat_tmp &lt;- Seurat::Read10X_h5(hdf5_files[1])
+my_genes &lt;- row.names(mat_tmp)
+rm(mat_tmp)
+gc()</code></pre>
+<pre><code>           used  (Mb) gc trigger  (Mb)  max used  (Mb)
+Ncells 10995803 587.3   16559960 884.4  14635520 781.7
+Vcells 19679453 150.2   85287993 650.7 106593458 813.3</code></pre>
+<p>Combine the matrices.</p>
+<pre class="r"><code>combined_matrix &lt;- do.call(cbind, mats)
+row.names(combined_matrix) &lt;- my_genes
+combined_matrix</code></pre>
+<pre><code>38606 x 22203 IterableMatrix object with class RenameDims
+
+Row names: DDX11L2, MIR1302-2HG ... ENSG00000277196
+Col names: donor1_AAACCAAAGGTGACGA-1, donor1_AAACCCTGTGACGAGT-1 ... donor4_TGTGTTGAGTTACGGC-1
+
+Data type: uint32_t
+Storage order: column major
+
+Queued Operations:
+1. Concatenate cols of 4 matrix objects with classes: RenameDims, RenameDims ... RenameDims (threads=0)
+2. Reset dimnames</code></pre>
 </div>
 <div id="seurat-object" class="section level2">
 <h2>Seurat object</h2>
 <p>Create Seurat object from the list of matrices.</p>
 <pre class="r"><code>pbmc20k &lt;- CreateSeuratObject(
-  counts = mats,
+  counts = combined_matrix,
   min.cells = 3,
   min.features = 200
 )
 pbmc20k</code></pre>
 <pre><code>An object of class Seurat 
-27385 features across 22061 samples within 1 assay 
-Active assay: RNA (27385 features, 0 variable features)
- 4 layers present: counts.1, counts.2, counts.3, counts.4</code></pre>
-<p>Create one count layer.</p>
-<pre class="r"><code>pbmc20k &lt;- JoinLayers(pbmc20k)
-pbmc20k</code></pre>
-<pre><code>An object of class Seurat 
-27385 features across 22061 samples within 1 assay 
-Active assay: RNA (27385 features, 0 variable features)
+29157 features across 22061 samples within 1 assay 
+Active assay: RNA (29157 features, 0 variable features)
  1 layer present: counts</code></pre>
+<p>Counts layer.</p>
+<pre class="r"><code>pbmc20k@assays$RNA$counts</code></pre>
+<pre><code>29157 x 22061 IterableMatrix object with class RenameDims
+
+Row names: DDX11L2, ENSG00000238009 ... ENSG00000278817
+Col names: donor1_AAACCAAAGGTGACGA-1, donor1_AAACCCTGTGACGAGT-1 ... donor4_TGTGTTGAGTTACGGC-1
+
+Data type: uint32_t
+Storage order: column major
+
+Queued Operations:
+1. Concatenate cols of 4 matrix objects with classes: RenameDims, RenameDims ... RenameDims (threads=0)
+2. Reset dimnames</code></pre>
 <p>Donor information in <code>orig.ident</code>.</p>
 <pre class="r"><code>head(pbmc20k@meta.data)</code></pre>
 <pre><code>                          orig.ident nCount_RNA nFeature_RNA
-donor1_AAACCAAAGGTGACGA-1     donor1      42833         7079
-donor1_AAACCCTGTGACGAGT-1     donor1       4890         2102
+donor1_AAACCAAAGGTGACGA-1     donor1      42841         7087
+donor1_AAACCCTGTGACGAGT-1     donor1       4896         2104
 donor1_AAACGAATCAGGCTAC-1     donor1      12498         3564
-donor1_AAACGACAGATTGACT-1     donor1      22193         4366
+donor1_AAACGACAGATTGACT-1     donor1      22198         4371
 donor1_AAACGATGTCTTGAAC-1     donor1      10305         2945
-donor1_AAACGATGTGCGCGAA-1     donor1      15947         4160</code></pre>
-<p>Use {BPCells} to convert the matrices in your already created Seurat
-objects to on-disk matrices. Note, that this is only possible for V5
-assays. Convert the counts matrix of the RNA assay to a BPCells
-matrix.</p>
+donor1_AAACGATGTGCGCGAA-1     donor1      15948         4161</code></pre>
+<p>Use {BPCells} to store the matrix in the Seurat object to on-disk
+matrices. Note, that this is only possible for V5 assays.</p>
 <pre class="r"><code>BPCells::write_matrix_dir(
-  mat = BPCells::convert_matrix_type(matrix = pbmc20k@assays$RNA$counts, type = &quot;uint32_t&quot;),
+  mat = pbmc20k@assays$RNA$counts,
   dir = &#39;data/pbmc20k&#39;,
   overwrite = TRUE
 )</code></pre>
-<pre><code>27385 x 22061 IterableMatrix object with class MatrixDir
+<pre><code>29157 x 22061 IterableMatrix object with class MatrixDir
 
-Row names: ENSG00000238009, ENSG00000239945 ... AMELY
+Row names: DDX11L2, ENSG00000238009 ... ENSG00000278817
 Col names: donor1_AAACCAAAGGTGACGA-1, donor1_AAACCCTGTGACGAGT-1 ... donor4_TGTGTTGAGTTACGGC-1
 
 Data type: uint32_t
@@ -891,9 +954,9 @@ Queued Operations:
 
 pbmc20k@assays$RNA$counts &lt;- pbmc20k.mat
 pbmc20k@assays$RNA$counts</code></pre>
-<pre><code>27385 x 22061 IterableMatrix object with class RenameDims
+<pre><code>29157 x 22061 IterableMatrix object with class RenameDims
 
-Row names: ENSG00000238009, ENSG00000239945 ... AMELY
+Row names: DDX11L2, ENSG00000238009 ... ENSG00000278817
 Col names: donor1_AAACCAAAGGTGACGA-1, donor1_AAACCCTGTGACGAGT-1 ... donor4_TGTGTTGAGTTACGGC-1
 
 Data type: uint32_t
@@ -984,9 +1047,9 @@ This message will be shown once per session</code></pre>
 <p>Normalised and scaled data are stored as <code>IterableMatrix</code>
 objects.</p>
 <pre class="r"><code>pbmc20k@assays$RNA$data</code></pre>
-<pre><code>27385 x 22061 IterableMatrix object with class RenameDims
+<pre><code>29157 x 22061 IterableMatrix object with class RenameDims
 
-Row names: ENSG00000238009, ENSG00000239945 ... AMELY
+Row names: DDX11L2, ENSG00000238009 ... ENSG00000278817
 Col names: donor1_AAACCAAAGGTGACGA-1, donor1_AAACCCTGTGACGAGT-1 ... donor4_TGTGTTGAGTTACGGC-1
 
 Data type: double
@@ -1003,7 +1066,7 @@ Queued Operations:
 <pre class="r"><code>pbmc20k@assays$RNA$scale.data</code></pre>
 <pre><code>2000 x 22061 IterableMatrix object with class RenameDims
 
-Row names: HES4, ISG15 ... ENSG00000265995
+Row names: HES4, ISG15 ... ENSG00000275063
 Col names: donor1_AAACCAAAGGTGACGA-1, donor1_AAACCCTGTGACGAGT-1 ... donor4_TGTGTTGAGTTACGGC-1
 
 Data type: double
@@ -1011,18 +1074,18 @@ Storage order: column major
 
 Queued Operations:
 1. Load compressed matrix from directory /home/rstudio/muse/data/pbmc20k
-2. Select rows: 19, 20 ... 27288 and cols: all
+2. Select rows: 24, 25 ... 29156 and cols: all
 3. Reset dimnames
 4. Convert type from uint32_t to double
 5. Scale by 1e+04
 6. Scale columns by 2.33e-05, 0.000204 ... 7.7e-05
 7. Transform log1p
-8. Select rows: 489, 1810 ... 438 and cols: all
+8. Select rows: 497, 1853 ... 446 and cols: all
 9. Reset dimnames
-10. Transform min by row: 2.8, 2.49 ... 1
-11. Scale rows by 3.59, 4.04 ... 10.1
-12. Shift rows by -0.0687, -0.0609 ... -0.12
-13. Select rows: 1243, 443 ... 1553 and cols: all
+10. Transform min by row: 2.8, 2.49 ... 0.38
+11. Scale rows by 3.59, 4.04 ... 26.4
+12. Shift rows by -0.0687, -0.0609 ... -0.049
+13. Select rows: 1252, 443 ... 604 and cols: all
 14. Reset dimnames</code></pre>
 <p>UMAP.</p>
 <pre class="r"><code>DimPlot(pbmc20k, reduction = &quot;umap&quot;, group.by = &quot;orig.ident&quot;, pt.size = .1)</code></pre>
@@ -1087,25 +1150,25 @@ colData names(3): label.main label.fine label.ont</code></pre>
 <pre><code>Warning: Converting to a dense matrix may use excessive memory
 This message is displayed once every 8 hours.</code></pre>
 <pre><code>Warning in asMethod(object): sparse-&gt;dense coercion: allocating vector of size
-4.5 GiB</code></pre>
+4.8 GiB</code></pre>
 <pre class="r"><code>head(pbmc20k.anno)</code></pre>
 <pre><code>DataFrame with 6 rows and 4 columns
                                                   scores       labels
                                                 &lt;matrix&gt;  &lt;character&gt;
-donor1_AAACCAAAGGTGACGA-1 0.324853:0.258408:0.483121:...      T cells
-donor1_AAACCCTGTGACGAGT-1 0.151325:0.124804:0.304293:... CD4+ T cells
-donor1_AAACGAATCAGGCTAC-1 0.252303:0.235463:0.436783:... CD4+ T cells
-donor1_AAACGACAGATTGACT-1 0.318234:0.338696:0.122619:...    Monocytes
-donor1_AAACGATGTCTTGAAC-1 0.230288:0.199487:0.418062:... CD4+ T cells
-donor1_AAACGATGTGCGCGAA-1 0.470569:0.243399:0.252875:...      B cells
+donor1_AAACCAAAGGTGACGA-1 0.320884:0.260316:0.480567:...      T cells
+donor1_AAACCCTGTGACGAGT-1 0.150790:0.128674:0.302692:... CD4+ T cells
+donor1_AAACGAATCAGGCTAC-1 0.250532:0.239444:0.435132:... CD4+ T cells
+donor1_AAACGACAGATTGACT-1 0.318373:0.340789:0.126101:...    Monocytes
+donor1_AAACGATGTCTTGAAC-1 0.228895:0.202186:0.417512:... CD4+ T cells
+donor1_AAACGATGTGCGCGAA-1 0.467819:0.245565:0.253680:...      B cells
                           delta.next pruned.labels
                            &lt;numeric&gt;   &lt;character&gt;
-donor1_AAACCAAAGGTGACGA-1  0.0820203       T cells
-donor1_AAACCCTGTGACGAGT-1  0.0984110  CD4+ T cells
-donor1_AAACGAATCAGGCTAC-1  0.0642314  CD4+ T cells
-donor1_AAACGACAGATTGACT-1  0.1762658     Monocytes
-donor1_AAACGATGTCTTGAAC-1  0.0913007  CD4+ T cells
-donor1_AAACGATGTGCGCGAA-1  0.1458069       B cells</code></pre>
+donor1_AAACCAAAGGTGACGA-1  0.0813905       T cells
+donor1_AAACCCTGTGACGAGT-1  0.0978551  CD4+ T cells
+donor1_AAACGAATCAGGCTAC-1  0.0634572  CD4+ T cells
+donor1_AAACGACAGATTGACT-1  0.1820548     Monocytes
+donor1_AAACGATGTCTTGAAC-1  0.0908428  CD4+ T cells
+donor1_AAACGATGTGCGCGAA-1  0.1411577       B cells</code></pre>
 <p>Add annotations to metadata.</p>
 <pre class="r"><code>cbind(
   pbmc20k@meta.data,
@@ -1190,14 +1253,14 @@ layers will be imported.</p>
 <pre class="r"><code>pbmc20k_import &lt;- LoadSeuratRds(paste0(output_dir, &#39;/pbmc20k.rds&#39;))
 pbmc20k_import</code></pre>
 <pre><code>An object of class Seurat 
-27385 features across 22061 samples within 1 assay 
-Active assay: RNA (27385 features, 2000 variable features)
+29157 features across 22061 samples within 1 assay 
+Active assay: RNA (29157 features, 2000 variable features)
  3 layers present: counts, data, scale.data
  3 dimensional reductions calculated: pca, harmony, umap</code></pre>
 <pre class="r"><code>pbmc20k_import@assays$RNA$counts</code></pre>
-<pre><code>27385 x 22061 IterableMatrix object with class RenameDims
+<pre><code>29157 x 22061 IterableMatrix object with class RenameDims
 
-Row names: ENSG00000238009, ENSG00000239945 ... AMELY
+Row names: DDX11L2, ENSG00000238009 ... ENSG00000278817
 Col names: donor1_AAACCAAAGGTGACGA-1, donor1_AAACCCTGTGACGAGT-1 ... donor4_TGTGTTGAGTTACGGC-1
 
 Data type: uint32_t
