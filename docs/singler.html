@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree35706ef6d6253c3d2d56003478f69ee5e52c1334targetblank35706efa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8466e98d010f0ab684c72e7bc2f1b3fe37886aaatargetblank8466e98a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/35706ef6d6253c3d2d56003478f69ee5e52c1334" target="_blank">35706ef</a>
+<a href="https://github.com/davetang/muse/tree/8466e98d010f0ab684c72e7bc2f1b3fe37886aaa" target="_blank">8466e98</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree35706ef6d6253c3d2d56003478f69ee5e52c1334targetblank35706efa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8466e98d010f0ab684c72e7bc2f1b3fe37886aaatargetblank8466e98a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/35706ef6d6253c3d2d56003478f69ee5e52c1334" target="_blank">35706ef</a>.
+<a href="https://github.com/davetang/muse/tree/8466e98d010f0ab684c72e7bc2f1b3fe37886aaa" target="_blank">8466e98</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -625,6 +625,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/8466e98d010f0ab684c72e7bc2f1b3fe37886aaa/analysis/singler.Rmd" target="_blank">8466e98</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-03
+</td>
+<td>
+plot scores with pruning
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/3cf6ed808a0d74fb5840d1612e4ece445fdfd622/docs/singler.html" target="_blank">3cf6ed8</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1316,6 +1350,11 @@ table(
   NK cells             147           0      14
   Progenitors            0          12       0
   T cells                2           0     180</code></pre>
+<pre class="r"><code>sum(pbmc3k@meta.data$labels == pbmc3k.self.pred$labels) / length(pbmc3k.self.pred$labels)</code></pre>
+<pre><code>[1] 0.897037</code></pre>
+<p>Self annotate score heatmap.</p>
+<pre class="r"><code>plotScoreHeatmap(pbmc3k.self.pred, show.pruned = TRUE)</code></pre>
+<p><img src="figure/singler.Rmd/self_annotate_heatmap-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
