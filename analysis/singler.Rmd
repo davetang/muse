@@ -233,3 +233,31 @@ sce.pred <- SingleR(
 table(sce_ref$label)
 table(sce.pred$labels)
 ```
+
+Self annotate.
+
+```{r self_annotate}
+pbmc3k_ref <- SingleCellExperiment(
+  assays = list(counts = pbmc3k@assays$RNA$counts)
+)
+colLabels(pbmc3k_ref) <- pbmc3k@meta.data$labels
+pbmc3k_ref <- logNormCounts(pbmc3k_ref)
+
+pbmc3k_query <- SingleCellExperiment(
+  assays = list(counts = pbmc3k@assays$RNA$counts)
+)
+pbmc3k_query <- logNormCounts(pbmc3k_query)
+
+pbmc3k.self.pred <- SingleR(
+  test=pbmc3k_query,
+  ref=pbmc3k_ref,
+  labels=pbmc3k_ref$label,
+  de.method="wilcox"
+)
+
+stopifnot(all(row.names(pbmc3k.self.pred) == row.names(pbmc3k@meta.data)))
+table(
+  pbmc3k@meta.data$labels,
+  pbmc3k.self.pred$labels
+)
+```
