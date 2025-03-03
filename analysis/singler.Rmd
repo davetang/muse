@@ -269,3 +269,9 @@ Self annotate score heatmap.
 ```{r self_annotate_heatmap}
 plotScoreHeatmap(pbmc3k.self.pred, show.pruned = TRUE)
 ```
+
+Match ratio for pruned labels.
+
+```{r pruned_summary}
+table((pbmc3k@meta.data$labels == pbmc3k.self.pred$labels)[pruneScores(pbmc3k.self.pred)])
+```
