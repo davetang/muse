@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-02-26" />
+<meta name="date" content="2025-03-03" />
 
 <title>Reference-Based Single-Cell RNA-Seq Annotation</title>
 
@@ -360,7 +360,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">Reference-Based Single-Cell RNA-Seq
 Annotation</h1>
-<h4 class="date">2025-02-26</h4>
+<h4 class="date">2025-03-03</h4>
 
 </div>
 
@@ -389,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-02-26
+<strong>Last updated:</strong> 2025-03-03
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8a3ad8c0f280f9e0b88f80d70989e7ce1430785btargetblank8a3ad8ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree49a802331549cc37ae97f1d3e797fe7a2e3e9477targetblank49a8023a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/8a3ad8c0f280f9e0b88f80d70989e7ce1430785b" target="_blank">8a3ad8c</a>
+<a href="https://github.com/davetang/muse/tree/49a802331549cc37ae97f1d3e797fe7a2e3e9477" target="_blank">49a8023</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8a3ad8c0f280f9e0b88f80d70989e7ce1430785btargetblank8a3ad8ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree49a802331549cc37ae97f1d3e797fe7a2e3e9477targetblank49a8023a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/8a3ad8c0f280f9e0b88f80d70989e7ce1430785b" target="_blank">8a3ad8c</a>.
+<a href="https://github.com/davetang/muse/tree/49a802331549cc37ae97f1d3e797fe7a2e3e9477" target="_blank">49a8023</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -625,6 +625,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/49a802331549cc37ae97f1d3e797fe7a2e3e9477/analysis/singler.Rmd" target="_blank">49a8023</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-03
+</td>
+<td>
+Fix subsetting
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/359326fa3c447f2decc91d8a787dd92e5487c773/docs/singler.html" target="_blank">359326f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-02-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1168,7 +1202,7 @@ mainExpName: NULL
 altExpNames(0):</code></pre>
 <p>Create query.</p>
 <pre class="r"><code>sce_query &lt;- SingleCellExperiment(
-  assays = list(counts = pbmc3k@assays$RNA$counts[, first_half])
+  assays = list(counts = pbmc3k@assays$RNA$counts[, second_half])
 )
 sce_query &lt;- logNormCounts(sce_query)
 sce_query</code></pre>
@@ -1178,8 +1212,8 @@ metadata(0):
 assays(2): counts logcounts
 rownames(13714): AL627309.1 AP006222.2 ... PNRC2.1 SRSF10.1
 rowData names(0):
-colnames(1350): AAACATACAACCAC-1 AAACATTGAGCTAC-1 ... CTATAGCTTCGCTC-1
-  CTATAGCTTGCCTC-1
+colnames(1350): CTATCAACGAACTC-1 CTATCAACGCAGAG-1 ... TTTGCATGAGAGGC-1
+  TTTGCATGCCTCAC-1
 colData names(1): sizeFactor
 reducedDimNames(0):
 mainExpName: NULL
@@ -1201,9 +1235,9 @@ table(sce_ref$label)</code></pre>
 <pre class="r"><code>table(sce.pred$labels)</code></pre>
 <pre><code>
         B cells    CD4+ T cells    CD8+ T cells Dendritic cells       Monocytes 
-            179             501             139              34             307 
+            175             508             126              34             312 
        NK cells     Progenitors         T cells 
-             79               6             105 </code></pre>
+             72               9             114 </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
