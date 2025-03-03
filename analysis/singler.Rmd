@@ -214,7 +214,7 @@ Create query.
 
 ```{r pbmc3k_query}
 sce_query <- SingleCellExperiment(
-  assays = list(counts = pbmc3k@assays$RNA$counts[, first_half])
+  assays = list(counts = pbmc3k@assays$RNA$counts[, second_half])
 )
 sce_query <- logNormCounts(sce_query)
 sce_query
