@@ -30,6 +30,9 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
@@ -232,6 +235,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -239,6 +305,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -443,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree413b2a08a2ffb4a984005fc945527bfc8b0ac860targetblank413b2a0a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebdcdb89b8efe5e7822d0f9c307342ba8030fd40etargetblankbdcdb89a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/413b2a08a2ffb4a984005fc945527bfc8b0ac860" target="_blank">413b2a0</a>
+<a href="https://github.com/davetang/muse/tree/bdcdb89b8efe5e7822d0f9c307342ba8030fd40e" target="_blank">bdcdb89</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree413b2a08a2ffb4a984005fc945527bfc8b0ac860targetblank413b2a0a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebdcdb89b8efe5e7822d0f9c307342ba8030fd40etargetblankbdcdb89a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/413b2a08a2ffb4a984005fc945527bfc8b0ac860" target="_blank">413b2a0</a>.
+<a href="https://github.com/davetang/muse/tree/bdcdb89b8efe5e7822d0f9c307342ba8030fd40e" target="_blank">bdcdb89</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -550,6 +626,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/bdcdb89b8efe5e7822d0f9c307342ba8030fd40e/analysis/hdf5.Rmd" target="_blank">bdcdb89</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-05
+</td>
+<td>
+Get celltypes from AnnData
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/d0ac93881a296a41c50209783317d1922b41e2e9/docs/hdf5.html" target="_blank">d0ac938</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -663,8 +773,8 @@ and the Java-based HDF Viewer (HDFView).</p>
 from the major legacy version HDF4.</p>
 </blockquote>
 </div>
-<div id="h5ad" class="section level1">
-<h1>h5ad</h1>
+<div id="anndata" class="section level1">
+<h1>AnnData</h1>
 <p><a
 href="https://cellxgene.cziscience.com/collections/e5f58829-1a66-40b5-a624-9046778e74f5">Download</a>
 from Tabula Sapiens:</p>
@@ -685,7 +795,7 @@ if(file.exists(ts_heart_file)){
   download.file(url = ts_heart_url, destfile = ts_heart_file)
 }</code></pre>
 <pre><code>data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad already exists</code></pre>
-<p>Creat new <code>H5File</code>.</p>
+<p>Create new <code>H5File</code>.</p>
 <pre class="r"><code>ts_heart_h5 &lt;- H5File$new(filename = ts_heart_file, mode = &quot;r&quot;)
 ts_heart_h5</code></pre>
 <pre><code>Class: H5File
@@ -704,17 +814,59 @@ Listing:
     var H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
    varm H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
    varp H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;</code></pre>
-<p>List datasets.</p>
+<p>List datasets; see <a
+href="https://anndata.readthedocs.io/en/latest/tutorials/notebooks/getting-started.html">Getting
+started with AnnData</a>.</p>
 <pre class="r"><code>hdf5r::list.datasets(ts_heart_h5) |&gt;
   head()</code></pre>
 <pre><code>[1] &quot;X/data&quot;                       &quot;X/indices&quot;                   
 [3] &quot;X/indptr&quot;                     &quot;layers/decontXcounts/data&quot;   
 [5] &quot;layers/decontXcounts/indices&quot; &quot;layers/decontXcounts/indptr&quot; </code></pre>
 <p>UMAP.</p>
-<pre class="r"><code>ts_heart_umap_h5 &lt;- ts_heart_h5[[&quot;obsm/X_umap&quot;]]
+<pre class="r"><code>celltypes &lt;- ts_heart_h5[[&quot;obs/cell_type/categories&quot;]][]
+celltype_codes &lt;- ts_heart_h5[[&quot;obs/cell_type/codes&quot;]][]
+
+ts_heart_umap_h5 &lt;- ts_heart_h5[[&quot;obsm/X_umap&quot;]]
 ts_heart_umap &lt;- ts_heart_umap_h5[,]
-plot(t(ts_heart_umap), pch = &#39;.&#39;, xlab = &quot;UMAP1&quot;, ylab = &quot;UMAP2&quot;, main = &quot;Tabula Sapiens Heart&quot;)</code></pre>
-<p><img src="figure/hdf5.Rmd/heart_h5_umap-1.png" width="672" style="display: block; margin: auto;" /></p>
+plot(t(ts_heart_umap), pch = &#39;16&#39;, xlab = &quot;UMAP1&quot;, ylab = &quot;UMAP2&quot;, main = &quot;Tabula Sapiens Heart&quot;, col = celltype_codes)</code></pre>
+<p><img src="figure/hdf5.Rmd/heart_h5_umap-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-heart_h5_umap-1">
+Past versions of heart_h5_umap-1.png
+</button>
+</p>
+<div id="fig-heart_h5_umap-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/d0ac93881a296a41c50209783317d1922b41e2e9/docs/figure/hdf5.Rmd/heart_h5_umap-1.png" target="_blank">d0ac938</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="x-hdf5" class="section level1">
 <h1>10x HDF5</h1>
@@ -1066,6 +1218,8 @@ footer is added to webpages before the MathJax javascript. -->
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -1098,6 +1252,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
