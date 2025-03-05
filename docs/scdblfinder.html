@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecc8428f053fe26cb050434e535af9acc024b8344targetblankcc8428fa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb00c1a719ddc0c5c2d749c70d28cd2b0f7931e0dtargetblankb00c1a7a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/cc8428f053fe26cb050434e535af9acc024b8344" target="_blank">cc8428f</a>
+<a href="https://github.com/davetang/muse/tree/b00c1a719ddc0c5c2d749c70d28cd2b0f7931e0d" target="_blank">b00c1a7</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecc8428f053fe26cb050434e535af9acc024b8344targetblankcc8428fa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb00c1a719ddc0c5c2d749c70d28cd2b0f7931e0dtargetblankb00c1a7a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/cc8428f053fe26cb050434e535af9acc024b8344" target="_blank">cc8428f</a>.
+<a href="https://github.com/davetang/muse/tree/b00c1a719ddc0c5c2d749c70d28cd2b0f7931e0d" target="_blank">b00c1a7</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -573,16 +573,15 @@ Ignored files:
     Ignored:    data/pbmc20k_seurat/
     Ignored:    data/pbmc3k/
     Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
     Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
     Ignored:    data/seurat_1m_neuron.rds
     Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
     Ignored:    r_packages_4.4.1/
 
 Untracked files:
-    Untracked:  Nothobranchius_furzeri.Nfu_20140520.113.gtf.gz
     Untracked:  analysis/bioc_scrnaseq.Rmd
     Untracked:  data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
-    Untracked:  data/pbmc_1k_v3_raw_feature_bc_matrix.h5
 
 </code></pre>
 <p>
@@ -627,6 +626,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/b00c1a719ddc0c5c2d749c70d28cd2b0f7931e0d/analysis/scdblfinder.Rmd" target="_blank">b00c1a7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-05
+</td>
+<td>
+Set seed and compare results
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/7738b4a56bb39472701a97e4ffcd7fdd26aead82/docs/scdblfinder.html" target="_blank">7738b4a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -766,34 +799,62 @@ altExpNames(0):</code></pre>
 <div id="predict-doublets" class="section level2">
 <h2>Predict doublets</h2>
 <p>Run <code>scDblFinder()</code>.</p>
-<pre class="r"><code>pbmc1k.pred &lt;- scDblFinder(pbmc1k)</code></pre>
+<pre class="r"><code>set.seed(1984)
+scDblFinder(pbmc1k) |&gt;
+  colData() |&gt;
+  as.data.frame() -&gt; pbmc1k.pred</code></pre>
 <pre><code>Creating ~1500 artificial doublets...</code></pre>
 <pre><code>Dimensional reduction</code></pre>
 <pre><code>Evaluating kNN...</code></pre>
 <pre><code>Training model...</code></pre>
-<pre><code>iter=0, 155 cells excluded from training.</code></pre>
-<pre><code>iter=1, 142 cells excluded from training.</code></pre>
-<pre><code>iter=2, 135 cells excluded from training.</code></pre>
-<pre><code>Threshold found:0.294</code></pre>
-<pre><code>26 (2.1%) doublets called</code></pre>
-<pre class="r"><code>colData(pbmc1k.pred) |&gt;
-  as.data.frame() -&gt; pbmc1k.pred
-
-head(pbmc1k.pred)</code></pre>
+<pre><code>iter=0, 163 cells excluded from training.</code></pre>
+<pre><code>iter=1, 139 cells excluded from training.</code></pre>
+<pre><code>iter=2, 128 cells excluded from training.</code></pre>
+<pre><code>Threshold found:0.354</code></pre>
+<pre><code>28 (2.3%) doublets called</code></pre>
+<pre class="r"><code>set.seed(1984)
+scDblFinder(pbmc1k) |&gt;
+  colData() |&gt;
+  as.data.frame() -&gt; pbmc1k.pred2</code></pre>
+<pre><code>Creating ~1500 artificial doublets...</code></pre>
+<pre><code>Dimensional reduction</code></pre>
+<pre><code>Evaluating kNN...</code></pre>
+<pre><code>Training model...</code></pre>
+<pre><code>iter=0, 163 cells excluded from training.</code></pre>
+<pre><code>iter=1, 139 cells excluded from training.</code></pre>
+<pre><code>iter=2, 128 cells excluded from training.</code></pre>
+<pre><code>Threshold found:0.354</code></pre>
+<pre><code>28 (2.3%) doublets called</code></pre>
+<pre class="r"><code>head(pbmc1k.pred)</code></pre>
 <pre><code>                   scDblFinder.class scDblFinder.score scDblFinder.weighted
-AAACCCAAGGAGAGTA-1           singlet      0.0169715248           0.40543264
-AAACGCTTCAGCCCAG-1           singlet      0.0008992357           0.29487536
-AAAGAACAGACGACTG-1           singlet      0.0003129665           0.21450453
-AAAGAACCAATGGCAG-1           singlet      0.0005328555           0.22582183
-AAAGAACGTCTGCAAT-1           singlet      0.0127416188           0.37730614
-AAAGGATAGTAGACAT-1           singlet      0.0020924010           0.07760762
+AAACCCAAGGAGAGTA-1           singlet       0.045929316            0.4312649
+AAACGCTTCAGCCCAG-1           singlet       0.004174906            0.2353700
+AAAGAACAGACGACTG-1           singlet       0.012409605            0.4142709
+AAAGAACCAATGGCAG-1           singlet       0.003421359            0.2900510
+AAAGAACGTCTGCAAT-1           singlet       0.008659453            0.2425525
+AAAGGATAGTAGACAT-1           singlet       0.016740253            0.1398486
                    scDblFinder.cxds_score
-AAACCCAAGGAGAGTA-1            0.006469792
-AAACGCTTCAGCCCAG-1            0.049250538
-AAAGAACAGACGACTG-1            0.074387442
-AAAGAACCAATGGCAG-1            0.050214668
-AAAGAACGTCTGCAAT-1            0.103131556
-AAAGGATAGTAGACAT-1            0.075818423</code></pre>
+AAACCCAAGGAGAGTA-1            0.005120514
+AAACGCTTCAGCCCAG-1            0.065461443
+AAAGAACAGACGACTG-1            0.078274898
+AAAGAACCAATGGCAG-1            0.056915421
+AAAGAACGTCTGCAAT-1            0.114158769
+AAAGGATAGTAGACAT-1            0.094354705</code></pre>
+<pre class="r"><code>head(pbmc1k.pred2)</code></pre>
+<pre><code>                   scDblFinder.class scDblFinder.score scDblFinder.weighted
+AAACCCAAGGAGAGTA-1           singlet       0.045929316            0.4312649
+AAACGCTTCAGCCCAG-1           singlet       0.004174906            0.2353700
+AAAGAACAGACGACTG-1           singlet       0.012409605            0.4142709
+AAAGAACCAATGGCAG-1           singlet       0.003421359            0.2900510
+AAAGAACGTCTGCAAT-1           singlet       0.008659453            0.2425525
+AAAGGATAGTAGACAT-1           singlet       0.016740253            0.1398486
+                   scDblFinder.cxds_score
+AAACCCAAGGAGAGTA-1            0.005120514
+AAACGCTTCAGCCCAG-1            0.065461443
+AAAGAACAGACGACTG-1            0.078274898
+AAAGAACCAATGGCAG-1            0.056915421
+AAAGAACGTCTGCAAT-1            0.114158769
+AAAGGATAGTAGACAT-1            0.094354705</code></pre>
 <p>Plot scores per label.</p>
 <pre class="r"><code>boxplot(scDblFinder.score ~ scDblFinder.class, data = pbmc1k.pred, pch = 16)</code></pre>
 <p><img src="figure/scdblfinder.Rmd/boxplot-1.png" width="672" style="display: block; margin: auto;" /></p>
@@ -834,6 +895,12 @@ Dave Tang
 </table>
 </div>
 </div>
+<p>Compare runs.</p>
+<pre class="r"><code>x &lt;- pbmc1k.pred$scDblFinder.score
+y &lt;- pbmc1k.pred2$scDblFinder.score
+
+plot(x, y, pch = 16)</code></pre>
+<p><img src="figure/scdblfinder.Rmd/deterministic-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="data-subset" class="section level2">
 <h2>Data subset</h2>
@@ -975,19 +1042,21 @@ multiplexed using cell hashes, what you want to give here are the
 different batches/wells (i.e. independent captures, since doublets
 cannot arise across them) rather than biological samples.</p>
 </blockquote>
-<pre class="r"><code>pbmc5k.pred &lt;- scDblFinder(pbmc5k, samples=&quot;donor&quot;)</code></pre>
+<pre class="r"><code>set.seed(1984)
+pbmc5k.pred &lt;- scDblFinder(pbmc5k, samples=&quot;donor&quot;)</code></pre>
 <pre><code>  |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%</code></pre>
 <p>Predict on single batch.</p>
-<pre class="r"><code>pbmc5k_1.pred &lt;- scDblFinder(pbmc5k_1)</code></pre>
+<pre class="r"><code>set.seed(1984)
+pbmc5k_1.pred &lt;- scDblFinder(pbmc5k_1)</code></pre>
 <pre><code>Creating ~4568 artificial doublets...</code></pre>
 <pre><code>Dimensional reduction</code></pre>
 <pre><code>Evaluating kNN...</code></pre>
 <pre><code>Training model...</code></pre>
-<pre><code>iter=0, 405 cells excluded from training.</code></pre>
-<pre><code>iter=1, 397 cells excluded from training.</code></pre>
-<pre><code>iter=2, 384 cells excluded from training.</code></pre>
-<pre><code>Threshold found:0.381</code></pre>
-<pre><code>223 (3.9%) doublets called</code></pre>
+<pre><code>iter=0, 452 cells excluded from training.</code></pre>
+<pre><code>iter=1, 456 cells excluded from training.</code></pre>
+<pre><code>iter=2, 457 cells excluded from training.</code></pre>
+<pre><code>Threshold found:0.337</code></pre>
+<pre><code>263 (4.6%) doublets called</code></pre>
 <p>Compare results.</p>
 <pre class="r"><code>idx &lt;- match(colnames(pbmc5k_1.pred), colnames(pbmc5k.pred))
 
@@ -996,15 +1065,52 @@ y &lt;- pbmc5k_1.pred$scDblFinder.score
 
 plot(x, y, pch = 16, xlab = &quot;Combined but using batch&quot;, ylab = &quot;Independent batch&quot;)</code></pre>
 <p><img src="figure/scdblfinder.Rmd/compare_batch_run-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-compare_batch_run-1">
+Past versions of compare_batch_run-1.png
+</button>
+</p>
+<div id="fig-compare_batch_run-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/7738b4a56bb39472701a97e4ffcd7fdd26aead82/docs/figure/scdblfinder.Rmd/compare_batch_run-1.png" target="_blank">7738b4a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Numbers.</p>
 <pre class="r"><code>table(pbmc5k.pred[, idx]$scDblFinder.class)</code></pre>
 <pre><code>
 singlet doublet 
-   5453     257 </code></pre>
+   5462     248 </code></pre>
 <pre class="r"><code>table(pbmc5k_1.pred$scDblFinder.class)</code></pre>
 <pre><code>
 singlet doublet 
-   5487     223 </code></pre>
+   5447     263 </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
