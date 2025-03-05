@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0f0153124814105e600db474e41bb42dbd8add43targetblank0f01531a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecc8428f053fe26cb050434e535af9acc024b8344targetblankcc8428fa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/0f0153124814105e600db474e41bb42dbd8add43" target="_blank">0f01531</a>
+<a href="https://github.com/davetang/muse/tree/cc8428f053fe26cb050434e535af9acc024b8344" target="_blank">cc8428f</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0f0153124814105e600db474e41bb42dbd8add43targetblank0f01531a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecc8428f053fe26cb050434e535af9acc024b8344targetblankcc8428fa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/0f0153124814105e600db474e41bb42dbd8add43" target="_blank">0f01531</a>.
+<a href="https://github.com/davetang/muse/tree/cc8428f053fe26cb050434e535af9acc024b8344" target="_blank">cc8428f</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -632,6 +632,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/cc8428f053fe26cb050434e535af9acc024b8344/analysis/scdblfinder.Rmd" target="_blank">cc8428f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-05
+</td>
+<td>
+Combined batch run versus isolated run
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/e6e32688e00a20a4eb999959b4aa89d124a49c47/docs/scdblfinder.html" target="_blank">e6e3268</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/0f0153124814105e600db474e41bb42dbd8add43/analysis/scdblfinder.Rmd" target="_blank">0f01531</a>
 </td>
 <td>
@@ -678,8 +712,14 @@ suppressPackageStartupMessages(library(TENxIO))</code></pre>
 <div id="data" class="section level2">
 <h2>Data</h2>
 <p>Download data.</p>
-<pre class="r"><code>filtered_h5_url &lt;- &#39;https://cf.10xgenomics.com/samples/cell-exp/3.0.0/pbmc_1k_v3/pbmc_1k_v3_filtered_feature_bc_matrix.h5&#39;
-filtered_h5 &lt;- paste0(&#39;data/&#39;, basename(filtered_h5_url))
+<pre class="r"><code>outdir &lt;- &#39;data/&#39;
+filtered_h5_url &lt;- &#39;https://cf.10xgenomics.com/samples/cell-exp/3.0.0/pbmc_1k_v3/pbmc_1k_v3_filtered_feature_bc_matrix.h5&#39;
+filtered_h5 &lt;- paste0(outdir, basename(filtered_h5_url))
+
+pbmc5k_1_url &lt;- &quot;https://cf.10xgenomics.com/samples/cell-exp/9.0.0/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5&quot;
+pbmc5k_2_url &lt;- &quot;https://cf.10xgenomics.com/samples/cell-exp/9.0.0/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5&quot;
+pbmc5k_1_h5 &lt;- paste0(outdir, basename(pbmc5k_1_url))
+pbmc5k_2_h5 &lt;- paste0(outdir, basename(pbmc5k_2_url))
 
 download_file &lt;- function(url, outfile){
   fn &lt;- basename(url)
@@ -692,6 +732,10 @@ download_file &lt;- function(url, outfile){
 
 download_file(filtered_h5_url, filtered_h5)</code></pre>
 <pre><code>data/pbmc_1k_v3_filtered_feature_bc_matrix.h5 already exists</code></pre>
+<pre class="r"><code>download_file(pbmc5k_1_url, pbmc5k_1_h5)</code></pre>
+<pre><code>data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5 already exists</code></pre>
+<pre class="r"><code>download_file(pbmc5k_2_url, pbmc5k_2_h5)</code></pre>
+<pre><code>data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5 already exists</code></pre>
 </div>
 <div id="create-objects" class="section level2">
 <h2>Create objects</h2>
@@ -753,6 +797,43 @@ AAAGGATAGTAGACAT-1            0.075818423</code></pre>
 <p>Plot scores per label.</p>
 <pre class="r"><code>boxplot(scDblFinder.score ~ scDblFinder.class, data = pbmc1k.pred, pch = 16)</code></pre>
 <p><img src="figure/scdblfinder.Rmd/boxplot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-boxplot-1">
+Past versions of boxplot-1.png
+</button>
+</p>
+<div id="fig-boxplot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/e6e32688e00a20a4eb999959b4aa89d124a49c47/docs/figure/scdblfinder.Rmd/boxplot-1.png" target="_blank">e6e3268</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="data-subset" class="section level2">
 <h2>Data subset</h2>
@@ -803,6 +884,127 @@ y &lt;- pbmc1k_subset.pred$scDblFinder.score
 
 plot(x, y, pch = 16, xlab = &#39;Full dataset&#39;, ylab = &#39;Subset&#39;)</code></pre>
 <p><img src="figure/scdblfinder.Rmd/pbmc1k_subset_pred-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-pbmc1k_subset_pred-1">
+Past versions of pbmc1k_subset_pred-1.png
+</button>
+</p>
+<div id="fig-pbmc1k_subset_pred-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/e6e32688e00a20a4eb999959b4aa89d124a49c47/docs/figure/scdblfinder.Rmd/pbmc1k_subset_pred-1.png" target="_blank">e6e3268</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-05
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="running-in-batches" class="section level2">
+<h2>Running in batches</h2>
+<p>Create single <code>SingleCellExperiment</code> object.</p>
+<pre class="r"><code>pbmc5k_1 &lt;- create_sce_obj(pbmc5k_1_h5)</code></pre>
+<pre><code>Warning in rhdf5::h5read(file, name = paste0(group, ranges), index = list(1L),
+: Object &#39;matrix/features/interval&#39; does not exist in this HDF5 file.</code></pre>
+<pre class="r"><code>pbmc5k_2 &lt;- create_sce_obj(pbmc5k_2_h5)</code></pre>
+<pre><code>Warning in rhdf5::h5read(file, name = paste0(group, ranges), index = list(1L),
+: Object &#39;matrix/features/interval&#39; does not exist in this HDF5 file.</code></pre>
+<pre class="r"><code>colnames(pbmc5k_1) &lt;- paste0(colnames(pbmc5k_1), &quot;_1&quot;)
+colnames(pbmc5k_2) &lt;- paste0(colnames(pbmc5k_2), &quot;_2&quot;)
+
+if(any(colnames(pbmc5k_1) %in% colnames(pbmc5k_2)) == TRUE){
+  stop(&quot;Cell barcodes are not unique&quot;)
+}
+
+cbind(
+  pbmc5k_1,
+  pbmc5k_2
+) -&gt; pbmc5k
+
+coldata &lt;- DataFrame(
+  donor = paste0(&#39;donor&#39;, sub(pattern = &quot;.*_&quot;, replacement = &quot;&quot;, x = colnames(pbmc5k)))
+)
+row.names(coldata) &lt;- colnames(pbmc5k)
+colData(pbmc5k) &lt;- coldata
+
+pbmc5k</code></pre>
+<pre><code>class: SingleCellExperiment 
+dim: 38606 11699 
+metadata(2): TENxFile TENxFile
+assays(1): counts
+rownames(38606): ENSG00000290825 ENSG00000243485 ... ENSG00000278817
+  ENSG00000277196
+rowData names(3): ID Symbol Type
+colnames(11699): AAACCAAAGGTGACGA-1_1 AAACCCTGTGACGAGT-1_1 ...
+  TGTGTTAGTTAAGTGG-1_2 TGTGTTGAGCCAATGC-1_2
+colData names(1): donor
+reducedDimNames(0):
+mainExpName: Gene Expression
+altExpNames(0):</code></pre>
+<p>Predict on combined object but on different samples.</p>
+<blockquote>
+<p>A vector of the same length as cells (or the name of a column of
+colData(x)), indicating to which sample each cell belongs. Here, a
+sample is understood as being processed independently. If omitted,
+doublets will be searched for with all cells together. If given,
+doublets will be searched for independently for each sample, which is
+preferable if they represent different captures. If your samples were
+multiplexed using cell hashes, what you want to give here are the
+different batches/wells (i.e. independent captures, since doublets
+cannot arise across them) rather than biological samples.</p>
+</blockquote>
+<pre class="r"><code>pbmc5k.pred &lt;- scDblFinder(pbmc5k, samples=&quot;donor&quot;)</code></pre>
+<pre><code>  |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%</code></pre>
+<p>Predict on single batch.</p>
+<pre class="r"><code>pbmc5k_1.pred &lt;- scDblFinder(pbmc5k_1)</code></pre>
+<pre><code>Creating ~4568 artificial doublets...</code></pre>
+<pre><code>Dimensional reduction</code></pre>
+<pre><code>Evaluating kNN...</code></pre>
+<pre><code>Training model...</code></pre>
+<pre><code>iter=0, 405 cells excluded from training.</code></pre>
+<pre><code>iter=1, 397 cells excluded from training.</code></pre>
+<pre><code>iter=2, 384 cells excluded from training.</code></pre>
+<pre><code>Threshold found:0.381</code></pre>
+<pre><code>223 (3.9%) doublets called</code></pre>
+<p>Compare results.</p>
+<pre class="r"><code>idx &lt;- match(colnames(pbmc5k_1.pred), colnames(pbmc5k.pred))
+
+x &lt;- pbmc5k.pred[, idx]$scDblFinder.score
+y &lt;- pbmc5k_1.pred$scDblFinder.score
+
+plot(x, y, pch = 16, xlab = &quot;Combined but using batch&quot;, ylab = &quot;Independent batch&quot;)</code></pre>
+<p><img src="figure/scdblfinder.Rmd/compare_batch_run-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Numbers.</p>
+<pre class="r"><code>table(pbmc5k.pred[, idx]$scDblFinder.class)</code></pre>
+<pre><code>
+singlet doublet 
+   5453     257 </code></pre>
+<pre class="r"><code>table(pbmc5k_1.pred$scDblFinder.class)</code></pre>
+<pre><code>
+singlet doublet 
+   5487     223 </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
