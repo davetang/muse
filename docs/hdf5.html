@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-03-01" />
+<meta name="date" content="2025-03-05" />
 
 <title>Working with HDF5 data in R</title>
 
@@ -283,7 +283,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Working with HDF5 data in R</h1>
-<h4 class="date">2025-03-01</h4>
+<h4 class="date">2025-03-05</h4>
 
 </div>
 
@@ -312,7 +312,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-03-01
+<strong>Last updated:</strong> 2025-03-05
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -443,15 +443,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef3c325ea5d27f13806703cec404cf530ea49880dtargetblankf3c325ea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree413b2a08a2ffb4a984005fc945527bfc8b0ac860targetblank413b2a0a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/f3c325ea5d27f13806703cec404cf530ea49880d" target="_blank">f3c325e</a>
+<a href="https://github.com/davetang/muse/tree/413b2a08a2ffb4a984005fc945527bfc8b0ac860" target="_blank">413b2a0</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef3c325ea5d27f13806703cec404cf530ea49880dtargetblankf3c325ea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree413b2a08a2ffb4a984005fc945527bfc8b0ac860targetblank413b2a0a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +461,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/f3c325ea5d27f13806703cec404cf530ea49880d" target="_blank">f3c325e</a>.
+<a href="https://github.com/davetang/muse/tree/413b2a08a2ffb4a984005fc945527bfc8b0ac860" target="_blank">413b2a0</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -497,6 +497,7 @@ Ignored files:
     Ignored:    data/pbmc20k_seurat/
     Ignored:    data/pbmc3k/
     Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
     Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
     Ignored:    data/seurat_1m_neuron.rds
     Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
@@ -504,6 +505,8 @@ Ignored files:
 
 Untracked files:
     Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Untracked:  data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
 
 </code></pre>
 <p>
@@ -547,6 +550,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/413b2a08a2ffb4a984005fc945527bfc8b0ac860/analysis/hdf5.Rmd" target="_blank">413b2a0</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-05
+</td>
+<td>
+Tabula Sapiens h5ad
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4c0da5462729815b0acc7b35a4419ab417b2df58/docs/hdf5.html" target="_blank">4c0da54</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -625,6 +662,59 @@ and the Java-based HDF Viewer (HDFView).</p>
 <p>The current version, HDF5, differs significantly in design and API
 from the major legacy version HDF4.</p>
 </blockquote>
+</div>
+<div id="h5ad" class="section level1">
+<h1>h5ad</h1>
+<p><a
+href="https://cellxgene.cziscience.com/collections/e5f58829-1a66-40b5-a624-9046778e74f5">Download</a>
+from Tabula Sapiens:</p>
+<blockquote>
+<p>Tabula Sapiens is a benchmark, first-draft human cell atlas of over
+1.1M cells from 28 organs of 24 normal human subjects. This work is the
+product of the Tabula Sapiens Consortium. Taking the organs from the
+same individual controls for genetic background, age, environment, and
+epigenetic effects, and allows detailed analysis and comparison of cell
+types that are shared between tissues.</p>
+</blockquote>
+<pre class="r"><code>ts_heart_url &lt;- &quot;https://datasets.cellxgene.cziscience.com/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad&quot;
+ts_heart_file &lt;- paste0(&#39;data/&#39;, basename(ts_heart_url))
+if(file.exists(ts_heart_file)){
+  message(paste0(ts_heart_file, &quot; already exists&quot;))
+} else {
+  options(timeout = 1000)
+  download.file(url = ts_heart_url, destfile = ts_heart_file)
+}</code></pre>
+<pre><code>data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad already exists</code></pre>
+<p>Creat new <code>H5File</code>.</p>
+<pre class="r"><code>ts_heart_h5 &lt;- H5File$new(filename = ts_heart_file, mode = &quot;r&quot;)
+ts_heart_h5</code></pre>
+<pre><code>Class: H5File
+Filename: /home/rstudio/muse/data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+Access type: H5F_ACC_RDONLY
+Attributes: encoding-type, encoding-version
+Listing:
+   name  obj_type dataset.dims dataset.type_class
+      X H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
+ layers H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
+    obs H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
+   obsm H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
+   obsp H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
+    raw H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
+    uns H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
+    var H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
+   varm H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;
+   varp H5I_GROUP         &lt;NA&gt;               &lt;NA&gt;</code></pre>
+<p>List datasets.</p>
+<pre class="r"><code>hdf5r::list.datasets(ts_heart_h5) |&gt;
+  head()</code></pre>
+<pre><code>[1] &quot;X/data&quot;                       &quot;X/indices&quot;                   
+[3] &quot;X/indptr&quot;                     &quot;layers/decontXcounts/data&quot;   
+[5] &quot;layers/decontXcounts/indices&quot; &quot;layers/decontXcounts/indptr&quot; </code></pre>
+<p>UMAP.</p>
+<pre class="r"><code>ts_heart_umap_h5 &lt;- ts_heart_h5[[&quot;obsm/X_umap&quot;]]
+ts_heart_umap &lt;- ts_heart_umap_h5[,]
+plot(t(ts_heart_umap), pch = &#39;.&#39;, xlab = &quot;UMAP1&quot;, ylab = &quot;UMAP2&quot;, main = &quot;Tabula Sapiens Heart&quot;)</code></pre>
+<p><img src="figure/hdf5.Rmd/heart_h5_umap-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="x-hdf5" class="section level1">
 <h1>10x HDF5</h1>
@@ -948,9 +1038,9 @@ loaded via a namespace (and not attached):
 [33] vctrs_0.6.5       R6_2.5.1          lifecycle_1.0.4   git2r_0.35.0     
 [37] bit_4.5.0         fs_1.6.4          pkgconfig_2.0.3   callr_3.7.6      
 [41] pillar_1.9.0      bslib_0.8.0       later_1.3.2       gtable_0.3.6     
-[45] glue_1.8.0        Rcpp_1.0.13       xfun_0.48         tidyselect_1.2.1 
-[49] rstudioapi_0.17.1 knitr_1.48        htmltools_0.5.8.1 rmarkdown_2.28   
-[53] compiler_4.4.1    getPass_0.2-4    </code></pre>
+[45] glue_1.8.0        Rcpp_1.0.13       highr_0.11        xfun_0.48        
+[49] tidyselect_1.2.1  rstudioapi_0.17.1 knitr_1.48        htmltools_0.5.8.1
+[53] rmarkdown_2.28    compiler_4.4.1    getPass_0.2-4    </code></pre>
 </div>
 </div>
 </div>
