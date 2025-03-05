@@ -1,0 +1,114 @@
+---
+title: "The SingleCellExperiment class"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+From [Introduction to Single-Cell Analysis with Bioconductor](https://bioconductor.org/books/3.13/OSCA.intro/the-singlecellexperiment-class.html):
+
+> ... the SingleCellExperiment class (from the SingleCellExperiment package) serves as the common currency for data exchange across 70+ single-cell-related Bioconductor packages. This class implements a data structure that stores all aspects of our single-cell data - gene-by-cell expression data, per-cell metadata and per-gene annotation (Figure 4.1) - and manipulate them in a synchronized manner.
+
+## Dependencies
+
+Install Bioconductor packages using `BiocManager::install()`.
+
+```{r install_dependencies, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("SingleCellExperiment")
+BiocManager::install("TENxIO")
+install.packages("hdf5r")
+install.packages("Seurat")
+```
+
+Load libraries.
+
+```{r load_dependencies}
+suppressPackageStartupMessages(library(SingleCellExperiment))
+suppressPackageStartupMessages(library(TENxIO))
+suppressPackageStartupMessages(library(hdf5r))
+suppressPackageStartupMessages(library(Seurat))
+```
+
+## Data
+
+Download data.
+
+```{r h5_data}
+outdir <- 'data/'
+
+pbmc5k_1_url <- "https://cf.10xgenomics.com/samples/cell-exp/9.0.0/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5"
+pbmc5k_2_url <- "https://cf.10xgenomics.com/samples/cell-exp/9.0.0/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5"
+pbmc5k_1_h5 <- paste0(outdir, basename(pbmc5k_1_url))
+pbmc5k_2_h5 <- paste0(outdir, basename(pbmc5k_2_url))
+
+download_file <- function(url, outfile){
+  fn <- basename(url)
+  if(file.exists(outfile) == FALSE){
+    download.file(url, destfile = outfile)
+  } else {
+    message(paste0(outfile, " already exists"))
+  }
+}
+
+download_file(pbmc5k_1_url, pbmc5k_1_h5)
+download_file(pbmc5k_2_url, pbmc5k_2_h5)
+```
+
+## Create objects
+
+Create `SingleCellExperiment` files.
+
+```{r create_sce_obj}
+create_sce_obj <- function(h5){
+  con <- TENxH5(h5)
+  import(con)
+}
+
+pbmc5k_1 <- create_sce_obj(pbmc5k_1_h5)
+pbmc5k_1
+```
+
+Seurat object.
+
+```{r pbmc5k_1_seurat}
+min_cells <- 10
+min_features <- 500
+
+pbmc5k_1_seurat <- Seurat::CreateSeuratObject(
+  counts = Seurat::Read10X_h5(pbmc5k_1_h5),
+  min.cells = min_cells,
+  min.features = min_features
+)
+pbmc5k_1_seurat
+```
+
+Filter `SingleCellExperiment` object in the same way; the order and manner of filtering is important or else you can not reproduce Seurat's behaviour.
+
+```{r filter_sce}
+filter_sce <- function(sce, min.features, min.cells){
+  detected_genes_in_bcs <- colSums(counts(sce) > 0)
+  sce <- sce[, detected_genes_in_bcs >= min.features]
+  detected_genes <- rowSums(counts(sce) > 0)
+  sce <- sce[detected_genes >= min.cells, ]
+  sce
+}
+
+pbmc5k_1_filtered <- filter_sce(pbmc5k_1, min_features, min_cells)
+pbmc5k_1_filtered
+```
+
+Compare barcodes.
+
+```{r compare_sce_seurat}
+all(colnames(pbmc5k_1_seurat) == colnames(pbmc5k_1_filtered))
+```
