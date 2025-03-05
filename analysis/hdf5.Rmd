@@ -3,7 +3,7 @@ title: "Working with HDF5 data in R"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
-    toc: false
+    toc: true
 editor_options:
   chunk_output_type: console
 ---
@@ -34,7 +34,7 @@ utilities, test suite source, Java interface, and the Java-based HDF Viewer
 > The current version, HDF5, differs significantly in design and API from the
 major legacy version HDF4.
 
-# h5ad
+# AnnData
 
 [Download](https://cellxgene.cziscience.com/collections/e5f58829-1a66-40b5-a624-9046778e74f5) from Tabula Sapiens:
 
@@ -51,14 +51,14 @@ if(file.exists(ts_heart_file)){
 }
 ```
 
-Creat new `H5File`.
+Create new `H5File`.
 
 ```{r ts_heart_h5}
 ts_heart_h5 <- H5File$new(filename = ts_heart_file, mode = "r")
 ts_heart_h5
 ```
 
-List datasets.
+List datasets; see [Getting started with AnnData](https://anndata.readthedocs.io/en/latest/tutorials/notebooks/getting-started.html).
 
 ```{r list_datasets_heart_h5}
 hdf5r::list.datasets(ts_heart_h5) |>
@@ -67,10 +67,13 @@ hdf5r::list.datasets(ts_heart_h5) |>
 
 UMAP.
 
-```{r heart_h5_umap}
+```{r heart_h5_umap, fig.width=10, fig.height=10}
+celltypes <- ts_heart_h5[["obs/cell_type/categories"]][]
+celltype_codes <- ts_heart_h5[["obs/cell_type/codes"]][]
+
 ts_heart_umap_h5 <- ts_heart_h5[["obsm/X_umap"]]
 ts_heart_umap <- ts_heart_umap_h5[,]
-plot(t(ts_heart_umap), pch = '.', xlab = "UMAP1", ylab = "UMAP2", main = "Tabula Sapiens Heart")
+plot(t(ts_heart_umap), pch = '16', xlab = "UMAP1", ylab = "UMAP2", main = "Tabula Sapiens Heart", col = celltype_codes)
 ```
 
 # 10x HDF5
