@@ -83,18 +83,33 @@ pbmc1k
 Run `scDblFinder()`.
 
 ```{r scdblfinder}
-pbmc1k.pred <- scDblFinder(pbmc1k)
-
-colData(pbmc1k.pred) |>
+set.seed(1984)
+scDblFinder(pbmc1k) |>
+  colData() |>
   as.data.frame() -> pbmc1k.pred
 
+set.seed(1984)
+scDblFinder(pbmc1k) |>
+  colData() |>
+  as.data.frame() -> pbmc1k.pred2
+
 head(pbmc1k.pred)
+head(pbmc1k.pred2)
 ```
 
 Plot scores per label.
 
 ```{r boxplot}
 boxplot(scDblFinder.score ~ scDblFinder.class, data = pbmc1k.pred, pch = 16)
+```
+
+Compare runs.
+
+```{r deterministic}
+x <- pbmc1k.pred$scDblFinder.score
+y <- pbmc1k.pred2$scDblFinder.score
+
+plot(x, y, pch = 16)
 ```
 
 ## Data subset
@@ -164,12 +179,14 @@ Predict on combined object but on different samples.
 > A vector of the same length as cells (or the name of a column of colData(x)), indicating to which sample each cell belongs. Here, a sample is understood as being processed independently. If omitted, doublets will be searched for with all cells together. If given, doublets will be searched for independently for each sample, which is preferable if they represent different captures. If your samples were multiplexed using cell hashes, what you want to give here are the different batches/wells (i.e. independent captures, since doublets cannot arise across them) rather than biological samples.
 
 ```{r scdblfinder_samples}
+set.seed(1984)
 pbmc5k.pred <- scDblFinder(pbmc5k, samples="donor")
 ```
 
 Predict on single batch.
 
 ```{r scdblfinder_donor1}
+set.seed(1984)
 pbmc5k_1.pred <- scDblFinder(pbmc5k_1)
 ```
 
