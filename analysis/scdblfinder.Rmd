@@ -41,8 +41,14 @@ suppressPackageStartupMessages(library(TENxIO))
 Download data.
 
 ```{r h5_data}
+outdir <- 'data/'
 filtered_h5_url <- 'https://cf.10xgenomics.com/samples/cell-exp/3.0.0/pbmc_1k_v3/pbmc_1k_v3_filtered_feature_bc_matrix.h5'
-filtered_h5 <- paste0('data/', basename(filtered_h5_url))
+filtered_h5 <- paste0(outdir, basename(filtered_h5_url))
+
+pbmc5k_1_url <- "https://cf.10xgenomics.com/samples/cell-exp/9.0.0/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5"
+pbmc5k_2_url <- "https://cf.10xgenomics.com/samples/cell-exp/9.0.0/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5"
+pbmc5k_1_h5 <- paste0(outdir, basename(pbmc5k_1_url))
+pbmc5k_2_h5 <- paste0(outdir, basename(pbmc5k_2_url))
 
 download_file <- function(url, outfile){
   fn <- basename(url)
@@ -54,6 +60,8 @@ download_file <- function(url, outfile){
 }
 
 download_file(filtered_h5_url, filtered_h5)
+download_file(pbmc5k_1_url, pbmc5k_1_h5)
+download_file(pbmc5k_2_url, pbmc5k_2_h5)
 ```
 
 ## Create objects
@@ -120,4 +128,65 @@ x <- pbmc1k.pred[idx, ]$scDblFinder.score
 y <- pbmc1k_subset.pred$scDblFinder.score
 
 plot(x, y, pch = 16, xlab = 'Full dataset', ylab = 'Subset')
+```
+
+## Running in batches
+
+Create single `SingleCellExperiment` object.
+
+```{r pbmc5k}
+pbmc5k_1 <- create_sce_obj(pbmc5k_1_h5)
+pbmc5k_2 <- create_sce_obj(pbmc5k_2_h5)
+
+colnames(pbmc5k_1) <- paste0(colnames(pbmc5k_1), "_1")
+colnames(pbmc5k_2) <- paste0(colnames(pbmc5k_2), "_2")
+
+if(any(colnames(pbmc5k_1) %in% colnames(pbmc5k_2)) == TRUE){
+  stop("Cell barcodes are not unique")
+}
+
+cbind(
+  pbmc5k_1,
+  pbmc5k_2
+) -> pbmc5k
+
+coldata <- DataFrame(
+  donor = paste0('donor', sub(pattern = ".*_", replacement = "", x = colnames(pbmc5k)))
+)
+row.names(coldata) <- colnames(pbmc5k)
+colData(pbmc5k) <- coldata
+
+pbmc5k
+```
+
+Predict on combined object but on different samples.
+
+> A vector of the same length as cells (or the name of a column of colData(x)), indicating to which sample each cell belongs. Here, a sample is understood as being processed independently. If omitted, doublets will be searched for with all cells together. If given, doublets will be searched for independently for each sample, which is preferable if they represent different captures. If your samples were multiplexed using cell hashes, what you want to give here are the different batches/wells (i.e. independent captures, since doublets cannot arise across them) rather than biological samples.
+
+```{r scdblfinder_samples}
+pbmc5k.pred <- scDblFinder(pbmc5k, samples="donor")
+```
+
+Predict on single batch.
+
+```{r scdblfinder_donor1}
+pbmc5k_1.pred <- scDblFinder(pbmc5k_1)
+```
+
+Compare results.
+
+```{r compare_batch_run}
+idx <- match(colnames(pbmc5k_1.pred), colnames(pbmc5k.pred))
+
+x <- pbmc5k.pred[, idx]$scDblFinder.score
+y <- pbmc5k_1.pred$scDblFinder.score
+
+plot(x, y, pch = 16, xlab = "Combined but using batch", ylab = "Independent batch")
+```
+
+Numbers.
+
+```{r compare_batch_run_n}
+table(pbmc5k.pred[, idx]$scDblFinder.class)
+table(pbmc5k_1.pred$scDblFinder.class)
 ```
