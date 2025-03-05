@@ -10,6 +10,7 @@ editor_options:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
 BPCells is an [R package](https://github.com/bnprks/BPCells) that allows for computationally efficient single-cell analysis. It utilizes bit-packing compression to store counts matrices on disk and C++ code to cache operations. 
@@ -23,7 +24,7 @@ suppressPackageStartupMessages(library(BPCells))
 suppressPackageStartupMessages(library(Seurat))
 ```
 
-# Load Data
+# PBMC3k
 
 Download the Peripheral Blood Mononuclear Cells (PBMCs) 2,700 cells dataset.
 
@@ -162,4 +163,44 @@ table(
   seurat_obj_bpcells@meta.data$seurat_clusters,
   seurat_obj_mem@meta.data$seurat_clusters
 )
+```
+
+# Tabula Sapiens
+
+[Download](https://cellxgene.cziscience.com/collections/e5f58829-1a66-40b5-a624-9046778e74f5) from Tabula Sapiens:
+
+> Tabula Sapiens is a benchmark, first-draft human cell atlas of over 1.1M cells from 28 organs of 24 normal human subjects. This work is the product of the Tabula Sapiens Consortium. Taking the organs from the same individual controls for genetic background, age, environment, and epigenetic effects, and allows detailed analysis and comparison of cell types that are shared between tissues.
+
+```{r ts_heart}
+ts_heart_url <- "https://datasets.cellxgene.cziscience.com/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad"
+ts_heart_file <- paste0('data/', basename(ts_heart_url))
+if(file.exists(ts_heart_file)){
+  message(paste0(ts_heart_file, " already exists"))
+} else {
+  options(timeout = 1000)
+  download.file(url = ts_heart_url, destfile = ts_heart_file)
+}
+```
+
+Run workflow for on disk.
+
+```{r run_seurat_workflow_ts_heart}
+start_time <- Sys.time()
+
+ts_heart <- CreateSeuratObject(
+  counts = BPCells::open_matrix_anndata_hdf5(ts_heart_file),
+  min.cells = 3,
+  min.features = 200,
+  project = "ts_heart"
+)
+
+ts_heart <- seurat_workflow(ts_heart)
+end_time <- Sys.time()
+end_time - start_time
+```
+
+UMAP.
+
+```{r ts_heart_umap}
+DimPlot(ts_heart)
 ```
