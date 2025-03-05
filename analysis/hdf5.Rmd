@@ -34,6 +34,45 @@ utilities, test suite source, Java interface, and the Java-based HDF Viewer
 > The current version, HDF5, differs significantly in design and API from the
 major legacy version HDF4.
 
+# h5ad
+
+[Download](https://cellxgene.cziscience.com/collections/e5f58829-1a66-40b5-a624-9046778e74f5) from Tabula Sapiens:
+
+> Tabula Sapiens is a benchmark, first-draft human cell atlas of over 1.1M cells from 28 organs of 24 normal human subjects. This work is the product of the Tabula Sapiens Consortium. Taking the organs from the same individual controls for genetic background, age, environment, and epigenetic effects, and allows detailed analysis and comparison of cell types that are shared between tissues.
+
+```{r ts_heart}
+ts_heart_url <- "https://datasets.cellxgene.cziscience.com/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad"
+ts_heart_file <- paste0('data/', basename(ts_heart_url))
+if(file.exists(ts_heart_file)){
+  message(paste0(ts_heart_file, " already exists"))
+} else {
+  options(timeout = 1000)
+  download.file(url = ts_heart_url, destfile = ts_heart_file)
+}
+```
+
+Creat new `H5File`.
+
+```{r ts_heart_h5}
+ts_heart_h5 <- H5File$new(filename = ts_heart_file, mode = "r")
+ts_heart_h5
+```
+
+List datasets.
+
+```{r list_datasets_heart_h5}
+hdf5r::list.datasets(ts_heart_h5) |>
+  head()
+```
+
+UMAP.
+
+```{r heart_h5_umap}
+ts_heart_umap_h5 <- ts_heart_h5[["obsm/X_umap"]]
+ts_heart_umap <- ts_heart_umap_h5[,]
+plot(t(ts_heart_umap), pch = '.', xlab = "UMAP1", ylab = "UMAP2", main = "Tabula Sapiens Heart")
+```
+
 # 10x HDF5
 
 ## Gene expression data
