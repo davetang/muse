@@ -1,0 +1,123 @@
+---
+title: "Doublet prediction using {scDblFinder}"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+[scDblFinder](https://bioconductor.org/packages/release/bioc/html/scDblFinder.html):
+
+> The scDblFinder package gathers various methods for the detection and handling of doublets/multiplets in single-cell sequencing data (i.e. multiple cells captured within the same droplet or reaction volume). It includes methods formerly found in the scran package, the new fast and comprehensive scDblFinder method, and a reimplementation of the Amulet detection method for single-cell ATAC-seq.
+
+## Dependencies
+
+Install Bioconductor packages using `BiocManager::install()`.
+
+```{r install_dependencies, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("scDblFinder")
+BiocManager::install("TENxIO")
+```
+
+Load libraries.
+
+```{r load_dependencies}
+suppressPackageStartupMessages(library(scDblFinder))
+suppressPackageStartupMessages(library(SingleCellExperiment))
+suppressPackageStartupMessages(library(TENxIO))
+```
+
+## Data
+
+Download data.
+
+```{r h5_data}
+filtered_h5_url <- 'https://cf.10xgenomics.com/samples/cell-exp/3.0.0/pbmc_1k_v3/pbmc_1k_v3_filtered_feature_bc_matrix.h5'
+filtered_h5 <- paste0('data/', basename(filtered_h5_url))
+
+download_file <- function(url, outfile){
+  fn <- basename(url)
+  if(file.exists(outfile) == FALSE){
+    download.file(url, destfile = outfile)
+  } else {
+    message(paste0(outfile, " already exists"))
+  }
+}
+
+download_file(filtered_h5_url, filtered_h5)
+```
+
+## Create objects
+
+Create `SingleCellExperiment` files.
+
+```{r create_sce_obj}
+create_sce_obj <- function(h5){
+  con <- TENxH5(h5)
+  import(con)
+}
+
+pbmc1k <- create_sce_obj(filtered_h5)
+pbmc1k
+```
+
+## Predict doublets
+
+Run `scDblFinder()`.
+
+```{r scdblfinder}
+pbmc1k.pred <- scDblFinder(pbmc1k)
+
+colData(pbmc1k.pred) |>
+  as.data.frame() -> pbmc1k.pred
+
+head(pbmc1k.pred)
+```
+
+Plot scores per label.
+
+```{r boxplot}
+boxplot(scDblFinder.score ~ scDblFinder.class, data = pbmc1k.pred, pch = 16)
+```
+
+## Data subset
+
+Since doublets are artifically generated using the available data, providing a different input should affect the scoring and prediction.
+
+```{r pbmc1k_subset}
+set.seed(1984)
+
+n <- ceiling(ncol(pbmc1k)*0.9)
+bcs <- sample(x = colnames(pbmc1k), size = n)
+
+pbmc1k_subset <- pbmc1k[, bcs]
+pbmc1k_subset
+```
+
+Predict doublets on the data subset.
+
+```{r pbmc1k_subset_pred}
+pbmc1k_subset.pred <- scDblFinder(pbmc1k_subset)
+
+colData(pbmc1k_subset.pred) |>
+  as.data.frame() -> pbmc1k_subset.pred
+
+idx <- match(
+  row.names(pbmc1k_subset.pred),
+  row.names(pbmc1k.pred)
+)
+
+x <- pbmc1k.pred[idx, ]$scDblFinder.score
+y <- pbmc1k_subset.pred$scDblFinder.score
+
+plot(x, y, pch = 16, xlab = 'Full dataset', ylab = 'Subset')
+```
