@@ -7,10 +7,10 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-suppressPackageStartupMessages(library(tidyverse))
-suppressPackageStartupMessages(library(ggarchery))
-suppressPackageStartupMessages(library(clusterProfiler))
-suppressPackageStartupMessages(library(org.Hs.eg.db))
+
+options(repos=c(CRAN="https://cran.r-project.org"))
+# getOption("repos")
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
 ## Getting started
@@ -19,11 +19,23 @@ Install.
 
 ```{r install_cluster_profiler, eval=FALSE}
 if (!require("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
+  install.packages("BiocManager")
 
+install.packages('ggarchery')
+install.packages('ggtangle')
 BiocManager::install("clusterProfiler")
 BiocManager::install("org.Hs.eg.db")
-install.packages('ggarchery')
+BiocManager::install("GO.db")
+```
+
+Load libraries.
+
+```{r load_libraries}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(ggarchery))
+suppressPackageStartupMessages(library(clusterProfiler))
+suppressPackageStartupMessages(library(org.Hs.eg.db))
+suppressPackageStartupMessages(library(GO.db))
 ```
 
 ## Example data
@@ -175,4 +187,117 @@ Dot plot with enriched GO terms by gene list.
 
 ```{r dotplot_gene_list, fig.width=12, fig.height=12}
 dotplot(ego_bp_both, showCategory = 15)
+```
+
+## enricher
+
+`enricher()` is a universal enrichment analyzer.
+
+* gene - a vector of gene id
+* universe - background genes. If missing, the all genes listed in the database (eg TERM2GENE table) will be used as background.
+* minGSSize - minimal size of genes annotated for testing
+* maxGSSize - maximal size of genes annotated for testing
+* TERM2GENE - user input annotation of TERM TO GENE mapping, a data.frame of 2 column with term and gene. Only used when gson is NULL.
+* TERM2NAME - user input of TERM TO NAME mapping, a data.frame of 2 column with term and name. Only used when gson is NULL.
+
+[TERM2NAME](https://support.bioconductor.org/p/9144621/) is needed to map the GOID to its term (description).
+
+An easy way of obtaining this mapping is by extracting the information from the Bioconductor GO annotation database package ({GO.db}).
+
+```{r term2name}
+# extract a named vector of all terms
+goterms <- Term(GOTERM)
+
+#convert into a data frame
+term2name <- data.frame(
+  "term"=names(goterms),
+  "name"=goterms
+)
+
+dim(term2name)
+head(term2name)
+```
+
+`term2name` can then be used when calling `enrichr()`, by specifying `TERM2NAME=term2name`. Be sure, though, to check that `term2name` contains all GOIDs present in your TERM2GENE mapping.
+
+Demo input.
+
+```{r demo}
+demo <- readr::read_csv("data/nfurzeri_gene_id_to_go_id.csv.gz", show_col_types = FALSE)
+head(demo)
+```
+
+Prepare data frame of 2 column with term and gene.
+
+```{r term2gene}
+demo |>
+  dplyr::filter(!is.na(go_id)) |>
+  dplyr::rename(term = go_id, gene = ensembl_gene_id) |>
+  dplyr::select(term, gene) |>
+  dplyr::arrange(term) -> term2gene
+
+head(term2gene)
+```
+
+Test with random genes.
+
+```{r enricher_random}
+set.seed(1984)
+my_genes <- sample(x = unique(term2gene$gene), size = 100, replace = FALSE)
+
+res <- enricher(
+  gene = my_genes,
+  TERM2GENE = term2gene,
+  TERM2NAME = term2name
+)
+
+res
+```
+
+Test with genes associated with same term.
+
+```{r enricher_same_term}
+term2gene |>
+  dplyr::group_by(term) |>
+  dplyr::summarise(n = n()) |>
+  dplyr::arrange(-n) -> dev_null
+
+my_term <- "GO:0006397"
+dplyr::filter(term2name, term == my_term)
+
+term2gene |>
+  dplyr::filter(term == my_term) |>
+  dplyr::pull(gene) |>
+  head(75) -> enriched_genes
+
+set.seed(1984)
+my_genes <- sample(x = unique(term2gene$gene), size = 25, replace = FALSE)
+my_genes <- union(enriched_genes, my_genes)
+
+res <- enricher(
+  gene = my_genes,
+  TERM2GENE = term2gene,
+  TERM2NAME = term2name
+)
+
+res |>
+  as.data.frame()
+```
+
+Check some of the results.
+
+```{r check_res}
+go_term <- "GO:0007156"
+
+dplyr::filter(term2name, term == go_term)
+
+dplyr::filter(term2gene, gene %in% my_genes, term == go_term) |>
+  nrow()
+
+dplyr::filter(term2gene, term == go_term) |>
+  nrow()
+```
+
+```{r dotplot_res, fig.height=7, fig.width=8}
+dotplot(res, showCategory=10)
 ```
