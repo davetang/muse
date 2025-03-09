@@ -206,7 +206,7 @@ An easy way of obtaining this mapping is by extracting the information from the 
 
 ```{r term2name}
 # extract a named vector of all terms
-goterms <- Term(GOTERM)
+goterms <- AnnotationDbi::Term(GOTERM)
 
 #convert into a data frame
 term2name <- data.frame(
@@ -218,6 +218,22 @@ dim(term2name)
 head(term2name)
 ```
 
+Get the ontologies and store in `term2name`.
+
+```{r get_ontology}
+ontologies <- AnnotationDbi::select(x = GO.db, keys = names(goterms), columns = c("GOID", "ONTOLOGY"))
+
+length(unique(term2name$term))
+length(unique(ontologies$GOID))
+
+stopifnot(all(term2name$term == ontologies$GOID))
+
+term2name$ontology <- ontologies$ONTOLOGY
+head(term2name)
+
+any(is.na(term2name$term))
+```
+
 `term2name` can then be used when calling `enrichr()`, by specifying `TERM2NAME=term2name`. Be sure, though, to check that `term2name` contains all GOIDs present in your TERM2GENE mapping.
 
 Demo input.
@@ -225,6 +241,28 @@ Demo input.
 ```{r demo}
 demo <- readr::read_csv("data/nfurzeri_gene_id_to_go_id.csv.gz", show_col_types = FALSE)
 head(demo)
+```
+
+Check if we have all the GO IDs.
+
+```{r check_go_id}
+goids <- demo$go_id
+goids <- goids[!is.na(goids)]
+
+table(unique(goids) %in% term2name$term)
+```
+
+Which GO IDs are missing?
+
+```{r missing_goids}
+missing_goids <- setdiff(unique(goids), term2name$term)
+missing_goids
+```
+
+They are missing because they have become obsolete.
+
+```{r obsolete}
+missing_goids %in% keys(GOOBSOLETE)
 ```
 
 Prepare data frame of 2 column with term and gene.
