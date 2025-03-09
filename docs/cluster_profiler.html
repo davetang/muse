@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6ad265795436739eeafc0d41461cfcb4bea982c2targetblank6ad2657a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefc1274d1c95357d2b0b1dbffe8584e8f00296111targetblankfc1274da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/6ad265795436739eeafc0d41461cfcb4bea982c2" target="_blank">6ad2657</a>
+<a href="https://github.com/davetang/muse/tree/fc1274d1c95357d2b0b1dbffe8584e8f00296111" target="_blank">fc1274d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6ad265795436739eeafc0d41461cfcb4bea982c2targetblank6ad2657a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefc1274d1c95357d2b0b1dbffe8584e8f00296111targetblankfc1274da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/6ad265795436739eeafc0d41461cfcb4bea982c2" target="_blank">6ad2657</a>.
+<a href="https://github.com/davetang/muse/tree/fc1274d1c95357d2b0b1dbffe8584e8f00296111" target="_blank">fc1274d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -627,6 +627,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/fc1274d1c95357d2b0b1dbffe8584e8f00296111/analysis/cluster_profiler.Rmd" target="_blank">fc1274d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-09
+</td>
+<td>
+Subset GO terms to only biological processes
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/f0166b0791270b7f3b51540dc73a64d37947e451/docs/cluster_profiler.html" target="_blank">f0166b0</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-09
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1064,6 +1098,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/f0166b0791270b7f3b51540dc73a64d37947e451/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">f0166b0</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-09
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/e815348c6fc2adfec65202ff3718880a944b088c/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">e815348</a>
 </td>
 <td>
@@ -1320,24 +1365,30 @@ missing_goids</code></pre>
   dplyr::select(term, gene) |&gt;
   dplyr::arrange(term) -&gt; term2gene
 
+lookup &lt;- AnnotationDbi::select(x = GO.db, keys = term2gene$term, columns = c(&quot;GOID&quot;, &quot;ONTOLOGY&quot;))</code></pre>
+<pre><code>&#39;select()&#39; returned many:1 mapping between keys and columns</code></pre>
+<pre class="r"><code>stopifnot(all(lookup$GOID == term2gene$term))
+
+term2gene$ontology &lt;- lookup$ONTOLOGY
+
 head(term2gene)</code></pre>
-<pre><code># A tibble: 6 × 2
-  term       gene              
-  &lt;chr&gt;      &lt;chr&gt;             
-1 GO:0000002 ENSNFUG00015006992
-2 GO:0000002 ENSNFUG00015020070
-3 GO:0000002 ENSNFUG00015013825
-4 GO:0000002 ENSNFUG00015019642
-5 GO:0000009 ENSNFUG00015008531
-6 GO:0000012 ENSNFUG00015012664</code></pre>
+<pre><code># A tibble: 6 × 3
+  term       gene               ontology
+  &lt;chr&gt;      &lt;chr&gt;              &lt;chr&gt;   
+1 GO:0000002 ENSNFUG00015006992 BP      
+2 GO:0000002 ENSNFUG00015020070 BP      
+3 GO:0000002 ENSNFUG00015013825 BP      
+4 GO:0000002 ENSNFUG00015019642 BP      
+5 GO:0000009 ENSNFUG00015008531 MF      
+6 GO:0000012 ENSNFUG00015012664 BP      </code></pre>
 <p>Test with random genes.</p>
 <pre class="r"><code>set.seed(1984)
 my_genes &lt;- sample(x = unique(term2gene$gene), size = 100, replace = FALSE)
 
 res &lt;- enricher(
   gene = my_genes,
-  TERM2GENE = term2gene,
-  TERM2NAME = term2name
+  TERM2GENE = dplyr::filter(term2gene, ontology == &quot;BP&quot;),
+  TERM2NAME = dplyr::filter(term2name, ontology == &quot;BP&quot;)
 )
 
 res</code></pre>
@@ -1372,8 +1423,8 @@ my_genes &lt;- union(enriched_genes, my_genes)
 
 res &lt;- enricher(
   gene = my_genes,
-  TERM2GENE = term2gene,
-  TERM2NAME = term2name
+  TERM2GENE = dplyr::filter(term2gene, ontology == &quot;BP&quot;),
+  TERM2NAME = dplyr::filter(term2name, ontology == &quot;BP&quot;)
 )
 
 res |&gt;
@@ -1381,133 +1432,48 @@ res |&gt;
 <pre><code>                   ID                                              Description
 GO:0006397 GO:0006397                                          mRNA processing
 GO:0008380 GO:0008380                                             RNA splicing
-GO:0005681 GO:0005681                                     spliceosomal complex
 GO:0000398 GO:0000398                           mRNA splicing, via spliceosome
-GO:0071011 GO:0071011                                 precatalytic spliceosome
-GO:0046540 GO:0046540                             U4/U6 x U5 tri-snRNP complex
 GO:0000381 GO:0000381 regulation of alternative mRNA splicing, via spliceosome
-GO:0071013 GO:0071013                             catalytic step 2 spliceosome
-GO:0005682 GO:0005682                                                 U5 snRNP
-GO:1990904 GO:1990904                                ribonucleoprotein complex
-GO:0016607 GO:0016607                                            nuclear speck
-GO:0005688 GO:0005688                                                 U6 snRNP
-GO:0003729 GO:0003729                                             mRNA binding
-GO:0005685 GO:0005685                                                 U1 snRNP
 GO:0000387 GO:0000387                              spliceosomal snRNP assembly
 GO:0043484 GO:0043484                               regulation of RNA splicing
-GO:0004527 GO:0004527                                     exonuclease activity
-GO:0005686 GO:0005686                                                 U2 snRNP
-GO:0003730 GO:0003730                                      mRNA 3&#39;-UTR binding
-GO:0005654 GO:0005654                                              nucleoplasm
-GO:0000932 GO:0000932                                                   P-body
 GO:0080090 GO:0080090                  regulation of primary metabolic process
 GO:0030968 GO:0030968          endoplasmic reticulum unfolded protein response
-GO:0005687 GO:0005687                                                 U4 snRNP
-GO:0004521 GO:0004521                                RNA endonuclease activity
            GeneRatio   BgRatio RichFactor FoldEnrichment    zScore
-GO:0006397    75/100 125/18585 0.60000000     111.510000 91.180214
-GO:0008380    43/100  89/18585 0.48314607      89.792697 61.757998
-GO:0005681    22/100  54/18585 0.40740741      75.716667 40.441272
-GO:0000398    21/100  71/18585 0.29577465      54.969718 33.511130
-GO:0071011     7/100  16/18585 0.43750000      81.309375 23.636973
-GO:0046540     9/100  43/18585 0.20930233      38.898837 18.299604
-GO:0000381     7/100  20/18585 0.35000000      65.047500 21.078008
-GO:0071013     7/100  20/18585 0.35000000      65.047500 21.078008
-GO:0005682     5/100  19/18585 0.26315789      48.907895 15.366841
-GO:1990904    10/100 228/18585 0.04385965       8.151316  7.991207
-GO:0016607     5/100  32/18585 0.15625000      29.039062 11.675924
-GO:0005688     4/100  15/18585 0.26666667      49.560000 13.838156
-GO:0003729     7/100 104/18585 0.06730769      12.509135  8.656782
-GO:0005685     4/100  26/18585 0.15384615      28.592308 10.355171
-GO:0000387     3/100  12/18585 0.25000000      46.462500 11.586780
-GO:0043484     3/100  14/18585 0.21428571      39.825000 10.688523
-GO:0004527     3/100  19/18585 0.15789474      29.344737  9.091801
-GO:0005686     3/100  30/18585 0.10000000      18.585000  7.089774
-GO:0003730     3/100  31/18585 0.09677419      17.985484  6.961453
-GO:0005654     5/100 129/18585 0.03875969       7.203488  5.200222
-GO:0000932     3/100  35/18585 0.08571429      15.930000  6.502521
-GO:0080090     2/100  12/18585 0.16666667      30.975000  7.639565
-GO:0030968     2/100  14/18585 0.14285714      26.550000  7.033916
-GO:0005687     2/100  15/18585 0.13333333      24.780000  6.776593
-GO:0004521     2/100  17/18585 0.11764706      21.864706  6.330150
+GO:0006397     75/92 125/12886  0.6000000       84.03913 79.109456
+GO:0008380     43/92  89/12886  0.4831461       67.67196 53.520121
+GO:0000398     21/92  71/12886  0.2957746       41.42774 28.965584
+GO:0000381      7/92  20/12886  0.3500000       49.02283 18.225267
+GO:0000387      3/92  12/12886  0.2500000       35.01630  9.996638
+GO:0043484      3/92  14/12886  0.2142857       30.01398  9.210457
+GO:0080090      2/92  12/12886  0.1666667       23.34420  6.566466
+GO:0030968      2/92  14/12886  0.1428571       20.00932  6.034488
                   pvalue      p.adjust        qvalue
-GO:0006397 1.059713e-152 1.653153e-150 1.372050e-150
-GO:0008380  2.787322e-77  2.174111e-75  1.804424e-75
-GO:0005681  6.857863e-37  3.566089e-35  2.959709e-35
-GO:0000398  1.048636e-31  4.089682e-30  3.394270e-30
-GO:0071011  1.159786e-12  3.298732e-11  2.737814e-11
-GO:0046540  1.268743e-12  3.298732e-11  2.737814e-11
-GO:0000381  7.722209e-12  1.505831e-10  1.249779e-10
-GO:0071013  7.722209e-12  1.505831e-10  1.249779e-10
-GO:0005682  4.465615e-08  7.740399e-07  6.424217e-07
-GO:1990904  4.185349e-07  6.529145e-06  5.418926e-06
-GO:0016607  7.316677e-07  1.037638e-05  8.611974e-06
-GO:0005688  1.029158e-06  1.337905e-05  1.110407e-05
-GO:0003729  1.464263e-06  1.757115e-05  1.458335e-05
-GO:0005685  1.077073e-05  1.200167e-04  9.960900e-05
-GO:0000387  3.210311e-05  3.338724e-04  2.771006e-04
-GO:0043484  5.270183e-05  5.138429e-04  4.264688e-04
-GO:0004527  1.375797e-04  1.262496e-03  1.047821e-03
-GO:0005686  5.522099e-04  4.785820e-03  3.972036e-03
-GO:0003730  6.089961e-04  5.000179e-03  4.149946e-03
-GO:0005654  6.625769e-04  5.168100e-03  4.289314e-03
-GO:0000932  8.730213e-04  6.485301e-03  5.382538e-03
-GO:0080090  1.826457e-03  1.295124e-02  1.074900e-02
-GO:0030968  2.500695e-03  1.696123e-02  1.407714e-02
-GO:0005687  2.875322e-03  1.868959e-02  1.551160e-02
-GO:0004521  3.698227e-03  2.307694e-02  1.915293e-02
+GO:0006397 5.586297e-146 4.133859e-144 3.586990e-144
+GO:0008380  1.687611e-72  6.244159e-71  5.418118e-71
+GO:0000398  3.041395e-29  7.502109e-28  6.509653e-28
+GO:0000381  5.389679e-11  9.970906e-10  8.651853e-10
+GO:0000387  7.395374e-05  1.094515e-03  9.497217e-04
+GO:0043484  1.210986e-04  1.493549e-03  1.295967e-03
+GO:0080090  3.176485e-03  3.357999e-02  2.913769e-02
+GO:0030968  4.339229e-03  4.013787e-02  3.482802e-02
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      geneID
 GO:0006397 ENSNFUG00015000047/ENSNFUG00015000176/ENSNFUG00015000433/ENSNFUG00015000717/ENSNFUG00015000995/ENSNFUG00015002878/ENSNFUG00015003278/ENSNFUG00015003412/ENSNFUG00015003645/ENSNFUG00015006374/ENSNFUG00015008466/ENSNFUG00015010592/ENSNFUG00015011476/ENSNFUG00015011629/ENSNFUG00015012572/ENSNFUG00015015893/ENSNFUG00015018395/ENSNFUG00015021027/ENSNFUG00015023111/ENSNFUG00015024532/ENSNFUG00015000276/ENSNFUG00015000347/ENSNFUG00015000470/ENSNFUG00015000633/ENSNFUG00015000679/ENSNFUG00015001197/ENSNFUG00015001330/ENSNFUG00015002687/ENSNFUG00015003553/ENSNFUG00015003613/ENSNFUG00015004037/ENSNFUG00015004391/ENSNFUG00015008722/ENSNFUG00015009124/ENSNFUG00015010820/ENSNFUG00015011580/ENSNFUG00015013273/ENSNFUG00015014123/ENSNFUG00015014399/ENSNFUG00015014448/ENSNFUG00015019426/ENSNFUG00015020527/ENSNFUG00015020545/ENSNFUG00015021436/ENSNFUG00015004299/ENSNFUG00015006219/ENSNFUG00015006538/ENSNFUG00015007623/ENSNFUG00015008859/ENSNFUG00015008871/ENSNFUG00015008954/ENSNFUG00015013147/ENSNFUG00015014506/ENSNFUG00015014956/ENSNFUG00015015816/ENSNFUG00015017783/ENSNFUG00015019674/ENSNFUG00015019903/ENSNFUG00015020693/ENSNFUG00015021220/ENSNFUG00015022748/ENSNFUG00015023101/ENSNFUG00015023143/ENSNFUG00015004762/ENSNFUG00015005084/ENSNFUG00015005095/ENSNFUG00015006742/ENSNFUG00015008749/ENSNFUG00015009426/ENSNFUG00015013451/ENSNFUG00015014267/ENSNFUG00015014760/ENSNFUG00015014763/ENSNFUG00015018080/ENSNFUG00015018929
 GO:0008380                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ENSNFUG00015000047/ENSNFUG00015000433/ENSNFUG00015002878/ENSNFUG00015003412/ENSNFUG00015008466/ENSNFUG00015010592/ENSNFUG00015011629/ENSNFUG00015012572/ENSNFUG00015015893/ENSNFUG00015018395/ENSNFUG00015021027/ENSNFUG00015023111/ENSNFUG00015000276/ENSNFUG00015000347/ENSNFUG00015000470/ENSNFUG00015001197/ENSNFUG00015002687/ENSNFUG00015004391/ENSNFUG00015009124/ENSNFUG00015010820/ENSNFUG00015011580/ENSNFUG00015013273/ENSNFUG00015014123/ENSNFUG00015014448/ENSNFUG00015019426/ENSNFUG00015020527/ENSNFUG00015008859/ENSNFUG00015008871/ENSNFUG00015013147/ENSNFUG00015014506/ENSNFUG00015019674/ENSNFUG00015019903/ENSNFUG00015020693/ENSNFUG00015021220/ENSNFUG00015022748/ENSNFUG00015023101/ENSNFUG00015005084/ENSNFUG00015008749/ENSNFUG00015014267/ENSNFUG00015014760/ENSNFUG00015014763/ENSNFUG00015018080/ENSNFUG00015018929
-GO:0005681                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ENSNFUG00015000433/ENSNFUG00015002878/ENSNFUG00015010592/ENSNFUG00015011629/ENSNFUG00015012572/ENSNFUG00015015893/ENSNFUG00015018395/ENSNFUG00015021027/ENSNFUG00015023111/ENSNFUG00015001197/ENSNFUG00015002687/ENSNFUG00015014123/ENSNFUG00015019426/ENSNFUG00015014506/ENSNFUG00015019903/ENSNFUG00015020693/ENSNFUG00015022748/ENSNFUG00015023101/ENSNFUG00015005084/ENSNFUG00015014760/ENSNFUG00015014763/ENSNFUG00015018929
 GO:0000398                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ENSNFUG00015000433/ENSNFUG00015002878/ENSNFUG00015003412/ENSNFUG00015010592/ENSNFUG00015011629/ENSNFUG00015012572/ENSNFUG00015015893/ENSNFUG00015023111/ENSNFUG00015001197/ENSNFUG00015002687/ENSNFUG00015014123/ENSNFUG00015008871/ENSNFUG00015014506/ENSNFUG00015019903/ENSNFUG00015020693/ENSNFUG00015022748/ENSNFUG00015005084/ENSNFUG00015008749/ENSNFUG00015014267/ENSNFUG00015014760/ENSNFUG00015014763
-GO:0071011                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ENSNFUG00015000433/ENSNFUG00015011629/ENSNFUG00015018395/ENSNFUG00015014123/ENSNFUG00015019674/ENSNFUG00015005084/ENSNFUG00015014763
-GO:0046540                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       ENSNFUG00015002878/ENSNFUG00015011629/ENSNFUG00015014123/ENSNFUG00015008871/ENSNFUG00015019674/ENSNFUG00015019903/ENSNFUG00015020693/ENSNFUG00015005084/ENSNFUG00015014763
 GO:0000381                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ENSNFUG00015024532/ENSNFUG00015000470/ENSNFUG00015011580/ENSNFUG00015014123/ENSNFUG00015014448/ENSNFUG00015008859/ENSNFUG00015013147
-GO:0071013                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ENSNFUG00015010592/ENSNFUG00015018395/ENSNFUG00015001197/ENSNFUG00015004391/ENSNFUG00015019674/ENSNFUG00015005084/ENSNFUG00015014267
-GO:0005682                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ENSNFUG00015018395/ENSNFUG00015001197/ENSNFUG00015008871/ENSNFUG00015019674/ENSNFUG00015020693
-GO:1990904                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ENSNFUG00015000047/ENSNFUG00015018395/ENSNFUG00015024532/ENSNFUG00015008722/ENSNFUG00015010820/ENSNFUG00015014956/ENSNFUG00015019674/ENSNFUG00015021220/ENSNFUG00015005084/ENSNFUG00015014763
-GO:0016607                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ENSNFUG00015003412/ENSNFUG00015006374/ENSNFUG00015000276/ENSNFUG00015009124/ENSNFUG00015019426
-GO:0005688                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ENSNFUG00015002878/ENSNFUG00015011629/ENSNFUG00015019903/ENSNFUG00015005084
-GO:0003729                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             ENSNFUG00015000047/ENSNFUG00015000995/ENSNFUG00015008466/ENSNFUG00015000347/ENSNFUG00015000470/ENSNFUG00015014448/ENSNFUG00015008954
-GO:0005685                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ENSNFUG00015008466/ENSNFUG00015010592/ENSNFUG00015018395/ENSNFUG00015019674
 GO:0000387                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ENSNFUG00015010592/ENSNFUG00015018395/ENSNFUG00015019674
 GO:0043484                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ENSNFUG00015000995/ENSNFUG00015014448/ENSNFUG00015018080
-GO:0004527                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ENSNFUG00015014399/ENSNFUG00015005095/ENSNFUG00015000334
-GO:0005686                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ENSNFUG00015000433/ENSNFUG00015018395/ENSNFUG00015019674
-GO:0003730                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ENSNFUG00015024532/ENSNFUG00015008722/ENSNFUG00015004762
-GO:0005654                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ENSNFUG00015021027/ENSNFUG00015023111/ENSNFUG00015010820/ENSNFUG00015019426/ENSNFUG00015018836
-GO:0000932                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ENSNFUG00015002878/ENSNFUG00015006219/ENSNFUG00015005084
 GO:0080090                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ENSNFUG00015011476/ENSNFUG00015021436
 GO:0030968                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ENSNFUG00015011476/ENSNFUG00015021436
-GO:0005687                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ENSNFUG00015018395/ENSNFUG00015014123
-GO:0004521                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ENSNFUG00015011476/ENSNFUG00015021436
            Count
 GO:0006397    75
 GO:0008380    43
-GO:0005681    22
 GO:0000398    21
-GO:0071011     7
-GO:0046540     9
 GO:0000381     7
-GO:0071013     7
-GO:0005682     5
-GO:1990904    10
-GO:0016607     5
-GO:0005688     4
-GO:0003729     7
-GO:0005685     4
 GO:0000387     3
 GO:0043484     3
-GO:0004527     3
-GO:0005686     3
-GO:0003730     3
-GO:0005654     5
-GO:0000932     3
 GO:0080090     2
-GO:0030968     2
-GO:0005687     2
-GO:0004521     2</code></pre>
+GO:0030968     2</code></pre>
 <p>Check some of the results.</p>
 <pre class="r"><code>go_term &lt;- &quot;GO:0007156&quot;
 
@@ -1524,7 +1490,9 @@ GO:0007156       BP</code></pre>
 <pre class="r"><code>dplyr::filter(term2gene, term == go_term) |&gt;
   nrow()</code></pre>
 <pre><code>[1] 130</code></pre>
-<pre class="r"><code>dotplot(res, showCategory=10)</code></pre>
+<p>Dot plot.</p>
+<pre class="r"><code>dotplot(res, showCategory=10) +
+  ggtitle(&quot;Biological Processes&quot;)</code></pre>
 <p><img src="figure/cluster_profiler.Rmd/dotplot_res-1.png" width="768" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-dotplot_res-1">
