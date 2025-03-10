@@ -1,0 +1,52 @@
+---
+title: "pbmc3k"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+suppressPackageStartupMessages(library(Seurat))
+```
+
+Create raw Seurat object of the pbmc3k dataset and store on my server for easy access.
+
+# PBMC3k
+
+Download the Peripheral Blood Mononuclear Cells (PBMCs) 2,700 cells dataset.
+
+```{r download_pbmc3k, eval=FALSE}
+mkdir -p data/pbmc3k && cd data/pbmc3k
+wget -c https://s3-us-west-2.amazonaws.com/10x.files/samples/cell/pbmc3k/pbmc3k_filtered_gene_bc_matrices.tar.gz
+tar -xzf pbmc3k_filtered_gene_bc_matrices.tar.gz
+```
+
+Create Seurat object.
+
+```{r seurat_obj}
+seurat_obj <- CreateSeuratObject(
+  counts = Seurat::Read10X(data.dir = "data/pbmc3k/filtered_gene_bc_matrices/hg19/"),
+  project = "pbmc3k"
+)
+
+seurat_obj
+```
+
+Export and uploaded to my server.
+
+```{r export}
+saveRDS(object = seurat_obj, file = "data/pbmc3k_seurat.rds")
+```
+
+Import from server.
+
+```{r import}
+seurat_obj_imported <- readRDS(url("https://davetang.org/file/pbmc3k_seurat.rds", "rb"))
+
+identical(seurat_obj, seurat_obj_imported)
+```
