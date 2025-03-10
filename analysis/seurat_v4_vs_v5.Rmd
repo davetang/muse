@@ -86,6 +86,20 @@ UMAP.
 DimPlot(pbmc3k_v5, reduction = "umap")
 ```
 
+### Data layer
+
+Version 4 store log normalised data.
+
+```{r pbmc3k_v4_data}
+colSums(pbmc3k_v4@assays$RNA$data)[1:6]
+```
+
+The data layer is in the SCT assay.
+
+```{r pbmc3k_v5_data}
+colSums(pbmc3k_v5@assays$SCT$data)[1:6]
+```
+
 ### Compare clustering
 
 More granular clustering of version 4's cluster 0 in version 5.
