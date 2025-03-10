@@ -1,0 +1,100 @@
+---
+title: "Seurat v4 versus v5"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+library(tidyverse)
+library(Seurat)
+```
+
+## Seurat object
+
+Import [raw pbmc3k dataset](pbmc3k.html) from my server.
+
+```{r seurat_obj}
+seurat_obj <- readRDS(url("https://davetang.org/file/pbmc3k_seurat.rds", "rb"))
+seurat_obj
+```
+
+Filter.
+
+```{r pbmc3k}
+pbmc3k <- CreateSeuratObject(
+  counts = seurat_obj@assays$RNA$counts,
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k"
+)
+pbmc3k
+```
+
+## Seurat workflows
+
+Process with the Seurat 4 workflow.
+
+```{r seurat_wf_v4}
+seurat_wf_v4 <- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
+  
+  seurat_obj <- NormalizeData(seurat_obj, normalization.method = "LogNormalize", scale.factor = scale_factor, verbose = debug_flag)
+  seurat_obj <- FindVariableFeatures(seurat_obj, selection.method = 'vst', nfeatures = num_features, verbose = debug_flag)
+  seurat_obj <- ScaleData(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunPCA(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunUMAP(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindNeighbors(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindClusters(seurat_obj, resolution = cluster_res, verbose = debug_flag)
+  
+  seurat_obj
+}
+
+pbmc3k_v4 <- seurat_wf_v4(pbmc3k)
+pbmc3k_v4
+```
+
+UMAP.
+
+```{r umap_v4}
+DimPlot(pbmc3k_v4, reduction = "umap")
+```
+
+
+```{r seurat_wf_v5}
+seurat_wf_v5 <- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
+  
+  seurat_obj <- SCTransform(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunPCA(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunUMAP(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindNeighbors(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindClusters(seurat_obj, resolution = cluster_res, verbose = debug_flag)
+  
+  seurat_obj
+}
+
+pbmc3k_v5 <- seurat_wf_v5(pbmc3k)
+pbmc3k_v5
+```
+
+UMAP.
+
+```{r umap_v5}
+DimPlot(pbmc3k_v5, reduction = "umap")
+```
+
+### Compare clustering
+
+More granular clustering of version 4's cluster 0 in version 5.
+
+```{r compare_clustering}
+stopifnot(all(row.names(pbmc3k_v4@meta.data) == row.names(pbmc3k_v5@meta.data)))
+
+table(
+  pbmc3k_v4@meta.data$seurat_clusters,
+  pbmc3k_v5@meta.data$seurat_clusters
+)
+```
