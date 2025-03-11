@@ -14,6 +14,8 @@ library(tidyverse)
 library(Seurat)
 ```
 
+## sctransform
+
 The paper [Comparison and evaluation of statistical error models for scRNA-seq](https://link.springer.com/article/10.1186/s13059-021-02584-9) is the basis for the default approach used in Seurat version 5. The following is text from the paper:
 
 * Heterogeneity in single-cell RNA-seq (scRNA-seq) data is driven by multiple sources, including biological variation in cellular state as well as technical variation introduced during experimental processing. Deconvolving these effects is a key challenge for preprocessing workflows.
@@ -26,6 +28,8 @@ Using statistical models like Generalised Linear Models:
 * Two recent studies proposed to use generalized linear models (GLMs), where cellular sequencing depth was included as a covariate, as part of scRNA-seq preprocessing workflows.
 * The sctransform approach utilizes the **Pearson residuals from negative binomial regression as input to standard dimensional reduction techniques**, while GLM-PCA focuses on a generalized version of principal component analysis (PCA) for data with Poisson-distributed errors.
 * More broadly, multiple techniques aim to learn a latent state that captures biologically relevant cellular heterogeneity using either matrix factorization or neural networks, alongside a defined error model that describes the variation that is not captured by the latent space.
+
+If a regression model doesn't fully explain variability, the residuals might contain structure that another technique can capture to uncover hidden patterns. For example, if a regression model captures main trends, applying Principal Component Analysis (PCA) on residuals can find underlying structures in the unexplained variance. Another use case can be clustering on residuals to group data points based on deviations from a model.
 
 Parameterising statistical models:
 
@@ -59,6 +63,31 @@ Errors can be random (causing variability) or systematic (bias), but variance is
 
 * In regression, we separate variance into **explained variance** (by the model) and **unexplained variance** (error).
 * Error variance $\sigma^2$ is modeled to improve predictions and uncertainty estimation.
+* For a negative binomial regression model, the **Pearson residual** $r_i$ for observation $i$ is given by:  
+
+$$
+r_i = \frac{y_i - \hat{y}_i}{\sqrt{\text{Var}(y_i)}}
+$$
+
+where:  
+* $y_i$ = observed count  
+* $\hat{y}_i$ = predicted mean (expected value under the model)  
+* $\text{Var}(y_i)$ = model-estimated variance of $y_i$
+
+* Unlike Poisson regression (where $\text{Var}(y) = \hat{y}$), the **negative binomial** model accounts for **overdispersion** using a dispersion parameter $\theta$, and the variance is:  
+
+$$
+\text{Var}(y_i) = \hat{y}_i + \frac{\hat{y}_i^2}{\theta}
+$$
+
+This means the variance **grows faster than the mean**, making negative binomial regression suitable when count data has extra variability.
+
+* Pearson residuals can be used for:
+    * **Standardized measure** - Large residuals ($|r_i| > 2$) may indicate poor model fit.
+    * **Overdispersion check** - If Pearson residuals systematically increase with predicted values, it suggests the model may not fully account for overdispersion.
+    * **Model diagnostics** - Residual plots help assess whether assumptions (e.g., correct functional form) hold.
+
+Pearson residuals focus on **variance-adjusted differences** and deviance residuals come from likelihood-based goodness-of-fit measures. They both help diagnose model fit, but deviance residuals tend to emphasise extreme deviations more. Pearson residuals in negative binomial regression are useful for model diagnostics, particularly for checking overdispersion and assessing fit.
 
 ## Seurat object
 
