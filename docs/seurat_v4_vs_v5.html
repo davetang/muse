@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4688c4091f3496e67130a46ca05149d12336efd1targetblank4688c40a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed37908d93d6d8ba596766929378360b76e47657ftargetblankd37908da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/4688c4091f3496e67130a46ca05149d12336efd1" target="_blank">4688c40</a>
+<a href="https://github.com/davetang/muse/tree/d37908d93d6d8ba596766929378360b76e47657f" target="_blank">d37908d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4688c4091f3496e67130a46ca05149d12336efd1targetblank4688c40a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed37908d93d6d8ba596766929378360b76e47657ftargetblankd37908da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/4688c4091f3496e67130a46ca05149d12336efd1" target="_blank">4688c40</a>.
+<a href="https://github.com/davetang/muse/tree/d37908d93d6d8ba596766929378360b76e47657f" target="_blank">d37908d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -628,6 +628,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/d37908d93d6d8ba596766929378360b76e47657f/analysis/seurat_v4_vs_v5.Rmd" target="_blank">d37908d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-11
+</td>
+<td>
+Overdispersion varies across datasets
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/d2a2660b3bc359e1607251bee4d6ca64b2a2a3ff/docs/seurat_v4_vs_v5.html" target="_blank">d2a2660</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -846,7 +880,7 @@ preprocessing of single-cell RNA-seq data.</li>
 sequencing depth, which collectively arise from fluctuations in cellular
 RNA content, efficiency in lysis and reverse transcription, and
 stochastic sampling during next-generation sequencing.</li>
-<li><strong>Variance stabilization aims to address the confounding
+<li><strong>Variance stabilisation aims to address the confounding
 relationship between gene abundance and gene variance, and to ensure
 that both lowly and highly expressed genes can contribute to the
 downstream definition of cellular state</strong>.</li>
@@ -986,6 +1020,55 @@ deviance residuals tend to emphasise extreme deviations more. Pearson
 residuals in negative binomial regression are useful for model
 diagnostics, particularly for checking overdispersion and assessing
 fit.</p>
+<div id="variance-stabilisation" class="section level3">
+<h3>Variance stabilisation</h3>
+<ul>
+<li>Variance stabilisation is a statistical transformation technique
+used to make the <strong>variance of a dataset independent of the
+mean</strong>.</li>
+<li>In many biological datasets, including scRNA-seq, the variance of
+gene expression measurements often <strong>increases with the mean
+expression level</strong>.
+<ul>
+<li>This heteroskedasticity (non-constant variance) can obscure
+downstream analyses such as clustering, differential expression testing,
+or dimensionality reduction.</li>
+</ul></li>
+<li>The goal of variance stabilisation is to <strong>transform the
+data</strong> so that the <strong>variance becomes roughly constant
+across different levels of the mean</strong>, i.e., to achieve
+homoskedasticity.</li>
+</ul>
+<p>Some methods for variance stabilisation:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Logarithmic transformation:</strong>
+<ul>
+<li>Common when variance increases with the mean.</li>
+<li>Applied as: <code>log(x + c)</code> (where <code>c</code> is a
+pseudocount to handle zeros).</li>
+<li>Effective when variance increases linearly with the mean.</li>
+</ul></li>
+<li><strong>Square-root transformation:</strong>
+<ul>
+<li>Applied as: <code>sqrt(x)</code>, often used for Poisson-distributed
+data.</li>
+<li>Suitable when variance is proportional to the mean.</li>
+</ul></li>
+<li><strong>Variance Stabilising Transformation (VST):</strong>
+<ul>
+<li>Involves estimating the mean-variance relationship and applying a
+transformation derived from it.</li>
+</ul></li>
+<li><strong>Regularised methods:</strong>
+<ul>
+<li>Uses <strong>negative binomial regression</strong> to model and
+normalise gene expression, accounting for sequencing depth and technical
+noise.</li>
+<li>Produces a Pearson residual that approximates homoskedastic
+behavior.</li>
+</ul></li>
+</ol>
+</div>
 </div>
 <div id="seurat-object" class="section level2">
 <h2>Seurat object</h2>
@@ -1173,7 +1256,7 @@ table(
 </div>
 <div id="appendix" class="section level2">
 <h2>Appendix</h2>
-<p>More information text from the paper <a
+<p>More text from the paper <a
 href="https://link.springer.com/article/10.1186/s13059-021-02584-9">Comparison
 and evaluation of statistical error models for scRNA-seq</a>.</p>
 <div id="shallow-sequencing-masks-overdispersion-in-scrna-seq-data"
@@ -1221,6 +1304,52 @@ represent an acceptable approximation for scRNA-seq datasets with
 shallow sequencing, but as the sensitivity of molecular profiling
 continues to increase, error models that allow for overdispersion are
 required for scRNA-seq analysis</strong>.</li>
+</ul>
+</div>
+<div
+id="the-level-of-overdispersion-varies-substantially-across-datasets"
+class="section level3">
+<h3>The level of overdispersion varies substantially across
+datasets</h3>
+<ul>
+<li>Recent work suggested that a negative binomial model with a fixed
+parameterisation (for example, inverse overdispersion parameter <span
+class="math inline">\(\theta\)</span>=100) could be applied to all
+scRNA-seq datasets to achieve effective variance stabilisation.</li>
+<li>To explore whether a single value of <span
+class="math inline">\(\theta\)</span> could be applied to diverse
+scRNA-seq datasets, we first independently fit <span
+class="math inline">\(\theta\)</span> estimates for each gene in each
+dataset using a GLM with negative binomial errors (NB GLM), using
+library size as an offset to account for variation in cellular
+sequencing depth.</li>
+<li>Substantial differences were observed in the magnitude of the
+estimated <span class="math inline">\(\theta\)</span> across different
+datasets, though replicate datasets from the same study yielded
+concordant results.
+<ul>
+<li>Consistent with previous results <span
+class="math inline">\(\theta\)</span> values for each dataset varied
+across different biological systems, technologies, and sequencing
+depths.</li>
+</ul></li>
+<li>To consider different methods for NB parameterisation, we first
+tested the ability for a single value of <span
+class="math inline">\(\theta\)</span> to perform effective variance
+stabilization across a range of datasets.</li>
+<li>Processed 59 datasets using an NB GLM after fixing <span
+class="math inline">\(\theta\)</span> to a single value for all genes in
+the dataset (for example, <span
+class="math inline">\(\theta\)</span>=100).
+<ul>
+<li>Found that no single value of <span
+class="math inline">\(\theta\)</span> could achieve effective variance
+stabilisation across all datasets.</li>
+</ul></li>
+<li>Concluded that fixing a single value of <span
+class="math inline">\(\theta\)</span> may achieve effective performance
+in certain cases, but is unlikely to generalise across the diversity of
+systems and technologies represented by scRNA-seq data.</li>
 </ul>
 <br>
 <p>
