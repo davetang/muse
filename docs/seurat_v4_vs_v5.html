@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-03-10" />
+<meta name="date" content="2025-03-11" />
 
 <title>Seurat v4 versus v5</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Seurat v4 versus v5</h1>
-<h4 class="date">2025-03-10</h4>
+<h4 class="date">2025-03-11</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-03-10
+<strong>Last updated:</strong> 2025-03-11
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4c187b3ffae504a683192c5eb899efeb338c09f8targetblank4c187b3a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree613993535f63f46ec1a68472f976de64d5d14888targetblank6139935a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/4c187b3ffae504a683192c5eb899efeb338c09f8" target="_blank">4c187b3</a>
+<a href="https://github.com/davetang/muse/tree/613993535f63f46ec1a68472f976de64d5d14888" target="_blank">6139935</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4c187b3ffae504a683192c5eb899efeb338c09f8targetblank4c187b3a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree613993535f63f46ec1a68472f976de64d5d14888targetblank6139935a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/4c187b3ffae504a683192c5eb899efeb338c09f8" target="_blank">4c187b3</a>.
+<a href="https://github.com/davetang/muse/tree/613993535f63f46ec1a68472f976de64d5d14888" target="_blank">6139935</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -633,6 +633,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/613993535f63f46ec1a68472f976de64d5d14888/analysis/seurat_v4_vs_v5.Rmd" target="_blank">6139935</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-11
+</td>
+<td>
+Introduction to modelling variance
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/94116b19e07cb243d9a27be3d7522ecbcc4d6e94/docs/seurat_v4_vs_v5.html" target="_blank">94116b1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-10
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/4c187b3ffae504a683192c5eb899efeb338c09f8/analysis/seurat_v4_vs_v5.Rmd" target="_blank">4c187b3</a>
 </td>
 <td>
@@ -686,6 +720,75 @@ Seurat version 4 vs. 5
 </div>
 </div>
 </div>
+<p>The paper <a
+href="https://link.springer.com/article/10.1186/s13059-021-02584-9">Comparison
+and evaluation of statistical error models for scRNA-seq</a> is the
+basis for the default approach used in Seurat version 5. The following
+is text from the paper:</p>
+<ul>
+<li>Heterogeneity in single-cell RNA-seq (scRNA-seq) data is driven by
+multiple sources, including biological variation in cellular state as
+well as technical variation introduced during experimental processing.
+Deconvolving these effects is a key challenge for preprocessing
+workflows.
+<ul>
+<li>Separating biological heterogeneity across cells that corresponds to
+differences in cell type and state from alternative sources of variation
+represents a key analytical challenge in the normalization and
+preprocessing of single-cell RNA-seq data.</li>
+</ul></li>
+<li>Data normalization aims to adjust for differences in cellular
+sequencing depth, which collectively arise from fluctuations in cellular
+RNA content, efficiency in lysis and reverse transcription, and
+stochastic sampling during next-generation sequencing.</li>
+<li><strong>Variance stabilization aims to address the confounding
+relationship between gene abundance and gene variance, and to ensure
+that both lowly and highly expressed genes can contribute to the
+downstream definition of cellular state</strong>.</li>
+</ul>
+<p>Using statistical models like Generalised Linear Models:</p>
+<ul>
+<li>Two recent studies proposed to use generalized linear models (GLMs),
+where cellular sequencing depth was included as a covariate, as part of
+scRNA-seq preprocessing workflows.</li>
+<li>The sctransform approach utilizes the <strong>Pearson residuals from
+negative binomial regression as input to standard dimensional reduction
+techniques</strong>, while GLM-PCA focuses on a generalized version of
+principal component analysis (PCA) for data with Poisson-distributed
+errors.</li>
+<li>More broadly, multiple techniques aim to learn a latent state that
+captures biologically relevant cellular heterogeneity using either
+matrix factorization or neural networks, alongside a defined error model
+that describes the variation that is not captured by the latent
+space.</li>
+</ul>
+<p>Parameterising statistical models:</p>
+<ul>
+<li>Likelihood-based approaches require an explicit definition of a
+statistical error model for scRNA-seq, and there is little consensus on
+how to define or parameterize this model.</li>
+<li>Multiple groups have utilized a Poisson error model but others argue
+that the data exhibit evidence of overdispersion, requiring the use of a
+negative-binomial (NB) distribution.</li>
+<li>Methods that assume a NB distribution have different methods to
+parameterize their model.
+<ul>
+<li>A recent study argued that fixing the NB inverse overdispersion
+parameter <span class="math inline">\(\theta\)</span> to a single value
+is an appropriate estimate of technical overdispersion for all genes in
+all scRNA-seq datasets, while others propose learning unique parameter
+values for each gene in each dataset.</li>
+</ul></li>
+<li>This lack of consensus is further exemplified by the scvi-tools
+suite, which supports nine different methods for parameterizing error
+models.</li>
+<li>The purpose of this error model is to describe and quantify
+heterogeneity that is not captured by biologically relevant differences
+in cell state, and highlights a specific question: <strong>How can we
+model the observed variation in gene expression for an scRNA-seq
+experiment conducted on a biologically “homogeneous”
+population?</strong></li>
+</ul>
 <div id="seurat-object" class="section level2">
 <h2>Seurat object</h2>
 <p>Import <a href="pbmc3k.html">raw pbmc3k dataset</a> from my
