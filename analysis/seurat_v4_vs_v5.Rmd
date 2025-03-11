@@ -187,3 +187,19 @@ table(
   pbmc3k_v5@meta.data$seurat_clusters
 )
 ```
+
+## Appendix
+
+More information text from the paper [Comparison and evaluation of statistical error models for scRNA-seq](https://link.springer.com/article/10.1186/s13059-021-02584-9).
+
+### Shallow sequencing masks overdispersion in scRNA-seq data
+
+* The rationale behind a Poisson model assumes that homogeneous cells express mRNA molecules for a given gene at a **fixed underlying rate**, and the variation in scRNA-seq results specifically from a **stochastic sampling** of mRNA molecules, for example due to inefficiencies in reverse transcription and PCR, combined with incomplete molecular sampling during DNA sequencing
+* While the Poisson distribution is well suited to capture variation driven by stochastic technical loss and sampling noise, it cannot capture other sources of biological heterogeneity between cells that are not driven by changes in cell state, for example, intrinsic variation caused by stochastic transcriptional bursts.
+    * These fluctuations would cause scRNA-seq data to deviate from Poisson statistics, exhibiting overdispersion.
+* To assess whether scRNA-seq datasets follow the Poisson distribution, the authors performed a goodness-of-fit test, independently modeling the observed counts for each gene to be Poisson distributed, while accounting for differences in sequencing depth between individual cells.
+* In each of the 59 datasets analysed, genes exhibiting Poisson variation were overwhelmingly lowly expressed compared to genes that were overdispersed.
+    * Moreover, when comparing results for cell-line datasets where we expect low levels of variation in cell state, we found that the global fraction of genes deviating from a Poisson distribution was correlated with the average sequencing depth of the dataset.
+* The results suggest that scRNA-seq datasets commonly exhibit biological variation that exceeds Poisson sampling, but that the statistical power to detect these fluctuations requires sufficient sequencing depth.
+* After downsampling, only 0.5% genes failed the Poisson goodness-of-fit test, demonstrating that reducing cellular sequencing depth can artificially create the appearance of Poisson variation.
+* **The authors conclude that the Poisson error model may represent an acceptable approximation for scRNA-seq datasets with shallow sequencing, but as the sensitivity of molecular profiling continues to increase, error models that allow for overdispersion are required for scRNA-seq analysis**.
