@@ -148,3 +148,49 @@ Using the [Poisson Confidence Interval Calculator](https://www.danielsoper.com/s
 * 90% confidence interval: 13.25465 - 29.06202
 
 which matches our 95% CI values.
+
+## Checking whether distribution is Poisson
+
+To assess whether count data follows a Poisson distribution, check whether observed counts match expected counts under a Poisson model.
+
+The **Chi-Square test** compares observed vs. expected frequencies in count data.
+
+```{r chi_square_test}
+# Simulated count data
+counts <- c(0, 1, 2, 3, 4, 5)  # Unique count values
+observed <- c(50, 80, 70, 40, 30, 10)  # Frequency of each count
+
+# Estimate lambda (mean count per observation)
+lambda_hat <- sum(counts * observed) / sum(observed)
+
+# Compute expected counts using Poisson probabilities
+expected <- dpois(counts, lambda_hat) * sum(observed)
+
+# Perform Chi-Square test
+chisq.test(observed, p = expected / sum(expected))
+```
+* A **p-value > 0.05** suggests no significant deviation from a Poisson distribution.
+* A **p-value < 0.05** suggests the data does not follow a Poisson distribution.
+
+The Chi-Square test assumes **sufficient counts per category** (expected values should be > 5). If expected values are too low, consider **collapsing categories**.
+
+If data follows a Poisson model, the **deviance** from a Poisson regression should be roughly chi-square distributed.
+
+```{r poisson_deviance}
+# Example dataset
+set.seed(1984)
+data <- data.frame(counts = rpois(100, lambda = 2))
+
+# Fit Poisson model
+poisson_model <- glm(counts ~ 1, family = poisson, data = data)
+summary(poisson_model)
+```
+
+Kolmogorov-Smirnov (KS) test for Poisson Fit.
+
+```{r poisson_ks}
+set.seed(1984)
+observed_data <- rpois(100, lambda = 2)
+
+ks.test(observed_data, "ppois", lambda = mean(observed_data))
+```
