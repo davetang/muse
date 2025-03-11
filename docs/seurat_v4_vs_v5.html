@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed47858c27395b410916e68f1c4fee611c9ba13datargetblankd47858ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4688c4091f3496e67130a46ca05149d12336efd1targetblank4688c40a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/d47858c27395b410916e68f1c4fee611c9ba13da" target="_blank">d47858c</a>
+<a href="https://github.com/davetang/muse/tree/4688c4091f3496e67130a46ca05149d12336efd1" target="_blank">4688c40</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed47858c27395b410916e68f1c4fee611c9ba13datargetblankd47858ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4688c4091f3496e67130a46ca05149d12336efd1targetblank4688c40a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/d47858c27395b410916e68f1c4fee611c9ba13da" target="_blank">d47858c</a>.
+<a href="https://github.com/davetang/muse/tree/4688c4091f3496e67130a46ca05149d12336efd1" target="_blank">4688c40</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -628,6 +628,41 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/4688c4091f3496e67130a46ca05149d12336efd1/analysis/seurat_v4_vs_v5.Rmd" target="_blank">4688c40</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-11
+</td>
+<td>
+Overdispersion exists in all scRNA-seq datasets if sufficiently
+sequenced
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/6248d96391af91d09a54ae7766378710f1670fe5/docs/seurat_v4_vs_v5.html" target="_blank">6248d96</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1134,6 +1169,59 @@ table(
   5   0  16   0   0   0 145   0   0   0   0
   6   0   1   0   0   0   0   0   0  31   0
   7   0   1   0   1   0   0   0   0   0  12</code></pre>
+</div>
+</div>
+<div id="appendix" class="section level2">
+<h2>Appendix</h2>
+<p>More information text from the paper <a
+href="https://link.springer.com/article/10.1186/s13059-021-02584-9">Comparison
+and evaluation of statistical error models for scRNA-seq</a>.</p>
+<div id="shallow-sequencing-masks-overdispersion-in-scrna-seq-data"
+class="section level3">
+<h3>Shallow sequencing masks overdispersion in scRNA-seq data</h3>
+<ul>
+<li>The rationale behind a Poisson model assumes that homogeneous cells
+express mRNA molecules for a given gene at a <strong>fixed underlying
+rate</strong>, and the variation in scRNA-seq results specifically from
+a <strong>stochastic sampling</strong> of mRNA molecules, for example
+due to inefficiencies in reverse transcription and PCR, combined with
+incomplete molecular sampling during DNA sequencing</li>
+<li>While the Poisson distribution is well suited to capture variation
+driven by stochastic technical loss and sampling noise, it cannot
+capture other sources of biological heterogeneity between cells that are
+not driven by changes in cell state, for example, intrinsic variation
+caused by stochastic transcriptional bursts.
+<ul>
+<li>These fluctuations would cause scRNA-seq data to deviate from
+Poisson statistics, exhibiting overdispersion.</li>
+</ul></li>
+<li>To assess whether scRNA-seq datasets follow the Poisson
+distribution, the authors performed a goodness-of-fit test,
+independently modeling the observed counts for each gene to be Poisson
+distributed, while accounting for differences in sequencing depth
+between individual cells.</li>
+<li>In each of the 59 datasets analysed, genes exhibiting Poisson
+variation were overwhelmingly lowly expressed compared to genes that
+were overdispersed.
+<ul>
+<li>Moreover, when comparing results for cell-line datasets where we
+expect low levels of variation in cell state, we found that the global
+fraction of genes deviating from a Poisson distribution was correlated
+with the average sequencing depth of the dataset.</li>
+</ul></li>
+<li>The results suggest that scRNA-seq datasets commonly exhibit
+biological variation that exceeds Poisson sampling, but that the
+statistical power to detect these fluctuations requires sufficient
+sequencing depth.</li>
+<li>After downsampling, only 0.5% genes failed the Poisson
+goodness-of-fit test, demonstrating that reducing cellular sequencing
+depth can artificially create the appearance of Poisson variation.</li>
+<li><strong>The authors conclude that the Poisson error model may
+represent an acceptable approximation for scRNA-seq datasets with
+shallow sequencing, but as the sensitivity of molecular profiling
+continues to increase, error models that allow for overdispersion are
+required for scRNA-seq analysis</strong>.</li>
+</ul>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
