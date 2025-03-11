@@ -21,7 +21,7 @@ The paper [Comparison and evaluation of statistical error models for scRNA-seq](
 * Heterogeneity in single-cell RNA-seq (scRNA-seq) data is driven by multiple sources, including biological variation in cellular state as well as technical variation introduced during experimental processing. Deconvolving these effects is a key challenge for preprocessing workflows.
     * Separating biological heterogeneity across cells that corresponds to differences in cell type and state from alternative sources of variation represents a key analytical challenge in the normalization and preprocessing of single-cell RNA-seq data.
 * Data normalization aims to adjust for differences in cellular sequencing depth, which collectively arise from fluctuations in cellular RNA content, efficiency in lysis and reverse transcription, and stochastic sampling during next-generation sequencing.
-* **Variance stabilization aims to address the confounding relationship between gene abundance and gene variance, and to ensure that both lowly and highly expressed genes can contribute to the downstream definition of cellular state**.
+* **Variance stabilisation aims to address the confounding relationship between gene abundance and gene variance, and to ensure that both lowly and highly expressed genes can contribute to the downstream definition of cellular state**.
 
 Using statistical models like Generalised Linear Models:
 
@@ -88,6 +88,31 @@ This means the variance **grows faster than the mean**, making negative binomial
     * **Model diagnostics** - Residual plots help assess whether assumptions (e.g., correct functional form) hold.
 
 Pearson residuals focus on **variance-adjusted differences** and deviance residuals come from likelihood-based goodness-of-fit measures. They both help diagnose model fit, but deviance residuals tend to emphasise extreme deviations more. Pearson residuals in negative binomial regression are useful for model diagnostics, particularly for checking overdispersion and assessing fit.
+
+### Variance stabilisation
+
+* Variance stabilisation is a statistical transformation technique used to make the **variance of a dataset independent of the mean**.
+* In many biological datasets, including scRNA-seq, the variance of gene expression measurements often **increases with the mean expression level**.
+    * This heteroskedasticity (non-constant variance) can obscure downstream analyses such as clustering, differential expression testing, or dimensionality reduction.
+* The goal of variance stabilisation is to **transform the data** so that the **variance becomes roughly constant across different levels of the mean**, i.e., to achieve homoskedasticity.
+
+Some methods for variance stabilisation:
+
+1. **Logarithmic transformation:**
+    * Common when variance increases with the mean.
+    * Applied as: `log(x + c)` (where `c` is a pseudocount to handle zeros).
+    * Effective when variance increases linearly with the mean.
+
+2. **Square-root transformation:**
+    * Applied as: `sqrt(x)`, often used for Poisson-distributed data.
+    * Suitable when variance is proportional to the mean.
+
+3. **Variance Stabilising Transformation (VST):**
+    * Involves estimating the mean-variance relationship and applying a transformation derived from it.
+
+4. **Regularised methods:**
+    * Uses **negative binomial regression** to model and normalise gene expression, accounting for sequencing depth and technical noise.
+    * Produces a Pearson residual that approximates homoskedastic behavior.
 
 ## Seurat object
 
@@ -190,7 +215,7 @@ table(
 
 ## Appendix
 
-More information text from the paper [Comparison and evaluation of statistical error models for scRNA-seq](https://link.springer.com/article/10.1186/s13059-021-02584-9).
+More text from the paper [Comparison and evaluation of statistical error models for scRNA-seq](https://link.springer.com/article/10.1186/s13059-021-02584-9).
 
 ### Shallow sequencing masks overdispersion in scRNA-seq data
 
@@ -203,3 +228,14 @@ More information text from the paper [Comparison and evaluation of statistical e
 * The results suggest that scRNA-seq datasets commonly exhibit biological variation that exceeds Poisson sampling, but that the statistical power to detect these fluctuations requires sufficient sequencing depth.
 * After downsampling, only 0.5% genes failed the Poisson goodness-of-fit test, demonstrating that reducing cellular sequencing depth can artificially create the appearance of Poisson variation.
 * **The authors conclude that the Poisson error model may represent an acceptable approximation for scRNA-seq datasets with shallow sequencing, but as the sensitivity of molecular profiling continues to increase, error models that allow for overdispersion are required for scRNA-seq analysis**.
+
+### The level of overdispersion varies substantially across datasets
+
+* Recent work suggested that a negative binomial model with a fixed parameterisation (for example, inverse overdispersion parameter $\theta$=100) could be applied to all scRNA-seq datasets to achieve effective variance stabilisation.
+* To explore whether a single value of $\theta$ could be applied to diverse scRNA-seq datasets, we first independently fit $\theta$ estimates for each gene in each dataset using a GLM with negative binomial errors (NB GLM), using library size as an offset to account for variation in cellular sequencing depth.
+* Substantial differences were observed in the magnitude of the estimated $\theta$ across different datasets, though replicate datasets from the same study yielded concordant results.
+    * Consistent with previous results $\theta$ values for each dataset varied across different biological systems, technologies, and sequencing depths.
+* To consider different methods for NB parameterisation, we first tested the ability for a single value of $\theta$ to perform effective variance stabilization across a range of datasets.
+* Processed 59 datasets using an NB GLM after fixing $\theta$ to a single value for all genes in the dataset (for example, $\theta$=100).
+    * Found that no single value of $\theta$ could achieve effective variance stabilisation across all datasets.
+* Concluded that fixing a single value of $\theta$ may achieve effective performance in certain cases, but is unlikely to generalise across the diversity of systems and technologies represented by scRNA-seq data.
