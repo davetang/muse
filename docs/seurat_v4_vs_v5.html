@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree613993535f63f46ec1a68472f976de64d5d14888targetblank6139935a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4aacb58f49523299d8a1340ee80af0c058916da9targetblank4aacb58a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/613993535f63f46ec1a68472f976de64d5d14888" target="_blank">6139935</a>
+<a href="https://github.com/davetang/muse/tree/4aacb58f49523299d8a1340ee80af0c058916da9" target="_blank">4aacb58</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree613993535f63f46ec1a68472f976de64d5d14888targetblank6139935a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4aacb58f49523299d8a1340ee80af0c058916da9targetblank4aacb58a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/613993535f63f46ec1a68472f976de64d5d14888" target="_blank">6139935</a>.
+<a href="https://github.com/davetang/muse/tree/4aacb58f49523299d8a1340ee80af0c058916da9" target="_blank">4aacb58</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -628,6 +628,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/4aacb58f49523299d8a1340ee80af0c058916da9/analysis/seurat_v4_vs_v5.Rmd" target="_blank">4aacb58</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-11
+</td>
+<td>
+Error versus variance
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/fc7e28db6d2b4db4731c8e91af1d3ddd5b551524/docs/seurat_v4_vs_v5.html" target="_blank">fc7e28d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -789,6 +823,46 @@ model the observed variation in gene expression for an scRNA-seq
 experiment conducted on a biologically “homogeneous”
 population?</strong></li>
 </ul>
+<div id="error-and-variance" class="section level2">
+<h2>Error and variance</h2>
+<ul>
+<li>Error modeling refers to capturing and understanding the
+<strong>uncertainty, randomness, and deviations</strong> in data or
+predictions. Error is not exactly synonymous with variance but they are
+related.</li>
+<li>Errors arise from:
+<ul>
+<li>Randomness: unavoidable variability in data, e.g., measurement noise
+and natural fluctuations</li>
+<li>Model Imperfections: due to missing information or incorrect model
+assumptions.</li>
+</ul></li>
+<li>Statistical models, like regression, often include an error term
+<span class="math inline">\(\epsilon\)</span> to account for these
+uncertainties:</li>
+</ul>
+<p><span class="math display">\[
+Y = f(X) + \epsilon
+\]</span></p>
+<p>where <span class="math inline">\(\epsilon\)</span> captures random
+fluctuations or unknown influences.</p>
+<p>While error contributes to variance, they are distinct:</p>
+<ul>
+<li><strong>Error</strong>: The deviation of an observation from the
+model’s predicted value.</li>
+<li><strong>Variance</strong>: A statistical measure of how much values
+deviate from their mean (spread of data).</li>
+</ul>
+<p>Errors can be random (causing variability) or systematic (bias), but
+variance is a quantification of dispersion.</p>
+<ul>
+<li>In regression, we separate variance into <strong>explained
+variance</strong> (by the model) and <strong>unexplained
+variance</strong> (error).</li>
+<li>Error variance <span class="math inline">\(\sigma^2\)</span> is
+modeled to improve predictions and uncertainty estimation.</li>
+</ul>
+</div>
 <div id="seurat-object" class="section level2">
 <h2>Seurat object</h2>
 <p>Import <a href="pbmc3k.html">raw pbmc3k dataset</a> from my
