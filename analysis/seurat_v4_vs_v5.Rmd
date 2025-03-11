@@ -36,6 +36,30 @@ Parameterising statistical models:
 * This lack of consensus is further exemplified by the scvi-tools suite, which supports nine different methods for parameterizing error models.
 * The purpose of this error model is to describe and quantify heterogeneity that is not captured by biologically relevant differences in cell state, and highlights a specific question: **How can we model the observed variation in gene expression for an scRNA-seq experiment conducted on a biologically "homogeneous" population?**
 
+## Error and variance
+
+* Error modeling refers to capturing and understanding the **uncertainty, randomness, and deviations** in data or predictions. Error is not exactly synonymous with variance but they are related.
+* Errors arise from:
+    * Randomness: unavoidable variability in data, e.g., measurement noise and natural fluctuations
+    * Model Imperfections: due to missing information or incorrect model assumptions.
+* Statistical models, like regression, often include an error term $\epsilon$ to account for these uncertainties:
+
+$$
+Y = f(X) + \epsilon
+$$
+
+where $\epsilon$ captures random fluctuations or unknown influences.
+
+While error contributes to variance, they are distinct:
+
+* **Error**: The deviation of an observation from the model's predicted value.
+* **Variance**: A statistical measure of how much values deviate from their mean (spread of data).
+
+Errors can be random (causing variability) or systematic (bias), but variance is a quantification of dispersion.
+
+* In regression, we separate variance into **explained variance** (by the model) and **unexplained variance** (error).
+* Error variance $\sigma^2$ is modeled to improve predictions and uncertainty estimation.
+
 ## Seurat object
 
 Import [raw pbmc3k dataset](pbmc3k.html) from my server.
