@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4aacb58f49523299d8a1340ee80af0c058916da9targetblank4aacb58a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed47858c27395b410916e68f1c4fee611c9ba13datargetblankd47858ca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/4aacb58f49523299d8a1340ee80af0c058916da9" target="_blank">4aacb58</a>
+<a href="https://github.com/davetang/muse/tree/d47858c27395b410916e68f1c4fee611c9ba13da" target="_blank">d47858c</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4aacb58f49523299d8a1340ee80af0c058916da9targetblank4aacb58a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed47858c27395b410916e68f1c4fee611c9ba13datargetblankd47858ca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/4aacb58f49523299d8a1340ee80af0c058916da9" target="_blank">4aacb58</a>.
+<a href="https://github.com/davetang/muse/tree/d47858c27395b410916e68f1c4fee611c9ba13da" target="_blank">d47858c</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -628,6 +628,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/d47858c27395b410916e68f1c4fee611c9ba13da/analysis/seurat_v4_vs_v5.Rmd" target="_blank">d47858c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-11
+</td>
+<td>
+Pearson residuals
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/747fe3f384dde4c6a24a3051b69e5f6590e7af62/docs/seurat_v4_vs_v5.html" target="_blank">747fe3f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -754,6 +788,8 @@ Seurat version 4 vs. 5
 </div>
 </div>
 </div>
+<div id="sctransform" class="section level2">
+<h2>sctransform</h2>
 <p>The paper <a
 href="https://link.springer.com/article/10.1186/s13059-021-02584-9">Comparison
 and evaluation of statistical error models for scRNA-seq</a> is the
@@ -796,6 +832,13 @@ matrix factorization or neural networks, alongside a defined error model
 that describes the variation that is not captured by the latent
 space.</li>
 </ul>
+<p>If a regression model doesn’t fully explain variability, the
+residuals might contain structure that another technique can capture to
+uncover hidden patterns. For example, if a regression model captures
+main trends, applying Principal Component Analysis (PCA) on residuals
+can find underlying structures in the unexplained variance. Another use
+case can be clustering on residuals to group data points based on
+deviations from a model.</p>
 <p>Parameterising statistical models:</p>
 <ul>
 <li>Likelihood-based approaches require an explicit definition of a
@@ -823,6 +866,7 @@ model the observed variation in gene expression for an scRNA-seq
 experiment conducted on a biologically “homogeneous”
 population?</strong></li>
 </ul>
+</div>
 <div id="error-and-variance" class="section level2">
 <h2>Error and variance</h2>
 <ul>
@@ -861,7 +905,52 @@ variance</strong> (by the model) and <strong>unexplained
 variance</strong> (error).</li>
 <li>Error variance <span class="math inline">\(\sigma^2\)</span> is
 modeled to improve predictions and uncertainty estimation.</li>
+<li>For a negative binomial regression model, the <strong>Pearson
+residual</strong> <span class="math inline">\(r_i\)</span> for
+observation <span class="math inline">\(i\)</span> is given by:</li>
 </ul>
+<p><span class="math display">\[
+r_i = \frac{y_i - \hat{y}_i}{\sqrt{\text{Var}(y_i)}}
+\]</span></p>
+<p>where:<br />
+* <span class="math inline">\(y_i\)</span> = observed count<br />
+* <span class="math inline">\(\hat{y}_i\)</span> = predicted mean
+(expected value under the model)<br />
+* <span class="math inline">\(\text{Var}(y_i)\)</span> = model-estimated
+variance of <span class="math inline">\(y_i\)</span></p>
+<ul>
+<li>Unlike Poisson regression (where <span
+class="math inline">\(\text{Var}(y) = \hat{y}\)</span>), the
+<strong>negative binomial</strong> model accounts for
+<strong>overdispersion</strong> using a dispersion parameter <span
+class="math inline">\(\theta\)</span>, and the variance is:</li>
+</ul>
+<p><span class="math display">\[
+\text{Var}(y_i) = \hat{y}_i + \frac{\hat{y}_i^2}{\theta}
+\]</span></p>
+<p>This means the variance <strong>grows faster than the mean</strong>,
+making negative binomial regression suitable when count data has extra
+variability.</p>
+<ul>
+<li>Pearson residuals can be used for:
+<ul>
+<li><strong>Standardized measure</strong> - Large residuals (<span
+class="math inline">\(|r_i| &gt; 2\)</span>) may indicate poor model
+fit.</li>
+<li><strong>Overdispersion check</strong> - If Pearson residuals
+systematically increase with predicted values, it suggests the model may
+not fully account for overdispersion.</li>
+<li><strong>Model diagnostics</strong> - Residual plots help assess
+whether assumptions (e.g., correct functional form) hold.</li>
+</ul></li>
+</ul>
+<p>Pearson residuals focus on <strong>variance-adjusted
+differences</strong> and deviance residuals come from likelihood-based
+goodness-of-fit measures. They both help diagnose model fit, but
+deviance residuals tend to emphasise extreme deviations more. Pearson
+residuals in negative binomial regression are useful for model
+diagnostics, particularly for checking overdispersion and assessing
+fit.</p>
 </div>
 <div id="seurat-object" class="section level2">
 <h2>Seurat object</h2>
