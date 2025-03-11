@@ -14,6 +14,28 @@ library(tidyverse)
 library(Seurat)
 ```
 
+The paper [Comparison and evaluation of statistical error models for scRNA-seq](https://link.springer.com/article/10.1186/s13059-021-02584-9) is the basis for the default approach used in Seurat version 5. The following is text from the paper:
+
+* Heterogeneity in single-cell RNA-seq (scRNA-seq) data is driven by multiple sources, including biological variation in cellular state as well as technical variation introduced during experimental processing. Deconvolving these effects is a key challenge for preprocessing workflows.
+    * Separating biological heterogeneity across cells that corresponds to differences in cell type and state from alternative sources of variation represents a key analytical challenge in the normalization and preprocessing of single-cell RNA-seq data.
+* Data normalization aims to adjust for differences in cellular sequencing depth, which collectively arise from fluctuations in cellular RNA content, efficiency in lysis and reverse transcription, and stochastic sampling during next-generation sequencing.
+* **Variance stabilization aims to address the confounding relationship between gene abundance and gene variance, and to ensure that both lowly and highly expressed genes can contribute to the downstream definition of cellular state**.
+
+Using statistical models like Generalised Linear Models:
+
+* Two recent studies proposed to use generalized linear models (GLMs), where cellular sequencing depth was included as a covariate, as part of scRNA-seq preprocessing workflows.
+* The sctransform approach utilizes the **Pearson residuals from negative binomial regression as input to standard dimensional reduction techniques**, while GLM-PCA focuses on a generalized version of principal component analysis (PCA) for data with Poisson-distributed errors.
+* More broadly, multiple techniques aim to learn a latent state that captures biologically relevant cellular heterogeneity using either matrix factorization or neural networks, alongside a defined error model that describes the variation that is not captured by the latent space.
+
+Parameterising statistical models:
+
+* Likelihood-based approaches require an explicit definition of a statistical error model for scRNA-seq, and there is little consensus on how to define or parameterize this model.
+* Multiple groups have utilized a Poisson error model but others argue that the data exhibit evidence of overdispersion, requiring the use of a negative-binomial (NB) distribution.
+* Methods that assume a NB distribution have different methods to parameterize their model.
+    * A recent study argued that fixing the NB inverse overdispersion parameter $\theta$ to a single value is an appropriate estimate of technical overdispersion for all genes in all scRNA-seq datasets, while others propose learning unique parameter values for each gene in each dataset.
+* This lack of consensus is further exemplified by the scvi-tools suite, which supports nine different methods for parameterizing error models.
+* The purpose of this error model is to describe and quantify heterogeneity that is not captured by biologically relevant differences in cell state, and highlights a specific question: **How can we model the observed variation in gene expression for an scRNA-seq experiment conducted on a biologically "homogeneous" population?**
+
 ## Seurat object
 
 Import [raw pbmc3k dataset](pbmc3k.html) from my server.
