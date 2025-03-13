@@ -253,10 +253,39 @@ More text from the paper [Comparison and evaluation of statistical error models 
 * In sctransform, we aim to estimate a global relationship between gene abundance and $\theta$ by employing a regularization (i.e., preventing overfitting) procedure where parameters are first fit for each gene individually, but information from genes with similar average abundances is subsequently pooled together in order to improve the robustness of parameter estimates.
     * The underlying rationale for this choice is the non-decreasing relationship between gene abundance and $\theta$ that has been repeatedly observed in bulk RNA-seq studies.
     * When analyzing each of the technologies and biological systems explored in this manuscript, we identified the same global patterns relating gene abundance and overdispersion levels.
-* Considered the finding that \$theta$ values should not vary as a function of gene abundance, and suggested that the relationship between these two variables was driven entirely by biases in the parameter estimation procedure, especially when analyzing lowly expressed genes.
+* Considered the finding that $\theta$ values should not vary as a function of gene abundance, and suggested that the relationship between these two variables was driven entirely by biases in the parameter estimation procedure, especially when analyzing lowly expressed genes.
 * Confirmed that lowly expressed genes, particularly those with average abundance <0.1 UMI/cell, posed difficulties for parameter estimation. This is because the vast majority of count values for these genes are 0, creating inherent challenges in maximum likelihood estimation.
-    * **When estimating parameters on simulated data drawn from a negative binomial with fixed $\theta$, confirmed a bias for these genes that resulted in decreased parameter estimates for $\theta$.
+    * When estimating parameters on simulated data drawn from a negative binomial with fixed $\theta$, confirmed a bias for these genes that resulted in decreased parameter estimates for $\theta$.
 * However, using two complementary analyses, found that this bias was not sufficient to explain the true relationships we observed in biological data.
     * First, observed a non-decreasing relationship between gene abundance ($\mu$) and dispersion ($\theta$) even when moving beyond the threshold for lowly expressed genes, which we did not observe when analyzing simulated data.
     * Additionally, we attempted to increase (“upsample”) the depth of single cell datasets by pooling together molecular counts from cells with similar molecular profiles as inspired by the MetaCell framework. We repeated the parameter estimation procedure on metacells generated either from single-cell data, or using our simulation framework. Increasing the depth of sampling removed the effects of bias when analyzing simulated data, but preserved the observed relationship between $\mu$ and $\theta$ on real biological datasets.
-* Conclude that when modeling scRNA-seq data using a negative binomial distribution, the inverse overdispersion parameter $\theta$ does vary as a function of gene abundance, but the true nature of this relationship can be masked for genes with low molecular counts.
+* Concluded that when modeling scRNA-seq data using a negative binomial distribution, the inverse overdispersion parameter $\theta$ does vary as a function of gene abundance, but the true nature of this relationship can be masked for genes with low molecular counts.
+
+### Recommendations for modeling heterogeneity in scRNA-seq datasets
+
+* **The findings highlight how the extensive diversity of scRNA-seq datasets poses challenges in identifying uniform procedures for the preprocessing and normalization of scRNA-seq data**.
+* Sparsely sequenced datasets may appear to be compatible with the use of Poisson error models, but datasets with additional sequencing depth reveal clear evidence of overdispersion.
+* The level of overdispersion, exemplified by the NB parameter $\theta$, also can vary substantially across datasets, technologies, and systems and even varies within a dataset as a function of gene abundance.
+    * However, the estimation of robust parameter estimates for $\theta$ can be challenging for lowly expressed genes, especially when analyzing datasets with sparse sequencing.
+* The authors therefore considered recommendations for balancing these considerations, providing the flexibility to learn error models that can be robustly applied to our full spectrum of scRNA-seq datasets.
+
+The first recommendation is to use the negative binomial observation model as an alternative to the Poisson distribution.
+
+* Their analyses show that the Poisson distribution is a reasonable approximation for technical-control datasets consisting of endogenous or spike-in RNA, as well as for some scRNA-seq experiments with shallow sequencing.
+* However, scRNA-seq datasets from cell lines exhibit clear evidence of overdispersion at higher sequencing depths, even for genes that do not correlate with changes in cell type or state.
+* At least some of this overdispersion likely originates from "intrinsic" noise, stochastic cellular variation that is inherent to the processes of mRNA transcription and degradation, and will affect the expression heterogeneity of all genes.
+* While this variation is not a result of measurement error, it is not the primary focus of downstream scRNA-seq analyses, including the identification of cell types and states, and the inference of developmental trajectories.
+* **We therefore recommend that this variation be modeled independently of the latent space, which requires the use of a negative binomial error model**.
+* We note that the Poisson distribution is a special case of the negative binomial, and therefore the NB model can be successfully applied for datasets with very shallow sequencing, with appropriate parameter settings.
+
+The second recommendation is to learn negative binomial parameters separately for each dataset, rather than fixing them to a single value across all analyses. Moreover, they recommend allowing $\theta$ to vary across genes within a dataset, as a function of average gene abundance.
+
+* The relationship between $\mu$ and $\theta$ has been repeatedly demonstrated in bulk RNA-seq and is apparent across diverse scRNA-seq datasets as well, particularly for genes with sufficient sequencing depth.
+* Using a fixed $\theta$ to parameterize all genes in a scRNA-seq dataset leads to ineffective variance stabilization and results in a global relationship between expression level and expression variance.
+* Results highlighted that lowly expressed genes with particularly sparse molecular counts often lacked sufficient information content to robustly detect overdispersion.
+    * The authors therefore designed a modified regularization procedure for learning GLM parameter estimates and calculating Pearson residuals.
+    * First, the authors fix the slope of the NB GLM to its analytically derived solution of $ln(10)$, so that only the overdispersion and intercept parameters are estimated for each gene.
+    * Second, for genes with very low expression ($\mu<0.001$), or where the variance of their molecular counts does not exceed the mean (i.e., $\sigma^2 \le \mu$), we do not have sufficient evidence for overdispersion to fit negative binomial parameters. We therefore removed these genes from the regularization process and fixed their $\theta$ parameter to $\infty$, exemplifying a Poisson distribution.
+    * The authors found that their modified regularization enables them to reproducibly learn gene-specific parameters even when using a subset of cells in the estimation procedure.
+    * Third, they apply a lower bound on the minimum variance while calculating the Pearson residual for each per cell to prevent genes with minimal information content from resulting in high residual variance. In particular, this step helps to ensure that very low UMI counts (i.e., 1 to 2 molecules) are not assigned extremely high Pearson residuals.
+* All this work has been implemented in the updated regularization procedure as a version 2 update of sctransform (sctransform v2).
