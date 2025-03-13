@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-03-11" />
+<meta name="date" content="2025-03-13" />
 
 <title>Seurat v4 versus v5</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Seurat v4 versus v5</h1>
-<h4 class="date">2025-03-11</h4>
+<h4 class="date">2025-03-13</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-03-11
+<strong>Last updated:</strong> 2025-03-13
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed37908d93d6d8ba596766929378360b76e47657ftargetblankd37908da">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed2f9c34d9dd640607cd0698181e86c60e42867ddtargetblankd2f9c34a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/d37908d93d6d8ba596766929378360b76e47657f" target="_blank">d37908d</a>
+<a href="https://github.com/davetang/muse/tree/d2f9c34d9dd640607cd0698181e86c60e42867dd" target="_blank">d2f9c34</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed37908d93d6d8ba596766929378360b76e47657ftargetblankd37908da"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed2f9c34d9dd640607cd0698181e86c60e42867ddtargetblankd2f9c34a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/d37908d93d6d8ba596766929378360b76e47657f" target="_blank">d37908d</a>.
+<a href="https://github.com/davetang/muse/tree/d2f9c34d9dd640607cd0698181e86c60e42867dd" target="_blank">d2f9c34</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -628,6 +628,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/d2f9c34d9dd640607cd0698181e86c60e42867dd/analysis/seurat_v4_vs_v5.Rmd" target="_blank">d2f9c34</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-13
+</td>
+<td>
+Overdispersion varies as a function of abundance
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/7c6077bdd098e66a4b3ba7bf7a90a1bc70a6ad33/docs/seurat_v4_vs_v5.html" target="_blank">7c6077b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1026,6 +1060,18 @@ fit.</p>
 <li>Variance stabilisation is a statistical transformation technique
 used to make the <strong>variance of a dataset independent of the
 mean</strong>.</li>
+</ul>
+<p>For example in the linked paper:</p>
+<blockquote>
+<p>A negative binomial error model with <span
+class="math inline">\(\theta\)</span> = 100 resulted in clear
+heteroskedasticity in multiple datasets, as we observed a strong
+relationship between the mean expression of a gene, and its residual
+variance.</p>
+</blockquote>
+<p>Therefore relationship between expression and variance means
+heteroskedasticity, which means variance stabilisation is required.</p>
+<ul>
 <li>In many biological datasets, including scRNA-seq, the variance of
 gene expression measurements often <strong>increases with the mean
 expression level</strong>.
@@ -1350,6 +1396,73 @@ stabilisation across all datasets.</li>
 class="math inline">\(\theta\)</span> may achieve effective performance
 in certain cases, but is unlikely to generalise across the diversity of
 systems and technologies represented by scRNA-seq data.</li>
+</ul>
+</div>
+<div id="gene-overdispersion-varies-as-a-function-of-abundance"
+class="section level3">
+<h3>Gene overdispersion varies as a function of abundance</h3>
+<ul>
+<li>An alternative strategy for parameterizing <span
+class="math inline">\(\theta\)</span> leverages a well-characterized
+strategy for modeling counts in bulk RNA-seq data, where
+<strong>per-gene dispersion estimates have repeatedly been found to vary
+as a function of expression abundance</strong>.</li>
+<li>In sctransform, we aim to estimate a global relationship between
+gene abundance and <span class="math inline">\(\theta\)</span> by
+employing a regularization (i.e., preventing overfitting) procedure
+where parameters are first fit for each gene individually, but
+information from genes with similar average abundances is subsequently
+pooled together in order to improve the robustness of parameter
+estimates.
+<ul>
+<li>The underlying rationale for this choice is the non-decreasing
+relationship between gene abundance and <span
+class="math inline">\(\theta\)</span> that has been repeatedly observed
+in bulk RNA-seq studies.</li>
+<li>When analyzing each of the technologies and biological systems
+explored in this manuscript, we identified the same global patterns
+relating gene abundance and overdispersion levels.</li>
+</ul></li>
+<li>Considered the finding that $theta$ values should not vary as a
+function of gene abundance, and suggested that the relationship between
+these two variables was driven entirely by biases in the parameter
+estimation procedure, especially when analyzing lowly expressed
+genes.</li>
+<li>Confirmed that lowly expressed genes, particularly those with
+average abundance &lt;0.1 UMI/cell, posed difficulties for parameter
+estimation. This is because the vast majority of count values for these
+genes are 0, creating inherent challenges in maximum likelihood
+estimation.
+<ul>
+<li>**When estimating parameters on simulated data drawn from a negative
+binomial with fixed <span class="math inline">\(\theta\)</span>,
+confirmed a bias for these genes that resulted in decreased parameter
+estimates for <span class="math inline">\(\theta\)</span>.</li>
+</ul></li>
+<li>However, using two complementary analyses, found that this bias was
+not sufficient to explain the true relationships we observed in
+biological data.
+<ul>
+<li>First, observed a non-decreasing relationship between gene abundance
+(<span class="math inline">\(\mu\)</span>) and dispersion (<span
+class="math inline">\(\theta\)</span>) even when moving beyond the
+threshold for lowly expressed genes, which we did not observe when
+analyzing simulated data.</li>
+<li>Additionally, we attempted to increase (“upsample”) the depth of
+single cell datasets by pooling together molecular counts from cells
+with similar molecular profiles as inspired by the MetaCell framework.
+We repeated the parameter estimation procedure on metacells generated
+either from single-cell data, or using our simulation framework.
+Increasing the depth of sampling removed the effects of bias when
+analyzing simulated data, but preserved the observed relationship
+between <span class="math inline">\(\mu\)</span> and <span
+class="math inline">\(\theta\)</span> on real biological datasets.</li>
+</ul></li>
+<li>Conclude that when modeling scRNA-seq data using a negative binomial
+distribution, the inverse overdispersion parameter <span
+class="math inline">\(\theta\)</span> does vary as a function of gene
+abundance, but the true nature of this relationship can be masked for
+genes with low molecular counts.</li>
 </ul>
 <br>
 <p>
