@@ -92,6 +92,13 @@ Pearson residuals focus on **variance-adjusted differences** and deviance residu
 ### Variance stabilisation
 
 * Variance stabilisation is a statistical transformation technique used to make the **variance of a dataset independent of the mean**.
+
+For example in the linked paper:
+
+> A negative binomial error model with $\theta$ = 100 resulted in clear heteroskedasticity in multiple datasets, as we observed a strong relationship between the mean expression of a gene, and its residual variance.
+
+Therefore relationship between expression and variance means heteroskedasticity, which means variance stabilisation is required.
+
 * In many biological datasets, including scRNA-seq, the variance of gene expression measurements often **increases with the mean expression level**.
     * This heteroskedasticity (non-constant variance) can obscure downstream analyses such as clustering, differential expression testing, or dimensionality reduction.
 * The goal of variance stabilisation is to **transform the data** so that the **variance becomes roughly constant across different levels of the mean**, i.e., to achieve homoskedasticity.
@@ -239,3 +246,17 @@ More text from the paper [Comparison and evaluation of statistical error models 
 * Processed 59 datasets using an NB GLM after fixing $\theta$ to a single value for all genes in the dataset (for example, $\theta$=100).
     * Found that no single value of $\theta$ could achieve effective variance stabilisation across all datasets.
 * Concluded that fixing a single value of $\theta$ may achieve effective performance in certain cases, but is unlikely to generalise across the diversity of systems and technologies represented by scRNA-seq data.
+
+### Gene overdispersion varies as a function of abundance
+
+* An alternative strategy for parameterizing $\theta$ leverages a well-characterized strategy for modeling counts in bulk RNA-seq data, where **per-gene dispersion estimates have repeatedly been found to vary as a function of expression abundance**.
+* In sctransform, we aim to estimate a global relationship between gene abundance and $\theta$ by employing a regularization (i.e., preventing overfitting) procedure where parameters are first fit for each gene individually, but information from genes with similar average abundances is subsequently pooled together in order to improve the robustness of parameter estimates.
+    * The underlying rationale for this choice is the non-decreasing relationship between gene abundance and $\theta$ that has been repeatedly observed in bulk RNA-seq studies.
+    * When analyzing each of the technologies and biological systems explored in this manuscript, we identified the same global patterns relating gene abundance and overdispersion levels.
+* Considered the finding that \$theta$ values should not vary as a function of gene abundance, and suggested that the relationship between these two variables was driven entirely by biases in the parameter estimation procedure, especially when analyzing lowly expressed genes.
+* Confirmed that lowly expressed genes, particularly those with average abundance <0.1 UMI/cell, posed difficulties for parameter estimation. This is because the vast majority of count values for these genes are 0, creating inherent challenges in maximum likelihood estimation.
+    * **When estimating parameters on simulated data drawn from a negative binomial with fixed $\theta$, confirmed a bias for these genes that resulted in decreased parameter estimates for $\theta$.
+* However, using two complementary analyses, found that this bias was not sufficient to explain the true relationships we observed in biological data.
+    * First, observed a non-decreasing relationship between gene abundance ($\mu$) and dispersion ($\theta$) even when moving beyond the threshold for lowly expressed genes, which we did not observe when analyzing simulated data.
+    * Additionally, we attempted to increase (“upsample”) the depth of single cell datasets by pooling together molecular counts from cells with similar molecular profiles as inspired by the MetaCell framework. We repeated the parameter estimation procedure on metacells generated either from single-cell data, or using our simulation framework. Increasing the depth of sampling removed the effects of bias when analyzing simulated data, but preserved the observed relationship between $\mu$ and $\theta$ on real biological datasets.
+* Conclude that when modeling scRNA-seq data using a negative binomial distribution, the inverse overdispersion parameter $\theta$ does vary as a function of gene abundance, but the true nature of this relationship can be masked for genes with low molecular counts.
