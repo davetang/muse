@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed2f9c34d9dd640607cd0698181e86c60e42867ddtargetblankd2f9c34a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb8e8e5e983dd03eb1e213bcc56886cfa87f3edc0targetblankb8e8e5ea">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/d2f9c34d9dd640607cd0698181e86c60e42867dd" target="_blank">d2f9c34</a>
+<a href="https://github.com/davetang/muse/tree/b8e8e5e983dd03eb1e213bcc56886cfa87f3edc0" target="_blank">b8e8e5e</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed2f9c34d9dd640607cd0698181e86c60e42867ddtargetblankd2f9c34a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb8e8e5e983dd03eb1e213bcc56886cfa87f3edc0targetblankb8e8e5ea"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/d2f9c34d9dd640607cd0698181e86c60e42867dd" target="_blank">d2f9c34</a>.
+<a href="https://github.com/davetang/muse/tree/b8e8e5e983dd03eb1e213bcc56886cfa87f3edc0" target="_blank">b8e8e5e</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -628,6 +628,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/b8e8e5e983dd03eb1e213bcc56886cfa87f3edc0/analysis/seurat_v4_vs_v5.Rmd" target="_blank">b8e8e5e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-13
+</td>
+<td>
+Author’s recommendation
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/276f7d110f52039ad9f8f7f127c7ab9b1d4e9455/docs/seurat_v4_vs_v5.html" target="_blank">276f7d1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-13
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1423,7 +1457,8 @@ in bulk RNA-seq studies.</li>
 explored in this manuscript, we identified the same global patterns
 relating gene abundance and overdispersion levels.</li>
 </ul></li>
-<li>Considered the finding that $theta$ values should not vary as a
+<li>Considered the finding that <span
+class="math inline">\(\theta\)</span> values should not vary as a
 function of gene abundance, and suggested that the relationship between
 these two variables was driven entirely by biases in the parameter
 estimation procedure, especially when analyzing lowly expressed
@@ -1434,7 +1469,7 @@ estimation. This is because the vast majority of count values for these
 genes are 0, creating inherent challenges in maximum likelihood
 estimation.
 <ul>
-<li>**When estimating parameters on simulated data drawn from a negative
+<li>When estimating parameters on simulated data drawn from a negative
 binomial with fixed <span class="math inline">\(\theta\)</span>,
 confirmed a bias for these genes that resulted in decreased parameter
 estimates for <span class="math inline">\(\theta\)</span>.</li>
@@ -1458,11 +1493,111 @@ analyzing simulated data, but preserved the observed relationship
 between <span class="math inline">\(\mu\)</span> and <span
 class="math inline">\(\theta\)</span> on real biological datasets.</li>
 </ul></li>
-<li>Conclude that when modeling scRNA-seq data using a negative binomial
-distribution, the inverse overdispersion parameter <span
+<li>Concluded that when modeling scRNA-seq data using a negative
+binomial distribution, the inverse overdispersion parameter <span
 class="math inline">\(\theta\)</span> does vary as a function of gene
 abundance, but the true nature of this relationship can be masked for
 genes with low molecular counts.</li>
+</ul>
+</div>
+<div
+id="recommendations-for-modeling-heterogeneity-in-scrna-seq-datasets"
+class="section level3">
+<h3>Recommendations for modeling heterogeneity in scRNA-seq
+datasets</h3>
+<ul>
+<li><strong>The findings highlight how the extensive diversity of
+scRNA-seq datasets poses challenges in identifying uniform procedures
+for the preprocessing and normalization of scRNA-seq data</strong>.</li>
+<li>Sparsely sequenced datasets may appear to be compatible with the use
+of Poisson error models, but datasets with additional sequencing depth
+reveal clear evidence of overdispersion.</li>
+<li>The level of overdispersion, exemplified by the NB parameter <span
+class="math inline">\(\theta\)</span>, also can vary substantially
+across datasets, technologies, and systems and even varies within a
+dataset as a function of gene abundance.
+<ul>
+<li>However, the estimation of robust parameter estimates for <span
+class="math inline">\(\theta\)</span> can be challenging for lowly
+expressed genes, especially when analyzing datasets with sparse
+sequencing.</li>
+</ul></li>
+<li>The authors therefore considered recommendations for balancing these
+considerations, providing the flexibility to learn error models that can
+be robustly applied to our full spectrum of scRNA-seq datasets.</li>
+</ul>
+<p>The first recommendation is to use the negative binomial observation
+model as an alternative to the Poisson distribution.</p>
+<ul>
+<li>Their analyses show that the Poisson distribution is a reasonable
+approximation for technical-control datasets consisting of endogenous or
+spike-in RNA, as well as for some scRNA-seq experiments with shallow
+sequencing.</li>
+<li>However, scRNA-seq datasets from cell lines exhibit clear evidence
+of overdispersion at higher sequencing depths, even for genes that do
+not correlate with changes in cell type or state.</li>
+<li>At least some of this overdispersion likely originates from
+“intrinsic” noise, stochastic cellular variation that is inherent to the
+processes of mRNA transcription and degradation, and will affect the
+expression heterogeneity of all genes.</li>
+<li>While this variation is not a result of measurement error, it is not
+the primary focus of downstream scRNA-seq analyses, including the
+identification of cell types and states, and the inference of
+developmental trajectories.</li>
+<li><strong>We therefore recommend that this variation be modeled
+independently of the latent space, which requires the use of a negative
+binomial error model</strong>.</li>
+<li>We note that the Poisson distribution is a special case of the
+negative binomial, and therefore the NB model can be successfully
+applied for datasets with very shallow sequencing, with appropriate
+parameter settings.</li>
+</ul>
+<p>The second recommendation is to learn negative binomial parameters
+separately for each dataset, rather than fixing them to a single value
+across all analyses. Moreover, they recommend allowing <span
+class="math inline">\(\theta\)</span> to vary across genes within a
+dataset, as a function of average gene abundance.</p>
+<ul>
+<li>The relationship between <span class="math inline">\(\mu\)</span>
+and <span class="math inline">\(\theta\)</span> has been repeatedly
+demonstrated in bulk RNA-seq and is apparent across diverse scRNA-seq
+datasets as well, particularly for genes with sufficient sequencing
+depth.</li>
+<li>Using a fixed <span class="math inline">\(\theta\)</span> to
+parameterize all genes in a scRNA-seq dataset leads to ineffective
+variance stabilization and results in a global relationship between
+expression level and expression variance.</li>
+<li>Results highlighted that lowly expressed genes with particularly
+sparse molecular counts often lacked sufficient information content to
+robustly detect overdispersion.
+<ul>
+<li>The authors therefore designed a modified regularization procedure
+for learning GLM parameter estimates and calculating Pearson
+residuals.</li>
+<li>First, the authors fix the slope of the NB GLM to its analytically
+derived solution of <span class="math inline">\(ln(10)\)</span>, so that
+only the overdispersion and intercept parameters are estimated for each
+gene.</li>
+<li>Second, for genes with very low expression (<span
+class="math inline">\(\mu&lt;0.001\)</span>), or where the variance of
+their molecular counts does not exceed the mean (i.e., <span
+class="math inline">\(\sigma^2 \le \mu\)</span>), we do not have
+sufficient evidence for overdispersion to fit negative binomial
+parameters. We therefore removed these genes from the regularization
+process and fixed their <span class="math inline">\(\theta\)</span>
+parameter to <span class="math inline">\(\infty\)</span>, exemplifying a
+Poisson distribution.</li>
+<li>The authors found that their modified regularization enables them to
+reproducibly learn gene-specific parameters even when using a subset of
+cells in the estimation procedure.</li>
+<li>Third, they apply a lower bound on the minimum variance while
+calculating the Pearson residual for each per cell to prevent genes with
+minimal information content from resulting in high residual variance. In
+particular, this step helps to ensure that very low UMI counts (i.e., 1
+to 2 molecules) are not assigned extremely high Pearson residuals.</li>
+</ul></li>
+<li>All this work has been implemented in the updated regularization
+procedure as a version 2 update of sctransform (sctransform v2).</li>
 </ul>
 <br>
 <p>
