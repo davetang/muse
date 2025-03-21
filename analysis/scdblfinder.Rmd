@@ -93,6 +93,11 @@ scDblFinder(pbmc1k) |>
   colData() |>
   as.data.frame() -> pbmc1k.pred2
 
+set.seed(1948)
+scDblFinder(pbmc1k) |>
+  colData() |>
+  as.data.frame() -> pbmc1k.pred3
+
 head(pbmc1k.pred)
 head(pbmc1k.pred2)
 ```
@@ -103,11 +108,20 @@ Plot scores per label.
 boxplot(scDblFinder.score ~ scDblFinder.class, data = pbmc1k.pred, pch = 16)
 ```
 
-Compare runs.
+Compare `pred` with `pred2`.
 
-```{r deterministic}
+```{r pred_vs_pred2}
 x <- pbmc1k.pred$scDblFinder.score
 y <- pbmc1k.pred2$scDblFinder.score
+
+plot(x, y, pch = 16)
+```
+
+Compare `pred` with `pred3`.
+
+```{r pred_vs_pred3}
+x <- pbmc1k.pred$scDblFinder.score
+y <- pbmc1k.pred3$scDblFinder.score
 
 plot(x, y, pch = 16)
 ```
