@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea86eba56934106bc159badbfe3e34393631cda06targetblanka86eba5a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree77bdfb3d74f5f47969d750e47bb312328f577929targetblank77bdfb3a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/a86eba56934106bc159badbfe3e34393631cda06" target="_blank">a86eba5</a>
+<a href="https://github.com/davetang/muse/tree/77bdfb3d74f5f47969d750e47bb312328f577929" target="_blank">77bdfb3</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea86eba56934106bc159badbfe3e34393631cda06targetblanka86eba5a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree77bdfb3d74f5f47969d750e47bb312328f577929targetblank77bdfb3a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/a86eba56934106bc159badbfe3e34393631cda06" target="_blank">a86eba5</a>.
+<a href="https://github.com/davetang/muse/tree/77bdfb3d74f5f47969d750e47bb312328f577929" target="_blank">77bdfb3</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -627,6 +627,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/77bdfb3d74f5f47969d750e47bb312328f577929/analysis/fisher.Rmd" target="_blank">77bdfb3</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-29
+</td>
+<td>
+Volcano plot and cluster proportions
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/1b5016da96362435160f669e83855b33733bc94f/docs/fisher.html" target="_blank">1b5016d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -847,23 +881,62 @@ odds ratio
   Cluster = clusters,
   Treated = treated,
   Untreated = untreated,
-  pvalue = purrr::map_dbl(res, \(x) x$stat$p.value)
+  pvalue = purrr::map_dbl(res, \(x) x$stat$p.value),
+  odds_ratio = purrr::map_dbl(res, \(x) x$stat$estimate)
 ) -&gt; res_df
 
 res_df$padj &lt;- p.adjust(res_df$pvalue, method = &quot;BH&quot;)
+res_df$log2_odds_ratio &lt;- log2(res_df$odds_ratio)
 
 res_df</code></pre>
-<pre><code>    Cluster Treated Untreated       pvalue         padj
-1  cluster0     200        55 7.654036e-17 7.654036e-16
-2  cluster1      60        50 7.625829e-01 7.625829e-01
-3  cluster2      40        35 6.324680e-01 7.027423e-01
-4  cluster3      30        30 3.519013e-01 5.027161e-01
-5  cluster4      80        85 4.189083e-02 1.226881e-01
-6  cluster5      90        95 2.924272e-02 1.226881e-01
-7  cluster6      20        25 1.259970e-01 2.099949e-01
-8  cluster7      15        20 1.215913e-01 2.099949e-01
-9  cluster8      70        75 4.907522e-02 1.226881e-01
-10 cluster9      45        40 5.716169e-01 7.027423e-01</code></pre>
+<pre><code>    Cluster Treated Untreated       pvalue odds_ratio         padj
+1  cluster0     200        55 7.654036e-17  3.6726937 7.654036e-16
+2  cluster1      60        50 7.625829e-01  0.9356553 7.625829e-01
+3  cluster2      40        35 6.324680e-01  0.8900209 7.027423e-01
+4  cluster3      30        30 3.519013e-01  0.7743725 5.027161e-01
+5  cluster4      80        85 4.189083e-02  0.7019839 1.226881e-01
+6  cluster5      90        95 2.924272e-02  0.7022974 1.226881e-01
+7  cluster6      20        25 1.259970e-01  0.6161451 2.099949e-01
+8  cluster7      15        20 1.215913e-01  0.5790270 2.099949e-01
+9  cluster8      70        75 4.907522e-02  0.7002301 1.226881e-01
+10 cluster9      45        40 5.716169e-01  0.8740708 7.027423e-01
+   log2_odds_ratio
+1       1.87683857
+2      -0.09595098
+3      -0.16808884
+4      -0.36890045
+5      -0.51049016
+6      -0.50984593
+7      -0.69865806
+8      -0.78829757
+9      -0.51409895
+10     -0.19417790</code></pre>
+<p>Volcano plot.</p>
+<pre class="r"><code>library(ggplot2)
+
+ggplot(res_df, aes(x = log2_odds_ratio, y = -log10(pvalue), label=Cluster)) +
+  geom_point(size=3) +
+  geom_text(nudge_y = 0.3) +
+  geom_hline(yintercept = -log10(0.05), linetype=&quot;dashed&quot;, color=&quot;red&quot;) +
+  xlab(&quot;Log2 Odds Ratio&quot;) + ylab(&quot;-log10(p-value)&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/fisher.Rmd/volcano_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Plot Cluster Proportions.</p>
+<pre class="r"><code>prop_df &lt;- data.frame(
+  Cluster = rep(clusters, 2),
+  Condition = rep(c(&quot;Treated&quot;, &quot;Untreated&quot;), each=length(clusters)),
+  Proportion = c(treated / total_treated, untreated / total_untreated)
+)
+
+ggplot(prop_df, aes(x=Cluster, y=Proportion, fill=Condition)) +
+  geom_bar(stat=&quot;identity&quot;, position=&quot;dodge&quot;) +
+  ylab(&quot;Proportion of Cells&quot;) +
+  theme_minimal() +
+  theme(axis.title.x = element_blank())</code></pre>
+<p><img src="figure/fisher.Rmd/cluster_proportions-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>If using Seurat, just use
+<code>table(Idents(seurat_obj), seurat_obj$condition)</code> to create
+the contingency table and carry out the steps as per above.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -911,9 +984,10 @@ loaded via a namespace (and not attached):
 [29] httpuv_1.6.15     vctrs_0.6.5       R6_2.5.1          lifecycle_1.0.4  
 [33] git2r_0.35.0      fs_1.6.4          pkgconfig_2.0.3   callr_3.7.6      
 [37] pillar_1.10.1     bslib_0.8.0       later_1.3.2       gtable_0.3.6     
-[41] glue_1.8.0        Rcpp_1.0.13       xfun_0.48         tidyselect_1.2.1 
-[45] rstudioapi_0.17.1 knitr_1.48        htmltools_0.5.8.1 rmarkdown_2.28   
-[49] compiler_4.4.1    getPass_0.2-4    </code></pre>
+[41] glue_1.8.0        Rcpp_1.0.13       highr_0.11        xfun_0.48        
+[45] tidyselect_1.2.1  rstudioapi_0.17.1 knitr_1.48        farver_2.1.2     
+[49] htmltools_0.5.8.1 labeling_0.4.3    rmarkdown_2.28    compiler_4.4.1   
+[53] getPass_0.2-4    </code></pre>
 </div>
 </div>
 </div>
