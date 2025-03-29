@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeaa71d484ac6bda06628ca6f67eafdc0a508c086ctargetblankaa71d48a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea86eba56934106bc159badbfe3e34393631cda06targetblanka86eba5a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/aa71d484ac6bda06628ca6f67eafdc0a508c086c" target="_blank">aa71d48</a>
+<a href="https://github.com/davetang/muse/tree/a86eba56934106bc159badbfe3e34393631cda06" target="_blank">a86eba5</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeaa71d484ac6bda06628ca6f67eafdc0a508c086ctargetblankaa71d48a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea86eba56934106bc159badbfe3e34393631cda06targetblanka86eba5a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/aa71d484ac6bda06628ca6f67eafdc0a508c086c" target="_blank">aa71d48</a>.
+<a href="https://github.com/davetang/muse/tree/a86eba56934106bc159badbfe3e34393631cda06" target="_blank">a86eba5</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -632,6 +632,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/a86eba56934106bc159badbfe3e34393631cda06/analysis/fisher.Rmd" target="_blank">a86eba5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-29
+</td>
+<td>
+Per-cluster Fisher’s Exact Test
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/5477eb3ca70d298bf9b527f64df4559de3abc4c7/docs/fisher.html" target="_blank">5477eb3</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/aa71d484ac6bda06628ca6f67eafdc0a508c086c/analysis/fisher.Rmd" target="_blank">aa71d48</a>
 </td>
 <td>
@@ -651,6 +685,8 @@ Fisher’s Exact Test
 </div>
 </div>
 </div>
+<div id="global-test" class="section level2">
+<h2>Global test</h2>
 <p>If you have more than two clusters, Fisher’s Exact Test becomes a
 generalised Fisher’s Exact Test (also known as Fisher-Freeman-Halton
 test), because the regular Fisher’s test is for 2x2 tables.</p>
@@ -760,6 +796,74 @@ chisq.test(cluster_table3)</code></pre>
 
 data:  cluster_table3
 X-squared = 5.8925, df = 9, p-value = 0.7506</code></pre>
+</div>
+<div id="per-cluster-fishers-exact-test" class="section level2">
+<h2>Per-cluster Fisher’s Exact Test</h2>
+<p>Perform one Fisher’s Exact Test per cluster.</p>
+<pre class="r"><code>treated   &lt;- c(200, 60, 40, 30, 80, 90, 20, 15, 70, 45)
+untreated &lt;- c(55, 50, 35, 30, 85, 95, 25, 20, 75, 40)
+clusters &lt;- paste0(&quot;cluster&quot;, 0:9)
+
+total_treated &lt;- sum(treated)
+total_untreated &lt;- sum(untreated)
+
+res &lt;- purrr::map(seq_along(clusters), \(i){
+  contingency_table &lt;- matrix(
+    c(
+      treated[i], total_treated - treated[i],
+      untreated[i], total_untreated - untreated[i]
+    ),
+    nrow=2,
+    byrow=TRUE
+  )
+  
+  fisher_res &lt;- fisher.test(contingency_table)
+  list(
+    table = contingency_table,
+    stat = fisher_res
+  )
+})
+
+res[[1]]</code></pre>
+<pre><code>$table
+     [,1] [,2]
+[1,]  200  450
+[2,]   55  455
+
+$stat
+
+    Fisher&#39;s Exact Test for Count Data
+
+data:  contingency_table
+p-value &lt; 2.2e-16
+alternative hypothesis: true odds ratio is not equal to 1
+95 percent confidence interval:
+ 2.631973 5.188538
+sample estimates:
+odds ratio 
+  3.672694 </code></pre>
+<p>As a table with multiple testing correction.</p>
+<pre class="r"><code>data.frame(
+  Cluster = clusters,
+  Treated = treated,
+  Untreated = untreated,
+  pvalue = purrr::map_dbl(res, \(x) x$stat$p.value)
+) -&gt; res_df
+
+res_df$padj &lt;- p.adjust(res_df$pvalue, method = &quot;BH&quot;)
+
+res_df</code></pre>
+<pre><code>    Cluster Treated Untreated       pvalue         padj
+1  cluster0     200        55 7.654036e-17 7.654036e-16
+2  cluster1      60        50 7.625829e-01 7.625829e-01
+3  cluster2      40        35 6.324680e-01 7.027423e-01
+4  cluster3      30        30 3.519013e-01 5.027161e-01
+5  cluster4      80        85 4.189083e-02 1.226881e-01
+6  cluster5      90        95 2.924272e-02 1.226881e-01
+7  cluster6      20        25 1.259970e-01 2.099949e-01
+8  cluster7      15        20 1.215913e-01 2.099949e-01
+9  cluster8      70        75 4.907522e-02 1.226881e-01
+10 cluster9      45        40 5.716169e-01 7.027423e-01</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -810,6 +914,7 @@ loaded via a namespace (and not attached):
 [41] glue_1.8.0        Rcpp_1.0.13       xfun_0.48         tidyselect_1.2.1 
 [45] rstudioapi_0.17.1 knitr_1.48        htmltools_0.5.8.1 rmarkdown_2.28   
 [49] compiler_4.4.1    getPass_0.2-4    </code></pre>
+</div>
 </div>
 </div>
 </div>
