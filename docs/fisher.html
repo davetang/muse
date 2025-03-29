@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee9e40c4306ce9ec323be7deeda74d15e31f128dftargetblanke9e40c4a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecd487f9642fa8160347df6801f48280aa4e374eftargetblankcd487f9a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/e9e40c4306ce9ec323be7deeda74d15e31f128df" target="_blank">e9e40c4</a>
+<a href="https://github.com/davetang/muse/tree/cd487f9642fa8160347df6801f48280aa4e374ef" target="_blank">cd487f9</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee9e40c4306ce9ec323be7deeda74d15e31f128dftargetblanke9e40c4a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecd487f9642fa8160347df6801f48280aa4e374eftargetblankcd487f9a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/e9e40c4306ce9ec323be7deeda74d15e31f128df" target="_blank">e9e40c4</a>.
+<a href="https://github.com/davetang/muse/tree/cd487f9642fa8160347df6801f48280aa4e374ef" target="_blank">cd487f9</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -627,6 +627,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/cd487f9642fa8160347df6801f48280aa4e374ef/analysis/fisher.Rmd" target="_blank">cd487f9</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-29
+</td>
+<td>
+Label significant cluster in volcano plot
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/c33357f99489b86dbe995e98d15daac458907cfc/docs/fisher.html" target="_blank">c33357f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -948,11 +982,22 @@ res_df</code></pre>
 <p>Volcano plot.</p>
 <pre class="r"><code>library(ggplot2)
 
-ggplot(res_df, aes(x = log2_odds_ratio, y = -log10(pvalue), label=Cluster)) +
-  geom_point(size=3) +
-  geom_text(nudge_y = 0.3) +
-  geom_hline(yintercept = -log10(0.05), linetype=&quot;dashed&quot;, color=&quot;red&quot;) +
-  xlab(&quot;Log2 Odds Ratio&quot;) + ylab(&quot;-log10(p-value)&quot;) +
+alpha &lt;- 0.05
+res_df$Significant &lt;- res_df$padj &lt; alpha
+
+ggplot(res_df, aes(x=log2_odds_ratio, y=-log10(pvalue))) +
+  geom_point(aes(colour=Significant), size=3) +
+  geom_text(
+    data=res_df[res_df$Significant,],
+    aes(label=Cluster),
+    nudge_y=1,
+    size=4
+  ) +
+  geom_hline(yintercept = -log10(0.05), linetype=&quot;dashed&quot;, colour=&quot;red&quot;) +
+  scale_colour_manual(values=c(&quot;grey&quot;, &quot;firebrick&quot;)) +
+  xlab(&quot;Log2 Odds Ratio&quot;) + 
+  ylab(&quot;-log10(p-value)&quot;) +
+  ggtitle(&quot;Volcano Plot of Cluster Proportions (Treated vs Untreated)&quot;) +
   theme_minimal()</code></pre>
 <p><img src="figure/fisher.Rmd/volcano_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
@@ -1093,8 +1138,8 @@ in a specific cluster <strong>in treated cells</strong> versus
 <pre class="r"><code>res_df[1, ]</code></pre>
 <pre><code>   Cluster Treated Untreated       pvalue odds_ratio         padj
 1 cluster0     200        55 7.654036e-17   3.672694 7.654036e-16
-  log2_odds_ratio
-1        1.876839</code></pre>
+  log2_odds_ratio Significant
+1        1.876839        TRUE</code></pre>
 <table>
 <thead>
 <tr class="header">
