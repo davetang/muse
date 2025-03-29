@@ -147,11 +147,22 @@ Volcano plot.
 ```{r volcano_plot}
 library(ggplot2)
 
-ggplot(res_df, aes(x = log2_odds_ratio, y = -log10(pvalue), label=Cluster)) +
-  geom_point(size=3) +
-  geom_text(nudge_y = 0.3) +
-  geom_hline(yintercept = -log10(0.05), linetype="dashed", color="red") +
-  xlab("Log2 Odds Ratio") + ylab("-log10(p-value)") +
+alpha <- 0.05
+res_df$Significant <- res_df$padj < alpha
+
+ggplot(res_df, aes(x=log2_odds_ratio, y=-log10(pvalue))) +
+  geom_point(aes(colour=Significant), size=3) +
+  geom_text(
+    data=res_df[res_df$Significant,],
+    aes(label=Cluster),
+    nudge_y=1,
+    size=4
+  ) +
+  geom_hline(yintercept = -log10(0.05), linetype="dashed", colour="red") +
+  scale_colour_manual(values=c("grey", "firebrick")) +
+  xlab("Log2 Odds Ratio") + 
+  ylab("-log10(p-value)") +
+  ggtitle("Volcano Plot of Cluster Proportions (Treated vs Untreated)") +
   theme_minimal()
 ```
 
