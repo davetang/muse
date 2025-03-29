@@ -172,3 +172,54 @@ ggplot(prop_df, aes(x=Cluster, y=Proportion, fill=Condition)) +
 ```
  
 If using Seurat, just use `table(Idents(seurat_obj), seurat_obj$condition)` to create the contingency table and carry out the steps as per above.
+
+## Notes
+
+The **odds ratio** compares the odds of finding a cell in a specific cluster **in treated cells** versus **in untreated cells**.
+
+For example:
+
+|           | Cluster A | Not Cluster A | Total |
+|-----------|-----------|---------------|-------|
+| Treated   | 200       | 450           | 650   |
+| Untreated | 55        | 455           | 510   |
+
+The **odds** of being in Cluster A:
+
+* For treated cells:  
+
+$$ {Odds}_{\text{treated}} = \frac{200}{450} = 0.4444 $$
+  
+* For untreated cells:  
+
+$$ \text{Odds}_{\text{untreated}} = \frac{55}{455} = 0.1209 $$
+
+So the **odds ratio** is:
+
+$$ \text{OR} = \frac{0.4444}{0.1209} \approx 3.6758 $$
+
+```{r check_odds_ratio}
+res_df[1, ]
+```
+
+| Odds Ratio | Interpretation                                 |
+|------------|------------------------------------------------|
+| OR = 1     | No difference between treated and untreated    |
+| OR > 1     | Treated cells are **enriched** in this cluster |
+| OR < 1     | Treated cells are **depleted** in this cluster |
+
+In the example above, OR ~ 3.67 means treated cells are ~3.67 times more likely to be in Cluster 0 than untreated cells.
+
+Taking the `log2` of the odds ratio is common because:
+
+1. It makes the scale symmetric:
+   - `log2(OR = 2)` = `1`  
+   - `log2(OR = 0.5)` = `-1`
+2. It helps with plotting (like in volcano plots) where you want to easily spot:
+   - Positive values = enrichment
+   - Negative values = depletion
+   - Zero = no change
+
+- `log2(OR) = 1` means cells are **2x more likely** to be in that cluster if treated.
+- `log2(OR) = -1` means cells are **2x less likely** (i.e., enriched in untreated).
+- `log2(OR) = 0` means no difference between treated and untreated.
