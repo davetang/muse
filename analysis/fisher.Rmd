@@ -11,6 +11,8 @@ library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Global test
+
 If you have more than two clusters, Fisher's Exact Test becomes a generalised Fisher's Exact Test (also known as Fisher-Freeman-Halton test), because the regular Fisher's test is for 2x2 tables.
 
 For larger tables, people often use:
@@ -89,4 +91,51 @@ colnames(cluster_table3) <- paste0("cluster", 0:9)
 rownames(cluster_table3) <- c("Treated", "Untreated")
 
 chisq.test(cluster_table3)
+```
+
+## Per-cluster Fisher's Exact Test
+
+Perform one Fisher's Exact Test per cluster.
+
+```{r fisher_per_cluster}
+treated   <- c(200, 60, 40, 30, 80, 90, 20, 15, 70, 45)
+untreated <- c(55, 50, 35, 30, 85, 95, 25, 20, 75, 40)
+clusters <- paste0("cluster", 0:9)
+
+total_treated <- sum(treated)
+total_untreated <- sum(untreated)
+
+res <- purrr::map(seq_along(clusters), \(i){
+  contingency_table <- matrix(
+    c(
+      treated[i], total_treated - treated[i],
+      untreated[i], total_untreated - untreated[i]
+    ),
+    nrow=2,
+    byrow=TRUE
+  )
+  
+  fisher_res <- fisher.test(contingency_table)
+  list(
+    table = contingency_table,
+    stat = fisher_res
+  )
+})
+
+res[[1]]
+```
+
+As a table with multiple testing correction.
+
+```{r fisher_per_cluster_table}
+data.frame(
+  Cluster = clusters,
+  Treated = treated,
+  Untreated = untreated,
+  pvalue = purrr::map_dbl(res, \(x) x$stat$p.value)
+) -> res_df
+
+res_df$padj <- p.adjust(res_df$pvalue, method = "BH")
+
+res_df
 ```
