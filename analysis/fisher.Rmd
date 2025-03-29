@@ -132,10 +132,43 @@ data.frame(
   Cluster = clusters,
   Treated = treated,
   Untreated = untreated,
-  pvalue = purrr::map_dbl(res, \(x) x$stat$p.value)
+  pvalue = purrr::map_dbl(res, \(x) x$stat$p.value),
+  odds_ratio = purrr::map_dbl(res, \(x) x$stat$estimate)
 ) -> res_df
 
 res_df$padj <- p.adjust(res_df$pvalue, method = "BH")
+res_df$log2_odds_ratio <- log2(res_df$odds_ratio)
 
 res_df
 ```
+
+Volcano plot.
+
+```{r volcano_plot}
+library(ggplot2)
+
+ggplot(res_df, aes(x = log2_odds_ratio, y = -log10(pvalue), label=Cluster)) +
+  geom_point(size=3) +
+  geom_text(nudge_y = 0.3) +
+  geom_hline(yintercept = -log10(0.05), linetype="dashed", color="red") +
+  xlab("Log2 Odds Ratio") + ylab("-log10(p-value)") +
+  theme_minimal()
+```
+
+Plot Cluster Proportions.
+
+```{r cluster_proportions}
+prop_df <- data.frame(
+  Cluster = rep(clusters, 2),
+  Condition = rep(c("Treated", "Untreated"), each=length(clusters)),
+  Proportion = c(treated / total_treated, untreated / total_untreated)
+)
+
+ggplot(prop_df, aes(x=Cluster, y=Proportion, fill=Condition)) +
+  geom_bar(stat="identity", position="dodge") +
+  ylab("Proportion of Cells") +
+  theme_minimal() +
+  theme(axis.title.x = element_blank())
+```
+ 
+If using Seurat, just use `table(Idents(seurat_obj), seurat_obj$condition)` to create the contingency table and carry out the steps as per above.
