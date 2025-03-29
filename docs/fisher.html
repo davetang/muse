@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree77bdfb3d74f5f47969d750e47bb312328f577929targetblank77bdfb3a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee9e40c4306ce9ec323be7deeda74d15e31f128dftargetblanke9e40c4a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/77bdfb3d74f5f47969d750e47bb312328f577929" target="_blank">77bdfb3</a>
+<a href="https://github.com/davetang/muse/tree/e9e40c4306ce9ec323be7deeda74d15e31f128df" target="_blank">e9e40c4</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree77bdfb3d74f5f47969d750e47bb312328f577929targetblank77bdfb3a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee9e40c4306ce9ec323be7deeda74d15e31f128dftargetblanke9e40c4a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/77bdfb3d74f5f47969d750e47bb312328f577929" target="_blank">77bdfb3</a>.
+<a href="https://github.com/davetang/muse/tree/e9e40c4306ce9ec323be7deeda74d15e31f128df" target="_blank">e9e40c4</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -627,6 +627,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/e9e40c4306ce9ec323be7deeda74d15e31f128df/analysis/fisher.Rmd" target="_blank">e9e40c4</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-29
+</td>
+<td>
+Add some notes
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4bccd4022ab4588c013a279efa1b8b2a02b1f6ba/docs/fisher.html" target="_blank">4bccd40</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -921,6 +955,43 @@ ggplot(res_df, aes(x = log2_odds_ratio, y = -log10(pvalue), label=Cluster)) +
   xlab(&quot;Log2 Odds Ratio&quot;) + ylab(&quot;-log10(p-value)&quot;) +
   theme_minimal()</code></pre>
 <p><img src="figure/fisher.Rmd/volcano_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-volcano_plot-1">
+Past versions of volcano_plot-1.png
+</button>
+</p>
+<div id="fig-volcano_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4bccd4022ab4588c013a279efa1b8b2a02b1f6ba/docs/figure/fisher.Rmd/volcano_plot-1.png" target="_blank">4bccd40</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-29
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Plot Cluster Proportions.</p>
 <pre class="r"><code>prop_df &lt;- data.frame(
   Cluster = rep(clusters, 2),
@@ -934,9 +1005,144 @@ ggplot(prop_df, aes(x=Cluster, y=Proportion, fill=Condition)) +
   theme_minimal() +
   theme(axis.title.x = element_blank())</code></pre>
 <p><img src="figure/fisher.Rmd/cluster_proportions-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-cluster_proportions-1">
+Past versions of cluster_proportions-1.png
+</button>
+</p>
+<div id="fig-cluster_proportions-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4bccd4022ab4588c013a279efa1b8b2a02b1f6ba/docs/figure/fisher.Rmd/cluster_proportions-1.png" target="_blank">4bccd40</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-29
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>If using Seurat, just use
 <code>table(Idents(seurat_obj), seurat_obj$condition)</code> to create
 the contingency table and carry out the steps as per above.</p>
+</div>
+<div id="notes" class="section level2">
+<h2>Notes</h2>
+<p>The <strong>odds ratio</strong> compares the odds of finding a cell
+in a specific cluster <strong>in treated cells</strong> versus
+<strong>in untreated cells</strong>.</p>
+<p>For example:</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>Cluster A</th>
+<th>Not Cluster A</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Treated</td>
+<td>200</td>
+<td>450</td>
+<td>650</td>
+</tr>
+<tr class="even">
+<td>Untreated</td>
+<td>55</td>
+<td>455</td>
+<td>510</td>
+</tr>
+</tbody>
+</table>
+<p>The <strong>odds</strong> of being in Cluster A:</p>
+<ul>
+<li>For treated cells:</li>
+</ul>
+<p><span class="math display">\[ {Odds}_{\text{treated}} =
+\frac{200}{450} = 0.4444 \]</span></p>
+<ul>
+<li>For untreated cells:</li>
+</ul>
+<p><span class="math display">\[ \text{Odds}_{\text{untreated}} =
+\frac{55}{455} = 0.1209 \]</span></p>
+<p>So the <strong>odds ratio</strong> is:</p>
+<p><span class="math display">\[ \text{OR} = \frac{0.4444}{0.1209}
+\approx 3.6758 \]</span></p>
+<pre class="r"><code>res_df[1, ]</code></pre>
+<pre><code>   Cluster Treated Untreated       pvalue odds_ratio         padj
+1 cluster0     200        55 7.654036e-17   3.672694 7.654036e-16
+  log2_odds_ratio
+1        1.876839</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th>Odds Ratio</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>OR = 1</td>
+<td>No difference between treated and untreated</td>
+</tr>
+<tr class="even">
+<td>OR &gt; 1</td>
+<td>Treated cells are <strong>enriched</strong> in this cluster</td>
+</tr>
+<tr class="odd">
+<td>OR &lt; 1</td>
+<td>Treated cells are <strong>depleted</strong> in this cluster</td>
+</tr>
+</tbody>
+</table>
+<p>In the example above, OR ~ 3.67 means treated cells are ~3.67 times
+more likely to be in Cluster 0 than untreated cells.</p>
+<p>Taking the <code>log2</code> of the odds ratio is common because:</p>
+<ol style="list-style-type: decimal">
+<li>It makes the scale symmetric:
+<ul>
+<li><code>log2(OR = 2)</code> = <code>1</code><br />
+</li>
+<li><code>log2(OR = 0.5)</code> = <code>-1</code></li>
+</ul></li>
+<li>It helps with plotting (like in volcano plots) where you want to
+easily spot:
+<ul>
+<li>Positive values = enrichment</li>
+<li>Negative values = depletion</li>
+<li>Zero = no change</li>
+</ul></li>
+</ol>
+<ul>
+<li><code>log2(OR) = 1</code> means cells are <strong>2x more
+likely</strong> to be in that cluster if treated.</li>
+<li><code>log2(OR) = -1</code> means cells are <strong>2x less
+likely</strong> (i.e., enriched in untreated).</li>
+<li><code>log2(OR) = 0</code> means no difference between treated and
+untreated.</li>
+</ul>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
