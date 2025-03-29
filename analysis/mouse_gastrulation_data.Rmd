@@ -1,0 +1,30 @@
+---
+title: "Mouse gastrulation and organogeneis datasets"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+[Overview of the MouseGastrulationData datasets](https://bioconductor.org/packages/release/data/experiment/vignettes/MouseGastrulationData/inst/doc/MouseGastrulationData.html).
+
+Install using `BiocManager::install()`.
+
+```{r install_dependencies, eval=FALSE}
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("MouseGastrulationData")
+```
+
+Package version.
+
+```{r package_version}
+packageVersion("MouseGastrulationData")
+```
