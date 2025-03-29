@@ -1,0 +1,92 @@
+---
+title: "Fisher's Exact Test"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+If you have more than two clusters, Fisher's Exact Test becomes a generalised Fisher's Exact Test (also known as Fisher-Freeman-Halton test), because the regular Fisher's test is for 2x2 tables.
+
+For larger tables, people often use:
+
+* Chi-squared test (if counts are not too small)
+* Generalised Fisher's Exact Test (exact test and have a small sample)
+
+Create cluster table.
+
+```{r cluster_table}
+treated   <- c(50, 60, 40, 30, 80, 90, 20, 15, 70, 45)
+untreated <- c(55, 50, 35, 25, 85, 95, 25, 20, 65, 40)
+
+cluster_table <- rbind(treated, untreated)
+colnames(cluster_table) <- paste0("cluster", 0:9)
+rownames(cluster_table) <- c("Treated", "Untreated")
+cluster_table
+```
+
+Chi-squared Test.
+
+```{r chi_squared}
+chisq_test <- chisq.test(cluster_table)
+chisq_test
+```
+
+Generalised Fisher's Exact Test.
+
+* `workspace` - an integer specifying the size of the workspace used in the network algorithm. In units of 4 bytes. Only used for non-simulated p-values larger than 2×22×2 tables. Since R version 3.5.0, this also increases the internal stack size which allows larger problems to be solved, however sometimes needing hours. In such cases, simulate.p.values=TRUE may be more reasonable.
+
+```{r fishers_test}
+fisher_test <- fisher.test(cluster_table, workspace=2e8)
+fisher_test
+```
+
+Another cluster table.
+
+```{r cluster_table2}
+treated2   <- c(200, 60, 40, 30, 80, 90, 20, 15, 70, 45)
+untreated2 <- c(55, 50, 35, 30, 85, 95, 25, 20, 75, 40)
+
+cluster_table2 <- rbind(treated2, untreated2)
+colnames(cluster_table2) <- paste0("cluster", 0:9)
+rownames(cluster_table2) <- c("Treated", "Untreated")
+cluster_table2
+```
+
+Chi-squared Test; Chi-squared is valid when expected counts are reasonably large (> 5 cells per condition per cluster).
+
+```{r chi_squared2}
+chisq_test2 <- chisq.test(cluster_table2)
+chisq_test2
+```
+
+Generalised Fisher's Exact Test.
+
+* `simulate.p.value` - a logical indicating whether to compute p-values by Monte Carlo simulation, in larger than 2×22×2 tables.
+
+```{r fishers_test2}
+fisher_test2 <- fisher.test(cluster_table2, simulate.p.value = TRUE)
+fisher_test2
+```
+
+Notes:
+
+* Fisher's and Chi-squared tests operate on contingency tables of counts, not proportions.
+* They intrinsically consider the marginal totals (total treated cells, total untreated cells, total cells in each cluster) when computing expected frequencies.
+* If you use percentages or normalised counts, you actually distort the expected distribution.
+
+```{r cluster_table3}
+treated3   <- c(50, 60, 40, 30, 80, 90, 20, 15, 70, 45)
+untreated3 <- untreated*3
+
+cluster_table3 <- rbind(treated3, untreated3)
+colnames(cluster_table3) <- paste0("cluster", 0:9)
+rownames(cluster_table3) <- c("Treated", "Untreated")
+
+chisq.test(cluster_table3)
+```
