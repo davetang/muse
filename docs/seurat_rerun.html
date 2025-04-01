@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8c145e4512c49ca9e99466e71b3a87a754872eb4targetblank8c145e4a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree476c4adfac727fe1204fa2bef5f5d94cda20e3d7targetblank476c4ada">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/8c145e4512c49ca9e99466e71b3a87a754872eb4" target="_blank">8c145e4</a>
+<a href="https://github.com/davetang/muse/tree/476c4adfac727fe1204fa2bef5f5d94cda20e3d7" target="_blank">476c4ad</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8c145e4512c49ca9e99466e71b3a87a754872eb4targetblank8c145e4a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree476c4adfac727fe1204fa2bef5f5d94cda20e3d7targetblank476c4ada"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/8c145e4512c49ca9e99466e71b3a87a754872eb4" target="_blank">8c145e4</a>.
+<a href="https://github.com/davetang/muse/tree/476c4adfac727fe1204fa2bef5f5d94cda20e3d7" target="_blank">476c4ad</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -628,6 +628,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/476c4adfac727fe1204fa2bef5f5d94cda20e3d7/analysis/seurat_rerun.Rmd" target="_blank">476c4ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-01
+</td>
+<td>
+Create new Seurat object with the same order
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/319c615689eb287327084c35282eedeb7a094688/docs/seurat_rerun.html" target="_blank">319c615</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -948,6 +982,74 @@ table(
   6    0    0    0    0    0    0   32    0
   7    0    1    0    0    0    0    0   13</code></pre>
 </div>
+<div id="same-order" class="section level3">
+<h3>Same order</h3>
+<p>Since it seems a different order of genes and barcodes generates
+slightly different results, what if we used the same order? (The easiest
+way is to simply create a new Seurat object with the new order.
+Originally, I had tried to re-order an existing Seurat object but ended
+up creating an invalid Seurat object.)</p>
+<pre class="r"><code>pbmc3k &lt;- CreateSeuratObject(
+  counts = seurat_obj@assays$RNA$counts,
+  min.cells = 3,
+  min.features = 200,
+  project = &quot;pbmc3k&quot;
+)
+
+set.seed(1941)
+rs &lt;- sample(rownames(pbmc3k@assays$RNA$counts))
+cs &lt;- sample(colnames(pbmc3k@assays$RNA$counts))
+
+pbmc3k_c &lt;- CreateSeuratObject(
+  counts = pbmc3k@assays$RNA$counts[rs, cs],
+  min.cells = 3,
+  min.features = 200,
+  project = &quot;pbmc3k&quot;
+)
+
+pbmc3k_d &lt;- CreateSeuratObject(
+  counts = pbmc3k_reordered@assays$RNA$counts[rs, cs],
+  min.cells = 3,
+  min.features = 200,
+  project = &quot;pbmc3k&quot;
+)
+
+pbmc3k_c &lt;- seurat_wf_v4(pbmc3k_c)
+pbmc3k_d &lt;- seurat_wf_v4(pbmc3k_d)
+
+stopifnot(row.names(pbmc3k_c@meta.data) == row.names(pbmc3k_d@meta.data))
+stopifnot(row.names(pbmc3k_c@reductions$pca@cell.embeddings) == row.names(pbmc3k_d@reductions$pca@cell.embeddings))
+stopifnot(row.names(pbmc3k_c@reductions$umap@cell.embeddings) == row.names(pbmc3k_d@reductions$umap@cell.embeddings))
+
+DimPlot(pbmc3k_c, reduction = &quot;pca&quot;) + DimPlot(pbmc3k_d, reduction = &quot;pca&quot;)</code></pre>
+<p><img src="figure/seurat_rerun.Rmd/compare_same_order-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>identical(
+  pbmc3k_c@reductions$pca@cell.embeddings,
+  pbmc3k_d@reductions$pca@cell.embeddings
+)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<pre class="r"><code>DimPlot(pbmc3k_c) + DimPlot(pbmc3k_d)</code></pre>
+<p><img src="figure/seurat_rerun.Rmd/compare_same_order-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>identical(
+  pbmc3k_c@reductions$umap@cell.embeddings,
+  pbmc3k_d@reductions$umap@cell.embeddings
+)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<pre class="r"><code>table(
+  pbmc3k_c@meta.data$seurat_clusters,
+  pbmc3k_d@meta.data$seurat_clusters
+)</code></pre>
+<pre><code>   
+       0    1    2    3    4    5    6    7
+  0 1182    0    0    0    0    0    0    0
+  1    0  491    0    0    0    0    0    0
+  2    0    0  351    0    0    0    0    0
+  3    0    0    0  307    0    0    0    0
+  4    0    0    0    0  162    0    0    0
+  5    0    0    0    0    0  161    0    0
+  6    0    0    0    0    0    0   32    0
+  7    0    0    0    0    0    0    0   14</code></pre>
+</div>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
@@ -957,6 +1059,16 @@ clustering results.</li>
 <li>Re-running Seurat on the same data but shuffled produced different
 results.</li>
 </ul>
+<p>As answered by <a
+href="https://github.com/satijalab/seurat/issues/4192#issuecomment-797637532">Tim</a>:</p>
+<blockquote>
+<p>The graph-based clustering algorithm (Louvain, SLM, Leiden, etc.) is
+non-deterministic. Identical results across different runs of the
+algorithm are obtained by setting the same random seed. Changing the
+order of the cells will change the order that nodes are visited during
+the local moving phase of the algorithm and will potentially change the
+final cluster identities of cells.</p>
+</blockquote>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
