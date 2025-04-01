@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree90696a0a22d0f7d6ddd4401bb7949e26af781980targetblank90696a0a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8c145e4512c49ca9e99466e71b3a87a754872eb4targetblank8c145e4a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/90696a0a22d0f7d6ddd4401bb7949e26af781980" target="_blank">90696a0</a>
+<a href="https://github.com/davetang/muse/tree/8c145e4512c49ca9e99466e71b3a87a754872eb4" target="_blank">8c145e4</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree90696a0a22d0f7d6ddd4401bb7949e26af781980targetblank90696a0a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8c145e4512c49ca9e99466e71b3a87a754872eb4targetblank8c145e4a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/90696a0a22d0f7d6ddd4401bb7949e26af781980" target="_blank">90696a0</a>.
+<a href="https://github.com/davetang/muse/tree/8c145e4512c49ca9e99466e71b3a87a754872eb4" target="_blank">8c145e4</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -633,6 +633,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/8c145e4512c49ca9e99466e71b3a87a754872eb4/analysis/seurat_rerun.Rmd" target="_blank">8c145e4</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-01
+</td>
+<td>
+Using Seurat version 4
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4f8b0d20e771d207f201740c7a774d0dddafcb94/docs/seurat_rerun.html" target="_blank">4f8b0d2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/90696a0a22d0f7d6ddd4401bb7949e26af781980/analysis/seurat_rerun.Rmd" target="_blank">90696a0</a>
 </td>
 <td>
@@ -677,11 +711,24 @@ pbmc3k</code></pre>
 Active assay: RNA (13714 features, 0 variable features)
  1 layer present: counts</code></pre>
 </div>
-<div id="seurat-workflow" class="section level2">
-<h2>Seurat workflow</h2>
-<p>Seurat version 5 workflow as a function:
-<code>seurat_wf_v5</code>.</p>
-<pre class="r"><code>seurat_wf_v5 &lt;- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
+<div id="seurat-workflows" class="section level2">
+<h2>Seurat workflows</h2>
+<p><a href="seurat_v4_vs_v5.html">Seurat version workflows</a> as
+functions.</p>
+<pre class="r"><code>seurat_wf_v4 &lt;- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
+  
+  seurat_obj &lt;- NormalizeData(seurat_obj, normalization.method = &quot;LogNormalize&quot;, scale.factor = scale_factor, verbose = debug_flag)
+  seurat_obj &lt;- FindVariableFeatures(seurat_obj, selection.method = &#39;vst&#39;, nfeatures = num_features, verbose = debug_flag)
+  seurat_obj &lt;- ScaleData(seurat_obj, verbose = debug_flag)
+  seurat_obj &lt;- RunPCA(seurat_obj, verbose = debug_flag)
+  seurat_obj &lt;- RunUMAP(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj &lt;- FindNeighbors(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj &lt;- FindClusters(seurat_obj, resolution = cluster_res, verbose = debug_flag)
+  
+  seurat_obj
+}
+
+seurat_wf_v5 &lt;- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
   
   seurat_obj &lt;- SCTransform(seurat_obj, verbose = debug_flag)
   seurat_obj &lt;- RunPCA(seurat_obj, verbose = debug_flag)
@@ -724,6 +771,43 @@ Active assay: SCT (12572 features, 3000 variable features)
 <p>Compare UMAPs.</p>
 <pre class="r"><code>DimPlot(pbmc3k_1) + DimPlot(pbmc3k_1)</code></pre>
 <p><img src="figure/seurat_rerun.Rmd/compare_umaps-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-compare_umaps-1">
+Past versions of compare_umaps-1.png
+</button>
+</p>
+<div id="fig-compare_umaps-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4f8b0d20e771d207f201740c7a774d0dddafcb94/docs/figure/seurat_rerun.Rmd/compare_umaps-1.png" target="_blank">4f8b0d2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Looks the same but let’s double check.</p>
 <pre class="r"><code>identical(
   pbmc3k_1@reductions$umap@cell.embeddings,
@@ -757,6 +841,10 @@ pbmc3k_reordered &lt;- CreateSeuratObject(
   min.features = 200,
   project = &quot;pbmc3k&quot;
 )
+
+stopifnot(all(colnames(pbmc3k_reordered@assays$RNA$counts) %in% colnames(pbmc3k@assays$RNA$counts)))
+stopifnot(all(rownames(pbmc3k_reordered@assays$RNA$counts) %in% rownames(pbmc3k@assays$RNA$counts)))
+
 pbmc3k_reordered</code></pre>
 <pre><code>An object of class Seurat 
 13714 features across 2700 samples within 1 assay 
@@ -778,6 +866,43 @@ Active assay: SCT (12572 features, 3000 variable features)
 <p>Compare UMAPs.</p>
 <pre class="r"><code>DimPlot(pbmc3k_1) + DimPlot(pbmc3k_3)</code></pre>
 <p><img src="figure/seurat_rerun.Rmd/compare_umaps_3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-compare_umaps_3-1">
+Past versions of compare_umaps_3-1.png
+</button>
+</p>
+<div id="fig-compare_umaps_3-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4f8b0d20e771d207f201740c7a774d0dddafcb94/docs/figure/seurat_rerun.Rmd/compare_umaps_3-1.png" target="_blank">4f8b0d2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Compare clustering.</p>
 <pre class="r"><code>idx &lt;- match(row.names(pbmc3k_1@meta.data), row.names(pbmc3k_3@meta.data))
 
@@ -799,10 +924,33 @@ table(
   7   0   0   2   1   0   0   0  43   0   0
   8   0   0   0   0   0   0   0   0  34   0
   9   0   0   0   0   0   0   0   0   0  12</code></pre>
+<div id="use-seurat-version-4" class="section level3">
+<h3>Use Seurat version 4</h3>
+<p>What if we used version 4?</p>
+<pre class="r"><code>pbmc3k_a &lt;- seurat_wf_v4(pbmc3k)
+pbmc3k_b &lt;- seurat_wf_v4(pbmc3k_reordered)
+
+idx &lt;- match(row.names(pbmc3k_a@meta.data), row.names(pbmc3k_b@meta.data))
+stopifnot(row.names(pbmc3k_a@meta.data) == row.names(pbmc3k_b@meta.data)[idx])
+
+table(
+  pbmc3k_a@meta.data$seurat_clusters,
+  pbmc3k_b@meta.data$seurat_clusters[idx]
+)</code></pre>
+<pre><code>   
+       0    1    2    3    4    5    6    7
+  0 1182    0    0    5    0    0    0    0
+  1    0  489    0    0    2    0    0    0
+  2    0    0  351    0    0    0    0    0
+  3    6    0    0  295    0    0    0    0
+  4    0    0    0    1    0  162    0    0
+  5    0    0    0    0  161    0    0    0
+  6    0    0    0    0    0    0   32    0
+  7    0    1    0    0    0    0    0   13</code></pre>
+</div>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
-<p>Using Seurat version 5:</p>
 <ul>
 <li>Re-running Seurat on the same object produced the same UMAP and
 clustering results.</li>
