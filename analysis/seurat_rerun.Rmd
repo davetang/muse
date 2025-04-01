@@ -1,0 +1,159 @@
+---
+title: "Re-running Seurat"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+library(tidyverse)
+library(Seurat)
+```
+
+If I re-run Seurat in the same manner with the same dataset, will I get identical results?
+
+## Seurat object
+
+Import [raw pbmc3k dataset](pbmc3k.html) from my server.
+
+```{r seurat_obj}
+seurat_obj <- readRDS(url("https://davetang.org/file/pbmc3k_seurat.rds", "rb"))
+seurat_obj
+```
+
+Filter.
+
+```{r pbmc3k}
+pbmc3k <- CreateSeuratObject(
+  counts = seurat_obj@assays$RNA$counts,
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k"
+)
+pbmc3k
+```
+
+## Seurat workflow
+
+Seurat version 5 workflow as a function: `seurat_wf_v5`.
+
+```{r seurat_wf_v5}
+seurat_wf_v5 <- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
+  
+  seurat_obj <- SCTransform(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunPCA(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunUMAP(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindNeighbors(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindClusters(seurat_obj, resolution = cluster_res, verbose = debug_flag)
+  
+  seurat_obj
+}
+```
+
+## First run
+
+Process pbmc3k using the Seurat version 5 workflow.
+
+```{r first_run}
+pbmc3k_1 <- seurat_wf_v5(pbmc3k)
+pbmc3k_1
+```
+
+## Second run
+
+Process pbmc3k using the Seurat version 5 workflow again.
+
+```{r second_run}
+pbmc3k_2 <- seurat_wf_v5(pbmc3k)
+pbmc3k_2
+```
+
+## Compare first and second runs
+
+Compare UMAPs.
+
+```{r compare_umaps}
+DimPlot(pbmc3k_1) + DimPlot(pbmc3k_1)
+```
+
+Looks the same but let's double check.
+
+```{r compare_umap_cell_embeddings}
+identical(
+  pbmc3k_1@reductions$umap@cell.embeddings,
+  pbmc3k_2@reductions$umap@cell.embeddings
+)
+```
+
+Compare clustering.
+
+```{r compare_clustering}
+identical(
+  row.names(pbmc3k_1@meta.data),
+  row.names(pbmc3k_2@meta.data)
+)
+
+identical(
+  pbmc3k_1@meta.data$seurat_clusters,
+  pbmc3k_2@meta.data$seurat_clusters
+)
+```
+
+## Third run
+
+Use the same dataset but re-order the count matrix randomly.
+
+```{r pbmc3k_reordered}
+my_mat <- seurat_obj@assays$RNA$counts
+set.seed(1984)
+col_order <- sample(colnames(my_mat))
+row_order <- sample(rownames(my_mat))
+my_mat <- my_mat[row_order, col_order]
+
+pbmc3k_reordered <- CreateSeuratObject(
+  counts = my_mat,
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k"
+)
+pbmc3k_reordered
+```
+
+Process the re-ordered pbmc3k dataset using the Seurat version 5 workflow again.
+
+```{r third_run}
+pbmc3k_3 <- seurat_wf_v5(pbmc3k_reordered)
+pbmc3k_3
+```
+
+## Compare third run
+
+Compare UMAPs.
+
+```{r compare_umaps_3}
+DimPlot(pbmc3k_1) + DimPlot(pbmc3k_3)
+```
+
+Compare clustering.
+
+```{r compare_clustering_3}
+idx <- match(row.names(pbmc3k_1@meta.data), row.names(pbmc3k_3@meta.data))
+
+stopifnot(row.names(pbmc3k_1@meta.data) == row.names(pbmc3k_3@meta.data)[idx])
+
+table(
+  pbmc3k_1@meta.data$seurat_clusters,
+  pbmc3k_3@meta.data$seurat_clusters[idx]
+)
+```
+
+## Summary
+
+Using Seurat version 5:
+
+* Re-running Seurat on the same object produced the same UMAP and clustering results.
+* Re-running Seurat on the same data but shuffled produced different results.
