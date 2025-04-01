@@ -1,0 +1,215 @@
+---
+title: "PCA with DESeq2"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(DESeq2)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) is used to:
+
+> Estimate variance-mean dependence in count data from high-throughput sequencing assays and test for differential expression based on a model using the negative binomial distribution. 
+
+## Installation
+
+Install using `BiocManager::install()`.
+
+```{r install_edger, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("DESeq2")
+```
+
+Package version.
+
+```{r package_version}
+packageVersion("DESeq2")
+```
+
+## Count table
+
+https://zenodo.org/records/13970886.
+
+```{r gene_counts}
+my_url <- 'https://zenodo.org/records/13970886/files/rsem.merged.gene_counts.tsv?download=1'
+my_file <- 'rsem.merged.gene_counts.tsv'
+
+if(file.exists(my_file) == FALSE){
+  download.file(url = my_url, destfile = my_file)
+}
+
+gene_counts <- read_tsv("rsem.merged.gene_counts.tsv", show_col_types = FALSE)
+head(gene_counts)
+```
+
+Metadata.
+
+```{r metadata}
+tibble::tribble(
+  ~sample, ~run_id, ~group,
+  "C2_norm", "ERR160122", "normal",
+  "C3_norm", "ERR160123", "normal",
+  "C5_norm", "ERR160124", "normal",
+  "C1_norm", "ERR164473", "normal",
+  "C1_cancer", "ERR164550", "cancer",
+  "C2_cancer", "ERR164551", "cancer",
+  "C3_cancer", "ERR164552", "cancer",
+  "C5_cancer", "ERR164554", "cancer"
+) -> my_metadata
+
+my_metadata$group <- factor(my_metadata$group, levels = c('normal', 'cancer'))
+```
+
+Matrix.
+
+```{r gene_counts_mat}
+gene_counts |>
+  dplyr::select(starts_with("ERR")) |>
+  mutate(across(everything(), as.integer)) |>
+  as.matrix() -> gene_counts_mat
+
+row.names(gene_counts_mat) <- gene_counts$gene_id
+
+idx <- match(colnames(gene_counts_mat), my_metadata$run_id)
+colnames(gene_counts_mat) <- my_metadata$sample[idx]
+
+tail(gene_counts_mat)
+```
+
+## PCA
+
+Create `DESeqDataSet` object.
+
+```{r deseq_data_set}
+lung_cancer <- DESeqDataSetFromMatrix(
+  countData = gene_counts_mat,
+  colData   = my_metadata,
+  design    = ~ group
+)
+lung_cancer
+```
+
+Quickly estimate dispersion trend and apply a variance stabilizing transformation.
+
+```{r vst}
+pas_vst <- vst(lung_cancer)
+pas_vst
+```
+
+Plot PCA.
+
+```{r plot_PCA, fig.width=6, fig.height=6}
+plotPCA(pas_vst, intgroup = "group") +
+  theme_minimal()
+```
+
+PCA data.
+
+```{r pca_data}
+pca_data <- plotPCA(pas_vst, intgroup = "group", returnData = TRUE)
+pca_data
+```
+
+[Source code](https://github.com/thelovelab/DESeq2/blob/devel/R/plots.R).
+
+```{r plot_pca_source}
+plotPCA_copied = function(object, intgroup="condition", ntop=500, returnData=FALSE, pcsToUse=1:2){
+  message(paste0("using ntop=",ntop," top features by variance"))
+  
+  # calculate the variance for each gene
+  rv <- rowVars(assay(object))
+
+  # select the ntop genes by variance
+  select <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
+
+  # perform a PCA on the data in assay(x) for the selected genes
+  pca <- prcomp(t(assay(object)[select,]))
+
+  # the contribution to the total variance for each component
+  percentVar <- pca$sdev^2 / sum( pca$sdev^2 )
+
+  if (!all(intgroup %in% names(colData(object)))) {
+    stop("the argument 'intgroup' should specify columns of colData(dds)")
+  }
+
+  # add the intgroup factors together to create a new grouping factor
+  group <- if (length(intgroup) > 1) {
+    intgroup.df <- as.data.frame(colData(object)[, intgroup, drop=FALSE])
+    factor(apply( intgroup.df, 1, paste, collapse=":"))
+  } else {
+    colData(object)[[intgroup]]
+  }
+
+  # assembly the data for the plot
+  pcs <- paste0("PC", pcsToUse)
+  d <- data.frame(V1=pca$x[,pcsToUse[1]],
+                  V2=pca$x[,pcsToUse[2]],
+                  group=group, name=colnames(object), colData(object))
+  colnames(d)[1:2] <- pcs
+  
+  if (returnData) {
+    attr(d, "percentVar") <- percentVar[pcsToUse]
+    return(d)
+  }
+
+  ggplot(data=d, aes_string(x=pcs[1], y=pcs[2], color="group")) +
+    geom_point(size=3) + 
+    xlab(paste0(pcs[1],": ",round(percentVar[pcsToUse[1]] * 100),"% variance")) +
+      ylab(paste0(pcs[2],": ",round(percentVar[pcsToUse[2]] * 100),"% variance")) +
+        coord_fixed()
+}
+```
+
+Plot using the copied function.
+
+```{r plot_PCA_copied, fig.width=6, fig.height=6}
+plotPCA_copied(pas_vst, intgroup = "group") +
+  theme_minimal()
+```
+
+Perform PCA as per `plotPCA()`.
+
+```{r plot_pca_analysis}
+# calculate the variance for each gene
+rv <- rowVars(assay(pas_vst))
+rv
+
+# select the ntop genes by variance
+ntop <- 500
+topgenes <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
+topgenes
+
+# perform a PCA on the data in assay(x) for the selected genes
+pca <- prcomp(t(assay(pas_vst)[topgenes,]))
+```
+
+Loadings are the coefficients that define how strongly each genes contributes to a principal component (PC).
+
+```{r loadings}
+loadings <- pca$rotation
+loadings[1:10, 1:2]
+```
+
+Squared loadings represent how much variance of each PC is attributable to each variable.
+
+```{r contribution}
+contribution <- loadings^2
+contribution[1:10, 1:2]
+```
+
+Gene contributing most to PC1.
+
+```{r gene_pc1}
+sort(contribution[, 1], decreasing = TRUE) |> head()
+```
+
+Note that the order is the same, because `plotPCA()` already sorted the genes by their variance!
