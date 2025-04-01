@@ -37,11 +37,24 @@ pbmc3k <- CreateSeuratObject(
 pbmc3k
 ```
 
-## Seurat workflow
+## Seurat workflows
 
-Seurat version 5 workflow as a function: `seurat_wf_v5`.
+[Seurat version workflows](seurat_v4_vs_v5.html) as functions.
 
-```{r seurat_wf_v5}
+```{r seurat_wfs}
+seurat_wf_v4 <- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
+  
+  seurat_obj <- NormalizeData(seurat_obj, normalization.method = "LogNormalize", scale.factor = scale_factor, verbose = debug_flag)
+  seurat_obj <- FindVariableFeatures(seurat_obj, selection.method = 'vst', nfeatures = num_features, verbose = debug_flag)
+  seurat_obj <- ScaleData(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunPCA(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunUMAP(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindNeighbors(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindClusters(seurat_obj, resolution = cluster_res, verbose = debug_flag)
+  
+  seurat_obj
+}
+
 seurat_wf_v5 <- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
   
   seurat_obj <- SCTransform(seurat_obj, verbose = debug_flag)
@@ -120,6 +133,10 @@ pbmc3k_reordered <- CreateSeuratObject(
   min.features = 200,
   project = "pbmc3k"
 )
+
+stopifnot(all(colnames(pbmc3k_reordered@assays$RNA$counts) %in% colnames(pbmc3k@assays$RNA$counts)))
+stopifnot(all(rownames(pbmc3k_reordered@assays$RNA$counts) %in% rownames(pbmc3k@assays$RNA$counts)))
+
 pbmc3k_reordered
 ```
 
@@ -151,9 +168,24 @@ table(
 )
 ```
 
-## Summary
+### Use Seurat version 4
 
-Using Seurat version 5:
+What if we used version 4?
+
+```{r compare_seurat_version_4}
+pbmc3k_a <- seurat_wf_v4(pbmc3k)
+pbmc3k_b <- seurat_wf_v4(pbmc3k_reordered)
+
+idx <- match(row.names(pbmc3k_a@meta.data), row.names(pbmc3k_b@meta.data))
+stopifnot(row.names(pbmc3k_a@meta.data) == row.names(pbmc3k_b@meta.data)[idx])
+
+table(
+  pbmc3k_a@meta.data$seurat_clusters,
+  pbmc3k_b@meta.data$seurat_clusters[idx]
+)
+```
+
+## Summary
 
 * Re-running Seurat on the same object produced the same UMAP and clustering results.
 * Re-running Seurat on the same data but shuffled produced different results.
