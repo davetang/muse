@@ -181,12 +181,12 @@ Perform PCA as per `plotPCA()`.
 ```{r plot_pca_analysis}
 # calculate the variance for each gene
 rv <- rowVars(assay(pas_vst))
-rv
+head(rv)
 
 # select the ntop genes by variance
 ntop <- 500
 topgenes <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
-topgenes
+head(topgenes)
 
 # perform a PCA on the data in assay(x) for the selected genes
 pca <- prcomp(t(assay(pas_vst)[topgenes,]))
