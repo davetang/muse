@@ -107,7 +107,7 @@ pas_vst
 
 Plot PCA.
 
-```{r plot_PCA, fig.width=6, fig.height=6}
+```{r plot_PCA, fig.width=8, fig.height=8}
 plotPCA(pas_vst, intgroup = "group") +
   theme_minimal()
 ```
@@ -171,7 +171,7 @@ plotPCA_copied = function(object, intgroup="condition", ntop=500, returnData=FAL
 
 Plot using the copied function.
 
-```{r plot_PCA_copied, fig.width=6, fig.height=6}
+```{r plot_PCA_copied, fig.width=8, fig.height=8}
 plotPCA_copied(pas_vst, intgroup = "group") +
   theme_minimal()
 ```
@@ -212,4 +212,4 @@ Gene contributing most to PC1.
 sort(contribution[, 1], decreasing = TRUE) |> head()
 ```
 
-Note that the order is the same, because `plotPCA()` already sorted the genes by their variance!
+Note that the order is similar, because `plotPCA()` already sorted the genes by their variance!
