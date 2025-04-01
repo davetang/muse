@@ -185,7 +185,66 @@ table(
 )
 ```
 
+### Same order
+
+Since it seems a different order of genes and barcodes generates slightly different results, what if we used the same order? (The easiest way is to simply create a new Seurat object with the new order. Originally, I had tried to re-order an existing Seurat object but ended up creating an invalid Seurat object.)
+
+```{r compare_same_order}
+pbmc3k <- CreateSeuratObject(
+  counts = seurat_obj@assays$RNA$counts,
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k"
+)
+
+set.seed(1941)
+rs <- sample(rownames(pbmc3k@assays$RNA$counts))
+cs <- sample(colnames(pbmc3k@assays$RNA$counts))
+
+pbmc3k_c <- CreateSeuratObject(
+  counts = pbmc3k@assays$RNA$counts[rs, cs],
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k"
+)
+
+pbmc3k_d <- CreateSeuratObject(
+  counts = pbmc3k_reordered@assays$RNA$counts[rs, cs],
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k"
+)
+
+pbmc3k_c <- seurat_wf_v4(pbmc3k_c)
+pbmc3k_d <- seurat_wf_v4(pbmc3k_d)
+
+stopifnot(row.names(pbmc3k_c@meta.data) == row.names(pbmc3k_d@meta.data))
+stopifnot(row.names(pbmc3k_c@reductions$pca@cell.embeddings) == row.names(pbmc3k_d@reductions$pca@cell.embeddings))
+stopifnot(row.names(pbmc3k_c@reductions$umap@cell.embeddings) == row.names(pbmc3k_d@reductions$umap@cell.embeddings))
+
+DimPlot(pbmc3k_c, reduction = "pca") + DimPlot(pbmc3k_d, reduction = "pca")
+identical(
+  pbmc3k_c@reductions$pca@cell.embeddings,
+  pbmc3k_d@reductions$pca@cell.embeddings
+)
+
+DimPlot(pbmc3k_c) + DimPlot(pbmc3k_d)
+identical(
+  pbmc3k_c@reductions$umap@cell.embeddings,
+  pbmc3k_d@reductions$umap@cell.embeddings
+)
+
+table(
+  pbmc3k_c@meta.data$seurat_clusters,
+  pbmc3k_d@meta.data$seurat_clusters
+)
+```
+
 ## Summary
 
 * Re-running Seurat on the same object produced the same UMAP and clustering results.
 * Re-running Seurat on the same data but shuffled produced different results.
+
+As answered by [Tim](https://github.com/satijalab/seurat/issues/4192#issuecomment-797637532):
+
+> The graph-based clustering algorithm (Louvain, SLM, Leiden, etc.) is non-deterministic. Identical results across different runs of the algorithm are obtained by setting the same random seed. Changing the order of the cells will change the order that nodes are visited during the local moving phase of the algorithm and will potentially change the final cluster identities of cells.
