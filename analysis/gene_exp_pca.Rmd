@@ -213,3 +213,30 @@ sort(contribution[, 1], decreasing = TRUE) |> head()
 ```
 
 Note that the order is similar, because `plotPCA()` already sorted the genes by their variance!
+
+## Gene contribution
+
+Generate normalised counts for visualisation.
+
+```{r norm_counts}
+lung_cancer <- estimateSizeFactors(lung_cancer)
+norm_counts <- counts(lung_cancer, normalized=TRUE)
+head(norm_counts)
+```
+
+Top 10 genes contributing to PC1.
+
+```{r top_genes}
+sort(contribution[, 1], decreasing = TRUE) |>
+  head(10) |>
+  names() -> top_genes
+
+norm_counts[top_genes, ] |>
+  as.data.frame() |>
+  tibble::rownames_to_column(var = "ensembl_gene_id") |>
+  tidyr::pivot_longer(-ensembl_gene_id) |>
+  ggplot(aes(name, ensembl_gene_id, fill = value)) +
+  geom_tile() +
+  theme_minimal() +
+  theme(axis.title = element_blank())
+```
