@@ -190,16 +190,42 @@ head(topgenes)
 
 # perform a PCA on the data in assay(x) for the selected genes
 pca <- prcomp(t(assay(pas_vst)[topgenes,]))
+names(pca)
 ```
 
-Loadings are the coefficients that define how strongly each genes contributes to a principal component (PC).
+1. **`sdev`** (Standard Deviations)  
+   - A numeric vector containing the standard deviations of the principal components.
+   - These values correspond to the square roots of the eigenvalues of the covariance (or correlation) matrix.
+   - They indicate the amount of variance explained by each principal component.
+
+2. **`rotation`** (Loadings)
+   - A matrix where each column represents a principal component.
+   - The rows correspond to the original variables, and the values indicate how much each variable contributes to each principal component.
+   - This is sometimes referred to as the eigenvectors or loadings matrix.
+
+3. **`center`**
+   - A numeric vector containing the means of the original variables if centering was performed.
+   - If `center = TRUE` in `prcomp()`, each column of the input data was mean-centered before PCA.
+   - If centering was not performed, this slot will be `NULL`.
+
+4. **`scale`**
+   - A numeric vector containing the scaling values applied to the original variables if scaling was performed.
+   - If `scale = TRUE`, each column of the input data was scaled to have unit variance before PCA.
+   - If scaling was not performed, this slot will be `NULL`.
+
+5. **`x`** (Principal Component Scores)
+   - A matrix containing the transformed data in the new principal component space.
+   - The rows correspond to observations, and the columns correspond to the principal components.
+   - This is obtained by projecting the original data onto the principal component directions.
 
 ```{r loadings}
 loadings <- pca$rotation
 loadings[1:10, 1:2]
 ```
 
-Squared loadings represent how much variance of each PC is attributable to each variable.
+The loadings matrix contains the coefficients that define how the original variables contribute to each principal component. Each element in the matrix tells you how much a given original variable contributes (positively or negatively) to a principal component.
+
+When you square the loadings, you get the proportion of variance in a variable explained by each principal component. Squaring eliminates negative signs, so you lose the direction of influence. It is useful when you want to: (i) determine the relative importance of each variable in a principal component and (ii) see how much of the original variable's variance is captured by each principal component.
 
 ```{r contribution}
 contribution <- loadings^2
