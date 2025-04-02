@@ -1,0 +1,44 @@
+---
+title: "ANOVA"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+ANOVA (Analysis of Variance) is a statistical test used to compare the **means** of three or more groups to see if at least one group is significantly different. If you have only two groups, a _t_-test is usually better because it is simpler and more powerful for two-group comparisons. However, the _t_-test can only compare two groups at a time. ANOVA checks for overall differences among all groups.
+
+If gene expression is measured across different conditions (e.g., Control, Treatment A, Treatment B), ANOVA tests whether the **average expression levels** differ significantly across these conditions.  
+
+In scRNA-seq, ANOVA can be useful when analysing gene expression differences across multiple conditions or cell types. If we have three conditions (Control, A, and B) we can use ANOVA to check whether a gene's expression significantly changes across the conditions. Note that the ANOVA test will indicate that there's a difference, but not which groups are different (a post-hoc test like Tukey's HSD can be used). Tukey's HSD (Honestly Significant Difference) test can be used to determine which specific groups are significantly different from each other. It compares all possible group pairs and controls for multiple testing.
+
+
+## One-way ANOVA for Gene Expression
+
+Simple example.
+
+```{r simple_example}
+gene_expr <- data.frame(
+  Expression = c(5.2, 4.8, 5.1, 6.3, 6.8, 6.5, 7.2, 7.5, 7.1),
+  Condition = rep(c("control", "treated1", "treated2"), each = 3)
+)
+
+ggplot(gene_expr, aes(Condition, Expression)) +
+  geom_boxplot() +
+  theme_minimal()
+
+anova_result <- aov(Expression ~ Condition, data = gene_expr)
+summary(anova_result)
+```
+
+Tukey's HSD.
+
+```{r tukeys_hsd}
+tukey_result <- TukeyHSD(anova_result)
+tukey_result
+```
