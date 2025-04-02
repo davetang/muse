@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea162500d37a03aeb5b9d6e989cb3c6cff21ebbc6targetblanka162500a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec4425121957035c933baf091ed4881585ed53ddctargetblankc442512a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/a162500d37a03aeb5b9d6e989cb3c6cff21ebbc6" target="_blank">a162500</a>
+<a href="https://github.com/davetang/muse/tree/c4425121957035c933baf091ed4881585ed53ddc" target="_blank">c442512</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea162500d37a03aeb5b9d6e989cb3c6cff21ebbc6targetblanka162500a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec4425121957035c933baf091ed4881585ed53ddctargetblankc442512a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/a162500d37a03aeb5b9d6e989cb3c6cff21ebbc6" target="_blank">a162500</a>.
+<a href="https://github.com/davetang/muse/tree/c4425121957035c933baf091ed4881585ed53ddc" target="_blank">c442512</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -629,6 +629,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/c4425121957035c933baf091ed4881585ed53ddc/analysis/gene_exp_pca.Rmd" target="_blank">c442512</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-02
+</td>
+<td>
+Explain results of prcomp
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4d70d9194ae0069bafae0a87637bdeded2a5a332/docs/gene_exp_pca.html" target="_blank">4d70d91</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1056,9 +1090,56 @@ topgenes &lt;- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
 head(topgenes)</code></pre>
 <pre><code>[1] 12679 12446 12359 20116 53333  8411</code></pre>
 <pre class="r"><code># perform a PCA on the data in assay(x) for the selected genes
-pca &lt;- prcomp(t(assay(pas_vst)[topgenes,]))</code></pre>
-<p>Loadings are the coefficients that define how strongly each genes
-contributes to a principal component (PC).</p>
+pca &lt;- prcomp(t(assay(pas_vst)[topgenes,]))
+names(pca)</code></pre>
+<pre><code>[1] &quot;sdev&quot;     &quot;rotation&quot; &quot;center&quot;   &quot;scale&quot;    &quot;x&quot;       </code></pre>
+<ol style="list-style-type: decimal">
+<li><strong><code>sdev</code></strong> (Standard Deviations)
+<ul>
+<li>A numeric vector containing the standard deviations of the principal
+components.</li>
+<li>These values correspond to the square roots of the eigenvalues of
+the covariance (or correlation) matrix.</li>
+<li>They indicate the amount of variance explained by each principal
+component.</li>
+</ul></li>
+<li><strong><code>rotation</code></strong> (Loadings)
+<ul>
+<li>A matrix where each column represents a principal component.</li>
+<li>The rows correspond to the original variables, and the values
+indicate how much each variable contributes to each principal
+component.</li>
+<li>This is sometimes referred to as the eigenvectors or loadings
+matrix.</li>
+</ul></li>
+<li><strong><code>center</code></strong>
+<ul>
+<li>A numeric vector containing the means of the original variables if
+centering was performed.</li>
+<li>If <code>center = TRUE</code> in <code>prcomp()</code>, each column
+of the input data was mean-centered before PCA.</li>
+<li>If centering was not performed, this slot will be
+<code>NULL</code>.</li>
+</ul></li>
+<li><strong><code>scale</code></strong>
+<ul>
+<li>A numeric vector containing the scaling values applied to the
+original variables if scaling was performed.</li>
+<li>If <code>scale = TRUE</code>, each column of the input data was
+scaled to have unit variance before PCA.</li>
+<li>If scaling was not performed, this slot will be
+<code>NULL</code>.</li>
+</ul></li>
+<li><strong><code>x</code></strong> (Principal Component Scores)
+<ul>
+<li>A matrix containing the transformed data in the new principal
+component space.</li>
+<li>The rows correspond to observations, and the columns correspond to
+the principal components.</li>
+<li>This is obtained by projecting the original data onto the principal
+component directions.</li>
+</ul></li>
+</ol>
 <pre class="r"><code>loadings &lt;- pca$rotation
 loadings[1:10, 1:2]</code></pre>
 <pre><code>                        PC1          PC2
@@ -1072,8 +1153,16 @@ ENSG00000087086  0.05824667  0.016638253
 ENSG00000204849 -0.05843500  0.001321622
 ENSG00000276040 -0.05730797  0.013343573
 ENSG00000185775 -0.05689974 -0.001037869</code></pre>
-<p>Squared loadings represent how much variance of each PC is
-attributable to each variable.</p>
+<p>The loadings matrix contains the coefficients that define how the
+original variables contribute to each principal component. Each element
+in the matrix tells you how much a given original variable contributes
+(positively or negatively) to a principal component.</p>
+<p>When you square the loadings, you get the proportion of variance in a
+variable explained by each principal component. Squaring eliminates
+negative signs, so you lose the direction of influence. It is useful
+when you want to: (i) determine the relative importance of each variable
+in a principal component and (ii) see how much of the original
+variable’s variance is captured by each principal component.</p>
 <pre class="r"><code>contribution &lt;- loadings^2
 contribution[1:10, 1:2]</code></pre>
 <pre><code>                        PC1          PC2
@@ -1130,6 +1219,43 @@ norm_counts[top_genes, ] |&gt;
   theme_minimal() +
   theme(axis.title = element_blank())</code></pre>
 <p><img src="figure/gene_exp_pca.Rmd/top_genes-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-top_genes-1">
+Past versions of top_genes-1.png
+</button>
+</p>
+<div id="fig-top_genes-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4d70d9194ae0069bafae0a87637bdeded2a5a332/docs/figure/gene_exp_pca.Rmd/top_genes-1.png" target="_blank">4d70d91</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-02
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
