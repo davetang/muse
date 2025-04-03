@@ -211,6 +211,9 @@ pbmc3k_v4_1 <- seurat_wf_v4(pbmc3k)
 pbmc3k_v4_genes <- seurat_wf_v4(pbmc3k_reorder_genes)
 pbmc3k_v4_cells <- seurat_wf_v4(pbmc3k_reorder_cells)
 
+(DimPlot(pbmc3k_v4_1) + ggtitle("Re-ordered genes")) + DimPlot(pbmc3k_v4_genes)
+(DimPlot(pbmc3k_v4_1) + ggtitle("Re-ordered cells")) + DimPlot(pbmc3k_v4_cells)
+
 compare_clustering(pbmc3k_v4_1, pbmc3k_v4_genes)
 compare_clustering(pbmc3k_v4_1, pbmc3k_v4_cells)
 ```
