@@ -39,7 +39,7 @@ pbmc3k
 
 ## Seurat workflows
 
-[Seurat version workflows](seurat_v4_vs_v5.html) as functions.
+[Seurat workflows](seurat_v4_vs_v5.html) as functions.
 
 ```{r seurat_wfs}
 seurat_wf_v4 <- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
@@ -72,8 +72,8 @@ seurat_wf_v5 <- function(seurat_obj, scale_factor = 1e4, num_features = 2000, nu
 Process pbmc3k using the Seurat version 5 workflow.
 
 ```{r first_run}
-pbmc3k_1 <- seurat_wf_v5(pbmc3k)
-pbmc3k_1
+pbmc3k_v5_1 <- seurat_wf_v5(pbmc3k)
+pbmc3k_v5_1
 ```
 
 ## Second run
@@ -81,8 +81,8 @@ pbmc3k_1
 Process pbmc3k using the Seurat version 5 workflow again.
 
 ```{r second_run}
-pbmc3k_2 <- seurat_wf_v5(pbmc3k)
-pbmc3k_2
+pbmc3k_v5_2 <- seurat_wf_v5(pbmc3k)
+pbmc3k_v5_2
 ```
 
 ## Compare first and second runs
@@ -90,15 +90,15 @@ pbmc3k_2
 Compare UMAPs.
 
 ```{r compare_umaps}
-DimPlot(pbmc3k_1) + DimPlot(pbmc3k_1)
+DimPlot(pbmc3k_v5_1) + DimPlot(pbmc3k_v5_2)
 ```
 
 Looks the same but let's double check.
 
 ```{r compare_umap_cell_embeddings}
 identical(
-  pbmc3k_1@reductions$umap@cell.embeddings,
-  pbmc3k_2@reductions$umap@cell.embeddings
+  pbmc3k_v5_1@reductions$umap@cell.embeddings,
+  pbmc3k_v5_2@reductions$umap@cell.embeddings
 )
 ```
 
@@ -106,45 +106,74 @@ Compare clustering.
 
 ```{r compare_clustering}
 identical(
-  row.names(pbmc3k_1@meta.data),
-  row.names(pbmc3k_2@meta.data)
+  row.names(pbmc3k_v5_1@meta.data),
+  row.names(pbmc3k_v5_2@meta.data)
 )
 
 identical(
-  pbmc3k_1@meta.data$seurat_clusters,
-  pbmc3k_2@meta.data$seurat_clusters
+  pbmc3k_v5_1@meta.data$seurat_clusters,
+  pbmc3k_v5_2@meta.data$seurat_clusters
 )
 ```
 
-## Third run
+## Reorder
 
-Use the same dataset but re-order the count matrix randomly.
+Use the same dataset but re-order the genes in the count matrix randomly.
 
-```{r pbmc3k_reordered}
+```{r pbmc3k_reorder_genes}
 my_mat <- seurat_obj@assays$RNA$counts
 set.seed(1984)
-col_order <- sample(colnames(my_mat))
 row_order <- sample(rownames(my_mat))
-my_mat <- my_mat[row_order, col_order]
+my_mat <- my_mat[row_order, ]
 
-pbmc3k_reordered <- CreateSeuratObject(
+stopifnot(all(rownames(my_mat) %in% rownames(seurat_obj@assays$RNA$counts)))
+stopifnot(all(colnames(my_mat) %in% colnames(seurat_obj@assays$RNA$counts)))
+
+pbmc3k_reorder_genes <- CreateSeuratObject(
   counts = my_mat,
   min.cells = 3,
   min.features = 200,
   project = "pbmc3k"
 )
 
-stopifnot(all(colnames(pbmc3k_reordered@assays$RNA$counts) %in% colnames(pbmc3k@assays$RNA$counts)))
-stopifnot(all(rownames(pbmc3k_reordered@assays$RNA$counts) %in% rownames(pbmc3k@assays$RNA$counts)))
+stopifnot(all(colnames(pbmc3k_reorder_genes@assays$RNA$counts) %in% colnames(pbmc3k@assays$RNA$counts)))
+stopifnot(all(rownames(pbmc3k_reorder_genes@assays$RNA$counts) %in% rownames(pbmc3k@assays$RNA$counts)))
 
-pbmc3k_reordered
+pbmc3k_reorder_genes
+```
+
+Use the same dataset but re-order the barcodes in the count matrix randomly.
+
+```{r pbmc3k_reorder_cells}
+my_mat <- seurat_obj@assays$RNA$counts
+set.seed(1984)
+col_order <- sample(colnames(my_mat))
+my_mat <- my_mat[, col_order]
+
+stopifnot(all(rownames(my_mat) %in% rownames(seurat_obj@assays$RNA$counts)))
+stopifnot(all(colnames(my_mat) %in% colnames(seurat_obj@assays$RNA$counts)))
+
+pbmc3k_reorder_cells <- CreateSeuratObject(
+  counts = my_mat,
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k"
+)
+
+stopifnot(all(colnames(pbmc3k_reorder_cells@assays$RNA$counts) %in% colnames(pbmc3k@assays$RNA$counts)))
+stopifnot(all(rownames(pbmc3k_reorder_cells@assays$RNA$counts) %in% rownames(pbmc3k@assays$RNA$counts)))
+
+pbmc3k_reorder_cells
 ```
 
 Process the re-ordered pbmc3k dataset using the Seurat version 5 workflow again.
 
-```{r third_run}
-pbmc3k_3 <- seurat_wf_v5(pbmc3k_reordered)
-pbmc3k_3
+```{r seurat_v5_reordered}
+pbmc3k_v5_genes <- seurat_wf_v5(pbmc3k_reorder_genes)
+pbmc3k_v5_cells <- seurat_wf_v5(pbmc3k_reorder_cells)
+
+pbmc3k_v5_1
+pbmc3k_v5_cells
 ```
 
 ## Compare third run
@@ -152,20 +181,25 @@ pbmc3k_3
 Compare UMAPs.
 
 ```{r compare_umaps_3}
-DimPlot(pbmc3k_1) + DimPlot(pbmc3k_3)
+(DimPlot(pbmc3k_v5_1) + ggtitle("Re-ordered genes")) + DimPlot(pbmc3k_v5_genes)
+(DimPlot(pbmc3k_v5_1) + ggtitle("Re-ordered cells")) + DimPlot(pbmc3k_v5_cells)
 ```
 
 Compare clustering.
 
 ```{r compare_clustering_3}
-idx <- match(row.names(pbmc3k_1@meta.data), row.names(pbmc3k_3@meta.data))
+compare_clustering <- function(obj1, obj2){
+  idx <- match(row.names(obj1@meta.data), row.names(obj2@meta.data))
+  stopifnot(row.names(obj1@meta.data) == row.names(obj2@meta.data)[idx])
+  table(
+    obj1@meta.data$seurat_clusters,
+    obj2@meta.data$seurat_clusters[idx]
+  )
+}
 
-stopifnot(row.names(pbmc3k_1@meta.data) == row.names(pbmc3k_3@meta.data)[idx])
-
-table(
-  pbmc3k_1@meta.data$seurat_clusters,
-  pbmc3k_3@meta.data$seurat_clusters[idx]
-)
+compare_clustering(pbmc3k_v5_1, pbmc3k_v5_genes)
+compare_clustering(pbmc3k_v5_1, pbmc3k_v5_cells)
+compare_clustering(pbmc3k_v5_genes, pbmc3k_v5_cells)
 ```
 
 ### Use Seurat version 4
@@ -173,21 +207,19 @@ table(
 What if we used version 4?
 
 ```{r compare_seurat_version_4}
-pbmc3k_a <- seurat_wf_v4(pbmc3k)
-pbmc3k_b <- seurat_wf_v4(pbmc3k_reordered)
+pbmc3k_v4_1 <- seurat_wf_v4(pbmc3k)
+pbmc3k_v4_genes <- seurat_wf_v4(pbmc3k_reorder_genes)
+pbmc3k_v4_cells <- seurat_wf_v4(pbmc3k_reorder_cells)
 
-idx <- match(row.names(pbmc3k_a@meta.data), row.names(pbmc3k_b@meta.data))
-stopifnot(row.names(pbmc3k_a@meta.data) == row.names(pbmc3k_b@meta.data)[idx])
-
-table(
-  pbmc3k_a@meta.data$seurat_clusters,
-  pbmc3k_b@meta.data$seurat_clusters[idx]
-)
+compare_clustering(pbmc3k_v4_1, pbmc3k_v4_genes)
+compare_clustering(pbmc3k_v4_1, pbmc3k_v4_cells)
 ```
+
+Re-ordering genes results in the same results using Seurat version 4 but different results when re-ordering cells.
 
 ### Same order
 
-Since it seems a different order of genes and barcodes generates slightly different results, what if we used the same order? (The easiest way is to simply create a new Seurat object with the new order. Originally, I had tried to re-order an existing Seurat object but ended up creating an invalid Seurat object.)
+Since it seems a different order of barcodes/cells generates slightly different results, what if we used the same order? (The easiest way is to simply create a new Seurat object with the new order. Originally, I had tried to re-order an existing Seurat object but ended up creating an invalid Seurat object.)
 
 ```{r compare_same_order}
 pbmc3k <- CreateSeuratObject(
@@ -209,42 +241,54 @@ pbmc3k_c <- CreateSeuratObject(
 )
 
 pbmc3k_d <- CreateSeuratObject(
-  counts = pbmc3k_reordered@assays$RNA$counts[rs, cs],
+  counts = pbmc3k_reorder_cells@assays$RNA$counts[rs, cs],
   min.cells = 3,
   min.features = 200,
   project = "pbmc3k"
 )
 
-pbmc3k_c <- seurat_wf_v4(pbmc3k_c)
-pbmc3k_d <- seurat_wf_v4(pbmc3k_d)
+pbmc3k_v4_c <- seurat_wf_v4(pbmc3k_c)
+pbmc3k_v4_d <- seurat_wf_v4(pbmc3k_d)
 
-stopifnot(row.names(pbmc3k_c@meta.data) == row.names(pbmc3k_d@meta.data))
-stopifnot(row.names(pbmc3k_c@reductions$pca@cell.embeddings) == row.names(pbmc3k_d@reductions$pca@cell.embeddings))
-stopifnot(row.names(pbmc3k_c@reductions$umap@cell.embeddings) == row.names(pbmc3k_d@reductions$umap@cell.embeddings))
+stopifnot(row.names(pbmc3k_v4_c@meta.data) == row.names(pbmc3k_v4_d@meta.data))
+stopifnot(row.names(pbmc3k_v4_c@reductions$pca@cell.embeddings) == row.names(pbmc3k_v4_d@reductions$pca@cell.embeddings))
+stopifnot(row.names(pbmc3k_v4_c@reductions$umap@cell.embeddings) == row.names(pbmc3k_v4_d@reductions$umap@cell.embeddings))
 
-DimPlot(pbmc3k_c, reduction = "pca") + DimPlot(pbmc3k_d, reduction = "pca")
+DimPlot(pbmc3k_v4_c, reduction = "pca") + DimPlot(pbmc3k_v4_d, reduction = "pca")
 identical(
-  pbmc3k_c@reductions$pca@cell.embeddings,
-  pbmc3k_d@reductions$pca@cell.embeddings
+  pbmc3k_v4_c@reductions$pca@cell.embeddings,
+  pbmc3k_v4_d@reductions$pca@cell.embeddings
 )
 
-DimPlot(pbmc3k_c) + DimPlot(pbmc3k_d)
+DimPlot(pbmc3k_v4_c) + DimPlot(pbmc3k_v4_d)
 identical(
-  pbmc3k_c@reductions$umap@cell.embeddings,
-  pbmc3k_d@reductions$umap@cell.embeddings
+  pbmc3k_v4_c@reductions$umap@cell.embeddings,
+  pbmc3k_v4_d@reductions$umap@cell.embeddings
 )
 
 table(
-  pbmc3k_c@meta.data$seurat_clusters,
-  pbmc3k_d@meta.data$seurat_clusters
+  pbmc3k_v4_c@meta.data$seurat_clusters,
+  pbmc3k_v4_d@meta.data$seurat_clusters
 )
 ```
 
 ## Summary
 
-* Re-running Seurat on the same object produced the same UMAP and clustering results.
-* Re-running Seurat on the same data but shuffled produced different results.
+Seurat version 5:
 
-As answered by [Tim](https://github.com/satijalab/seurat/issues/4192#issuecomment-797637532):
+* Re-running Seurat on the same object produced the same UMAP and clustering results.
+* Re-running Seurat on the same data but shuffled genes produced different results.
+* Re-running Seurat on the same data but shuffled barcodes/cells produced different results.
+
+[Tim](https://github.com/satijalab/seurat/issues/4192#issuecomment-797637532) answered with respect to re-ordering cells:
 
 > The graph-based clustering algorithm (Louvain, SLM, Leiden, etc.) is non-deterministic. Identical results across different runs of the algorithm are obtained by setting the same random seed. Changing the order of the cells will change the order that nodes are visited during the local moving phase of the algorithm and will potentially change the final cluster identities of cells.
+
+However it is concerning that re-ordering genes produced different results when using Seurat version 5.
+
+Seurat version 4:
+
+* Re-running Seurat on the same data but shuffled genes produced the same result.
+* Re-running Seurat on the same data but shuffled barcodes/cells produced different results.
+
+Differences can be mitigated if the same order of cells is used.
