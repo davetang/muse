@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree56646ffde5abba93793b4616cd3f317e8c8355c5targetblank56646ffa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb6fe07d7dd7178974a8b9d2fd4238e4f67665f43targetblankb6fe07da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/56646ffde5abba93793b4616cd3f317e8c8355c5" target="_blank">56646ff</a>
+<a href="https://github.com/davetang/muse/tree/b6fe07d7dd7178974a8b9d2fd4238e4f67665f43" target="_blank">b6fe07d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree56646ffde5abba93793b4616cd3f317e8c8355c5targetblank56646ffa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb6fe07d7dd7178974a8b9d2fd4238e4f67665f43targetblankb6fe07da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/56646ffde5abba93793b4616cd3f317e8c8355c5" target="_blank">56646ff</a>.
+<a href="https://github.com/davetang/muse/tree/b6fe07d7dd7178974a8b9d2fd4238e4f67665f43" target="_blank">b6fe07d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -629,6 +629,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/b6fe07d7dd7178974a8b9d2fd4238e4f67665f43/analysis/seurat_rerun.Rmd" target="_blank">b6fe07d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-03
+</td>
+<td>
+UMAPs for comparing Seurat version 4
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/2e9882053bb7f891f2cc40c5b9c52dd00354797c/docs/seurat_rerun.html" target="_blank">2e98820</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -995,6 +1029,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/2e9882053bb7f891f2cc40c5b9c52dd00354797c/docs/figure/seurat_rerun.Rmd/compare_umaps_3-1.png" target="_blank">2e98820</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-03
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/4f8b0d20e771d207f201740c7a774d0dddafcb94/docs/figure/seurat_rerun.Rmd/compare_umaps_3-1.png" target="_blank">4f8b0d2</a>
 </td>
 <td>
@@ -1010,6 +1055,43 @@ Dave Tang
 </div>
 <pre class="r"><code>(DimPlot(pbmc3k_v5_1) + ggtitle(&quot;Re-ordered cells&quot;)) + DimPlot(pbmc3k_v5_cells)</code></pre>
 <p><img src="figure/seurat_rerun.Rmd/compare_umaps_3-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-compare_umaps_3-2">
+Past versions of compare_umaps_3-2.png
+</button>
+</p>
+<div id="fig-compare_umaps_3-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/2e9882053bb7f891f2cc40c5b9c52dd00354797c/docs/figure/seurat_rerun.Rmd/compare_umaps_3-2.png" target="_blank">2e98820</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Compare clustering.</p>
 <pre class="r"><code>compare_clustering &lt;- function(obj1, obj2){
   idx &lt;- match(row.names(obj1@meta.data), row.names(obj2@meta.data))
@@ -1066,7 +1148,11 @@ compare_clustering(pbmc3k_v5_1, pbmc3k_v5_genes)</code></pre>
 pbmc3k_v4_genes &lt;- seurat_wf_v4(pbmc3k_reorder_genes)
 pbmc3k_v4_cells &lt;- seurat_wf_v4(pbmc3k_reorder_cells)
 
-compare_clustering(pbmc3k_v4_1, pbmc3k_v4_genes)</code></pre>
+(DimPlot(pbmc3k_v4_1) + ggtitle(&quot;Re-ordered genes&quot;)) + DimPlot(pbmc3k_v4_genes)</code></pre>
+<p><img src="figure/seurat_rerun.Rmd/compare_seurat_version_4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>(DimPlot(pbmc3k_v4_1) + ggtitle(&quot;Re-ordered cells&quot;)) + DimPlot(pbmc3k_v4_cells)</code></pre>
+<p><img src="figure/seurat_rerun.Rmd/compare_seurat_version_4-2.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>compare_clustering(pbmc3k_v4_1, pbmc3k_v4_genes)</code></pre>
 <pre><code>   
        0    1    2    3    4    5    6    7
   0 1187    0    0    0    0    0    0    0
