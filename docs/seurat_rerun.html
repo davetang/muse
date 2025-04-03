@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-04-01" />
+<meta name="date" content="2025-04-03" />
 
 <title>Re-running Seurat</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Re-running Seurat</h1>
-<h4 class="date">2025-04-01</h4>
+<h4 class="date">2025-04-03</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-04-01
+<strong>Last updated:</strong> 2025-04-03
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree476c4adfac727fe1204fa2bef5f5d94cda20e3d7targetblank476c4ada">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree56646ffde5abba93793b4616cd3f317e8c8355c5targetblank56646ffa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/476c4adfac727fe1204fa2bef5f5d94cda20e3d7" target="_blank">476c4ad</a>
+<a href="https://github.com/davetang/muse/tree/56646ffde5abba93793b4616cd3f317e8c8355c5" target="_blank">56646ff</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree476c4adfac727fe1204fa2bef5f5d94cda20e3d7targetblank476c4ada"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree56646ffde5abba93793b4616cd3f317e8c8355c5targetblank56646ffa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/476c4adfac727fe1204fa2bef5f5d94cda20e3d7" target="_blank">476c4ad</a>.
+<a href="https://github.com/davetang/muse/tree/56646ffde5abba93793b4616cd3f317e8c8355c5" target="_blank">56646ff</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -584,6 +584,7 @@ Ignored files:
 
 Untracked files:
     Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  rsem.merged.gene_counts.tsv
 
 </code></pre>
 <p>
@@ -628,6 +629,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/56646ffde5abba93793b4616cd3f317e8c8355c5/analysis/seurat_rerun.Rmd" target="_blank">56646ff</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-03
+</td>
+<td>
+Test gene and cell/barcode order separately
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4e49f2d5a4d548c95e9c3de1536af4a9dce73b0b/docs/seurat_rerun.html" target="_blank">4e49f2d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -747,8 +782,7 @@ Active assay: RNA (13714 features, 0 variable features)
 </div>
 <div id="seurat-workflows" class="section level2">
 <h2>Seurat workflows</h2>
-<p><a href="seurat_v4_vs_v5.html">Seurat version workflows</a> as
-functions.</p>
+<p><a href="seurat_v4_vs_v5.html">Seurat workflows</a> as functions.</p>
 <pre class="r"><code>seurat_wf_v4 &lt;- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
   
   seurat_obj &lt;- NormalizeData(seurat_obj, normalization.method = &quot;LogNormalize&quot;, scale.factor = scale_factor, verbose = debug_flag)
@@ -776,11 +810,11 @@ seurat_wf_v5 &lt;- function(seurat_obj, scale_factor = 1e4, num_features = 2000,
 <div id="first-run" class="section level2">
 <h2>First run</h2>
 <p>Process pbmc3k using the Seurat version 5 workflow.</p>
-<pre class="r"><code>pbmc3k_1 &lt;- seurat_wf_v5(pbmc3k)</code></pre>
+<pre class="r"><code>pbmc3k_v5_1 &lt;- seurat_wf_v5(pbmc3k)</code></pre>
 <pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
 To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
 This message will be shown once per session</code></pre>
-<pre class="r"><code>pbmc3k_1</code></pre>
+<pre class="r"><code>pbmc3k_v5_1</code></pre>
 <pre><code>An object of class Seurat 
 26286 features across 2700 samples within 2 assays 
 Active assay: SCT (12572 features, 3000 variable features)
@@ -791,8 +825,8 @@ Active assay: SCT (12572 features, 3000 variable features)
 <div id="second-run" class="section level2">
 <h2>Second run</h2>
 <p>Process pbmc3k using the Seurat version 5 workflow again.</p>
-<pre class="r"><code>pbmc3k_2 &lt;- seurat_wf_v5(pbmc3k)
-pbmc3k_2</code></pre>
+<pre class="r"><code>pbmc3k_v5_2 &lt;- seurat_wf_v5(pbmc3k)
+pbmc3k_v5_2</code></pre>
 <pre><code>An object of class Seurat 
 26286 features across 2700 samples within 2 assays 
 Active assay: SCT (12572 features, 3000 variable features)
@@ -803,7 +837,7 @@ Active assay: SCT (12572 features, 3000 variable features)
 <div id="compare-first-and-second-runs" class="section level2">
 <h2>Compare first and second runs</h2>
 <p>Compare UMAPs.</p>
-<pre class="r"><code>DimPlot(pbmc3k_1) + DimPlot(pbmc3k_1)</code></pre>
+<pre class="r"><code>DimPlot(pbmc3k_v5_1) + DimPlot(pbmc3k_v5_2)</code></pre>
 <p><img src="figure/seurat_rerun.Rmd/compare_umaps-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-compare_umaps-1">
@@ -844,50 +878,87 @@ Dave Tang
 </div>
 <p>Looks the same but let’s double check.</p>
 <pre class="r"><code>identical(
-  pbmc3k_1@reductions$umap@cell.embeddings,
-  pbmc3k_2@reductions$umap@cell.embeddings
+  pbmc3k_v5_1@reductions$umap@cell.embeddings,
+  pbmc3k_v5_2@reductions$umap@cell.embeddings
 )</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <p>Compare clustering.</p>
 <pre class="r"><code>identical(
-  row.names(pbmc3k_1@meta.data),
-  row.names(pbmc3k_2@meta.data)
+  row.names(pbmc3k_v5_1@meta.data),
+  row.names(pbmc3k_v5_2@meta.data)
 )</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <pre class="r"><code>identical(
-  pbmc3k_1@meta.data$seurat_clusters,
-  pbmc3k_2@meta.data$seurat_clusters
+  pbmc3k_v5_1@meta.data$seurat_clusters,
+  pbmc3k_v5_2@meta.data$seurat_clusters
 )</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
-<div id="third-run" class="section level2">
-<h2>Third run</h2>
-<p>Use the same dataset but re-order the count matrix randomly.</p>
+<div id="reorder" class="section level2">
+<h2>Reorder</h2>
+<p>Use the same dataset but re-order the genes in the count matrix
+randomly.</p>
 <pre class="r"><code>my_mat &lt;- seurat_obj@assays$RNA$counts
 set.seed(1984)
-col_order &lt;- sample(colnames(my_mat))
 row_order &lt;- sample(rownames(my_mat))
-my_mat &lt;- my_mat[row_order, col_order]
+my_mat &lt;- my_mat[row_order, ]
 
-pbmc3k_reordered &lt;- CreateSeuratObject(
+stopifnot(all(rownames(my_mat) %in% rownames(seurat_obj@assays$RNA$counts)))
+stopifnot(all(colnames(my_mat) %in% colnames(seurat_obj@assays$RNA$counts)))
+
+pbmc3k_reorder_genes &lt;- CreateSeuratObject(
   counts = my_mat,
   min.cells = 3,
   min.features = 200,
   project = &quot;pbmc3k&quot;
 )
 
-stopifnot(all(colnames(pbmc3k_reordered@assays$RNA$counts) %in% colnames(pbmc3k@assays$RNA$counts)))
-stopifnot(all(rownames(pbmc3k_reordered@assays$RNA$counts) %in% rownames(pbmc3k@assays$RNA$counts)))
+stopifnot(all(colnames(pbmc3k_reorder_genes@assays$RNA$counts) %in% colnames(pbmc3k@assays$RNA$counts)))
+stopifnot(all(rownames(pbmc3k_reorder_genes@assays$RNA$counts) %in% rownames(pbmc3k@assays$RNA$counts)))
 
-pbmc3k_reordered</code></pre>
+pbmc3k_reorder_genes</code></pre>
+<pre><code>An object of class Seurat 
+13714 features across 2700 samples within 1 assay 
+Active assay: RNA (13714 features, 0 variable features)
+ 1 layer present: counts</code></pre>
+<p>Use the same dataset but re-order the barcodes in the count matrix
+randomly.</p>
+<pre class="r"><code>my_mat &lt;- seurat_obj@assays$RNA$counts
+set.seed(1984)
+col_order &lt;- sample(colnames(my_mat))
+my_mat &lt;- my_mat[, col_order]
+
+stopifnot(all(rownames(my_mat) %in% rownames(seurat_obj@assays$RNA$counts)))
+stopifnot(all(colnames(my_mat) %in% colnames(seurat_obj@assays$RNA$counts)))
+
+pbmc3k_reorder_cells &lt;- CreateSeuratObject(
+  counts = my_mat,
+  min.cells = 3,
+  min.features = 200,
+  project = &quot;pbmc3k&quot;
+)
+
+stopifnot(all(colnames(pbmc3k_reorder_cells@assays$RNA$counts) %in% colnames(pbmc3k@assays$RNA$counts)))
+stopifnot(all(rownames(pbmc3k_reorder_cells@assays$RNA$counts) %in% rownames(pbmc3k@assays$RNA$counts)))
+
+pbmc3k_reorder_cells</code></pre>
 <pre><code>An object of class Seurat 
 13714 features across 2700 samples within 1 assay 
 Active assay: RNA (13714 features, 0 variable features)
  1 layer present: counts</code></pre>
 <p>Process the re-ordered pbmc3k dataset using the Seurat version 5
 workflow again.</p>
-<pre class="r"><code>pbmc3k_3 &lt;- seurat_wf_v5(pbmc3k_reordered)
-pbmc3k_3</code></pre>
+<pre class="r"><code>pbmc3k_v5_genes &lt;- seurat_wf_v5(pbmc3k_reorder_genes)
+pbmc3k_v5_cells &lt;- seurat_wf_v5(pbmc3k_reorder_cells)
+
+pbmc3k_v5_1</code></pre>
+<pre><code>An object of class Seurat 
+26286 features across 2700 samples within 2 assays 
+Active assay: SCT (12572 features, 3000 variable features)
+ 3 layers present: counts, data, scale.data
+ 1 other assay present: RNA
+ 2 dimensional reductions calculated: pca, umap</code></pre>
+<pre class="r"><code>pbmc3k_v5_cells</code></pre>
 <pre><code>An object of class Seurat 
 26286 features across 2700 samples within 2 assays 
 Active assay: SCT (12572 features, 3000 variable features)
@@ -898,7 +969,7 @@ Active assay: SCT (12572 features, 3000 variable features)
 <div id="compare-third-run" class="section level2">
 <h2>Compare third run</h2>
 <p>Compare UMAPs.</p>
-<pre class="r"><code>DimPlot(pbmc3k_1) + DimPlot(pbmc3k_3)</code></pre>
+<pre class="r"><code>(DimPlot(pbmc3k_v5_1) + ggtitle(&quot;Re-ordered genes&quot;)) + DimPlot(pbmc3k_v5_genes)</code></pre>
 <p><img src="figure/seurat_rerun.Rmd/compare_umaps_3-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-compare_umaps_3-1">
@@ -937,40 +1008,76 @@ Dave Tang
 </table>
 </div>
 </div>
+<pre class="r"><code>(DimPlot(pbmc3k_v5_1) + ggtitle(&quot;Re-ordered cells&quot;)) + DimPlot(pbmc3k_v5_cells)</code></pre>
+<p><img src="figure/seurat_rerun.Rmd/compare_umaps_3-2.png" width="672" style="display: block; margin: auto;" /></p>
 <p>Compare clustering.</p>
-<pre class="r"><code>idx &lt;- match(row.names(pbmc3k_1@meta.data), row.names(pbmc3k_3@meta.data))
+<pre class="r"><code>compare_clustering &lt;- function(obj1, obj2){
+  idx &lt;- match(row.names(obj1@meta.data), row.names(obj2@meta.data))
+  stopifnot(row.names(obj1@meta.data) == row.names(obj2@meta.data)[idx])
+  table(
+    obj1@meta.data$seurat_clusters,
+    obj2@meta.data$seurat_clusters[idx]
+  )
+}
 
-stopifnot(row.names(pbmc3k_1@meta.data) == row.names(pbmc3k_3@meta.data)[idx])
-
-table(
-  pbmc3k_1@meta.data$seurat_clusters,
-  pbmc3k_3@meta.data$seurat_clusters[idx]
-)</code></pre>
+compare_clustering(pbmc3k_v5_1, pbmc3k_v5_genes)</code></pre>
 <pre><code>   
       0   1   2   3   4   5   6   7   8   9
-  0 968   0   1   0   0   0   6   0   0   0
+  0 970   0   4   0   0   0   0   0   1   0
   1   0 497   0   0   0   0   0   0   0   0
   2   1   0 365   0   0   0   0   0   0   0
-  3   0   0   4 355   0   0   0   0   0   0
+  3   0   0   0 359   0   0   0   0   0   0
   4   0   0   1   0 156   0   0   0   0   0
   5   0   0   0   0   0 154   0   0   0   0
-  6   1   0   0   0   0   0  99   0   0   0
-  7   0   0   2   1   0   0   0  43   0   0
-  8   0   0   0   0   0   0   0   0  34   0
+  6   3   0   0   0   0   0  97   0   0   0
+  7   2   0  25   0   0   0   0   0  19   0
+  8   0   0   0   0   0   0   0  34   0   0
+  9   0   0   0   0   0   0   0   0   0  12</code></pre>
+<pre class="r"><code>compare_clustering(pbmc3k_v5_1, pbmc3k_v5_cells)</code></pre>
+<pre><code>   
+      0   1   2   3   4   5   6   7   8   9
+  0 970   0   5   0   0   0   0   0   0   0
+  1   0 497   0   0   0   0   0   0   0   0
+  2   1   0 365   0   0   0   0   0   0   0
+  3   0   0   5 354   0   0   0   0   0   0
+  4   0   0   1   0 156   0   0   0   0   0
+  5   0   0   0   0   0 154   0   0   0   0
+  6   0   0   0   0   0   0 100   0   0   0
+  7   1   0  25   1   0   0   0   0  19   0
+  8   0   0   0   0   0   0   0  34   0   0
+  9   0   0   0   0   0   0   0   0   0  12</code></pre>
+<pre class="r"><code>compare_clustering(pbmc3k_v5_genes, pbmc3k_v5_cells)</code></pre>
+<pre><code>   
+      0   1   2   3   4   5   6   7   8   9
+  0 971   0   2   0   0   0   3   0   0   0
+  1   0 497   0   0   0   0   0   0   0   0
+  2   0   0 393   1   1   0   0   0   0   0
+  3   0   0   5 354   0   0   0   0   0   0
+  4   0   0   1   0 155   0   0   0   0   0
+  5   0   0   0   0   0 154   0   0   0   0
+  6   0   0   0   0   0   0  97   0   0   0
+  7   0   0   0   0   0   0   0  34   0   0
+  8   1   0   0   0   0   0   0   0  19   0
   9   0   0   0   0   0   0   0   0   0  12</code></pre>
 <div id="use-seurat-version-4" class="section level3">
 <h3>Use Seurat version 4</h3>
 <p>What if we used version 4?</p>
-<pre class="r"><code>pbmc3k_a &lt;- seurat_wf_v4(pbmc3k)
-pbmc3k_b &lt;- seurat_wf_v4(pbmc3k_reordered)
+<pre class="r"><code>pbmc3k_v4_1 &lt;- seurat_wf_v4(pbmc3k)
+pbmc3k_v4_genes &lt;- seurat_wf_v4(pbmc3k_reorder_genes)
+pbmc3k_v4_cells &lt;- seurat_wf_v4(pbmc3k_reorder_cells)
 
-idx &lt;- match(row.names(pbmc3k_a@meta.data), row.names(pbmc3k_b@meta.data))
-stopifnot(row.names(pbmc3k_a@meta.data) == row.names(pbmc3k_b@meta.data)[idx])
-
-table(
-  pbmc3k_a@meta.data$seurat_clusters,
-  pbmc3k_b@meta.data$seurat_clusters[idx]
-)</code></pre>
+compare_clustering(pbmc3k_v4_1, pbmc3k_v4_genes)</code></pre>
+<pre><code>   
+       0    1    2    3    4    5    6    7
+  0 1187    0    0    0    0    0    0    0
+  1    0  491    0    0    0    0    0    0
+  2    0    0  351    0    0    0    0    0
+  3    0    0    0  301    0    0    0    0
+  4    0    0    0    0  163    0    0    0
+  5    0    0    0    0    0  161    0    0
+  6    0    0    0    0    0    0   32    0
+  7    0    0    0    0    0    0    0   14</code></pre>
+<pre class="r"><code>compare_clustering(pbmc3k_v4_1, pbmc3k_v4_cells)</code></pre>
 <pre><code>   
        0    1    2    3    4    5    6    7
   0 1182    0    0    5    0    0    0    0
@@ -981,14 +1088,16 @@ table(
   5    0    0    0    0  161    0    0    0
   6    0    0    0    0    0    0   32    0
   7    0    1    0    0    0    0    0   13</code></pre>
+<p>Re-ordering genes results in the same results using Seurat version 4
+but different results when re-ordering cells.</p>
 </div>
 <div id="same-order" class="section level3">
 <h3>Same order</h3>
-<p>Since it seems a different order of genes and barcodes generates
-slightly different results, what if we used the same order? (The easiest
-way is to simply create a new Seurat object with the new order.
-Originally, I had tried to re-order an existing Seurat object but ended
-up creating an invalid Seurat object.)</p>
+<p>Since it seems a different order of barcodes/cells generates slightly
+different results, what if we used the same order? (The easiest way is
+to simply create a new Seurat object with the new order. Originally, I
+had tried to re-order an existing Seurat object but ended up creating an
+invalid Seurat object.)</p>
 <pre class="r"><code>pbmc3k &lt;- CreateSeuratObject(
   counts = seurat_obj@assays$RNA$counts,
   min.cells = 3,
@@ -1008,36 +1117,110 @@ pbmc3k_c &lt;- CreateSeuratObject(
 )
 
 pbmc3k_d &lt;- CreateSeuratObject(
-  counts = pbmc3k_reordered@assays$RNA$counts[rs, cs],
+  counts = pbmc3k_reorder_cells@assays$RNA$counts[rs, cs],
   min.cells = 3,
   min.features = 200,
   project = &quot;pbmc3k&quot;
 )
 
-pbmc3k_c &lt;- seurat_wf_v4(pbmc3k_c)
-pbmc3k_d &lt;- seurat_wf_v4(pbmc3k_d)
+pbmc3k_v4_c &lt;- seurat_wf_v4(pbmc3k_c)
+pbmc3k_v4_d &lt;- seurat_wf_v4(pbmc3k_d)
 
-stopifnot(row.names(pbmc3k_c@meta.data) == row.names(pbmc3k_d@meta.data))
-stopifnot(row.names(pbmc3k_c@reductions$pca@cell.embeddings) == row.names(pbmc3k_d@reductions$pca@cell.embeddings))
-stopifnot(row.names(pbmc3k_c@reductions$umap@cell.embeddings) == row.names(pbmc3k_d@reductions$umap@cell.embeddings))
+stopifnot(row.names(pbmc3k_v4_c@meta.data) == row.names(pbmc3k_v4_d@meta.data))
+stopifnot(row.names(pbmc3k_v4_c@reductions$pca@cell.embeddings) == row.names(pbmc3k_v4_d@reductions$pca@cell.embeddings))
+stopifnot(row.names(pbmc3k_v4_c@reductions$umap@cell.embeddings) == row.names(pbmc3k_v4_d@reductions$umap@cell.embeddings))
 
-DimPlot(pbmc3k_c, reduction = &quot;pca&quot;) + DimPlot(pbmc3k_d, reduction = &quot;pca&quot;)</code></pre>
+DimPlot(pbmc3k_v4_c, reduction = &quot;pca&quot;) + DimPlot(pbmc3k_v4_d, reduction = &quot;pca&quot;)</code></pre>
 <p><img src="figure/seurat_rerun.Rmd/compare_same_order-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-compare_same_order-1">
+Past versions of compare_same_order-1.png
+</button>
+</p>
+<div id="fig-compare_same_order-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4e49f2d5a4d548c95e9c3de1536af4a9dce73b0b/docs/figure/seurat_rerun.Rmd/compare_same_order-1.png" target="_blank">4e49f2d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>identical(
-  pbmc3k_c@reductions$pca@cell.embeddings,
-  pbmc3k_d@reductions$pca@cell.embeddings
+  pbmc3k_v4_c@reductions$pca@cell.embeddings,
+  pbmc3k_v4_d@reductions$pca@cell.embeddings
 )</code></pre>
 <pre><code>[1] TRUE</code></pre>
-<pre class="r"><code>DimPlot(pbmc3k_c) + DimPlot(pbmc3k_d)</code></pre>
+<pre class="r"><code>DimPlot(pbmc3k_v4_c) + DimPlot(pbmc3k_v4_d)</code></pre>
 <p><img src="figure/seurat_rerun.Rmd/compare_same_order-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-compare_same_order-2">
+Past versions of compare_same_order-2.png
+</button>
+</p>
+<div id="fig-compare_same_order-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4e49f2d5a4d548c95e9c3de1536af4a9dce73b0b/docs/figure/seurat_rerun.Rmd/compare_same_order-2.png" target="_blank">4e49f2d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>identical(
-  pbmc3k_c@reductions$umap@cell.embeddings,
-  pbmc3k_d@reductions$umap@cell.embeddings
+  pbmc3k_v4_c@reductions$umap@cell.embeddings,
+  pbmc3k_v4_d@reductions$umap@cell.embeddings
 )</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <pre class="r"><code>table(
-  pbmc3k_c@meta.data$seurat_clusters,
-  pbmc3k_d@meta.data$seurat_clusters
+  pbmc3k_v4_c@meta.data$seurat_clusters,
+  pbmc3k_v4_d@meta.data$seurat_clusters
 )</code></pre>
 <pre><code>   
        0    1    2    3    4    5    6    7
@@ -1053,14 +1236,18 @@ DimPlot(pbmc3k_c, reduction = &quot;pca&quot;) + DimPlot(pbmc3k_d, reduction = &
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
+<p>Seurat version 5:</p>
 <ul>
 <li>Re-running Seurat on the same object produced the same UMAP and
 clustering results.</li>
-<li>Re-running Seurat on the same data but shuffled produced different
-results.</li>
+<li>Re-running Seurat on the same data but shuffled genes produced
+different results.</li>
+<li>Re-running Seurat on the same data but shuffled barcodes/cells
+produced different results.</li>
 </ul>
-<p>As answered by <a
-href="https://github.com/satijalab/seurat/issues/4192#issuecomment-797637532">Tim</a>:</p>
+<p><a
+href="https://github.com/satijalab/seurat/issues/4192#issuecomment-797637532">Tim</a>
+answered with respect to re-ordering cells:</p>
 <blockquote>
 <p>The graph-based clustering algorithm (Louvain, SLM, Leiden, etc.) is
 non-deterministic. Identical results across different runs of the
@@ -1069,6 +1256,16 @@ order of the cells will change the order that nodes are visited during
 the local moving phase of the algorithm and will potentially change the
 final cluster identities of cells.</p>
 </blockquote>
+<p>However it is concerning that re-ordering genes produced different
+results when using Seurat version 5.</p>
+<p>Seurat version 4:</p>
+<ul>
+<li>Re-running Seurat on the same data but shuffled genes produced the
+same result.</li>
+<li>Re-running Seurat on the same data but shuffled barcodes/cells
+produced different results.</li>
+</ul>
+<p>Differences can be mitigated if the same order of cells is used.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
