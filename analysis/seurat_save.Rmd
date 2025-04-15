@@ -13,7 +13,9 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r install_bpcells, eval=FALSE}
-remotes::install_github("bnprks/BPCells/r")
+if ("BPCells" %in% row.names(installed.packages()) == FALSE){
+  remotes::install_github("bnprks/BPCells/r")
+}
 ```
 
 ```{r load_libraries}
@@ -109,6 +111,28 @@ pbmc3k_bpcells@assays$RNA$scale.data
 DimPlot(pbmc3k_bpcells)
 ```
 
+# Add miscellaneous data
+
+[Get and set miscellaneous data](https://satijalab.github.io/seurat-object/reference/Misc.html).
+
+```{r misc}
+Misc(pbmc3k_bpcells)
+```
+
+Set and output.
+
+```{r misc_set_and_get}
+Misc(pbmc3k_bpcells, slot = "seed") <- 1984
+Misc(pbmc3k_bpcells, slot = "author") <- "Davo"
+Misc(pbmc3k_bpcells)
+```
+
+Get specific slot.
+
+```{r author}
+Misc(pbmc3k_bpcells, slot = "author")
+```
+
 # Exporting
 
 Save.
@@ -125,4 +149,10 @@ pbmc3k_read_rds@assays$RNA$counts
 pbmc3k_read_rds@assays$RNA$data
 pbmc3k_read_rds@assays$RNA$scale.data
 pbmc3k_read_rds
+```
+
+Get author.
+
+```{r author_after_loading}
+Misc(pbmc3k_bpcells, slot = "author")
 ```
