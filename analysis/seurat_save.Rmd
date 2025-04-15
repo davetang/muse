@@ -1,0 +1,128 @@
+---
+title: "Saving Seurat objects"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r install_bpcells, eval=FALSE}
+remotes::install_github("bnprks/BPCells/r")
+```
+
+```{r load_libraries}
+suppressPackageStartupMessages(library(BPCells))
+suppressPackageStartupMessages(library(Seurat))
+```
+
+# Load Data
+
+Load from my server.
+
+```{r pbmc3k}
+pbmc3k <- readRDS(url("https://davetang.org/file/pbmc3k_seurat.rds", "rb"))
+pbmc3k
+```
+
+# Use BPCells
+
+Sparse matrix.
+
+```{r sparse_matrix}
+class(pbmc3k@assays$RNA$counts)
+```
+
+Write a matrix directory, load the matrix, and create a Seurat object. 
+
+```{r create_seurat_obj}
+my_outdir <- "data/pbmc3k_bpcells_mat"
+if(!dir.exists(my_outdir)){
+  BPCells::write_matrix_dir(
+    mat = pbmc3k@assays$RNA$counts,
+    dir = my_outdir
+  )
+}
+
+# Now that we have the matrix on disk, we can load it
+pbmc3k.mat <- open_matrix_dir(dir = my_outdir)
+pbmc3k.mat
+
+# Create Seurat Object
+pbmc3k_bpcells <- CreateSeuratObject(
+  counts = pbmc3k.mat,
+  project = 'pbmc3k',
+  min.cells = 3,
+  min.features = 200
+)
+
+pbmc3k_bpcells@assays$RNA$counts
+```
+
+# Seurat version 4
+
+Seurat workflow.
+
+```{r seurat_workflow}
+debug_flag <- FALSE
+start_time <- Sys.time()
+
+pbmc3k_bpcells <- NormalizeData(pbmc3k_bpcells, normalization.method = "LogNormalize")
+pbmc3k_bpcells <- FindVariableFeatures(pbmc3k_bpcells, selection.method = 'vst', nfeatures = 2000, verbose = debug_flag)
+pbmc3k_bpcells <- ScaleData(pbmc3k_bpcells, verbose = debug_flag)
+pbmc3k_bpcells <- RunPCA(pbmc3k_bpcells, verbose = debug_flag)
+pbmc3k_bpcells <- RunUMAP(pbmc3k_bpcells, dims = 1:30, verbose = debug_flag)
+pbmc3k_bpcells <- FindNeighbors(pbmc3k_bpcells, dims = 1:30, verbose = debug_flag)
+pbmc3k_bpcells <- FindClusters(pbmc3k_bpcells, resolution = 0.5, verbose = debug_flag)
+pbmc3k_bpcells
+
+end_time <- Sys.time()
+end_time - start_time
+```
+
+Counts.
+
+```{r counts}
+pbmc3k_bpcells@assays$RNA$counts
+```
+
+Data.
+
+```{r data}
+pbmc3k_bpcells@assays$RNA$data
+```
+
+Scale data.
+
+```{r scale_data}
+pbmc3k_bpcells@assays$RNA$scale.data
+```
+
+# Plots
+
+```{r dim_plot}
+DimPlot(pbmc3k_bpcells)
+```
+
+# Exporting
+
+Save.
+
+```{r save_rds}
+saveRDS(object = pbmc3k_bpcells, file = "pbmc3k_save_rds.rds")
+```
+
+Load.
+
+```{r read_rds}
+pbmc3k_read_rds <- readRDS("pbmc3k_save_rds.rds")
+pbmc3k_read_rds@assays$RNA$counts
+pbmc3k_read_rds@assays$RNA$data
+pbmc3k_read_rds@assays$RNA$scale.data
+pbmc3k_read_rds
+```
