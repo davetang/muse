@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee92335439f7eb18c6e4e980233864c20af4d2813targetblanke923354a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree445cb01d88a2d5fb0fc65ac51e0fb82dfcf847fctargetblank445cb01a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/e92335439f7eb18c6e4e980233864c20af4d2813" target="_blank">e923354</a>
+<a href="https://github.com/davetang/muse/tree/445cb01d88a2d5fb0fc65ac51e0fb82dfcf847fc" target="_blank">445cb01</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee92335439f7eb18c6e4e980233864c20af4d2813targetblanke923354a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree445cb01d88a2d5fb0fc65ac51e0fb82dfcf847fctargetblank445cb01a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/e92335439f7eb18c6e4e980233864c20af4d2813" target="_blank">e923354</a>.
+<a href="https://github.com/davetang/muse/tree/445cb01d88a2d5fb0fc65ac51e0fb82dfcf847fc" target="_blank">445cb01</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -631,6 +631,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/445cb01d88a2d5fb0fc65ac51e0fb82dfcf847fc/analysis/seurat_save.Rmd" target="_blank">445cb01</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-16
+</td>
+<td>
+Save additional RDS
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/68b953283b219926d8de4a6b0ecc8625013cdcf6/docs/seurat_save.html" target="_blank">68b9532</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -878,6 +912,8 @@ Seurat::Assays(pbmc3k_bpcells)</code></pre>
 <pre><code>[1] &quot;RNA&quot; &quot;RAW&quot;</code></pre>
 <pre class="r"><code>Seurat::DefaultAssay(pbmc3k_bpcells)</code></pre>
 <pre><code>[1] &quot;RNA&quot;</code></pre>
+<p>Save separate RDS file.</p>
+<pre class="r"><code>saveRDS(object = pbmc3k_bpcells, file = &quot;pbmc3k_before_filtering.rds&quot;)</code></pre>
 <p>Filter.</p>
 <pre class="r"><code>pbmc3k_bpcells &lt;- subset(pbmc3k_bpcells, subset = percent.mt &lt; 15)
 pbmc3k_bpcells</code></pre>
@@ -916,7 +952,7 @@ Active assay: RNA (13714 features, 2000 variable features)
  2 dimensional reductions calculated: pca, umap</code></pre>
 <pre class="r"><code>end_time &lt;- Sys.time()
 end_time - start_time</code></pre>
-<pre><code>Time difference of 11.78458 secs</code></pre>
+<pre><code>Time difference of 11.74716 secs</code></pre>
 <p>Counts.</p>
 <pre class="r"><code>pbmc3k_bpcells@assays$RNA$counts</code></pre>
 <pre><code>13714 x 2698 IterableMatrix object with class RenameDims
@@ -1133,6 +1169,16 @@ attr(,&quot;package&quot;)
 <pre><code>[1] 13714  2698</code></pre>
 <pre class="r"><code>dim(pbmc3k_read_rds@assays$RNA$counts)</code></pre>
 <pre><code>[1] 13714  2698</code></pre>
+<p>Load RDS that was saved before filtering.</p>
+<pre class="r"><code>pbmc3k_before_filtering &lt;- readRDS(&quot;pbmc3k_before_filtering.rds&quot;)
+class(pbmc3k_before_filtering@assays$RAW$counts)</code></pre>
+<pre><code>[1] &quot;dgCMatrix&quot;
+attr(,&quot;package&quot;)
+[1] &quot;Matrix&quot;</code></pre>
+<pre class="r"><code>class(pbmc3k_before_filtering@assays$RNA$counts)</code></pre>
+<pre><code>[1] &quot;RenameDims&quot;
+attr(,&quot;package&quot;)
+[1] &quot;BPCells&quot;</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
