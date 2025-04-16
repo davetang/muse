@@ -198,7 +198,9 @@ Misc(pbmc3k_read_rds)
 Check `RAW` assay.
 
 ```{r check_raw_after_loading}
-pbmc3k_read_rds@assays$RAW$counts
+class(pbmc3k_read_rds@assays$RAW$counts)
+class(pbmc3k_read_rds@assays$RNA$counts)
+
 dim(pbmc3k_read_rds@assays$RAW$counts)
 dim(pbmc3k_read_rds@assays$RNA$counts)
 ```
