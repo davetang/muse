@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree445cb01d88a2d5fb0fc65ac51e0fb82dfcf847fctargetblank445cb01a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree41cf54360e9ece58bea82854bcef57c2e93e18d7targetblank41cf543a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/445cb01d88a2d5fb0fc65ac51e0fb82dfcf847fc" target="_blank">445cb01</a>
+<a href="https://github.com/davetang/muse/tree/41cf54360e9ece58bea82854bcef57c2e93e18d7" target="_blank">41cf543</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree445cb01d88a2d5fb0fc65ac51e0fb82dfcf847fctargetblank445cb01a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree41cf54360e9ece58bea82854bcef57c2e93e18d7targetblank41cf543a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/445cb01d88a2d5fb0fc65ac51e0fb82dfcf847fc" target="_blank">445cb01</a>.
+<a href="https://github.com/davetang/muse/tree/41cf54360e9ece58bea82854bcef57c2e93e18d7" target="_blank">41cf543</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -585,6 +585,7 @@ Ignored files:
 
 Untracked files:
     Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  pbmc3k_before_filtering.rds
     Untracked:  pbmc3k_save_rds.rds
     Untracked:  rsem.merged.gene_counts.tsv
 
@@ -631,6 +632,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/41cf54360e9ece58bea82854bcef57c2e93e18d7/analysis/seurat_save.Rmd" target="_blank">41cf543</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-16
+</td>
+<td>
+Save as separate RDS instead of additional assay when using BPCells
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/1de8ba4cb2b8485ad0f242a56e3571cbd4214ceb/docs/seurat_save.html" target="_blank">1de8ba4</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -903,12 +938,9 @@ Dave Tang
 </div>
 </div>
 <p>Save original data into <code>RAW</code> assay before filtering.</p>
-<pre class="r"><code># build a new independent assay
-raw_counts &lt;- GetAssayData(pbmc3k_bpcells, layer = &quot;counts&quot;, assay = &quot;RNA&quot;)
-raw_assay &lt;- CreateAssayObject(counts = raw_counts)
-pbmc3k_bpcells[[&quot;RAW&quot;]] &lt;- raw_assay
-
-Seurat::Assays(pbmc3k_bpcells)</code></pre>
+<pre class="r"><code>pbmc3k_bpcells[[&quot;RAW&quot;]] &lt;- pbmc3k_bpcells@assays$RNA</code></pre>
+<pre><code>Warning: Key &#39;rna_&#39; taken, using &#39;raw_&#39; instead</code></pre>
+<pre class="r"><code>Seurat::Assays(pbmc3k_bpcells)</code></pre>
 <pre><code>[1] &quot;RNA&quot; &quot;RAW&quot;</code></pre>
 <pre class="r"><code>Seurat::DefaultAssay(pbmc3k_bpcells)</code></pre>
 <pre><code>[1] &quot;RNA&quot;</code></pre>
@@ -952,7 +984,7 @@ Active assay: RNA (13714 features, 2000 variable features)
  2 dimensional reductions calculated: pca, umap</code></pre>
 <pre class="r"><code>end_time &lt;- Sys.time()
 end_time - start_time</code></pre>
-<pre><code>Time difference of 11.74716 secs</code></pre>
+<pre><code>Time difference of 11.79401 secs</code></pre>
 <p>Counts.</p>
 <pre class="r"><code>pbmc3k_bpcells@assays$RNA$counts</code></pre>
 <pre><code>13714 x 2698 IterableMatrix object with class RenameDims
@@ -1158,9 +1190,9 @@ $author
 [1] &quot;Davo&quot;</code></pre>
 <p>Check <code>RAW</code> assay.</p>
 <pre class="r"><code>class(pbmc3k_read_rds@assays$RAW$counts)</code></pre>
-<pre><code>[1] &quot;dgCMatrix&quot;
+<pre><code>[1] &quot;RenameDims&quot;
 attr(,&quot;package&quot;)
-[1] &quot;Matrix&quot;</code></pre>
+[1] &quot;BPCells&quot;</code></pre>
 <pre class="r"><code>class(pbmc3k_read_rds@assays$RNA$counts)</code></pre>
 <pre><code>[1] &quot;RenameDims&quot;
 attr(,&quot;package&quot;)
@@ -1172,13 +1204,17 @@ attr(,&quot;package&quot;)
 <p>Load RDS that was saved before filtering.</p>
 <pre class="r"><code>pbmc3k_before_filtering &lt;- readRDS(&quot;pbmc3k_before_filtering.rds&quot;)
 class(pbmc3k_before_filtering@assays$RAW$counts)</code></pre>
-<pre><code>[1] &quot;dgCMatrix&quot;
+<pre><code>[1] &quot;RenameDims&quot;
 attr(,&quot;package&quot;)
-[1] &quot;Matrix&quot;</code></pre>
+[1] &quot;BPCells&quot;</code></pre>
 <pre class="r"><code>class(pbmc3k_before_filtering@assays$RNA$counts)</code></pre>
 <pre><code>[1] &quot;RenameDims&quot;
 attr(,&quot;package&quot;)
 [1] &quot;BPCells&quot;</code></pre>
+<pre class="r"><code>dim(pbmc3k_before_filtering@assays$RAW$counts)</code></pre>
+<pre><code>[1] 13714  2700</code></pre>
+<pre class="r"><code>dim(pbmc3k_before_filtering@assays$RNA$counts)</code></pre>
+<pre><code>[1] 13714  2700</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
