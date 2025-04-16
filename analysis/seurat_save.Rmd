@@ -92,6 +92,12 @@ Seurat::Assays(pbmc3k_bpcells)
 Seurat::DefaultAssay(pbmc3k_bpcells)
 ```
 
+Save separate RDS file.
+
+```{r save_rds_before_filtering}
+saveRDS(object = pbmc3k_bpcells, file = "pbmc3k_before_filtering.rds")
+```
+
 Filter.
 
 ```{r filter_mito}
@@ -203,4 +209,12 @@ class(pbmc3k_read_rds@assays$RNA$counts)
 
 dim(pbmc3k_read_rds@assays$RAW$counts)
 dim(pbmc3k_read_rds@assays$RNA$counts)
+```
+
+Load RDS that was saved before filtering.
+
+```{r read_rds_before_filtering}
+pbmc3k_before_filtering <- readRDS("pbmc3k_before_filtering.rds")
+class(pbmc3k_before_filtering@assays$RAW$counts)
+class(pbmc3k_before_filtering@assays$RNA$counts)
 ```
