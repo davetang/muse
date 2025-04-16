@@ -35,11 +35,28 @@ edger_res <- readr::read_csv("https://raw.githubusercontent.com/davetang/muse/re
 head(edger_res)
 ```
 
-Add ranking metric.
+Add ranking metrics.
 
-```{r rank_metric}
+```{r rank_metrics}
 edger_res |>
-  dplyr::mutate(rank_metric = logFC * -log10(PValue)) -> edger_res
+  dplyr::mutate(rank_metric = logFC * -log10(PValue)) |>
+  dplyr::mutate(rank_metric2 = sign(logFC) * -log10(PValue)) -> edger_res
+```
+
+Compare rankings.
+
+```{r compare_ranking}
+library(ggplot2)
+
+ggplot(edger_res, aes(rank_metric, rank_metric2)) +
+  geom_point() +
+  theme_minimal()
+```
+
+Correlation of rank metrics.
+
+```{r ranking_correlation}
+cor(edger_res$rank_metric, edger_res$rank_metric2, method = "spearman")
 ```
 
 ## Convert to Entrez Gene IDs
@@ -134,10 +151,11 @@ head(hallmark_gs_list)
 
 ## fgsea analysis
 
-Rank metric distribution.
+Rank metrics distribution.
 
 ```{r rank_metric_dist}
 plot(hist(edger_res$rank_metric, breaks = 50))
+plot(hist(edger_res$rank_metric2, breaks = 50))
 ```
 
 Create ranks vector.
@@ -153,27 +171,40 @@ edger_res |>
 my_ranks <- res$rank_metric
 my_names <- as.character(res$ENTREZID)
 names(my_ranks) <- my_names
+
+my_ranks2 <- res$rank_metric2
+names(my_ranks2) <- my_names
 plot(hist(my_ranks, breaks = 50))
+plot(hist(my_ranks2, breaks = 50))
 ```
 
 The `fgsea()` function runs the pre-ranked gene set enrichment analysis.
 
 ```{r fgsea}
 set.seed(1984)
-
 fgseaRes <- fgsea(
   pathways = hallmark_gs_list, 
   stats = my_ranks,
   minSize=15,
   maxSize=500,
-  nPermSimple = 200000
+  nPermSimple = 100000
+)
+
+set.seed(1984)
+fgseaRes2 <- fgsea(
+  pathways = hallmark_gs_list, 
+  stats = my_ranks2,
+  minSize=15,
+  maxSize=500,
+  nPermSimple = 100000
 )
 ```
 
-Top 6 enriched pathways.
+Top 10 enriched pathways.
 
 ```{r fgsea_result}
-head(fgseaRes[order(pval), ])
+head(fgseaRes[order(pval), ], 10)
+head(fgseaRes2[order(pval), ], 10)
 ```
 
 Plot the most significantly enriched pathway.
