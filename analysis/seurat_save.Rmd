@@ -83,10 +83,7 @@ VlnPlot(pbmc3k_bpcells, features = c("nFeature_RNA", "nCount_RNA", "percent.mt")
 Save original data into `RAW` assay before filtering.
 
 ```{r raw_assay}
-# build a new independent assay
-raw_counts <- GetAssayData(pbmc3k_bpcells, layer = "counts", assay = "RNA")
-raw_assay <- CreateAssayObject(counts = raw_counts)
-pbmc3k_bpcells[["RAW"]] <- raw_assay
+pbmc3k_bpcells[["RAW"]] <- pbmc3k_bpcells@assays$RNA
 
 Seurat::Assays(pbmc3k_bpcells)
 Seurat::DefaultAssay(pbmc3k_bpcells)
@@ -217,4 +214,7 @@ Load RDS that was saved before filtering.
 pbmc3k_before_filtering <- readRDS("pbmc3k_before_filtering.rds")
 class(pbmc3k_before_filtering@assays$RAW$counts)
 class(pbmc3k_before_filtering@assays$RNA$counts)
+
+dim(pbmc3k_before_filtering@assays$RAW$counts)
+dim(pbmc3k_before_filtering@assays$RNA$counts)
 ```
