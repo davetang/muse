@@ -40,9 +40,9 @@ Sparse matrix.
 class(pbmc3k@assays$RNA$counts)
 ```
 
-Write a matrix directory, load the matrix, and create a Seurat object. 
+Write a matrix directory and load the matrix using {BPCells}.
 
-```{r create_seurat_obj}
+```{r bpcells_matrix}
 my_outdir <- "data/pbmc3k_bpcells_mat"
 if(!dir.exists(my_outdir)){
   BPCells::write_matrix_dir(
@@ -54,8 +54,11 @@ if(!dir.exists(my_outdir)){
 # Now that we have the matrix on disk, we can load it
 pbmc3k.mat <- open_matrix_dir(dir = my_outdir)
 pbmc3k.mat
+```
 
-# Create Seurat Object
+Create a Seurat object. 
+
+```{r create_seurat_obj}
 pbmc3k_bpcells <- CreateSeuratObject(
   counts = pbmc3k.mat,
   project = 'pbmc3k',
@@ -67,6 +70,41 @@ pbmc3k_bpcells@assays$RNA$counts
 ```
 
 # Seurat version 4
+
+Mitochondrial percent.
+
+```{r mito_genes}
+mito.genes <- grep(pattern = "^MT-", x = rownames(x = pbmc3k_bpcells@assays$RNA), ignore.case = TRUE, value = TRUE)
+
+pbmc3k_bpcells[["percent.mt"]] <- PercentageFeatureSet(pbmc3k_bpcells, features = mito.genes)
+VlnPlot(pbmc3k_bpcells, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3, layer = "counts")
+```
+
+Save original data into `RAW` assay before filtering.
+
+```{r raw_assay}
+# build a new independent assay
+raw_counts <- GetAssayData(pbmc3k_bpcells, layer = "counts", assay = "RNA")
+raw_assay <- CreateAssayObject(counts = raw_counts)
+pbmc3k_bpcells[["RAW"]] <- raw_assay
+
+Seurat::Assays(pbmc3k_bpcells)
+Seurat::DefaultAssay(pbmc3k_bpcells)
+```
+
+Filter.
+
+```{r filter_mito}
+pbmc3k_bpcells <- subset(pbmc3k_bpcells, subset = percent.mt < 15)
+pbmc3k_bpcells
+```
+
+Unfortunately, the `RAW` assay becomes filtered as well.
+
+```{r check_raw}
+dim(pbmc3k_bpcells@assays$RNA$counts)
+dim(pbmc3k_bpcells@assays$RAW$counts)
+```
 
 Seurat workflow.
 
@@ -151,8 +189,16 @@ pbmc3k_read_rds@assays$RNA$scale.data
 pbmc3k_read_rds
 ```
 
-Get author.
+Get miscellaneous data.
 
 ```{r author_after_loading}
-Misc(pbmc3k_bpcells, slot = "author")
+Misc(pbmc3k_read_rds)
+```
+
+Check `RAW` assay.
+
+```{r check_raw_after_loading}
+pbmc3k_read_rds@assays$RAW$counts
+dim(pbmc3k_read_rds@assays$RAW$counts)
+dim(pbmc3k_read_rds@assays$RNA$counts)
 ```
