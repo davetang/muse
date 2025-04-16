@@ -1,0 +1,58 @@
+---
+title: "BPCells"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+BPCells is an [R package](https://github.com/bnprks/BPCells) that allows for computationally efficient single-cell analysis. It utilizes bit-packing compression to store counts matrices on disk and C++ code to cache operations. 
+
+```{r install_bpcells, eval=FALSE}
+remotes::install_github("bnprks/BPCells/r")
+```
+
+```{r load_libraries}
+suppressPackageStartupMessages(library(BPCells))
+suppressPackageStartupMessages(library(Matrix))
+```
+
+Write matrix to disk using BPCells.
+
+```{r write_matrix_dir}
+set.seed(1984)
+bpcells_dir <- 'bpcells_matrix'
+if(dir.exists(bpcells_dir)){
+  unlink(bpcells_dir, recursive = TRUE)
+}
+write_matrix_dir(
+  mat = rsparsematrix(50000, 50000, density = 0.01),
+  dir = bpcells_dir
+)
+```
+
+Open the BPCells matrix from disk.
+
+```{r open_matrix_dir}
+bp_mat <- open_matrix_dir(bpcells_dir)
+bp_mat
+```
+
+Calculate row and column sums (lazily, disk-backed).
+
+```{r sums}
+row_sums <- rowSums(bp_mat)
+col_sums <- colSums(bp_mat)
+
+head(row_sums)
+
+dense_row <- as.matrix(bp_mat[1, ])
+sum(dense_row)
+```
