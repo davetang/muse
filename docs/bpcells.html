@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-04-16" />
+<meta name="date" content="2025-04-17" />
 
 <title>BPCells</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">BPCells</h1>
-<h4 class="date">2025-04-16</h4>
+<h4 class="date">2025-04-17</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-04-16
+<strong>Last updated:</strong> 2025-04-17
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2a577d97c514c4092f8e524fdcfb55013df33abdtargetblank2a577d9a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2141310685644f546762f093d95c471fd7580c48targetblank2141310a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/2a577d97c514c4092f8e524fdcfb55013df33abd" target="_blank">2a577d9</a>
+<a href="https://github.com/davetang/muse/tree/2141310685644f546762f093d95c471fd7580c48" target="_blank">2141310</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2a577d97c514c4092f8e524fdcfb55013df33abdtargetblank2a577d9a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2141310685644f546762f093d95c471fd7580c48targetblank2141310a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/2a577d97c514c4092f8e524fdcfb55013df33abd" target="_blank">2a577d9</a>.
+<a href="https://github.com/davetang/muse/tree/2141310685644f546762f093d95c471fd7580c48" target="_blank">2141310</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -638,6 +638,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/2141310685644f546762f093d95c471fd7580c48/analysis/bpcells.Rmd" target="_blank">2141310</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-17
+</td>
+<td>
+Modifying matrix path
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/aded5ff64e046d5f01ce135f9e9192ff7577f7ac/docs/bpcells.html" target="_blank">aded5ff</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/2a577d97c514c4092f8e524fdcfb55013df33abd/analysis/bpcells.Rmd" target="_blank">2a577d9</a>
 </td>
 <td>
@@ -662,6 +696,9 @@ package</a> that allows for computationally efficient single-cell
 analysis. It utilizes bit-packing compression to store counts matrices
 on disk and C++ code to cache operations.</p>
 <pre class="r"><code>remotes::install_github(&quot;bnprks/BPCells/r&quot;)</code></pre>
+<div id="getting-started" class="section level2">
+<h2>Getting started</h2>
+<p>Load packages.</p>
 <pre class="r"><code>suppressPackageStartupMessages(library(BPCells))
 suppressPackageStartupMessages(library(Matrix))</code></pre>
 <p>Write matrix to disk using BPCells.</p>
@@ -711,6 +748,78 @@ head(row_sums)</code></pre>
 This message is displayed once every 8 hours.</code></pre>
 <pre class="r"><code>sum(dense_row)</code></pre>
 <pre><code>[1] -3.04895</code></pre>
+</div>
+<div id="modifying-matrix-path" class="section level2">
+<h2>Modifying matrix path</h2>
+<p>Following the <a
+href="https://github.com/bnprks/BPCells/issues/247#issuecomment-2813863978">example</a>
+by Ben Parks:</p>
+<pre class="r"><code>my_dir &lt;- file.path(tempdir(), &quot;data&quot;)
+m1 &lt;- matrix(1:12, nrow=3) |&gt; 
+  as(&quot;IterableMatrix&quot;) |&gt;
+  write_matrix_dir(file.path(my_dir, &quot;m1&quot;), overwrite = TRUE) |&gt;
+  log1p()
+m1</code></pre>
+<pre><code>3 x 4 IterableMatrix object with class TransformLog1p
+
+Row names: unknown names
+Col names: unknown names
+
+Data type: double
+Storage order: column major
+
+Queued Operations:
+1. Load compressed matrix from directory /tmp/RtmpBmIqH5/data/m1
+2. Transform log1p</code></pre>
+<p><code>all_matrix_inputs()</code> strips away any queued operations:
+<code>Transform lop1p</code> is gone.</p>
+<pre class="r"><code>inputs &lt;- all_matrix_inputs(m1)
+inputs</code></pre>
+<pre><code>[[1]]
+3 x 4 IterableMatrix object with class MatrixDir
+
+Row names: unknown names
+Col names: unknown names
+
+Data type: double
+Storage order: column major
+
+Queued Operations:
+1. Load compressed matrix from directory /tmp/RtmpBmIqH5/data/m1</code></pre>
+<p>Create another matrix.</p>
+<pre class="r"><code>m2 &lt;- matrix(1:21, nrow=3) |&gt; 
+  as(&quot;IterableMatrix&quot;) |&gt;
+  write_matrix_dir(file.path(my_dir, &quot;m2&quot;), overwrite = TRUE)
+m2</code></pre>
+<pre><code>3 x 7 IterableMatrix object with class MatrixDir
+
+Row names: unknown names
+Col names: unknown names
+
+Data type: double
+Storage order: column major
+
+Queued Operations:
+1. Load compressed matrix from directory /tmp/RtmpBmIqH5/data/m2</code></pre>
+<p>Modify path.</p>
+<pre class="r"><code>inputs[[1]]@dir &lt;- file.path(my_dir, &quot;m2&quot;)
+
+all_matrix_inputs(m1) &lt;- inputs
+m1</code></pre>
+<pre><code>3 x 4 IterableMatrix object with class TransformLog1p
+
+Row names: unknown names
+Col names: unknown names
+
+Data type: double
+Storage order: column major
+
+Queued Operations:
+1. Load compressed matrix from directory /tmp/RtmpBmIqH5/data/m2
+2. Transform log1p</code></pre>
+<p>Check that it is using <code>m2</code>, which has 7 columns.</p>
+<pre class="r"><code>Matrix::colMeans(m1)</code></pre>
+<pre><code>[1] 1.059351 1.782369 2.193084 2.482584 2.706565 2.889341 3.043766</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -765,6 +874,7 @@ loaded via a namespace (and not attached):
 [49] rmarkdown_2.28          httr_1.4.7              matrixStats_1.5.0      
 [52] UCSC.utils_1.2.0        tools_4.4.1             pkgconfig_2.0.3        
 [55] htmltools_0.5.8.1      </code></pre>
+</div>
 </div>
 </div>
 </div>
