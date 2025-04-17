@@ -19,6 +19,10 @@ BPCells is an [R package](https://github.com/bnprks/BPCells) that allows for com
 remotes::install_github("bnprks/BPCells/r")
 ```
 
+## Getting started
+
+Load packages.
+
 ```{r load_libraries}
 suppressPackageStartupMessages(library(BPCells))
 suppressPackageStartupMessages(library(Matrix))
@@ -55,4 +59,48 @@ head(row_sums)
 
 dense_row <- as.matrix(bp_mat[1, ])
 sum(dense_row)
+```
+
+## Modifying matrix path
+
+Following the [example](https://github.com/bnprks/BPCells/issues/247#issuecomment-2813863978) by Ben Parks:
+
+```{r m1}
+my_dir <- file.path(tempdir(), "data")
+m1 <- matrix(1:12, nrow=3) |> 
+  as("IterableMatrix") |>
+  write_matrix_dir(file.path(my_dir, "m1"), overwrite = TRUE) |>
+  log1p()
+m1
+```
+
+`all_matrix_inputs()` strips away any queued operations: `Transform lop1p` is gone.
+
+```{r all_matrix_inputs}
+inputs <- all_matrix_inputs(m1)
+inputs
+```
+
+Create another matrix.
+
+```{r m2}
+m2 <- matrix(1:21, nrow=3) |> 
+  as("IterableMatrix") |>
+  write_matrix_dir(file.path(my_dir, "m2"), overwrite = TRUE)
+m2
+```
+
+Modify path.
+
+```{r modify_path}
+inputs[[1]]@dir <- file.path(my_dir, "m2")
+
+all_matrix_inputs(m1) <- inputs
+m1
+```
+
+Check that it is using `m2`, which has 7 columns.
+
+```{r colmeans_m1}
+Matrix::colMeans(m1)
 ```
