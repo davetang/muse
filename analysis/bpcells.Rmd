@@ -74,11 +74,12 @@ m1 <- matrix(1:12, nrow=3) |>
 m1
 ```
 
-`all_matrix_inputs()` strips away any queued operations: `Transform lop1p` is gone.
+`all_matrix_inputs()` strips away any queued operations, i.e., `Transform lop1p` is gone. We can use `inputs` to modify the path. Note that the queued operations in `m1` are intact.
 
 ```{r all_matrix_inputs}
 inputs <- all_matrix_inputs(m1)
-inputs
+str(inputs)
+m1
 ```
 
 Create another matrix.
@@ -103,4 +104,31 @@ Check that it is using `m2`, which has 7 columns.
 
 ```{r colmeans_m1}
 Matrix::colMeans(m1)
+```
+
+### Relative paths
+
+It seems that `write_matrix_dir()` uses full paths by default.
+
+```{r m3}
+m3 <- matrix(1:12, nrow=3) |> 
+  as("IterableMatrix") |>
+  write_matrix_dir("m3", overwrite = TRUE) |>
+  log1p()
+m3
+```
+
+Will it work if I modify it to a relative path?
+
+```{r m3_inputs}
+m3_inputs <- all_matrix_inputs(m3)
+m3_inputs[[1]]@dir <- file.path("m3")
+all_matrix_inputs(m3) <- m3_inputs
+m3
+```
+
+Calculate column means.
+
+```{r colmeans_m3}
+Matrix::colMeans(m3)
 ```
