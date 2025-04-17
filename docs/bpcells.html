@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2141310685644f546762f093d95c471fd7580c48targetblank2141310a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0a5c69fd52e4bda6a1c01cff43112c87beef2221targetblank0a5c69fa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/2141310685644f546762f093d95c471fd7580c48" target="_blank">2141310</a>
+<a href="https://github.com/davetang/muse/tree/0a5c69fd52e4bda6a1c01cff43112c87beef2221" target="_blank">0a5c69f</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2141310685644f546762f093d95c471fd7580c48targetblank2141310a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0a5c69fd52e4bda6a1c01cff43112c87beef2221targetblank0a5c69fa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/2141310685644f546762f093d95c471fd7580c48" target="_blank">2141310</a>.
+<a href="https://github.com/davetang/muse/tree/0a5c69fd52e4bda6a1c01cff43112c87beef2221" target="_blank">0a5c69f</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -586,6 +586,7 @@ Ignored files:
 Untracked files:
     Untracked:  analysis/bioc_scrnaseq.Rmd
     Untracked:  bpcells_matrix/
+    Untracked:  m3/
     Untracked:  pbmc3k_before_filtering.rds
     Untracked:  pbmc3k_save_rds.rds
     Untracked:  rsem.merged.gene_counts.tsv
@@ -633,6 +634,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/0a5c69fd52e4bda6a1c01cff43112c87beef2221/analysis/bpcells.Rmd" target="_blank">0a5c69f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-17
+</td>
+<td>
+Relative paths
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/277808a4a506e7d4c3784e1c17bbb65bc69daf9a/docs/bpcells.html" target="_blank">277808a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -769,14 +804,27 @@ Data type: double
 Storage order: column major
 
 Queued Operations:
-1. Load compressed matrix from directory /tmp/RtmpBmIqH5/data/m1
+1. Load compressed matrix from directory /tmp/RtmpV3xFS6/data/m1
 2. Transform log1p</code></pre>
-<p><code>all_matrix_inputs()</code> strips away any queued operations:
-<code>Transform lop1p</code> is gone.</p>
+<p><code>all_matrix_inputs()</code> strips away any queued operations,
+i.e., <code>Transform lop1p</code> is gone. We can use
+<code>inputs</code> to modify the path. Note that the queued operations
+in <code>m1</code> are intact.</p>
 <pre class="r"><code>inputs &lt;- all_matrix_inputs(m1)
-inputs</code></pre>
-<pre><code>[[1]]
-3 x 4 IterableMatrix object with class MatrixDir
+str(inputs)</code></pre>
+<pre><code>List of 1
+ $ :Formal class &#39;MatrixDir&#39; [package &quot;BPCells&quot;] with 7 slots
+  .. ..@ dir        : chr &quot;/tmp/RtmpV3xFS6/data/m1&quot;
+  .. ..@ compressed : logi TRUE
+  .. ..@ buffer_size: int 8192
+  .. ..@ type       : chr &quot;double&quot;
+  .. ..@ dim        : int [1:2] 3 4
+  .. ..@ transpose  : logi FALSE
+  .. ..@ dimnames   :List of 2
+  .. .. ..$ : NULL
+  .. .. ..$ : NULL</code></pre>
+<pre class="r"><code>m1</code></pre>
+<pre><code>3 x 4 IterableMatrix object with class TransformLog1p
 
 Row names: unknown names
 Col names: unknown names
@@ -785,7 +833,8 @@ Data type: double
 Storage order: column major
 
 Queued Operations:
-1. Load compressed matrix from directory /tmp/RtmpBmIqH5/data/m1</code></pre>
+1. Load compressed matrix from directory /tmp/RtmpV3xFS6/data/m1
+2. Transform log1p</code></pre>
 <p>Create another matrix.</p>
 <pre class="r"><code>m2 &lt;- matrix(1:21, nrow=3) |&gt; 
   as(&quot;IterableMatrix&quot;) |&gt;
@@ -800,7 +849,7 @@ Data type: double
 Storage order: column major
 
 Queued Operations:
-1. Load compressed matrix from directory /tmp/RtmpBmIqH5/data/m2</code></pre>
+1. Load compressed matrix from directory /tmp/RtmpV3xFS6/data/m2</code></pre>
 <p>Modify path.</p>
 <pre class="r"><code>inputs[[1]]@dir &lt;- file.path(my_dir, &quot;m2&quot;)
 
@@ -815,11 +864,50 @@ Data type: double
 Storage order: column major
 
 Queued Operations:
-1. Load compressed matrix from directory /tmp/RtmpBmIqH5/data/m2
+1. Load compressed matrix from directory /tmp/RtmpV3xFS6/data/m2
 2. Transform log1p</code></pre>
 <p>Check that it is using <code>m2</code>, which has 7 columns.</p>
 <pre class="r"><code>Matrix::colMeans(m1)</code></pre>
 <pre><code>[1] 1.059351 1.782369 2.193084 2.482584 2.706565 2.889341 3.043766</code></pre>
+<div id="relative-paths" class="section level3">
+<h3>Relative paths</h3>
+<p>It seems that <code>write_matrix_dir()</code> uses full paths by
+default.</p>
+<pre class="r"><code>m3 &lt;- matrix(1:12, nrow=3) |&gt; 
+  as(&quot;IterableMatrix&quot;) |&gt;
+  write_matrix_dir(&quot;m3&quot;, overwrite = TRUE) |&gt;
+  log1p()
+m3</code></pre>
+<pre><code>3 x 4 IterableMatrix object with class TransformLog1p
+
+Row names: unknown names
+Col names: unknown names
+
+Data type: double
+Storage order: column major
+
+Queued Operations:
+1. Load compressed matrix from directory /home/rstudio/muse/m3
+2. Transform log1p</code></pre>
+<p>Will it work if I modify it to a relative path?</p>
+<pre class="r"><code>m3_inputs &lt;- all_matrix_inputs(m3)
+m3_inputs[[1]]@dir &lt;- file.path(&quot;m3&quot;)
+all_matrix_inputs(m3) &lt;- m3_inputs
+m3</code></pre>
+<pre><code>3 x 4 IterableMatrix object with class TransformLog1p
+
+Row names: unknown names
+Col names: unknown names
+
+Data type: double
+Storage order: column major
+
+Queued Operations:
+1. Load compressed matrix from directory m3
+2. Transform log1p</code></pre>
+<p>Calculate column means.</p>
+<pre class="r"><code>Matrix::colMeans(m3)</code></pre>
+<pre><code>[1] 1.059351 1.782369 2.193084 2.482584</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -874,6 +962,7 @@ loaded via a namespace (and not attached):
 [49] rmarkdown_2.28          httr_1.4.7              matrixStats_1.5.0      
 [52] UCSC.utils_1.2.0        tools_4.4.1             pkgconfig_2.0.3        
 [55] htmltools_0.5.8.1      </code></pre>
+</div>
 </div>
 </div>
 </div>
