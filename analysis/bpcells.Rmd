@@ -132,3 +132,24 @@ Calculate column means.
 ```{r colmeans_m3}
 Matrix::colMeans(m3)
 ```
+
+### Exporting and loading
+
+Use `saveRDS()`.
+
+```{r save_rds}
+saveRDS(object = m3, file = paste0(my_dir, 'm3.rds'))
+```
+
+Load.
+
+```{r m3_loaded}
+m3_loaded <- readRDS(paste0(my_dir, 'm3.rds'))
+m3_loaded
+```
+
+For `m3` we used a relative path, so it will work if the matrix directory exists in the current directory (which it should).
+
+```{r m3_loaded_colmeans}
+Matrix::colMeans(m3)
+```
