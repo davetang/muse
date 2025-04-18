@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-04-17" />
+<meta name="date" content="2025-04-18" />
 
 <title>BPCells</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">BPCells</h1>
-<h4 class="date">2025-04-17</h4>
+<h4 class="date">2025-04-18</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-04-17
+<strong>Last updated:</strong> 2025-04-18
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0a5c69fd52e4bda6a1c01cff43112c87beef2221targetblank0a5c69fa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb082b567fe2fcda3827c84c9f1922abda858e4dbtargetblankb082b56a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/0a5c69fd52e4bda6a1c01cff43112c87beef2221" target="_blank">0a5c69f</a>
+<a href="https://github.com/davetang/muse/tree/b082b567fe2fcda3827c84c9f1922abda858e4db" target="_blank">b082b56</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0a5c69fd52e4bda6a1c01cff43112c87beef2221targetblank0a5c69fa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb082b567fe2fcda3827c84c9f1922abda858e4dbtargetblankb082b56a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/0a5c69fd52e4bda6a1c01cff43112c87beef2221" target="_blank">0a5c69f</a>.
+<a href="https://github.com/davetang/muse/tree/b082b567fe2fcda3827c84c9f1922abda858e4db" target="_blank">b082b56</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -634,6 +634,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/b082b567fe2fcda3827c84c9f1922abda858e4db/analysis/bpcells.Rmd" target="_blank">b082b56</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-18
+</td>
+<td>
+Exporting and loading
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/48410a3ac8e6793343eba30ac5672d62d7be38bf/docs/bpcells.html" target="_blank">48410a3</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -804,7 +838,7 @@ Data type: double
 Storage order: column major
 
 Queued Operations:
-1. Load compressed matrix from directory /tmp/RtmpV3xFS6/data/m1
+1. Load compressed matrix from directory /tmp/RtmpGBuknV/data/m1
 2. Transform log1p</code></pre>
 <p><code>all_matrix_inputs()</code> strips away any queued operations,
 i.e., <code>Transform lop1p</code> is gone. We can use
@@ -814,7 +848,7 @@ in <code>m1</code> are intact.</p>
 str(inputs)</code></pre>
 <pre><code>List of 1
  $ :Formal class &#39;MatrixDir&#39; [package &quot;BPCells&quot;] with 7 slots
-  .. ..@ dir        : chr &quot;/tmp/RtmpV3xFS6/data/m1&quot;
+  .. ..@ dir        : chr &quot;/tmp/RtmpGBuknV/data/m1&quot;
   .. ..@ compressed : logi TRUE
   .. ..@ buffer_size: int 8192
   .. ..@ type       : chr &quot;double&quot;
@@ -833,7 +867,7 @@ Data type: double
 Storage order: column major
 
 Queued Operations:
-1. Load compressed matrix from directory /tmp/RtmpV3xFS6/data/m1
+1. Load compressed matrix from directory /tmp/RtmpGBuknV/data/m1
 2. Transform log1p</code></pre>
 <p>Create another matrix.</p>
 <pre class="r"><code>m2 &lt;- matrix(1:21, nrow=3) |&gt; 
@@ -849,7 +883,7 @@ Data type: double
 Storage order: column major
 
 Queued Operations:
-1. Load compressed matrix from directory /tmp/RtmpV3xFS6/data/m2</code></pre>
+1. Load compressed matrix from directory /tmp/RtmpGBuknV/data/m2</code></pre>
 <p>Modify path.</p>
 <pre class="r"><code>inputs[[1]]@dir &lt;- file.path(my_dir, &quot;m2&quot;)
 
@@ -864,7 +898,7 @@ Data type: double
 Storage order: column major
 
 Queued Operations:
-1. Load compressed matrix from directory /tmp/RtmpV3xFS6/data/m2
+1. Load compressed matrix from directory /tmp/RtmpGBuknV/data/m2
 2. Transform log1p</code></pre>
 <p>Check that it is using <code>m2</code>, which has 7 columns.</p>
 <pre class="r"><code>Matrix::colMeans(m1)</code></pre>
@@ -906,6 +940,29 @@ Queued Operations:
 1. Load compressed matrix from directory m3
 2. Transform log1p</code></pre>
 <p>Calculate column means.</p>
+<pre class="r"><code>Matrix::colMeans(m3)</code></pre>
+<pre><code>[1] 1.059351 1.782369 2.193084 2.482584</code></pre>
+</div>
+<div id="exporting-and-loading" class="section level3">
+<h3>Exporting and loading</h3>
+<p>Use <code>saveRDS()</code>.</p>
+<pre class="r"><code>saveRDS(object = m3, file = paste0(my_dir, &#39;m3.rds&#39;))</code></pre>
+<p>Load.</p>
+<pre class="r"><code>m3_loaded &lt;- readRDS(paste0(my_dir, &#39;m3.rds&#39;))
+m3_loaded</code></pre>
+<pre><code>3 x 4 IterableMatrix object with class TransformLog1p
+
+Row names: unknown names
+Col names: unknown names
+
+Data type: double
+Storage order: column major
+
+Queued Operations:
+1. Load compressed matrix from directory m3
+2. Transform log1p</code></pre>
+<p>For <code>m3</code> we used a relative path, so it will work if the
+matrix directory exists in the current directory (which it should).</p>
 <pre class="r"><code>Matrix::colMeans(m3)</code></pre>
 <pre><code>[1] 1.059351 1.782369 2.193084 2.482584</code></pre>
 <br>
