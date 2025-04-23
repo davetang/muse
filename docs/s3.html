@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebaf65f77daf6ea745e10318a4dd321af01fea737targetblankbaf65f7a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef876485c3664fecdccc1babdaada3995404be1e8targetblankf876485a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/baf65f77daf6ea745e10318a4dd321af01fea737" target="_blank">baf65f7</a>
+<a href="https://github.com/davetang/muse/tree/f876485c3664fecdccc1babdaada3995404be1e8" target="_blank">f876485</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebaf65f77daf6ea745e10318a4dd321af01fea737targetblankbaf65f7a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef876485c3664fecdccc1babdaada3995404be1e8targetblankf876485a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/baf65f77daf6ea745e10318a4dd321af01fea737" target="_blank">baf65f7</a>.
+<a href="https://github.com/davetang/muse/tree/f876485c3664fecdccc1babdaada3995404be1e8" target="_blank">f876485</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -633,6 +633,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/f876485c3664fecdccc1babdaada3995404be1e8/analysis/s3.Rmd" target="_blank">f876485</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-23
+</td>
+<td>
+Fallback method
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/21e7c910c496e5a4007463bb8016e290f0f7d7e6/docs/s3.html" target="_blank">21e7c91</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -775,6 +809,26 @@ Dave Tang
 </table>
 </div>
 </div>
+<p>Fallback method.</p>
+<pre class="r"><code>plot_results.default &lt;- function(x, ...) {
+  stop(&quot;No &#39;plot_results&#39; method for class: &quot;, paste(class(x), collapse = &quot;, &quot;))
+}</code></pre>
+<p>Inspect method dispatch with <code>methods()</code> and
+<code>getS3method()</code>.</p>
+<pre class="r"><code>methods(plot_results)</code></pre>
+<pre><code>[1] plot_results.bar     plot_results.default plot_results.foo    
+see &#39;?methods&#39; for accessing help and source code</code></pre>
+<pre class="r"><code>getS3method(&quot;plot_results&quot;, &quot;bar&quot;)</code></pre>
+<pre><code>function (x, ...) 
+{
+    plot(x$t, x$val, type = &quot;b&quot;, col = &quot;orange&quot;, main = &quot;Plot for bar&quot;, 
+        xlab = &quot;Time&quot;, ylab = &quot;Value&quot;)
+}</code></pre>
+<p>Fallback.</p>
+<pre class="r"><code>set.seed(1984)
+df3 &lt;- data.frame(time = 1:10, value = rbinom(n = 10, size = 21, prob = 0.5))
+plot_results(df3)</code></pre>
+<pre><code>Error in plot_results.default(df3): No &#39;plot_results&#39; method for class: data.frame</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
