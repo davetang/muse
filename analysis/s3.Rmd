@@ -28,10 +28,10 @@ df2 <- data.frame(t = 1:10, val = runif(10))
 Assign custom classes to each data frame
 
 ```{r assign_classes}
-class(df1) <- "foo"
-class(df2) <- "bar"
+class(df1) <- c("foo", class(df1))
+class(df2) <- c("bar", class(df2))
 
-df1
+class(df1)
 ```
 
 Define a generic plotting function.
