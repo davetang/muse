@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree37f24dfa9a34311ebabcbfdbc4d27e7d908995c3targetblank37f24dfa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebaf65f77daf6ea745e10318a4dd321af01fea737targetblankbaf65f7a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/37f24dfa9a34311ebabcbfdbc4d27e7d908995c3" target="_blank">37f24df</a>
+<a href="https://github.com/davetang/muse/tree/baf65f77daf6ea745e10318a4dd321af01fea737" target="_blank">baf65f7</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree37f24dfa9a34311ebabcbfdbc4d27e7d908995c3targetblank37f24dfa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebaf65f77daf6ea745e10318a4dd321af01fea737targetblankbaf65f7a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/37f24dfa9a34311ebabcbfdbc4d27e7d908995c3" target="_blank">37f24df</a>.
+<a href="https://github.com/davetang/muse/tree/baf65f77daf6ea745e10318a4dd321af01fea737" target="_blank">baf65f7</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -638,6 +638,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/baf65f77daf6ea745e10318a4dd321af01fea737/analysis/s3.Rmd" target="_blank">baf65f7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-23
+</td>
+<td>
+Prepend class instead assigning new class
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/16718ba848f3c7560e6b5ab1c26b2a3eda292f84/docs/s3.html" target="_blank">16718ba</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/37f24dfa9a34311ebabcbfdbc4d27e7d908995c3/analysis/s3.Rmd" target="_blank">37f24df</a>
 </td>
 <td>
@@ -668,21 +702,11 @@ names.</p>
 df1 &lt;- data.frame(time = 1:10, value = rnorm(10))
 df2 &lt;- data.frame(t = 1:10, val = runif(10))</code></pre>
 <p>Assign custom classes to each data frame</p>
-<pre class="r"><code>class(df1) &lt;- &quot;foo&quot;
-class(df2) &lt;- &quot;bar&quot;
+<pre class="r"><code>class(df1) &lt;- c(&quot;foo&quot;, class(df1))
+class(df2) &lt;- c(&quot;bar&quot;, class(df2))
 
-df1</code></pre>
-<pre><code>$time
- [1]  1  2  3  4  5  6  7  8  9 10
-
-$value
- [1]  0.4092032 -0.3230250  0.6358523 -1.8461288  0.9536474  1.1884898
- [7]  0.5424544 -0.8327254 -0.5262079  1.4159828
-
-attr(,&quot;class&quot;)
-[1] &quot;foo&quot;
-attr(,&quot;row.names&quot;)
- [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+class(df1)</code></pre>
+<pre><code>[1] &quot;foo&quot;        &quot;data.frame&quot;</code></pre>
 <p>Define a generic plotting function.</p>
 <pre class="r"><code>plot_results &lt;- function(x, ...) {
   UseMethod(&quot;plot_results&quot;)
@@ -714,6 +738,43 @@ attr(,&quot;row.names&quot;)
 plot_results(df1)
 plot_results(df2)</code></pre>
 <p><img src="figure/s3.Rmd/plot_foobar-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_foobar-1">
+Past versions of plot_foobar-1.png
+</button>
+</p>
+<div id="fig-plot_foobar-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/16718ba848f3c7560e6b5ab1c26b2a3eda292f84/docs/figure/s3.Rmd/plot_foobar-1.png" target="_blank">16718ba</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-04-23
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
