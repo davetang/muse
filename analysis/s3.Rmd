@@ -1,0 +1,81 @@
+---
+title: "S3"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+S3 is R's simplest and most flexible object-oriented system. It allows you to create objects that behave differently depending on their class.
+
+## Getting started
+
+Create two equivalent data frames but with different column names.
+
+```{r dfs}
+set.seed(1984)
+df1 <- data.frame(time = 1:10, value = rnorm(10))
+df2 <- data.frame(t = 1:10, val = runif(10))
+```
+
+Assign custom classes to each data frame
+
+```{r assign_classes}
+class(df1) <- "foo"
+class(df2) <- "bar"
+
+df1
+```
+
+Define a generic plotting function.
+
+```{r plot_results}
+plot_results <- function(x, ...) {
+  UseMethod("plot_results")
+}
+```
+
+Method for class `foo`.
+
+```{r foo}
+plot_results.foo <- function(x, ...) {
+  plot(
+    x$time, x$value,
+    type = "b",
+    col = "skyblue",
+    main = "Plot for foo",
+    xlab = "Time",
+    ylab = "Value"
+  )
+}
+```
+
+Method for class `bar`.
+
+```{r bar}
+plot_results.bar <- function(x, ...) {
+  plot(
+    x$t, x$val,
+    type = "b",
+    col = "orange",
+    main = "Plot for bar",
+    xlab = "Time",
+    ylab = "Value"
+  )
+}
+```
+
+Plot!
+
+```{r plot_foobar}
+par(mfrow = c(1, 2))  # Optional: plot side by side
+plot_results(df1)
+plot_results(df2)
+```
