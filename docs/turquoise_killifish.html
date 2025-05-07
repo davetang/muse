@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree331a019bc36b4387c8114cfe1add2ff966ccaf09targetblank331a019a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree990a827b55f22a6571cc9ec6bf10b787bd08b843targetblank990a827a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/331a019bc36b4387c8114cfe1add2ff966ccaf09" target="_blank">331a019</a>
+<a href="https://github.com/davetang/muse/tree/990a827b55f22a6571cc9ec6bf10b787bd08b843" target="_blank">990a827</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree331a019bc36b4387c8114cfe1add2ff966ccaf09targetblank331a019a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree990a827b55f22a6571cc9ec6bf10b787bd08b843targetblank990a827a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/331a019bc36b4387c8114cfe1add2ff966ccaf09" target="_blank">331a019</a>.
+<a href="https://github.com/davetang/muse/tree/990a827b55f22a6571cc9ec6bf10b787bd08b843" target="_blank">990a827</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -584,6 +584,7 @@ Ignored files:
     Ignored:    r_packages_4.4.1/
 
 Untracked files:
+    Untracked:  Nothobranchius_furzeri.Nfu_20140520.113.gtf.gz
     Untracked:  analysis/bioc_scrnaseq.Rmd
     Untracked:  bpcells_matrix/
     Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
@@ -591,6 +592,10 @@ Untracked files:
     Untracked:  pbmc3k_before_filtering.rds
     Untracked:  pbmc3k_save_rds.rds
     Untracked:  rsem.merged.gene_counts.tsv
+
+Unstaged changes:
+    Modified:   data/nfurzeri_gene_id_to_go_id.csv.gz
+    Modified:   data/nfurzeri_gene_info.csv.gz
 
 </code></pre>
 <p>
@@ -635,6 +640,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/990a827b55f22a6571cc9ec6bf10b787bd08b843/analysis/turquoise_killifish.Rmd" target="_blank">990a827</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-07
+</td>
+<td>
+Lookup table
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/074ec500694cb4f8832f84349147d0608d728cc5/docs/turquoise_killifish.html" target="_blank">074ec50</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -902,7 +941,7 @@ assembly NfurGRZ-RIMD1</a> reference.</p>
 <p>Download GAF file <code>*_gene_ontology.gaf.gz</code>, which contains
 Gene Ontology (GO) annotation of the annotated genes in GO Annotation
 File <a
-href="https://geneontology.org/docs/go-annotation-file-gaf-format-2.1/">GAF
+href="https://geneontology.org/docs/go-annotation-file-gaf-format-2.2/">GAF
 format</a>.</p>
 <pre class="r"><code>gaf_url &lt;- &#39;https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/043/380/555/GCF_043380555.1_NfurGRZ-RIMD1/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz&#39;
 gaf_file &lt;- paste0(&quot;data/&quot;, basename(gaf_url))
@@ -938,6 +977,47 @@ head(gaf)</code></pre>
 <pre><code>
    IEA 
 100961 </code></pre>
+<p>Lookup table; check whether lookup is unique.</p>
+<pre class="r"><code>library(dplyr)</code></pre>
+<pre><code>
+Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>The following object is masked from &#39;package:biomaRt&#39;:
+
+    select</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    filter, lag</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>select(gaf, GeneID, GO_ID) |&gt;
+  group_by(GeneID, GO_ID) |&gt;
+  summarise(n = n(), .groups = &quot;keep&quot;) |&gt;
+  arrange(-n) -&gt; lookup_table
+
+head(lookup_table)</code></pre>
+<pre><code># A tibble: 6 × 3
+# Groups:   GeneID, GO_ID [6]
+     GeneID GO_ID          n
+      &lt;dbl&gt; &lt;chr&gt;      &lt;int&gt;
+1 107372345 GO:0005975     2
+2 107372345 GO:0016020     2
+3 107372345 GO:0016758     2
+4 107372351 GO:0004674     2
+5 107372352 GO:0017025     2
+6 107372360 GO:0004930     2</code></pre>
+<p>Look at an example of a duplicated entry.</p>
+<pre class="r"><code>eg &lt;- head(lookup_table, n = 1)
+
+dplyr::filter(gaf, GeneID == eg$GeneID, GO_ID == eg$GO_ID)</code></pre>
+<pre><code># A tibble: 2 × 17
+  DB      GeneID Symbol Qualifier GO_ID Reference Evidence_Code With_From Aspect
+  &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;     &lt;chr&gt; &lt;chr&gt;     &lt;chr&gt;         &lt;chr&gt;     &lt;chr&gt; 
+1 NCBIGe… 1.07e8 LOC10… involved… GO:0… PMID:223… IEA           InterPro… P     
+2 NCBIGe… 1.07e8 LOC10… involved… GO:0… PMID:300… IEA           UniProtK… P     
+# ℹ 8 more variables: Gene_Name &lt;chr&gt;, Gene_Synonym &lt;lgl&gt;, Type &lt;chr&gt;,
+#   Taxon &lt;chr&gt;, Date &lt;dbl&gt;, Assigned_By &lt;chr&gt;, Annot_Ext &lt;lgl&gt;,
+#   Gene_Product_Form_ID &lt;lgl&gt;</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -970,7 +1050,7 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] biomaRt_2.62.1  workflowr_1.7.1
+[1] dplyr_1.1.4     biomaRt_2.62.1  workflowr_1.7.1
 
 loaded via a namespace (and not attached):
  [1] KEGGREST_1.46.0         xfun_0.48               bslib_0.8.0            
@@ -988,19 +1068,19 @@ loaded via a namespace (and not attached):
 [37] later_1.3.2             pillar_1.10.1           crayon_1.5.3           
 [40] jquerylib_0.1.4         whisker_0.4.1           cachem_1.1.0           
 [43] tidyselect_1.2.1        digest_0.6.37           stringi_1.8.4          
-[46] purrr_1.0.2             dplyr_1.1.4             rprojroot_2.0.4        
-[49] fastmap_1.2.0           cli_3.6.3               magrittr_2.0.3         
-[52] utf8_1.2.4              readr_2.1.5             withr_3.0.2            
-[55] filelock_1.0.3          prettyunits_1.2.0       UCSC.utils_1.2.0       
-[58] promises_1.3.2          rappdirs_0.3.3          bit64_4.5.2            
-[61] rmarkdown_2.28          XVector_0.46.0          httr_1.4.7             
-[64] bit_4.5.0               png_0.1-8               hms_1.1.3              
-[67] memoise_2.0.1           evaluate_1.0.1          knitr_1.48             
-[70] IRanges_2.40.1          BiocFileCache_2.14.0    rlang_1.1.4            
-[73] Rcpp_1.0.13             glue_1.8.0              DBI_1.2.3              
-[76] xml2_1.3.6              BiocGenerics_0.52.0     vroom_1.6.5            
-[79] rstudioapi_0.17.1       jsonlite_1.8.9          R6_2.5.1               
-[82] fs_1.6.4                zlibbioc_1.52.0        </code></pre>
+[46] purrr_1.0.2             rprojroot_2.0.4         fastmap_1.2.0          
+[49] cli_3.6.3               magrittr_2.0.3          utf8_1.2.4             
+[52] readr_2.1.5             withr_3.0.2             filelock_1.0.3         
+[55] prettyunits_1.2.0       UCSC.utils_1.2.0        promises_1.3.2         
+[58] rappdirs_0.3.3          bit64_4.5.2             rmarkdown_2.28         
+[61] XVector_0.46.0          httr_1.4.7              bit_4.5.0              
+[64] png_0.1-8               hms_1.1.3               memoise_2.0.1          
+[67] evaluate_1.0.1          knitr_1.48              IRanges_2.40.1         
+[70] BiocFileCache_2.14.0    rlang_1.1.4             Rcpp_1.0.13            
+[73] glue_1.8.0              DBI_1.2.3               xml2_1.3.6             
+[76] BiocGenerics_0.52.0     vroom_1.6.5             rstudioapi_0.17.1      
+[79] jsonlite_1.8.9          R6_2.5.1                fs_1.6.4               
+[82] zlibbioc_1.52.0        </code></pre>
 </div>
 </div>
 </div>
