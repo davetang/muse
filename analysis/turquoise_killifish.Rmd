@@ -187,7 +187,7 @@ readr::write_csv(x = all_gene_go_ids, file = "data/nfurzeri_gene_id_to_go_id.csv
 
 NCBI [Genome assembly NfurGRZ-RIMD1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_043380555.1/) reference.
 
-Download GAF file `*_gene_ontology.gaf.gz`, which contains Gene Ontology (GO) annotation of the annotated genes in GO Annotation File [GAF format](https://geneontology.org/docs/go-annotation-file-gaf-format-2.1/).
+Download GAF file `*_gene_ontology.gaf.gz`, which contains Gene Ontology (GO) annotation of the annotated genes in GO Annotation File [GAF format](https://geneontology.org/docs/go-annotation-file-gaf-format-2.2/).
 
 ```{r download_gaf}
 gaf_url <- 'https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/043/380/555/GCF_043380555.1_NfurGRZ-RIMD1/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz'
@@ -217,4 +217,24 @@ Evidence code.
 
 ```{r table_of_evidence_codes}
 table(gaf$Evidence_Code)
+```
+
+Lookup table; check whether lookup is unique.
+
+```{r entrez_gene_id_to_go_id}
+library(dplyr)
+select(gaf, GeneID, GO_ID) |>
+  group_by(GeneID, GO_ID) |>
+  summarise(n = n(), .groups = "keep") |>
+  arrange(-n) -> lookup_table
+
+head(lookup_table)
+```
+
+Look at an example of a duplicated entry.
+
+```{r duplicated_entry}
+eg <- head(lookup_table, n = 1)
+
+dplyr::filter(gaf, GeneID == eg$GeneID, GO_ID == eg$GO_ID)
 ```
