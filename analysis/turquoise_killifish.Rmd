@@ -182,3 +182,39 @@ Save GO table.
 ```{r save_all_gene_go_ids}
 readr::write_csv(x = all_gene_go_ids, file = "data/nfurzeri_gene_id_to_go_id.csv.gz")
 ```
+
+## NCBI
+
+NCBI [Genome assembly NfurGRZ-RIMD1](https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_043380555.1/) reference.
+
+Download GAF file `*_gene_ontology.gaf.gz`, which contains Gene Ontology (GO) annotation of the annotated genes in GO Annotation File [GAF format](https://geneontology.org/docs/go-annotation-file-gaf-format-2.1/).
+
+```{r download_gaf}
+gaf_url <- 'https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/043/380/555/GCF_043380555.1_NfurGRZ-RIMD1/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz'
+gaf_file <- paste0("data/", basename(gaf_url))
+
+if(file.exists(gaf_file) == FALSE){
+  download.file(url = gaf_url, destfile = gaf_file)
+}
+```
+
+The annotation flat file format is comprised of 17 tab-delimited fields.
+
+```{r read_gaf}
+gaf_cols <- c("DB","GeneID","Symbol","Qualifier","GO_ID","Reference","Evidence_Code","With_From","Aspect","Gene_Name","Gene_Synonym","Type","Taxon","Date","Assigned_By","Annot_Ext","Gene_Product_Form_ID")
+
+gaf <- readr::read_tsv(file = gaf_file, comment = '!', show_col_types = FALSE, col_names = gaf_cols)
+head(gaf)
+```
+
+Qualifiers.
+
+```{r table_of_qualifiers}
+table(gaf$Qualifier)
+```
+
+Evidence code.
+
+```{r table_of_evidence_codes}
+table(gaf$Evidence_Code)
+```
