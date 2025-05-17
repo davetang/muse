@@ -1,0 +1,38 @@
+---
+title: "Tidyverse"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+To get started, install the `tidyverse` if you haven't already.
+
+```{r install_tidyverse, message=FALSE, warning=FALSE}
+if(!require("tidyverse")){
+  install.packages("tidyverse")
+}
+library(tidyverse)
+```
+
+## Separate
+
+If you want to split by any non-alphanumeric value (the default):
+
+```{r eg1}
+tibble(x = c(NA, "x.y", "x.z", "y.z")) |>
+  separate(x, c("A", "B"))
+```
+
+> separate() has been superseded in favour of separate_wider_position() and separate_wider_delim() because the two functions make the two uses more obvious, the API is more polished, and the handling of problems is better. Superseded functions will not go away, but will only receive critical bug fixes.
+
+```{r eg2}
+tibble(x = c(NA, "x.y", "x.z", "y.z")) |>
+  separate_wider_delim(x, delim = ".", names = c("gender", "unit"))
+```
