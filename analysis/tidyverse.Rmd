@@ -36,3 +36,24 @@ tibble(x = c(NA, "x.y", "x.z", "y.z")) |>
 tibble(x = c(NA, "x.y", "x.z", "y.z")) |>
   separate_wider_delim(x, delim = ".", names = c("gender", "unit"))
 ```
+
+## Clean column names
+
+Use {janitor} to sanitise column names.
+
+```{r janitor}
+if(!require("janitor")){
+  install.packages("janitor")
+}
+library(janitor)
+
+df_messy <- tibble(
+  "Student Name" = c("Alice", "Bob"),
+  "Math Score (%)" = c(85, 92)
+)
+
+df_clean <- df_messy |>
+  clean_names()
+
+print(df_clean)
+```
