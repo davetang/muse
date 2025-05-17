@@ -443,15 +443,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree304d1b26cabc94cd803d03644db17613d2d7eecctargetblank304d1b2a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecb5a7656bc10df105b137496dba6e5c08f3fc580targetblankcb5a765a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/304d1b26cabc94cd803d03644db17613d2d7eecc" target="_blank">304d1b2</a>
+<a href="https://github.com/davetang/muse/tree/cb5a7656bc10df105b137496dba6e5c08f3fc580" target="_blank">cb5a765</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree304d1b26cabc94cd803d03644db17613d2d7eecctargetblank304d1b2a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecb5a7656bc10df105b137496dba6e5c08f3fc580targetblankcb5a765a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +461,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/304d1b26cabc94cd803d03644db17613d2d7eecc" target="_blank">304d1b2</a>.
+<a href="https://github.com/davetang/muse/tree/cb5a7656bc10df105b137496dba6e5c08f3fc580" target="_blank">cb5a765</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -565,6 +565,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/cb5a7656bc10df105b137496dba6e5c08f3fc580/analysis/tidyverse.Rmd" target="_blank">cb5a765</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-17
+</td>
+<td>
+Clean column names with {janitor}
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/d15e7f5d93d238d38d5fc848edb702f052cc81e6/docs/tidyverse.html" target="_blank">d15e7f5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-17
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/304d1b26cabc94cd803d03644db17613d2d7eecc/analysis/tidyverse.Rmd" target="_blank">304d1b2</a>
 </td>
 <td>
@@ -621,6 +655,35 @@ critical bug fixes.</p>
 2 x      y    
 3 x      z    
 4 y      z    </code></pre>
+</div>
+<div id="clean-column-names" class="section level2">
+<h2>Clean column names</h2>
+<p>Use {janitor} to sanitise column names.</p>
+<pre class="r"><code>if(!require(&quot;janitor&quot;)){
+  install.packages(&quot;janitor&quot;)
+}</code></pre>
+<pre><code>Loading required package: janitor</code></pre>
+<pre><code>
+Attaching package: &#39;janitor&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    chisq.test, fisher.test</code></pre>
+<pre class="r"><code>library(janitor)
+
+df_messy &lt;- tibble(
+  &quot;Student Name&quot; = c(&quot;Alice&quot;, &quot;Bob&quot;),
+  &quot;Math Score (%)&quot; = c(85, 92)
+)
+
+df_clean &lt;- df_messy |&gt;
+  clean_names()
+
+print(df_clean)</code></pre>
+<pre><code># A tibble: 2 × 2
+  student_name math_score_percent
+  &lt;chr&gt;                     &lt;dbl&gt;
+1 Alice                        85
+2 Bob                          92</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -653,9 +716,9 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] lubridate_1.9.3 forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4    
- [5] purrr_1.0.2     readr_2.1.5     tidyr_1.3.1     tibble_3.2.1   
- [9] ggplot2_3.5.1   tidyverse_2.0.0 workflowr_1.7.1
+ [1] janitor_2.2.0   lubridate_1.9.3 forcats_1.0.0   stringr_1.5.1  
+ [5] dplyr_1.1.4     purrr_1.0.2     readr_2.1.5     tidyr_1.3.1    
+ [9] tibble_3.2.1    ggplot2_3.5.1   tidyverse_2.0.0 workflowr_1.7.1
 
 loaded via a namespace (and not attached):
  [1] utf8_1.2.4        sass_0.4.9        generics_0.1.3    stringi_1.8.4    
@@ -666,11 +729,11 @@ loaded via a namespace (and not attached):
 [21] cli_3.6.3         rlang_1.1.4       munsell_0.5.1     withr_3.0.2      
 [25] cachem_1.1.0      yaml_2.3.10       tools_4.4.1       tzdb_0.4.0       
 [29] colorspace_2.1-1  httpuv_1.6.15     vctrs_0.6.5       R6_2.5.1         
-[33] lifecycle_1.0.4   git2r_0.35.0      fs_1.6.4          pkgconfig_2.0.3  
-[37] callr_3.7.6       pillar_1.10.1     bslib_0.8.0       later_1.3.2      
-[41] gtable_0.3.6      glue_1.8.0        Rcpp_1.0.13       xfun_0.48        
-[45] tidyselect_1.2.1  rstudioapi_0.17.1 knitr_1.48        htmltools_0.5.8.1
-[49] rmarkdown_2.28    compiler_4.4.1    getPass_0.2-4    </code></pre>
+[33] lifecycle_1.0.4   git2r_0.35.0      snakecase_0.11.1  fs_1.6.4         
+[37] pkgconfig_2.0.3   callr_3.7.6       pillar_1.10.1     bslib_0.8.0      
+[41] later_1.3.2       gtable_0.3.6      glue_1.8.0        Rcpp_1.0.13      
+[45] xfun_0.48         tidyselect_1.2.1  rstudioapi_0.17.1 knitr_1.48       
+[49] htmltools_0.5.8.1 rmarkdown_2.28    compiler_4.4.1    getPass_0.2-4    </code></pre>
 </div>
 </div>
 </div>
