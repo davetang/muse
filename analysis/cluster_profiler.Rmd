@@ -123,6 +123,78 @@ ego_bp <- enrichGO(
 head(ego_bp)
 ```
 
+Here, we'll perform an over-representation analysis using molecular functions.
+
+```{r ego_mf}
+ego_mf <- enrichGO(
+  gene          = sig_up_genes,
+  universe      = the_universe,
+  OrgDb         = org.Hs.eg.db,
+  ont           = "MF",
+  pAdjustMethod = "BH",
+  pvalueCutoff  = 0.01,
+  qvalueCutoff  = 0.05,
+  minGSSize     = 10,
+  maxGSSize     = 500,
+  readable      = TRUE
+)
+
+head(ego_mf)
+```
+
+`enrichResult` object.
+
+```{r enrich_result_obj}
+class(ego_mf)
+```
+
+Slot names.
+
+```{r enrich_result_slot}
+slotNames(ego_mf)
+```
+
+Why do the universe lengths differ?
+
+```{r universe_lengths}
+length(the_universe)
+length(ego_mf@universe)
+length(ego_bp@universe)
+```
+
+Create Entrez Gene ID to GO term lookup table.
+
+```{r entrez_to_go}
+entrez_to_go <- select(
+  org.Hs.eg.db,
+  keys = keys(org.Hs.eg.db, keytype = "ENTREZID"),
+  columns = c("GO", "ONTOLOGY"),
+  keytype = "ENTREZID"
+)
+
+head(entrez_to_go)
+```
+
+Reproduce the numbers.
+
+```{r universe_lengths_reproduce}
+dplyr::filter(entrez_to_go, ONTOLOGY == "MF") |>
+  dplyr::select(ENTREZID, GO) |>
+  dplyr::distinct() |>
+  dplyr::filter(ENTREZID %in% the_universe) |>
+  dplyr::pull(ENTREZID) |>
+  unique() |>
+  length()
+  
+dplyr::filter(entrez_to_go, ONTOLOGY == "BP") |>
+  dplyr::select(ENTREZID, GO) |>
+  dplyr::distinct() |>
+  dplyr::filter(ENTREZID %in% the_universe) |>
+  dplyr::pull(ENTREZID) |>
+  unique() |>
+  length()
+```
+
 Bar plot showing each enriched GO term coloured by the adjusted p-value.
 
 ```{r barplot}
