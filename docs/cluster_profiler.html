@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree845e8649fe20396618d985ec6f972fcd317b332atargetblank845e864a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebc9f220452162c36b6fde9b7d9d6bb709fe803f6targetblankbc9f220a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/845e8649fe20396618d985ec6f972fcd317b332a" target="_blank">845e864</a>
+<a href="https://github.com/davetang/muse/tree/bc9f220452162c36b6fde9b7d9d6bb709fe803f6" target="_blank">bc9f220</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree845e8649fe20396618d985ec6f972fcd317b332atargetblank845e864a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebc9f220452162c36b6fde9b7d9d6bb709fe803f6targetblankbc9f220a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/845e8649fe20396618d985ec6f972fcd317b332a" target="_blank">845e864</a>.
+<a href="https://github.com/davetang/muse/tree/bc9f220452162c36b6fde9b7d9d6bb709fe803f6" target="_blank">bc9f220</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -636,6 +636,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/bc9f220452162c36b6fde9b7d9d6bb709fe803f6/analysis/cluster_profiler.Rmd" target="_blank">bc9f220</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-24
+</td>
+<td>
+Trying to recreate the ratios
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/0ac82102a0064cf6f70ad9fdec39e3272f0aefe0/docs/cluster_profiler.html" target="_blank">0ac8210</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1168,6 +1202,180 @@ columns</li>
 created by only keeping genes that have at least one GO term in the Gene
 Ontology group of interest.</p>
 </div>
+<div id="ratios" class="section level3">
+<h3>Ratios</h3>
+<p>Another question asked on the interweb and not conclusively answered
+is how are <code>GeneRatio</code> and <code>BgRatio</code> calculated.
+Since we now know that genes are filtered per ontology group we need to
+take this into account. Let’s reproduce the first result for biological
+processes.</p>
+<pre class="r"><code>ego_bp |&gt;
+  as.data.frame() |&gt;
+  dplyr::slice_head(n = 1)</code></pre>
+<pre><code>                   ID                             Description GeneRatio
+GO:0016064 GO:0016064 immunoglobulin mediated immune response    30/385
+             BgRatio RichFactor FoldEnrichment   zScore       pvalue
+GO:0016064 196/17518  0.1530612       6.964484 12.58767 4.569415e-17
+               p.adjust       qvalue
+GO:0016064 1.319717e-13 1.180762e-13
+                                                                                                                                                                                                                       geneID
+GO:0016064 IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/IGHV3-48/BATF/IGHM/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/TREM2/CD28
+           Count
+GO:0016064    30</code></pre>
+<p>Re-create denominators of <code>GeneRatio</code> and
+<code>BgRatio</code>.</p>
+<pre class="r"><code>gene_list_to_go &lt;- function(gene_list, ont = &quot;BP&quot;){
+  dplyr::filter(entrez_to_go, ONTOLOGY == ont) |&gt;
+    dplyr::select(ENTREZID, GO) |&gt;
+    dplyr::filter(ENTREZID %in% gene_list)
+}
+
+gene_list_to_go(sig_up_genes) |&gt;
+  pull(ENTREZID) |&gt;
+  unique() |&gt;
+  length()</code></pre>
+<pre><code>[1] 385</code></pre>
+<pre class="r"><code>gene_list_to_go(the_universe) |&gt;
+  pull(ENTREZID) |&gt;
+  unique() |&gt;
+  length()</code></pre>
+<pre><code>[1] 17518</code></pre>
+<p>The numerator is provided by tallying the <code>geneID</code>
+column.</p>
+<pre class="r"><code>ego_bp |&gt;
+  as.data.frame() |&gt;
+  dplyr::slice_head(n = 1) |&gt;
+  dplyr::pull(geneID) |&gt;
+  stringr::str_split(&quot;/&quot;) |&gt;
+  unlist() |&gt;
+  unique() -&gt; ego_bp_first_gs
+
+ego_bp_first_gs</code></pre>
+<pre><code> [1] &quot;IGLC1&quot;     &quot;IGHG4&quot;     &quot;IGHG2&quot;     &quot;IGHG3&quot;     &quot;IGHV5-51&quot;  &quot;IGLL5&quot;    
+ [7] &quot;IGHV4-39&quot;  &quot;IGLC3&quot;     &quot;IGHV3-23&quot;  &quot;IGHV2-5&quot;   &quot;CD27&quot;      &quot;IGHV3-30&quot; 
+[13] &quot;IGHV3-48&quot;  &quot;BATF&quot;      &quot;IGHM&quot;      &quot;IGHG1&quot;     &quot;IGLC2&quot;     &quot;IGHV4-61&quot; 
+[19] &quot;IGHA2&quot;     &quot;IGHV3-7&quot;   &quot;IGHV3-21&quot;  &quot;IGHV3-33&quot;  &quot;IGHV4-59&quot;  &quot;C4A&quot;      
+[25] &quot;IGHV1-69D&quot; &quot;FOXP3&quot;     &quot;IGKC&quot;      &quot;IGHV3-15&quot;  &quot;TREM2&quot;     &quot;CD28&quot;     </code></pre>
+<p>A clue to reproducing this is that gene symbols are used, so there
+must be some Entrez ID to gene symbol conversion (potentially
+contributing to a one-to-many lookup).</p>
+<pre class="r"><code># columns(org.Hs.eg.db)
+entrez_to_gene_symbol &lt;- select(
+  org.Hs.eg.db,
+  keys = keys(org.Hs.eg.db, keytype = &quot;ENTREZID&quot;),
+  columns = c(&quot;SYMBOL&quot;, &quot;ALIAS&quot;),
+  keytype = &quot;ENTREZID&quot;
+)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>head(entrez_to_gene_symbol)</code></pre>
+<pre><code>  ENTREZID SYMBOL    ALIAS
+1        1   A1BG      A1B
+2        1   A1BG      ABG
+3        1   A1BG      GAB
+4        1   A1BG HYST2477
+5        1   A1BG     A1BG
+6        2    A2M     A2MD</code></pre>
+<p>Get the list of Entrez Gene IDs for up-regulated genes for the first
+result of the biological processes enrichment analysis.</p>
+<p>Note that this length does not match the numerator of
+<code>GeneRatio</code>.</p>
+<pre class="r"><code>gene_list_to_go(sig_up_genes) |&gt;
+  dplyr::filter(GO == &quot;GO:0016064&quot;) |&gt;
+  dplyr::pull(ENTREZID) |&gt;
+  unique() -&gt; eg1
+
+length(eg1)</code></pre>
+<pre><code>[1] 19</code></pre>
+<p>Convert to gene symbols.</p>
+<pre class="r"><code>entrez_to_gene_symbol |&gt;
+  dplyr::filter(ENTREZID %in% eg1) -&gt; eg1_id_symbol
+
+eg1_id_symbol</code></pre>
+<pre><code>    ENTREZID    SYMBOL       ALIAS
+1        939      CD27        S152
+2        939      CD27 S152. LPFS2
+3        939      CD27         T14
+4        939      CD27     TNFRSF7
+5        939      CD27        Tp55
+6        939      CD27        CD27
+7       3514      IGKC       HCAK1
+8       3514      IGKC       IGKCD
+9       3514      IGKC          Km
+10      3514      IGKC        IGKC
+11      3537     IGLC1        IGLC
+12      3537     IGLC1       IGLC1
+13      3538     IGLC2        IGLC
+14      3538     IGLC2       IGLC2
+15      3539     IGLC3        IGLC
+16      3539     IGLC3       IGLC3
+17     28388  IGHV5-51     IGHV551
+18     28388  IGHV5-51          VH
+19     28388  IGHV5-51    IGHV5-51
+20     28391  IGHV4-61     IGHV461
+21     28391  IGHV4-61          VH
+22     28391  IGHV4-61    IGHV4-61
+23     28392  IGHV4-59     IGHV459
+24     28392  IGHV4-59          VH
+25     28392  IGHV4-59    IGHV4-59
+26     28394  IGHV4-39     IGHV439
+27     28394  IGHV4-39          VH
+28     28394  IGHV4-39    IGHV4-39
+29     28424  IGHV3-48     IGHV348
+30     28424  IGHV3-48          VH
+31     28424  IGHV3-48    IGHV3-48
+32     28434  IGHV3-33     IGHV333
+33     28434  IGHV3-33          VH
+34     28434  IGHV3-33    IGHV3-33
+35     28439  IGHV3-30     IGHV330
+36     28439  IGHV3-30          VH
+37     28439  IGHV3-30    IGHV3-30
+38     28442  IGHV3-23        DP47
+39     28442  IGHV3-23     IGHV323
+40     28442  IGHV3-23       V3-23
+41     28442  IGHV3-23        VH26
+42     28442  IGHV3-23    IGHV3-23
+43     28444  IGHV3-21     IGHV321
+44     28444  IGHV3-21          VH
+45     28444  IGHV3-21    IGHV3-21
+46     28448  IGHV3-15     IGHV315
+47     28448  IGHV3-15          VH
+48     28448  IGHV3-15    IGHV3-15
+49     28452   IGHV3-7      IGHV37
+50     28452   IGHV3-7          VH
+51     28452   IGHV3-7     IGHV3-7
+52     28457   IGHV2-5      IGHV25
+53     28457   IGHV2-5          VH
+54     28457   IGHV2-5     IGHV2-5
+55 100423062     IGLL5         IGL
+56 100423062     IGLL5        IGLV
+57 100423062     IGLL5      VL-MAR
+58 100423062     IGLL5       IGLL5
+59 102723169 IGHV1-69D   IGHV1-69D</code></pre>
+<p>Are these gene symbols in our Entrez Gene ID to gene symbol lookup
+table? They are since the same length is returned.</p>
+<pre class="r"><code>entrez_to_gene_symbol |&gt;
+  dplyr::filter(SYMBOL %in% ego_bp_first_gs) |&gt;
+  dplyr::pull(SYMBOL) |&gt;
+  unique() |&gt;
+  length()</code></pre>
+<pre><code>[1] 30</code></pre>
+<p>Get the Entrez Gene IDs from the gene symbols of the results.</p>
+<pre class="r"><code>entrez_to_gene_symbol |&gt;
+  dplyr::filter(SYMBOL %in% ego_bp_first_gs) |&gt;
+  dplyr::pull(ENTREZID) |&gt;
+  unique() -&gt; ego_bp_first_gs_entrez
+
+ego_bp_first_gs_entrez</code></pre>
+<pre><code> [1] &quot;720&quot;       &quot;939&quot;       &quot;940&quot;       &quot;3494&quot;      &quot;3500&quot;      &quot;3501&quot;     
+ [7] &quot;3502&quot;      &quot;3503&quot;      &quot;3507&quot;      &quot;3514&quot;      &quot;3537&quot;      &quot;3538&quot;     
+[13] &quot;3539&quot;      &quot;10538&quot;     &quot;28388&quot;     &quot;28391&quot;     &quot;28392&quot;     &quot;28394&quot;    
+[19] &quot;28424&quot;     &quot;28434&quot;     &quot;28439&quot;     &quot;28442&quot;     &quot;28444&quot;     &quot;28448&quot;    
+[25] &quot;28452&quot;     &quot;28457&quot;     &quot;50943&quot;     &quot;54209&quot;     &quot;100423062&quot; &quot;102723169&quot;</code></pre>
+<p>Why are these Entrez Gene IDs included?</p>
+<pre class="r"><code>setdiff(ego_bp_first_gs_entrez, eg1)</code></pre>
+<pre><code> [1] &quot;720&quot;   &quot;940&quot;   &quot;3494&quot;  &quot;3500&quot;  &quot;3501&quot;  &quot;3502&quot;  &quot;3503&quot;  &quot;3507&quot;  &quot;10538&quot;
+[10] &quot;50943&quot; &quot;54209&quot;</code></pre>
+</div>
 <div id="visualisations" class="section level3">
 <h3>Visualisations</h3>
 <p>Bar plot showing each enriched GO term coloured by the adjusted
@@ -1354,6 +1562,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/0ac82102a0064cf6f70ad9fdec39e3272f0aefe0/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">0ac8210</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-24
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/c8e80cd43b29fa99ef8a009be39c1b496db2de7f/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">c8e80cd</a>
