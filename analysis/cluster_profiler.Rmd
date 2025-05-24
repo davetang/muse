@@ -13,9 +13,13 @@ options(repos=c(CRAN="https://cran.r-project.org"))
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 
+[clusterProfiler](https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html):
+
+> This package supports functional characteristics of both coding and non-coding genomics data for thousands of species with up-to-date gene annotation. It provides a univeral interface for gene functional annotation from a variety of sources and thus can be applied in diverse scenarios. It provides a tidy interface to access, manipulate, and visualize enrichment results to help users achieve efficient data interpretation. Datasets obtained from multiple treatments and time points can be analyzed and compared in a single run, easily revealing functional consensus and differences among distinct conditions.
+
 ## Getting started
 
-Install.
+Install {clusterProfiler} and some dependencies.
 
 ```{r install_cluster_profiler, eval=FALSE}
 if (!require("BiocManager", quietly = TRUE))
@@ -28,7 +32,7 @@ BiocManager::install("org.Hs.eg.db")
 BiocManager::install("GO.db")
 ```
 
-Load libraries.
+Load required libraries.
 
 ```{r load_libraries}
 suppressPackageStartupMessages(library(tidyverse))
@@ -40,7 +44,7 @@ suppressPackageStartupMessages(library(GO.db))
 
 ## Example data
 
-Use [An example differential gene expression results table](https://davetang.org/muse/2024/10/31/an-example-differential-gene-expression-results-table/).
+We will use [An example differential gene expression results table](https://davetang.org/muse/2024/10/31/an-example-differential-gene-expression-results-table/) that contains {edgeR} results comparing normal versus cancer samples.
 
 ```{r de_res}
 de_res <- read_csv("https://raw.githubusercontent.com/davetang/muse/refs/heads/main/data/13970886_edger_res.csv", show_col_types = FALSE)
@@ -49,7 +53,20 @@ head(de_res)
 
 ## Gene IDs
 
-The {clusterProfiler} package uses the `enrichGO()` function for performing a [Gene Ontology over-representation test](https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-go.html#clusterprofiler-go-ora). The input for `gene` is a vector of Entrez Gene IDs.
+The {clusterProfiler} package uses the `enrichGO()` function for performing a [Gene Ontology over-representation test](https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-go.html#clusterprofiler-go-ora). The arguments are:
+
+* `gene` - a vector of entrez gene id.
+* `OrgDb` - OrgDb database
+* `keyType` - keytype of input gene
+* `ont` - One of "BP", "MF", and "CC" subontologies, or "ALL" for all three.
+* `pvalueCutoff` - adjusted pvalue cutoff on enrichment tests to report
+* `pAdjustMethod` - one of "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"
+* `universe` - background genes. If missing, the all genes listed in the database (e.g. TERM2GENE table) will be used as background.
+* `qvalueCutoff` - qvalue cutoff on enrichment tests to report as significant. Tests must pass i) pvalueCutoff on unadjusted pvalues, ii) pvalueCutoff on adjusted pvalues and iii) qvalueCutoff on qvalues to be reported.
+* `minGSSize` - minimal size of genes annotated by Ontology term for testing.
+* `maxGSSize` - maximal size of genes annotated for testing
+* `readable` - whether mapping gene ID to gene Name
+* `pool` - If ont='ALL', whether pool 3 GO sub-ontologies
 
 Our example data uses Ensembl gene IDs, so we need to convert these into Entrez Gene IDs. We can use the {org.Hs.eg.db} package provided by [Bioconductor](https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html), which provides genome wide annotation for human, primarily based on mapping using Entrez Gene identifiers. 
 
@@ -78,9 +95,9 @@ de_res |>
   nrow()
 ```
 
-Instead of examining the list of up-regulated genes individually, which would take a long time, we can see whether these genes have common Gene Ontology terms more often than expected.
+Instead of examining the list of up-regulated genes individually, which would take a long time, we can see whether these genes are associated with Gene Ontology terms more often than expected. Our expectation will be based on the background.
 
-First we'll get the top 500 most significantly up-regulated genes.
+First we'll get the top 500 (an arbitrary number) most significantly up-regulated genes.
 
 ```{r sig_up_genes}
 de_res |>
@@ -90,7 +107,7 @@ de_res |>
   dplyr::pull(ENTREZID) -> sig_up_genes
 ```
 
-Create the background, i.e., the universe, so we can test for over-representation.
+Create the background, i.e., the universe, using all genes tested for differential expression so we can test for over-representation.
 
 ```{r the_universe}
 de_res |>
@@ -142,19 +159,21 @@ ego_mf <- enrichGO(
 head(ego_mf)
 ```
 
-`enrichResult` object.
+### Examining the results
+
+Results are stored in an `enrichResult` class.
 
 ```{r enrich_result_obj}
 class(ego_mf)
 ```
 
-Slot names.
+Slot names of the class.
 
 ```{r enrich_result_slot}
 slotNames(ego_mf)
 ```
 
-Why do the universe lengths differ?
+One question that has been asked (and not conclusively answered) on the interweb is why do the universe lengths differ when the same list of background genes is provided?
 
 ```{r universe_lengths}
 length(the_universe)
@@ -162,7 +181,7 @@ length(ego_mf@universe)
 length(ego_bp@universe)
 ```
 
-Create Entrez Gene ID to GO term lookup table.
+In order to address this, we will first create a Entrez Gene ID to GO term lookup table.
 
 ```{r entrez_to_go}
 entrez_to_go <- select(
@@ -175,9 +194,27 @@ entrez_to_go <- select(
 head(entrez_to_go)
 ```
 
-Reproduce the numbers.
+Intuitively (to me), the only reason why the universe lengths are different per ontology group is because there is some sort of filtering performed per ontology group. One gene is associated to various GO terms and if you group them into the three respective groups, their numbers might be different. Here's an example.
 
-```{r universe_lengths_reproduce}
+```{r entrez_gene_1}
+entrez_to_go |>
+  dplyr::filter(ENTREZID == "1") |>
+  dplyr::summarise(n = n(), .by = ONTOLOGY)
+```
+
+Let's reproduce the universe list for molecular functions. The pipeline below is:
+
+* Filter the Entrez Gene ID to GO term lookup table to only contain GO terms in the MF group
+* Output only the `ENTREZID` and `GO` columns
+* Keep only the unique rows
+* Keep only the Entrez Gene IDs in our background
+* Output all the Entrez Gene IDs
+* Keep only unique IDs
+* Calculate the length
+
+```{r universe_lengths_mf}
+length(ego_mf@universe)
+
 dplyr::filter(entrez_to_go, ONTOLOGY == "MF") |>
   dplyr::select(ENTREZID, GO) |>
   dplyr::distinct() |>
@@ -185,7 +222,13 @@ dplyr::filter(entrez_to_go, ONTOLOGY == "MF") |>
   dplyr::pull(ENTREZID) |>
   unique() |>
   length()
-  
+```
+
+Repeat the same workflow on biological processes.
+
+```{r universe_lengths_bp}
+length(ego_bp@universe)
+
 dplyr::filter(entrez_to_go, ONTOLOGY == "BP") |>
   dplyr::select(ENTREZID, GO) |>
   dplyr::distinct() |>
@@ -194,6 +237,10 @@ dplyr::filter(entrez_to_go, ONTOLOGY == "BP") |>
   unique() |>
   length()
 ```
+
+Getting the same lengths confirms our intuition that gene lists are created by only keeping genes that have at least one GO term in the Gene Ontology group of interest.
+
+### Visualisations
 
 Bar plot showing each enriched GO term coloured by the adjusted p-value.
 
