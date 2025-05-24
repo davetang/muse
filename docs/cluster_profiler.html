@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-05-23" />
+<meta name="date" content="2025-05-24" />
 
 <title>Getting started with clusterProfiler</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Getting started with clusterProfiler</h1>
-<h4 class="date">2025-05-23</h4>
+<h4 class="date">2025-05-24</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-05-23
+<strong>Last updated:</strong> 2025-05-24
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8f0da0060e58f212dd8866784eebf82d06589ccetargetblank8f0da00a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree845e8649fe20396618d985ec6f972fcd317b332atargetblank845e864a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/8f0da0060e58f212dd8866784eebf82d06589cce" target="_blank">8f0da00</a>
+<a href="https://github.com/davetang/muse/tree/845e8649fe20396618d985ec6f972fcd317b332a" target="_blank">845e864</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8f0da0060e58f212dd8866784eebf82d06589ccetargetblank8f0da00a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree845e8649fe20396618d985ec6f972fcd317b332atargetblank845e864a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/8f0da0060e58f212dd8866784eebf82d06589cce" target="_blank">8f0da00</a>.
+<a href="https://github.com/davetang/muse/tree/845e8649fe20396618d985ec6f972fcd317b332a" target="_blank">845e864</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -636,6 +636,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/845e8649fe20396618d985ec6f972fcd317b332a/analysis/cluster_profiler.Rmd" target="_blank">845e864</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-24
+</td>
+<td>
+Better explanations
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/c8e80cd43b29fa99ef8a009be39c1b496db2de7f/docs/cluster_profiler.html" target="_blank">c8e80cd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -796,9 +830,22 @@ Using clusterProfiler
 </div>
 </div>
 </div>
+<p><a
+href="https://bioconductor.org/packages/release/bioc/html/clusterProfiler.html">clusterProfiler</a>:</p>
+<blockquote>
+<p>This package supports functional characteristics of both coding and
+non-coding genomics data for thousands of species with up-to-date gene
+annotation. It provides a univeral interface for gene functional
+annotation from a variety of sources and thus can be applied in diverse
+scenarios. It provides a tidy interface to access, manipulate, and
+visualize enrichment results to help users achieve efficient data
+interpretation. Datasets obtained from multiple treatments and time
+points can be analyzed and compared in a single run, easily revealing
+functional consensus and differences among distinct conditions.</p>
+</blockquote>
 <div id="getting-started" class="section level2">
 <h2>Getting started</h2>
-<p>Install.</p>
+<p>Install {clusterProfiler} and some dependencies.</p>
 <pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
   install.packages(&quot;BiocManager&quot;)
 
@@ -807,7 +854,7 @@ install.packages(&#39;ggtangle&#39;)
 BiocManager::install(&quot;clusterProfiler&quot;)
 BiocManager::install(&quot;org.Hs.eg.db&quot;)
 BiocManager::install(&quot;GO.db&quot;)</code></pre>
-<p>Load libraries.</p>
+<p>Load required libraries.</p>
 <pre class="r"><code>suppressPackageStartupMessages(library(tidyverse))
 suppressPackageStartupMessages(library(ggarchery))
 suppressPackageStartupMessages(library(clusterProfiler))
@@ -816,9 +863,10 @@ suppressPackageStartupMessages(library(GO.db))</code></pre>
 </div>
 <div id="example-data" class="section level2">
 <h2>Example data</h2>
-<p>Use <a
+<p>We will use <a
 href="https://davetang.org/muse/2024/10/31/an-example-differential-gene-expression-results-table/">An
-example differential gene expression results table</a>.</p>
+example differential gene expression results table</a> that contains
+{edgeR} results comparing normal versus cancer samples.</p>
 <pre class="r"><code>de_res &lt;- read_csv(&quot;https://raw.githubusercontent.com/davetang/muse/refs/heads/main/data/13970886_edger_res.csv&quot;, show_col_types = FALSE)
 head(de_res)</code></pre>
 <pre><code># A tibble: 6 × 6
@@ -836,8 +884,32 @@ head(de_res)</code></pre>
 <p>The {clusterProfiler} package uses the <code>enrichGO()</code>
 function for performing a <a
 href="https://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-go.html#clusterprofiler-go-ora">Gene
-Ontology over-representation test</a>. The input for <code>gene</code>
-is a vector of Entrez Gene IDs.</p>
+Ontology over-representation test</a>. The arguments are:</p>
+<ul>
+<li><code>gene</code> - a vector of entrez gene id.</li>
+<li><code>OrgDb</code> - OrgDb database</li>
+<li><code>keyType</code> - keytype of input gene</li>
+<li><code>ont</code> - One of “BP”, “MF”, and “CC” subontologies, or
+“ALL” for all three.</li>
+<li><code>pvalueCutoff</code> - adjusted pvalue cutoff on enrichment
+tests to report</li>
+<li><code>pAdjustMethod</code> - one of “holm”, “hochberg”, “hommel”,
+“bonferroni”, “BH”, “BY”, “fdr”, “none”</li>
+<li><code>universe</code> - background genes. If missing, the all genes
+listed in the database (e.g. TERM2GENE table) will be used as
+background.</li>
+<li><code>qvalueCutoff</code> - qvalue cutoff on enrichment tests to
+report as significant. Tests must pass i) pvalueCutoff on unadjusted
+pvalues, ii) pvalueCutoff on adjusted pvalues and iii) qvalueCutoff on
+qvalues to be reported.</li>
+<li><code>minGSSize</code> - minimal size of genes annotated by Ontology
+term for testing.</li>
+<li><code>maxGSSize</code> - maximal size of genes annotated for
+testing</li>
+<li><code>readable</code> - whether mapping gene ID to gene Name</li>
+<li><code>pool</code> - If ont=‘ALL’, whether pool 3 GO
+sub-ontologies</li>
+</ul>
 <p>Our example data uses Ensembl gene IDs, so we need to convert these
 into Entrez Gene IDs. We can use the {org.Hs.eg.db} package provided by
 <a
@@ -877,17 +949,18 @@ in cancer.</p>
   nrow()</code></pre>
 <pre><code>[1] 1440</code></pre>
 <p>Instead of examining the list of up-regulated genes individually,
-which would take a long time, we can see whether these genes have common
-Gene Ontology terms more often than expected.</p>
-<p>First we’ll get the top 500 most significantly up-regulated
-genes.</p>
+which would take a long time, we can see whether these genes are
+associated with Gene Ontology terms more often than expected. Our
+expectation will be based on the background.</p>
+<p>First we’ll get the top 500 (an arbitrary number) most significantly
+up-regulated genes.</p>
 <pre class="r"><code>de_res |&gt;
   dplyr::filter(logFC &gt; 0, adjusted_pvalue &lt; 0.05) |&gt;
   dplyr::slice_min(order_by = adjusted_pvalue, n = 500) |&gt;
   dplyr::filter(!is.na(ENTREZID)) |&gt;
   dplyr::pull(ENTREZID) -&gt; sig_up_genes</code></pre>
-<p>Create the background, i.e., the universe, so we can test for
-over-representation.</p>
+<p>Create the background, i.e., the universe, using all genes tested for
+differential expression so we can test for over-representation.</p>
 <pre class="r"><code>de_res |&gt;
   dplyr::filter(!is.na(ENTREZID)) |&gt;
   dplyr::pull(ENTREZID) -&gt; the_universe</code></pre>
@@ -1006,25 +1079,30 @@ GO:0042379    12
 GO:0034987     7
 GO:1901681    19
 GO:0005539    17</code></pre>
-<p><code>enrichResult</code> object.</p>
+<div id="examining-the-results" class="section level3">
+<h3>Examining the results</h3>
+<p>Results are stored in an <code>enrichResult</code> class.</p>
 <pre class="r"><code>class(ego_mf)</code></pre>
 <pre><code>[1] &quot;enrichResult&quot;
 attr(,&quot;package&quot;)
 [1] &quot;DOSE&quot;</code></pre>
-<p>Slot names.</p>
+<p>Slot names of the class.</p>
 <pre class="r"><code>slotNames(ego_mf)</code></pre>
 <pre><code> [1] &quot;result&quot;        &quot;pvalueCutoff&quot;  &quot;pAdjustMethod&quot; &quot;qvalueCutoff&quot; 
  [5] &quot;organism&quot;      &quot;ontology&quot;      &quot;gene&quot;          &quot;keytype&quot;      
  [9] &quot;universe&quot;      &quot;gene2Symbol&quot;   &quot;geneSets&quot;      &quot;readable&quot;     
 [13] &quot;termsim&quot;       &quot;method&quot;        &quot;dr&quot;           </code></pre>
-<p>Why do the universe lengths differ?</p>
+<p>One question that has been asked (and not conclusively answered) on
+the interweb is why do the universe lengths differ when the same list of
+background genes is provided?</p>
 <pre class="r"><code>length(the_universe)</code></pre>
 <pre><code>[1] 28722</code></pre>
 <pre class="r"><code>length(ego_mf@universe)</code></pre>
 <pre><code>[1] 17990</code></pre>
 <pre class="r"><code>length(ego_bp@universe)</code></pre>
 <pre><code>[1] 17518</code></pre>
-<p>Create Entrez Gene ID to GO term lookup table.</p>
+<p>In order to address this, we will first create a Entrez Gene ID to GO
+term lookup table.</p>
 <pre class="r"><code>entrez_to_go &lt;- select(
   org.Hs.eg.db,
   keys = keys(org.Hs.eg.db, keytype = &quot;ENTREZID&quot;),
@@ -1040,7 +1118,33 @@ attr(,&quot;package&quot;)
 4        1 GO:0005576      IDA       CC
 5        1 GO:0005576      TAS       CC
 6        1 GO:0005615      HDA       CC</code></pre>
-<p>Reproduce the numbers.</p>
+<p>Intuitively (to me), the only reason why the universe lengths are
+different per ontology group is because there is some sort of filtering
+performed per ontology group. One gene is associated to various GO terms
+and if you group them into the three respective groups, their numbers
+might be different. Here’s an example.</p>
+<pre class="r"><code>entrez_to_go |&gt;
+  dplyr::filter(ENTREZID == &quot;1&quot;) |&gt;
+  dplyr::summarise(n = n(), .by = ONTOLOGY)</code></pre>
+<pre><code>  ONTOLOGY  n
+1       BP  2
+2       MF  1
+3       CC 11</code></pre>
+<p>Let’s reproduce the universe list for molecular functions. The
+pipeline below is:</p>
+<ul>
+<li>Filter the Entrez Gene ID to GO term lookup table to only contain GO
+terms in the MF group</li>
+<li>Output only the <code>ENTREZID</code> and <code>GO</code>
+columns</li>
+<li>Keep only the unique rows</li>
+<li>Keep only the Entrez Gene IDs in our background</li>
+<li>Output all the Entrez Gene IDs</li>
+<li>Keep only unique IDs</li>
+<li>Calculate the length</li>
+</ul>
+<pre class="r"><code>length(ego_mf@universe)</code></pre>
+<pre><code>[1] 17990</code></pre>
 <pre class="r"><code>dplyr::filter(entrez_to_go, ONTOLOGY == &quot;MF&quot;) |&gt;
   dplyr::select(ENTREZID, GO) |&gt;
   dplyr::distinct() |&gt;
@@ -1049,6 +1153,9 @@ attr(,&quot;package&quot;)
   unique() |&gt;
   length()</code></pre>
 <pre><code>[1] 17990</code></pre>
+<p>Repeat the same workflow on biological processes.</p>
+<pre class="r"><code>length(ego_bp@universe)</code></pre>
+<pre><code>[1] 17518</code></pre>
 <pre class="r"><code>dplyr::filter(entrez_to_go, ONTOLOGY == &quot;BP&quot;) |&gt;
   dplyr::select(ENTREZID, GO) |&gt;
   dplyr::distinct() |&gt;
@@ -1057,6 +1164,12 @@ attr(,&quot;package&quot;)
   unique() |&gt;
   length()</code></pre>
 <pre><code>[1] 17518</code></pre>
+<p>Getting the same lengths confirms our intuition that gene lists are
+created by only keeping genes that have at least one GO term in the Gene
+Ontology group of interest.</p>
+</div>
+<div id="visualisations" class="section level3">
+<h3>Visualisations</h3>
 <p>Bar plot showing each enriched GO term coloured by the adjusted
 p-value.</p>
 <pre class="r"><code>barplot(ego_bp, showCategory=10)</code></pre>
@@ -1243,6 +1356,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/c8e80cd43b29fa99ef8a009be39c1b496db2de7f/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">c8e80cd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-23
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/006e824308df24e7f43c3d664e30d96617250941/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">006e824</a>
 </td>
 <td>
@@ -1410,6 +1534,7 @@ Dave Tang
 </tr>
 </tbody>
 </table>
+</div>
 </div>
 </div>
 </div>
