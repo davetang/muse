@@ -240,6 +240,113 @@ dplyr::filter(entrez_to_go, ONTOLOGY == "BP") |>
 
 Getting the same lengths confirms our intuition that gene lists are created by only keeping genes that have at least one GO term in the Gene Ontology group of interest.
 
+### Ratios
+
+Another question asked on the interweb and not conclusively answered is how are `GeneRatio` and `BgRatio` calculated. Since we now know that genes are filtered per ontology group we need to take this into account. Let's reproduce the first result for biological processes.
+
+```{r ego_bp_first}
+ego_bp |>
+  as.data.frame() |>
+  dplyr::slice_head(n = 1)
+```
+
+Re-create denominators of `GeneRatio` and `BgRatio`.
+
+```{r gene_list_to_go}
+gene_list_to_go <- function(gene_list, ont = "BP"){
+  dplyr::filter(entrez_to_go, ONTOLOGY == ont) |>
+    dplyr::select(ENTREZID, GO) |>
+    dplyr::filter(ENTREZID %in% gene_list)
+}
+
+gene_list_to_go(sig_up_genes) |>
+  pull(ENTREZID) |>
+  unique() |>
+  length()
+  
+gene_list_to_go(the_universe) |>
+  pull(ENTREZID) |>
+  unique() |>
+  length()
+```
+
+The numerator is provided by tallying the `geneID` column.
+
+```{r ego_bp_gene_ratio_denom}
+ego_bp |>
+  as.data.frame() |>
+  dplyr::slice_head(n = 1) |>
+  dplyr::pull(geneID) |>
+  stringr::str_split("/") |>
+  unlist() |>
+  unique() -> ego_bp_first_gs
+
+ego_bp_first_gs
+```
+
+A clue to reproducing this is that gene symbols are used, so there must be some Entrez ID to gene symbol conversion (potentially contributing to a one-to-many lookup).
+
+```{r entrez_to_gene_symbol}
+# columns(org.Hs.eg.db)
+entrez_to_gene_symbol <- select(
+  org.Hs.eg.db,
+  keys = keys(org.Hs.eg.db, keytype = "ENTREZID"),
+  columns = c("SYMBOL", "ALIAS"),
+  keytype = "ENTREZID"
+)
+
+head(entrez_to_gene_symbol)
+```
+
+Get the list of Entrez Gene IDs for up-regulated genes for the first result of the biological processes enrichment analysis.
+
+Note that this length does not match the numerator of `GeneRatio`.
+
+```{r eg1}
+gene_list_to_go(sig_up_genes) |>
+  dplyr::filter(GO == "GO:0016064") |>
+  dplyr::pull(ENTREZID) |>
+  unique() -> eg1
+
+length(eg1)
+```
+
+Convert to gene symbols.
+
+```{r eg1_gene_symbols}
+entrez_to_gene_symbol |>
+  dplyr::filter(ENTREZID %in% eg1) -> eg1_id_symbol
+
+eg1_id_symbol
+```
+
+Are these gene symbols in our Entrez Gene ID to gene symbol lookup table? They are since the same length is returned.
+
+```{r check_gene_symbol}
+entrez_to_gene_symbol |>
+  dplyr::filter(SYMBOL %in% ego_bp_first_gs) |>
+  dplyr::pull(SYMBOL) |>
+  unique() |>
+  length()
+```
+
+Get the Entrez Gene IDs from the gene symbols of the results.
+
+```{r ego_bp_first_gs_entrez}
+entrez_to_gene_symbol |>
+  dplyr::filter(SYMBOL %in% ego_bp_first_gs) |>
+  dplyr::pull(ENTREZID) |>
+  unique() -> ego_bp_first_gs_entrez
+
+ego_bp_first_gs_entrez
+```
+
+Why are these Entrez Gene IDs included?
+
+```{r additional_entrez_gene_ids}
+setdiff(ego_bp_first_gs_entrez, eg1)
+```
+
 ### Visualisations
 
 Bar plot showing each enriched GO term coloured by the adjusted p-value.
