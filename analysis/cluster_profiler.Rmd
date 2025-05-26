@@ -261,16 +261,25 @@ gene_list_to_go <- function(gene_list, ont = "BP"){
 
 gene_list_to_go(sig_up_genes) |>
   pull(ENTREZID) |>
-  unique() |>
-  length()
+  unique() -> sig_up_genes_entrez
+length(sig_up_genes_entrez)
   
 gene_list_to_go(the_universe) |>
   pull(ENTREZID) |>
-  unique() |>
-  length()
+  unique() -> the_universe_entrez
+length(the_universe_entrez)
 ```
 
-The numerator is provided by tallying the `geneID` column.
+GO:0016064 is associated to 19 Entrez Gene IDs but the results above are 29.
+
+```{r try_numerator}
+entrez_to_go |>
+  dplyr::filter(ENTREZID %in% sig_up_genes_entrez) |>
+  dplyr::summarise(n = n(), .by = "GO") |>
+  dplyr::filter(GO == "GO:0016064")
+```
+
+The numerator can also be calculated by tallying the `geneID` column.
 
 ```{r ego_bp_gene_ratio_denom}
 ego_bp |>
@@ -284,7 +293,7 @@ ego_bp |>
 ego_bp_first_gs
 ```
 
-A clue to reproducing this is that gene symbols are used, so there must be some Entrez ID to gene symbol conversion (potentially contributing to a one-to-many lookup).
+A clue to reproducing the numerator is that gene symbols are used, so there must be some Entrez Gene ID to gene symbol conversion (potentially contributing to a one-to-many lookup). We will create a Entrez Gene ID to gene symbol lookup table.
 
 ```{r entrez_to_gene_symbol}
 # columns(org.Hs.eg.db)
@@ -308,19 +317,25 @@ gene_list_to_go(sig_up_genes) |>
   dplyr::pull(ENTREZID) |>
   unique() -> eg1
 
-length(eg1)
+eg1
 ```
 
 Convert to gene symbols.
 
 ```{r eg1_gene_symbols}
 entrez_to_gene_symbol |>
-  dplyr::filter(ENTREZID %in% eg1) -> eg1_id_symbol
+  dplyr::filter(ENTREZID %in% eg1) -> eg1_gene_symbol
 
-eg1_id_symbol
+eg1_gene_symbol
 ```
 
-Are these gene symbols in our Entrez Gene ID to gene symbol lookup table? They are since the same length is returned.
+Are the gene symbols in the enriched result in our table of gene symbol and aliases?
+
+```{r check_symbol_and_alias}
+ego_bp_first_gs %in% c(unique(eg1_gene_symbol$SYMBOL), unique(eg1_gene_symbol$ALIAS))
+```
+
+Are all the gene symbols in the enriched results in our Entrez Gene ID to gene symbol lookup table? (Yes.)
 
 ```{r check_gene_symbol}
 entrez_to_gene_symbol |>
@@ -344,8 +359,54 @@ ego_bp_first_gs_entrez
 Why are these Entrez Gene IDs included?
 
 ```{r additional_entrez_gene_ids}
-setdiff(ego_bp_first_gs_entrez, eg1)
+additional_ids <- setdiff(ego_bp_first_gs_entrez, eg1)
+additional_ids
 ```
+
+Are these additional IDs in our results?
+
+```{r check_additional_ids}
+additional_ids %in% sig_up_genes
+```
+
+Build GO to Entrez Gene ID lookup.
+
+```{r go_to_entrez}
+go_to_entrez <- select(
+  org.Hs.eg.db,
+  keys = keys(GO.db),
+  columns = "ENTREZID",
+  keytype = "GO"
+)
+
+head(go_to_entrez)
+```
+
+I still get 19.
+
+```{r go_to_entrez_sig_up_genes}
+go_to_entrez |>
+  dplyr::filter(GO == "GO:0016064", ENTREZID %in% sig_up_genes) |>
+  dplyr::pull(ENTREZID) |>
+  unique() |>
+  length()
+```
+
+Include GO.
+
+```{r entrez_to_symbol_and_go}
+entrez_to_symbol_and_go <- select(
+  org.Hs.eg.db,
+  keys = keys(org.Hs.eg.db, keytype = "ENTREZID"),
+  columns = c("SYMBOL", "GO"),
+  keytype = "ENTREZID"
+)
+
+entrez_to_symbol_and_go |>
+  dplyr::filter(GO == "GO:0016064", ENTREZID %in% sig_up_genes)
+```
+
+Still a mystery on the number 29.
 
 ### Visualisations
 
@@ -369,7 +430,7 @@ heatplot(ego_bp, showCategory=10)
 
 `goplot` shows the gene ontology graph with the enriched GO terms highlighted.
 
-```{r goplot, fig.height=10, fig.width=12}
+```{r goplot, fig.height=10, fig.width=12, error=TRUE}
 goplot(ego_bp)
 ```
 
