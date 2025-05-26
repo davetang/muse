@@ -298,11 +298,35 @@ sum(fgseaRes[, padj < 0.01])
 Plot the most significantly enriched pathway.
 
 ```{r plot_sign_pathway}
+library(ggplot2)
 plotEnrichment(
   examplePathways[[head(fgseaRes[order(pval), ], 1)$pathway]],
-  exampleRanks
+  exampleRanks,
+  ticksSize = 0.2 # default
 ) +
-  ggplot2::labs(title=head(fgseaRes[order(pval), ], 1)$pathway)
+  labs(title=head(fgseaRes[order(pval), ], 1)$pathway) -> p
+
+p
+```
+
+Check out the object returned by `plotEnrichment()`.
+
+```{r plot_enrichment_object}
+class(p)
+names(p)
+```
+
+Look inside layers.
+
+```{r ggplot_layers}
+p$layers
+```
+
+Change line width of `geom_line`.
+
+```{r change_line_width}
+p$layers[[1]]$aes_params$size <- 2
+p
 ```
 
 Plot the top 10 pathways enriched at the top and bottom of the ranked list, respectively.
