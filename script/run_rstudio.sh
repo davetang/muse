@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-version=4.4.1
+version=4.5.0
 rstudio_image=davetang/rstudio:${version}
 container_name=rstudio_muse
 port=7777
