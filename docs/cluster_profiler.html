@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2025-05-24" />
+<meta name="date" content="2025-05-26" />
 
 <title>Getting started with clusterProfiler</title>
 
-<script src="site_libs/header-attrs-2.28/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -36,8 +36,8 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Getting started with clusterProfiler</h1>
-<h4 class="date">2025-05-24</h4>
+<h4 class="date">2025-05-26</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-05-24
+<strong>Last updated:</strong> 2025-05-26
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebc9f220452162c36b6fde9b7d9d6bb709fe803f6targetblankbc9f220a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeec4e2515caca03020a6be3dc7914be6231d90208targetblankec4e251a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/bc9f220452162c36b6fde9b7d9d6bb709fe803f6" target="_blank">bc9f220</a>
+<a href="https://github.com/davetang/muse/tree/ec4e2515caca03020a6be3dc7914be6231d90208" target="_blank">ec4e251</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebc9f220452162c36b6fde9b7d9d6bb709fe803f6targetblankbc9f220a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeec4e2515caca03020a6be3dc7914be6231d90208targetblankec4e251a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/bc9f220452162c36b6fde9b7d9d6bb709fe803f6" target="_blank">bc9f220</a>.
+<a href="https://github.com/davetang/muse/tree/ec4e2515caca03020a6be3dc7914be6231d90208" target="_blank">ec4e251</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -582,6 +582,7 @@ Ignored files:
     Ignored:    data/seurat_1m_neuron.rds
     Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
     Ignored:    r_packages_4.4.1/
+    Ignored:    r_packages_4.5.0/
 
 Untracked files:
     Untracked:  Nothobranchius_furzeri.Nfu_20140520.113.gtf.gz
@@ -636,6 +637,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/ec4e2515caca03020a6be3dc7914be6231d90208/analysis/cluster_profiler.Rmd" target="_blank">ec4e251</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-26
+</td>
+<td>
+Trying to reproduce the numerator
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/94680bd73fa5fd3b9ff81bae1f6dda032ef2f4d2/docs/cluster_profiler.html" target="_blank">94680bd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -981,7 +1016,7 @@ in cancer.</p>
 <pre class="r"><code>de_res |&gt;
   dplyr::filter(logFC &gt; 0, adjusted_pvalue &lt; 0.05) |&gt;
   nrow()</code></pre>
-<pre><code>[1] 1440</code></pre>
+<pre><code>[1] 1442</code></pre>
 <p>Instead of examining the list of up-regulated genes individually,
 which would take a long time, we can see whether these genes are
 associated with Gene Ontology terms more often than expected. Our
@@ -1035,30 +1070,30 @@ GO:0002449                                                                      
 GO:0002443                                                                                               leukocyte mediated immunity
 GO:0006959                                                                                                   humoral immune response
            GeneRatio   BgRatio RichFactor FoldEnrichment    zScore       pvalue
-GO:0016064    30/385 196/17518 0.15306122       6.964484 12.587673 4.569415e-17
-GO:0019724    30/385 199/17518 0.15075377       6.859492 12.461452 7.046005e-17
-GO:0002460    37/385 382/17518 0.09685864       4.407194 10.092931 3.590714e-14
-GO:0002449    35/385 368/17518 0.09510870       4.327569  9.670801 3.134308e-13
-GO:0002443    38/385 466/17518 0.08154506       3.710406  8.889621 3.440135e-12
-GO:0006959    30/385 299/17518 0.10033445       4.565348  9.321312 4.278292e-12
+GO:0016064    29/386 192/17354 0.15104167       6.790614 12.169056 3.046858e-16
+GO:0019724    29/386 195/17354 0.14871795       6.686143 12.043556 4.660827e-16
+GO:0002460    36/386 379/17354 0.09498681       4.270469  9.709355 2.085276e-13
+GO:0002449    35/386 367/17354 0.09536785       4.287600  9.601062 4.074276e-13
+GO:0002443    38/386 465/17354 0.08172043       3.674032  8.815698 4.599706e-12
+GO:0006959    30/386 298/17354 0.10067114       4.526028  9.260213 5.283568e-12
                p.adjust       qvalue
-GO:0016064 1.319717e-13 1.180762e-13
-GO:0019724 1.319717e-13 1.180762e-13
-GO:0002460 4.483604e-11 4.011520e-11
-GO:0002449 2.935280e-10 2.626220e-10
-GO:0002443 2.577349e-09 2.305977e-09
-GO:0006959 2.671080e-09 2.389839e-09
-                                                                                                                                                                                                                                                                     geneID
-GO:0016064                                               IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/IGHV3-48/BATF/IGHM/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/TREM2/CD28
-GO:0019724                                               IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/IGHV3-48/BATF/IGHM/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/TREM2/CD28
-GO:0002460   IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IL4I1/IRF4/JAK3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/CCL19/IGHV3-48/CXCL13/LILRB4/BATF/IGHM/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/PLA2G4A/TREM2/CD28
-GO:0002449                IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IL4I1/IGHV3-23/IGHV2-5/CD27/IGHV3-30/SLAMF7/IGHV3-48/LILRB4/BATF/IGHM/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/CD2/FOXP3/LGALS9/IGKC/IGHV3-15/TREM2/CD28
-GO:0002443 IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IL4I1/JAK3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/SLAMF7/IGHV3-48/LILRB4/BATF/IGHM/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/CCL3/IGHV1-69D/CD84/CD2/FOXP3/LGALS9/IGKC/IGHV3-15/TREM2/CD28
-GO:0006959                                                                             WFDC2/IGHG4/IGHG2/IGHG3/IGKV3-20/CXCL14/POU2AF1/MMP7/CCL22/BPIFA1/CXCL9/CCL19/CXCL13/CXCL1/LTF/CXCL10/MS4A1/IGHM/IGHG1/POU2F2/CCL7/TNFRSF21/ADM/IGHA2/C4A/CCL3/CXCL8/CCL8/TREM2/CD28
+GO:0016064 8.722738e-13 7.827737e-13
+GO:0019724 8.722738e-13 7.827737e-13
+GO:0002460 2.601729e-10 2.334777e-10
+GO:0002449 3.812504e-10 3.421319e-10
+GO:0002443 3.296066e-09 2.957871e-09
+GO:0006959 3.296066e-09 2.957871e-09
+                                                                                                                                                                                                                                                                        geneID
+GO:0016064                                                       IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/IGHV3-48/BATF/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/TREM2/CD28
+GO:0019724                                                       IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/IGHV3-48/BATF/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/TREM2/CD28
+GO:0002460           IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IL4I1/IRF4/JAK3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/CCL19/IGHV3-48/CXCL13/LILRB4/BATF/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/PLA2G4A/TREM2/CD28
+GO:0002449                IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IL4I1/IGHV3-23/IGHV2-5/CD27/IGHV3-30/SLAMF7/IGHV3-48/NECTIN4/LILRB4/BATF/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/CD2/FOXP3/LGALS9/IGKC/IGHV3-15/TREM2/CD28
+GO:0002443 IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IL4I1/JAK3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/SLAMF7/IGHV3-48/NECTIN4/LILRB4/BATF/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/CCL3/IGHV1-69D/CD84/CD2/FOXP3/LGALS9/IGKC/IGHV3-15/TREM2/CD28
+GO:0006959                                                                                WFDC2/IGHG4/IGHG2/IGHG3/IGKV3-20/CXCL14/POU2AF1/MMP7/CCL22/BPIFA1/CXCL9/CCL19/CXCL13/CXCL1/LTF/CXCL10/MS4A1/IGHM/IGHG1/POU2F2/CCL7/TNFRSF21/ADM/IGHA2/C4A/CCL3/CXCL8/CCL8/TREM2/CD28
            Count
-GO:0016064    30
-GO:0019724    30
-GO:0002460    37
+GO:0016064    29
+GO:0019724    29
+GO:0002460    36
 GO:0002449    35
 GO:0002443    38
 GO:0006959    30</code></pre>
@@ -1079,38 +1114,38 @@ functions.</p>
 
 head(ego_mf)</code></pre>
 <pre><code>                   ID                     Description GeneRatio   BgRatio
-GO:0003823 GO:0003823                 antigen binding    50/387 160/17990
-GO:0008009 GO:0008009              chemokine activity    11/387  48/17990
-GO:0042379 GO:0042379      chemokine receptor binding    12/387  71/17990
-GO:0034987 GO:0034987 immunoglobulin receptor binding     7/387  18/17990
-GO:1901681 GO:1901681         sulfur compound binding    19/387 275/17990
-GO:0005539 GO:0005539       glycosaminoglycan binding    17/387 242/17990
+GO:0003823 GO:0003823                 antigen binding    50/387 158/17900
+GO:0008009 GO:0008009              chemokine activity    10/387  44/17900
+GO:0034987 GO:0034987 immunoglobulin receptor binding     7/387  18/17900
+GO:0042379 GO:0042379      chemokine receptor binding    11/387  68/17900
+GO:1901681 GO:1901681         sulfur compound binding    19/387 273/17900
+GO:0005539 GO:0005539       glycosaminoglycan binding    17/387 238/17900
            RichFactor FoldEnrichment    zScore       pvalue     p.adjust
-GO:0003823 0.31250000      14.526809 25.482693 2.115229e-44 1.360092e-41
-GO:0008009 0.22916667      10.652993  9.929168 4.385342e-09 1.409887e-06
-GO:0042379 0.16901408       7.856753  8.583342 3.381536e-08 7.247758e-06
-GO:0034987 0.38888889      18.077806 10.748201 5.239361e-08 8.422272e-06
-GO:1901681 0.06909091       3.211745  5.480202 8.581339e-06 1.103560e-03
-GO:0005539 0.07024793       3.265531  5.261003 2.059303e-05 2.004116e-03
+GO:0003823 0.31645570      14.637098 25.594038 1.316692e-44 9.348515e-42
+GO:0008009 0.22727273      10.512098  9.390747 2.560692e-08 9.090455e-06
+GO:0034987 0.38888889      17.987367 10.718743 5.420961e-08 1.282961e-05
+GO:0042379 0.16176471       7.482140  7.960905 2.126713e-07 3.774916e-05
+GO:1901681 0.06959707       3.219089  5.492328 8.292546e-06 1.177542e-03
+GO:0005539 0.07142857       3.303802  5.318673 1.769284e-05 2.057883e-03
                  qvalue
-GO:0003823 1.266911e-41
-GO:0008009 1.313294e-06
-GO:0042379 6.751207e-06
-GO:0034987 7.845253e-06
-GO:1901681 1.027954e-03
-GO:0005539 1.866812e-03
+GO:0003823 8.787188e-42
+GO:0008009 8.544623e-06
+GO:0034987 1.205926e-05
+GO:0042379 3.548253e-05
+GO:1901681 1.106837e-03
+GO:0005539 1.934319e-03
                                                                                                                                                                                                                                                                                                                                                                                                                                geneID
 GO:0003823 IGKV4-1/IGLV1-51/IGLV1-44/IGLV1-40/IGLV3-21/IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGKV3-20/IGKV1-5/IGKV3-15/IGLL5/IGHV4-39/IGLV1-47/IGLV2-23/IGLV2-14/IGLC3/IGKV1D-39/IGHV3-23/IGHV2-5/HLA-DQB2/IGLV3-19/IGHV3-30/IGHV3-48/IGKV2D-28/IGLV6-57/IGLV3-25/IGHM/IGHG1/IGLC2/SLC7A5/IGHV4-61/IGLV2-8/IGLV7-43/IGLV3-27/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/HLA-DQA1/HLA-DQA2/IGKV1-39/IGKV2-30/IGHV1-69D/IGKC/IGHV3-15/IGKV1-17
-GO:0008009                                                                                                                                                                                                                                                                                                                                                          CXCL14/CCL22/CXCL9/CCL19/CXCL13/CXCL1/CXCL10/CCL7/CCL3/CXCL8/CCL8
-GO:0042379                                                                                                                                                                                                                                                                                                                                                    CXCL14/CCL22/CXCL9/CCL19/CXCL13/CXCL1/CXCL10/CCL7/CCL3/CXCL8/STAT1/CCL8
+GO:0008009                                                                                                                                                                                                                                                                                                                                                                CXCL14/CCL22/CXCL9/CCL19/CXCL13/CXCL10/CCL7/CCL3/CXCL8/CCL8
 GO:0034987                                                                                                                                                                                                                                                                                                                                                                                  IGHG4/IGHG2/IGHG3/IGHM/IGHG1/ADAM28/IGHA2
+GO:0042379                                                                                                                                                                                                                                                                                                                                                          CXCL14/CCL22/CXCL9/CCL19/CXCL13/CXCL10/CCL7/CCL3/CXCL8/STAT1/CCL8
 GO:1901681                                                                                                                                                                                                                                                                                                            PLA2G2D/CXCL13/LTF/CXCL10/TMEM184A/MDK/PTGES/CCN4/COMP/CCL7/NRP2/RCC1/CHST15/ADGRG1/THBS2/CXCL8/PTGES2/GSS/CCL8
 GO:0005539                                                                                                                                                                                                                                                                                                                        PLA2G2D/CXCL13/LTF/CXCL10/IGHM/TMEM184A/MDK/CEMIP/CCN4/COMP/CCL7/NRP2/ADGRG1/THBS2/CXCL8/CCL8/TREM2
            Count
 GO:0003823    50
-GO:0008009    11
-GO:0042379    12
+GO:0008009    10
 GO:0034987     7
+GO:0042379    11
 GO:1901681    19
 GO:0005539    17</code></pre>
 <div id="examining-the-results" class="section level3">
@@ -1130,11 +1165,11 @@ attr(,&quot;package&quot;)
 the interweb is why do the universe lengths differ when the same list of
 background genes is provided?</p>
 <pre class="r"><code>length(the_universe)</code></pre>
-<pre><code>[1] 28722</code></pre>
+<pre><code>[1] 28981</code></pre>
 <pre class="r"><code>length(ego_mf@universe)</code></pre>
-<pre><code>[1] 17990</code></pre>
+<pre><code>[1] 17900</code></pre>
 <pre class="r"><code>length(ego_bp@universe)</code></pre>
-<pre><code>[1] 17518</code></pre>
+<pre><code>[1] 17354</code></pre>
 <p>In order to address this, we will first create a Entrez Gene ID to GO
 term lookup table.</p>
 <pre class="r"><code>entrez_to_go &lt;- select(
@@ -1147,11 +1182,11 @@ term lookup table.</p>
 <pre class="r"><code>head(entrez_to_go)</code></pre>
 <pre><code>  ENTREZID         GO EVIDENCE ONTOLOGY
 1        1 GO:0002764      IBA       BP
-2        1 GO:0003674       ND       MF
-3        1 GO:0005576      HDA       CC
-4        1 GO:0005576      IDA       CC
-5        1 GO:0005576      TAS       CC
-6        1 GO:0005615      HDA       CC</code></pre>
+2        1 GO:0005576      HDA       CC
+3        1 GO:0005576      IDA       CC
+4        1 GO:0005576      TAS       CC
+5        1 GO:0005615      HDA       CC
+6        1 GO:0005886      IBA       CC</code></pre>
 <p>Intuitively (to me), the only reason why the universe lengths are
 different per ontology group is because there is some sort of filtering
 performed per ontology group. One gene is associated to various GO terms
@@ -1161,9 +1196,8 @@ might be different. Here’s an example.</p>
   dplyr::filter(ENTREZID == &quot;1&quot;) |&gt;
   dplyr::summarise(n = n(), .by = ONTOLOGY)</code></pre>
 <pre><code>  ONTOLOGY  n
-1       BP  2
-2       MF  1
-3       CC 11</code></pre>
+1       BP  1
+2       CC 11</code></pre>
 <p>Let’s reproduce the universe list for molecular functions. The
 pipeline below is:</p>
 <ul>
@@ -1178,7 +1212,7 @@ columns</li>
 <li>Calculate the length</li>
 </ul>
 <pre class="r"><code>length(ego_mf@universe)</code></pre>
-<pre><code>[1] 17990</code></pre>
+<pre><code>[1] 17900</code></pre>
 <pre class="r"><code>dplyr::filter(entrez_to_go, ONTOLOGY == &quot;MF&quot;) |&gt;
   dplyr::select(ENTREZID, GO) |&gt;
   dplyr::distinct() |&gt;
@@ -1186,10 +1220,10 @@ columns</li>
   dplyr::pull(ENTREZID) |&gt;
   unique() |&gt;
   length()</code></pre>
-<pre><code>[1] 17990</code></pre>
+<pre><code>[1] 17900</code></pre>
 <p>Repeat the same workflow on biological processes.</p>
 <pre class="r"><code>length(ego_bp@universe)</code></pre>
-<pre><code>[1] 17518</code></pre>
+<pre><code>[1] 17354</code></pre>
 <pre class="r"><code>dplyr::filter(entrez_to_go, ONTOLOGY == &quot;BP&quot;) |&gt;
   dplyr::select(ENTREZID, GO) |&gt;
   dplyr::distinct() |&gt;
@@ -1197,7 +1231,7 @@ columns</li>
   dplyr::pull(ENTREZID) |&gt;
   unique() |&gt;
   length()</code></pre>
-<pre><code>[1] 17518</code></pre>
+<pre><code>[1] 17354</code></pre>
 <p>Getting the same lengths confirms our intuition that gene lists are
 created by only keeping genes that have at least one GO term in the Gene
 Ontology group of interest.</p>
@@ -1213,15 +1247,15 @@ processes.</p>
   as.data.frame() |&gt;
   dplyr::slice_head(n = 1)</code></pre>
 <pre><code>                   ID                             Description GeneRatio
-GO:0016064 GO:0016064 immunoglobulin mediated immune response    30/385
+GO:0016064 GO:0016064 immunoglobulin mediated immune response    29/386
              BgRatio RichFactor FoldEnrichment   zScore       pvalue
-GO:0016064 196/17518  0.1530612       6.964484 12.58767 4.569415e-17
+GO:0016064 192/17354  0.1510417       6.790614 12.16906 3.046858e-16
                p.adjust       qvalue
-GO:0016064 1.319717e-13 1.180762e-13
-                                                                                                                                                                                                                       geneID
-GO:0016064 IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/IGHV3-48/BATF/IGHM/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/TREM2/CD28
+GO:0016064 8.722738e-13 7.827737e-13
+                                                                                                                                                                                                                  geneID
+GO:0016064 IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/IGHV3-48/BATF/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/TREM2/CD28
            Count
-GO:0016064    30</code></pre>
+GO:0016064    29</code></pre>
 <p>Re-create denominators of <code>GeneRatio</code> and
 <code>BgRatio</code>.</p>
 <pre class="r"><code>gene_list_to_go &lt;- function(gene_list, ont = &quot;BP&quot;){
@@ -1232,16 +1266,24 @@ GO:0016064    30</code></pre>
 
 gene_list_to_go(sig_up_genes) |&gt;
   pull(ENTREZID) |&gt;
-  unique() |&gt;
-  length()</code></pre>
-<pre><code>[1] 385</code></pre>
+  unique() -&gt; sig_up_genes_entrez
+length(sig_up_genes_entrez)</code></pre>
+<pre><code>[1] 386</code></pre>
 <pre class="r"><code>gene_list_to_go(the_universe) |&gt;
   pull(ENTREZID) |&gt;
-  unique() |&gt;
-  length()</code></pre>
-<pre><code>[1] 17518</code></pre>
-<p>The numerator is provided by tallying the <code>geneID</code>
-column.</p>
+  unique() -&gt; the_universe_entrez
+length(the_universe_entrez)</code></pre>
+<pre><code>[1] 17354</code></pre>
+<p><a href="GO:0016064" class="uri">GO:0016064</a> is associated to 19
+Entrez Gene IDs but the results above are 29.</p>
+<pre class="r"><code>entrez_to_go |&gt;
+  dplyr::filter(ENTREZID %in% sig_up_genes_entrez) |&gt;
+  dplyr::summarise(n = n(), .by = &quot;GO&quot;) |&gt;
+  dplyr::filter(GO == &quot;GO:0016064&quot;)</code></pre>
+<pre><code>          GO  n
+1 GO:0016064 19</code></pre>
+<p>The numerator can also be calculated by tallying the
+<code>geneID</code> column.</p>
 <pre class="r"><code>ego_bp |&gt;
   as.data.frame() |&gt;
   dplyr::slice_head(n = 1) |&gt;
@@ -1253,12 +1295,13 @@ column.</p>
 ego_bp_first_gs</code></pre>
 <pre><code> [1] &quot;IGLC1&quot;     &quot;IGHG4&quot;     &quot;IGHG2&quot;     &quot;IGHG3&quot;     &quot;IGHV5-51&quot;  &quot;IGLL5&quot;    
  [7] &quot;IGHV4-39&quot;  &quot;IGLC3&quot;     &quot;IGHV3-23&quot;  &quot;IGHV2-5&quot;   &quot;CD27&quot;      &quot;IGHV3-30&quot; 
-[13] &quot;IGHV3-48&quot;  &quot;BATF&quot;      &quot;IGHM&quot;      &quot;IGHG1&quot;     &quot;IGLC2&quot;     &quot;IGHV4-61&quot; 
-[19] &quot;IGHA2&quot;     &quot;IGHV3-7&quot;   &quot;IGHV3-21&quot;  &quot;IGHV3-33&quot;  &quot;IGHV4-59&quot;  &quot;C4A&quot;      
-[25] &quot;IGHV1-69D&quot; &quot;FOXP3&quot;     &quot;IGKC&quot;      &quot;IGHV3-15&quot;  &quot;TREM2&quot;     &quot;CD28&quot;     </code></pre>
-<p>A clue to reproducing this is that gene symbols are used, so there
-must be some Entrez ID to gene symbol conversion (potentially
-contributing to a one-to-many lookup).</p>
+[13] &quot;IGHV3-48&quot;  &quot;BATF&quot;      &quot;IGHG1&quot;     &quot;IGLC2&quot;     &quot;IGHV4-61&quot;  &quot;IGHA2&quot;    
+[19] &quot;IGHV3-7&quot;   &quot;IGHV3-21&quot;  &quot;IGHV3-33&quot;  &quot;IGHV4-59&quot;  &quot;C4A&quot;       &quot;IGHV1-69D&quot;
+[25] &quot;FOXP3&quot;     &quot;IGKC&quot;      &quot;IGHV3-15&quot;  &quot;TREM2&quot;     &quot;CD28&quot;     </code></pre>
+<p>A clue to reproducing the numerator is that gene symbols are used, so
+there must be some Entrez Gene ID to gene symbol conversion (potentially
+contributing to a one-to-many lookup). We will create a Entrez Gene ID
+to gene symbol lookup table.</p>
 <pre class="r"><code># columns(org.Hs.eg.db)
 entrez_to_gene_symbol &lt;- select(
   org.Hs.eg.db,
@@ -1284,13 +1327,16 @@ result of the biological processes enrichment analysis.</p>
   dplyr::pull(ENTREZID) |&gt;
   unique() -&gt; eg1
 
-length(eg1)</code></pre>
-<pre><code>[1] 19</code></pre>
+eg1</code></pre>
+<pre><code> [1] &quot;939&quot;       &quot;3514&quot;      &quot;3537&quot;      &quot;3538&quot;      &quot;3539&quot;      &quot;28388&quot;    
+ [7] &quot;28391&quot;     &quot;28392&quot;     &quot;28394&quot;     &quot;28424&quot;     &quot;28434&quot;     &quot;28439&quot;    
+[13] &quot;28442&quot;     &quot;28444&quot;     &quot;28448&quot;     &quot;28452&quot;     &quot;28457&quot;     &quot;100423062&quot;
+[19] &quot;102723169&quot;</code></pre>
 <p>Convert to gene symbols.</p>
 <pre class="r"><code>entrez_to_gene_symbol |&gt;
-  dplyr::filter(ENTREZID %in% eg1) -&gt; eg1_id_symbol
+  dplyr::filter(ENTREZID %in% eg1) -&gt; eg1_gene_symbol
 
-eg1_id_symbol</code></pre>
+eg1_gene_symbol</code></pre>
 <pre><code>    ENTREZID    SYMBOL       ALIAS
 1        939      CD27        S152
 2        939      CD27 S152. LPFS2
@@ -1351,14 +1397,20 @@ eg1_id_symbol</code></pre>
 57 100423062     IGLL5      VL-MAR
 58 100423062     IGLL5       IGLL5
 59 102723169 IGHV1-69D   IGHV1-69D</code></pre>
-<p>Are these gene symbols in our Entrez Gene ID to gene symbol lookup
-table? They are since the same length is returned.</p>
+<p>Are the gene symbols in the enriched result in our table of gene
+symbol and aliases?</p>
+<pre class="r"><code>ego_bp_first_gs %in% c(unique(eg1_gene_symbol$SYMBOL), unique(eg1_gene_symbol$ALIAS))</code></pre>
+<pre><code> [1]  TRUE FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE
+[13]  TRUE FALSE FALSE  TRUE  TRUE FALSE  TRUE  TRUE  TRUE  TRUE FALSE  TRUE
+[25] FALSE  TRUE  TRUE FALSE FALSE</code></pre>
+<p>Are all the gene symbols in the enriched results in our Entrez Gene
+ID to gene symbol lookup table? (Yes.)</p>
 <pre class="r"><code>entrez_to_gene_symbol |&gt;
   dplyr::filter(SYMBOL %in% ego_bp_first_gs) |&gt;
   dplyr::pull(SYMBOL) |&gt;
   unique() |&gt;
   length()</code></pre>
-<pre><code>[1] 30</code></pre>
+<pre><code>[1] 29</code></pre>
 <p>Get the Entrez Gene IDs from the gene symbols of the results.</p>
 <pre class="r"><code>entrez_to_gene_symbol |&gt;
   dplyr::filter(SYMBOL %in% ego_bp_first_gs) |&gt;
@@ -1367,14 +1419,72 @@ table? They are since the same length is returned.</p>
 
 ego_bp_first_gs_entrez</code></pre>
 <pre><code> [1] &quot;720&quot;       &quot;939&quot;       &quot;940&quot;       &quot;3494&quot;      &quot;3500&quot;      &quot;3501&quot;     
- [7] &quot;3502&quot;      &quot;3503&quot;      &quot;3507&quot;      &quot;3514&quot;      &quot;3537&quot;      &quot;3538&quot;     
-[13] &quot;3539&quot;      &quot;10538&quot;     &quot;28388&quot;     &quot;28391&quot;     &quot;28392&quot;     &quot;28394&quot;    
-[19] &quot;28424&quot;     &quot;28434&quot;     &quot;28439&quot;     &quot;28442&quot;     &quot;28444&quot;     &quot;28448&quot;    
-[25] &quot;28452&quot;     &quot;28457&quot;     &quot;50943&quot;     &quot;54209&quot;     &quot;100423062&quot; &quot;102723169&quot;</code></pre>
+ [7] &quot;3502&quot;      &quot;3503&quot;      &quot;3514&quot;      &quot;3537&quot;      &quot;3538&quot;      &quot;3539&quot;     
+[13] &quot;10538&quot;     &quot;28388&quot;     &quot;28391&quot;     &quot;28392&quot;     &quot;28394&quot;     &quot;28424&quot;    
+[19] &quot;28434&quot;     &quot;28439&quot;     &quot;28442&quot;     &quot;28444&quot;     &quot;28448&quot;     &quot;28452&quot;    
+[25] &quot;28457&quot;     &quot;50943&quot;     &quot;54209&quot;     &quot;100423062&quot; &quot;102723169&quot;</code></pre>
 <p>Why are these Entrez Gene IDs included?</p>
-<pre class="r"><code>setdiff(ego_bp_first_gs_entrez, eg1)</code></pre>
-<pre><code> [1] &quot;720&quot;   &quot;940&quot;   &quot;3494&quot;  &quot;3500&quot;  &quot;3501&quot;  &quot;3502&quot;  &quot;3503&quot;  &quot;3507&quot;  &quot;10538&quot;
-[10] &quot;50943&quot; &quot;54209&quot;</code></pre>
+<pre class="r"><code>additional_ids &lt;- setdiff(ego_bp_first_gs_entrez, eg1)
+additional_ids</code></pre>
+<pre><code> [1] &quot;720&quot;   &quot;940&quot;   &quot;3494&quot;  &quot;3500&quot;  &quot;3501&quot;  &quot;3502&quot;  &quot;3503&quot;  &quot;10538&quot; &quot;50943&quot;
+[10] &quot;54209&quot;</code></pre>
+<p>Are these additional IDs in our results?</p>
+<pre class="r"><code>additional_ids %in% sig_up_genes</code></pre>
+<pre><code> [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE</code></pre>
+<p>Build GO to Entrez Gene ID lookup.</p>
+<pre class="r"><code>go_to_entrez &lt;- select(
+  org.Hs.eg.db,
+  keys = keys(GO.db),
+  columns = &quot;ENTREZID&quot;,
+  keytype = &quot;GO&quot;
+)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>head(go_to_entrez)</code></pre>
+<pre><code>          GO EVIDENCE ONTOLOGY ENTREZID
+1 GO:0000001     &lt;NA&gt;     &lt;NA&gt;     &lt;NA&gt;
+2 GO:0000002      TAS       BP      291
+3 GO:0000002      IMP       BP     1890
+4 GO:0000002      ISS       BP     4205
+5 GO:0000002      IMP       BP     4358
+6 GO:0000002      IMP       BP     4976</code></pre>
+<p>I still get 19.</p>
+<pre class="r"><code>go_to_entrez |&gt;
+  dplyr::filter(GO == &quot;GO:0016064&quot;, ENTREZID %in% sig_up_genes) |&gt;
+  dplyr::pull(ENTREZID) |&gt;
+  unique() |&gt;
+  length()</code></pre>
+<pre><code>[1] 19</code></pre>
+<p>Include GO.</p>
+<pre class="r"><code>entrez_to_symbol_and_go &lt;- select(
+  org.Hs.eg.db,
+  keys = keys(org.Hs.eg.db, keytype = &quot;ENTREZID&quot;),
+  columns = c(&quot;SYMBOL&quot;, &quot;GO&quot;),
+  keytype = &quot;ENTREZID&quot;
+)</code></pre>
+<pre><code>&#39;select()&#39; returned 1:many mapping between keys and columns</code></pre>
+<pre class="r"><code>entrez_to_symbol_and_go |&gt;
+  dplyr::filter(GO == &quot;GO:0016064&quot;, ENTREZID %in% sig_up_genes)</code></pre>
+<pre><code>    ENTREZID    SYMBOL         GO EVIDENCE ONTOLOGY
+1        939      CD27 GO:0016064      NAS       BP
+2       3514      IGKC GO:0016064      IBA       BP
+3       3537     IGLC1 GO:0016064      IBA       BP
+4       3538     IGLC2 GO:0016064      IBA       BP
+5       3539     IGLC3 GO:0016064      IBA       BP
+6      28388  IGHV5-51 GO:0016064      IBA       BP
+7      28391  IGHV4-61 GO:0016064      IBA       BP
+8      28392  IGHV4-59 GO:0016064      IBA       BP
+9      28394  IGHV4-39 GO:0016064      IBA       BP
+10     28424  IGHV3-48 GO:0016064      IBA       BP
+11     28434  IGHV3-33 GO:0016064      IBA       BP
+12     28439  IGHV3-30 GO:0016064      IBA       BP
+13     28442  IGHV3-23 GO:0016064      IBA       BP
+14     28444  IGHV3-21 GO:0016064      IBA       BP
+15     28448  IGHV3-15 GO:0016064      IBA       BP
+16     28452   IGHV3-7 GO:0016064      IBA       BP
+17     28457   IGHV2-5 GO:0016064      IBA       BP
+18 100423062     IGLL5 GO:0016064      IBA       BP
+19 102723169 IGHV1-69D GO:0016064      IBA       BP</code></pre>
+<p>Still a mystery on the number 29.</p>
 </div>
 <div id="visualisations" class="section level3">
 <h3>Visualisations</h3>
@@ -1537,101 +1647,7 @@ Dave Tang
 <p><code>goplot</code> shows the gene ontology graph with the enriched
 GO terms highlighted.</p>
 <pre class="r"><code>goplot(ego_bp)</code></pre>
-<pre><code>Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
-increasing max.overlaps</code></pre>
-<p><img src="figure/cluster_profiler.Rmd/goplot-1.png" width="1152" style="display: block; margin: auto;" /></p>
-<p>
-<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-goplot-1">
-Past versions of goplot-1.png
-</button>
-</p>
-<div id="fig-goplot-1" class="collapse">
-<div class="table-responsive">
-<table class="table table-condensed table-hover">
-<thead>
-<tr>
-<th>
-Version
-</th>
-<th>
-Author
-</th>
-<th>
-Date
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/0ac82102a0064cf6f70ad9fdec39e3272f0aefe0/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">0ac8210</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2025-05-24
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/c8e80cd43b29fa99ef8a009be39c1b496db2de7f/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">c8e80cd</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2025-05-23
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/006e824308df24e7f43c3d664e30d96617250941/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">006e824</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2025-03-09
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/f0166b0791270b7f3b51540dc73a64d37947e451/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">f0166b0</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2025-03-09
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/e815348c6fc2adfec65202ff3718880a944b088c/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">e815348</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2025-03-06
-</td>
-</tr>
-<tr>
-<td>
-<a href="https://github.com/davetang/muse/blob/2c080dce2c4547d90fe19cf649b4683a4aaa5142/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">2c080dc</a>
-</td>
-<td>
-Dave Tang
-</td>
-<td>
-2024-11-01
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
+<pre><code>Error in goplot.enrichResult(x, showCategory = showCategory, color = color, : Ontology should be one of &#39;MF&#39;, &#39;CC&#39; or &#39;BP&#39;</code></pre>
 <p>Another nice feature of {clusterProfiler} is that you can plot
 multiple gene lists together. We can create a list of down-regulated
 genes.</p>
@@ -1677,30 +1693,30 @@ head(as.data.frame(ego_bp_both))</code></pre>
 5                                                                                               leukocyte mediated immunity
 6                                                                                                   humoral immune response
   GeneRatio   BgRatio RichFactor FoldEnrichment    zScore       pvalue
-1    30/385 196/17518 0.15306122       6.964484 12.587673 4.569415e-17
-2    30/385 199/17518 0.15075377       6.859492 12.461452 7.046005e-17
-3    37/385 382/17518 0.09685864       4.407194 10.092931 3.590714e-14
-4    35/385 368/17518 0.09510870       4.327569  9.670801 3.134308e-13
-5    38/385 466/17518 0.08154506       3.710406  8.889621 3.440135e-12
-6    30/385 299/17518 0.10033445       4.565348  9.321312 4.278292e-12
+1    29/386 192/17354 0.15104167       6.790614 12.169056 3.046858e-16
+2    29/386 195/17354 0.14871795       6.686143 12.043556 4.660827e-16
+3    36/386 379/17354 0.09498681       4.270469  9.709355 2.085276e-13
+4    35/386 367/17354 0.09536785       4.287600  9.601062 4.074276e-13
+5    38/386 465/17354 0.08172043       3.674032  8.815698 4.599706e-12
+6    30/386 298/17354 0.10067114       4.526028  9.260213 5.283568e-12
       p.adjust       qvalue
-1 1.319717e-13 1.180762e-13
-2 1.319717e-13 1.180762e-13
-3 4.483604e-11 4.011520e-11
-4 2.935280e-10 2.626220e-10
-5 2.577349e-09 2.305977e-09
-6 2.671080e-09 2.389839e-09
-                                                                                                                                                                                                                                                            geneID
-1                                               IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/IGHV3-48/BATF/IGHM/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/TREM2/CD28
-2                                               IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/IGHV3-48/BATF/IGHM/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/TREM2/CD28
-3   IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IL4I1/IRF4/JAK3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/CCL19/IGHV3-48/CXCL13/LILRB4/BATF/IGHM/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/PLA2G4A/TREM2/CD28
-4                IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IL4I1/IGHV3-23/IGHV2-5/CD27/IGHV3-30/SLAMF7/IGHV3-48/LILRB4/BATF/IGHM/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/CD2/FOXP3/LGALS9/IGKC/IGHV3-15/TREM2/CD28
-5 IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IL4I1/JAK3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/SLAMF7/IGHV3-48/LILRB4/BATF/IGHM/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/CCL3/IGHV1-69D/CD84/CD2/FOXP3/LGALS9/IGKC/IGHV3-15/TREM2/CD28
-6                                                                             WFDC2/IGHG4/IGHG2/IGHG3/IGKV3-20/CXCL14/POU2AF1/MMP7/CCL22/BPIFA1/CXCL9/CCL19/CXCL13/CXCL1/LTF/CXCL10/MS4A1/IGHM/IGHG1/POU2F2/CCL7/TNFRSF21/ADM/IGHA2/C4A/CCL3/CXCL8/CCL8/TREM2/CD28
+1 8.722738e-13 7.827737e-13
+2 8.722738e-13 7.827737e-13
+3 2.601729e-10 2.334777e-10
+4 3.812504e-10 3.421319e-10
+5 3.296066e-09 2.957871e-09
+6 3.296066e-09 2.957871e-09
+                                                                                                                                                                                                                                                               geneID
+1                                                       IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/IGHV3-48/BATF/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/TREM2/CD28
+2                                                       IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/IGHV3-48/BATF/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/TREM2/CD28
+3           IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IL4I1/IRF4/JAK3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/CCL19/IGHV3-48/CXCL13/LILRB4/BATF/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/FOXP3/IGKC/IGHV3-15/PLA2G4A/TREM2/CD28
+4                IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IL4I1/IGHV3-23/IGHV2-5/CD27/IGHV3-30/SLAMF7/IGHV3-48/NECTIN4/LILRB4/BATF/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/IGHV1-69D/CD2/FOXP3/LGALS9/IGKC/IGHV3-15/TREM2/CD28
+5 IGLC1/IGHG4/IGHG2/IGHG3/IGHV5-51/IGLL5/IGHV4-39/IGLC3/IL4I1/JAK3/IGHV3-23/IGHV2-5/CD27/IGHV3-30/SLAMF7/IGHV3-48/NECTIN4/LILRB4/BATF/IGHG1/IGLC2/IGHV4-61/IGHA2/IGHV3-7/IGHV3-21/IGHV3-33/IGHV4-59/C4A/CCL3/IGHV1-69D/CD84/CD2/FOXP3/LGALS9/IGKC/IGHV3-15/TREM2/CD28
+6                                                                                WFDC2/IGHG4/IGHG2/IGHG3/IGKV3-20/CXCL14/POU2AF1/MMP7/CCL22/BPIFA1/CXCL9/CCL19/CXCL13/CXCL1/LTF/CXCL10/MS4A1/IGHM/IGHG1/POU2F2/CCL7/TNFRSF21/ADM/IGHA2/C4A/CCL3/CXCL8/CCL8/TREM2/CD28
   Count
-1    30
-2    30
-3    37
+1    29
+2    29
+3    36
 4    35
 5    38
 6    30</code></pre>
@@ -1787,7 +1803,7 @@ term2name &lt;- data.frame(
 )
 
 dim(term2name)</code></pre>
-<pre><code>[1] 40940     2</code></pre>
+<pre><code>[1] 40268     2</code></pre>
 <pre class="r"><code>head(term2name)</code></pre>
 <pre><code>                 term                                                     name
 GO:0000001 GO:0000001                                mitochondrion inheritance
@@ -1800,9 +1816,9 @@ GO:0000010 GO:0000010                heptaprenyl diphosphate synthase activity</
 <pre class="r"><code>ontologies &lt;- AnnotationDbi::select(x = GO.db, keys = names(goterms), columns = c(&quot;GOID&quot;, &quot;ONTOLOGY&quot;))</code></pre>
 <pre><code>&#39;select()&#39; returned 1:1 mapping between keys and columns</code></pre>
 <pre class="r"><code>length(unique(term2name$term))</code></pre>
-<pre><code>[1] 40940</code></pre>
+<pre><code>[1] 40268</code></pre>
 <pre class="r"><code>length(unique(ontologies$GOID))</code></pre>
-<pre><code>[1] 40940</code></pre>
+<pre><code>[1] 40268</code></pre>
 <pre class="r"><code>stopifnot(all(term2name$term == ontologies$GOID))
 
 term2name$ontology &lt;- ontologies$ONTOLOGY
@@ -1846,18 +1862,26 @@ goids &lt;- goids[!is.na(goids)]
 table(unique(goids) %in% term2name$term)</code></pre>
 <pre><code>
 FALSE  TRUE 
-   16  6531 </code></pre>
+   48  6499 </code></pre>
 <p>Which GO IDs are missing?</p>
 <pre class="r"><code>missing_goids &lt;- setdiff(unique(goids), term2name$term)
 missing_goids</code></pre>
-<pre><code> [1] &quot;GO:0008272&quot; &quot;GO:0102769&quot; &quot;GO:0006211&quot; &quot;GO:0004024&quot; &quot;GO:0090179&quot;
- [6] &quot;GO:0004310&quot; &quot;GO:0035308&quot; &quot;GO:0042543&quot; &quot;GO:0052794&quot; &quot;GO:0052795&quot;
-[11] &quot;GO:0052796&quot; &quot;GO:0034998&quot; &quot;GO:0102148&quot; &quot;GO:0005355&quot; &quot;GO:0003867&quot;
-[16] &quot;GO:0060775&quot;</code></pre>
+<pre><code> [1] &quot;GO:0001054&quot; &quot;GO:0008272&quot; &quot;GO:0102769&quot; &quot;GO:0032508&quot; &quot;GO:0006211&quot;
+ [6] &quot;GO:0006880&quot; &quot;GO:0014070&quot; &quot;GO:0097428&quot; &quot;GO:0043402&quot; &quot;GO:0045263&quot;
+[11] &quot;GO:0045261&quot; &quot;GO:0030374&quot; &quot;GO:0004024&quot; &quot;GO:0044255&quot; &quot;GO:0106035&quot;
+[16] &quot;GO:0003896&quot; &quot;GO:0097153&quot; &quot;GO:0001056&quot; &quot;GO:0001055&quot; &quot;GO:0046538&quot;
+[21] &quot;GO:0061780&quot; &quot;GO:0090179&quot; &quot;GO:0097159&quot; &quot;GO:0051103&quot; &quot;GO:0004310&quot;
+[26] &quot;GO:0006268&quot; &quot;GO:0035308&quot; &quot;GO:0042989&quot; &quot;GO:0042543&quot; &quot;GO:0090309&quot;
+[31] &quot;GO:0052794&quot; &quot;GO:0052795&quot; &quot;GO:0052796&quot; &quot;GO:0071407&quot; &quot;GO:0034998&quot;
+[36] &quot;GO:1901615&quot; &quot;GO:0022417&quot; &quot;GO:0102148&quot; &quot;GO:0097199&quot; &quot;GO:1901006&quot;
+[41] &quot;GO:0005355&quot; &quot;GO:0046177&quot; &quot;GO:0046950&quot; &quot;GO:0002094&quot; &quot;GO:0003867&quot;
+[46] &quot;GO:0045226&quot; &quot;GO:0060775&quot; &quot;GO:1901617&quot;</code></pre>
 <p>They are missing because they have become obsolete.</p>
 <pre class="r"><code>missing_goids %in% keys(GOOBSOLETE)</code></pre>
 <pre><code> [1] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
-[16] TRUE</code></pre>
+[16] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+[31] TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE TRUE
+[46] TRUE TRUE TRUE</code></pre>
 <p>Prepare data frame of 2 column with term and gene.</p>
 <pre class="r"><code>demo |&gt;
   dplyr::filter(!is.na(go_id)) |&gt;
@@ -1901,7 +1925,7 @@ res</code></pre>
 #...pvalues adjusted by &#39;BH&#39; with cutoff &lt;0.05 
 #...0 enriched terms found
 #...Citation
-G Yu. Thirteen years of clusterProfiler. The Innovation. 2024, 5(6):100722 </code></pre>
+S Xu, E Hu, Y Cai, Z Xie, X Luo, L Zhan, W Tang, Q Wang, B Liu, R Wang, W Xie, T Wu, L Xie, G Yu. Using clusterProfiler to characterize multiomics data. Nature Protocols. 2024, 19(11):3292-3320 </code></pre>
 <p>Test with genes associated with same term.</p>
 <pre class="r"><code>term2gene |&gt;
   dplyr::group_by(term) |&gt;
@@ -1939,23 +1963,23 @@ GO:0043484 GO:0043484                               regulation of RNA splicing
 GO:0080090 GO:0080090                  regulation of primary metabolic process
 GO:0030968 GO:0030968          endoplasmic reticulum unfolded protein response
            GeneRatio   BgRatio RichFactor FoldEnrichment    zScore
-GO:0006397     75/92 125/12886  0.6000000       84.03913 79.109456
-GO:0008380     43/92  89/12886  0.4831461       67.67196 53.520121
-GO:0000398     21/92  71/12886  0.2957746       41.42774 28.965584
-GO:0000381      7/92  20/12886  0.3500000       49.02283 18.225267
-GO:0000387      3/92  12/12886  0.2500000       35.01630  9.996638
-GO:0043484      3/92  14/12886  0.2142857       30.01398  9.210457
-GO:0080090      2/92  12/12886  0.1666667       23.34420  6.566466
-GO:0030968      2/92  14/12886  0.1428571       20.00932  6.034488
+GO:0006397     75/92 125/12879  0.6000000       83.99348 79.087811
+GO:0008380     43/92  89/12879  0.4831461       67.63520 53.505351
+GO:0000398     21/92  71/12879  0.2957746       41.40524 28.957426
+GO:0000381      7/92  20/12879  0.3500000       48.99620 18.220152
+GO:0000387      3/92  12/12879  0.2500000       34.99728  9.993784
+GO:0043484      3/92  14/12879  0.2142857       29.99767  9.207803
+GO:0080090      2/92  12/12879  0.1666667       23.33152  6.564537
+GO:0030968      2/92  14/12879  0.1428571       19.99845  6.032690
                   pvalue      p.adjust        qvalue
-GO:0006397 5.586297e-146 4.133859e-144 3.586990e-144
-GO:0008380  1.687611e-72  6.244159e-71  5.418118e-71
-GO:0000398  3.041395e-29  7.502109e-28  6.509653e-28
-GO:0000381  5.389679e-11  9.970906e-10  8.651853e-10
-GO:0000387  7.395374e-05  1.094515e-03  9.497217e-04
-GO:0043484  1.210986e-04  1.493549e-03  1.295967e-03
-GO:0080090  3.176485e-03  3.357999e-02  2.913769e-02
-GO:0030968  4.339229e-03  4.013787e-02  3.482802e-02
+GO:0006397 5.819132e-146 4.306157e-144 3.736495e-144
+GO:0008380  1.727409e-72  6.391414e-71  5.545893e-71
+GO:0000398  3.075882e-29  7.587174e-28  6.583466e-28
+GO:0000381  5.410001e-11  1.000850e-09  8.684475e-10
+GO:0000387  7.407252e-05  1.096273e-03  9.512471e-04
+GO:0043484  1.212924e-04  1.495940e-03  1.298042e-03
+GO:0080090  3.179859e-03  3.361565e-02  2.916863e-02
+GO:0030968  4.343815e-03  4.018029e-02  3.486483e-02
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      geneID
 GO:0006397 ENSNFUG00015000047/ENSNFUG00015000176/ENSNFUG00015000433/ENSNFUG00015000717/ENSNFUG00015000995/ENSNFUG00015002878/ENSNFUG00015003278/ENSNFUG00015003412/ENSNFUG00015003645/ENSNFUG00015006374/ENSNFUG00015008466/ENSNFUG00015010592/ENSNFUG00015011476/ENSNFUG00015011629/ENSNFUG00015012572/ENSNFUG00015015893/ENSNFUG00015018395/ENSNFUG00015021027/ENSNFUG00015023111/ENSNFUG00015024532/ENSNFUG00015000276/ENSNFUG00015000347/ENSNFUG00015000470/ENSNFUG00015000633/ENSNFUG00015000679/ENSNFUG00015001197/ENSNFUG00015001330/ENSNFUG00015002687/ENSNFUG00015003553/ENSNFUG00015003613/ENSNFUG00015004037/ENSNFUG00015004391/ENSNFUG00015008722/ENSNFUG00015009124/ENSNFUG00015010820/ENSNFUG00015011580/ENSNFUG00015013273/ENSNFUG00015014123/ENSNFUG00015014399/ENSNFUG00015014448/ENSNFUG00015019426/ENSNFUG00015020527/ENSNFUG00015020545/ENSNFUG00015021436/ENSNFUG00015004299/ENSNFUG00015006219/ENSNFUG00015006538/ENSNFUG00015007623/ENSNFUG00015008859/ENSNFUG00015008871/ENSNFUG00015008954/ENSNFUG00015013147/ENSNFUG00015014506/ENSNFUG00015014956/ENSNFUG00015015816/ENSNFUG00015017783/ENSNFUG00015019674/ENSNFUG00015019903/ENSNFUG00015020693/ENSNFUG00015021220/ENSNFUG00015022748/ENSNFUG00015023101/ENSNFUG00015023143/ENSNFUG00015004762/ENSNFUG00015005084/ENSNFUG00015005095/ENSNFUG00015006742/ENSNFUG00015008749/ENSNFUG00015009426/ENSNFUG00015013451/ENSNFUG00015014267/ENSNFUG00015014760/ENSNFUG00015014763/ENSNFUG00015018080/ENSNFUG00015018929
 GO:0008380                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ENSNFUG00015000047/ENSNFUG00015000433/ENSNFUG00015002878/ENSNFUG00015003412/ENSNFUG00015008466/ENSNFUG00015010592/ENSNFUG00015011629/ENSNFUG00015012572/ENSNFUG00015015893/ENSNFUG00015018395/ENSNFUG00015021027/ENSNFUG00015023111/ENSNFUG00015000276/ENSNFUG00015000347/ENSNFUG00015000470/ENSNFUG00015001197/ENSNFUG00015002687/ENSNFUG00015004391/ENSNFUG00015009124/ENSNFUG00015010820/ENSNFUG00015011580/ENSNFUG00015013273/ENSNFUG00015014123/ENSNFUG00015014448/ENSNFUG00015019426/ENSNFUG00015020527/ENSNFUG00015008859/ENSNFUG00015008871/ENSNFUG00015013147/ENSNFUG00015014506/ENSNFUG00015019674/ENSNFUG00015019903/ENSNFUG00015020693/ENSNFUG00015021220/ENSNFUG00015022748/ENSNFUG00015023101/ENSNFUG00015005084/ENSNFUG00015008749/ENSNFUG00015014267/ENSNFUG00015014760/ENSNFUG00015014763/ENSNFUG00015018080/ENSNFUG00015018929
@@ -2051,13 +2075,13 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.4.1 (2024-06-14)
+<pre><code>R version 4.5.0 (2025-04-11)
 Platform: x86_64-pc-linux-gnu
-Running under: Ubuntu 22.04.5 LTS
+Running under: Ubuntu 24.04.2 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
 
 locale:
  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -2075,51 +2099,49 @@ attached base packages:
 [8] base     
 
 other attached packages:
- [1] GO.db_3.20.0           org.Hs.eg.db_3.20.0    AnnotationDbi_1.68.0  
- [4] IRanges_2.40.1         S4Vectors_0.44.0       Biobase_2.66.0        
- [7] BiocGenerics_0.52.0    clusterProfiler_4.14.6 ggarchery_0.4.3       
-[10] lubridate_1.9.3        forcats_1.0.0          stringr_1.5.1         
-[13] dplyr_1.1.4            purrr_1.0.2            readr_2.1.5           
-[16] tidyr_1.3.1            tibble_3.2.1           ggplot2_3.5.1         
-[19] tidyverse_2.0.0        workflowr_1.7.1       
+ [1] GO.db_3.21.0           org.Hs.eg.db_3.21.0    AnnotationDbi_1.70.0  
+ [4] IRanges_2.42.0         S4Vectors_0.46.0       Biobase_2.68.0        
+ [7] BiocGenerics_0.54.0    generics_0.1.4         clusterProfiler_4.16.0
+[10] ggarchery_0.4.3        lubridate_1.9.4        forcats_1.0.0         
+[13] stringr_1.5.1          dplyr_1.1.4            purrr_1.0.4           
+[16] readr_2.1.5            tidyr_1.3.1            tibble_3.2.1          
+[19] ggplot2_3.5.2          tidyverse_2.0.0        workflowr_1.7.1       
 
 loaded via a namespace (and not attached):
-  [1] DBI_1.2.3               gson_0.1.0              rlang_1.1.4            
-  [4] magrittr_2.0.3          DOSE_4.0.1              git2r_0.35.0           
-  [7] compiler_4.4.1          RSQLite_2.3.9           getPass_0.2-4          
+  [1] DBI_1.2.3               gson_0.1.0              rlang_1.1.6            
+  [4] magrittr_2.0.3          DOSE_4.2.0              git2r_0.36.2           
+  [7] compiler_4.5.0          RSQLite_2.3.11          getPass_0.2-4          
  [10] png_0.1-8               callr_3.7.6             vctrs_0.6.5            
  [13] reshape2_1.4.4          pkgconfig_2.0.3         crayon_1.5.3           
- [16] fastmap_1.2.0           XVector_0.46.0          labeling_0.4.3         
- [19] utf8_1.2.4              promises_1.3.2          rmarkdown_2.28         
- [22] tzdb_0.4.0              enrichplot_1.26.6       UCSC.utils_1.2.0       
- [25] ps_1.8.1                bit_4.5.0               xfun_0.48              
- [28] zlibbioc_1.52.0         cachem_1.1.0            aplot_0.2.5            
- [31] GenomeInfoDb_1.42.3     jsonlite_1.8.9          blob_1.2.4             
- [34] highr_0.11              later_1.3.2             BiocParallel_1.40.0    
- [37] parallel_4.4.1          R6_2.5.1                bslib_0.8.0            
- [40] stringi_1.8.4           RColorBrewer_1.1-3      jquerylib_0.1.4        
- [43] GOSemSim_2.32.0         Rcpp_1.0.13             knitr_1.48             
- [46] ggtangle_0.0.6          R.utils_2.13.0          igraph_2.1.4           
- [49] httpuv_1.6.15           Matrix_1.7-0            splines_4.4.1          
- [52] timechange_0.3.0        tidyselect_1.2.1        qvalue_2.38.0          
- [55] rstudioapi_0.17.1       yaml_2.3.10             codetools_0.2-20       
- [58] curl_6.2.1              processx_3.8.4          lattice_0.22-6         
- [61] plyr_1.8.9              treeio_1.30.0           withr_3.0.2            
- [64] KEGGREST_1.46.0         evaluate_1.0.1          gridGraphics_0.5-1     
- [67] Biostrings_2.74.1       ggtree_3.14.0           pillar_1.10.1          
- [70] whisker_0.4.1           ggfun_0.1.8             generics_0.1.3         
- [73] vroom_1.6.5             rprojroot_2.0.4         hms_1.1.3              
- [76] tidytree_0.4.6          munsell_0.5.1           scales_1.3.0           
- [79] glue_1.8.0              lazyeval_0.2.2          tools_4.4.1            
- [82] data.table_1.16.2       fgsea_1.32.4            fs_1.6.4               
- [85] fastmatch_1.1-6         cowplot_1.1.3           grid_4.4.1             
- [88] ape_5.8-1               colorspace_2.1-1        nlme_3.1-164           
- [91] patchwork_1.3.0         GenomeInfoDbData_1.2.13 cli_3.6.3              
- [94] gtable_0.3.6            R.methodsS3_1.8.2       yulab.utils_0.2.0      
- [97] sass_0.4.9              digest_0.6.37           ggrepel_0.9.6          
-[100] ggplotify_0.1.2         farver_2.1.2            memoise_2.0.1          
-[103] htmltools_0.5.8.1       R.oo_1.27.0             lifecycle_1.0.4        
-[106] httr_1.4.7              bit64_4.5.2            </code></pre>
+ [16] fastmap_1.2.0           XVector_0.48.0          labeling_0.4.3         
+ [19] utf8_1.2.5              promises_1.3.2          rmarkdown_2.29         
+ [22] tzdb_0.5.0              enrichplot_1.28.2       UCSC.utils_1.4.0       
+ [25] ps_1.9.1                bit_4.6.0               xfun_0.52              
+ [28] cachem_1.1.0            aplot_0.2.5             GenomeInfoDb_1.44.0    
+ [31] jsonlite_2.0.0          blob_1.2.4              later_1.4.2            
+ [34] BiocParallel_1.42.0     parallel_4.5.0          R6_2.6.1               
+ [37] bslib_0.9.0             stringi_1.8.7           RColorBrewer_1.1-3     
+ [40] jquerylib_0.1.4         GOSemSim_2.34.0         Rcpp_1.0.14            
+ [43] knitr_1.50              ggtangle_0.0.6          R.utils_2.13.0         
+ [46] igraph_2.1.4            httpuv_1.6.16           Matrix_1.7-3           
+ [49] splines_4.5.0           timechange_0.3.0        tidyselect_1.2.1       
+ [52] qvalue_2.40.0           rstudioapi_0.17.1       yaml_2.3.10            
+ [55] codetools_0.2-20        curl_6.2.3              processx_3.8.6         
+ [58] lattice_0.22-6          plyr_1.8.9              treeio_1.32.0          
+ [61] withr_3.0.2             KEGGREST_1.48.0         evaluate_1.0.3         
+ [64] gridGraphics_0.5-1      Biostrings_2.76.0       ggtree_3.16.0          
+ [67] pillar_1.10.2           whisker_0.4.1           ggfun_0.1.8            
+ [70] vroom_1.6.5             rprojroot_2.0.4         hms_1.1.3              
+ [73] tidytree_0.4.6          scales_1.4.0            glue_1.8.0             
+ [76] lazyeval_0.2.2          tools_4.5.0             data.table_1.17.2      
+ [79] fgsea_1.34.0            fs_1.6.6                fastmatch_1.1-6        
+ [82] cowplot_1.1.3           grid_4.5.0              ape_5.8-1              
+ [85] nlme_3.1-168            patchwork_1.3.0         GenomeInfoDbData_1.2.14
+ [88] cli_3.6.5               gtable_0.3.6            R.methodsS3_1.8.2      
+ [91] yulab.utils_0.2.0       sass_0.4.10             digest_0.6.37          
+ [94] ggrepel_0.9.6           ggplotify_0.1.2         farver_2.1.2           
+ [97] memoise_2.0.1           htmltools_0.5.8.1       R.oo_1.27.1            
+[100] lifecycle_1.0.4         httr_1.4.7              bit64_4.6.0-1          </code></pre>
 </div>
 </div>
 </div>
