@@ -1,0 +1,56 @@
+---
+title: "zellkonverter"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+From [Conversion Between scRNA-seq Objects](https://www.bioconductor.org/packages/release/bioc/html/zellkonverter.html):
+
+> Provides methods to convert between Python AnnData objects and SingleCellExperiment objects. These are primarily intended for use by downstream Bioconductor packages that wrap Python methods for single-cell data analysis. It also includes functions to read and write H5AD files used for saving AnnData objects to disk.
+
+## Dependencies
+
+Install packages using `BiocManager::install()`.
+
+```{r install_dependencies, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("zellkonverter")
+```
+
+Load libraries.
+
+```{r load_dependencies}
+suppressPackageStartupMessages(library(zellkonverter))
+```
+
+## Data
+
+Download data.
+
+```{r pbmc3k_file}
+pbmc3k_url <- 'https://davetang.org/file/pbmc3k/pbmc3k.h5ad'
+pbmc3k_file <- paste0('data/', basename(pbmc3k_url))
+
+if(!file.exists(pbmc3k_file)){
+  download.file(url = pbmc3k_url, destfile = pbmc3k_file)
+}
+```
+
+Read as `SingleCellExperiment` using `readH5AD()`, which uses [basilisk](https://www.bioconductor.org/packages/release/bioc/html/basilisk.html):
+
+> + /home/rstudio/.cache/R/basilisk/1.20.0/0/bin/conda create --yes --prefix /home/rstudio/.cache/R/basilisk/1.20.0/zellkonverter/1.18.0/zellkonverterAnnDataEnv-0.11.4 'python=3.13.2' --quiet -c conda-forge --override-channels
+
+```{r sce, error=TRUE}
+sce <- readH5AD(pbmc3k_file)
+sce
+```
