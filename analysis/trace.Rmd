@@ -1,0 +1,121 @@
+---
+title: "Trace"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+`?trace`:
+
+> Interactive Tracing and Debugging of Calls to a Function or Method
+>
+> A call to trace allows you to insert debugging code (e.g., a call to browser or recover) at chosen places in any function. A call to untrace cancels the tracing. Specified methods can be traced the same way, without tracing all calls to the generic function. Trace code (tracer) can be any R expression. Tracing can be temporarily turned on or off globally by calling tracingState.
+
+`trace()` is a built-in R function that lets you temporarily insert code into another function. It's useful for:
+
+* Debugging
+* Logging when a function is called
+* Peeking into function arguments
+* Finding out who called what, and when
+
+It works even on functions inside packages without editing package source code.
+
+Usage:
+
+> trace(what, tracer, exit, at, print, signature,
+      where = topenv(parent.frame()), edit = FALSE)
+      
+You can get started by setting two arguments:
+
+* `what`: the function you want to trace
+* `tracer`: the code you want to run when that function is called
+
+## See when a function is called
+
+The example below will print "sq was called!" when `sq()` is called. After printing, the function will operate as usual.
+
+```{r sq}
+sq <- function(x){
+  x^2
+}
+
+trace("sq", tracer = quote(print("sq was called!")))
+
+sq(4)
+```
+
+## See what arguments were passed
+
+You can inspect the function's arguments inside the tracer by using `args()` or directly printing them.
+
+```{r sq_args}
+trace("sq", tracer = quote({
+  print(paste("x is", x))
+}))
+
+sq(5)
+```
+
+## Trace a base R function
+
+You can also trace functions from packages.
+
+```{r mean}
+trace("mean", tracer = quote(print("mean() was called!")))
+
+mean(c(1, 2, 3))
+```
+
+Calling `mean()` from another function.
+
+```{r my_mean}
+trace("mean", tracer = quote(print("mean() was called!")))
+
+my_mean <- function(x){
+  mean(x)
+}
+
+my_mean(1:10)
+```
+
+Calling `base::mean()`.
+
+```{r base_mean}
+trace("mean", tracer = quote(print("mean() was called!")))
+
+base::mean(1:10)
+```
+
+## Trace a function inside a package namespace
+
+`trace("kmeans")` with a namespace.
+
+```{r kmeans}
+trace("kmeans", tracer = quote(print("stats::kmeans was called")), where = asNamespace("stats"))
+
+k <- kmeans(iris[, 1:4], centers = 3)
+```
+
+Calling `stats::kmeans()`.
+
+```{r stats_kmeans}
+k <- stats::kmeans(iris[, 1:4], centers = 3)
+```
+
+## Removing a trace
+
+When done debugging, remove the trace.
+
+```{r untrace}
+untrace("sq")
+untrace("mean")
+untrace("kmeans", where = asNamespace("stats"))
+```
