@@ -1,0 +1,64 @@
+---
+title: "Monkey patch"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+[Monkey patch](https://en.wikipedia.org/wiki/Monkey_patch):
+
+> In computer programming, monkey patching is a technique used to dynamically update the behavior of a piece of code at run-time. It is used to extend or modify the runtime code of dynamic languages such as Smalltalk, JavaScript, Objective-C, Ruby, Perl, Python, Groovy, Lisp, and Lua without altering the original source code.
+
+Great question! In R, you can use the `assign()` function to monkeypatch by programmatically replacing or redefining a function, including functions in other environments like packages. This is especially useful when you want to inject a new version of a function into an environment like `package:stats`.
+
+Monkey patch `stats::kmeans()` using `assign()` so that it prints a message before executing.
+
+Save the original function.
+
+```{r original_kmeans}
+original_kmeans <- stats::kmeans
+```
+
+Define the new function.
+
+```{r my_kmeans}
+my_kmeans <- function(x, centers, ...) {
+  message("Modified kmeans called")
+  original_kmeans(x, centers, ...)
+}
+```
+
+Use `assign()` to overwrite `kmeans` in the `stats` namespace. If run without `unlockBinding()`:
+
+> Error in assign("kmeans", my_kmeans, envir = asNamespace("stats")) : 
+>   cannot change value of locked binding for 'kmeans'
+
+```{r assign}
+unlockBinding("kmeans", asNamespace("stats"))
+assign("kmeans", my_kmeans, envir = asNamespace("stats"))
+lockBinding("kmeans", asNamespace("stats"))
+```
+
+Test.
+
+```{r test}
+set.seed(1984)
+data <- matrix(rnorm(100), ncol = 2)
+data_kmeans <- stats::kmeans(data, centers = 3)
+```
+
+Restore the Original
+
+```{r restore}
+unlockBinding("kmeans", asNamespace("stats"))
+assign("kmeans", original_kmeans, envir = asNamespace("stats"))
+lockBinding("kmeans", asNamespace("stats"))
+```
