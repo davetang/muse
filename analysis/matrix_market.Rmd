@@ -36,7 +36,7 @@ my_mat <- Matrix::readMM(mtx_file)
 class(my_mat)
 ```
 
-Convert dgTMatrix to dgCMatrix.
+Convert `dgTMatrix` to `dgCMatrix`.
 
 | Feature                 | `dgCMatrix`                                 | `dgTMatrix`                                    |
 | ----------------------- | ------------------------------------------- | ---------------------------------------------- |
@@ -46,8 +46,10 @@ Convert dgTMatrix to dgCMatrix.
 | **Construction**        | Less intuitive (needs compressed structure) | Easy to build from scratch                     |
 | **Efficiency**          | Fast and memory-efficient                   | Slower and less compact                        |
 
+`dgCMatrix` is a `CsparseMatrix`.
+
 ```{r dgc_matrix}
-my_mat <- as(my_mat, "dgCMatrix")
+my_mat <- as(my_mat, "CsparseMatrix")
 class(my_mat)
 ```
 
