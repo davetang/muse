@@ -10,11 +10,6 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 # https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
-library(tidyverse)
-library(patchwork)
-library(harmony)
-library(Seurat)
-library(hdf5r)
 ```
 
 ## Introduction
@@ -57,12 +52,43 @@ The "Quick-TRANSfer stage steps exceeded maximum" warning is explained in the De
 
 > In rare cases, when some of the points (rows of x) are extremely close, the algorithm may not converge in the “Quick-Transfer” stage, signalling a warning (and returning ifault = 4). Slight rounding of the data may be advisable in that case.
 
+From `?RunHarmony.default`, here are what I assume the default arguments:
+
+* `theta` = NULL
+* `sigma` = 0.1
+* `lambda` = 1
+* `nclust` = NULL
+* `max_iter` = 10
+* `early_stop` = TRUE
+* `ncores` = 1
+* `plot_convergence` = FALSE
+* `.options` = `harmony_options()`
+
+From `?harmony_options`:
+
+* `alpha` = 0.2
+* `tau` = 0
+* `block.size` = 0.05
+* `max.iter.cluster` = 20
+* `epsilon.cluster` = 0.001
+* `epsilon.harmony` = 0.01
+
 ## Quickstart
 
-Follow the [quickstart tutorial](https://htmlpreview.github.io/?https://github.com/immunogenomics/harmony/blob/master/doc/quickstart.html)
+Following the [quickstart tutorial](https://htmlpreview.github.io/?https://github.com/immunogenomics/harmony/blob/master/doc/quickstart.html).
 
 ```{r install_harmony, eval=FALSE}
 install.packages("harmony")
+```
+
+Load required packages.
+
+```{r load_libraries}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(patchwork))
+suppressPackageStartupMessages(library(harmony))
+suppressPackageStartupMessages(library(Seurat))
+suppressPackageStartupMessages(library(hdf5r))
 ```
 
 {harmony} version.
@@ -135,6 +161,16 @@ ggplot(my_df2, aes(PC1, PC2, colour = cell_type)) +
   theme_minimal() -> p2
 
 p1 + p2
+```
+
+Check out the harmony object.
+
+```{r harmonyObj}
+harmonyObj <- harmony::RunHarmony(
+    V, meta_data, 'dataset', verbose=FALSE, return_object = TRUE
+)
+
+str(harmonyObj, max.level = 2)
 ```
 
 ## Using harmony with Seurat
