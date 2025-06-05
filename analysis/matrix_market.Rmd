@@ -1,0 +1,58 @@
+---
+title: "Matrix Market"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+[Matrix Market exchange formats](https://en.wikipedia.org/wiki/Matrix_Market_exchange_formats):
+
+> The Matrix Market exchange formats are a set of human readable, ASCII-based file formats designed to facilitate the exchange of matrix data. The file formats were designed and adopted for the Matrix Market, a NIST repository for test data for use in comparative studies of algorithms for numerical linear algebra.
+
+Download Matrix Market file.
+
+```{r download_matrix_mtx}
+my_url <- 'https://davetang.org/file/pbmc3k/filtered_gene_bc_matrices/hg19/matrix.mtx'
+
+mtx_file <- "data/pbmc3k_matrix.mtx"
+
+if(!file.exists(mtx_file)){
+  download.file(url = my_url, destfile = mtx_file)
+}
+```
+
+The {Matrix} package has support for Matrix Market using `readMM()` and `writeMM()`.
+
+```{r my_mat}
+my_mat <- Matrix::readMM(mtx_file)
+class(my_mat)
+```
+
+Convert dgTMatrix to dgCMatrix.
+
+| Feature                 | `dgCMatrix`                                 | `dgTMatrix`                                    |
+| ----------------------- | ------------------------------------------- | ---------------------------------------------- |
+| **Name**                | *Double General Compressed Column*          | *Double General Triplet*                       |
+| **Format**              | CSC (Compressed Sparse Column)              | COO (Coordinate / Triplet)                     |
+| **Storage**             | Uses column pointers + row indices          | Stores each non-zero entry's (row, col, val)   |
+| **Construction**        | Less intuitive (needs compressed structure) | Easy to build from scratch                     |
+| **Efficiency**          | Fast and memory-efficient                   | Slower and less compact                        |
+
+```{r dgc_matrix}
+my_mat <- as(my_mat, "dgCMatrix")
+class(my_mat)
+```
+
+Export.
+
+```{r write_mm}
+Matrix::writeMM(obj = my_mat, file = "data/pbmc3k_export.mtx")
+```
