@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree18c0aedf8cd66ebbe977397f09dbefcf6702fe45targetblank18c0aeda">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea0049f6dadc7f0baa520810ba252a6048daa4098targetblanka0049f6a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/18c0aedf8cd66ebbe977397f09dbefcf6702fe45" target="_blank">18c0aed</a>
+<a href="https://github.com/davetang/muse/tree/a0049f6dadc7f0baa520810ba252a6048daa4098" target="_blank">a0049f6</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree18c0aedf8cd66ebbe977397f09dbefcf6702fe45targetblank18c0aeda"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea0049f6dadc7f0baa520810ba252a6048daa4098targetblanka0049f6a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/18c0aedf8cd66ebbe977397f09dbefcf6702fe45" target="_blank">18c0aed</a>.
+<a href="https://github.com/davetang/muse/tree/a0049f6dadc7f0baa520810ba252a6048daa4098" target="_blank">a0049f6</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -553,7 +553,6 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
     Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
     Ignored:    data/293t/
     Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
@@ -639,6 +638,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/a0049f6dadc7f0baa520810ba252a6048daa4098/analysis/harmony.Rmd" target="_blank">a0049f6</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+<td>
+Return harmony object
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/66d57ad72057228b0c7b813af5082a04d344514c/docs/harmony.html" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1036,14 +1069,42 @@ close, the algorithm may not converge in the “Quick-Transfer” stage,
 signalling a warning (and returning ifault = 4). Slight rounding of the
 data may be advisable in that case.</p>
 </blockquote>
+<p>From <code>?RunHarmony.default</code>, here are what I assume the
+default arguments:</p>
+<ul>
+<li><code>theta</code> = NULL</li>
+<li><code>sigma</code> = 0.1</li>
+<li><code>lambda</code> = 1</li>
+<li><code>nclust</code> = NULL</li>
+<li><code>max_iter</code> = 10</li>
+<li><code>early_stop</code> = TRUE</li>
+<li><code>ncores</code> = 1</li>
+<li><code>plot_convergence</code> = FALSE</li>
+<li><code>.options</code> = <code>harmony_options()</code></li>
+</ul>
+<p>From <code>?harmony_options</code>:</p>
+<ul>
+<li><code>alpha</code> = 0.2</li>
+<li><code>tau</code> = 0</li>
+<li><code>block.size</code> = 0.05</li>
+<li><code>max.iter.cluster</code> = 20</li>
+<li><code>epsilon.cluster</code> = 0.001</li>
+<li><code>epsilon.harmony</code> = 0.01</li>
+</ul>
 </div>
 </div>
 <div id="quickstart" class="section level2">
 <h2>Quickstart</h2>
-<p>Follow the <a
+<p>Following the <a
 href="https://htmlpreview.github.io/?https://github.com/immunogenomics/harmony/blob/master/doc/quickstart.html">quickstart
-tutorial</a></p>
+tutorial</a>.</p>
 <pre class="r"><code>install.packages(&quot;harmony&quot;)</code></pre>
+<p>Load required packages.</p>
+<pre class="r"><code>suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(patchwork))
+suppressPackageStartupMessages(library(harmony))
+suppressPackageStartupMessages(library(Seurat))
+suppressPackageStartupMessages(library(hdf5r))</code></pre>
 <p>{harmony} version.</p>
 <pre class="r"><code>packageVersion(&quot;harmony&quot;)</code></pre>
 <pre><code>[1] &#39;1.2.3&#39;</code></pre>
@@ -1143,6 +1204,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/plot_pc1_pc2-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/f55033ca59818b63fc04302b6a67010bc57b64b3/docs/figure/harmony.Rmd/plot_pc1_pc2-1.png" target="_blank">f55033c</a>
 </td>
 <td>
@@ -1210,6 +1282,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/run_harmony_quickstart-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/f55033ca59818b63fc04302b6a67010bc57b64b3/docs/figure/harmony.Rmd/run_harmony_quickstart-1.png" target="_blank">f55033c</a>
 </td>
 <td>
@@ -1234,6 +1317,44 @@ Dave Tang
 </table>
 </div>
 </div>
+<p>Check out the harmony object.</p>
+<pre class="r"><code>harmonyObj &lt;- harmony::RunHarmony(
+    V, meta_data, &#39;dataset&#39;, verbose=FALSE, return_object = TRUE
+)
+
+str(harmonyObj, max.level = 2)</code></pre>
+<pre><code>Reference class &#39;Rcpp_harmony&#39; [package &quot;harmony&quot;] with 27 fields
+ $ B                       : num 3
+ $ B_vec                   : int 3
+ $ E                       : num [1:79, 1:3] 7.14 10.02 12.6 9.51 12.29 ...
+ $ K                       : num 79
+ $ N                       : num 2370
+ $ O                       : num [1:79, 1:3] 4.95 9.56 13.01 9.42 12.53 ...
+ $ Phi                     :Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots
+ $ Phi_moe                 :Formal class &#39;dgCMatrix&#39; [package &quot;Matrix&quot;] with 6 slots
+ $ Pr_b                    : num [1:3, 1] 0.357 0.348 0.295
+ $ R                       : num [1:79, 1:2370] 8.35e-05 1.09e-04 1.06e-13 1.16e-11 6.28e-12 ...
+ $ W                       : num [1:4, 1:20] 0.00 1.53e-04 8.74e-09 -1.53e-04 0.00 ...
+ $ Y                       : num [1:20, 1:79] 0.5474 0.0345 -0.2684 -0.2462 0.1879 ...
+ $ Z_corr                  : num [1:20, 1:2370] 0.004308 0.002214 -0.004278 0.000472 0.00155 ...
+ $ Z_cos                   : num [1:20, 1:2370] 0.5154 0.2649 -0.5118 0.0565 0.1855 ...
+ $ Z_orig                  : num [1:20, 1:2370] 0.002807 -0.00145 -0.00639 0.000282 0.001444 ...
+ $ alpha                   : num 0.2
+ $ d                       : num 20
+ $ kmeans_rounds           : int [1:5] 10 7 6 5 5
+ $ lambda                  : num [1:4, 1] 0 1 1 1
+ $ max_iter_kmeans         : num 20
+ $ objective_harmony       : num [1:6] 590 513 460 440 434 ...
+ $ objective_kmeans        : num [1:34] 590 537 524 520 517 ...
+ $ objective_kmeans_cross  : num [1:34] 475 454 453 453 453 ...
+ $ objective_kmeans_dist   : num [1:34] 508 547 560 568 574 ...
+ $ objective_kmeans_entropy: num [1:34] -393 -464 -489 -501 -509 ...
+ $ sigma                   : num [1:79, 1] 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 0.1 ...
+ $ theta                   : num [1:3, 1] 2 2 2
+ and 23 methods, of which 9 are  possibly relevant:
+   check_convergence, cluster_cpp, compute_objective, finalize,
+   init_cluster_cpp, initialize, moe_correct_ridge_cpp,
+   moe_ridge_get_betas_cpp, setup</code></pre>
 </div>
 </div>
 <div id="using-harmony-with-seurat" class="section level2">
@@ -1338,6 +1459,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/sctransform_workflow-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/dbb1ef7fcb0308940e542421f1bcb2453cb5f7a4/docs/figure/harmony.Rmd/sctransform_workflow-1.png" target="_blank">dbb1ef7</a>
@@ -1462,6 +1594,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/run_harmony_pbmc-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/f55033ca59818b63fc04302b6a67010bc57b64b3/docs/figure/harmony.Rmd/run_harmony_pbmc-1.png" target="_blank">f55033c</a>
@@ -1673,6 +1816,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/contrast_harmony-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/f55033ca59818b63fc04302b6a67010bc57b64b3/docs/figure/harmony.Rmd/contrast_harmony-1.png" target="_blank">f55033c</a>
 </td>
 <td>
@@ -1722,6 +1876,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/heatmap_harmony-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/f55033ca59818b63fc04302b6a67010bc57b64b3/docs/figure/harmony.Rmd/heatmap_harmony-1.png" target="_blank">f55033c</a>
@@ -1797,6 +1962,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/tsne-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/f55033ca59818b63fc04302b6a67010bc57b64b3/docs/figure/harmony.Rmd/tsne-1.png" target="_blank">f55033c</a>
 </td>
 <td>
@@ -1869,6 +2045,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/feature_plot-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/f55033ca59818b63fc04302b6a67010bc57b64b3/docs/figure/harmony.Rmd/feature_plot-1.png" target="_blank">f55033c</a>
 </td>
 <td>
@@ -1923,6 +2110,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/umap_harmony-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/f55033ca59818b63fc04302b6a67010bc57b64b3/docs/figure/harmony.Rmd/umap_harmony-1.png" target="_blank">f55033c</a>
@@ -1998,6 +2196,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/sctransform_with_harmony-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/dbb1ef7fcb0308940e542421f1bcb2453cb5f7a4/docs/figure/harmony.Rmd/sctransform_with_harmony-1.png" target="_blank">dbb1ef7</a>
@@ -2097,6 +2306,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/from_10x_filtered-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/dbb1ef7fcb0308940e542421f1bcb2453cb5f7a4/docs/figure/harmony.Rmd/from_10x_filtered-1.png" target="_blank">dbb1ef7</a>
 </td>
 <td>
@@ -2160,6 +2380,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/from_10x_filtered_with_harmony-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/dbb1ef7fcb0308940e542421f1bcb2453cb5f7a4/docs/figure/harmony.Rmd/from_10x_filtered_with_harmony-1.png" target="_blank">dbb1ef7</a>
@@ -2236,6 +2467,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/feature_plot_xist-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/dbb1ef7fcb0308940e542421f1bcb2453cb5f7a4/docs/figure/harmony.Rmd/feature_plot_xist-1.png" target="_blank">dbb1ef7</a>
@@ -3458,7 +3700,7 @@ control$trace &gt; : iteration limit reached</code></pre>
 <pre><code>Second step: Get residuals using fitted parameters for 25954 genes</code></pre>
 <pre><code>Computing corrected count matrix for 25954 genes</code></pre>
 <pre><code>Calculating gene attributes</code></pre>
-<pre><code>Wall clock passed: Time difference of 4.956925 mins</code></pre>
+<pre><code>Wall clock passed: Time difference of 4.809548 mins</code></pre>
 <pre><code>Determine variable features</code></pre>
 <pre><code>Centering data matrix</code></pre>
 <pre><code>Place corrected count matrix in counts slot</code></pre>
@@ -3489,6 +3731,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/pbmc20k_no_harmony-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/dbb1ef7fcb0308940e542421f1bcb2453cb5f7a4/docs/figure/harmony.Rmd/pbmc20k_no_harmony-1.png" target="_blank">dbb1ef7</a>
@@ -3532,6 +3785,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/66d57ad72057228b0c7b813af5082a04d344514c/docs/figure/harmony.Rmd/pbmc20k_10x_filtered_with_harmony-1.png" target="_blank">66d57ad</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/dbb1ef7fcb0308940e542421f1bcb2453cb5f7a4/docs/figure/harmony.Rmd/pbmc20k_10x_filtered_with_harmony-1.png" target="_blank">dbb1ef7</a>
