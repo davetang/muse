@@ -14,7 +14,48 @@ library(tidyverse)
 library(patchwork)
 library(harmony)
 library(Seurat)
+library(hdf5r)
 ```
+
+## Introduction
+
+Harmony helps address the following problem:
+
+> ... it is challenging to analyze multiple scRNA-seq datasets together, particularly when they are assayed with different technologies, because **biological and technical differences are interspersed**. 
+
+The algorithm works by:
+
+> ... **projecting cells into a shared embedding** in which cells group by cell type rather than dataset-specific conditions. Harmony simultaneously accounts for multiple experimental and biological factors.
+
+Read the manuscript: [Fast, sensitive and accurate integration of single-cell data with Harmony](https://www.nature.com/articles/s41592-019-0619-0.epdf?shared_access_token=rDg_Rd07lrFXExt_ySj7V9RgN0jAjWel9jnR3ZoTv0NfDJkKCfDV_X9Mq3lweQmKiXEXxhrebQRjJEZdc-xNv6-7ZN1XotlD_mo5TSS4Z4eWn-kUo6mBwA5dEAKlTfR8OT6E10MZY_E-906ajbzvgg%3D%3D).
+
+### Harmony algorithm
+
+1. Carry out PCA (or something equivalent) to embed cells into a space with reduced dimensionality.
+2. Harmony accepts the cell coordinates in this reduced space and runs an iterative algorithm to adjust for dataset specific effects.
+2a. Harmony uses fuzzy (regular k-means) clustering to assign each cell to multiple clusters, while a penalty term ensures that the diversity of datasets within each cluster is maximized. (I.e., the penalty term tries to keep multiple datasets in the same cluster.)
+2b. Harmony calculates a global centroid for each cluster, as well as dataset-specific centroids for each cluster.
+2c. Within each cluster, Harmony calculates a correction factor for each dataset based on the centroids. 
+2d. Finally, Harmony corrects each cell with a cell-specific factor: a linear combination of dataset correction factors weighted by the cell's soft cluster 
+assignments made in step 2a.
+3. Harmony repeats steps 2a to 2d until convergence. The dependence between cluster assignment and dataset diminishes with each round.
+
+### Harmony algorithm details
+
+[Detailed Walkthrough of Harmony Algorithm](https://htmlpreview.github.io/?https://github.com/immunogenomics/harmony/blob/master/doc/detailedWalkthrough.html).
+
+Since I'm getting the following errors when using `RunHarmony()`:
+
+* Warning: Quick-TRANSfer stage steps exceeded maximum
+* did not converge in 25 iterations
+
+I'm interested in the details of the initial clustering.
+
+> Initializing the Harmony object also triggered initialization of all the clustering data structures. Harmony currently uses regular kmeans, with 10 random restarts, to find initial locations for the cluster centroids.
+
+The "Quick-TRANSfer stage steps exceeded maximum" warning is explained in the Details section of `?kmeans`:
+
+> In rare cases, when some of the points (rows of x) are extremely close, the algorithm may not converge in the “Quick-Transfer” stage, signalling a warning (and returning ifault = 4). Slight rounding of the data may be advisable in that case.
 
 ## Quickstart
 
