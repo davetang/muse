@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee53b097a3322ee5157c700e85eb30260cb4f68cetargetblanke53b097a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecc627f7be3c1c931df86f09235dfb5512119c934targetblankcc627f7a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/e53b097a3322ee5157c700e85eb30260cb4f68ce" target="_blank">e53b097</a>
+<a href="https://github.com/davetang/muse/tree/cc627f7be3c1c931df86f09235dfb5512119c934" target="_blank">cc627f7</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee53b097a3322ee5157c700e85eb30260cb4f68cetargetblanke53b097a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecc627f7be3c1c931df86f09235dfb5512119c934targetblankcc627f7a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/e53b097a3322ee5157c700e85eb30260cb4f68ce" target="_blank">e53b097</a>.
+<a href="https://github.com/davetang/muse/tree/cc627f7be3c1c931df86f09235dfb5512119c934" target="_blank">cc627f7</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -645,6 +645,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/cc627f7be3c1c931df86f09235dfb5512119c934/analysis/matrix_market.Rmd" target="_blank">cc627f7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+<td>
+CsparseMatrix
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/e6f872a6a45bbd5f1f6e9fb699cd263a04c85d84/docs/matrix_market.html" target="_blank">e6f872a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-06-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/e53b097a3322ee5157c700e85eb30260cb4f68ce/analysis/matrix_market.Rmd" target="_blank">e53b097</a>
 </td>
 <td>
@@ -689,7 +723,7 @@ class(my_mat)</code></pre>
 <pre><code>[1] &quot;dgTMatrix&quot;
 attr(,&quot;package&quot;)
 [1] &quot;Matrix&quot;</code></pre>
-<p>Convert dgTMatrix to dgCMatrix.</p>
+<p>Convert <code>dgTMatrix</code> to <code>dgCMatrix</code>.</p>
 <table>
 <colgroup>
 <col width="20%" />
@@ -731,11 +765,9 @@ attr(,&quot;package&quot;)
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>my_mat &lt;- as(my_mat, &quot;dgCMatrix&quot;)</code></pre>
-<pre><code>&#39;as(&lt;dgTMatrix&gt;, &quot;dgCMatrix&quot;)&#39; is deprecated.
-Use &#39;as(., &quot;CsparseMatrix&quot;)&#39; instead.
-See help(&quot;Deprecated&quot;) and help(&quot;Matrix-deprecated&quot;).</code></pre>
-<pre class="r"><code>class(my_mat)</code></pre>
+<p><code>dgCMatrix</code> is a <code>CsparseMatrix</code>.</p>
+<pre class="r"><code>my_mat &lt;- as(my_mat, &quot;CsparseMatrix&quot;)
+class(my_mat)</code></pre>
 <pre><code>[1] &quot;dgCMatrix&quot;
 attr(,&quot;package&quot;)
 [1] &quot;Matrix&quot;</code></pre>
