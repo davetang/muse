@@ -73,6 +73,19 @@ From `?harmony_options`:
 * `epsilon.cluster` = 0.001
 * `epsilon.harmony` = 0.01
 
+## Dependencies
+
+Make sure {glmGamPoi} is installed for much faster estimation.
+
+```{r install_glm_gam_poi}
+installed.packages() |>
+  row.names() -> installed_packages
+
+if(!'glmGamPoi' %in% installed_packages){
+  BiocManager::install('glmGamPoi')
+}
+```
+
 ## Quickstart
 
 Following the [quickstart tutorial](https://htmlpreview.github.io/?https://github.com/immunogenomics/harmony/blob/master/doc/quickstart.html).
