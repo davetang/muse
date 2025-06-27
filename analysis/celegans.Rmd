@@ -1,0 +1,184 @@
+---
+title: "Caenorhabditis elegans"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# https://stackoverflow.com/questions/30237310/setting-work-directory-in-knitr-using-opts-chunksetroot-dir-doesnt-wor
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+The [biomaRt package](https://bioconductor.org/packages/release/bioc/html/biomaRt.html) provides an interface to BioMart databases provided by Ensembl.
+
+> biomaRt provides an interface to a growing collection of databases implementing the BioMart software suite. The package enables retrieval of large amounts of data in a uniform way without the need to know the underlying database schemas or write complex SQL queries. The most prominent examples of BioMart databases are maintain by Ensembl, which provides biomaRt users direct access to a diverse set of data and enables a wide range of powerful online queries from gene annotation to database mining. 
+
+For more information, check out the [Accessing Ensembl annotation with biomaRt](https://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.html) guide.
+
+## Installation
+
+To begin, install the {biomaRt} package.
+
+```{r install_biomart, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("biomaRt")
+```
+
+## Package
+
+Load package.
+
+```{r load_biomart}
+packageVersion("biomaRt")
+suppressPackageStartupMessages(library(biomaRt))
+```
+
+## Getting started
+
+Use mirror.
+
+```{r mirror_mart}
+ensembl <- useEnsembl(biomart = "ensembl", mirror = "asia")
+ensembl
+```
+
+Connect to the selected BioMart database by using `useMart()`.
+
+```{r ensembl}
+avail_datasets <- listDatasets(ensembl)
+head(avail_datasets)
+```
+
+Look for _C. elegans_ datasets by searching the description column.
+
+```{r celegans}
+idx <- grep(pattern = "elegans", avail_datasets$dataset, ignore.case = TRUE)
+avail_datasets[idx, ]
+```
+
+Connect to the selected BioMart database and _Caenorhabditis elegans_ dataset.
+
+```{r usemart_with_dataset}
+ensembl <- useEnsembl(biomart = "ensembl", mirror = "asia", dataset=avail_datasets[idx, 'dataset'])
+ensembl
+```
+
+Building a query, requires three things:
+
+1. filters
+2. attributes
+3. values
+
+Use `listFilters()` to show available filters.
+
+```{r avail_filters}
+avail_filters <- listFilters(ensembl)
+head(avail_filters)
+```
+
+Use `listAttributes()` to show available attributes.
+
+```{r avail_attributes}
+avail_attributes <- listAttributes(ensembl)
+avail_attributes |>
+  head()
+```
+
+The `getBM()` function is the main query function in {biomaRt}; use it once you have identified your attributes of interest and filters to use. Note that the gene IDs aren't really Ensembl Gene IDs.
+
+```{r affy_to_entrez_gene}
+gene_ids <- c("WBGene00000007", "WBGene00000027", "WBGene00000056", "WBGene00000071")
+
+getBM(
+  attributes=c('ensembl_gene_id', 'external_gene_name', 'description'),
+  filters = 'ensembl_gene_id',
+  values = gene_ids,
+  mart = ensembl
+) -> res
+
+res
+```
+
+All gene IDs.
+
+```{r gtf_file}
+gtf_file <- "https://ftp.ensembl.org/pub/release-113/gtf/caenorhabditis_elegans/Caenorhabditis_elegans.WBcel235.113.gtf.gz"
+if(file.exists(basename(gtf_file)) == FALSE){
+  download.file(url = gtf_file, destfile = basename(gtf_file))
+}
+
+gtf_cols <- c(
+  "seqname",
+  "source",
+  "feature",
+  "start",
+  "end",
+  "score",
+  "strand",
+  "frame",
+  "attribute"
+)
+
+gtf <- readr::read_tsv(file = gtf_file, comment = "#", col_names = gtf_cols, show_col_types = FALSE)
+gtf |>
+  dplyr::filter(feature == "gene") |>
+  dplyr::select(attribute) |>
+  tidyr::separate_rows(attribute, sep = ";\\s*") |>
+  dplyr::filter(grepl("gene_id", attribute)) |>
+  tidyr::separate(attribute, c('key', 'value'), sep = "\\s") |>
+  dplyr::pull(value) |>
+  gsub(pattern ='"', replacement = "") -> all_gene_ids
+
+length(all_gene_ids) == length(unique(all_gene_ids))
+```
+
+Get gene names and descriptions.
+
+```{r all_gene_info}
+getBM(
+  attributes=c('ensembl_gene_id', 'external_gene_name', 'description'),
+  filters = 'ensembl_gene_id',
+  values = all_gene_ids,
+  mart = ensembl
+) -> all_gene_info
+
+head(all_gene_info)
+```
+
+Save lookup table.
+
+```{r save_all_gene_info}
+readr::write_csv(x = all_gene_info, file = "data/celegans_gene_info.csv.gz")
+```
+
+## Gene Ontology terms
+
+Find GO attribute names.
+
+```{r find_go}
+grep("^go", avail_attributes$name, ignore.case=TRUE, value=TRUE)
+```
+
+Query.
+
+```{r go_id}
+getBM(
+  attributes=c("ensembl_gene_id", "go_id"),
+  filters="ensembl_gene_id",
+  values = all_gene_ids,
+  mart = ensembl
+) -> all_gene_go_ids
+
+head(all_gene_go_ids)
+```
+
+Save GO table.
+
+```{r save_all_gene_go_ids}
+readr::write_csv(x = all_gene_go_ids, file = "data/celegans_gene_id_to_go_id.csv.gz")
+```
