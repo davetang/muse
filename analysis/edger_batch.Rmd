@@ -259,3 +259,43 @@ Plot.
 plotMD(qlf)
 abline(h=c(-1,1), col="blue")
 ```
+
+## Incorrect order
+
+Recall that the test is for the last coefficient in the design matrix, which in this case is `Time3`.
+
+```{r incorrect_order}
+count_rds <- "data/arab.rds"
+arab <- readRDS(count_rds)
+
+Treat <- factor(substring(colnames(arab),1,4))
+Treat <- relevel(Treat, ref="mock")
+Time <- factor(substring(colnames(arab),5,5))
+
+y <- DGEList(counts=arab, group=Treat)
+keep <- filterByExpr(y)
+y <- y[keep, , keep.lib.sizes=FALSE]
+
+y <- normLibSizes(y)
+
+design <- model.matrix(~Treat+Time)
+rownames(design) <- colnames(y)
+design
+```
+
+Continue the analysis.
+
+```{r incorrect_order_cont}
+y <- estimateDisp(y, design, robust=TRUE)
+
+fit <- glmQLFit(y, design, robust=TRUE)
+
+qlf <- glmQLFTest(fit)
+
+summary(decideTests(qlf))
+
+top <- rownames(topTags(qlf))
+cpm(y)[top,]
+```
+
+The top genes are different between timepoint 3 and the other timepoints!
