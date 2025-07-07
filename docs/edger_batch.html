@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef43069f53abe37883f043a912caf221e5086386atargetblankf43069fa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree088b98660fd82f7a51c1210982f8909bcd97a527targetblank088b986a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/f43069f53abe37883f043a912caf221e5086386a" target="_blank">f43069f</a>
+<a href="https://github.com/davetang/muse/tree/088b98660fd82f7a51c1210982f8909bcd97a527" target="_blank">088b986</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef43069f53abe37883f043a912caf221e5086386atargetblankf43069fa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree088b98660fd82f7a51c1210982f8909bcd97a527targetblank088b986a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/f43069f53abe37883f043a912caf221e5086386a" target="_blank">f43069f</a>.
+<a href="https://github.com/davetang/muse/tree/088b98660fd82f7a51c1210982f8909bcd97a527" target="_blank">088b986</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -553,7 +553,6 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rproj.user/
-    Ignored:    analysis/figure/
     Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
     Ignored:    data/293t/
     Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
@@ -644,6 +643,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/088b98660fd82f7a51c1210982f8909bcd97a527/analysis/edger_batch.Rmd" target="_blank">088b986</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+Test wrong order in model matrix
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/bb163c5dbb519e1e5e73589819e77f4e188d4ad4/docs/edger_batch.html" target="_blank">bb163c5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -895,6 +928,43 @@ mock1 &lt;- arab[my_genes, &#39;mock1&#39;]
 my_logfc &lt;- log(hrcc1 / (mock1 + 0.1))
 plot(logFC[, 4], my_logfc, pch = 16, main = cor(logFC[, 4], my_logfc, method = &quot;spearman&quot;))</code></pre>
 <p><img src="figure/edger_batch.Rmd/my_logfc-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-my_logfc-1">
+Past versions of my_logfc-1.png
+</button>
+</p>
+<div id="fig-my_logfc-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/bb163c5dbb519e1e5e73589819e77f4e188d4ad4/docs/figure/edger_batch.Rmd/my_logfc-1.png" target="_blank">bb163c5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="design-matrix" class="section level2">
 <h2>Design matrix</h2>
@@ -1247,6 +1317,69 @@ Dave Tang
 </table>
 </div>
 </div>
+</div>
+<div id="incorrect-order" class="section level2">
+<h2>Incorrect order</h2>
+<p>Recall that the test is for the last coefficient in the design
+matrix, which in this case is <code>Time3</code>.</p>
+<pre class="r"><code>count_rds &lt;- &quot;data/arab.rds&quot;
+arab &lt;- readRDS(count_rds)
+
+Treat &lt;- factor(substring(colnames(arab),1,4))
+Treat &lt;- relevel(Treat, ref=&quot;mock&quot;)
+Time &lt;- factor(substring(colnames(arab),5,5))
+
+y &lt;- DGEList(counts=arab, group=Treat)
+keep &lt;- filterByExpr(y)
+y &lt;- y[keep, , keep.lib.sizes=FALSE]
+
+y &lt;- normLibSizes(y)
+
+design &lt;- model.matrix(~Treat+Time)
+rownames(design) &lt;- colnames(y)
+design</code></pre>
+<pre><code>      (Intercept) Treathrcc Time2 Time3
+mock1           1         0     0     0
+mock2           1         0     1     0
+mock3           1         0     0     1
+hrcc1           1         1     0     0
+hrcc2           1         1     1     0
+hrcc3           1         1     0     1
+attr(,&quot;assign&quot;)
+[1] 0 1 2 2
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$Treat
+[1] &quot;contr.treatment&quot;
+
+attr(,&quot;contrasts&quot;)$Time
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>Continue the analysis.</p>
+<pre class="r"><code>y &lt;- estimateDisp(y, design, robust=TRUE)
+
+fit &lt;- glmQLFit(y, design, robust=TRUE)
+
+qlf &lt;- glmQLFTest(fit)
+
+summary(decideTests(qlf))</code></pre>
+<pre><code>       Time3
+Down     496
+NotSig 12842
+Up       592</code></pre>
+<pre class="r"><code>top &lt;- rownames(topTags(qlf))
+cpm(y)[top,]</code></pre>
+<pre><code>              mock1     mock2       mock3      hrcc1      hrcc2        hrcc3
+AT5G23380  88.07158 100.34708    7.795581 118.240667   83.93615   11.9866336
+AT1G10095 818.73947 616.71642   47.112427 823.188825 2168.22679   38.3572277
+AT2G36800 125.58354 124.38857   16.269039  33.718821   51.99585    4.1953218
+AT5G24770 122.32163 124.38857  675.843012  37.765080  111.41967  480.6640093
+AT1G76790  61.97629  73.69239  432.485298  65.639306   52.73864  284.9822150
+AT5G54160 259.86552 171.42626 1336.772738 849.264714  939.63922 5432.3423691
+AT5G01380 106.01208 115.50367   14.913286  60.244294   61.65222   11.9866336
+AT3G52700 100.03191 116.54895   10.168150 137.123207  479.84738    7.4916460
+AT5G47455  11.96034  12.54338   85.751395   9.890854   13.37036   69.5224752
+AT1G42140  28.26989  49.65090    1.694692  27.424641  102.50610    0.5993317</code></pre>
+<p>The top genes are different between timepoint 3 and the other
+timepoints!</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
