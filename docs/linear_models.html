@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2025-07-07" />
+
+<title>Linear models in R</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Linear models in R</h1>
+<h4 class="date">2025-07-07</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2025-07-07
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefadc325060df5306e4de4a5ca9528e9dbaabf8f4targetblankfadc325a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/fadc325060df5306e4de4a5ca9528e9dbaabf8f4" target="_blank">fadc325</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefadc325060df5306e4de4a5ca9528e9dbaabf8f4targetblankfadc325a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/fadc325060df5306e4de4a5ca9528e9dbaabf8f4" target="_blank">fadc325</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.4.1/
+    Ignored:    r_packages_4.5.0/
+
+Untracked files:
+    Untracked:  Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  Nothobranchius_furzeri.Nfu_20140520.113.gtf.gz
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/arab.rds
+    Untracked:  m3/
+    Untracked:  pbmc3k_before_filtering.rds
+    Untracked:  pbmc3k_save_rds.rds
+    Untracked:  rsem.merged.gene_counts.tsv
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/linear_models.Rmd</code>) and
+HTML (<code>docs/linear_models.html</code>) files. If you’ve configured
+a remote Git repository (see <code>?wflow_git_remote</code>), click on
+the hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/fadc325060df5306e4de4a5ca9528e9dbaabf8f4/analysis/linear_models.Rmd" target="_blank">fadc325</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+Linear models in R
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>From <a
+href="https://genomicsclass.github.io/book/pages/linear_models_intro.html">Introduction
+to Linear Models</a>:</p>
+<blockquote>
+<p>Many of the models we use in data analysis can be presented using
+matrix algebra. We refer to these types of models as linear models.
+“Linear” here does not refer to lines, but rather to linear
+combinations. The representations we describe are convenient because we
+can write models more succinctly and we have the matrix algebra
+mathematical machinery to facilitate computation. In this chapter, we
+will describe in some detail how we use matrix algebra to represent and
+fit.</p>
+<p>In this book, we focus on linear models that represent dichotomous
+groups: treatment versus control, for example. The effect of diet on
+mice weights is an example of this type of linear model. Here we
+describe slightly more complicated models, but continue to focus on
+dichotomous variables.</p>
+<p>As we learn about linear models, we need to remember that we are
+still working with random variables. This means that the estimates we
+obtain using linear models are also random variables. Although the
+mathematics is more complex, the concepts we learned in previous
+chapters apply here. We begin with some exercises to review the concept
+of random variables in the context of linear models.</p>
+</blockquote>
+<div id="the-design-matrix" class="section level2">
+<h2>The Design Matrix</h2>
+<p>From <a
+href="https://genomicsclass.github.io/book/pages/expressing_design_formula.html">Expressing
+design formula in R</a>.</p>
+<p>Here we will show how to use the two R functions,
+<code>formula</code> and <code>model.matrix</code>, in order to produce
+<em>design matrices</em> (also known as <em>model matrices</em>) for a
+variety of linear models. For example, in the mouse diet examples we
+wrote the model as</p>
+<p><span class="math display">\[
+Y_i = \beta_0 + \beta_1 x_i + \varepsilon_i, i=1,\dots,N
+\]</span></p>
+<p>with <span class="math inline">\(Y_i\)</span> the weights and <span
+class="math inline">\(x_i\)</span> equal to 1 only when mouse <span
+class="math inline">\(i\)</span> receives the high fat diet. We use the
+term <em>experimental unit</em> to <span
+class="math inline">\(N\)</span> different entities from which we obtain
+a measurement. In this case, the mice are the experimental units.</p>
+<p>This is the type of variable we will focus on in this chapter. We
+call them <em>indicator variables</em> since they simply indicate if the
+experimental unit had a certain characteristic or not. As we described
+earlier, we can use linear algebra to represent this model:</p>
+<p><span class="math display">\[
+\mathbf{Y} = \begin{pmatrix}
+Y_1\\
+Y_2\\
+\vdots\\
+Y_N
+\end{pmatrix}
+,
+\mathbf{X} = \begin{pmatrix}
+1&amp;x_1\\
+1&amp;x_2\\
+\vdots\\
+1&amp;x_N
+\end{pmatrix}
+,
+\boldsymbol{\beta} = \begin{pmatrix}
+\beta_0\\
+\beta_1
+\end{pmatrix} \mbox{ and }
+\boldsymbol{\varepsilon} = \begin{pmatrix}
+\varepsilon_1\\
+\varepsilon_2\\
+\vdots\\
+\varepsilon_N
+\end{pmatrix}
+\]</span></p>
+<p>as:</p>
+<p><span class="math display">\[
+\,
+\begin{pmatrix}
+Y_1\\
+Y_2\\
+\vdots\\
+Y_N
+\end{pmatrix} =
+\begin{pmatrix}
+1&amp;x_1\\
+1&amp;x_2\\
+\vdots\\
+1&amp;x_N
+\end{pmatrix}
+\begin{pmatrix}
+\beta_0\\
+\beta_1
+\end{pmatrix} +
+\begin{pmatrix}
+\varepsilon_1\\
+\varepsilon_2\\
+\vdots\\
+\varepsilon_N
+\end{pmatrix}
+\]</span></p>
+<p>or simply:</p>
+<p><span class="math display">\[
+\mathbf{Y}=\mathbf{X}\boldsymbol{\beta}+\boldsymbol{\varepsilon}
+\]</span></p>
+<p>The design matrix is the matrix <span
+class="math inline">\(\mathbf{X}\)</span>.</p>
+<p>Once we define a design matrix, we are ready to find the least
+squares estimates. We refer to this as <em>fitting the model</em>. For
+fitting linear models in R, we will directly provide a <em>formula</em>
+to the <code>lm</code> function. In this script, we will use the
+<code>model.matrix</code> function, which is used internally by the
+<code>lm</code> function. This will help us to connect the R
+<code>formula</code> with the matrix <span
+class="math inline">\(\mathbf{X}\)</span>. It will therefore help us
+interpret the results from <code>lm</code>.</p>
+<div id="choice-of-design" class="section level4">
+<h4>Choice of design</h4>
+<p>The choice of design matrix is a critical step in linear modeling
+since it encodes which coefficients will be fit in the model, as well as
+the inter-relationship between the samples. A common misunderstanding is
+that the choice of design follows straightforward from a description of
+which samples were included in the experiment. This is not the case. The
+basic information about each sample (whether control or treatment group,
+experimental batch, etc.) does not imply a single ‘correct’ design
+matrix. The design matrix additionally encodes various assumptions about
+how the variables in <span class="math inline">\(\mathbf{X}\)</span>
+explain the observed values in <span
+class="math inline">\(\mathbf{Y}\)</span>, on which the investigator
+must decide.</p>
+<p>For the examples we cover here, we use linear models to make
+comparisons between different groups. Hence, the design matrices that we
+ultimately work with will have at least two columns: an
+<em>intercept</em> column, which consists of a column of 1’s, and a
+second column, which specifies which samples are in a second group. In
+this case, two coefficients are fit in the linear model: the intercept,
+which represents the population average of the first group, and a second
+coefficient, which represents the difference between the population
+averages of the second group and the first group. The latter is
+typically the coefficient we are interested in when we are performing
+statistical tests: we want to know if there is a difference between the
+two groups.</p>
+<p>We encode this experimental design in R with two pieces. We start
+with a formula with the tilde symbol <code>~</code>. This means that we
+want to model the observations using the variables to the right of the
+tilde. Then we put the name of a variable, which tells us which samples
+are in which group.</p>
+<p>Let’s try an example. Suppose we have two groups, control and high
+fat diet, with two samples each. For illustrative purposes, we will code
+these with 1 and 2 respectively. We should first tell R that these
+values should not be interpreted numerically, but as different levels of
+a <em>factor</em>. We can then use the paradigm <code>~ group</code> to,
+say, model on the variable <code>group</code>.</p>
+<pre class="r"><code>group &lt;- factor( c(1,1,2,2) )
+model.matrix(~ group)</code></pre>
+<pre><code>  (Intercept) group2
+1           1      0
+2           1      0
+3           1      1
+4           1      1
+attr(,&quot;assign&quot;)
+[1] 0 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$group
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>(Don’t worry about the <code>attr</code> lines printed beneath the
+matrix. We won’t be using this information.)</p>
+<p>What about the <code>formula</code> function? We don’t have to
+include this. By starting an expression with <code>~</code>, it is
+equivalent to telling R that the expression is a formula:</p>
+<pre class="r"><code>model.matrix(formula(~ group))</code></pre>
+<pre><code>  (Intercept) group2
+1           1      0
+2           1      0
+3           1      1
+4           1      1
+attr(,&quot;assign&quot;)
+[1] 0 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$group
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>What happens if we don’t tell R that <code>group</code> should be
+interpreted as a factor?</p>
+<pre class="r"><code>group &lt;- c(1,1,2,2)
+model.matrix(~ group)</code></pre>
+<pre><code>  (Intercept) group
+1           1     1
+2           1     1
+3           1     2
+4           1     2
+attr(,&quot;assign&quot;)
+[1] 0 1</code></pre>
+<p>This is <strong>not</strong> the design matrix we wanted, and the
+reason is that we provided a numeric variable as opposed to an
+<em>indicator</em> to the <code>formula</code> and
+<code>model.matrix</code> functions, without saying that these numbers
+actually referred to different groups. We want the second column to have
+only 0 and 1, indicating group membership.</p>
+<p>A note about factors: the names of the levels are irrelevant to
+<code>model.matrix</code> and <code>lm</code>. All that matters is the
+order. For example:</p>
+<pre class="r"><code>group &lt;- factor(c(&quot;control&quot;,&quot;control&quot;,&quot;highfat&quot;,&quot;highfat&quot;))
+model.matrix(~ group)</code></pre>
+<pre><code>  (Intercept) grouphighfat
+1           1            0
+2           1            0
+3           1            1
+4           1            1
+attr(,&quot;assign&quot;)
+[1] 0 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$group
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>produces the same design matrix as our first code chunk.</p>
+</div>
+<div id="more-groups" class="section level4">
+<h4>More groups</h4>
+<p>Using the same formula, we can accommodate modeling more groups.
+Suppose we have a third diet:</p>
+<pre class="r"><code>group &lt;- factor(c(1,1,2,2,3,3))
+model.matrix(~ group)</code></pre>
+<pre><code>  (Intercept) group2 group3
+1           1      0      0
+2           1      0      0
+3           1      1      0
+4           1      1      0
+5           1      0      1
+6           1      0      1
+attr(,&quot;assign&quot;)
+[1] 0 1 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$group
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>Now we have a third column which specifies which samples belong to
+the third group.</p>
+<p>An alternate formulation of design matrix is possible by specifying
+<code>+ 0</code> in the formula:</p>
+<pre class="r"><code>group &lt;- factor(c(1,1,2,2,3,3))
+model.matrix(~ group + 0)</code></pre>
+<pre><code>  group1 group2 group3
+1      1      0      0
+2      1      0      0
+3      0      1      0
+4      0      1      0
+5      0      0      1
+6      0      0      1
+attr(,&quot;assign&quot;)
+[1] 1 1 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$group
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>This group now fits a separate coefficient for each group. We will
+explore this design in more depth later on.</p>
+</div>
+<div id="more-variables" class="section level4">
+<h4>More variables</h4>
+<p>We have been using a simple case with just one variable (diet) as an
+example. In the life sciences, it is quite common to perform experiments
+with more than one variable. For example, we may be interested in the
+effect of diet and the difference in sexes. In this case, we have four
+possible groups:</p>
+<pre class="r"><code>diet &lt;- factor(c(1,1,1,1,2,2,2,2))
+sex &lt;- factor(c(&quot;f&quot;,&quot;f&quot;,&quot;m&quot;,&quot;m&quot;,&quot;f&quot;,&quot;f&quot;,&quot;m&quot;,&quot;m&quot;))
+table(diet,sex)</code></pre>
+<pre><code>    sex
+diet f m
+   1 2 2
+   2 2 2</code></pre>
+<p>If we assume that the diet effect is the same for males and females
+(this is an assumption), then our linear model is:</p>
+<p><span class="math display">\[
+Y_{i}= \beta_0 + \beta_1 x_{i,1} + \beta_2 x_{i,2} + \varepsilon_i
+\]</span></p>
+<p>To fit this model in R, we can simply add the additional variable
+with a <code>+</code> sign in order to build a design matrix which fits
+based on the information in additional variables:</p>
+<pre class="r"><code>diet &lt;- factor(c(1,1,1,1,2,2,2,2))
+sex &lt;- factor(c(&quot;f&quot;,&quot;f&quot;,&quot;m&quot;,&quot;m&quot;,&quot;f&quot;,&quot;f&quot;,&quot;m&quot;,&quot;m&quot;))
+model.matrix(~ diet + sex)</code></pre>
+<pre><code>  (Intercept) diet2 sexm
+1           1     0    0
+2           1     0    0
+3           1     0    1
+4           1     0    1
+5           1     1    0
+6           1     1    0
+7           1     1    1
+8           1     1    1
+attr(,&quot;assign&quot;)
+[1] 0 1 2
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$diet
+[1] &quot;contr.treatment&quot;
+
+attr(,&quot;contrasts&quot;)$sex
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>The design matrix includes an intercept, a term for <code>diet</code>
+and a term for <code>sex</code>. We would say that this linear model
+accounts for differences in both the group and condition variables.
+However, as mentioned above, the model assumes that the diet effect is
+the same for both males and females. We say these are an
+<em>additive</em> effect. For each variable, we add an effect regardless
+of what the other is. Another model is possible here, which fits an
+additional term and which encodes the potential interaction of group and
+condition variables. We will cover interaction terms in depth in a later
+script.</p>
+<p>The interaction model can be written in either of the following two
+formulas:</p>
+<pre class="r"><code>model.matrix(~ diet + sex + diet:sex)</code></pre>
+<p>or</p>
+<pre class="r"><code>model.matrix(~ diet*sex)</code></pre>
+<pre><code>  (Intercept) diet2 sexm diet2:sexm
+1           1     0    0          0
+2           1     0    0          0
+3           1     0    1          0
+4           1     0    1          0
+5           1     1    0          0
+6           1     1    0          0
+7           1     1    1          1
+8           1     1    1          1
+attr(,&quot;assign&quot;)
+[1] 0 1 2 3
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$diet
+[1] &quot;contr.treatment&quot;
+
+attr(,&quot;contrasts&quot;)$sex
+[1] &quot;contr.treatment&quot;</code></pre>
+</div>
+<div id="releveling" class="section level4">
+<h4>Releveling</h4>
+<p>The level which is chosen for the <em>reference level</em> is the
+level which is contrasted against. By default, this is simply the first
+level alphabetically. We can specify that we want group 2 to be the
+reference level by either using the <code>relevel</code> function:</p>
+<pre class="r"><code>group &lt;- factor(c(1,1,2,2))
+group &lt;- relevel(group, &quot;2&quot;)
+model.matrix(~ group)</code></pre>
+<pre><code>  (Intercept) group1
+1           1      1
+2           1      1
+3           1      0
+4           1      0
+attr(,&quot;assign&quot;)
+[1] 0 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$group
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>or by providing the levels explicitly in the <code>factor</code>
+call:</p>
+<pre class="r"><code>group &lt;- factor(group, levels=c(&quot;1&quot;,&quot;2&quot;))
+model.matrix(~ group)</code></pre>
+<pre><code>  (Intercept) group2
+1           1      0
+2           1      0
+3           1      1
+4           1      1
+attr(,&quot;assign&quot;)
+[1] 0 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$group
+[1] &quot;contr.treatment&quot;</code></pre>
+</div>
+<div id="where-does-model.matrix-look-for-the-data"
+class="section level4">
+<h4>Where does model.matrix look for the data?</h4>
+<p>The <code>model.matrix</code> function will grab the variable from
+the R global environment, unless the data is explicitly provided as a
+data frame to the <code>data</code> argument:</p>
+<pre class="r"><code>group &lt;- 1:4
+model.matrix(~ group, data=data.frame(group=5:8))</code></pre>
+<pre><code>  (Intercept) group
+1           1     5
+2           1     6
+3           1     7
+4           1     8
+attr(,&quot;assign&quot;)
+[1] 0 1</code></pre>
+<p>Note how the R global environment variable <code>group</code> is
+ignored.</p>
+</div>
+<div id="continuous-variables" class="section level4">
+<h4>Continuous variables</h4>
+<p>In this chapter, we focus on models based on indicator values. In
+certain designs, however, we will be interested in using numeric
+variables in the design formula, as opposed to converting them to
+factors first. For example, in the falling object example, time was a
+continuous variable in the model and time squared was also included:</p>
+<pre class="r"><code>tt &lt;- seq(0,3.4,len=4) 
+model.matrix(~ tt + I(tt^2))</code></pre>
+<pre><code>  (Intercept)       tt   I(tt^2)
+1           1 0.000000  0.000000
+2           1 1.133333  1.284444
+3           1 2.266667  5.137778
+4           1 3.400000 11.560000
+attr(,&quot;assign&quot;)
+[1] 0 1 2</code></pre>
+<p>The <code>I</code> function above is necessary to specify a
+mathematical transformation of a variable. For more details, see the
+manual page for the <code>I</code> function by typing
+<code>?I</code>.</p>
+<p>In the life sciences, we could be interested in testing various
+dosages of a treatment, where we expect a specific relationship between
+a measured quantity and the dosage, e.g. 0 mg, 10 mg, 20 mg.</p>
+<p>The assumptions imposed by including continuous data as variables are
+typically hard to defend and motivate than the indicator function
+variables. Whereas the indicator variables simply assume a different
+mean between two groups, continuous variables assume a very specific
+relationship between the outcome and predictor variables.</p>
+<p>In cases like the falling object, we have the theory of gravitation
+supporting the model. In the father-son height example, because the data
+is bivariate normal, it follows that there is a linear relationship if
+we condition. However, we find that continuous variables are included in
+linear models without justification to “adjust” for variables such as
+age. We highly discourage this practice unless the data support the
+model being used.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.2 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4    
+ [5] purrr_1.0.4     readr_2.1.5     tidyr_1.3.1     tibble_3.3.0   
+ [9] ggplot2_3.5.2   tidyverse_2.0.0 workflowr_1.7.1
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      hms_1.1.3         
+ [5] digest_0.6.37      magrittr_2.0.3     timechange_0.3.0   evaluate_1.0.4    
+ [9] grid_4.5.0         RColorBrewer_1.1-3 fastmap_1.2.0      rprojroot_2.0.4   
+[13] jsonlite_2.0.0     processx_3.8.6     whisker_0.4.1      ps_1.9.1          
+[17] promises_1.3.3     httr_1.4.7         scales_1.4.0       jquerylib_0.1.4   
+[21] cli_3.6.5          rlang_1.1.6        withr_3.0.2        cachem_1.1.0      
+[25] yaml_2.3.10        tools_4.5.0        tzdb_0.5.0         httpuv_1.6.16     
+[29] vctrs_0.6.5        R6_2.6.1           lifecycle_1.0.4    git2r_0.36.2      
+[33] fs_1.6.6           pkgconfig_2.0.3    callr_3.7.6        pillar_1.11.0     
+[37] bslib_0.9.0        later_1.4.2        gtable_0.3.6       glue_1.8.0        
+[41] Rcpp_1.1.0         xfun_0.52          tidyselect_1.2.1   rstudioapi_0.17.1 
+[45] knitr_1.50         farver_2.1.2       htmltools_0.5.8.1  rmarkdown_2.29    
+[49] compiler_4.5.0     getPass_0.2-4     </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
