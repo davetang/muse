@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2025-07-07" />
+
+<title>edgeR with batch effects</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">edgeR with batch effects</h1>
+<h4 class="date">2025-07-07</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2025-07-07
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1382bfb73215de1466307b92b8805228822e1a0ftargetblank1382bfba">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/1382bfb73215de1466307b92b8805228822e1a0f" target="_blank">1382bfb</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1382bfb73215de1466307b92b8805228822e1a0ftargetblank1382bfba"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/1382bfb73215de1466307b92b8805228822e1a0f" target="_blank">1382bfb</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.4.1/
+    Ignored:    r_packages_4.5.0/
+
+Untracked files:
+    Untracked:  Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  Nothobranchius_furzeri.Nfu_20140520.113.gtf.gz
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/arab.rds
+    Untracked:  m3/
+    Untracked:  pbmc3k_before_filtering.rds
+    Untracked:  pbmc3k_save_rds.rds
+    Untracked:  rsem.merged.gene_counts.tsv
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/edger_batch.Rmd</code>) and HTML
+(<code>docs/edger_batch.html</code>) files. If you’ve configured a
+remote Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/1382bfb73215de1466307b92b8805228822e1a0f/analysis/edger_batch.Rmd" target="_blank">1382bfb</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+edgeR analysis with batch effects
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p><a
+href="https://bioconductor.org/packages/release/bioc/html/edgeR.html">edgeR</a>
+carries out:</p>
+<blockquote>
+<p>Differential expression analysis of RNA-seq expression profiles with
+biological replication. Implements a range of statistical methodology
+based on the negative binomial distributions, including empirical Bayes
+estimation, exact tests, generalized linear models and quasi-likelihood
+tests. As well as RNA-seq, it be applied to differential signal analysis
+of other types of genomic data that produce read counts, including
+ChIP-seq, ATAC-seq, Bisulfite-seq, SAGE and CAGE.</p>
+</blockquote>
+<p>In this notebook we will be following Section 4.2 RNA-Seq of pathogen
+inoculated arabidopsis with batch effects on page 55 of the <a
+href="https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf">edgeR
+user guide</a>.</p>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>Install using <code>BiocManager::install()</code>.</p>
+<pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+
+BiocManager::install(&quot;edgeR&quot;)</code></pre>
+<p>Load.</p>
+<pre class="r"><code>library(edgeR)</code></pre>
+<pre><code>Loading required package: limma</code></pre>
+<pre class="r"><code>packageVersion(&quot;edgeR&quot;)</code></pre>
+<pre><code>[1] &#39;4.6.2&#39;</code></pre>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p><code>arab.rds</code> was downloaded from WEHI’s <a
+href="https://bioinf.wehi.edu.au/edgeR/">Bioinformatics page for
+edgeR</a> on my web server. (There have been more than one occasion
+where my personal web server out lasted a tool’s webpage, so I prefer
+referring to my web server.)</p>
+<pre class="r"><code>count_rds &lt;- &quot;data/arab.rds&quot;
+if(!file.exists(count_rds)){
+  download.file(url = &quot;https://davetang.org/file/arab.rds&quot;, destfile = count_rds)
+}
+
+stopifnot(tools::md5sum(count_rds) == &#39;4af4a2e351279b73cb53a58991b0e004&#39;)</code></pre>
+<p>Load.</p>
+<pre class="r"><code>arab &lt;- readRDS(count_rds)
+head(arab)</code></pre>
+<pre><code>          mock1 mock2 mock3 hrcc1 hrcc2 hrcc3
+AT1G01010    35    77    40    46    64    60
+AT1G01020    43    45    32    43    39    49
+AT1G01030    16    24    26    27    35    20
+AT1G01040    72    43    64    66    25    90
+AT1G01050    49    78    90    67    45    60
+AT1G01060     0    15     2     0    21     8</code></pre>
+</div>
+<div id="dgelist" class="section level2">
+<h2>DGEList</h2>
+<p>There are two experimental factors:</p>
+<ol style="list-style-type: decimal">
+<li>treatment (<code>hrcc</code> vs. <code>mock</code>) and</li>
+<li>the time that each replicate was conducted.</li>
+</ol>
+<pre class="r"><code>Treat &lt;- factor(substring(colnames(arab),1,4))
+Treat &lt;- relevel(Treat, ref=&quot;mock&quot;)
+Treat</code></pre>
+<pre><code>[1] mock mock mock hrcc hrcc hrcc
+Levels: mock hrcc</code></pre>
+<pre class="r"><code>Time &lt;- factor(substring(colnames(arab),5,5))
+Time</code></pre>
+<pre><code>[1] 1 2 3 1 2 3
+Levels: 1 2 3</code></pre>
+<p>Create a DGEList object.</p>
+<pre class="r"><code>y &lt;- DGEList(counts=arab, group=Treat)
+y</code></pre>
+<pre><code>An object of class &quot;DGEList&quot;
+$counts
+          mock1 mock2 mock3 hrcc1 hrcc2 hrcc3
+AT1G01010    35    77    40    46    64    60
+AT1G01020    43    45    32    43    39    49
+AT1G01030    16    24    26    27    35    20
+AT1G01040    72    43    64    66    25    90
+AT1G01050    49    78    90    67    45    60
+26217 more rows ...
+
+$samples
+      group lib.size norm.factors
+mock1  mock  1902162            1
+mock2  mock  1934131            1
+mock3  mock  3259861            1
+hrcc1  hrcc  2130030            1
+hrcc2  hrcc  1295377            1
+hrcc3  hrcc  3526743            1</code></pre>
+</div>
+<div id="filtering-and-normalisation" class="section level2">
+<h2>Filtering and normalisation</h2>
+<p>Filter.</p>
+<pre class="r"><code>keep &lt;- filterByExpr(y)
+table(keep)</code></pre>
+<pre><code>keep
+FALSE  TRUE 
+12292 13930 </code></pre>
+<pre class="r"><code>y &lt;- y[keep, , keep.lib.sizes=FALSE]</code></pre>
+<p>TMM normalization.</p>
+<pre class="r"><code>y &lt;- normLibSizes(y)
+y$samples</code></pre>
+<pre><code>      group lib.size norm.factors
+mock1  mock  1882391    0.9771684
+mock2  mock  1870625    1.0228448
+mock3  mock  3227243    0.9142136
+hrcc1  hrcc  2101449    1.0584492
+hrcc2  hrcc  1243266    1.0828426
+hrcc3  hrcc  3494821    0.9548559</code></pre>
+</div>
+<div id="exploratory-analysis" class="section level2">
+<h2>Exploratory analysis</h2>
+<p>MDS.</p>
+<pre class="r"><code>plotMDS(y, col=rep(1:2, each=3))</code></pre>
+<p><img src="figure/edger_batch.Rmd/mds-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Examine consistency of the three replicates by computing predictive
+log2-fold-changes (logFC) for the treatment separately for the three
+times.</p>
+<pre class="r"><code>design &lt;- model.matrix(~Time+Time:Treat)
+logFC &lt;- predFC(y,design,prior.count=1,dispersion=0.05)
+head(logFC)</code></pre>
+<pre><code>          (Intercept)        Time2       Time3 Time1:Treathrcc Time2:Treathrcc
+AT1G01010   -15.64849  1.063316243 -0.47589404       0.1175744       0.2379616
+AT1G01020   -15.35760  0.008565037 -1.07739983      -0.2685150       0.2956956
+AT1G01030   -16.73949  0.506610030  0.01787955       0.4609379       1.0258955
+AT1G01040   -14.62473 -0.788654290 -0.83871710      -0.3945032      -0.2694368
+AT1G01050   -15.17243  0.605668395  0.19250419       0.1745699      -0.2830148
+AT1G01070   -16.73949  0.994631770 -1.88496410      -1.0262976      -0.2515519
+          Time3:Treathrcc
+AT1G01010       0.3960761
+AT1G01020       0.4222396
+AT1G01030      -0.5242078
+AT1G01040       0.3085508
+AT1G01050      -0.7483852
+AT1G01070      -1.7405528</code></pre>
+<p>The logFC at the three times are positively correlated with one
+another.</p>
+<pre class="r"><code>cor(logFC[,4:6])</code></pre>
+<pre><code>                Time1:Treathrcc Time2:Treathrcc Time3:Treathrcc
+Time1:Treathrcc       1.0000000       0.3965193       0.4974535
+Time2:Treathrcc       0.3965193       1.0000000       0.5162039
+Time3:Treathrcc       0.4974535       0.5162039       1.0000000</code></pre>
+</div>
+<div id="design-matrix" class="section level2">
+<h2>Design matrix</h2>
+<p>Before we fit GLMs, we need to define our design matrix based on the
+experimental design. We want to test for differential expressions
+between <code>hrcc</code> challenged and mock-inoculated samples within
+batches, i.e. adjusting for differences between batches. In statistical
+terms, this is an additive linear model. So the design matrix is created
+as:</p>
+<pre class="r"><code>design &lt;- model.matrix(~Time+Treat)
+rownames(design) &lt;- colnames(y)
+design</code></pre>
+<pre><code>      (Intercept) Time2 Time3 Treathrcc
+mock1           1     0     0         0
+mock2           1     1     0         0
+mock3           1     0     1         0
+hrcc1           1     0     0         1
+hrcc2           1     1     0         1
+hrcc3           1     0     1         1
+attr(,&quot;assign&quot;)
+[1] 0 1 1 2
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$Time
+[1] &quot;contr.treatment&quot;
+
+attr(,&quot;contrasts&quot;)$Treat
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>Switch the covariates around (for testing purposes).</p>
+<pre class="r"><code>design2 &lt;- model.matrix(~Treat+Time)
+rownames(design2) &lt;- colnames(y)
+design2</code></pre>
+<pre><code>      (Intercept) Treathrcc Time2 Time3
+mock1           1         0     0     0
+mock2           1         0     1     0
+mock3           1         0     0     1
+hrcc1           1         1     0     0
+hrcc2           1         1     1     0
+hrcc3           1         1     0     1
+attr(,&quot;assign&quot;)
+[1] 0 1 2 2
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$Treat
+[1] &quot;contr.treatment&quot;
+
+attr(,&quot;contrasts&quot;)$Time
+[1] &quot;contr.treatment&quot;</code></pre>
+</div>
+<div id="dispersion-estimation" class="section level2">
+<h2>Dispersion estimation</h2>
+<p>Estimate the genewise dispersion estimates over all genes, allowing
+for a possible abundance trend. The estimation is also robustified
+against potential outlier genes.</p>
+<pre class="r"><code>y &lt;- estimateDisp(y, design, robust=TRUE)
+y$common.dispersion</code></pre>
+<pre><code>[1] 0.06383161</code></pre>
+<pre class="r"><code>y2 &lt;- estimateDisp(y, design2, robust=TRUE)
+y2$common.dispersion</code></pre>
+<pre><code>[1] 0.06383161</code></pre>
+<p>Plot.</p>
+<pre class="r"><code>plotBCV(y)</code></pre>
+<p><img src="figure/edger_batch.Rmd/plot_bcv-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The QL dispersions can be estimated using the <code>glmQLFit()</code>
+function, and then be visualised with the <code>plotQLDisp()</code>
+function.</p>
+<pre class="r"><code>fit &lt;- glmQLFit(y, design, robust=TRUE)
+plotQLDisp(fit)</code></pre>
+<p><img src="figure/edger_batch.Rmd/fit-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>fit2 &lt;- glmQLFit(y2, design2, robust=TRUE)
+plotQLDisp(fit2)</code></pre>
+<p><img src="figure/edger_batch.Rmd/fit-2.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="differential-expression" class="section level2">
+<h2>Differential expression</h2>
+<p>Now we test for significant differential expression in each gene
+using the QL F-test.</p>
+<p>First we check whether there was a genuine need to adjust for the
+experimental times. We do this by testing for differential expression
+between the three times. There is considerable differential expression,
+justifying our decision to adjust for the batch effect.</p>
+<pre class="r"><code>qlf &lt;- glmQLFTest(fit, coef=2:3)
+summary(decideTests(qlf))</code></pre>
+<pre><code>       Time3-Time2
+NotSig       12136
+Sig           1794</code></pre>
+<p>Now conduct QL F-tests for the pathogen effect and show the top
+genes. By default, the test is for the last coefficient in the design
+matrix, which in this case is the treatment effect:</p>
+<pre class="r"><code>qlf2 &lt;- glmQLFTest(fit)
+summary(decideTests(qlf2))</code></pre>
+<pre><code>       Treathrcc
+Down        1042
+NotSig     11891
+Up           997</code></pre>
+<p>Test.</p>
+<pre class="r"><code>qlf3 &lt;- glmQLFTest(fit2, coef=2)
+summary(decideTests(qlf3))</code></pre>
+<pre><code>       Treathrcc
+Down        1042
+NotSig     11891
+Up           997</code></pre>
+<p>Closer look at the individual counts-per-million for the top genes.
+The top genes are very consistent across the three replicates:</p>
+<pre class="r"><code>top &lt;- rownames(topTags(qlf2))
+cpm(y)[top,]</code></pre>
+<pre><code>                mock1      mock2      mock3      hrcc1      hrcc2      hrcc3
+AT2G19190  16.8532030  12.543385  13.218595  341.68406  262.20763  344.91538
+AT2G39530   7.0674722   9.407539  13.218595  158.25367  197.58422  238.83368
+AT3G46280  19.0278098  17.769795  18.302669  385.29373  385.51206  806.40078
+AT5G48430   4.3492137   4.703769   0.000000  189.27498  323.85984  122.86299
+AT1G51800  29.3571923  17.247154  30.504449  362.81452  358.02854  455.79174
+AT2G39380   2.1746068   3.135846   4.745136   91.71519   86.90734  132.75197
+AT3G55150   0.5436517   1.045282   1.355753   43.16009   66.85180   63.22949
+AT5G64120 135.3692755 119.684797 104.054065 1342.45867 1692.83620 1606.20891
+AT1G51850   1.0873034   1.045282   3.728322   78.22767   57.93823  106.98071
+AT1G51820   9.7857308   7.839616   6.100890  121.38776  161.18712  187.89048</code></pre>
+<p>Plot.</p>
+<pre class="r"><code>plotMD(qlf2)
+abline(h=c(-1,1), col=&quot;blue&quot;)</code></pre>
+<p><img src="figure/edger_batch.Rmd/plot_md-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="no-correction" class="section level2">
+<h2>No correction</h2>
+<p>No correction.</p>
+<pre class="r"><code>count_rds &lt;- &quot;data/arab.rds&quot;
+arab &lt;- readRDS(count_rds)
+
+Treat &lt;- factor(substring(colnames(arab),1,4))
+Treat &lt;- relevel(Treat, ref=&quot;mock&quot;)
+
+y &lt;- DGEList(counts=arab, group=Treat)
+keep &lt;- filterByExpr(y)
+y &lt;- y[keep, , keep.lib.sizes=FALSE]
+
+y &lt;- normLibSizes(y)
+
+design &lt;- model.matrix(~Treat)
+rownames(design) &lt;- colnames(y)
+
+y &lt;- estimateDisp(y, design, robust=TRUE)
+
+fit &lt;- glmQLFit(y, design, robust=TRUE)
+
+qlf &lt;- glmQLFTest(fit)
+
+summary(decideTests(qlf))</code></pre>
+<pre><code>       Treathrcc
+Down          54
+NotSig     13681
+Up           195</code></pre>
+<p>Top genes.</p>
+<pre class="r"><code>top &lt;- rownames(topTags(qlf))
+cpm(y)[top,]</code></pre>
+<pre><code>                mock1      mock2      mock3      hrcc1      hrcc2      hrcc3
+AT3G55150   0.5436517   1.045282   1.355753   43.16009   66.85180   63.22949
+AT2G19190  16.8532030  12.543385  13.218595  341.68406  262.20763  344.91538
+AT2G44370   2.1746068   1.045282   1.694692   57.09720   69.08020   84.50577
+AT1G51820   9.7857308   7.839616   6.100890  121.38776  161.18712  187.89048
+AT2G39380   2.1746068   3.135846   4.745136   91.71519   86.90734  132.75197
+AT2G39530   7.0674722   9.407539  13.218595  158.25367  197.58422  238.83368
+AT3G46280  19.0278098  17.769795  18.302669  385.29373  385.51206  806.40078
+AT5G64120 135.3692755 119.684797 104.054065 1342.45867 1692.83620 1606.20891
+AT1G51800  29.3571923  17.247154  30.504449  362.81452  358.02854  455.79174
+AT4G12500 155.4843888 104.005566 133.202760 1831.60638 3757.81410 2449.16892</code></pre>
+<p>Plot.</p>
+<pre class="r"><code>plotMD(qlf)
+abline(h=c(-1,1), col=&quot;blue&quot;)</code></pre>
+<p><img src="figure/edger_batch.Rmd/plot_md_no_correction-1.png" width="672" style="display: block; margin: auto;" /></p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.2 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] edgeR_4.6.2     limma_3.64.1    lubridate_1.9.4 forcats_1.0.0  
+ [5] stringr_1.5.1   dplyr_1.1.4     purrr_1.0.4     readr_2.1.5    
+ [9] tidyr_1.3.1     tibble_3.3.0    ggplot2_3.5.2   tidyverse_2.0.0
+[13] workflowr_1.7.1
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.10        generics_0.1.4     lattice_0.22-6     stringi_1.8.7     
+ [5] hms_1.1.3          digest_0.6.37      magrittr_2.0.3     timechange_0.3.0  
+ [9] evaluate_1.0.4     grid_4.5.0         RColorBrewer_1.1-3 fastmap_1.2.0     
+[13] rprojroot_2.0.4    jsonlite_2.0.0     processx_3.8.6     whisker_0.4.1     
+[17] ps_1.9.1           promises_1.3.3     httr_1.4.7         scales_1.4.0      
+[21] jquerylib_0.1.4    cli_3.6.5          rlang_1.1.6        withr_3.0.2       
+[25] cachem_1.1.0       yaml_2.3.10        tools_4.5.0        tzdb_0.5.0        
+[29] locfit_1.5-9.12    httpuv_1.6.16      vctrs_0.6.5        R6_2.6.1          
+[33] lifecycle_1.0.4    git2r_0.36.2       fs_1.6.6           pkgconfig_2.0.3   
+[37] callr_3.7.6        pillar_1.11.0      bslib_0.9.0        later_1.4.2       
+[41] gtable_0.3.6       glue_1.8.0         Rcpp_1.1.0         statmod_1.5.0     
+[45] xfun_0.52          tidyselect_1.2.1   rstudioapi_0.17.1  knitr_1.50        
+[49] farver_2.1.2       htmltools_0.5.8.1  rmarkdown_2.29     compiler_4.5.0    
+[53] getPass_0.2-4     </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
