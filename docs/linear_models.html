@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3bd2ef6a7387d6804deae3b0ab55bb34717deacatargetblank3bd2ef6a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3c3a848e49388f8dc41fab62819fa2cbed85f0c6targetblank3c3a848a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/3bd2ef6a7387d6804deae3b0ab55bb34717deaca" target="_blank">3bd2ef6</a>
+<a href="https://github.com/davetang/muse/tree/3c3a848e49388f8dc41fab62819fa2cbed85f0c6" target="_blank">3c3a848</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3bd2ef6a7387d6804deae3b0ab55bb34717deacatargetblank3bd2ef6a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3c3a848e49388f8dc41fab62819fa2cbed85f0c6targetblank3c3a848a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/3bd2ef6a7387d6804deae3b0ab55bb34717deaca" target="_blank">3bd2ef6</a>.
+<a href="https://github.com/davetang/muse/tree/3c3a848e49388f8dc41fab62819fa2cbed85f0c6" target="_blank">3c3a848</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -644,6 +644,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/3c3a848e49388f8dc41fab62819fa2cbed85f0c6/analysis/linear_models.Rmd" target="_blank">3c3a848</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+Add source
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/79968d7ce342f32f81f109bb65b0658c128b60c3/docs/linear_models.html" target="_blank">79968d7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1120,6 +1154,9 @@ model being used.</p>
 </div>
 <div id="linear-models-in-practice" class="section level2">
 <h2>Linear models in practice</h2>
+<p>From <a
+href="https://genomicsclass.github.io/book/pages/linear_models_in_practice.html">Linear
+models in practice</a>.</p>
 <div id="the-mouse-diet-example" class="section level3">
 <h3>The mouse diet example</h3>
 <p>We will demonstrate how to analyze the high fat diet data using
@@ -1135,6 +1172,43 @@ stripchart(dat$Bodyweight ~ dat$Diet, vertical=TRUE, method=&quot;jitter&quot;,
 Mice bodyweights stratified by diet.
 </p>
 </div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-bodyweight_by_diet_stripchart-1">
+Past versions of bodyweight_by_diet_stripchart-1.png
+</button>
+</p>
+<div id="fig-bodyweight_by_diet_stripchart-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/79968d7ce342f32f81f109bb65b0658c128b60c3/docs/figure/linear_models.Rmd/bodyweight_by_diet_stripchart-1.png" target="_blank">79968d7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>We can see that the high fat diet group appears to have higher
 weights on average, although there is overlap between the two
 samples.</p>
@@ -1143,17 +1217,41 @@ class="math inline">\(\mathbf{X}\)</span> using the formula
 <code>~ Diet</code>. The group with the 1’s in the second column is
 determined by the level of <code>Diet</code> which comes second; that
 is, the non-reference level.</p>
-<pre class="r"><code>levels(dat$Diet)</code></pre>
-<pre><code>NULL</code></pre>
+<pre class="r"><code>dat$Diet &lt;- factor(dat$Diet)
+levels(dat$Diet)</code></pre>
+<pre><code>[1] &quot;chow&quot; &quot;hf&quot;  </code></pre>
 <pre class="r"><code>X &lt;- model.matrix(~ Diet, data=dat)
-head(X)</code></pre>
-<pre><code>  (Intercept) Diethf
-1           1      0
-2           1      0
-3           1      0
-4           1      0
-5           1      0
-6           1      0</code></pre>
+X</code></pre>
+<pre><code>   (Intercept) Diethf
+1            1      0
+2            1      0
+3            1      0
+4            1      0
+5            1      0
+6            1      0
+7            1      0
+8            1      0
+9            1      0
+10           1      0
+11           1      0
+12           1      0
+13           1      1
+14           1      1
+15           1      1
+16           1      1
+17           1      1
+18           1      1
+19           1      1
+20           1      1
+21           1      1
+22           1      1
+23           1      1
+24           1      1
+attr(,&quot;assign&quot;)
+[1] 0 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$Diet
+[1] &quot;contr.treatment&quot;</code></pre>
 </div>
 <div id="the-mathematics-behind-lm" class="section level3">
 <h3>The Mathematics Behind lm()</h3>
@@ -1168,8 +1266,8 @@ this solution is:</p>
 (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{Y}
 \]</span></p>
 <p>We can calculate this in R using our matrix multiplication operator
-<code>%*%</code>, the inverse function <code>solve</code>, and the
-transpose function <code>t</code>.</p>
+<code>%*%</code>, the inverse function <code>solve</code> (Solve a
+System of Equations), and the transpose function <code>t</code>.</p>
 <pre class="r"><code>Y &lt;- dat$Bodyweight
 X &lt;- model.matrix(~ Diet, data=dat)
 solve(t(X) %*% X) %*% t(X) %*% Y</code></pre>
@@ -1212,13 +1310,62 @@ F-statistic: 4.224 on 1 and 22 DF,  p-value: 0.05192</code></pre>
 <div id="examining-the-coefficients" class="section level3">
 <h3>Examining the coefficients</h3>
 <p>The following plot provides a visualization of the meaning of the
-coefficients with colored arrows (code not shown):</p>
+coefficients with colored arrows:</p>
+<pre class="r"><code>stripchart(dat$Bodyweight ~ dat$Diet, vertical=TRUE, method=&quot;jitter&quot;,
+           main=&quot;Bodyweight over Diet&quot;, ylim=c(0,40), xlim=c(0,3))
+a &lt;- -0.25
+lgth &lt;- .1
+library(RColorBrewer)
+cols &lt;- brewer.pal(3,&quot;Dark2&quot;)
+abline(h=0)
+arrows(1+a,0,1+a,coefs[1],lwd=3,col=cols[1],length=lgth)
+abline(h=coefs[1],col=cols[1])
+arrows(2+a,coefs[1],2+a,coefs[1]+coefs[2],lwd=3,col=cols[2],length=lgth)
+abline(h=coefs[1]+coefs[2],col=cols[2])
+legend(&quot;right&quot;,names(coefs),fill=cols,cex=.75,bg=&quot;white&quot;)</code></pre>
 <div class="figure" style="text-align: center">
 <img src="figure/linear_models.Rmd/parameter_estimate_illustration-1.png" alt="Estimated linear model coefficients for bodyweight data illustrated with arrows." width="672" />
 <p class="caption">
 Estimated linear model coefficients for bodyweight data illustrated with
 arrows.
 </p>
+</div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-parameter_estimate_illustration-1">
+Past versions of parameter_estimate_illustration-1.png
+</button>
+</p>
+<div id="fig-parameter_estimate_illustration-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/79968d7ce342f32f81f109bb65b0658c128b60c3/docs/figure/linear_models.Rmd/parameter_estimate_illustration-1.png" target="_blank">79968d7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <p>To make a connection with material presented earlier, this simple
 linear model is actually giving us the same result (the t-statistic and
