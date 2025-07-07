@@ -105,7 +105,9 @@ MDS.
 plotMDS(y, col=rep(1:2, each=3))
 ```
 
-Examine consistency of the three replicates by computing predictive log2-fold-changes (logFC) for the treatment separately for the three times.
+Examine consistency of the three replicates by computing predictive log2-fold-changes (logFC) for the treatment separately for the three times. The `predFC()` function:
+
+> Computes estimated coefficients for a NB glm in such a way that the log-fold-changes are shrunk towards zero.
 
 ```{r pred_fc}
 design <- model.matrix(~Time+Time:Treat)
@@ -117,6 +119,17 @@ The logFC at the three times are positively correlated with one another.
 
 ```{r pred_fc_cor}
 cor(logFC[,4:6])
+```
+
+Calculate my own log FC to confirm what `predFC()` is doing for timepoint `1`.
+
+```{r my_logfc}
+my_genes <- row.names(logFC)
+hrcc1 <- arab[my_genes, 'hrcc1']
+mock1 <- arab[my_genes, 'mock1']
+
+my_logfc <- log(hrcc1 / (mock1 + 0.1))
+plot(logFC[, 4], my_logfc, pch = 16, main = cor(logFC[, 4], my_logfc, method = "spearman"))
 ```
 
 ## Design matrix
