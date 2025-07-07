@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree088b98660fd82f7a51c1210982f8909bcd97a527targetblank088b986a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefcb2eadf3dbcb8a5b7254cc4328028df77e00fb1targetblankfcb2eada">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/088b98660fd82f7a51c1210982f8909bcd97a527" target="_blank">088b986</a>
+<a href="https://github.com/davetang/muse/tree/fcb2eadf3dbcb8a5b7254cc4328028df77e00fb1" target="_blank">fcb2ead</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree088b98660fd82f7a51c1210982f8909bcd97a527targetblank088b986a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefcb2eadf3dbcb8a5b7254cc4328028df77e00fb1targetblankfcb2eada"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/088b98660fd82f7a51c1210982f8909bcd97a527" target="_blank">088b986</a>.
+<a href="https://github.com/davetang/muse/tree/fcb2eadf3dbcb8a5b7254cc4328028df77e00fb1" target="_blank">fcb2ead</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -595,6 +595,7 @@ Untracked files:
     Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
     Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
     Untracked:  data/arab.rds
+    Untracked:  data/femaleMiceWeights.csv
     Untracked:  m3/
     Untracked:  pbmc3k_before_filtering.rds
     Untracked:  pbmc3k_save_rds.rds
@@ -643,6 +644,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/fcb2eadf3dbcb8a5b7254cc4328028df77e00fb1/analysis/edger_batch.Rmd" target="_blank">fcb2ead</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+Compare results of correction and no correction
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/3f1a56b3343e6c43735595e3abe27e289a9183a1/docs/edger_batch.html" target="_blank">3f1a56b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1169,6 +1204,14 @@ summary(decideTests(qlf2))</code></pre>
 Down        1042
 NotSig     11891
 Up           997</code></pre>
+<p>Save DE genes.</p>
+<pre class="r"><code>topTags(qlf2, n = Inf) |&gt;
+  as.data.frame() |&gt;
+  dplyr::filter(FDR &lt; 0.05) |&gt;
+  row.names() -&gt; de_genes
+
+length(de_genes)</code></pre>
+<pre><code>[1] 2039</code></pre>
 <p>Test.</p>
 <pre class="r"><code>qlf3 &lt;- glmQLFTest(fit2, coef=2)
 summary(decideTests(qlf3))</code></pre>
@@ -1262,7 +1305,21 @@ summary(decideTests(qlf))</code></pre>
 Down          54
 NotSig     13681
 Up           195</code></pre>
-<p>Top genes.</p>
+<p>Compare DE genes with DE genes called with batch effect correction.
+More sensitive testing with batch correction.</p>
+<pre class="r"><code>topTags(qlf, n = Inf) |&gt;
+  as.data.frame() |&gt;
+  dplyr::filter(FDR &lt; 0.05) |&gt;
+  row.names() -&gt; de_genes_no_correction
+
+gplots::venn(
+  list(
+    corrected = de_genes,
+    not_corrected = de_genes_no_correction
+  )
+)</code></pre>
+<p><img src="figure/edger_batch.Rmd/compare_de_genes-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Top genes from no correction test.</p>
 <pre class="r"><code>top &lt;- rownames(topTags(qlf))
 cpm(y)[top,]</code></pre>
 <pre><code>                mock1      mock2      mock3      hrcc1      hrcc2      hrcc3
@@ -1418,20 +1475,21 @@ other attached packages:
 [13] workflowr_1.7.1
 
 loaded via a namespace (and not attached):
- [1] sass_0.4.10        generics_0.1.4     lattice_0.22-6     stringi_1.8.7     
- [5] hms_1.1.3          digest_0.6.37      magrittr_2.0.3     timechange_0.3.0  
- [9] evaluate_1.0.4     grid_4.5.0         RColorBrewer_1.1-3 fastmap_1.2.0     
-[13] rprojroot_2.0.4    jsonlite_2.0.0     processx_3.8.6     whisker_0.4.1     
-[17] ps_1.9.1           promises_1.3.3     httr_1.4.7         scales_1.4.0      
-[21] jquerylib_0.1.4    cli_3.6.5          rlang_1.1.6        withr_3.0.2       
-[25] cachem_1.1.0       yaml_2.3.10        tools_4.5.0        tzdb_0.5.0        
-[29] locfit_1.5-9.12    httpuv_1.6.16      vctrs_0.6.5        R6_2.6.1          
-[33] lifecycle_1.0.4    git2r_0.36.2       fs_1.6.6           pkgconfig_2.0.3   
-[37] callr_3.7.6        pillar_1.11.0      bslib_0.9.0        later_1.4.2       
-[41] gtable_0.3.6       glue_1.8.0         Rcpp_1.1.0         statmod_1.5.0     
-[45] xfun_0.52          tidyselect_1.2.1   rstudioapi_0.17.1  knitr_1.50        
-[49] farver_2.1.2       htmltools_0.5.8.1  rmarkdown_2.29     compiler_4.5.0    
-[53] getPass_0.2-4     </code></pre>
+ [1] sass_0.4.10        generics_0.1.4     gplots_3.2.0       bitops_1.0-9      
+ [5] KernSmooth_2.23-26 gtools_3.9.5       lattice_0.22-6     stringi_1.8.7     
+ [9] caTools_1.18.3     hms_1.1.3          digest_0.6.37      magrittr_2.0.3    
+[13] timechange_0.3.0   evaluate_1.0.4     grid_4.5.0         RColorBrewer_1.1-3
+[17] fastmap_1.2.0      rprojroot_2.0.4    jsonlite_2.0.0     processx_3.8.6    
+[21] whisker_0.4.1      ps_1.9.1           promises_1.3.3     httr_1.4.7        
+[25] scales_1.4.0       jquerylib_0.1.4    cli_3.6.5          rlang_1.1.6       
+[29] withr_3.0.2        cachem_1.1.0       yaml_2.3.10        tools_4.5.0       
+[33] tzdb_0.5.0         locfit_1.5-9.12    httpuv_1.6.16      vctrs_0.6.5       
+[37] R6_2.6.1           lifecycle_1.0.4    git2r_0.36.2       fs_1.6.6          
+[41] pkgconfig_2.0.3    callr_3.7.6        pillar_1.11.0      bslib_0.9.0       
+[45] later_1.4.2        gtable_0.3.6       glue_1.8.0         Rcpp_1.1.0        
+[49] statmod_1.5.0      xfun_0.52          tidyselect_1.2.1   rstudioapi_0.17.1 
+[53] knitr_1.50         farver_2.1.2       htmltools_0.5.8.1  rmarkdown_2.29    
+[57] compiler_4.5.0     getPass_0.2-4     </code></pre>
 </div>
 </div>
 </div>
