@@ -196,6 +196,17 @@ qlf2 <- glmQLFTest(fit)
 summary(decideTests(qlf2))
 ```
 
+Save DE genes.
+
+```{r save_de_genes}
+topTags(qlf2, n = Inf) |>
+  as.data.frame() |>
+  dplyr::filter(FDR < 0.05) |>
+  row.names() -> de_genes
+
+length(de_genes)
+```
+
 Test.
 
 ```{r glm_ql_ftest3}
@@ -246,7 +257,23 @@ qlf <- glmQLFTest(fit)
 summary(decideTests(qlf))
 ```
 
-Top genes.
+Compare DE genes with DE genes called with batch effect correction. More sensitive testing with batch correction.
+
+```{r compare_de_genes}
+topTags(qlf, n = Inf) |>
+  as.data.frame() |>
+  dplyr::filter(FDR < 0.05) |>
+  row.names() -> de_genes_no_correction
+
+gplots::venn(
+  list(
+    corrected = de_genes,
+    not_corrected = de_genes_no_correction
+  )
+)
+```
+
+Top genes from no correction test.
 
 ```{r top_genes_no_correction}
 top <- rownames(topTags(qlf))
