@@ -101,7 +101,7 @@ The design matrix is the matrix $\mathbf{X}$.
 
 Once we define a design matrix, we are ready to find the least squares estimates. We refer to this as _fitting the model_. For fitting linear models in R, we will directly provide a _formula_ to the `lm` function. In this script, we will use the `model.matrix` function, which is used internally by the `lm` function. This will help us to connect the R `formula` with the matrix $\mathbf{X}$. It will therefore help us interpret the results from `lm`.
 
-#### Choice of design
+### Choice of design
 
 The choice of design matrix is a critical step in linear modeling since it encodes which coefficients will be fit in the model, as well as the inter-relationship between the samples. 
 A common misunderstanding is that the choice of design follows straightforward from a description of which samples were included in the experiment. This is not the case. The basic information about each sample (whether control or treatment group, experimental batch, etc.) does not imply a single 'correct' design matrix. The design matrix additionally encodes various assumptions about how the variables in $\mathbf{X}$ explain the observed values in $\mathbf{Y}$, on which the investigator must decide.
@@ -143,7 +143,7 @@ model.matrix(~ group)
 
 produces the same design matrix as our first code chunk.
 
-#### More groups
+### More groups
 
 Using the same formula, we can accommodate modeling more groups. Suppose we have a third diet:
 
@@ -163,7 +163,7 @@ model.matrix(~ group + 0)
 
 This group now fits a separate coefficient for each group. We will explore this design in more depth later on.
 
-#### More variables
+### More variables
 
 We have been using a simple case with just one variable (diet) as an example. In the life sciences, it is quite common to perform experiments with more than one variable. For example, we may be interested in the effect of diet and the difference in sexes. In this case, we have four possible groups:
 
@@ -201,7 +201,7 @@ or
 model.matrix(~ diet*sex)
 ```
 
-#### Releveling
+### Releveling
 
 The level which is chosen for the *reference level* is the level which is contrasted against.  By default, this is simply the first level alphabetically. We can specify that we want group 2 to be the reference level by either using the `relevel` function:
 
@@ -217,7 +217,7 @@ group <- factor(group, levels=c("1","2"))
 model.matrix(~ group)
 ```
 
-#### Where does model.matrix look for the data?
+### Where does model.matrix look for the data?
 
 The `model.matrix` function will grab the variable from the R global environment, unless the data is explicitly provided as a data frame to the `data` argument:
 
@@ -228,7 +228,7 @@ model.matrix(~ group, data=data.frame(group=5:8))
 
 Note how the R global environment variable `group` is ignored.
 
-#### Continuous variables
+### Continuous variables
 
 In this chapter, we focus on models based on indicator values. In certain designs, however, we will be interested in using numeric variables in the design formula, as opposed to converting them to factors first. For example, in the falling object example, time was a continuous variable in the model and time squared was also included:
 
@@ -249,3 +249,104 @@ between a measured quantity and the dosage, e.g. 0 mg, 10 mg, 20 mg.
 The assumptions imposed by including continuous data as variables are typically hard to defend and motivate than the indicator function variables. Whereas the indicator variables simply assume a different mean between two groups, continuous variables assume a very specific relationship between the outcome and predictor variables. 
 
 In cases like the falling object, we have the theory of gravitation supporting the model. In the father-son height example, because the data is bivariate normal, it follows that there is a linear relationship if we condition. However, we find that continuous variables are included in linear models without justification to "adjust" for variables such as age. We highly discourage this practice unless the data support the model being used.
+
+## Linear models in practice
+
+### The mouse diet example
+
+We will demonstrate how to analyze the high fat diet data using linear models instead of directly applying a t-test. We will demonstrate how ultimately these two approaches are equivalent. 
+
+We start by reading in the data and creating a quick stripchart:
+
+```{r,echo=FALSE}
+url <- "https://raw.githubusercontent.com/genomicsclass/dagdata/master/inst/extdata/femaleMiceWeights.csv"
+filename <- "data/femaleMiceWeights.csv"
+
+if(!file.exists(filename)){
+  download.file(url = url, destfile = filename)
+}
+```
+
+```{r bodyweight_by_diet_stripchart, fig.cap="Mice bodyweights stratified by diet."}
+dat <- read.csv(filename)
+stripchart(dat$Bodyweight ~ dat$Diet, vertical=TRUE, method="jitter",
+           main="Bodyweight over Diet")
+```
+
+We can see that the high fat diet group appears to have higher weights on average, although there is overlap between the two samples.
+
+For demonstration purposes, we will build the design matrix $\mathbf{X}$ using the formula `~ Diet`. The group with the 1's in the second column is determined by the level of `Diet` which comes second; that is, the non-reference level. 
+
+```{r}
+levels(dat$Diet)
+X <- model.matrix(~ Diet, data=dat)
+head(X)
+```
+
+### The Mathematics Behind lm()
+
+Before we use our shortcut for running linear models, `lm`, we want to review what will happen internally. Inside of `lm`, we will form the design matrix $\mathbf{X}$ and calculate the $\boldsymbol{\beta}$, which minimizes the sum of squares using the previously described formula. The formula for this solution is:
+
+$$ \hat{\boldsymbol{\beta}} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{Y} $$
+
+We can calculate this in R using our matrix multiplication operator `%*%`, the inverse function `solve`, and the transpose function `t`.
+
+```{r}
+Y <- dat$Bodyweight
+X <- model.matrix(~ Diet, data=dat)
+solve(t(X) %*% X) %*% t(X) %*% Y
+```
+
+These coefficients are the average of the control group and the difference of the averages:
+
+
+```{r}
+s <- split(dat$Bodyweight, dat$Diet)
+mean(s[["chow"]])
+mean(s[["hf"]]) - mean(s[["chow"]])
+```
+
+Finally, we use our shortcut, `lm`, to run the linear model:
+
+```{r}
+fit <- lm(Bodyweight ~ Diet, data=dat)
+summary(fit)
+(coefs <- coef(fit))
+```
+
+### Examining the coefficients
+
+The following plot provides a visualization of the meaning of the coefficients with colored arrows (code not shown):
+
+```{r parameter_estimate_illustration, fig.cap="Estimated linear model coefficients for bodyweight data illustrated with arrows.",echo=FALSE}
+stripchart(dat$Bodyweight ~ dat$Diet, vertical=TRUE, method="jitter",
+           main="Bodyweight over Diet", ylim=c(0,40), xlim=c(0,3))
+a <- -0.25
+lgth <- .1
+library(RColorBrewer)
+cols <- brewer.pal(3,"Dark2")
+abline(h=0)
+arrows(1+a,0,1+a,coefs[1],lwd=3,col=cols[1],length=lgth)
+abline(h=coefs[1],col=cols[1])
+arrows(2+a,coefs[1],2+a,coefs[1]+coefs[2],lwd=3,col=cols[2],length=lgth)
+abline(h=coefs[1]+coefs[2],col=cols[2])
+legend("right",names(coefs),fill=cols,cex=.75,bg="white")
+```
+
+To make a connection with material presented earlier, this simple linear model is actually giving us the same result (the t-statistic and p-value) for the difference as a specific kind of t-test. This is the t-test between two groups with the assumption that the population standard deviation is the same for both groups. This was encoded into our linear model when we assumed that the errors $\boldsymbol{\varepsilon}$ were all equally distributed.
+
+Although in this case the linear model is equivalent to a t-test, we will soon explore more complicated designs, where the linear model is a useful extension. Below we demonstrate that one does in fact get the exact same results:
+
+Our `lm` estimates were:
+
+```{r}
+summary(fit)$coefficients
+```
+
+And the t-statistic  is the same:
+
+```{r}
+ttest <- t.test(s[["hf"]], s[["chow"]], var.equal=TRUE)
+summary(fit)$coefficients[2,3]
+ttest$statistic
+```
