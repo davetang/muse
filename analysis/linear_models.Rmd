@@ -252,6 +252,8 @@ In cases like the falling object, we have the theory of gravitation supporting t
 
 ## Linear models in practice
 
+From [Linear models in practice](https://genomicsclass.github.io/book/pages/linear_models_in_practice.html).
+
 ### The mouse diet example
 
 We will demonstrate how to analyze the high fat diet data using linear models instead of directly applying a t-test. We will demonstrate how ultimately these two approaches are equivalent. 
@@ -278,9 +280,11 @@ We can see that the high fat diet group appears to have higher weights on averag
 For demonstration purposes, we will build the design matrix $\mathbf{X}$ using the formula `~ Diet`. The group with the 1's in the second column is determined by the level of `Diet` which comes second; that is, the non-reference level. 
 
 ```{r}
+dat$Diet <- factor(dat$Diet)
 levels(dat$Diet)
+
 X <- model.matrix(~ Diet, data=dat)
-head(X)
+X
 ```
 
 ### The Mathematics Behind lm()
@@ -289,7 +293,7 @@ Before we use our shortcut for running linear models, `lm`, we want to review wh
 
 $$ \hat{\boldsymbol{\beta}} = (\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{Y} $$
 
-We can calculate this in R using our matrix multiplication operator `%*%`, the inverse function `solve`, and the transpose function `t`.
+We can calculate this in R using our matrix multiplication operator `%*%`, the inverse function `solve` (Solve a System of Equations), and the transpose function `t`.
 
 ```{r}
 Y <- dat$Bodyweight
@@ -298,7 +302,6 @@ solve(t(X) %*% X) %*% t(X) %*% Y
 ```
 
 These coefficients are the average of the control group and the difference of the averages:
-
 
 ```{r}
 s <- split(dat$Bodyweight, dat$Diet)
@@ -316,9 +319,9 @@ summary(fit)
 
 ### Examining the coefficients
 
-The following plot provides a visualization of the meaning of the coefficients with colored arrows (code not shown):
+The following plot provides a visualization of the meaning of the coefficients with colored arrows:
 
-```{r parameter_estimate_illustration, fig.cap="Estimated linear model coefficients for bodyweight data illustrated with arrows.",echo=FALSE}
+```{r parameter_estimate_illustration, fig.cap="Estimated linear model coefficients for bodyweight data illustrated with arrows."}
 stripchart(dat$Bodyweight ~ dat$Diet, vertical=TRUE, method="jitter",
            main="Bodyweight over Diet", ylim=c(0,40), xlim=c(0,3))
 a <- -0.25
@@ -343,7 +346,7 @@ Our `lm` estimates were:
 summary(fit)$coefficients
 ```
 
-And the t-statistic  is the same:
+And the t-statistic is the same:
 
 ```{r}
 ttest <- t.test(s[["hf"]], s[["chow"]], var.equal=TRUE)
