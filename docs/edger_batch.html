@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1382bfb73215de1466307b92b8805228822e1a0ftargetblank1382bfba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef43069f53abe37883f043a912caf221e5086386atargetblankf43069fa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/1382bfb73215de1466307b92b8805228822e1a0f" target="_blank">1382bfb</a>
+<a href="https://github.com/davetang/muse/tree/f43069f53abe37883f043a912caf221e5086386a" target="_blank">f43069f</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1382bfb73215de1466307b92b8805228822e1a0ftargetblank1382bfba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreef43069f53abe37883f043a912caf221e5086386atargetblankf43069fa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/1382bfb73215de1466307b92b8805228822e1a0f" target="_blank">1382bfb</a>.
+<a href="https://github.com/davetang/muse/tree/f43069f53abe37883f043a912caf221e5086386a" target="_blank">f43069f</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -553,6 +553,7 @@ were generated:
 <pre><code>
 Ignored files:
     Ignored:    .Rproj.user/
+    Ignored:    analysis/figure/
     Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
     Ignored:    data/293t/
     Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
@@ -643,6 +644,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/f43069f53abe37883f043a912caf221e5086386a/analysis/edger_batch.Rmd" target="_blank">f43069f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+Compare logFC calculations
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4db8276c35c2cbff590a77ae0923ca2150136294/docs/edger_batch.html" target="_blank">4db8276</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -783,9 +818,50 @@ hrcc3  hrcc  3494821    0.9548559</code></pre>
 <p>MDS.</p>
 <pre class="r"><code>plotMDS(y, col=rep(1:2, each=3))</code></pre>
 <p><img src="figure/edger_batch.Rmd/mds-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-mds-1">
+Past versions of mds-1.png
+</button>
+</p>
+<div id="fig-mds-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4db8276c35c2cbff590a77ae0923ca2150136294/docs/figure/edger_batch.Rmd/mds-1.png" target="_blank">4db8276</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Examine consistency of the three replicates by computing predictive
 log2-fold-changes (logFC) for the treatment separately for the three
-times.</p>
+times. The <code>predFC()</code> function:</p>
+<blockquote>
+<p>Computes estimated coefficients for a NB glm in such a way that the
+log-fold-changes are shrunk towards zero.</p>
+</blockquote>
 <pre class="r"><code>design &lt;- model.matrix(~Time+Time:Treat)
 logFC &lt;- predFC(y,design,prior.count=1,dispersion=0.05)
 head(logFC)</code></pre>
@@ -810,6 +886,15 @@ another.</p>
 Time1:Treathrcc       1.0000000       0.3965193       0.4974535
 Time2:Treathrcc       0.3965193       1.0000000       0.5162039
 Time3:Treathrcc       0.4974535       0.5162039       1.0000000</code></pre>
+<p>Calculate my own log FC to confirm what <code>predFC()</code> is
+doing for timepoint <code>1</code>.</p>
+<pre class="r"><code>my_genes &lt;- row.names(logFC)
+hrcc1 &lt;- arab[my_genes, &#39;hrcc1&#39;]
+mock1 &lt;- arab[my_genes, &#39;mock1&#39;]
+
+my_logfc &lt;- log(hrcc1 / (mock1 + 0.1))
+plot(logFC[, 4], my_logfc, pch = 16, main = cor(logFC[, 4], my_logfc, method = &quot;spearman&quot;))</code></pre>
+<p><img src="figure/edger_batch.Rmd/my_logfc-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 <div id="design-matrix" class="section level2">
 <h2>Design matrix</h2>
@@ -871,15 +956,126 @@ y2$common.dispersion</code></pre>
 <p>Plot.</p>
 <pre class="r"><code>plotBCV(y)</code></pre>
 <p><img src="figure/edger_batch.Rmd/plot_bcv-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_bcv-1">
+Past versions of plot_bcv-1.png
+</button>
+</p>
+<div id="fig-plot_bcv-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4db8276c35c2cbff590a77ae0923ca2150136294/docs/figure/edger_batch.Rmd/plot_bcv-1.png" target="_blank">4db8276</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The QL dispersions can be estimated using the <code>glmQLFit()</code>
 function, and then be visualised with the <code>plotQLDisp()</code>
 function.</p>
 <pre class="r"><code>fit &lt;- glmQLFit(y, design, robust=TRUE)
 plotQLDisp(fit)</code></pre>
 <p><img src="figure/edger_batch.Rmd/fit-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-fit-1">
+Past versions of fit-1.png
+</button>
+</p>
+<div id="fig-fit-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4db8276c35c2cbff590a77ae0923ca2150136294/docs/figure/edger_batch.Rmd/fit-1.png" target="_blank">4db8276</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>fit2 &lt;- glmQLFit(y2, design2, robust=TRUE)
 plotQLDisp(fit2)</code></pre>
 <p><img src="figure/edger_batch.Rmd/fit-2.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-fit-2">
+Past versions of fit-2.png
+</button>
+</p>
+<div id="fig-fit-2" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4db8276c35c2cbff590a77ae0923ca2150136294/docs/figure/edger_batch.Rmd/fit-2.png" target="_blank">4db8276</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="differential-expression" class="section level2">
 <h2>Differential expression</h2>
@@ -929,6 +1125,43 @@ AT1G51820   9.7857308   7.839616   6.100890  121.38776  161.18712  187.89048</co
 <pre class="r"><code>plotMD(qlf2)
 abline(h=c(-1,1), col=&quot;blue&quot;)</code></pre>
 <p><img src="figure/edger_batch.Rmd/plot_md-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_md-1">
+Past versions of plot_md-1.png
+</button>
+</p>
+<div id="fig-plot_md-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4db8276c35c2cbff590a77ae0923ca2150136294/docs/figure/edger_batch.Rmd/plot_md-1.png" target="_blank">4db8276</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="no-correction" class="section level2">
 <h2>No correction</h2>
@@ -977,6 +1210,43 @@ AT4G12500 155.4843888 104.005566 133.202760 1831.60638 3757.81410 2449.16892</co
 <pre class="r"><code>plotMD(qlf)
 abline(h=c(-1,1), col=&quot;blue&quot;)</code></pre>
 <p><img src="figure/edger_batch.Rmd/plot_md_no_correction-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_md_no_correction-1">
+Past versions of plot_md_no_correction-1.png
+</button>
+</p>
+<div id="fig-plot_md_no_correction-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/4db8276c35c2cbff590a77ae0923ca2150136294/docs/figure/edger_batch.Rmd/plot_md_no_correction-1.png" target="_blank">4db8276</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
