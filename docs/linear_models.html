@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefadc325060df5306e4de4a5ca9528e9dbaabf8f4targetblankfadc325a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3bd2ef6a7387d6804deae3b0ab55bb34717deacatargetblank3bd2ef6a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/fadc325060df5306e4de4a5ca9528e9dbaabf8f4" target="_blank">fadc325</a>
+<a href="https://github.com/davetang/muse/tree/3bd2ef6a7387d6804deae3b0ab55bb34717deaca" target="_blank">3bd2ef6</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefadc325060df5306e4de4a5ca9528e9dbaabf8f4targetblankfadc325a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3bd2ef6a7387d6804deae3b0ab55bb34717deacatargetblank3bd2ef6a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/fadc325060df5306e4de4a5ca9528e9dbaabf8f4" target="_blank">fadc325</a>.
+<a href="https://github.com/davetang/muse/tree/3bd2ef6a7387d6804deae3b0ab55bb34717deaca" target="_blank">3bd2ef6</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -595,6 +595,7 @@ Untracked files:
     Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
     Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
     Untracked:  data/arab.rds
+    Untracked:  data/femaleMiceWeights.csv
     Untracked:  m3/
     Untracked:  pbmc3k_before_filtering.rds
     Untracked:  pbmc3k_save_rds.rds
@@ -643,6 +644,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/3bd2ef6a7387d6804deae3b0ab55bb34717deaca/analysis/linear_models.Rmd" target="_blank">3bd2ef6</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+Linear models in practice
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/f74eab5552f08bb450879a900a8393c02732197f/docs/linear_models.html" target="_blank">f74eab5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -781,8 +816,8 @@ to the <code>lm</code> function. In this script, we will use the
 <code>formula</code> with the matrix <span
 class="math inline">\(\mathbf{X}\)</span>. It will therefore help us
 interpret the results from <code>lm</code>.</p>
-<div id="choice-of-design" class="section level4">
-<h4>Choice of design</h4>
+<div id="choice-of-design" class="section level3">
+<h3>Choice of design</h3>
 <p>The choice of design matrix is a critical step in linear modeling
 since it encodes which coefficients will be fit in the model, as well as
 the inter-relationship between the samples. A common misunderstanding is
@@ -880,8 +915,8 @@ attr(,&quot;contrasts&quot;)$group
 [1] &quot;contr.treatment&quot;</code></pre>
 <p>produces the same design matrix as our first code chunk.</p>
 </div>
-<div id="more-groups" class="section level4">
-<h4>More groups</h4>
+<div id="more-groups" class="section level3">
+<h3>More groups</h3>
 <p>Using the same formula, we can accommodate modeling more groups.
 Suppose we have a third diet:</p>
 <pre class="r"><code>group &lt;- factor(c(1,1,2,2,3,3))
@@ -919,8 +954,8 @@ attr(,&quot;contrasts&quot;)$group
 <p>This group now fits a separate coefficient for each group. We will
 explore this design in more depth later on.</p>
 </div>
-<div id="more-variables" class="section level4">
-<h4>More variables</h4>
+<div id="more-variables" class="section level3">
+<h3>More variables</h3>
 <p>We have been using a simple case with just one variable (diet) as an
 example. In the life sciences, it is quite common to perform experiments
 with more than one variable. For example, we may be interested in the
@@ -994,8 +1029,8 @@ attr(,&quot;contrasts&quot;)$diet
 attr(,&quot;contrasts&quot;)$sex
 [1] &quot;contr.treatment&quot;</code></pre>
 </div>
-<div id="releveling" class="section level4">
-<h4>Releveling</h4>
+<div id="releveling" class="section level3">
+<h3>Releveling</h3>
 <p>The level which is chosen for the <em>reference level</em> is the
 level which is contrasted against. By default, this is simply the first
 level alphabetically. We can specify that we want group 2 to be the
@@ -1029,8 +1064,8 @@ attr(,&quot;contrasts&quot;)$group
 [1] &quot;contr.treatment&quot;</code></pre>
 </div>
 <div id="where-does-model.matrix-look-for-the-data"
-class="section level4">
-<h4>Where does model.matrix look for the data?</h4>
+class="section level3">
+<h3>Where does model.matrix look for the data?</h3>
 <p>The <code>model.matrix</code> function will grab the variable from
 the R global environment, unless the data is explicitly provided as a
 data frame to the <code>data</code> argument:</p>
@@ -1046,8 +1081,8 @@ attr(,&quot;assign&quot;)
 <p>Note how the R global environment variable <code>group</code> is
 ignored.</p>
 </div>
-<div id="continuous-variables" class="section level4">
-<h4>Continuous variables</h4>
+<div id="continuous-variables" class="section level3">
+<h3>Continuous variables</h3>
 <p>In this chapter, we focus on models based on indicator values. In
 certain designs, however, we will be interested in using numeric
 variables in the design formula, as opposed to converting them to
@@ -1081,6 +1116,134 @@ we condition. However, we find that continuous variables are included in
 linear models without justification to “adjust” for variables such as
 age. We highly discourage this practice unless the data support the
 model being used.</p>
+</div>
+</div>
+<div id="linear-models-in-practice" class="section level2">
+<h2>Linear models in practice</h2>
+<div id="the-mouse-diet-example" class="section level3">
+<h3>The mouse diet example</h3>
+<p>We will demonstrate how to analyze the high fat diet data using
+linear models instead of directly applying a t-test. We will demonstrate
+how ultimately these two approaches are equivalent.</p>
+<p>We start by reading in the data and creating a quick stripchart:</p>
+<pre class="r"><code>dat &lt;- read.csv(filename)
+stripchart(dat$Bodyweight ~ dat$Diet, vertical=TRUE, method=&quot;jitter&quot;,
+           main=&quot;Bodyweight over Diet&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/linear_models.Rmd/bodyweight_by_diet_stripchart-1.png" alt="Mice bodyweights stratified by diet." width="672" />
+<p class="caption">
+Mice bodyweights stratified by diet.
+</p>
+</div>
+<p>We can see that the high fat diet group appears to have higher
+weights on average, although there is overlap between the two
+samples.</p>
+<p>For demonstration purposes, we will build the design matrix <span
+class="math inline">\(\mathbf{X}\)</span> using the formula
+<code>~ Diet</code>. The group with the 1’s in the second column is
+determined by the level of <code>Diet</code> which comes second; that
+is, the non-reference level.</p>
+<pre class="r"><code>levels(dat$Diet)</code></pre>
+<pre><code>NULL</code></pre>
+<pre class="r"><code>X &lt;- model.matrix(~ Diet, data=dat)
+head(X)</code></pre>
+<pre><code>  (Intercept) Diethf
+1           1      0
+2           1      0
+3           1      0
+4           1      0
+5           1      0
+6           1      0</code></pre>
+</div>
+<div id="the-mathematics-behind-lm" class="section level3">
+<h3>The Mathematics Behind lm()</h3>
+<p>Before we use our shortcut for running linear models,
+<code>lm</code>, we want to review what will happen internally. Inside
+of <code>lm</code>, we will form the design matrix <span
+class="math inline">\(\mathbf{X}\)</span> and calculate the <span
+class="math inline">\(\boldsymbol{\beta}\)</span>, which minimizes the
+sum of squares using the previously described formula. The formula for
+this solution is:</p>
+<p><span class="math display">\[ \hat{\boldsymbol{\beta}} =
+(\mathbf{X}^\top \mathbf{X})^{-1} \mathbf{X}^\top \mathbf{Y}
+\]</span></p>
+<p>We can calculate this in R using our matrix multiplication operator
+<code>%*%</code>, the inverse function <code>solve</code>, and the
+transpose function <code>t</code>.</p>
+<pre class="r"><code>Y &lt;- dat$Bodyweight
+X &lt;- model.matrix(~ Diet, data=dat)
+solve(t(X) %*% X) %*% t(X) %*% Y</code></pre>
+<pre><code>                 [,1]
+(Intercept) 23.813333
+Diethf       3.020833</code></pre>
+<p>These coefficients are the average of the control group and the
+difference of the averages:</p>
+<pre class="r"><code>s &lt;- split(dat$Bodyweight, dat$Diet)
+mean(s[[&quot;chow&quot;]])</code></pre>
+<pre><code>[1] 23.81333</code></pre>
+<pre class="r"><code>mean(s[[&quot;hf&quot;]]) - mean(s[[&quot;chow&quot;]])</code></pre>
+<pre><code>[1] 3.020833</code></pre>
+<p>Finally, we use our shortcut, <code>lm</code>, to run the linear
+model:</p>
+<pre class="r"><code>fit &lt;- lm(Bodyweight ~ Diet, data=dat)
+summary(fit)</code></pre>
+<pre><code>
+Call:
+lm(formula = Bodyweight ~ Diet, data = dat)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-6.1042 -2.4358 -0.4138  2.8335  7.1858 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   23.813      1.039  22.912   &lt;2e-16 ***
+Diethf         3.021      1.470   2.055   0.0519 .  
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 3.6 on 22 degrees of freedom
+Multiple R-squared:  0.1611,    Adjusted R-squared:  0.1229 
+F-statistic: 4.224 on 1 and 22 DF,  p-value: 0.05192</code></pre>
+<pre class="r"><code>(coefs &lt;- coef(fit))</code></pre>
+<pre><code>(Intercept)      Diethf 
+  23.813333    3.020833 </code></pre>
+</div>
+<div id="examining-the-coefficients" class="section level3">
+<h3>Examining the coefficients</h3>
+<p>The following plot provides a visualization of the meaning of the
+coefficients with colored arrows (code not shown):</p>
+<div class="figure" style="text-align: center">
+<img src="figure/linear_models.Rmd/parameter_estimate_illustration-1.png" alt="Estimated linear model coefficients for bodyweight data illustrated with arrows." width="672" />
+<p class="caption">
+Estimated linear model coefficients for bodyweight data illustrated with
+arrows.
+</p>
+</div>
+<p>To make a connection with material presented earlier, this simple
+linear model is actually giving us the same result (the t-statistic and
+p-value) for the difference as a specific kind of t-test. This is the
+t-test between two groups with the assumption that the population
+standard deviation is the same for both groups. This was encoded into
+our linear model when we assumed that the errors <span
+class="math inline">\(\boldsymbol{\varepsilon}\)</span> were all equally
+distributed.</p>
+<p>Although in this case the linear model is equivalent to a t-test, we
+will soon explore more complicated designs, where the linear model is a
+useful extension. Below we demonstrate that one does in fact get the
+exact same results:</p>
+<p>Our <code>lm</code> estimates were:</p>
+<pre class="r"><code>summary(fit)$coefficients</code></pre>
+<pre><code>             Estimate Std. Error   t value     Pr(&gt;|t|)
+(Intercept) 23.813333   1.039353 22.911684 7.642256e-17
+Diethf       3.020833   1.469867  2.055174 5.192480e-02</code></pre>
+<p>And the t-statistic is the same:</p>
+<pre class="r"><code>ttest &lt;- t.test(s[[&quot;hf&quot;]], s[[&quot;chow&quot;]], var.equal=TRUE)
+summary(fit)$coefficients[2,3]</code></pre>
+<pre><code>[1] 2.055174</code></pre>
+<pre class="r"><code>ttest$statistic</code></pre>
+<pre><code>       t 
+2.055174 </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -1113,24 +1276,24 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4    
- [5] purrr_1.0.4     readr_2.1.5     tidyr_1.3.1     tibble_3.3.0   
- [9] ggplot2_3.5.2   tidyverse_2.0.0 workflowr_1.7.1
+ [1] RColorBrewer_1.1-3 lubridate_1.9.4    forcats_1.0.0      stringr_1.5.1     
+ [5] dplyr_1.1.4        purrr_1.0.4        readr_2.1.5        tidyr_1.3.1       
+ [9] tibble_3.3.0       ggplot2_3.5.2      tidyverse_2.0.0    workflowr_1.7.1   
 
 loaded via a namespace (and not attached):
- [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      hms_1.1.3         
- [5] digest_0.6.37      magrittr_2.0.3     timechange_0.3.0   evaluate_1.0.4    
- [9] grid_4.5.0         RColorBrewer_1.1-3 fastmap_1.2.0      rprojroot_2.0.4   
-[13] jsonlite_2.0.0     processx_3.8.6     whisker_0.4.1      ps_1.9.1          
-[17] promises_1.3.3     httr_1.4.7         scales_1.4.0       jquerylib_0.1.4   
-[21] cli_3.6.5          rlang_1.1.6        withr_3.0.2        cachem_1.1.0      
-[25] yaml_2.3.10        tools_4.5.0        tzdb_0.5.0         httpuv_1.6.16     
-[29] vctrs_0.6.5        R6_2.6.1           lifecycle_1.0.4    git2r_0.36.2      
-[33] fs_1.6.6           pkgconfig_2.0.3    callr_3.7.6        pillar_1.11.0     
-[37] bslib_0.9.0        later_1.4.2        gtable_0.3.6       glue_1.8.0        
-[41] Rcpp_1.1.0         xfun_0.52          tidyselect_1.2.1   rstudioapi_0.17.1 
-[45] knitr_1.50         farver_2.1.2       htmltools_0.5.8.1  rmarkdown_2.29    
-[49] compiler_4.5.0     getPass_0.2-4     </code></pre>
+ [1] sass_0.4.10       generics_0.1.4    stringi_1.8.7     hms_1.1.3        
+ [5] digest_0.6.37     magrittr_2.0.3    timechange_0.3.0  evaluate_1.0.4   
+ [9] grid_4.5.0        fastmap_1.2.0     rprojroot_2.0.4   jsonlite_2.0.0   
+[13] processx_3.8.6    whisker_0.4.1     ps_1.9.1          promises_1.3.3   
+[17] httr_1.4.7        scales_1.4.0      jquerylib_0.1.4   cli_3.6.5        
+[21] rlang_1.1.6       withr_3.0.2       cachem_1.1.0      yaml_2.3.10      
+[25] tools_4.5.0       tzdb_0.5.0        httpuv_1.6.16     vctrs_0.6.5      
+[29] R6_2.6.1          lifecycle_1.0.4   git2r_0.36.2      fs_1.6.6         
+[33] pkgconfig_2.0.3   callr_3.7.6       pillar_1.11.0     bslib_0.9.0      
+[37] later_1.4.2       gtable_0.3.6      glue_1.8.0        Rcpp_1.1.0       
+[41] xfun_0.52         tidyselect_1.2.1  rstudioapi_0.17.1 knitr_1.50       
+[45] farver_2.1.2      htmltools_0.5.8.1 rmarkdown_2.29    compiler_4.5.0   
+[49] getPass_0.2-4    </code></pre>
 </div>
 </div>
 </div>
