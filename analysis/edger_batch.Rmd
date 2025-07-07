@@ -1,0 +1,248 @@
+---
+title: "edgeR with batch effects"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html) carries out:
+
+> Differential expression analysis of RNA-seq expression profiles with biological replication. Implements a range of statistical methodology based on the negative binomial distributions, including empirical Bayes estimation, exact tests, generalized linear models and quasi-likelihood tests. As well as RNA-seq, it be applied to differential signal analysis of other types of genomic data that produce read counts, including ChIP-seq, ATAC-seq, Bisulfite-seq, SAGE and CAGE. 
+
+In this notebook we will be following Section 4.2 RNA-Seq of pathogen inoculated arabidopsis with batch effects on page 55 of the [edgeR user guide](https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf).
+
+## Installation
+
+Install using `BiocManager::install()`.
+
+```{r install_edger, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("edgeR")
+```
+
+Load.
+
+```{r load_edger}
+library(edgeR)
+packageVersion("edgeR")
+```
+
+## Data
+
+`arab.rds` was downloaded from WEHI's [Bioinformatics page for edgeR](https://bioinf.wehi.edu.au/edgeR/) on my web server. (There have been more than one occasion where my personal web server out lasted a tool's webpage, so I prefer referring to my web server.)
+
+```{r download_data}
+count_rds <- "data/arab.rds"
+if(!file.exists(count_rds)){
+  download.file(url = "https://davetang.org/file/arab.rds", destfile = count_rds)
+}
+
+stopifnot(tools::md5sum(count_rds) == '4af4a2e351279b73cb53a58991b0e004')
+```
+
+Load.
+
+```{r arab}
+arab <- readRDS(count_rds)
+head(arab)
+```
+
+## DGEList
+
+There are two experimental factors:
+
+1. treatment (`hrcc` vs. `mock`) and
+2. the time that each replicate was conducted.
+
+```{r conditions}
+Treat <- factor(substring(colnames(arab),1,4))
+Treat <- relevel(Treat, ref="mock")
+Treat
+
+Time <- factor(substring(colnames(arab),5,5))
+Time
+```
+
+Create a DGEList object.
+
+```{r dgelist}
+y <- DGEList(counts=arab, group=Treat)
+y
+```
+
+## Filtering and normalisation
+
+Filter.
+
+```{r filter_by_expr}
+keep <- filterByExpr(y)
+table(keep)
+y <- y[keep, , keep.lib.sizes=FALSE]
+```
+
+TMM normalization.
+
+```{r tmm}
+y <- normLibSizes(y)
+y$samples
+```
+
+## Exploratory analysis
+
+MDS.
+
+```{r mds}
+plotMDS(y, col=rep(1:2, each=3))
+```
+
+Examine consistency of the three replicates by computing predictive log2-fold-changes (logFC) for the treatment separately for the three times.
+
+```{r pred_fc}
+design <- model.matrix(~Time+Time:Treat)
+logFC <- predFC(y,design,prior.count=1,dispersion=0.05)
+head(logFC)
+```
+
+The logFC at the three times are positively correlated with one another.
+
+```{r pred_fc_cor}
+cor(logFC[,4:6])
+```
+
+## Design matrix
+
+Before we fit GLMs, we need to define our design matrix based on the experimental design. We want to test for differential expressions between `hrcc` challenged and mock-inoculated samples within batches, i.e. adjusting for differences between batches. In statistical terms, this is an additive linear model. So the design matrix is created as:
+
+```{r design}
+design <- model.matrix(~Time+Treat)
+rownames(design) <- colnames(y)
+design
+```
+
+Switch the covariates around (for testing purposes).
+
+```{r design2}
+design2 <- model.matrix(~Treat+Time)
+rownames(design2) <- colnames(y)
+design2
+```
+
+## Dispersion estimation
+
+Estimate the genewise dispersion estimates over all genes, allowing for a possible abundance trend. The estimation is also robustified against potential outlier genes.
+
+```{r est_disp}
+y <- estimateDisp(y, design, robust=TRUE)
+y$common.dispersion
+
+y2 <- estimateDisp(y, design2, robust=TRUE)
+y2$common.dispersion
+```
+
+Plot.
+
+```{r plot_bcv}
+plotBCV(y)
+```
+
+The QL dispersions can be estimated using the `glmQLFit()` function, and then be visualised with the `plotQLDisp()` function.
+
+```{r fit}
+fit <- glmQLFit(y, design, robust=TRUE)
+plotQLDisp(fit)
+
+fit2 <- glmQLFit(y2, design2, robust=TRUE)
+plotQLDisp(fit2)
+```
+
+## Differential expression
+
+Now we test for significant differential expression in each gene using the QL F-test.
+
+First we check whether there was a genuine need to adjust for the experimental times. We do this by testing for differential expression between the three times. There is considerable differential expression, justifying our decision to adjust for the batch effect.
+
+```{r glm_ql_ftest}
+qlf <- glmQLFTest(fit, coef=2:3)
+summary(decideTests(qlf))
+```
+
+Now conduct QL F-tests for the pathogen effect and show the top genes. By default, the test is for the last coefficient in the design matrix, which in this case is the treatment effect:
+
+```{r glm_ql_ftest2}
+qlf2 <- glmQLFTest(fit)
+summary(decideTests(qlf2))
+```
+
+Test.
+
+```{r glm_ql_ftest3}
+qlf3 <- glmQLFTest(fit2, coef=2)
+summary(decideTests(qlf3))
+```
+
+Closer look at the individual counts-per-million for the top genes. The top genes are very consistent across the three replicates:
+
+```{r top_genes}
+top <- rownames(topTags(qlf2))
+cpm(y)[top,]
+```
+
+Plot.
+
+```{r plot_md}
+plotMD(qlf2)
+abline(h=c(-1,1), col="blue")
+```
+
+## No correction
+
+No correction.
+
+```{r no_correction}
+count_rds <- "data/arab.rds"
+arab <- readRDS(count_rds)
+
+Treat <- factor(substring(colnames(arab),1,4))
+Treat <- relevel(Treat, ref="mock")
+
+y <- DGEList(counts=arab, group=Treat)
+keep <- filterByExpr(y)
+y <- y[keep, , keep.lib.sizes=FALSE]
+
+y <- normLibSizes(y)
+
+design <- model.matrix(~Treat)
+rownames(design) <- colnames(y)
+
+y <- estimateDisp(y, design, robust=TRUE)
+
+fit <- glmQLFit(y, design, robust=TRUE)
+
+qlf <- glmQLFTest(fit)
+
+summary(decideTests(qlf))
+```
+
+Top genes.
+
+```{r top_genes_no_correction}
+top <- rownames(topTags(qlf))
+cpm(y)[top,]
+```
+
+Plot.
+
+```{r plot_md_no_correction}
+plotMD(qlf)
+abline(h=c(-1,1), col="blue")
+```
