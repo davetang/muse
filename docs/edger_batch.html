@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-07-07" />
+<meta name="date" content="2025-07-08" />
 
 <title>edgeR with batch effects</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">edgeR with batch effects</h1>
-<h4 class="date">2025-07-07</h4>
+<h4 class="date">2025-07-08</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-07-07
+<strong>Last updated:</strong> 2025-07-08
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefcb2eadf3dbcb8a5b7254cc4328028df77e00fb1targetblankfcb2eada">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0e48b18acf6c035341610a1849380aa51fdf143dtargetblank0e48b18a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/fcb2eadf3dbcb8a5b7254cc4328028df77e00fb1" target="_blank">fcb2ead</a>
+<a href="https://github.com/davetang/muse/tree/0e48b18acf6c035341610a1849380aa51fdf143d" target="_blank">0e48b18</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefcb2eadf3dbcb8a5b7254cc4328028df77e00fb1targetblankfcb2eada"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0e48b18acf6c035341610a1849380aa51fdf143dtargetblank0e48b18a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/fcb2eadf3dbcb8a5b7254cc4328028df77e00fb1" target="_blank">fcb2ead</a>.
+<a href="https://github.com/davetang/muse/tree/0e48b18acf6c035341610a1849380aa51fdf143d" target="_blank">0e48b18</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -595,6 +595,7 @@ Untracked files:
     Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
     Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
     Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
     Untracked:  data/femaleMiceWeights.csv
     Untracked:  m3/
     Untracked:  pbmc3k_before_filtering.rds
@@ -644,6 +645,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/0e48b18acf6c035341610a1849380aa51fdf143d/analysis/edger_batch.Rmd" target="_blank">0e48b18</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-08
+</td>
+<td>
+Introduction to batch effects
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/738c76a78b847415f398a4ce9893df55f926d33c/docs/edger_batch.html" target="_blank">738c76a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -770,6 +805,122 @@ edgeR analysis with batch effects
 </div>
 </div>
 </div>
+<div id="batch-effects" class="section level2">
+<h2>Batch Effects</h2>
+<p>From <a
+href="https://genomicsclass.github.io/book/pages/intro_to_batch_effects.html">Batch
+Effects</a>.</p>
+<p>One often overlooked complication with high-throughput studies is
+batch effects, which occur because measurements are affected by
+laboratory conditions, reagent lots, and personnel differences. This
+becomes a major problem when batch effects are confounded with an
+outcome of interest and lead to incorrect conclusions. In this chapter,
+we describe batch effects in detail: how to detect, interpret, model,
+and adjust for batch effects.</p>
+<p>Batch effects are the biggest challenge faced by genomics research,
+especially in the context of precision medicine. The presence of batch
+effects in one form or another has been reported among most, if not all,
+high-throughput technologies [Leek et al. (2010) Nature Reviews Genetics
+11, 733-739]. But batch effects are not specific to genomics technology.
+In fact, in a 1972 paper, WJ Youden describes batch effects in the
+context of empirical estimates of physical constants. He pointed out the
+“subjective character of present estimates” of physical constants and
+how estimates changed from laboratory to laboratory. For example, in
+Table 1, Youden shows the following estimates of the astronomical unit
+from different laboratories. The reports included an estimate of spread
+(what we now would call a confidence interval).</p>
+<div class="figure" style="text-align: center">
+<img src="figure/edger_batch.Rmd/astronomical_units-1.png" alt="Estimates of the astronomical unit with estimates of spread, versus year it was reported. The two laboratories that reported more than one estimate are shown in color." width="672" />
+<p class="caption">
+Estimates of the astronomical unit with estimates of spread, versus year
+it was reported. The two laboratories that reported more than one
+estimate are shown in color.
+</p>
+</div>
+<p>Judging by the variability across labs and the fact that the reported
+bounds do not explain this variability, clearly shows the presence of an
+effect that differs across labs, but not within. This type of
+variability is what we call a batch effect. Note that there are
+laboratories that reported two estimates (purple and orange) and batch
+effects are seen across the two different measurements from the same
+laboratories as well.</p>
+<p>We can use statistical notation to precisely describe the problem.
+The scientists making these measurements assumed they observed:</p>
+<p><span class="math display">\[
+Y_{i,j} =
+\mu + \varepsilon_{i,j}, j=1,\dots,N
+\]</span></p>
+<p>with <span class="math inline">\(Y_{i,j}\)</span> the <span
+class="math inline">\(j\)</span>-th measurement of laboratory <span
+class="math inline">\(i\)</span>, <span
+class="math inline">\(\mu\)</span> the true physical constant, and <span
+class="math inline">\(\varepsilon_{i,j}\)</span> independent measurement
+error. To account for the variability introduced by <span
+class="math inline">\(\varepsilon_{i,j}\)</span>, we compute standard
+errors from the data. As we saw earlier in the book, we estimate the
+physical constant with the average of the <span
+class="math inline">\(N\)</span> measurements…</p>
+<p><span class="math display">\[
+\bar{Y}_i =
+\frac{1}{N} \sum_{i=1}^{N} Y_{i,j}
+\]</span></p>
+<p>.. and we can construct a confidence interval by:</p>
+<p><span class="math display">\[
+\bar{Y}_i
+\pm 2 s_i / \sqrt{N} \mbox{ with }
+s_i^2=
+\frac{1}{N-1} \sum_{i=1}^N (Y_{i,j} -
+\bar{Y}_i)^2
+\]</span></p>
+<p>However, this confidence interval will be too small because it does
+not catch the batch effect variability. A more appropriate model is:</p>
+<p><span class="math display">\[
+Y_{i,j} = \mu +
+\gamma_i + \varepsilon_{i,j}, j=1, \dots, N
+\]</span></p>
+<p>with <span class="math inline">\(\gamma_i\)</span> a laboratory
+specific bias or <em>batch effect</em>.</p>
+<p>From the plot it is quite clear that the variability of <span
+class="math inline">\(\gamma\)</span> across laboratories is larger than
+the variability of <span class="math inline">\(\varepsilon\)</span>
+within a lab. The problem here is that there is no information about
+<span class="math inline">\(\gamma\)</span> in the data from a single
+lab. The statistical term for the problem is that <span
+class="math inline">\(\mu\)</span> and <span
+class="math inline">\(\gamma\)</span> are unidentifiable. We can
+estimate the sum <span class="math inline">\(\mu_i+\gamma_i\)</span> ,
+but we can’t distinguish one from the other.</p>
+<p>We can also view <span class="math inline">\(\gamma\)</span> as a
+random variable. In this case, each laboratory has an error term <span
+class="math inline">\(\gamma_i\)</span> that is the same across
+measurements from that lab, but different from lab to lab. Under this
+interpretation the problem is that:</p>
+<p><span class="math display">\[
+s_i / \sqrt{N} \mbox{ with }
+s_i^2=
+\frac{1}{N-1} \sum_{i=1}^N (Y_{ij} -
+\bar{Y}_i)^2
+\]</span></p>
+<p>is an underestimate of the standard error since it does not account
+for the within lab correlation induced by <span
+class="math inline">\(\gamma\)</span>.</p>
+<p>With data from several laboratories we can in fact estimate the <span
+class="math inline">\(\gamma\)</span>, if we assume they average out to
+0. Or we can consider them to be random effects and simply estimate a
+new estimate and standard error with all measurements. Here is a
+confidence interval treating each reported average as a random
+observation:</p>
+<pre class="r"><code>avg &lt;- mean(dat[,3])
+se &lt;- sd(dat[,3]) / sqrt(nrow(dat))</code></pre>
+<pre><code>95% confidence interval is: [ 92.8727 , 92.98542 ]</code></pre>
+<pre><code>which does include the current estimate is: 92.95604</code></pre>
+<p>Youden’s paper also includes batch effect examples from more recent
+estimates of the speed of light, as well as estimates of the gravity
+constant. Here we demonstrate the widespread presence and complex nature
+of batch effects in high-throughput biological measurements.</p>
+</div>
+<div id="edger" class="section level2">
+<h2>edgeR</h2>
 <p><a
 href="https://bioconductor.org/packages/release/bioc/html/edgeR.html">edgeR</a>
 carries out:</p>
@@ -786,6 +937,7 @@ ChIP-seq, ATAC-seq, Bisulfite-seq, SAGE and CAGE.</p>
 inoculated arabidopsis with batch effects on page 55 of the <a
 href="https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf">edgeR
 user guide</a>.</p>
+</div>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
 <p>Install using <code>BiocManager::install()</code>.</p>
@@ -1319,6 +1471,43 @@ gplots::venn(
   )
 )</code></pre>
 <p><img src="figure/edger_batch.Rmd/compare_de_genes-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-compare_de_genes-1">
+Past versions of compare_de_genes-1.png
+</button>
+</p>
+<div id="fig-compare_de_genes-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/738c76a78b847415f398a4ce9893df55f926d33c/docs/figure/edger_batch.Rmd/compare_de_genes-1.png" target="_blank">738c76a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-07-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Top genes from no correction test.</p>
 <pre class="r"><code>top &lt;- rownames(topTags(qlf))
 cpm(y)[top,]</code></pre>
