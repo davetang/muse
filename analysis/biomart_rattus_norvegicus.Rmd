@@ -1,0 +1,79 @@
+---
+title: "Use biomaRt with Rattus norvegicus"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The [biomaRt package](https://bioconductor.org/packages/release/bioc/html/biomaRt.html) provides an interface to BioMart databases provided by Ensembl.
+
+> biomaRt provides an interface to a growing collection of databases implementing the BioMart software suite. The package enables retrieval of large amounts of data in a uniform way without the need to know the underlying database schemas or write complex SQL queries. The most prominent examples of BioMart databases are maintain by Ensembl, which provides biomaRt users direct access to a diverse set of data and enables a wide range of powerful online queries from gene annotation to database mining. 
+
+For more information, check out the [Accessing Ensembl annotation with biomaRt](https://bioconductor.org/packages/release/bioc/vignettes/biomaRt/inst/doc/accessing_ensembl.html) guide.
+
+## Installation
+
+To begin, install the {biomaRt} package.
+
+```{r install_biomart, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("biomaRt")
+```
+
+## Package
+
+Load package.
+
+```{r load_biomart}
+packageVersion("biomaRt")
+suppressPackageStartupMessages(library(biomaRt))
+```
+
+## Gene Ontology lookup
+
+Connect to the selected BioMart database and rat dataset.
+
+```{r rnorvegicus_gene_ensembl}
+ensembl <- useMart("ensembl", dataset='rnorvegicus_gene_ensembl')
+ensembl
+```
+
+ENSRNOG00000031780 should be associated to:
+
+* GO:0006412
+* GO:0030533
+
+```{r ENSRNOG00000031780}
+my_gene <- 'ENSRNOG00000031780'
+
+getBM(
+  attributes=c('ensembl_gene_id', 'go_id'),
+  filters="ensembl_gene_id",
+  values = my_gene,
+  mart = ensembl
+)
+```
+
+ENSRNOG00000030644.
+
+```{r ENSRNOG00000030644}
+my_gene <- 'ENSRNOG00000030644'
+expected_go <- c('GO:0001666', 'GO:0003954', 'GO:0005739', 'GO:0005743', 'GO:0006120', 'GO:0008137', 'GO:0009060', 'GO:0009410', 'GO:0016020', 'GO:0030425', 'GO:0031966', 'GO:0032981', 'GO:0033194', 'GO:0043025', 'GO:0045271', 'GO:1902600')
+
+getBM(
+  attributes=c('ensembl_gene_id', 'go_id'),
+  filters="ensembl_gene_id",
+  values = my_gene,
+  mart = ensembl
+) -> observed_go
+
+expected_go %in% observed_go$go_id
+observed_go$go_id %in% expected_go
+```
