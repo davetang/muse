@@ -1,0 +1,45 @@
+---
+title: "IsoformSwitchAnalyzeR"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The [IsoformSwitchAnalyzeR package](https://www.bioconductor.org/packages/release/bioc/html/IsoformSwitchAnalyzeR.html):
+
+> Analysis of alternative splicing and isoform switches with predicted functional consequences (e.g. gain/loss of protein domains etc.) from quantification of all types of RNASeq by tools such as Kallisto, Salmon, StringTie, Cufflinks/Cuffdiff etc.
+
+## Installation
+
+To begin, install the {IsoformSwitchAnalyzeR} package.
+
+```{r install_biomart, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("IsoformSwitchAnalyzeR")
+```
+
+## Package
+
+Load package.
+
+```{r load_package}
+packageVersion("IsoformSwitchAnalyzeR")
+suppressPackageStartupMessages(library(IsoformSwitchAnalyzeR))
+```
+
+## Abstract
+
+From the [vignette](https://www.bioconductor.org/packages/release/bioc/vignettes/IsoformSwitchAnalyzeR/inst/doc/IsoformSwitchAnalyzeR.html):
+
+Recent breakthroughs in bioinformatics now allow us to accurately reconstruct and quantify full-length gene isoforms from RNA-sequencing data via tools such as StringTie, Kallisto and Salmon. Alternatively long-read RNA-seq (third generation sequencing) now routinely provide us with full length transcripts. These full length transcripts makes it possible to analyze changes in isoform usage, but unfortunately this is rarely done meaning RNA-seq data is typically not used to its full potential.
+
+To solve this problem, we developed IsoformSwitchAnalyzeR. IsoformSwitchAnalyzeR is an easy-to use-R package that enables statistical identification of isoform switches from RNA-seq derived quantification of novel and/or known full-length isoforms. IsoformSwitchAnalyzeR facilitates integration of many sources of annotation such as protein domains, signal peptides, Intrinsically Disordered Regions (IDR), subcellular localization, sensitivity to Non-sense Mediated Decay (NMD) and more. The combination of identified isoform switches and their annotation enables IsoformSwitchAnalyzeR to predict potential functional consequences of the identified isoform switches — such as loss of protein domains — thereby identifying isoform switches of particular interest. Lastly, IsoformSwitchAnalyzeR provides article-ready visualization of isoform switches of individual genes, the genome-wide consequences of isoform switches, and the associated changes in alternative splicing.
+
+In summary, IsoformSwitchAnalyzeR enables analysis of RNA-seq data with isoform resolution with a focus on isoform switching (with predicted consequences) and its associated alternative splicing, thereby expanding the usability of RNA-seq data.
