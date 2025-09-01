@@ -1,0 +1,77 @@
+---
+title: "Is single-cell expression bimodal?"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+suppressPackageStartupMessages(library(Seurat))
+```
+
+# Introduction
+
+From [MAST: a flexible statistical framework for assessing transcriptional changes and characterizing heterogeneity in single-cell RNA sequencing data](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-015-0844-5):
+
+> First, single-cell expression has repeatedly been shown to exhibit a characteristic bimodal expression pattern, wherein the expression of otherwise abundant genes is either strongly positive or undetected within individual cells.
+>
+> This is due in part to low starting quantities of RNA such that many genes will be below the threshold of detection, but there is also a biological component to this variation (termed extrinsic noise in the literature) that is conflated with the technical variability.
+>
+> We and other groups have shown that the proportion of cells with detectable expression reflects both technical factors and biological differences between samples. Results from synthetic biology also support the notion that bimodality can arise from the stochastic nature of gene expression.
+
+# PBMC3k
+
+Import from server.
+
+```{r seurat_obj}
+seurat_obj <- readRDS(url("https://davetang.org/file/pbmc3k_seurat.rds", "rb"))
+seurat_obj
+```
+
+# Process
+
+Use Seurat version 4.
+
+```{r seurat_wf}
+seurat_wf_v4 <- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
+  
+  seurat_obj <- NormalizeData(seurat_obj, normalization.method = "LogNormalize", scale.factor = scale_factor, verbose = debug_flag)
+  seurat_obj <- FindVariableFeatures(seurat_obj, selection.method = 'vst', nfeatures = num_features, verbose = debug_flag)
+  seurat_obj <- ScaleData(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunPCA(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunUMAP(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindNeighbors(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindClusters(seurat_obj, resolution = cluster_res, verbose = debug_flag)
+  
+  seurat_obj
+}
+
+seurat_obj <- seurat_wf_v4(seurat_obj)
+seurat_obj
+```
+
+# Analysis
+
+Most highly expressed genes in cluster 0.
+
+```{r cluster0_cells}
+wanted <- seurat_obj@meta.data$seurat_clusters == "0"
+cluster0_cells <- row.names(seurat_obj@meta.data[wanted, ])
+cluster0_exp <- Matrix::rowMeans(seurat_obj[, cluster0_cells]@assays$RNA$count)
+sort(cluster0_exp, decreasing = TRUE) |>
+  head(n = 9) |>
+  names() -> my_genes
+
+my_genes
+```
+
+Plot the distribution.
+
+```{r cluster0_top_genes_dist}
+Seurat::RidgePlot(seurat_obj, features = my_genes, idents = "0", layer = 'count')
+```
