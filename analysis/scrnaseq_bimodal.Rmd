@@ -81,7 +81,7 @@ Seurat::RidgePlot(seurat_obj, features = my_genes, idents = "0", layer = 'count'
 Simple function to check how many peaks are in a distribution.
 
 ```{r is_unimodal}
-is_unimodal <- function(x, bw = "SJ") {
+is_unimodal <- function(x, bw = "SJ"){
   d <- density(x, bw = bw)
   y <- d$y
   
@@ -108,7 +108,7 @@ plot(density(x2), main = paste0("Is unimodel: ", is_unimodal(x2)))
 
 ## Detect peaks in gene expression
 
-Are any of the highly variable genes unimodal, i.e., does the simple function work?
+Are any of the highly expressed genes unimodal, i.e., does the simple function work?
 
 ```{r is_unimodal_highly_expressed_genes}
 my_mat <- seurat_obj[names(cluster0_exp[1:200]), cluster0_cells]@assays$RNA$count
@@ -121,7 +121,7 @@ Plot a unimodal example.
 ```{r unimodal_gene}
 to_plot <- names(my_tests[my_tests == TRUE])
 stopifnot(length(to_plot) > 0)
-plot(density(my_mat[to_plot[1], ]))
+plot(density(my_mat[to_plot[1], ]), main=to_plot[1])
 ```
 
 Not unimodal example.
@@ -129,5 +129,129 @@ Not unimodal example.
 ```{r non_unimodal_gene}
 to_plot <- names(my_tests[my_tests == FALSE])
 stopifnot(length(to_plot) > 0)
-plot(density(my_mat[to_plot[1], ]))
+plot(density(my_mat[to_plot[1], ]), main=to_plot[1])
+```
+
+## Check zero-inflation
+
+Function to check for zero-inflation.
+
+```{r check_zero_inflation}
+check_zero_spike <- function(x, bw = "SJ", window = NULL, alpha = 3, min_zeros = 5) {
+  x <- as.numeric(x)
+  n <- length(x)
+  n0 <- sum(x == 0)
+  p0 <- n0 / n
+ 
+  # no zeros
+  if (n0 == 0) {
+    return(list(
+      n = n, zeros = 0, p_zero_obs = 0,
+      window = NA_real_, expected_near_zero_prop = NA_real_,
+      inflation_ratio = NA_real_, zero_inflated = FALSE, zero_is_mode = FALSE
+    ))
+  }
+  # all zeros
+  if (n0 == n) {
+    return(list(
+      n = n, zeros = n, p_zero_obs = 1,
+      window = 0, expected_near_zero_prop = 0,
+      inflation_ratio = Inf, zero_inflated = TRUE, zero_is_mode = TRUE
+    ))
+  }
+  
+  x_nz <- x[x != 0]
+  
+  # kernel density estimation (KDE) data has boundary bias
+  # reflect if non-negative to reduce boundary bias at 0
+  if (min(x_nz) >= 0) {
+    x_kde <- c(x_nz, -x_nz[x_nz > 0])
+  } else {
+    x_kde <- x_nz
+  }
+  
+  d <- density(x_kde, bw = bw)
+  dx <- mean(diff(d$x))
+  
+  # choose window half-width eps
+  if (is.null(window)) {
+    bw_fd <- 2 * IQR(x_nz) / (length(x_nz)^(1/3))
+    # basic fallback if IQR is 0 or NA
+    if (!is.finite(bw_fd) || bw_fd <= 0) {
+      bw_fd <- sd(x_nz) * 1.06 * length(x_nz)^(-1/5)
+    }
+    eps <- max(min(d$bw, bw_fd), dx)  # at least one grid step
+  } else {
+    eps <- as.numeric(window)
+  }
+  
+  # smooth mass in [-eps, eps] from KDE (this integrates density over that window)
+  mask <- d$x >= -eps & d$x <= eps
+  p_window <- sum(d$y[mask]) * dx
+  
+  # expected fraction of ALL points near 0 coming from the smooth (non-zero) part
+  q <- p_window * (1 - p0)
+  
+  # "0 is a mode?" (compare density at 0 to density at ±eps)
+  d0 <- approx(d$x, d$y, xout = 0)$y
+  dr <- approx(d$x, d$y, xout = eps)$y
+  dl <- approx(d$x, d$y, xout = -eps)$y
+  zero_mode <- d0 >= max(c(dl, dr), na.rm = TRUE)
+  
+  ratio <- p0 / max(q, .Machine$double.eps)
+  inflated <- (n0 >= min_zeros) && (ratio >= alpha)
+  
+  list(
+    n = n,
+    zeros = n0,
+    p_zero_obs = p0,
+    window = eps,
+    expected_near_zero_prop = q,
+    inflation_ratio = ratio,
+    zero_inflated = inflated,
+    zero_is_mode = zero_mode
+  )
+}
+```
+
+Not zero-inflated.
+
+```{r not_zero_inflated}
+set.seed(1984)
+x1 <- rnorm(200, 0)
+plot(density(x1), main = paste0("Is zero-inflated: ", check_zero_spike(x1)$zero_inflated))
+```
+
+Zero-inflated.
+
+```{r zero_inflated}
+set.seed(1984)
+x2 <- c(rep(0, 50), rnorm(100, 2))
+plot(density(x2), main = paste0("Is zero-inflated: ", check_zero_spike(x2)$zero_inflated))
+```
+
+## Detect zero-inflation in gene expression
+
+Are any of the highly expressed genes zero-inflated, i.e., does the simple function work?
+
+```{r is_zero_inflated_highly_expressed_genes}
+my_mat <- seurat_obj[names(cluster0_exp[1:200]), cluster0_cells]@assays$RNA$count
+my_tests <- apply(my_mat, 1, function(x) check_zero_spike(x)$zero_inflated)
+table(my_tests)
+```
+
+Plot a zero-inflated example.
+
+```{r zero_inflated_gene}
+to_plot <- names(my_tests[my_tests == TRUE])
+stopifnot(length(to_plot) > 0)
+plot(density(my_mat[to_plot[1], ]), main = to_plot[1])
+```
+
+Not zero-inflated example.
+
+```{r not_zero_inflated_gene}
+to_plot <- names(my_tests[my_tests == FALSE])
+stopifnot(length(to_plot) > 0)
+plot(density(my_mat[to_plot[1], ]), main = to_plot[1])
 ```
