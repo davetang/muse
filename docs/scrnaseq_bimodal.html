@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed1938b12663690fd05d369437569541492fffd6ftargetblankd1938b1a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec2a814a8520bd962068d4a14d8c1a5bfdd9b4254targetblankc2a814aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/d1938b12663690fd05d369437569541492fffd6f" target="_blank">d1938b1</a>
+<a href="https://github.com/davetang/muse/tree/c2a814a8520bd962068d4a14d8c1a5bfdd9b4254" target="_blank">c2a814a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed1938b12663690fd05d369437569541492fffd6ftargetblankd1938b1a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec2a814a8520bd962068d4a14d8c1a5bfdd9b4254targetblankc2a814aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/d1938b12663690fd05d369437569541492fffd6f" target="_blank">d1938b1</a>.
+<a href="https://github.com/davetang/muse/tree/c2a814a8520bd962068d4a14d8c1a5bfdd9b4254" target="_blank">c2a814a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -649,6 +649,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/c2a814a8520bd962068d4a14d8c1a5bfdd9b4254/analysis/scrnaseq_bimodal.Rmd" target="_blank">c2a814a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-01
+</td>
+<td>
+Detect peaks
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/68e882e0c76eaab1d1e0b0af9d30fa30a37796bc/docs/scrnaseq_bimodal.html" target="_blank">68e882e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/d1938b12663690fd05d369437569541492fffd6f/analysis/scrnaseq_bimodal.Rmd" target="_blank">d1938b1</a>
 </td>
 <td>
@@ -734,8 +768,8 @@ Active assay: RNA (32738 features, 2000 variable features)
 <pre class="r"><code>wanted &lt;- seurat_obj@meta.data$seurat_clusters == &quot;0&quot;
 cluster0_cells &lt;- row.names(seurat_obj@meta.data[wanted, ])
 cluster0_exp &lt;- Matrix::rowMeans(seurat_obj[, cluster0_cells]@assays$RNA$count)
-sort(cluster0_exp, decreasing = TRUE) |&gt;
-  head(n = 9) |&gt;
+cluster0_exp &lt;- sort(cluster0_exp, decreasing = TRUE)
+head(cluster0_exp, n = 9) |&gt;
   names() -&gt; my_genes
 
 my_genes</code></pre>
@@ -767,6 +801,84 @@ Picking joint bandwidth of 2.93</code></pre>
 <pre><code>Picking joint bandwidth of 2.44
 Picking joint bandwidth of 2.44</code></pre>
 <p><img src="figure/scrnaseq_bimodal.Rmd/cluster0_top_genes_dist-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-cluster0_top_genes_dist-1">
+Past versions of cluster0_top_genes_dist-1.png
+</button>
+</p>
+<div id="fig-cluster0_top_genes_dist-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/68e882e0c76eaab1d1e0b0af9d30fa30a37796bc/docs/figure/scrnaseq_bimodal.Rmd/cluster0_top_genes_dist-1.png" target="_blank">68e882e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="detect-peaks" class="section level2">
+<h2>Detect peaks</h2>
+<p>Simple function to check how many peaks are in a distribution.</p>
+<pre class="r"><code>is_unimodal &lt;- function(x, bw = &quot;SJ&quot;) {
+  d &lt;- density(x, bw = bw)
+  y &lt;- d$y
+  
+  peaks &lt;- which(diff(sign(diff(y))) == -2) + 1
+  length(peaks) == 1
+}</code></pre>
+<p>Unimodal example.</p>
+<pre class="r"><code>set.seed(1984)
+x1 &lt;- rnorm(200, 0)
+plot(density(x1), main = paste0(&quot;Is unimodel: &quot;, is_unimodal(x1)))</code></pre>
+<p><img src="figure/scrnaseq_bimodal.Rmd/unimodal_eg-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Bi-modal example.</p>
+<pre class="r"><code>set.seed(1984)
+x2 &lt;- c(rnorm(110, -3), rnorm(50, 3))
+plot(density(x2), main = paste0(&quot;Is unimodel: &quot;, is_unimodal(x2)))</code></pre>
+<p><img src="figure/scrnaseq_bimodal.Rmd/unimodal_eg2-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="detect-peaks-in-gene-expression" class="section level2">
+<h2>Detect peaks in gene expression</h2>
+<p>Are any of the highly variable genes unimodal, i.e., does the simple
+function work?</p>
+<pre class="r"><code>my_mat &lt;- seurat_obj[names(cluster0_exp[1:200]), cluster0_cells]@assays$RNA$count
+my_tests &lt;- apply(my_mat, 1, is_unimodal)
+table(my_tests)</code></pre>
+<pre><code>my_tests
+FALSE  TRUE 
+  199     1 </code></pre>
+<p>Plot a unimodal example.</p>
+<pre class="r"><code>to_plot &lt;- names(my_tests[my_tests == TRUE])
+stopifnot(length(to_plot) &gt; 0)
+plot(density(my_mat[to_plot[1], ]))</code></pre>
+<p><img src="figure/scrnaseq_bimodal.Rmd/unimodal_gene-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Not unimodal example.</p>
+<pre class="r"><code>to_plot &lt;- names(my_tests[my_tests == FALSE])
+stopifnot(length(to_plot) &gt; 0)
+plot(density(my_mat[to_plot[1], ]))</code></pre>
+<p><img src="figure/scrnaseq_bimodal.Rmd/non_unimodal_gene-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -843,6 +955,7 @@ loaded via a namespace (and not attached):
 [112] progressr_0.15.1       ggrepel_0.9.6          htmlwidgets_1.6.4     
 [115] farver_2.1.2           htmltools_0.5.8.1      lifecycle_1.0.4       
 [118] httr_1.4.7             mime_0.13              MASS_7.3-65           </code></pre>
+</div>
 </div>
 </div>
 </div>
