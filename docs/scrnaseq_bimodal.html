@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec2a814a8520bd962068d4a14d8c1a5bfdd9b4254targetblankc2a814aa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree34cd9ede5100cb55b14dc5179ad7b37cfdf2e7bctargetblank34cd9eda">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/c2a814a8520bd962068d4a14d8c1a5bfdd9b4254" target="_blank">c2a814a</a>
+<a href="https://github.com/davetang/muse/tree/34cd9ede5100cb55b14dc5179ad7b37cfdf2e7bc" target="_blank">34cd9ed</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec2a814a8520bd962068d4a14d8c1a5bfdd9b4254targetblankc2a814aa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree34cd9ede5100cb55b14dc5179ad7b37cfdf2e7bctargetblank34cd9eda"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/c2a814a8520bd962068d4a14d8c1a5bfdd9b4254" target="_blank">c2a814a</a>.
+<a href="https://github.com/davetang/muse/tree/34cd9ede5100cb55b14dc5179ad7b37cfdf2e7bc" target="_blank">34cd9ed</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -644,6 +644,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/34cd9ede5100cb55b14dc5179ad7b37cfdf2e7bc/analysis/scrnaseq_bimodal.Rmd" target="_blank">34cd9ed</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-01
+</td>
+<td>
+Check for zero-inflation
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/945b0f75b5859fc0e9247a14b8cbc25d9d4d90fd/docs/scrnaseq_bimodal.html" target="_blank">945b0f7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -841,7 +875,7 @@ Dave Tang
 <div id="detect-peaks" class="section level2">
 <h2>Detect peaks</h2>
 <p>Simple function to check how many peaks are in a distribution.</p>
-<pre class="r"><code>is_unimodal &lt;- function(x, bw = &quot;SJ&quot;) {
+<pre class="r"><code>is_unimodal &lt;- function(x, bw = &quot;SJ&quot;){
   d &lt;- density(x, bw = bw)
   y &lt;- d$y
   
@@ -853,15 +887,89 @@ Dave Tang
 x1 &lt;- rnorm(200, 0)
 plot(density(x1), main = paste0(&quot;Is unimodel: &quot;, is_unimodal(x1)))</code></pre>
 <p><img src="figure/scrnaseq_bimodal.Rmd/unimodal_eg-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unimodal_eg-1">
+Past versions of unimodal_eg-1.png
+</button>
+</p>
+<div id="fig-unimodal_eg-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/945b0f75b5859fc0e9247a14b8cbc25d9d4d90fd/docs/figure/scrnaseq_bimodal.Rmd/unimodal_eg-1.png" target="_blank">945b0f7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Bi-modal example.</p>
 <pre class="r"><code>set.seed(1984)
 x2 &lt;- c(rnorm(110, -3), rnorm(50, 3))
 plot(density(x2), main = paste0(&quot;Is unimodel: &quot;, is_unimodal(x2)))</code></pre>
 <p><img src="figure/scrnaseq_bimodal.Rmd/unimodal_eg2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unimodal_eg2-1">
+Past versions of unimodal_eg2-1.png
+</button>
+</p>
+<div id="fig-unimodal_eg2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/945b0f75b5859fc0e9247a14b8cbc25d9d4d90fd/docs/figure/scrnaseq_bimodal.Rmd/unimodal_eg2-1.png" target="_blank">945b0f7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="detect-peaks-in-gene-expression" class="section level2">
 <h2>Detect peaks in gene expression</h2>
-<p>Are any of the highly variable genes unimodal, i.e., does the simple
+<p>Are any of the highly expressed genes unimodal, i.e., does the simple
 function work?</p>
 <pre class="r"><code>my_mat &lt;- seurat_obj[names(cluster0_exp[1:200]), cluster0_cells]@assays$RNA$count
 my_tests &lt;- apply(my_mat, 1, is_unimodal)
@@ -872,13 +980,198 @@ FALSE  TRUE
 <p>Plot a unimodal example.</p>
 <pre class="r"><code>to_plot &lt;- names(my_tests[my_tests == TRUE])
 stopifnot(length(to_plot) &gt; 0)
-plot(density(my_mat[to_plot[1], ]))</code></pre>
+plot(density(my_mat[to_plot[1], ]), main=to_plot[1])</code></pre>
 <p><img src="figure/scrnaseq_bimodal.Rmd/unimodal_gene-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unimodal_gene-1">
+Past versions of unimodal_gene-1.png
+</button>
+</p>
+<div id="fig-unimodal_gene-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/945b0f75b5859fc0e9247a14b8cbc25d9d4d90fd/docs/figure/scrnaseq_bimodal.Rmd/unimodal_gene-1.png" target="_blank">945b0f7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Not unimodal example.</p>
 <pre class="r"><code>to_plot &lt;- names(my_tests[my_tests == FALSE])
 stopifnot(length(to_plot) &gt; 0)
-plot(density(my_mat[to_plot[1], ]))</code></pre>
+plot(density(my_mat[to_plot[1], ]), main=to_plot[1])</code></pre>
 <p><img src="figure/scrnaseq_bimodal.Rmd/non_unimodal_gene-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-non_unimodal_gene-1">
+Past versions of non_unimodal_gene-1.png
+</button>
+</p>
+<div id="fig-non_unimodal_gene-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/945b0f75b5859fc0e9247a14b8cbc25d9d4d90fd/docs/figure/scrnaseq_bimodal.Rmd/non_unimodal_gene-1.png" target="_blank">945b0f7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="check-zero-inflation" class="section level2">
+<h2>Check zero-inflation</h2>
+<p>Function to check for zero-inflation.</p>
+<pre class="r"><code>check_zero_spike &lt;- function(x, bw = &quot;SJ&quot;, window = NULL, alpha = 3, min_zeros = 5) {
+  x &lt;- as.numeric(x)
+  n &lt;- length(x)
+  n0 &lt;- sum(x == 0)
+  p0 &lt;- n0 / n
+ 
+  # no zeros
+  if (n0 == 0) {
+    return(list(
+      n = n, zeros = 0, p_zero_obs = 0,
+      window = NA_real_, expected_near_zero_prop = NA_real_,
+      inflation_ratio = NA_real_, zero_inflated = FALSE, zero_is_mode = FALSE
+    ))
+  }
+  # all zeros
+  if (n0 == n) {
+    return(list(
+      n = n, zeros = n, p_zero_obs = 1,
+      window = 0, expected_near_zero_prop = 0,
+      inflation_ratio = Inf, zero_inflated = TRUE, zero_is_mode = TRUE
+    ))
+  }
+  
+  x_nz &lt;- x[x != 0]
+  
+  # kernel density estimation (KDE) data has boundary bias
+  # reflect if non-negative to reduce boundary bias at 0
+  if (min(x_nz) &gt;= 0) {
+    x_kde &lt;- c(x_nz, -x_nz[x_nz &gt; 0])
+  } else {
+    x_kde &lt;- x_nz
+  }
+  
+  d &lt;- density(x_kde, bw = bw)
+  dx &lt;- mean(diff(d$x))
+  
+  # choose window half-width eps
+  if (is.null(window)) {
+    bw_fd &lt;- 2 * IQR(x_nz) / (length(x_nz)^(1/3))
+    # basic fallback if IQR is 0 or NA
+    if (!is.finite(bw_fd) || bw_fd &lt;= 0) {
+      bw_fd &lt;- sd(x_nz) * 1.06 * length(x_nz)^(-1/5)
+    }
+    eps &lt;- max(min(d$bw, bw_fd), dx)  # at least one grid step
+  } else {
+    eps &lt;- as.numeric(window)
+  }
+  
+  # smooth mass in [-eps, eps] from KDE (this integrates density over that window)
+  mask &lt;- d$x &gt;= -eps &amp; d$x &lt;= eps
+  p_window &lt;- sum(d$y[mask]) * dx
+  
+  # expected fraction of ALL points near 0 coming from the smooth (non-zero) part
+  q &lt;- p_window * (1 - p0)
+  
+  # &quot;0 is a mode?&quot; (compare density at 0 to density at ±eps)
+  d0 &lt;- approx(d$x, d$y, xout = 0)$y
+  dr &lt;- approx(d$x, d$y, xout = eps)$y
+  dl &lt;- approx(d$x, d$y, xout = -eps)$y
+  zero_mode &lt;- d0 &gt;= max(c(dl, dr), na.rm = TRUE)
+  
+  ratio &lt;- p0 / max(q, .Machine$double.eps)
+  inflated &lt;- (n0 &gt;= min_zeros) &amp;&amp; (ratio &gt;= alpha)
+  
+  list(
+    n = n,
+    zeros = n0,
+    p_zero_obs = p0,
+    window = eps,
+    expected_near_zero_prop = q,
+    inflation_ratio = ratio,
+    zero_inflated = inflated,
+    zero_is_mode = zero_mode
+  )
+}</code></pre>
+<p>Not zero-inflated.</p>
+<pre class="r"><code>set.seed(1984)
+x1 &lt;- rnorm(200, 0)
+plot(density(x1), main = paste0(&quot;Is zero-inflated: &quot;, check_zero_spike(x1)$zero_inflated))</code></pre>
+<p><img src="figure/scrnaseq_bimodal.Rmd/not_zero_inflated-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Zero-inflated.</p>
+<pre class="r"><code>set.seed(1984)
+x2 &lt;- c(rep(0, 50), rnorm(100, 2))
+plot(density(x2), main = paste0(&quot;Is zero-inflated: &quot;, check_zero_spike(x2)$zero_inflated))</code></pre>
+<p><img src="figure/scrnaseq_bimodal.Rmd/zero_inflated-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="detect-zero-inflation-in-gene-expression"
+class="section level2">
+<h2>Detect zero-inflation in gene expression</h2>
+<p>Are any of the highly expressed genes zero-inflated, i.e., does the
+simple function work?</p>
+<pre class="r"><code>my_mat &lt;- seurat_obj[names(cluster0_exp[1:200]), cluster0_cells]@assays$RNA$count
+my_tests &lt;- apply(my_mat, 1, function(x) check_zero_spike(x)$zero_inflated)
+table(my_tests)</code></pre>
+<pre><code>my_tests
+FALSE  TRUE 
+   86   114 </code></pre>
+<p>Plot a zero-inflated example.</p>
+<pre class="r"><code>to_plot &lt;- names(my_tests[my_tests == TRUE])
+stopifnot(length(to_plot) &gt; 0)
+plot(density(my_mat[to_plot[1], ]), main = to_plot[1])</code></pre>
+<p><img src="figure/scrnaseq_bimodal.Rmd/zero_inflated_gene-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Not zero-inflated example.</p>
+<pre class="r"><code>to_plot &lt;- names(my_tests[my_tests == FALSE])
+stopifnot(length(to_plot) &gt; 0)
+plot(density(my_mat[to_plot[1], ]), main = to_plot[1])</code></pre>
+<p><img src="figure/scrnaseq_bimodal.Rmd/not_zero_inflated_gene-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
