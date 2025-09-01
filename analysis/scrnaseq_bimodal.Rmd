@@ -63,8 +63,8 @@ Most highly expressed genes in cluster 0.
 wanted <- seurat_obj@meta.data$seurat_clusters == "0"
 cluster0_cells <- row.names(seurat_obj@meta.data[wanted, ])
 cluster0_exp <- Matrix::rowMeans(seurat_obj[, cluster0_cells]@assays$RNA$count)
-sort(cluster0_exp, decreasing = TRUE) |>
-  head(n = 9) |>
+cluster0_exp <- sort(cluster0_exp, decreasing = TRUE)
+head(cluster0_exp, n = 9) |>
   names() -> my_genes
 
 my_genes
@@ -74,4 +74,60 @@ Plot the distribution.
 
 ```{r cluster0_top_genes_dist}
 Seurat::RidgePlot(seurat_obj, features = my_genes, idents = "0", layer = 'count')
+```
+
+## Detect peaks
+
+Simple function to check how many peaks are in a distribution.
+
+```{r is_unimodal}
+is_unimodal <- function(x, bw = "SJ") {
+  d <- density(x, bw = bw)
+  y <- d$y
+  
+  peaks <- which(diff(sign(diff(y))) == -2) + 1
+  length(peaks) == 1
+}
+```
+
+Unimodal example.
+
+```{r unimodal_eg}
+set.seed(1984)
+x1 <- rnorm(200, 0)
+plot(density(x1), main = paste0("Is unimodel: ", is_unimodal(x1)))
+```
+
+Bi-modal example.
+
+```{r unimodal_eg2}
+set.seed(1984)
+x2 <- c(rnorm(110, -3), rnorm(50, 3))
+plot(density(x2), main = paste0("Is unimodel: ", is_unimodal(x2)))
+```
+
+## Detect peaks in gene expression
+
+Are any of the highly variable genes unimodal, i.e., does the simple function work?
+
+```{r is_unimodal_highly_expressed_genes}
+my_mat <- seurat_obj[names(cluster0_exp[1:200]), cluster0_cells]@assays$RNA$count
+my_tests <- apply(my_mat, 1, is_unimodal)
+table(my_tests)
+```
+
+Plot a unimodal example.
+
+```{r unimodal_gene}
+to_plot <- names(my_tests[my_tests == TRUE])
+stopifnot(length(to_plot) > 0)
+plot(density(my_mat[to_plot[1], ]))
+```
+
+Not unimodal example.
+
+```{r non_unimodal_gene}
+to_plot <- names(my_tests[my_tests == FALSE])
+stopifnot(length(to_plot) > 0)
+plot(density(my_mat[to_plot[1], ]))
 ```
