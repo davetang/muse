@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree31607923166a9b5d0f958149f3e6a46dd40ef0c3targetblank3160792a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree15473bae75b26188311b56273753be5455f6ca03targetblank15473baa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/31607923166a9b5d0f958149f3e6a46dd40ef0c3" target="_blank">3160792</a>
+<a href="https://github.com/davetang/muse/tree/15473bae75b26188311b56273753be5455f6ca03" target="_blank">15473ba</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree31607923166a9b5d0f958149f3e6a46dd40ef0c3targetblank3160792a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree15473bae75b26188311b56273753be5455f6ca03targetblank15473baa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/31607923166a9b5d0f958149f3e6a46dd40ef0c3" target="_blank">3160792</a>.
+<a href="https://github.com/davetang/muse/tree/15473bae75b26188311b56273753be5455f6ca03" target="_blank">15473ba</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -649,6 +649,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/15473bae75b26188311b56273753be5455f6ca03/analysis/fitting.Rmd" target="_blank">15473ba</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-02
+</td>
+<td>
+Negative binomial
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/161c3d65b5036190f7351e0cc92564fd7ee2baae/docs/fitting.html" target="_blank">161c3d6</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/31607923166a9b5d0f958149f3e6a46dd40ef0c3/analysis/fitting.Rmd" target="_blank">3160792</a>
 </td>
 <td>
@@ -743,6 +777,33 @@ or &#39;scale&#39; but not both</code></pre>
 <pre><code>     shape       rate   
   2.0425966   3.1910159 
  (0.1550892) (0.2744437)</code></pre>
+<p>Negative binomial.</p>
+<pre class="r"><code>set.seed(1984)
+eg4 &lt;- rnbinom(100, mu = 10, size = 5)
+
+eg4_fit &lt;- MASS::fitdistr(eg4, &quot;negative binomial&quot;)
+eg4_fit</code></pre>
+<pre><code>     size         mu    
+  4.9764745   9.7999979 
+ (1.0492499) (0.5394329)</code></pre>
+<p><code>MASS::fitdistr()</code> supports the following
+distributions:</p>
+<ul>
+<li>“beta”</li>
+<li>“cauchy”</li>
+<li>“chi-squared”</li>
+<li>“exponential”</li>
+<li>“gamma”</li>
+<li>“geometric”</li>
+<li>“log-normal”</li>
+<li>“lognormal”</li>
+<li>“logistic”</li>
+<li>“negative binomial”</li>
+<li>“normal”</li>
+<li>“Poisson”</li>
+<li>“t”</li>
+<li>“weibull”</li>
+</ul>
 </div>
 <div id="which-fits-better" class="section level1">
 <h1>Which fits better?</h1>
