@@ -55,6 +55,33 @@ eg3_fit <- MASS::fitdistr(eg3, "gamma")
 eg3_fit
 ```
 
+Negative binomial.
+
+```{r eg4}
+set.seed(1984)
+eg4 <- rnbinom(100, mu = 10, size = 5)
+
+eg4_fit <- MASS::fitdistr(eg4, "negative binomial")
+eg4_fit
+```
+
+`MASS::fitdistr()` supports the following distributions:
+
+* "beta"
+* "cauchy"
+* "chi-squared"
+* "exponential"
+* "gamma"
+* "geometric"
+* "log-normal"
+* "lognormal"
+* "logistic"
+* "negative binomial"
+* "normal"
+* "Poisson"
+* "t"
+* "weibull"
+
 # Which fits better?
 
 [Akaike Information Criterion](https://en.wikipedia.org/wiki/Akaike_information_criterion) (AIC) is an estimator of prediction error and thereby relative quality of statistical models for a given set of data. Put simply, it's a measure of how well a statistical model fits the data, but with a built-in penalty for model complexity. When comparing models, the one with the lowest AIC is preferred.
