@@ -1,0 +1,60 @@
+---
+title: "Fitting"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+suppressPackageStartupMessages(library(MASS))
+```
+
+# Introduction
+
+When a "distribution was fit to" something, it means that we assume that the data comes from some probability distribution and we are estimating the distribution's parameters from the data so that the model best represents the observed values.
+
+# Fitting using {MASS}
+
+Suppose we have some data:
+
+```{r eg1}
+set.seed(1984)
+eg1 <- rnorm(100, mean = 5, sd = 2)
+```
+
+Fit a Normal distribution.
+
+```{r eg1_fit}
+eg1_fit <- MASS::fitdistr(eg1, "normal")
+eg1_fit
+```
+
+A Normal distribution was fit to `eg1`, with estimated mean `r eg1_fit$estimate['mean']` and standard deviation `r eg1_fit$estimate['sd']`
+
+Poisson.
+
+```{r eg2}
+set.seed(1984)
+eg2 <- rpois(100, lambda = 3)
+eg2_fit <- fitdistr(eg2, "Poisson")
+eg2_fit
+```
+
+# Which fits better?
+
+[Akaike Information Criterion](https://en.wikipedia.org/wiki/Akaike_information_criterion) (AIC) is an estimator of prediction error and thereby relative quality of statistical models for a given set of data. Put simply, it's a measure of how well a statistical model fits the data, but with a built-in penalty for model complexity. When comparing models, the one with the lowest AIC is preferred.
+
+```{r aic}
+set.seed(1984)
+eg1 <- rnorm(100, mean = 5, sd = 2)
+
+eg1_norm <- MASS::fitdistr(eg1, "normal")
+eg1_exp <- MASS::fitdistr(eg1, "exponential")
+
+stats::AIC(eg1_norm, eg1_exp)
+```
