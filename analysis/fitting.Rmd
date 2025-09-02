@@ -41,8 +41,18 @@ Poisson.
 ```{r eg2}
 set.seed(1984)
 eg2 <- rpois(100, lambda = 3)
-eg2_fit <- fitdistr(eg2, "Poisson")
+eg2_fit <- MASS::fitdistr(eg2, "Poisson")
 eg2_fit
+```
+
+[Gamma distribution](https://en.wikipedia.org/wiki/Gamma_distribution#Occurrence_and_applications).
+
+```{r eg3}
+set.seed(1984)
+eg3 <- stats::rgamma(300, shape = 2, rate = 3, scale = 1/3)
+
+eg3_fit <- MASS::fitdistr(eg3, "gamma")
+eg3_fit
 ```
 
 # Which fits better?
