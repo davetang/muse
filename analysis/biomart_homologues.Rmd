@@ -1,0 +1,106 @@
+---
+title: "Using biomaRt to get homologues"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Installation
+
+To begin, install the {biomaRt} package.
+
+```{r install_biomart, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("biomaRt")
+```
+
+## Package
+
+Load package.
+
+```{r load_biomart}
+suppressPackageStartupMessages(library(biomaRt))
+packageVersion("biomaRt")
+```
+
+## Getting started
+
+List the available BioMart databases.
+
+```{r list_marts}
+listMarts()
+```
+
+Connect to the selected BioMart database by using `useMart()`.
+
+```{r ensembl}
+ensembl <- useMart("ENSEMBL_MART_ENSEMBL")
+avail_datasets <- listDatasets(ensembl)
+head(avail_datasets)
+```
+
+Look for human datasets by searching the description column.
+
+```{r human}
+idx <- grep('human', avail_datasets$description, ignore.case = TRUE)
+avail_datasets[idx, ]
+```
+
+Connect to the selected BioMart database and human dataset.
+
+```{r usemart_with_dataset}
+ensembl <- useMart("ensembl", dataset=avail_datasets[idx, 'dataset'])
+ensembl
+```
+
+Building a query, requires three things:
+
+1. filters
+2. attributes
+3. values
+
+Use `listFilters()` to show available filters.
+
+```{r avail_filters}
+avail_filters <- listFilters(ensembl)
+head(avail_filters)
+```
+
+Use `listAttributes()` to show available attributes.
+
+```{r avail_attributes}
+avail_attributes <- listAttributes(ensembl)
+head(avail_attributes)
+```
+
+Look for mouse homologues.
+
+```{r look_for_homolog}
+grep('homolog', avail_attributes$name, ignore.case = TRUE, value = TRUE) |>
+  grep('mmus', x = _, ignore.case = TRUE, value = TRUE) -> wanted_attr
+
+wanted_attr <- c('ensembl_gene_id', wanted_attr)
+wanted_attr
+```
+
+ENSG00000206172 (HBA1).
+
+```{r hba1}
+my_gene <- 'ENSG00000206172'
+
+getBM(
+  attributes = wanted_attr,
+  filters = "ensembl_gene_id",
+  values = my_gene,
+  mart = ensembl
+) -> my_res
+
+t(my_res)
+```
