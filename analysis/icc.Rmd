@@ -1,0 +1,64 @@
+---
+title: "Intraclass correlation coefficient"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(irr))
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+> [In statistics](https://en.wikipedia.org/wiki/Intraclass_correlation), the intraclass correlation, or the intraclass correlation coefficient (ICC), is a descriptive statistic that can be used when quantitative measurements are made on units that are organized into groups. It describes how strongly units in the same group resemble each other. While it is viewed as a type of correlation, unlike most other correlation measures, it operates on data structured as groups rather than data structured as paired observations.
+
+## Setup
+
+Install {irr}.
+
+```{r install_irr, eval=FALSE}
+install.packages("irr")
+```
+
+## Example
+
+The `icc()` function:
+
+> Computes single score or average score ICCs as an index of interrater reliability of quantitative data. Additionally, F-test and confidence interval are computed.
+
+Takes:
+
+* `ratings` - $n \times m$ matrix or dataframe, $n$ subjects $m$ raters.
+* `model` - a character string specifying if a "oneway" model (default) with row effects random, or a "twoway" model with column and row effects random should be applied. You can specify just the initial letter.
+* `type` - a character string specifying if "consistency" (default) or "agreement" between raters should be estimated. If a "oneway" model is used, only "consistency" could be computed. You can specify just the initial letter.
+* `unit` - a character string specifying the unit of analysis: Must be one of "single" (default) or "average". You can specify just the initial letter.
+
+```{r anxiety}
+data(anxiety)
+head(anxiety)
+icc(anxiety, model="twoway", type="agreement")
+```
+
+Another example from the documentation; high consistency.
+
+```{r eg2_twoway}
+set.seed(1984)
+r1 <- round(rnorm(20, 10, 4))
+r2 <- round(r1 + 10 + rnorm(20, 0, 2))
+r3 <- round(r1 + 20 + rnorm(20, 0, 2))
+
+boxplot(data.frame(r1 = r1, r2 = r2, r3 = r3))
+icc(cbind(r1, r2, r3), "twoway")
+```
+
+Low agreement.
+
+```{r_twoway_agreement}
+icc(cbind(r1, r2, r3), "twoway", "agreement")
+```
