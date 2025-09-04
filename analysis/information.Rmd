@@ -14,38 +14,98 @@ suppressPackageStartupMessages(library(mpmi))
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Introduction
+
+According to [Claude Shannon](https://en.wikipedia.org/wiki/Claude_Shannon), information is present whenever a signal is transmitted from one place (sender) to another (receiver).
+
+Information theory, founded by Shannon, studies the **quantification, transmission, storage, and processing of information**. At its core, it answers:
+
+* How much *uncertainty* does a random variable have?
+* How much information is gained when we learn the outcome of something uncertain?
+* How efficiently can we transmit data over noisy communication channels?
+
+Key concepts include:
+
+* *Entropy (H)*: A widely used measure ([Shannon entropy](https://en.wikipedia.org/wiki/Entropy_(information_theory))) of uncertainty in a random variable. Higher entropy means more unpredictability.
+* *Joint entropy & conditional entropy*: Extensions that measure combined or conditional uncertainties.
+* *Channel capacity*: The maximum rate at which information can be transmitted over a noisy channel with arbitrarily low error.
+
+### Mutual Information
+
+[Mutual information](https://en.wikipedia.org/wiki/Mutual_information) between two random variables $X$ and $Y$ measures how much knowing one reduces uncertainty about the other.
+
+$$
+I(X;Y) = H(X) + H(Y) - H(X, Y)
+$$
+
+or equivalently,
+
+$$
+I(X;Y) = H(X) - H(X|Y) = H(Y) - H(Y|X).
+$$
+
+If $I(X;Y) = 0$, $X$ and $Y$ are independent (no shared information); larger values mean stronger statistical dependence.
+
+## Setup
+
 Install the dependencies required to render this document.
 
 ```{r install_dep, eval=FALSE}
 install.packages('mpmi')
-packageVersion("mpmi")
 ```
 
-Example data.
+## Examples
 
-```{r eg1}
-set.seed(1984)
+The `dmi()` function calculates MI and BCMI between a set of discrete variables held as columns in a matrix. It also performs jackknife bias correction and provides a z-score for the hypothesis of no association. Also included are the `*.pw` functions that calculate MI between two vectors only. The `*njk` functions do not perform the jackknife and are therefore faster.
 
-n <- 300
-Org <- sample(c("Org1","Org2","Org3"), n, replace=TRUE, prob=c(0.3, 0.4, 0.3))
+The results of `dmi()` are in many ways similar to a correlation matrix, with each row and column index corresponding to a given variable.
 
-Cluster <- character(n)
-for (i in 1:n) {
-  if (Org[i] == "Org1") {
-    Cluster[i] <- sample(c("C1","C2","C3","C4"), 1, prob=c(0.6,0.2,0.1,0.1))
-  } else if (Org[i] == "Org2") {
-    Cluster[i] <- sample(c("C1","C2","C3","C4"), 1, prob=c(0.2,0.5,0.2,0.1))
-  } else {
-    Cluster[i] <- sample(c("C1","C2","C3","C4"), 1, prob=c(0.1,0.1,0.3,0.5))
-  }
+Exploring a group of categorical variables (from the examples in the documentation of the `dmi()` function).
+
+* `cyl` - Number of cylinders
+* `vs` - Engine (0 = V-shaped, 1 = straight)
+* `am` - Transmission (0 = automatic, 1 = manual)
+* `gear` - Number of forward gears
+* `carb` - Number of carburetors (a device used by a gasoline internal combustion engine to control and mix air and fuel entering the engine)
+
+```{r discrete_example}
+my_vars <- c("cyl","vs","am","gear","carb")
+dat <- mtcars[, my_vars]
+discresults <- dmi(dat)
+
+add_names <- function(res, names){
+  purrr::map(res, \(x){
+    row.names(x) <- names
+    colnames(x) <- names
+    x
+  })
 }
 
-df <- data.frame(Cluster, Org)
-table(df$Cluster, df$Org)
+add_names(discresults, my_vars)
 ```
 
-This function calculates MI and BCMI between a set of discrete variables held as columns in a matrix. It also performs jackknife bias correction and provides a z-score for the hypothesis of no association. Also included are the *.pw functions that calculate MI between two vectors only. The *njk functions do not perform the jackknife and are therefore faster. 
+Two random variables.
 
-```{r dmi}
-dmi(df)
+```{r eg2}
+set.seed(1984)
+n <- 1000
+X <- rbinom(n, 1, 0.5)
+Y <- rbinom(n, 1, 0.5)
+xy <- c('X', 'Y')
+
+my_mat <- matrix(data = c(X,Y), nrow = n)
+add_names(dmi(my_mat), xy)
+```
+
+80% of the time make Y the same as X; the other 20% of the time make Y 1 less than X.
+
+```{r eg3}
+set.seed(1984)
+n <- 1000
+X <- rbinom(n, 1, 0.5)
+Y <- ifelse(runif(n) < 0.8, X, 1 - X)
+xy <- c('X', 'Y')
+
+my_mat <- matrix(data = c(X,Y), nrow = n)
+add_names(dmi(my_mat), xy)
 ```
