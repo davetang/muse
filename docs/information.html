@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-08-29" />
+<meta name="date" content="2025-09-04" />
 
 <title>Information</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Information</h1>
-<h4 class="date">2025-08-29</h4>
+<h4 class="date">2025-09-04</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-08-29
+<strong>Last updated:</strong> 2025-09-04
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2e7d52562ccd9dff6775033c78c493c18723f736targetblank2e7d525a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea67ade52fee0f335c2ec674ecc78d66a066c9890targetblanka67ade5a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/2e7d52562ccd9dff6775033c78c493c18723f736" target="_blank">2e7d525</a>
+<a href="https://github.com/davetang/muse/tree/a67ade52fee0f335c2ec674ecc78d66a066c9890" target="_blank">a67ade5</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2e7d52562ccd9dff6775033c78c493c18723f736targetblank2e7d525a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea67ade52fee0f335c2ec674ecc78d66a066c9890targetblanka67ade5a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/2e7d52562ccd9dff6775033c78c493c18723f736" target="_blank">2e7d525</a>.
+<a href="https://github.com/davetang/muse/tree/a67ade52fee0f335c2ec674ecc78d66a066c9890" target="_blank">a67ade5</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -648,6 +648,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/a67ade52fee0f335c2ec674ecc78d66a066c9890/analysis/information.Rmd" target="_blank">a67ade5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-04
+</td>
+<td>
+Add background information and working examples
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/06c1935b7d3989d2a421d08268b85bc4dc7d9b94/docs/information.html" target="_blank">06c1935</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-08-29
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/2e7d52562ccd9dff6775033c78c493c18723f736/analysis/information.Rmd" target="_blank">2e7d525</a>
 </td>
 <td>
@@ -667,55 +701,163 @@ Information theory
 </div>
 </div>
 </div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>According to <a
+href="https://en.wikipedia.org/wiki/Claude_Shannon">Claude Shannon</a>,
+information is present whenever a signal is transmitted from one place
+(sender) to another (receiver).</p>
+<p>Information theory, founded by Shannon, studies the
+<strong>quantification, transmission, storage, and processing of
+information</strong>. At its core, it answers:</p>
+<ul>
+<li>How much <em>uncertainty</em> does a random variable have?</li>
+<li>How much information is gained when we learn the outcome of
+something uncertain?</li>
+<li>How efficiently can we transmit data over noisy communication
+channels?</li>
+</ul>
+<p>Key concepts include:</p>
+<ul>
+<li><em>Entropy (H)</em>: A widely used measure (<a
+href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">Shannon
+entropy</a>) of uncertainty in a random variable. Higher entropy means
+more unpredictability.</li>
+<li><em>Joint entropy &amp; conditional entropy</em>: Extensions that
+measure combined or conditional uncertainties.</li>
+<li><em>Channel capacity</em>: The maximum rate at which information can
+be transmitted over a noisy channel with arbitrarily low error.</li>
+</ul>
+<div id="mutual-information" class="section level3">
+<h3>Mutual Information</h3>
+<p><a href="https://en.wikipedia.org/wiki/Mutual_information">Mutual
+information</a> between two random variables <span
+class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span> measures how much knowing one reduces
+uncertainty about the other.</p>
+<p><span class="math display">\[
+I(X;Y) = H(X) + H(Y) - H(X, Y)
+\]</span></p>
+<p>or equivalently,</p>
+<p><span class="math display">\[
+I(X;Y) = H(X) - H(X|Y) = H(Y) - H(Y|X).
+\]</span></p>
+<p>If <span class="math inline">\(I(X;Y) = 0\)</span>, <span
+class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span> are independent (no shared
+information); larger values mean stronger statistical dependence.</p>
+</div>
+</div>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
 <p>Install the dependencies required to render this document.</p>
-<pre class="r"><code>install.packages(&#39;mpmi&#39;)
-packageVersion(&quot;mpmi&quot;)</code></pre>
-<p>Example data.</p>
-<pre class="r"><code>set.seed(1984)
+<pre class="r"><code>install.packages(&#39;mpmi&#39;)</code></pre>
+</div>
+<div id="examples" class="section level2">
+<h2>Examples</h2>
+<p>The <code>dmi()</code> function calculates MI and BCMI between a set
+of discrete variables held as columns in a matrix. It also performs
+jackknife bias correction and provides a z-score for the hypothesis of
+no association. Also included are the <code>*.pw</code> functions that
+calculate MI between two vectors only. The <code>*njk</code> functions
+do not perform the jackknife and are therefore faster.</p>
+<p>The results of <code>dmi()</code> are in many ways similar to a
+correlation matrix, with each row and column index corresponding to a
+given variable.</p>
+<p>Exploring a group of categorical variables (from the examples in the
+documentation of the <code>dmi()</code> function).</p>
+<ul>
+<li><code>cyl</code> - Number of cylinders</li>
+<li><code>vs</code> - Engine (0 = V-shaped, 1 = straight)</li>
+<li><code>am</code> - Transmission (0 = automatic, 1 = manual)</li>
+<li><code>gear</code> - Number of forward gears</li>
+<li><code>carb</code> - Number of carburetors (a device used by a
+gasoline internal combustion engine to control and mix air and fuel
+entering the engine)</li>
+</ul>
+<pre class="r"><code>my_vars &lt;- c(&quot;cyl&quot;,&quot;vs&quot;,&quot;am&quot;,&quot;gear&quot;,&quot;carb&quot;)
+dat &lt;- mtcars[, my_vars]
+discresults &lt;- dmi(dat)
 
-n &lt;- 300
-Org &lt;- sample(c(&quot;Org1&quot;,&quot;Org2&quot;,&quot;Org3&quot;), n, replace=TRUE, prob=c(0.3, 0.4, 0.3))
-
-Cluster &lt;- character(n)
-for (i in 1:n) {
-  if (Org[i] == &quot;Org1&quot;) {
-    Cluster[i] &lt;- sample(c(&quot;C1&quot;,&quot;C2&quot;,&quot;C3&quot;,&quot;C4&quot;), 1, prob=c(0.6,0.2,0.1,0.1))
-  } else if (Org[i] == &quot;Org2&quot;) {
-    Cluster[i] &lt;- sample(c(&quot;C1&quot;,&quot;C2&quot;,&quot;C3&quot;,&quot;C4&quot;), 1, prob=c(0.2,0.5,0.2,0.1))
-  } else {
-    Cluster[i] &lt;- sample(c(&quot;C1&quot;,&quot;C2&quot;,&quot;C3&quot;,&quot;C4&quot;), 1, prob=c(0.1,0.1,0.3,0.5))
-  }
+add_names &lt;- function(res, names){
+  purrr::map(res, \(x){
+    row.names(x) &lt;- names
+    colnames(x) &lt;- names
+    x
+  })
 }
 
-df &lt;- data.frame(Cluster, Org)
-table(df$Cluster, df$Org)</code></pre>
-<pre><code>    
-     Org1 Org2 Org3
-  C1   58   30    5
-  C2   20   65    9
-  C3    8   21   22
-  C4    9   13   40</code></pre>
-<p>This function calculates MI and BCMI between a set of discrete
-variables held as columns in a matrix. It also performs jackknife bias
-correction and provides a z-score for the hypothesis of no association.
-Also included are the <em>.pw functions that calculate MI between two
-vectors only. The </em>njk functions do not perform the jackknife and
-are therefore faster.</p>
-<pre class="r"><code>dmi(df)</code></pre>
+add_names(discresults, my_vars)</code></pre>
 <pre><code>$mi
-          [,1]      [,2]
-[1,] 1.3537595 0.2110654
-[2,] 0.2110654 1.0748830
+           cyl         vs         am      gear      carb
+cyl  1.0612040 0.43120940 0.14523133 0.3634430 0.5097002
+vs   0.4312094 0.68531421 0.01417347 0.2036022 0.3123300
+am   0.1452313 0.01417347 0.67546458 0.4367718 0.1248672
+gear 0.3634430 0.20360224 0.43677177 1.0130227 0.2391776
+carb 0.5097002 0.31232996 0.12486719 0.2391776 1.4979575
 
 $bcmi
-          [,1]      [,2]
-[1,] 1.3587896 0.2006073
-[2,] 0.2006073 1.0782321
+           cyl           vs           am      gear       carb
+cyl  1.0939730  0.397633050  0.105802510 0.2755075 0.48789448
+vs   0.3976330  0.701457431 -0.003241008 0.1510687 0.29175135
+am   0.1058025 -0.003241008  0.691622603 0.4355686 0.08710974
+gear 0.2755075  0.151068658  0.435568574 1.0460800 0.16759348
+carb 0.4878945  0.291751354  0.087109744 0.1675935 1.61116674
 
 $zvalues
-          [,1]      [,2]
-[1,] 93.659447  5.547246
-[2,]  5.547246 85.356796</code></pre>
+           cyl         vs         am      gear      carb
+cyl  21.798246  3.3933783  1.0582216  2.244308  7.474051
+vs    3.393378 30.3263950 -0.1011464  1.223818  3.409049
+am    1.058222 -0.1011464 19.9920905  5.522984  1.381430
+gear  2.244308  1.2238177  5.5229835 14.478527  1.583226
+carb  7.474051  3.4090490  1.3814296  1.583226 10.791836</code></pre>
+<p>Two random variables.</p>
+<pre class="r"><code>set.seed(1984)
+n &lt;- 1000
+X &lt;- rbinom(n, 1, 0.5)
+Y &lt;- rbinom(n, 1, 0.5)
+xy &lt;- c(&#39;X&#39;, &#39;Y&#39;)
+
+my_mat &lt;- matrix(data = c(X,Y), nrow = n)
+add_names(dmi(my_mat), xy)</code></pre>
+<pre><code>$mi
+             X            Y
+X 0.6926971130 0.0008345847
+Y 0.0008345847 0.6923469671
+
+$bcmi
+             X            Y
+X 0.6931976142 0.0003330715
+Y 0.0003330715 0.6928474687
+
+$zvalues
+            X           Y
+X 729.7075031   0.2572701
+Y   0.2572701 547.0678525</code></pre>
+<p>80% of the time make Y the same as X; the other 20% of the time make
+Y 1 less than X.</p>
+<pre class="r"><code>set.seed(1984)
+n &lt;- 1000
+X &lt;- rbinom(n, 1, 0.5)
+Y &lt;- ifelse(runif(n) &lt; 0.8, X, 1 - X)
+xy &lt;- c(&#39;X&#39;, &#39;Y&#39;)
+
+my_mat &lt;- matrix(data = c(X,Y), nrow = n)
+add_names(dmi(my_mat), xy)</code></pre>
+<pre><code>$mi
+          X         Y
+X 0.6926971 0.2080063
+Y 0.2080063 0.6910978
+
+$bcmi
+          X         Y
+X 0.6931976 0.2075030
+Y 0.2075030 0.6915983
+
+$zvalues
+         X        Y
+X 729.7075  11.4776
+Y  11.4776 341.4429</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -767,6 +909,7 @@ loaded via a namespace (and not attached):
 [41] Rcpp_1.0.14        xfun_0.52          tidyselect_1.2.1   rstudioapi_0.17.1 
 [45] knitr_1.50         farver_2.1.2       htmltools_0.5.8.1  rmarkdown_2.29    
 [49] compiler_4.5.0     getPass_0.2-4     </code></pre>
+</div>
 </div>
 </div>
 </div>
