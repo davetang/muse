@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-09-04" />
+<meta name="date" content="2025-09-05" />
 
 <title>Using biomaRt to get homologues</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Using biomaRt to get homologues</h1>
-<h4 class="date">2025-09-04</h4>
+<h4 class="date">2025-09-05</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-09-04
+<strong>Last updated:</strong> 2025-09-05
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree87b461fd44f251e5d8f7bdb5373096006b966c98targetblank87b461fa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebfebc82656c660aa6ffde8340c4f83830ffecdc2targetblankbfebc82a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/87b461fd44f251e5d8f7bdb5373096006b966c98" target="_blank">87b461f</a>
+<a href="https://github.com/davetang/muse/tree/bfebc82656c660aa6ffde8340c4f83830ffecdc2" target="_blank">bfebc82</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree87b461fd44f251e5d8f7bdb5373096006b966c98targetblank87b461fa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebfebc82656c660aa6ffde8340c4f83830ffecdc2targetblankbfebc82a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/87b461fd44f251e5d8f7bdb5373096006b966c98" target="_blank">87b461f</a>.
+<a href="https://github.com/davetang/muse/tree/bfebc82656c660aa6ffde8340c4f83830ffecdc2" target="_blank">bfebc82</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -594,6 +594,7 @@ Untracked files:
     Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
     Untracked:  data/arab.rds
     Untracked:  data/astronomicalunit.csv
+    Untracked:  data/ensembl_113_human_mouse_homologues.csv
     Untracked:  data/femaleMiceWeights.csv
     Untracked:  m3/
 
@@ -643,6 +644,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/bfebc82656c660aa6ffde8340c4f83830ffecdc2/analysis/biomart_homologues.Rmd" target="_blank">bfebc82</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-05
+</td>
+<td>
+All human mouse homologues for Ensembl 113
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/2d0dd8f16c234b6e5c4dd6a55e48a47eae534796/docs/biomart_homologues.html" target="_blank">2d0dd8f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-04
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -811,6 +846,195 @@ mmusculus_homolog_perc_id_r1                   &quot;86.6197&quot;
 mmusculus_homolog_goc_score                    &quot;25&quot;                
 mmusculus_homolog_wga_coverage                 &quot;0&quot;                 
 mmusculus_homolog_orthology_confidence         &quot;0&quot;                 </code></pre>
+<p>I <a
+href="https://github.com/davetang/ensembldb?tab=readme-ov-file#database">manually
+slugged through the Compara database</a> and found that ENSG00000207721
+(MIR186) should have a one-to-one ortholog with ENSMUSG00000065431
+(Mir186).</p>
+<pre class="r"><code>my_gene &lt;- &#39;ENSG00000207721&#39;
+
+getBM(
+  attributes = wanted_attr,
+  filters = &quot;ensembl_gene_id&quot;,
+  values = my_gene,
+  mart = ensembl
+) -&gt; my_res
+
+t(my_res)</code></pre>
+<pre><code>                                               [,1]                
+ensembl_gene_id                                &quot;ENSG00000207721&quot;   
+mmusculus_homolog_ensembl_gene                 &quot;ENSMUSG00000065431&quot;
+mmusculus_homolog_associated_gene_name         &quot;Mir186&quot;            
+mmusculus_homolog_ensembl_peptide              &quot;ENSMUST00000083497&quot;
+mmusculus_homolog_chromosome                   &quot;3&quot;                 
+mmusculus_homolog_chrom_start                  &quot;157249916&quot;         
+mmusculus_homolog_chrom_end                    &quot;157249986&quot;         
+mmusculus_homolog_canonical_transcript_protein &quot;ENST00000384988&quot;   
+mmusculus_homolog_subtype                      &quot;Eutheria&quot;          
+mmusculus_homolog_orthology_type               &quot;ortholog_one2one&quot;  
+mmusculus_homolog_perc_id                      &quot;79.0698&quot;           
+mmusculus_homolog_perc_id_r1                   &quot;95.7747&quot;           
+mmusculus_homolog_goc_score                    NA                  
+mmusculus_homolog_wga_coverage                 &quot;100&quot;               
+mmusculus_homolog_orthology_confidence         &quot;1&quot;                 </code></pre>
+</div>
+<div id="older-release" class="section level2">
+<h2>Older release</h2>
+<p>List releases.</p>
+<pre class="r"><code>listEnsemblArchives()</code></pre>
+<pre><code>             name     date                                 url version
+1  Ensembl GRCh37 Feb 2014          https://grch37.ensembl.org  GRCh37
+2     Ensembl 115 Sep 2025 https://sep2025.archive.ensembl.org     115
+3     Ensembl 114 May 2025 https://may2025.archive.ensembl.org     114
+4     Ensembl 113 Oct 2024 https://oct2024.archive.ensembl.org     113
+5     Ensembl 112 May 2024 https://may2024.archive.ensembl.org     112
+6     Ensembl 111 Jan 2024 https://jan2024.archive.ensembl.org     111
+7     Ensembl 110 Jul 2023 https://jul2023.archive.ensembl.org     110
+8     Ensembl 109 Feb 2023 https://feb2023.archive.ensembl.org     109
+9     Ensembl 108 Oct 2022 https://oct2022.archive.ensembl.org     108
+10    Ensembl 107 Jul 2022 https://jul2022.archive.ensembl.org     107
+11    Ensembl 106 Apr 2022 https://apr2022.archive.ensembl.org     106
+12    Ensembl 105 Dec 2021 https://dec2021.archive.ensembl.org     105
+13    Ensembl 104 May 2021 https://may2021.archive.ensembl.org     104
+14    Ensembl 103 Feb 2021 https://feb2021.archive.ensembl.org     103
+15    Ensembl 102 Nov 2020 https://nov2020.archive.ensembl.org     102
+16    Ensembl 101 Aug 2020 https://aug2020.archive.ensembl.org     101
+17    Ensembl 100 Apr 2020 https://apr2020.archive.ensembl.org     100
+18     Ensembl 80 May 2015 https://may2015.archive.ensembl.org      80
+19     Ensembl 77 Oct 2014 https://oct2014.archive.ensembl.org      77
+20     Ensembl 75 Feb 2014 https://feb2014.archive.ensembl.org      75
+21     Ensembl 54 May 2009 https://may2009.archive.ensembl.org      54
+   current_release
+1                 
+2                *
+3                 
+4                 
+5                 
+6                 
+7                 
+8                 
+9                 
+10                
+11                
+12                
+13                
+14                
+15                
+16                
+17                
+18                
+19                
+20                
+21                </code></pre>
+<p>Use Ensembl 113.</p>
+<pre class="r"><code>ensembl &lt;- useMart(
+  &quot;ENSEMBL_MART_ENSEMBL&quot;,
+  dataset=avail_datasets[idx, &#39;dataset&#39;],
+  host = &quot;https://oct2024.archive.ensembl.org&quot;
+)</code></pre>
+<p>Check again.</p>
+<pre class="r"><code>my_gene &lt;- &#39;ENSG00000207721&#39;
+
+getBM(
+  attributes = wanted_attr,
+  filters = &quot;ensembl_gene_id&quot;,
+  values = my_gene,
+  mart = ensembl
+) -&gt; my_res
+
+t(my_res)</code></pre>
+<pre><code>                                               [,1]                
+ensembl_gene_id                                &quot;ENSG00000207721&quot;   
+mmusculus_homolog_ensembl_gene                 &quot;ENSMUSG00000065431&quot;
+mmusculus_homolog_associated_gene_name         &quot;Mir186&quot;            
+mmusculus_homolog_ensembl_peptide              &quot;ENSMUST00000083497&quot;
+mmusculus_homolog_chromosome                   &quot;3&quot;                 
+mmusculus_homolog_chrom_start                  &quot;157249916&quot;         
+mmusculus_homolog_chrom_end                    &quot;157249986&quot;         
+mmusculus_homolog_canonical_transcript_protein &quot;ENST00000384988&quot;   
+mmusculus_homolog_subtype                      &quot;Eutheria&quot;          
+mmusculus_homolog_orthology_type               &quot;ortholog_one2one&quot;  
+mmusculus_homolog_perc_id                      &quot;79.0698&quot;           
+mmusculus_homolog_perc_id_r1                   &quot;95.7747&quot;           
+mmusculus_homolog_goc_score                    NA                  
+mmusculus_homolog_wga_coverage                 &quot;100&quot;               
+mmusculus_homolog_orthology_confidence         &quot;1&quot;                 </code></pre>
+<p>Get all human genes for Ensembl 113.</p>
+<pre class="r"><code>all_genes_113 &lt;- getBM(
+  attributes = &quot;ensembl_gene_id&quot;,
+  mart = ensembl
+)
+
+length(unique(all_genes_113$ensembl_gene_id))</code></pre>
+<pre><code>[1] 86402</code></pre>
+<p>Get all homologues.</p>
+<pre class="r"><code>getBM(
+  attributes = wanted_attr,
+  filters = &quot;ensembl_gene_id&quot;,
+  values = all_genes_113$ensembl_gene_id,
+  mart = ensembl
+) -&gt; human_mouse_homologues
+
+dim(human_mouse_homologues)</code></pre>
+<pre><code>[1] 92787    15</code></pre>
+<p>Check out the results!</p>
+<pre class="r"><code>head(human_mouse_homologues)</code></pre>
+<pre><code>  ensembl_gene_id mmusculus_homolog_ensembl_gene
+1 ENSG00000000003             ENSMUSG00000067377
+2 ENSG00000000005             ENSMUSG00000031250
+3 ENSG00000000419             ENSMUSG00000078919
+4 ENSG00000000457             ENSMUSG00000026584
+5 ENSG00000000460             ENSMUSG00000041406
+6 ENSG00000000938             ENSMUSG00000028874
+  mmusculus_homolog_associated_gene_name mmusculus_homolog_ensembl_peptide
+1                                 Tspan6                ENSMUSP00000084838
+2                                   Tnmd                ENSMUSP00000033602
+3                                   Dpm1                ENSMUSP00000118776
+4                                  Scyl3                ENSMUSP00000027876
+5                                  Firrm                ENSMUSP00000095101
+6                                    Fgr                ENSMUSP00000030693
+  mmusculus_homolog_chromosome mmusculus_homolog_chrom_start
+1                            X                     132791817
+2                            X                     132751729
+3                            2                     168050968
+4                            1                     163756669
+5                            1                     163773562
+6                            4                     132701406
+  mmusculus_homolog_chrom_end mmusculus_homolog_canonical_transcript_protein
+1                   132799178                                ENSP00000362111
+2                   132766326                                ENSP00000362122
+3                   168072511                                ENSP00000360644
+4                   163782695                                ENSP00000356745
+5                   163822365                                ENSP00000352276
+6                   132729221                                ENSP00000363117
+  mmusculus_homolog_subtype mmusculus_homolog_orthology_type
+1          Euarchontoglires                 ortholog_one2one
+2          Euarchontoglires                 ortholog_one2one
+3                  Eutheria                 ortholog_one2one
+4          Euarchontoglires                 ortholog_one2one
+5          Euarchontoglires                 ortholog_one2one
+6          Euarchontoglires                 ortholog_one2one
+  mmusculus_homolog_perc_id mmusculus_homolog_perc_id_r1
+1                   93.0612                      93.0612
+2                   96.2145                      96.2145
+3                   91.1538                      91.1538
+4                   82.8488                      77.5510
+5                   72.0985                      66.3430
+6                   83.9319                      85.8801
+  mmusculus_homolog_goc_score mmusculus_homolog_wga_coverage
+1                         100                         100.00
+2                         100                         100.00
+3                         100                         100.00
+4                         100                         100.00
+5                           0                          99.21
+6                         100                         100.00
+  mmusculus_homolog_orthology_confidence
+1                                      1
+2                                      1
+3                                      1
+4                                      1
+5                                      1
+6                                      1</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
