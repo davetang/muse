@@ -104,3 +104,85 @@ getBM(
 
 t(my_res)
 ```
+
+I [manually slugged through the Compara database](https://github.com/davetang/ensembldb?tab=readme-ov-file#database) and found that ENSG00000207721 (MIR186) should have a one-to-one ortholog with ENSMUSG00000065431 (Mir186).
+
+```{r mir186}
+my_gene <- 'ENSG00000207721'
+
+getBM(
+  attributes = wanted_attr,
+  filters = "ensembl_gene_id",
+  values = my_gene,
+  mart = ensembl
+) -> my_res
+
+t(my_res)
+```
+
+## Older release
+
+List releases.
+
+```{r list_archives}
+listEnsemblArchives()
+```
+
+Use Ensembl 113.
+
+```{r use_ensembl_113}
+ensembl <- useMart(
+  "ENSEMBL_MART_ENSEMBL",
+  dataset=avail_datasets[idx, 'dataset'],
+  host = "https://oct2024.archive.ensembl.org"
+)
+```
+
+Check again.
+
+```{r mir186_113}
+my_gene <- 'ENSG00000207721'
+
+getBM(
+  attributes = wanted_attr,
+  filters = "ensembl_gene_id",
+  values = my_gene,
+  mart = ensembl
+) -> my_res
+
+t(my_res)
+```
+
+Get all human genes for Ensembl 113.
+
+```{r all_genes_113}
+all_genes_113 <- getBM(
+  attributes = "ensembl_gene_id",
+  mart = ensembl
+)
+
+length(unique(all_genes_113$ensembl_gene_id))
+```
+
+Get all homologues.
+
+```{r human_mouse_homologues}
+getBM(
+  attributes = wanted_attr,
+  filters = "ensembl_gene_id",
+  values = all_genes_113$ensembl_gene_id,
+  mart = ensembl
+) -> human_mouse_homologues
+
+dim(human_mouse_homologues)
+```
+
+Check out the results!
+
+```{r check_out_human_mouse_homologues}
+head(human_mouse_homologues)
+```
+
+```{r include=FALSE, eval=FALSE}
+readr::write_csv(x = human_mouse_homologues, file = "../data/ensembl_113_human_mouse_homologues.csv")
+```
