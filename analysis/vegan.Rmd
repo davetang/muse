@@ -1,0 +1,57 @@
+---
+title: "Community Ecology Package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(vegan))
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+The [{vegan} package](https://cran.r-project.org/web/packages/vegan/index.html) contains "Ordination methods, diversity analysis and other functions for community and vegetation ecologists."
+
+## Setup
+
+Install {vegan}.
+
+```{r install_irr, eval=FALSE}
+install.packages("vegan")
+```
+
+## Horn-Morisita index
+
+`?vegdist`:
+
+> The function computes dissimilarity indices that are useful for or popular with community ecologists. All indices use quantitative data, although they would be named by the corresponding binary index, but you can calculate the binary index using an appropriate argument. If you do not find your favourite index here, you can see if it can be implemented using designdist. Gower, Bray–Curtis, Jaccard and Kulczynski indices are good in detecting underlying ecological gradients (Faith et al. 1987). Morisita, Horn–Morisita, Binomial, Cao and Chao indices should be able to handle different sample sizes (Wolda 1981, Krebs 1999, Anderson & Millar 2004), and Mountford (1962) and Raup-Crick indices for presence–absence data should be able to handle unknown (and variable) sample sizes. Most of these indices are discussed by Krebs (1999) and Legendre & Legendre (2012), and their properties further compared by Wolda (1981) and Legendre & De Cáceres (2012). Aitchison (1986) distance is equivalent to Euclidean distance between CLR-transformed samples ("clr") and deals with positive compositional data. Robust Aitchison distance by Martino et al. (2019) uses robust CLR ("rlcr"), making it applicable to non-negative data including zeroes (unlike the standard Aitchison).
+
+Methods include: "manhattan", "euclidean", "canberra", "clark", "bray", "kulczynski", "jaccard", "gower", "altGower", "morisita", "horn", "mountford", "raup", "binomial", "chao", "cao", "mahalanobis", "chisq", "chord", "hellinger", "aitchison", or "robust.aitchison".
+
+Morisita index can be used with genuine count data (integers) only. Its Horn–Morisita variant is able to handle any abundance data.
+
+The abbreviation "horn" for the Horn–Morisita index is misleading, since there is a separate Horn index. The abbreviation will be changed if that index is implemented in vegan.
+
+`?varespec`:
+
+* The varespec data frame has 24 rows and 44 columns.
+* Columns are estimated cover values of 44 species.
+* Rows are sites.
+* The variable names are formed from the scientific names, and are self explanatory for anybody familiar with the vegetation type.
+
+```{r varespec}
+data(varespec)
+varespec[1:6, 1:6]
+```
+
+Horn-Morisita dissimilarity indices for the first six sites.
+
+```{r varespec_horn}
+vegdist(varespec[1:6, ], method = "horn")
+```
