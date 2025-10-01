@@ -1,0 +1,51 @@
+---
+title: "Schwartz circumplex"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages(library(tidyverse))
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r circumplex}
+basic_values <- c(
+  'Universalism',
+  'Benevolence',
+  'Conformity/Tradition',
+  'Security',
+  'Power',
+  'Achievement',
+  'Hedonism',
+  'Stimulation',
+  'Self-direction'
+)
+
+my_df <- data.frame(
+  label = basic_values,
+  value = rep(1, length(basic_values))
+) |>
+  mutate(
+    frac = value / sum(value),
+    ymax = cumsum(frac),
+    ymin = c(0, head(ymax, -1)),
+    label_pos = (ymax + ymin) / 2
+  )
+
+ggplot(my_df, aes(x = 1, y = frac, fill = label)) +
+  geom_bar(stat = "identity", width = 1, color = "white") +
+  coord_polar(theta = "y") +
+  geom_text(
+    aes(x = 1.15, y = label_pos, label = label),
+    color = "black",
+    size = 3.5,
+    fontface = "bold"
+  ) +
+  theme_void() +
+  theme(legend.position = "none")
+```
