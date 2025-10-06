@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree59c93924f62a7e935728e6938ae06cc3755bca1ftargetblank59c9392a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree47f216042676ac167dc6a1546532b00f4b77fe48targetblank47f2160a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/59c93924f62a7e935728e6938ae06cc3755bca1f" target="_blank">59c9392</a>
+<a href="https://github.com/davetang/muse/tree/47f216042676ac167dc6a1546532b00f4b77fe48" target="_blank">47f2160</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree59c93924f62a7e935728e6938ae06cc3755bca1ftargetblank59c9392a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree47f216042676ac167dc6a1546532b00f4b77fe48targetblank47f2160a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/59c93924f62a7e935728e6938ae06cc3755bca1f" target="_blank">59c9392</a>.
+<a href="https://github.com/davetang/muse/tree/47f216042676ac167dc6a1546532b00f4b77fe48" target="_blank">47f2160</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -642,6 +642,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/47f216042676ac167dc6a1546532b00f4b77fe48/analysis/rater.Rmd" target="_blank">47f2160</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-10-06
+</td>
+<td>
+Manually calculate Fleiss’ Kappa
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/a8d6f16fc4428f42f033541e5445f6622d728b93/docs/rater.html" target="_blank">a8d6f16</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-10-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -830,6 +864,38 @@ dim(diagnoses)</code></pre>
 
         z = 17.7 
   p-value = 0 </code></pre>
+<p>Manually calculate.</p>
+<pre class="r"><code>lapply(diagnoses, \(x) as.integer(sub(&quot;\\. .*&quot;, &quot;&quot;, x))) |&gt;
+  as.data.frame() |&gt;
+  as.matrix() -&gt; ratings
+
+# patients
+N &lt;- nrow(ratings)
+# doctors
+n &lt;- ncol(ratings)
+
+cats &lt;- sort(unique(as.numeric(ratings)))
+
+# build item × category counts
+counts &lt;- t(apply(ratings, 1, function(row) {
+  tab &lt;- table(factor(row, levels = cats))
+  as.integer(tab)
+}))
+colnames(counts) &lt;- cats
+  
+# category proportions across all items
+p_j &lt;- colSums(counts) / (N * n)
+
+# agreement per item
+P_i &lt;- (rowSums(counts^2) - n) / (n * (n - 1))
+
+# observed and expected agreement
+P_bar &lt;- mean(P_i)
+P_e &lt;- sum(p_j^2)
+
+fkappa &lt;- (P_bar - P_e) / (1 - P_e)
+fkappa</code></pre>
+<pre><code>[1] 0.4302445</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
