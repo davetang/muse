@@ -140,3 +140,38 @@ Fleiss' Kappa.
 ```{r fleiss_kappa}
 kappam.fleiss(diagnoses)
 ```
+
+Manually calculate.
+
+```{r fleiss_kappa_manual}
+lapply(diagnoses, \(x) as.integer(sub("\\. .*", "", x))) |>
+  as.data.frame() |>
+  as.matrix() -> ratings
+
+# patients
+N <- nrow(ratings)
+# doctors
+n <- ncol(ratings)
+
+cats <- sort(unique(as.numeric(ratings)))
+
+# build item × category counts
+counts <- t(apply(ratings, 1, function(row) {
+  tab <- table(factor(row, levels = cats))
+  as.integer(tab)
+}))
+colnames(counts) <- cats
+  
+# category proportions across all items
+p_j <- colSums(counts) / (N * n)
+
+# agreement per item
+P_i <- (rowSums(counts^2) - n) / (n * (n - 1))
+
+# observed and expected agreement
+P_bar <- mean(P_i)
+P_e <- sum(p_j^2)
+
+fkappa <- (P_bar - P_e) / (1 - P_e)
+fkappa
+```
