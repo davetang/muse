@@ -1,0 +1,142 @@
+---
+title: "Inter-rater reliability"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(irr)
+})
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Measures of inter-rater reliability (IRR) provide an index indicating how much agreement there is between raters/observers, correcting for agreement that would happen just by chance.
+
+## Packages
+
+Install {irr}.
+
+```{r install_irr, eval=FALSE}
+install.packages("irr")
+```
+
+## Cohen's Kappa
+
+Measures agreement between two raters who classify items into **categories**.
+
+* $\kappa$ = 1 means a perfect agreement.
+* $\kappa$ = 0 means agreement no better than chance.
+* $\kappa$ < 0 means worse than chance, i.e., systematic disagreement.
+ 
+$$ 
+\kappa = \frac{P_o - P_e}{1 - P_e}
+$$
+
+where
+
+* $P_o$ = observed agreement (proportion of times both raters agree).
+* $P_e$ = expected agreement by chance.
+
+```{r cohen_kappa}
+cohen_kappa <- function(x, y) {
+  stopifnot(length(x) == length(y))
+  
+  confusion_matrix <- table(x, y)
+  n <- sum(confusion_matrix)
+  
+  P_o <- sum(diag(confusion_matrix)) / n
+  
+  row_marginals <- rowSums(confusion_matrix) / n
+  col_marginals <- colSums(confusion_matrix) / n
+  P_e <- sum(row_marginals * col_marginals)
+  
+  kappa <- (P_o - P_e) / (1 - P_e)
+  return(list(
+    kappa = kappa,
+    observed = P_o,
+    expected = P_e,
+    confusion_matrix = confusion_matrix
+  ))
+}
+```
+
+Agreement between two doctors on 50 patients.
+
+|                      | Doctor 2: Disease | Doctor 2: No Disease | Row Total    |
+| -------------------- | ----------------- | -------------------- | ------------ |
+| Doctor 1: Disease    | 15                | 5                    | 20           |
+| Doctor 1: No Disease | 10                | 20                   | 30           |
+| Column Total         | 25                | 25                   | 50           |
+
+
+Total agreement = 15 + 20 = 35.
+
+$$
+P_o = \frac{35}{50} = 0.70 \quad \text{(70% agreement observed)}
+$$
+
+How much agreement would we expect just by chance, given how often each doctor says "Disease" versus "No Disease"?
+
+* Doctor 1 says "Disease" 20/50 = 0.40
+* Doctor 1 says "No Disease" 30/50 = 0.60
+* Doctor 2 says "Disease" 25/50 = 0.50
+* Doctor 2 says "No Disease" 25/50 = 0.50
+
+Now multiply matching probabilities:
+
+* Chance both say "Disease" = 0.40 × 0.50 = 0.20
+* Chance both say "No Disease" = 0.60 × 0.50 = 0.30
+
+Expected agreement = 0.20 + 0.30 = 0.50 (50%)
+
+Now calculate Cohen's Kappa manually:
+
+$$
+\kappa = \frac{Po - Pe}{1 - Pe} = \frac{0.70 - 0.50}{1 - 0.50} = \frac{0.20}{0.50} = 0.40
+$$
+
+Using our function and `irr::kappa2()`.
+
+```{r cohen_kappa_eg}
+doc1 <- c(rep('D', 15), rep('N', 20), rep('N', 10), rep('D', 5))
+doc2 <- c(rep('D', 15), rep('N', 20), rep('D', 10), rep('N', 5))
+
+cohen_kappa(doc1, doc2)$kappa
+irr::kappa2(data.frame(x = doc1, y = doc2))
+```
+
+## Fleiss' Kappa
+
+Generalises Cohen's Kappa to **more than two raters**. Each item is rated by *k* raters (not necessarily the same raters for every item). Compute the agreement per item, then average across items, correcting for chance.
+
+$$
+\kappa = \frac{\bar{P} - \bar{P_e}}{1 - \bar{P_e}}
+$$
+
+where
+
+* $\bar{P}$ = mean observed agreement across items.
+* $\bar{P_e}$ = mean expected agreement by chance.
+
+Data:
+
+> Psychiatric diagnoses of n=30 patients provided by different sets of m=6 raters. Data were used by Fleiss (1971) to illustrate the computation of Kappa for m raters.
+
+```{r diagnoses}
+data(diagnoses)
+dim(diagnoses)
+```
+
+Fleiss' Kappa.
+
+```{r fleiss_kappa}
+kappam.fleiss(diagnoses)
+```
