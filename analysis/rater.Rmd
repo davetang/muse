@@ -175,3 +175,20 @@ P_e <- sum(p_j^2)
 fkappa <- (P_bar - P_e) / (1 - P_e)
 fkappa
 ```
+
+## Random
+
+Since the expected number of agreements is taken into consideration, random guesses should result in a Kappa close to zero.
+
+```{r cohen_kappa_random}
+set.seed(1984)
+replicate(
+  100, 
+  {
+    a <- rbinom(n = 100, size = 1, prob = 0.5)
+    b <- rbinom(n = 100, size = 1, prob = 0.5)
+    irr::kappa2(data.frame(a, b))$value
+  }
+) |>
+  mean()
+```
