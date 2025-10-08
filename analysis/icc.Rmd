@@ -9,14 +9,18 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-suppressPackageStartupMessages(library(tidyverse))
-suppressPackageStartupMessages(library(irr))
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(irr)
+})
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Introduction
 
 > [In statistics](https://en.wikipedia.org/wiki/Intraclass_correlation), the intraclass correlation, or the intraclass correlation coefficient (ICC), is a descriptive statistic that can be used when quantitative measurements are made on units that are organized into groups. It describes how strongly units in the same group resemble each other. While it is viewed as a type of correlation, unlike most other correlation measures, it operates on data structured as groups rather than data structured as paired observations.
+
+For categorical data use [Cohen's or Fleiss' Kappa ](rater.html).
 
 ## Setup
 
@@ -61,4 +65,20 @@ Low agreement.
 
 ```{r_twoway_agreement}
 icc(cbind(r1, r2, r3), "twoway", "agreement")
+```
+
+## Random
+
+What values would we expect from random ratings?
+
+```{r random_ratings}
+set.seed(1984)
+replicate(
+  n = 100,
+  expr = {
+    x <- sample(x = 1:100, size = 100)
+    y <- sample(x = 1:100, size = 100)
+    icc(cbind(x, y))$value
+  }) |>
+  mean()
 ```
