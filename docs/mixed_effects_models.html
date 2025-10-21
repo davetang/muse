@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree96acdc584f3a8e3b924741d32078a74740ff7329targetblank96acdc5a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec20a3880b4cac31444dcf80cca0340b741e4e941targetblankc20a388a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/96acdc584f3a8e3b924741d32078a74740ff7329" target="_blank">96acdc5</a>
+<a href="https://github.com/davetang/muse/tree/c20a3880b4cac31444dcf80cca0340b741e4e941" target="_blank">c20a388</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree96acdc584f3a8e3b924741d32078a74740ff7329targetblank96acdc5a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec20a3880b4cac31444dcf80cca0340b741e4e941targetblankc20a388a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/96acdc584f3a8e3b924741d32078a74740ff7329" target="_blank">96acdc5</a>.
+<a href="https://github.com/davetang/muse/tree/c20a3880b4cac31444dcf80cca0340b741e4e941" target="_blank">c20a388</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -643,6 +643,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/c20a3880b4cac31444dcf80cca0340b741e4e941/analysis/mixed_effects_models.Rmd" target="_blank">c20a388</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-10-21
+</td>
+<td>
+Random effects specification in R’s formula syntax
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/238e4062e173a8ce7473f174344c033f676cda0a/docs/mixed_effects_models.html" target="_blank">238e406</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-10-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -757,6 +791,43 @@ head(sleepstudy)</code></pre>
   ) +
   theme(legend.position = &quot;none&quot;)</code></pre>
 <p><img src="figure/mixed_effects_models.Rmd/sleepstudy_by_subject-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-sleepstudy_by_subject-1">
+Past versions of sleepstudy_by_subject-1.png
+</button>
+</p>
+<div id="fig-sleepstudy_by_subject-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/238e4062e173a8ce7473f174344c033f676cda0a/docs/figure/mixed_effects_models.Rmd/sleepstudy_by_subject-1.png" target="_blank">238e406</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-10-21
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Fit a simple linear model (no random effects).</p>
 <pre class="r"><code>lm_model &lt;- lm(Reaction ~ Days, data = sleepstudy)
 summary(lm_model)</code></pre>
@@ -813,7 +884,16 @@ Days -0.371</code></pre>
 <li><code>Days</code> - A <strong>fixed effect</strong> (predictor that
 applies to everyone).</li>
 <li><code>(1 | Subject)</code> - A <strong>random effect</strong> where
-each Subject has their own intercept.</li>
+each Subject has their own intercept.
+<ul>
+<li><code>lme4::lmer()</code> (and similar functions), random effects
+always have the structure:
+<code>(random effects terms | grouping factor)</code></li>
+<li><code>(1 | Subject)</code> means allow the intercept (1) to vary by
+<code>Subject</code>; in a model formula, 1 represents the intercept
+term, which is the baseline level of the response variable when all
+predictors = 0.</li>
+</ul></li>
 <li><code>+</code> - Combine fixed and random effects.</li>
 </ul>
 <p>The model says:</p>
