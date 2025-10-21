@@ -102,6 +102,8 @@ summary(m1)
 * `Reaction` - The **response variable** (dependent variable).
 * `Days` - A **fixed effect** (predictor that applies to everyone).
 * `(1 | Subject)` - A **random effect** where each Subject has their own intercept.
+    * `lme4::lmer()` (and similar functions), random effects always have the structure: `(random effects terms | grouping factor)`
+    * `(1 | Subject)` means allow the intercept (1) to vary by `Subject`; in a model formula, 1 represents the intercept term, which is the baseline level of the response variable when all predictors = 0.
 * `+` - Combine fixed and random effects.
 
 The model says:
