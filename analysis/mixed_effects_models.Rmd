@@ -1,0 +1,122 @@
+---
+title: "Mixed-effects models"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+})
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Mixed-effects models (also known as multilevel models, hierarchical models, or random-effects models) are extensions of linear regression that account for both fixed and random effects.
+
+Given students’ test scores across multiple schools:
+
+* Fixed effects are predictors that apply to everyone such as the effect of study hours.
+* Random effects are effects that vary across groups such as school-to-school differences.
+
+Each school might have a slightly different average score (intercept) or respond differently to study hours (slope).
+
+Mixed-effects models handle this by modeling:
+
+$$
+\text{Score}*{ij} = \beta_0 + \beta_1 \text{Hours}*{ij} + u_{0j} + \epsilon_{ij}
+$$
+
+where:
+
+* $( j )$: the group index, i.e., the school.
+* $( i )$: the individual (observation) index within each group, i.e., the student within school $( j )$.
+
+Each school $( j )$ has its own intercept $( u_{0j} )$ that represents how that school's mean score differs from the overall population mean $( \beta_0 )$.
+
+Each student $( i )$ within that school has their own hours studied ($( \text{Hours}*{ij} )$) and residual error ($( \epsilon_{ij} )$).
+
+## Random effects
+
+A random effect is a variable whose levels are drawn from a larger population, not specifically fixed.
+
+For instance:
+
+* If we measured 10 schools, they are a sample from all possible schools.
+* We assume their effects (intercepts/slopes) come from a distribution (often Normal).
+
+**Random effects account for correlation among observations within the same group and share information across groups**.
+
+## Example in R
+
+Install dependencies.
+
+```{r install_libraries, eval=FALSE}
+install.packages("lme4")
+```
+
+Example data: Reaction times in a sleep deprivation study.
+
+> These data are from the study described in Belenky et al. (2003), for the most sleep-deprived group (3 hours time-in-bed) and for the first 10 days of the study, up to the recovery period. The original study analyzed speed (1/(reaction time)) and treated day as a categorical rather than a continuous predictor.
+
+```{r sleepstudy}
+library(lme4)
+data("sleepstudy")
+head(sleepstudy)
+```
+
+Visualise the data.
+
+```{r sleepstudy_by_subject}
+ggplot(sleepstudy, aes(x = Days, y = Reaction, group = Subject, colour = Subject)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  labs(
+    title = "Reaction Time over Days of Sleep Deprivation",
+    y = "Average reaction time (ms)",
+    x = "Number of days of sleep deprivation"
+  ) +
+  theme(legend.position = "none")
+```
+
+Fit a simple linear model (no random effects).
+
+```{r lm_model}
+lm_model <- lm(Reaction ~ Days, data = sleepstudy)
+summary(lm_model)
+```
+
+This assumes everyone has the same intercept and slope but each subject behaves differently.
+
+Fit a mixed-effects model (random intercepts).
+
+```{r m1}
+m1 <- lmer(Reaction ~ Days + (1 | Subject), data = sleepstudy)
+summary(m1)
+```
+
+* `Reaction` - The **response variable** (dependent variable).
+* `Days` - A **fixed effect** (predictor that applies to everyone).
+* `(1 | Subject)` - A **random effect** where each Subject has their own intercept.
+* `+` - Combine fixed and random effects.
+
+The model says:
+
+$$
+\text{Reaction}*{ij} = \beta_0 + \beta_1 \text{Days}*{ij} + u_{0j} + \epsilon_{ij}
+$$
+
+where:
+
+* $( i )$ = measurement within subject ( j ).
+* $( j )$ = subject.
+* $( \beta_0 )$: population-level intercept (average reaction time at Day 0).
+* $( \beta_1 )$: population-level slope (effect of each additional day).
+* $( u_{0j} )$: random intercept (how much each subject deviates from the average intercept).
+* $( \epsilon_{ij} )$: residual error.
+
+Each subject has their *own baseline* reaction time, but we assume the *same slope* (same rate of slowing down).
