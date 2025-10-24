@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2023-11-01" />
+<meta name="date" content="2025-10-24" />
 
 <title>Making a heatmap in R with the ComplexHeatmap package</title>
 
-<script src="site_libs/header-attrs-2.25/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -30,11 +30,14 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -232,6 +235,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -239,6 +305,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -284,7 +360,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">Making a heatmap in R with the
 ComplexHeatmap package</h1>
-<h4 class="date">2023-11-01</h4>
+<h4 class="date">2025-10-24</h4>
 
 </div>
 
@@ -313,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-11-01
+<strong>Last updated:</strong> 2025-10-24
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -444,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3e13eb5e0942531a2f1c3e7527b8f2c0b014b819targetblank3e13eb5a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree89151645dfe9a7bc39a7e213ab5c57e34c5d724ctargetblank8915164a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/3e13eb5e0942531a2f1c3e7527b8f2c0b014b819" target="_blank">3e13eb5</a>
+<a href="https://github.com/davetang/muse/tree/89151645dfe9a7bc39a7e213ab5c57e34c5d724c" target="_blank">8915164</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3e13eb5e0942531a2f1c3e7527b8f2c0b014b819targetblank3e13eb5a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree89151645dfe9a7bc39a7e213ab5c57e34c5d724ctargetblank8915164a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -462,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/3e13eb5e0942531a2f1c3e7527b8f2c0b014b819" target="_blank">3e13eb5</a>.
+<a href="https://github.com/davetang/muse/tree/89151645dfe9a7bc39a7e213ab5c57e34c5d724c" target="_blank">8915164</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -477,27 +553,53 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
-    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    analysis/cbioportal_cache/
-    Ignored:    r_packages_4.3.2/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.4.1/
+    Ignored:    r_packages_4.5.0/
 
 Untracked files:
-    Untracked:  analysis/cell_ranger.Rmd
-    Untracked:  analysis/sleuth.Rmd
-    Untracked:  analysis/tss_xgboost.Rmd
-    Untracked:  code/multiz100way/
-    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
-    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
-    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
-    Untracked:  data/ncrna_noncode_v3.fa
-    Untracked:  data/netmhciipan.out.gz
-    Untracked:  export/davetang039sblog.WordPress.2023-06-30.xml
-    Untracked:  export/output/
-    Untracked:  women.json
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  m3/
 
 Unstaged changes:
-    Modified:   analysis/graph.Rmd
+    Modified:   analysis/isoform_switch_analyzer.Rmd
 
 </code></pre>
 <p>
@@ -512,7 +614,6 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
 These are the previous versions of the repository in which changes were
 made to the R Markdown (<code>analysis/complex_heatmap.Rmd</code>) and
@@ -548,6 +649,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/89151645dfe9a7bc39a7e213ab5c57e34c5d724c/analysis/complex_heatmap.Rmd" target="_blank">8915164</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-10-24
+</td>
+<td>
+You can make UpSet plots with ComplexHeatmap
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/7b31570c5ea892a36be5fac1562770d6eb5fc70f/docs/complex_heatmap.html" target="_blank">7b31570</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/3e13eb5e0942531a2f1c3e7527b8f2c0b014b819/analysis/complex_heatmap.Rmd" target="_blank">3e13eb5</a>
 </td>
 <td>
@@ -567,10 +702,16 @@ ComplexHeatmap
 </div>
 </div>
 </div>
-<p>Install latest version from GitHub.</p>
-<pre class="r"><code>remotes::install_github(&quot;jokergoo/ComplexHeatmap&quot;)</code></pre>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>Install stable version from <a
+href="https://bioconductor.org/packages/release/bioc/html/ComplexHeatmap.html">Bioconductor</a>.</p>
+<pre class="r"><code>BiocManager::install(&quot;ComplexHeatmap&quot;)</code></pre>
 <p>Load library.</p>
 <pre class="r"><code>library(ComplexHeatmap)</code></pre>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
 <p>Download example data.</p>
 <pre class="r"><code>example_file &lt;- &quot;https://davetang.org/file/TagSeqExample.tab&quot;
 data &lt;- read.delim(example_file, header = TRUE, row.names = &quot;gene&quot;)
@@ -580,6 +721,43 @@ dim(data_subset)</code></pre>
 <p>Default heatmap for ComplexHeatmap.</p>
 <pre class="r"><code>Heatmap(data_subset)</code></pre>
 <p><img src="figure/complex_heatmap.Rmd/default_heatmap-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-default_heatmap-1">
+Past versions of default_heatmap-1.png
+</button>
+</p>
+<div id="fig-default_heatmap-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/7b31570c5ea892a36be5fac1562770d6eb5fc70f/docs/figure/complex_heatmap.Rmd/default_heatmap-1.png" target="_blank">7b31570</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Normalise using z-score.</p>
 <pre class="r"><code>cal_z_score &lt;- function(x){
   (x - mean(x)) / sd(x)
@@ -588,16 +766,127 @@ dim(data_subset)</code></pre>
 data_subset_norm &lt;- t(apply(data_subset, 1, cal_z_score))
 Heatmap(data_subset_norm)</code></pre>
 <p><img src="figure/complex_heatmap.Rmd/default_heatmap_norm-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-default_heatmap_norm-1">
+Past versions of default_heatmap_norm-1.png
+</button>
+</p>
+<div id="fig-default_heatmap_norm-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/7b31570c5ea892a36be5fac1562770d6eb5fc70f/docs/figure/complex_heatmap.Rmd/default_heatmap_norm-1.png" target="_blank">7b31570</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Add a title using <code>column_title</code>; the <code>name</code>
 parameter puts a title of the heatmap legend.</p>
 <pre class="r"><code>Heatmap(data_subset_norm, column_title = &quot;My title&quot;, name = &quot;Legend&quot;)</code></pre>
 <p><img src="figure/complex_heatmap.Rmd/pheatmap_title_main-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-pheatmap_title_main-1">
+Past versions of pheatmap_title_main-1.png
+</button>
+</p>
+<div id="fig-pheatmap_title_main-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/7b31570c5ea892a36be5fac1562770d6eb5fc70f/docs/figure/complex_heatmap.Rmd/pheatmap_title_main-1.png" target="_blank">7b31570</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Two heatmaps.</p>
 <pre class="r"><code>one &lt;- Heatmap(data_subset, column_title = &quot;Raw&quot;, name = &quot;Raw&quot;)
 two &lt;- Heatmap(data_subset_norm, column_title = &quot;Scaled&quot;, name = &quot;Scaled&quot;)
 
 one + two</code></pre>
 <p><img src="figure/complex_heatmap.Rmd/two_heatmaps-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-two_heatmaps-1">
+Past versions of two_heatmaps-1.png
+</button>
+</p>
+<div id="fig-two_heatmaps-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/7b31570c5ea892a36be5fac1562770d6eb5fc70f/docs/figure/complex_heatmap.Rmd/two_heatmaps-1.png" target="_blank">7b31570</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Add <a
 href="https://jokergoo.github.io/ComplexHeatmap-reference/book/heatmap-annotations.html">annotations</a>.</p>
 <pre class="r"><code>set.seed(123)
@@ -617,11 +906,134 @@ row_ha = rowAnnotation(
 
 Heatmap(mat, name = &quot;mat&quot;, top_annotation = column_ha, right_annotation = row_ha)</code></pre>
 <p><img src="figure/complex_heatmap.Rmd/annotation-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-annotation-1">
+Past versions of annotation-1.png
+</button>
+</p>
+<div id="fig-annotation-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/7b31570c5ea892a36be5fac1562770d6eb5fc70f/docs/figure/complex_heatmap.Rmd/annotation-1.png" target="_blank">7b31570</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p><a
 href="https://jokergoo.github.io/ComplexHeatmap-reference/book/a-single-heatmap.html#heatmap-split">Heatmap
 split</a>.</p>
 <pre class="r"><code>Heatmap(mat, name = &quot;mat&quot;, row_km = 3, column_km = 3)</code></pre>
 <p><img src="figure/complex_heatmap.Rmd/break-1.png" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-break-1">
+Past versions of break-1.png
+</button>
+</p>
+<div id="fig-break-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/7b31570c5ea892a36be5fac1562770d6eb5fc70f/docs/figure/complex_heatmap.Rmd/break-1.png" target="_blank">7b31570</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-11-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="upset-plot" class="section level2">
+<h2>UpSet plot</h2>
+<p>ComplexHeatmap has an <a
+href="https://jokergoo.github.io/ComplexHeatmap-reference/book/upset-plot.html">implementation
+of UpSet plots</a>.</p>
+<p>Three lists.</p>
+<pre class="r"><code>set.seed(123)
+lt &lt;- list(a = sample(letters, 10),
+          b = sample(letters, 15),
+          c = sample(letters, 20))
+m &lt;- make_comb_mat(lt)
+UpSet(m)</code></pre>
+<p><img src="figure/complex_heatmap.Rmd/upset_plot_eg1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<blockquote>
+<p>union mode: 1 means in that set and 0 is not taken into account. When
+there are multiple 1, the relationship is OR. Then, 1 1 0 means a set of
+elements in set A or B, and they can also in C or not in C (union(A,
+B)). Under this mode, the seven combination sets can overlap.</p>
+</blockquote>
+<pre class="r"><code>m = make_comb_mat(lt, mode = &quot;union&quot;)
+UpSet(m)</code></pre>
+<p><img src="figure/complex_heatmap.Rmd/upset_plot_eg2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>With colours.</p>
+<pre class="r"><code>UpSet(m, comb_col = c(rep(2, 3), rep(3, 3), 1))</code></pre>
+<p><img src="figure/complex_heatmap.Rmd/upset_plot_eg2_col-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Compare two UpSet plots.</p>
+<pre class="r"><code>set.seed(123)
+lt1 = list(a = sample(letters, 10),
+          b = sample(letters, 15),
+          c = sample(letters, 20))
+m1 = make_comb_mat(lt1)
+
+set.seed(456)
+lt2 = list(a = sample(letters, 10),
+          b = sample(letters, 15),
+          c = sample(letters, 20))
+m2 = make_comb_mat(lt2)
+
+max1 = max(c(set_size(m1), set_size(m2)))
+max2 = max(c(comb_size(m1), comb_size(m2)))
+
+UpSet(m1, top_annotation = upset_top_annotation(m1, ylim = c(0, max2)),
+    right_annotation = upset_right_annotation(m1, ylim = c(0, max1)),
+    column_title = &quot;UpSet1&quot;) +
+UpSet(m2, top_annotation = upset_top_annotation(m2, ylim = c(0, max2)),
+    right_annotation = upset_right_annotation(m2, ylim = c(0, max1)),
+    column_title = &quot;UpSet2&quot;)</code></pre>
+<p><img src="figure/complex_heatmap.Rmd/upset_plot_eg3-1.png" width="672" style="display: block; margin: auto;" /></p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -631,13 +1043,13 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.3.2 (2023-10-31)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 22.04.3 LTS
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.3 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
 
 locale:
  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -655,35 +1067,40 @@ attached base packages:
 [8] base     
 
 other attached packages:
-[1] ComplexHeatmap_2.15.4 gridExtra_2.3         dendextend_1.17.1    
-[4] pheatmap_1.0.12       workflowr_1.7.1      
+[1] ComplexHeatmap_2.24.1 gridExtra_2.3         dendextend_1.19.0    
+[4] pheatmap_1.0.13       workflowr_1.7.1      
 
 loaded via a namespace (and not attached):
- [1] shape_1.4.6         circlize_0.4.15     gtable_0.3.4       
- [4] rjson_0.2.21        xfun_0.40           bslib_0.5.1        
- [7] ggplot2_3.4.4       GlobalOptions_0.1.2 processx_3.8.2     
-[10] callr_3.7.3         vctrs_0.6.4         tools_4.3.2        
-[13] ps_1.7.5            generics_0.1.3      stats4_4.3.2       
-[16] parallel_4.3.2      tibble_3.2.1        fansi_1.0.5        
-[19] cluster_2.1.4       pkgconfig_2.0.3     RColorBrewer_1.1-3 
-[22] S4Vectors_0.40.1    lifecycle_1.0.3     compiler_4.3.2     
-[25] stringr_1.5.0       git2r_0.32.0        munsell_0.5.0      
-[28] getPass_0.2-2       codetools_0.2-19    clue_0.3-65        
-[31] httpuv_1.6.12       htmltools_0.5.6.1   sass_0.4.7         
-[34] yaml_2.3.7          later_1.3.1         pillar_1.9.0       
-[37] crayon_1.5.2        jquerylib_0.1.4     whisker_0.4.1      
-[40] cachem_1.0.8        iterators_1.0.14    viridis_0.6.4      
-[43] foreach_1.5.2       tidyselect_1.2.0    digest_0.6.33      
-[46] stringi_1.7.12      dplyr_1.1.3         rprojroot_2.0.3    
-[49] fastmap_1.1.1       colorspace_2.1-0    cli_3.6.1          
-[52] magrittr_2.0.3      utf8_1.2.4          scales_1.2.1       
-[55] promises_1.2.1      rmarkdown_2.25      httr_1.4.7         
-[58] matrixStats_1.0.0   png_0.1-8           GetoptLong_1.0.5   
-[61] evaluate_0.22       knitr_1.44          IRanges_2.36.0     
-[64] doParallel_1.0.17   viridisLite_0.4.2   rlang_1.1.1        
-[67] Rcpp_1.0.11         glue_1.6.2          BiocGenerics_0.48.0
-[70] rstudioapi_0.15.0   jsonlite_1.8.7      R6_2.5.1           
-[73] fs_1.6.3           </code></pre>
+ [1] gtable_0.3.6        circlize_0.4.16     shape_1.4.6.1      
+ [4] rjson_0.2.23        xfun_0.52           bslib_0.9.0        
+ [7] ggplot2_3.5.2       GlobalOptions_0.1.2 processx_3.8.6     
+[10] callr_3.7.6         vctrs_0.6.5         tools_4.5.0        
+[13] ps_1.9.1            generics_0.1.4      stats4_4.5.0       
+[16] parallel_4.5.0      tibble_3.3.0        cluster_2.1.8.1    
+[19] pkgconfig_2.0.3     RColorBrewer_1.1-3  S4Vectors_0.46.0   
+[22] lifecycle_1.0.4     compiler_4.5.0      farver_2.1.2       
+[25] stringr_1.5.1       git2r_0.36.2        getPass_0.2-4      
+[28] codetools_0.2-20    clue_0.3-66         httpuv_1.6.16      
+[31] htmltools_0.5.8.1   sass_0.4.10         yaml_2.3.10        
+[34] later_1.4.2         pillar_1.10.2       crayon_1.5.3       
+[37] jquerylib_0.1.4     whisker_0.4.1       cachem_1.1.0       
+[40] iterators_1.0.14    viridis_0.6.5       foreach_1.5.2      
+[43] tidyselect_1.2.1    digest_0.6.37       stringi_1.8.7      
+[46] dplyr_1.1.4         rprojroot_2.0.4     fastmap_1.2.0      
+[49] colorspace_2.1-1    cli_3.6.5           magrittr_2.0.3     
+[52] scales_1.4.0        promises_1.3.3      rmarkdown_2.29     
+[55] httr_1.4.7          matrixStats_1.5.0   png_0.1-8          
+[58] GetoptLong_1.0.5    evaluate_1.0.3      knitr_1.50         
+[61] IRanges_2.42.0      doParallel_1.0.17   viridisLite_0.4.2  
+[64] rlang_1.1.6         Rcpp_1.0.14         glue_1.8.0         
+[67] BiocGenerics_0.54.0 rstudioapi_0.17.1   jsonlite_2.0.0     
+[70] R6_2.6.1            fs_1.6.6           </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 
 
@@ -702,6 +1119,8 @@ footer is added to webpages before the MathJax javascript. -->
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -734,6 +1153,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
