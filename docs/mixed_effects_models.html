@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-10-21" />
+<meta name="date" content="2025-10-24" />
 
 <title>Mixed-effects models</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Mixed-effects models</h1>
-<h4 class="date">2025-10-21</h4>
+<h4 class="date">2025-10-24</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-10-21
+<strong>Last updated:</strong> 2025-10-24
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec20a3880b4cac31444dcf80cca0340b741e4e941targetblankc20a388a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree638126d31118ca8ce0b521bf83435131e332d213targetblank638126da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/c20a3880b4cac31444dcf80cca0340b741e4e941" target="_blank">c20a388</a>
+<a href="https://github.com/davetang/muse/tree/638126d31118ca8ce0b521bf83435131e332d213" target="_blank">638126d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec20a3880b4cac31444dcf80cca0340b741e4e941targetblankc20a388a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree638126d31118ca8ce0b521bf83435131e332d213targetblank638126da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/c20a3880b4cac31444dcf80cca0340b741e4e941" target="_blank">c20a388</a>.
+<a href="https://github.com/davetang/muse/tree/638126d31118ca8ce0b521bf83435131e332d213" target="_blank">638126d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -643,6 +643,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/638126d31118ca8ce0b521bf83435131e332d213/analysis/mixed_effects_models.Rmd" target="_blank">638126d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-10-24
+</td>
+<td>
+AIC and BIC
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/0400650595bc25d3437d877795980e9c385d55c3/docs/mixed_effects_models.html" target="_blank">0400650</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-10-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -917,6 +951,70 @@ error.</li>
 </ul>
 <p>Each subject has their <em>own baseline</em> reaction time, but we
 assume the <em>same slope</em> (same rate of slowing down).</p>
+<p>Fit multiple models with increasing complexity and calculate AIC
+(Akaike Information Criterion) and BIC (Bayesian Information Criterion),
+which are information criteria used for model selection. They help you
+balance:</p>
+<ul>
+<li>Model fit (how well the model explains the data)</li>
+<li>Model complexity (how many parameters the model uses)</li>
+</ul>
+<p>The actual numbers are meaningless by themselves and what matters is
+the relative comparison between models:</p>
+<ul>
+<li>Lower AIC/BIC = better model fit</li>
+<li>Delta AIC/BIC shows difference from best model</li>
+<li>Delta &lt; 2: substantial support</li>
+<li>Delta 4-7: considerably less support</li>
+<li>Delta &gt; 10: essentially no support</li>
+</ul>
+<pre class="r"><code>m0 &lt;- lm(Reaction ~ Days, data = sleepstudy)
+
+# Model 1: Random intercept only
+m1 &lt;- lmer(Reaction ~ Days + (1 | Subject), data = sleepstudy)
+
+# Model 2: Random intercept and random slope
+m2 &lt;- lmer(Reaction ~ Days + (Days | Subject), data = sleepstudy)
+
+# Model 3: Random intercept and random slope (uncorrelated)
+m3 &lt;- lmer(Reaction ~ Days + (Days || Subject), data = sleepstudy)
+
+aic_values &lt;- c(
+  M0_lm = AIC(m0),
+  M1_random_intercept = AIC(m1),
+  M2_random_slope_corr = AIC(m2),
+  M3_random_slope_uncorr = AIC(m3)
+)
+
+bic_values &lt;- c(
+  M0_lm = BIC(m0),
+  M1_random_intercept = BIC(m1),
+  M2_random_slope_corr = BIC(m2),
+  M3_random_slope_uncorr = BIC(m3)
+)
+
+comparison_df &lt;- data.frame(
+  Model = c(&quot;M0: Linear model&quot;, 
+            &quot;M1: Random intercept&quot;, 
+            &quot;M2: Random intercept + slope (correlated)&quot;,
+            &quot;M3: Random intercept + slope (uncorrelated)&quot;),
+  AIC = round(aic_values, 2),
+  BIC = round(bic_values, 2),
+  Delta_AIC = round(aic_values - min(aic_values), 2),
+  Delta_BIC = round(bic_values - min(bic_values), 2)
+)
+
+comparison_df</code></pre>
+<pre><code>                                                             Model     AIC
+M0_lm                                             M0: Linear model 1906.29
+M1_random_intercept                           M1: Random intercept 1794.47
+M2_random_slope_corr     M2: Random intercept + slope (correlated) 1755.63
+M3_random_slope_uncorr M3: Random intercept + slope (uncorrelated) 1753.67
+                           BIC Delta_AIC Delta_BIC
+M0_lm                  1915.87    152.62    146.24
+M1_random_intercept    1807.24     40.80     37.60
+M2_random_slope_corr   1774.79      1.96      5.15
+M3_random_slope_uncorr 1769.63      0.00      0.00</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
