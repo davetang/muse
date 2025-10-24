@@ -122,3 +122,56 @@ where:
 * $( \epsilon_{ij} )$: residual error.
 
 Each subject has their *own baseline* reaction time, but we assume the *same slope* (same rate of slowing down).
+
+Fit multiple models with increasing complexity and calculate AIC (Akaike Information Criterion) and BIC (Bayesian Information Criterion), which are information criteria used for model selection. They help you balance:
+
+* Model fit (how well the model explains the data)
+* Model complexity (how many parameters the model uses)
+
+The actual numbers are meaningless by themselves and what matters is the relative comparison between models:
+
+* Lower AIC/BIC = better model fit
+* Delta AIC/BIC shows difference from best model
+* Delta < 2: substantial support
+* Delta 4-7: considerably less support
+* Delta > 10: essentially no support
+
+```{r multiple_models}
+m0 <- lm(Reaction ~ Days, data = sleepstudy)
+
+# Model 1: Random intercept only
+m1 <- lmer(Reaction ~ Days + (1 | Subject), data = sleepstudy)
+
+# Model 2: Random intercept and random slope
+m2 <- lmer(Reaction ~ Days + (Days | Subject), data = sleepstudy)
+
+# Model 3: Random intercept and random slope (uncorrelated)
+m3 <- lmer(Reaction ~ Days + (Days || Subject), data = sleepstudy)
+
+aic_values <- c(
+  M0_lm = AIC(m0),
+  M1_random_intercept = AIC(m1),
+  M2_random_slope_corr = AIC(m2),
+  M3_random_slope_uncorr = AIC(m3)
+)
+
+bic_values <- c(
+  M0_lm = BIC(m0),
+  M1_random_intercept = BIC(m1),
+  M2_random_slope_corr = BIC(m2),
+  M3_random_slope_uncorr = BIC(m3)
+)
+
+comparison_df <- data.frame(
+  Model = c("M0: Linear model", 
+            "M1: Random intercept", 
+            "M2: Random intercept + slope (correlated)",
+            "M3: Random intercept + slope (uncorrelated)"),
+  AIC = round(aic_values, 2),
+  BIC = round(bic_values, 2),
+  Delta_AIC = round(aic_values - min(aic_values), 2),
+  Delta_BIC = round(bic_values - min(bic_values), 2)
+)
+
+comparison_df
+```
