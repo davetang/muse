@@ -12,6 +12,7 @@ editor_options:
 suppressPackageStartupMessages({
   library(tidyverse)
   library(irr)
+  library(yardstick)
 })
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -106,11 +107,17 @@ $$
 Using our function and `irr::kappa2()`.
 
 ```{r cohen_kappa_eg}
-doc1 <- c(rep('D', 15), rep('N', 20), rep('N', 10), rep('D', 5))
-doc2 <- c(rep('D', 15), rep('N', 20), rep('D', 10), rep('N', 5))
+doc1 <- factor(c(rep('D', 15), rep('N', 20), rep('N', 10), rep('D', 5)))
+doc2 <- factor(c(rep('D', 15), rep('N', 20), rep('D', 10), rep('N', 5)))
 
 cohen_kappa(doc1, doc2)$kappa
 irr::kappa2(data.frame(x = doc1, y = doc2))
+```
+
+Using {yardstick}.
+
+```{r cohen_kappa_yardstick}
+yardstick::kap_vec(doc1, doc2)
 ```
 
 ## Fleiss' Kappa
