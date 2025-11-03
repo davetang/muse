@@ -1,0 +1,99 @@
+---
+title: "Matthews Correlation Coefficient"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(yardstick)
+  library(tibble)
+})
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+The Matthews Correlation Coefficient (MCC) is a single-number measure of how well a **binary classification** model performs. It takes into account **true and false positives and negatives**, providing a **balanced** evaluation even when classes are **unevenly distributed**.
+
+Imagine an email classifier that predicts whether an email is **spam** (`1`) or **not spam** (`0`).
+
+|                     | Predicted Positive  | Predicted Negative  |
+| ------------------- | ------------------- | ------------------- |
+| **Actual Positive** | True Positive (TP)  | False Negative (FN) |
+| **Actual Negative** | False Positive (FP) | True Negative (TN)  |
+
+The MCC is calculated following:
+
+$$
+\text{MCC} = \frac{(TP \times TN) - (FP \times FN)}{\sqrt{(TP+FP)(TP+FN)(TN+FP)(TN+FN)}}
+$$
+
+* +1: perfect prediction
+* 0: random prediction
+* −1: total disagreement (inverse prediction)
+
+MCC works well **even with class imbalance** and provides a **balanced score**.
+
+## Simple example
+
+Given the following predictions and actual outcomes:
+
+```{r eg1}
+actual <- c(1, 0, 1, 1, 0, 0, 1, 0)
+predicted <- c(1, 0, 1, 0, 0, 0, 1, 1)
+table(actual, predicted)
+```
+
+* TP = 3
+* TN = 3
+* FP = 1
+* FN = 1
+
+Calculate the MCC:
+
+```{r eg1_mcc}
+TP <- 3
+TN <- 3
+FP <- 1
+FN <- 1
+
+my_mcc <- (TP * TN - FP * FN) /
+  sqrt((TP + FP) * (TP + FN) * (TN + FP) * (TN + FN))
+
+my_mcc
+```
+
+## Multiclass
+
+Suppose we have a model predicting three possible classes: "A", "B", and "C".
+
+```{r eg2}
+# Ground truth (actual labels)
+truth <- factor(c("A", "B", "C", "A", "B", "C", "A", "C", "B", "B"))
+
+# Model predictions
+predicted <- factor(c("A", "C", "C", "A", "B", "B", "C", "C", "B", "A"))
+
+results <- tibble(
+  truth = truth,
+  estimate = predicted
+)
+
+results
+```
+
+Using {yardstick}.
+
+```{eg2_mcc}
+mcc_result <- mcc(results, truth = truth, estimate = estimate)
+print(mcc_result)
+
+mcc_value <- mcc_vec(truth, estimate)
+print(mcc_value)
+```
