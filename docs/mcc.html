@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0be926eeefa1d8bffd613b576db9f0806d842b32targetblank0be926ea">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4a94ae857dead325c894f07e80bae224c3e4a5bbtargetblank4a94ae8a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/0be926eeefa1d8bffd613b576db9f0806d842b32" target="_blank">0be926e</a>
+<a href="https://github.com/davetang/muse/tree/4a94ae857dead325c894f07e80bae224c3e4a5bb" target="_blank">4a94ae8</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree0be926eeefa1d8bffd613b576db9f0806d842b32targetblank0be926ea"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4a94ae857dead325c894f07e80bae224c3e4a5bbtargetblank4a94ae8a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/0be926eeefa1d8bffd613b576db9f0806d842b32" target="_blank">0be926e</a>.
+<a href="https://github.com/davetang/muse/tree/4a94ae857dead325c894f07e80bae224c3e4a5bb" target="_blank">4a94ae8</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -642,6 +642,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/4a94ae857dead325c894f07e80bae224c3e4a5bb/analysis/mcc.Rmd" target="_blank">4a94ae8</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-11-03
+</td>
+<td>
+Run R code for yardstick::mcc_vec()
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/d44b00d677876af7e4d07e7da5a3adfd602c5081/docs/mcc.html" target="_blank">d44b00d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-11-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -768,11 +802,8 @@ results</code></pre>
  9 B     B       
 10 B     A       </code></pre>
 <p>Using {yardstick}.</p>
-<pre class="eg2_mcc"><code>mcc_result &lt;- mcc(results, truth = truth, estimate = estimate)
-print(mcc_result)
-
-mcc_value &lt;- mcc_vec(truth, estimate)
-print(mcc_value)</code></pre>
+<pre class="r"><code>yardstick::mcc_vec(truth, predicted)</code></pre>
+<pre><code>[1] 0.4090909</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
