@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-10-08" />
+<meta name="date" content="2025-11-03" />
 
 <title>Inter-rater reliability</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Inter-rater reliability</h1>
-<h4 class="date">2025-10-08</h4>
+<h4 class="date">2025-11-03</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-10-08
+<strong>Last updated:</strong> 2025-11-03
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree466f85fdc58e47cfd884c028ae3cf48da3c465d3targetblank466f85fa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree213cab10ee7ea9d750a33eeb1d3633a649267559targetblank213cab1a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/466f85fdc58e47cfd884c028ae3cf48da3c465d3" target="_blank">466f85f</a>
+<a href="https://github.com/davetang/muse/tree/213cab10ee7ea9d750a33eeb1d3633a649267559" target="_blank">213cab1</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree466f85fdc58e47cfd884c028ae3cf48da3c465d3targetblank466f85fa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree213cab10ee7ea9d750a33eeb1d3633a649267559targetblank213cab1a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/466f85fdc58e47cfd884c028ae3cf48da3c465d3" target="_blank">466f85f</a>.
+<a href="https://github.com/davetang/muse/tree/213cab10ee7ea9d750a33eeb1d3633a649267559" target="_blank">213cab1</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -642,6 +642,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/213cab10ee7ea9d750a33eeb1d3633a649267559/analysis/rater.Rmd" target="_blank">213cab1</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-11-03
+</td>
+<td>
+{yardstick} can calculate Cohen’s Kappa
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/719e63e97622ff61fed580392b29274d0d8ef69e/docs/rater.html" target="_blank">719e63e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-10-08
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -848,8 +882,8 @@ each doctor says “Disease” versus “No Disease”?</p>
 \frac{0.20}{0.50} = 0.40
 \]</span></p>
 <p>Using our function and <code>irr::kappa2()</code>.</p>
-<pre class="r"><code>doc1 &lt;- c(rep(&#39;D&#39;, 15), rep(&#39;N&#39;, 20), rep(&#39;N&#39;, 10), rep(&#39;D&#39;, 5))
-doc2 &lt;- c(rep(&#39;D&#39;, 15), rep(&#39;N&#39;, 20), rep(&#39;D&#39;, 10), rep(&#39;N&#39;, 5))
+<pre class="r"><code>doc1 &lt;- factor(c(rep(&#39;D&#39;, 15), rep(&#39;N&#39;, 20), rep(&#39;N&#39;, 10), rep(&#39;D&#39;, 5)))
+doc2 &lt;- factor(c(rep(&#39;D&#39;, 15), rep(&#39;N&#39;, 20), rep(&#39;D&#39;, 10), rep(&#39;N&#39;, 5)))
 
 cohen_kappa(doc1, doc2)$kappa</code></pre>
 <pre><code>[1] 0.4</code></pre>
@@ -862,6 +896,9 @@ cohen_kappa(doc1, doc2)$kappa</code></pre>
 
         z = 2.89 
   p-value = 0.00389 </code></pre>
+<p>Using {yardstick}.</p>
+<pre class="r"><code>yardstick::kap_vec(doc1, doc2)</code></pre>
+<pre><code>[1] 0.4</code></pre>
 </div>
 <div id="fleiss-kappa" class="section level2">
 <h2>Fleiss’ Kappa</h2>
@@ -957,7 +994,7 @@ Session information
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 4.5.0 (2025-04-11)
 Platform: x86_64-pc-linux-gnu
-Running under: Ubuntu 24.04.2 LTS
+Running under: Ubuntu 24.04.3 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -978,17 +1015,17 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] irr_0.84.1      lpSolve_5.6.23  lubridate_1.9.4 forcats_1.0.0  
- [5] stringr_1.5.1   dplyr_1.1.4     purrr_1.0.4     readr_2.1.5    
- [9] tidyr_1.3.1     tibble_3.2.1    ggplot2_3.5.2   tidyverse_2.0.0
-[13] workflowr_1.7.1
+ [1] yardstick_1.3.2 irr_0.84.1      lpSolve_5.6.23  lubridate_1.9.4
+ [5] forcats_1.0.0   stringr_1.5.1   dplyr_1.1.4     purrr_1.0.4    
+ [9] readr_2.1.5     tidyr_1.3.1     tibble_3.3.0    ggplot2_3.5.2  
+[13] tidyverse_2.0.0 workflowr_1.7.1
 
 loaded via a namespace (and not attached):
  [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      hms_1.1.3         
  [5] digest_0.6.37      magrittr_2.0.3     timechange_0.3.0   evaluate_1.0.3    
  [9] grid_4.5.0         RColorBrewer_1.1-3 fastmap_1.2.0      rprojroot_2.0.4   
 [13] jsonlite_2.0.0     processx_3.8.6     whisker_0.4.1      ps_1.9.1          
-[17] promises_1.3.2     httr_1.4.7         scales_1.4.0       jquerylib_0.1.4   
+[17] promises_1.3.3     httr_1.4.7         scales_1.4.0       jquerylib_0.1.4   
 [21] cli_3.6.5          rlang_1.1.6        withr_3.0.2        cachem_1.1.0      
 [25] yaml_2.3.10        tools_4.5.0        tzdb_0.5.0         httpuv_1.6.16     
 [29] vctrs_0.6.5        R6_2.6.1           lifecycle_1.0.4    git2r_0.36.2      
