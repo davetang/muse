@@ -90,10 +90,6 @@ results
 
 Using {yardstick}.
 
-```{eg2_mcc}
-mcc_result <- mcc(results, truth = truth, estimate = estimate)
-print(mcc_result)
-
-mcc_value <- mcc_vec(truth, estimate)
-print(mcc_value)
+```{r eg2_mcc}
+yardstick::mcc_vec(truth, predicted)
 ```
