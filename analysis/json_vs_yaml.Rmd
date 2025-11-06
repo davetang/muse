@@ -148,6 +148,7 @@ The [ffq](https://github.com/pachterlab/ffq) tool generates metadata in JSON:
 ```{r read_ffq_json}
 ffq_json <- jsonlite::read_json(path = "data/SRX079566.json", simplifyVector = TRUE)
 str(ffq_json)
+str(ffq_json, max.level = 3)
 ```
 
 Use a recursive apply to create a named character vector, which is convenient for plucking values.
@@ -161,6 +162,19 @@ Subset the FTP links.
 
 ```{r ftp_url}
 test[grepl("ftp.url\\d+$", names(test))]
+```
+
+Using {purrr}.
+
+```{r purrr_list_flatten}
+list_flatten_all <- function(x) {
+  if (!is.list(x)) return(list(x))
+  x |> purrr::map(list_flatten_all) %>% purrr::list_flatten()
+}
+
+ffq_json_flat <- list_flatten_all(ffq_json)
+ffq_json_flat[grep("ftp_url$", names(ffq_json_flat))] |>
+  unlist()
 ```
 
 ## Appendix
