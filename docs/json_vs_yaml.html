@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree431f1abb3aa8c5fb9af59e97e42f481bbc29b32ftargetblank431f1aba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4ca8b1aa9fbdbd134934acd2a8fae75285f6e9f8targetblank4ca8b1aa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/431f1abb3aa8c5fb9af59e97e42f481bbc29b32f" target="_blank">431f1ab</a>
+<a href="https://github.com/davetang/muse/tree/4ca8b1aa9fbdbd134934acd2a8fae75285f6e9f8" target="_blank">4ca8b1a</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree431f1abb3aa8c5fb9af59e97e42f481bbc29b32ftargetblank431f1aba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4ca8b1aa9fbdbd134934acd2a8fae75285f6e9f8targetblank4ca8b1aa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/431f1abb3aa8c5fb9af59e97e42f481bbc29b32f" target="_blank">431f1ab</a>.
+<a href="https://github.com/davetang/muse/tree/4ca8b1aa9fbdbd134934acd2a8fae75285f6e9f8" target="_blank">4ca8b1a</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -644,6 +644,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/4ca8b1aa9fbdbd134934acd2a8fae75285f6e9f8/analysis/json_vs_yaml.Rmd" target="_blank">4ca8b1a</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-11-06
+</td>
+<td>
+Tweak list_flatten_all()
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/3f3aa2213889b8afa1fa935d101bbe8521b6ae87/docs/json_vs_yaml.html" target="_blank">3f3aa22</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-11-06
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1422,10 +1456,10 @@ class(test)</code></pre>
 &quot;ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR390/SRR390728/SRR390728_1.fastq.gz&quot; 
                                    SRX079566.runs.SRR390728.files.ftp.url2 
 &quot;ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR390/SRR390728/SRR390728_2.fastq.gz&quot; </code></pre>
-<p>Using {purrr}.</p>
+<p>Using {purrr} to recursively flatten.</p>
 <pre class="r"><code>list_flatten_all &lt;- function(x) {
-  if (!is.list(x)) return(list(x))
-  x |&gt; purrr::map(list_flatten_all) %&gt;% purrr::list_flatten()
+  if (!is.list(x)) return(x)
+  purrr::map(x, list_flatten_all) |&gt; purrr::list_flatten()
 }
 
 ffq_json_flat &lt;- list_flatten_all(ffq_json)
