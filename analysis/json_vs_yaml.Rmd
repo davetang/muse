@@ -164,12 +164,12 @@ Subset the FTP links.
 test[grepl("ftp.url\\d+$", names(test))]
 ```
 
-Using {purrr}.
+Using {purrr} to recursively flatten.
 
 ```{r purrr_list_flatten}
 list_flatten_all <- function(x) {
-  if (!is.list(x)) return(list(x))
-  x |> purrr::map(list_flatten_all) %>% purrr::list_flatten()
+  if (!is.list(x)) return(x)
+  purrr::map(x, list_flatten_all) |> purrr::list_flatten()
 }
 
 ffq_json_flat <- list_flatten_all(ffq_json)
