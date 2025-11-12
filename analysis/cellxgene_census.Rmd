@@ -29,8 +29,10 @@ Install from the [R-universe platform](https://ropensci.org/r-universe/). If ins
 In addition you must have at least `cmake` v3.21. Install the {tiledbsoma} dependency first, since this takes some time to compile and install, it's better to fail first.
 
 ```{r install_tiledbsoma, eval=FALSE}
-install.packages('tiledbsoma', repos = c('https://tiledb-inc.r-universe.dev',
-                                         'https://cloud.r-project.org'))
+install.packages(
+  'tiledbsoma',
+  repos = c('https://tiledb-inc.r-universe.dev', 'https://cloud.r-project.org')
+)
 ```
 
 Now install {cellxgene.census}, which should be a breeze now.
@@ -65,6 +67,29 @@ To learn what metadata columns are available for fetching and filtering we can d
 census <- open_soma()
 my_keys <- census$get("census_data")$get("homo_sapiens")$obs$colnames()
 my_keys
+```
+
+Assays.
+
+```{r assays}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+})
+census$get("census_data")$get("homo_sapiens")$obs$read(column_names = c('dataset_id', "assay"))$concat() |>
+  as.data.frame() -> avail_assays
+
+avail_assays |>
+  distinct(dataset_id, assay) |>
+  dplyr::summarise(n = n(), .by = assay) |>
+  slice_max(order_by = n, n = 10) |>
+  arrange(n) |>
+  dplyr::mutate(assay = factor(assay, levels = assay)) |>
+  ggplot(aes(assay, n)) +
+  geom_col() +
+  theme_minimal() +
+  coord_flip() +
+  labs(x = 'Assay type', y = 'Datasets', title = 'CELLxGENE human datasets')
 ```
 
 `soma_joinid` is a special `SOMADataFrame` column that is used for join operations. All of the keys can be used to fetch specific columns or specific rows matching a condition. For the latter we need to know the values we are looking for _a priori_.
@@ -109,7 +134,7 @@ Use `get_seurat()` to perform the same type of filtering but returning a Seurat 
 * `var_value_filter` — expression with selection conditions to fetch genes meeting a criteria.
 
 ```{r get_seurat, eval=FALSE}
-library("Seurat")
+suppressPackageStartupMessages(library("Seurat"))
 
 seurat_obj <- get_seurat(
   census, "Homo sapiens",
