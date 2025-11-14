@@ -1,0 +1,247 @@
+---
+title: "Likelihood Ratio Tests"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+})
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This notebook demonstrates three fundamental concepts in statistical hypothesis testing:
+
+1. **Test Statistics**: Numbers calculated from data to make decisions.
+2. **Null Distributions**: The expected distribution of test statistics under the null hypothesis.
+3. **Likelihood Ratio Tests (LRT)**: A principled approach to comparing models.
+
+We'll use a simple, concrete example throughout: testing whether a coin is fair.
+
+## Test Statistics
+
+### The Scenario
+
+Suppose we flip a coin 100 times and observe 65 heads. Is this coin fair ($p = 0.5$) or biased?
+
+```{r observed_data}
+n_flips <- 100
+observed_heads <- 65
+observed_proportion <- observed_heads / n_flips
+```
+
+A **test statistic** is a function of our data. For this problem, we'll use the number of heads as our test statistic.
+
+```{r test-statistic}
+test_statistic <- observed_heads
+test_statistic
+```
+
+The test statistic alone doesn't tell us much. We need to know: *is 65 heads unusual if the coin is fair?*
+
+## Null Distributions
+
+### Defining the Null Hypothesis
+
+Our null hypothesis ($H_0$) is that the coin is fair: $p = 0.5$.
+
+Under this hypothesis, the number of heads follows a **Binomial(100, 0.5)** distribution. This is our **null distribution**.
+
+```{r null-distribution}
+possible_heads <- 0:100
+null_probabilities <- dbinom(possible_heads, size = n_flips, prob = 0.5)
+
+null_dist_df <- data.frame(
+  heads = possible_heads,
+  probability = null_probabilities
+)
+
+ggplot(null_dist_df, aes(x = heads, y = probability)) +
+  geom_col(fill = "skyblue", alpha = 0.7) +
+  geom_vline(xintercept = observed_heads, color = "red", lty = 2) +
+  annotate(
+    "text",
+    x = observed_heads + 10,
+    y = max(null_probabilities) * 0.9,
+    label = paste("Observed:", observed_heads),
+    color = "red",
+    size = 5
+  ) +
+  labs(
+    title = "Null Distribution: Binomial(100, 0.5)",
+    subtitle = "Distribution of heads if coin is fair",
+    x = "Number of Heads",
+    y = "Probability"
+  ) +
+  theme_minimal()
+```
+
+### Calculating the p-value
+
+**The p-value is the probability of observing a test statistic as extreme or more extreme than what we observed, assuming the null hypothesis is true**.
+
+```{r p-value}
+p_value <- 2 * pbinom(
+  observed_heads - 1,
+  size = n_flips, 
+  prob = 0.5,
+  lower.tail = FALSE
+)
+
+p_value
+```
+
+If the coin were fair, we'd observe `r observed_heads` or more heads only `r round(p_value * 100, 2)`% of the time.
+
+### Simulation Approach to Null Distribution
+
+We can also build the null distribution empirically through simulation.
+
+```{r simulate-null}
+set.seed(1984)
+n_simulations <- 10000
+simulated_heads <- rbinom(n_simulations, size = n_flips, prob = 0.5)
+
+ggplot(data.frame(heads = simulated_heads), aes(x = heads)) +
+  geom_histogram(
+    aes(y = after_stat(density)),
+    bins = 20, 
+    fill = "lightblue",
+    alpha = 0.7,
+    color = "black"
+  ) +
+  geom_vline(
+    xintercept = observed_heads,
+    color = "red",
+    lty = 2
+  ) +
+  labs(
+    title = "Simulated Null Distribution (10,000 simulations)",
+    subtitle = "Each simulation: 100 flips of a fair coin",
+    x = "Number of Heads",
+    y = "Density"
+  ) +
+  theme_minimal()
+
+empirical_p_value <- mean(abs(simulated_heads - 50) >= abs(observed_heads - 50))
+round(empirical_p_value, 4)
+```
+
+## Likelihood Ratio Tests
+
+The **Likelihood Ratio Test** compares two models:
+
+- Null model ($H_0$): Coin is fair, p = 0.5 (1 parameter fixed)
+- Alternative model ($H_1$): Coin has some bias, p = ? (1 parameter estimated from data)
+
+**The likelihood is the probability of observing our data given a model**.
+
+```{r likelihoods}
+p_null <- 0.5
+likelihood_null <- dbinom(observed_heads, size = n_flips, prob = p_null)
+likelihood_null
+
+# Maximum likelihood estimate
+p_alternative <- observed_heads / n_flips
+likelihood_alternative <- dbinom(observed_heads, size = n_flips, prob = p_alternative)
+likelihood_alternative
+
+my_ratio <- round(likelihood_alternative / likelihood_null, 2)
+my_ratio
+```
+
+The data is `r my_ratio` times more likely under $H_1$ than $H_0$.
+
+### Log-Likelihoods
+
+We typically work with log-likelihoods because likelihoods can be very small.
+
+```{r log-likelihoods}
+log_lik_null <- dbinom(observed_heads, size = n_flips, prob = p_null, log = TRUE)
+log_lik_null
+
+log_lik_alternative <- dbinom(observed_heads, size = n_flips, prob = p_alternative, log = TRUE)
+log_lik_alternative
+```
+
+### The LRT Statistic
+
+The likelihood ratio test statistic is:
+
+$$\Lambda = -2 \log\left(\frac{L(\text{H}_0)}{L(\text{H}_1)}\right) = -2[\log L(\text{H}_0) - \log L(\text{H}_1)]$$
+
+```{r lrt-statistic}
+lrt_statistic <- -2 * (log_lik_null - log_lik_alternative)
+lrt_statistic
+```
+
+### Null Distribution of the LRT Statistic
+
+Under certain conditions (Wilks' theorem), the LRT statistic follows a **chi-squared distribution** with degrees of freedom equal to the difference in number of parameters between models. In this case: df = 1 (alternative has 1 more parameter than null).
+
+```{r lrt-null-distribution}
+# Degrees of freedom
+df <- 1
+
+# P-value from chi-squared distribution
+lrt_p_value <- pchisq(lrt_statistic, df = df, lower.tail = FALSE)
+
+chi_sq_values <- seq(0, 15, length.out = 1000)
+chi_sq_density <- dchisq(chi_sq_values, df = df)
+
+ggplot(data.frame(x = chi_sq_values, y = chi_sq_density), aes(x, y)) +
+  geom_line(linewidth = 1, color = "blue") +
+  geom_area(
+    data = subset(
+      data.frame(
+        x = chi_sq_values,
+        y = chi_sq_density
+      ), 
+      x >= lrt_statistic
+    ),
+    aes(x, y),
+    fill = "red",
+    alpha = 0.3
+  ) +
+  geom_vline(xintercept = lrt_statistic, color = "red", lty = 2) +
+  annotate(
+    "text",
+    x = lrt_statistic + 2,
+    y = 3,
+    label = paste("Observed LRT:", round(lrt_statistic, 2)), 
+    color = "red", size = 5) +
+  labs(
+    title = "Null Distribution of LRT Statistic",
+    subtitle = "Chi-squared distribution with 1 degree of freedom",
+    x = "LRT Statistic Value",
+    y = "Density"
+  ) +
+  theme_minimal()
+```
+
+### Comparing to Standard Test
+
+Let's verify our LRT matches the standard proportion test:
+
+```{r comparison}
+# Standard proportion test
+prop_test <- prop.test(observed_heads, n_flips, p = 0.5, correct = FALSE)
+
+cat("=== Comparison of Methods ===\n\n")
+cat("Exact binomial test p-value:", round(p_value, 4), "\n")
+cat("Simulated p-value:", round(empirical_p_value, 4), "\n")
+cat("LRT p-value:", round(lrt_p_value, 4), "\n")
+cat("prop.test p-value:", round(prop_test$p.value, 4), "\n")
+```
+
+## Summary
+
+* The **test statistic** summarises data in a way that helps detect departures from the null hypothesis.
+* The **null distribution** shows what values we'd expect by chance alone.
+* The **LRT** is a principled way to compare models by looking at their relative likelihoods.
+* Under regularity conditions, the LRT statistic has a known null distribution (chi-squared), making it easy to calculate p-values.
