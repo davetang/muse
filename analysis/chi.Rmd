@@ -1,0 +1,78 @@
+---
+title: "Chi-squared Tests"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(knitr)
+})
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+The Chi-squared test checks whether two categorical variables are related. For example:
+
+* Is smoking related to cancer?
+* Is gender related to favorite ice cream flavor?
+* Is a treatment related to an outcome?
+
+A Chi-squared distribution is a probability distribution that arises when a test statistic is built from squared deviations. Squaring measures how large the differences are, treats positive and negative deviations equally, and leads to a distribution with well-understood mathematical properties (the Chi-squared distribution).
+
+## Is smoking associated with lung cancer?
+
+Create a contingency table
+
+```{r eg1}
+data <- matrix(
+  c(60, 40, 30, 70),
+  nrow = 2,
+  byrow = TRUE
+)
+
+colnames(data) <- c("Cancer", "NoCancer")
+rownames(data) <- c("Smoker", "NonSmoker")
+
+data
+
+chisq.test(data)
+```
+
+The test statistic is `X-squared = 16.99` and it measures how different your observed table is from what you would expect if the two variables were not related.
+
+* Bigger number means bigger difference from no relationship
+* Smaller number means closer to no relationship
+
+The degrees of freedom for a 2×2 table is always 1.
+
+A p-value answers the question:
+
+* If there were no real association between the variables, how likely is it to see a difference as extreme as the one we observed?
+
+A p-value of 3.758e-05 means that there's only a 0.0037% chance that this big a difference happened by random chance.
+
+```{r dchisq}
+x2 <- chisq.test(data)$statistic
+df <- chisq.test(data)$parameter
+
+x <- seq(0, x2+3, length = 500)
+
+plot(
+  x,
+  dchisq(x, df),
+  type = "l",
+  lwd = 2,
+  ylab = "Density",
+  xlab = "Chi-squared value",
+  main = paste0("Chi-squared distribution (df = ", df, ")")
+)
+
+abline(v = x2, col = "red", lwd = 2)
+```
+
+The Chi-square test statistic always follows a Chi-square distribution if the null hypothesis is true. Therefore by comparing our obtained value (16.99) to the known curve (df = 1), we can calculate the probability of getting such an extreme value by chance. That probability is the p-value.
