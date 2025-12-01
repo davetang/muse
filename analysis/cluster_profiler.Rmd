@@ -408,6 +408,30 @@ entrez_to_symbol_and_go |>
 
 Still a mystery on the number 29.
 
+### RichFactor
+
+The `RichFactor` is calculated by `Count` / `M`, where `Count` is the number of genes from your input list annotated to the term, and `M` is the total number of genes in the background that are annotated to that term (the numerator of `BgRatio`).
+
+```{r ego_bp_rich_factor}
+ego_bp |>
+  as.data.frame() |>
+  dplyr::slice_head(n = 1) -> my_df
+
+my_df$Count / as.numeric(unlist(stringr::str_split(string = my_df$BgRatio, pattern = '/'))[1]) == my_df$RichFactor
+```
+
+### FoldEnrichment
+
+`FoldEnrichment` is simply `GeneRatio` divided by `BgRatio`.
+
+```{r ego_bp_fold_enrichment}
+ego_bp |>
+  as.data.frame() |>
+  dplyr::slice_head(n = 1) -> my_df
+
+all.equal(my_df$FoldEnrichment, eval(parse(text = my_df$GeneRatio)) / eval(parse(text = my_df$BgRatio)))
+```
+
 ### Visualisations
 
 Bar plot showing each enriched GO term coloured by the adjusted p-value.
