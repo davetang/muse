@@ -432,6 +432,39 @@ ego_bp |>
 all.equal(my_df$FoldEnrichment, eval(parse(text = my_df$GeneRatio)) / eval(parse(text = my_df$BgRatio)))
 ```
 
+### zScore
+
+`zScore` = (k - mu)/sqrt(sigma),
+
+where mu = M * n / N and sigma = mu * (N - n) * (N - M) / N / (N-1),
+
+where:
+
+k = total genes in provided list annotated to the term
+M = total genes in background annotated to the term
+n = total genes in provided list
+N = total genes in the background universe
+
+```{r ego_bp_zscore}
+ego_bp |>
+  as.data.frame() |>
+  dplyr::slice_head(n = 1) -> my_df
+
+get_value_from_fraction <- function(x, y){
+  as.numeric(unlist(stringr::str_split(string = x, pattern = '/'))[y])
+}
+
+k <- get_value_from_fraction(my_df$GeneRatio, 1)
+n <- get_value_from_fraction(my_df$GeneRatio, 2)
+M <- get_value_from_fraction(my_df$BgRatio, 1)
+N <- get_value_from_fraction(my_df$BgRatio, 2)
+
+mu <- M * n / N
+s <- mu * (N - n) * (N - M) / N / (N - 1)
+
+(k - mu)/sqrt(s) == my_df$zScore
+```
+
 ### Visualisations
 
 Bar plot showing each enriched GO term coloured by the adjusted p-value.
