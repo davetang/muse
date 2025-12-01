@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3bc33aabcb24474b28e2c81844b6bc7733f7798etargetblank3bc33aaa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree25d78934270b81577c93bf28834077b7bf1a13d6targetblank25d7893a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/3bc33aabcb24474b28e2c81844b6bc7733f7798e" target="_blank">3bc33aa</a>
+<a href="https://github.com/davetang/muse/tree/25d78934270b81577c93bf28834077b7bf1a13d6" target="_blank">25d7893</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3bc33aabcb24474b28e2c81844b6bc7733f7798etargetblank3bc33aaa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree25d78934270b81577c93bf28834077b7bf1a13d6targetblank25d7893a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/3bc33aabcb24474b28e2c81844b6bc7733f7798e" target="_blank">3bc33aa</a>.
+<a href="https://github.com/davetang/muse/tree/25d78934270b81577c93bf28834077b7bf1a13d6" target="_blank">25d7893</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -646,6 +646,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/25d78934270b81577c93bf28834077b7bf1a13d6/analysis/cluster_profiler.Rmd" target="_blank">25d7893</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-12-01
+</td>
+<td>
+Calculate zScore
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/00195dc0d9e647747f5f77a17eec614ee65c391a/docs/cluster_profiler.html" target="_blank">00195dc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-12-01
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1554,6 +1588,34 @@ by <code>BgRatio</code>.</p>
 all.equal(my_df$FoldEnrichment, eval(parse(text = my_df$GeneRatio)) / eval(parse(text = my_df$BgRatio)))</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
+<div id="zscore" class="section level3">
+<h3>zScore</h3>
+<p><code>zScore</code> = (k - mu)/sqrt(sigma),</p>
+<p>where mu = M * n / N and sigma = mu * (N - n) * (N - M) / N /
+(N-1),</p>
+<p>where:</p>
+<p>k = total genes in provided list annotated to the term M = total
+genes in background annotated to the term n = total genes in provided
+list N = total genes in the background universe</p>
+<pre class="r"><code>ego_bp |&gt;
+  as.data.frame() |&gt;
+  dplyr::slice_head(n = 1) -&gt; my_df
+
+get_value_from_fraction &lt;- function(x, y){
+  as.numeric(unlist(stringr::str_split(string = x, pattern = &#39;/&#39;))[y])
+}
+
+k &lt;- get_value_from_fraction(my_df$GeneRatio, 1)
+n &lt;- get_value_from_fraction(my_df$GeneRatio, 2)
+M &lt;- get_value_from_fraction(my_df$BgRatio, 1)
+N &lt;- get_value_from_fraction(my_df$BgRatio, 2)
+
+mu &lt;- M * n / N
+s &lt;- mu * (N - n) * (N - M) / N / (N - 1)
+
+(k - mu)/sqrt(s) == my_df$zScore</code></pre>
+<pre><code>[1] TRUE</code></pre>
+</div>
 <div id="visualisations" class="section level3">
 <h3>Visualisations</h3>
 <p>Bar plot showing each enriched GO term coloured by the adjusted
@@ -1773,6 +1835,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/00195dc0d9e647747f5f77a17eec614ee65c391a/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">00195dc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-12-01
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/18e8e9b7e30957ba8e89e2e3844d045616cb3a86/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">18e8e9b</a>
