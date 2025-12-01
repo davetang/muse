@@ -465,6 +465,36 @@ s <- mu * (N - n) * (N - M) / N / (N - 1)
 (k - mu)/sqrt(s) == my_df$zScore
 ```
 
+### P-value
+
+The p-value is calculated using the hypergeometric distribution.
+
+```{r ego_bp_pvalue}
+ego_bp |>
+  as.data.frame() |>
+  dplyr::slice_head(n = 1) -> my_df
+
+phyper(
+  q = k - 1,
+  m = M,
+  n = N - M,
+  k = n,
+  lower.tail = FALSE
+) == my_df$pvalue
+```
+
+###  Adjusted p-value
+
+I don't know how I can get `n` from the results because the results only contain the significant results and not all the tests that were performed.
+
+```{r ego_bp_p_adjust}
+ego_bp |>
+  as.data.frame() |>
+  dplyr::slice_head(n = 1) -> my_df
+
+my_df$p.adjust == p.adjust(p = my_df$pvalue, method = "BH")
+```
+
 ### Visualisations
 
 Bar plot showing each enriched GO term coloured by the adjusted p-value.
