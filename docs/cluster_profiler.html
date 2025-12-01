@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-05-26" />
+<meta name="date" content="2025-12-01" />
 
 <title>Getting started with clusterProfiler</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Getting started with clusterProfiler</h1>
-<h4 class="date">2025-05-26</h4>
+<h4 class="date">2025-12-01</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-05-26
+<strong>Last updated:</strong> 2025-12-01
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeec4e2515caca03020a6be3dc7914be6231d90208targetblankec4e251a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3bc33aabcb24474b28e2c81844b6bc7733f7798etargetblank3bc33aaa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/ec4e2515caca03020a6be3dc7914be6231d90208" target="_blank">ec4e251</a>
+<a href="https://github.com/davetang/muse/tree/3bc33aabcb24474b28e2c81844b6bc7733f7798e" target="_blank">3bc33aa</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeec4e2515caca03020a6be3dc7914be6231d90208targetblankec4e251a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3bc33aabcb24474b28e2c81844b6bc7733f7798etargetblank3bc33aaa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/ec4e2515caca03020a6be3dc7914be6231d90208" target="_blank">ec4e251</a>.
+<a href="https://github.com/davetang/muse/tree/3bc33aabcb24474b28e2c81844b6bc7733f7798e" target="_blank">3bc33aa</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -572,8 +572,11 @@ Ignored files:
     Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
     Ignored:    data/pbmc20k/
     Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.h5ad
     Ignored:    data/pbmc3k/
     Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
     Ignored:    data/pbmc3k_seurat.rds
     Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
     Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
@@ -585,14 +588,20 @@ Ignored files:
     Ignored:    r_packages_4.5.0/
 
 Untracked files:
-    Untracked:  Nothobranchius_furzeri.Nfu_20140520.113.gtf.gz
+    Untracked:  analysis/bioc.Rmd
     Untracked:  analysis/bioc_scrnaseq.Rmd
     Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
     Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
     Untracked:  m3/
-    Untracked:  pbmc3k_before_filtering.rds
-    Untracked:  pbmc3k_save_rds.rds
-    Untracked:  rsem.merged.gene_counts.tsv
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/isoform_switch_analyzer.Rmd
 
 </code></pre>
 <p>
@@ -637,6 +646,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/3bc33aabcb24474b28e2c81844b6bc7733f7798e/analysis/cluster_profiler.Rmd" target="_blank">3bc33aa</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-12-01
+</td>
+<td>
+Manually calculate RichFactor and FoldEnrichment
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/18e8e9b7e30957ba8e89e2e3844d045616cb3a86/docs/cluster_profiler.html" target="_blank">18e8e9b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-26
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1486,6 +1529,31 @@ additional_ids</code></pre>
 19 102723169 IGHV1-69D GO:0016064      IBA       BP</code></pre>
 <p>Still a mystery on the number 29.</p>
 </div>
+<div id="richfactor" class="section level3">
+<h3>RichFactor</h3>
+<p>The <code>RichFactor</code> is calculated by <code>Count</code> /
+<code>M</code>, where <code>Count</code> is the number of genes from
+your input list annotated to the term, and <code>M</code> is the total
+number of genes in the background that are annotated to that term (the
+numerator of <code>BgRatio</code>).</p>
+<pre class="r"><code>ego_bp |&gt;
+  as.data.frame() |&gt;
+  dplyr::slice_head(n = 1) -&gt; my_df
+
+my_df$Count / as.numeric(unlist(stringr::str_split(string = my_df$BgRatio, pattern = &#39;/&#39;))[1]) == my_df$RichFactor</code></pre>
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div id="foldenrichment" class="section level3">
+<h3>FoldEnrichment</h3>
+<p><code>FoldEnrichment</code> is simply <code>GeneRatio</code> divided
+by <code>BgRatio</code>.</p>
+<pre class="r"><code>ego_bp |&gt;
+  as.data.frame() |&gt;
+  dplyr::slice_head(n = 1) -&gt; my_df
+
+all.equal(my_df$FoldEnrichment, eval(parse(text = my_df$GeneRatio)) / eval(parse(text = my_df$BgRatio)))</code></pre>
+<pre><code>[1] TRUE</code></pre>
+</div>
 <div id="visualisations" class="section level3">
 <h3>Visualisations</h3>
 <p>Bar plot showing each enriched GO term coloured by the adjusted
@@ -1514,6 +1582,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/18e8e9b7e30957ba8e89e2e3844d045616cb3a86/docs/figure/cluster_profiler.Rmd/barplot-1.png" target="_blank">18e8e9b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-26
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/e815348c6fc2adfec65202ff3718880a944b088c/docs/figure/cluster_profiler.Rmd/barplot-1.png" target="_blank">e815348</a>
@@ -1568,6 +1647,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/18e8e9b7e30957ba8e89e2e3844d045616cb3a86/docs/figure/cluster_profiler.Rmd/dotplot-1.png" target="_blank">18e8e9b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-26
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/e815348c6fc2adfec65202ff3718880a944b088c/docs/figure/cluster_profiler.Rmd/dotplot-1.png" target="_blank">e815348</a>
 </td>
 <td>
@@ -1620,6 +1710,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/18e8e9b7e30957ba8e89e2e3844d045616cb3a86/docs/figure/cluster_profiler.Rmd/heatplot-1.png" target="_blank">18e8e9b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-26
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/e815348c6fc2adfec65202ff3718880a944b088c/docs/figure/cluster_profiler.Rmd/heatplot-1.png" target="_blank">e815348</a>
 </td>
 <td>
@@ -1647,7 +1748,112 @@ Dave Tang
 <p><code>goplot</code> shows the gene ontology graph with the enriched
 GO terms highlighted.</p>
 <pre class="r"><code>goplot(ego_bp)</code></pre>
-<pre><code>Error in goplot.enrichResult(x, showCategory = showCategory, color = color, : Ontology should be one of &#39;MF&#39;, &#39;CC&#39; or &#39;BP&#39;</code></pre>
+<pre><code>Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+increasing max.overlaps</code></pre>
+<p><img src="figure/cluster_profiler.Rmd/goplot-1.png" width="1152" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-goplot-1">
+Past versions of goplot-1.png
+</button>
+</p>
+<div id="fig-goplot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/18e8e9b7e30957ba8e89e2e3844d045616cb3a86/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">18e8e9b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-26
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/0ac82102a0064cf6f70ad9fdec39e3272f0aefe0/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">0ac8210</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-24
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/c8e80cd43b29fa99ef8a009be39c1b496db2de7f/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">c8e80cd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-23
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/006e824308df24e7f43c3d664e30d96617250941/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">006e824</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-09
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/f0166b0791270b7f3b51540dc73a64d37947e451/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">f0166b0</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-09
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/e815348c6fc2adfec65202ff3718880a944b088c/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">e815348</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-03-06
+</td>
+</tr>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/2c080dce2c4547d90fe19cf649b4683a4aaa5142/docs/figure/cluster_profiler.Rmd/goplot-1.png" target="_blank">2c080dc</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2024-11-01
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Another nice feature of {clusterProfiler} is that you can plot
 multiple gene lists together. We can create a list of down-regulated
 genes.</p>
@@ -1745,6 +1951,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/18e8e9b7e30957ba8e89e2e3844d045616cb3a86/docs/figure/cluster_profiler.Rmd/dotplot_gene_list-1.png" target="_blank">18e8e9b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-26
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/davetang/muse/blob/e815348c6fc2adfec65202ff3718880a944b088c/docs/figure/cluster_profiler.Rmd/dotplot_gene_list-1.png" target="_blank">e815348</a>
@@ -2042,6 +2259,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/18e8e9b7e30957ba8e89e2e3844d045616cb3a86/docs/figure/cluster_profiler.Rmd/dotplot_res-1.png" target="_blank">18e8e9b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-05-26
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/006e824308df24e7f43c3d664e30d96617250941/docs/figure/cluster_profiler.Rmd/dotplot_res-1.png" target="_blank">006e824</a>
 </td>
 <td>
@@ -2077,7 +2305,7 @@ Session information
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 4.5.0 (2025-04-11)
 Platform: x86_64-pc-linux-gnu
-Running under: Ubuntu 24.04.2 LTS
+Running under: Ubuntu 24.04.3 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -2102,40 +2330,40 @@ other attached packages:
  [1] GO.db_3.21.0           org.Hs.eg.db_3.21.0    AnnotationDbi_1.70.0  
  [4] IRanges_2.42.0         S4Vectors_0.46.0       Biobase_2.68.0        
  [7] BiocGenerics_0.54.0    generics_0.1.4         clusterProfiler_4.16.0
-[10] ggarchery_0.4.3        lubridate_1.9.4        forcats_1.0.0         
+[10] ggarchery_0.4.4        lubridate_1.9.4        forcats_1.0.0         
 [13] stringr_1.5.1          dplyr_1.1.4            purrr_1.0.4           
-[16] readr_2.1.5            tidyr_1.3.1            tibble_3.2.1          
+[16] readr_2.1.5            tidyr_1.3.1            tibble_3.3.0          
 [19] ggplot2_3.5.2          tidyverse_2.0.0        workflowr_1.7.1       
 
 loaded via a namespace (and not attached):
   [1] DBI_1.2.3               gson_0.1.0              rlang_1.1.6            
   [4] magrittr_2.0.3          DOSE_4.2.0              git2r_0.36.2           
-  [7] compiler_4.5.0          RSQLite_2.3.11          getPass_0.2-4          
+  [7] compiler_4.5.0          RSQLite_2.4.2           getPass_0.2-4          
  [10] png_0.1-8               callr_3.7.6             vctrs_0.6.5            
  [13] reshape2_1.4.4          pkgconfig_2.0.3         crayon_1.5.3           
  [16] fastmap_1.2.0           XVector_0.48.0          labeling_0.4.3         
- [19] utf8_1.2.5              promises_1.3.2          rmarkdown_2.29         
- [22] tzdb_0.5.0              enrichplot_1.28.2       UCSC.utils_1.4.0       
+ [19] utf8_1.2.6              promises_1.3.3          rmarkdown_2.29         
+ [22] tzdb_0.5.0              enrichplot_1.28.4       UCSC.utils_1.4.0       
  [25] ps_1.9.1                bit_4.6.0               xfun_0.52              
- [28] cachem_1.1.0            aplot_0.2.5             GenomeInfoDb_1.44.0    
+ [28] cachem_1.1.0            aplot_0.2.8             GenomeInfoDb_1.44.1    
  [31] jsonlite_2.0.0          blob_1.2.4              later_1.4.2            
- [34] BiocParallel_1.42.0     parallel_4.5.0          R6_2.6.1               
+ [34] BiocParallel_1.42.1     parallel_4.5.0          R6_2.6.1               
  [37] bslib_0.9.0             stringi_1.8.7           RColorBrewer_1.1-3     
  [40] jquerylib_0.1.4         GOSemSim_2.34.0         Rcpp_1.0.14            
- [43] knitr_1.50              ggtangle_0.0.6          R.utils_2.13.0         
+ [43] knitr_1.50              ggtangle_0.0.7          R.utils_2.13.0         
  [46] igraph_2.1.4            httpuv_1.6.16           Matrix_1.7-3           
  [49] splines_4.5.0           timechange_0.3.0        tidyselect_1.2.1       
  [52] qvalue_2.40.0           rstudioapi_0.17.1       yaml_2.3.10            
- [55] codetools_0.2-20        curl_6.2.3              processx_3.8.6         
+ [55] codetools_0.2-20        curl_6.4.0              processx_3.8.6         
  [58] lattice_0.22-6          plyr_1.8.9              treeio_1.32.0          
- [61] withr_3.0.2             KEGGREST_1.48.0         evaluate_1.0.3         
- [64] gridGraphics_0.5-1      Biostrings_2.76.0       ggtree_3.16.0          
- [67] pillar_1.10.2           whisker_0.4.1           ggfun_0.1.8            
+ [61] withr_3.0.2             KEGGREST_1.48.1         evaluate_1.0.3         
+ [64] gridGraphics_0.5-1      Biostrings_2.76.0       ggtree_3.16.3          
+ [67] pillar_1.10.2           whisker_0.4.1           ggfun_0.2.0            
  [70] vroom_1.6.5             rprojroot_2.0.4         hms_1.1.3              
  [73] tidytree_0.4.6          scales_1.4.0            glue_1.8.0             
- [76] lazyeval_0.2.2          tools_4.5.0             data.table_1.17.2      
- [79] fgsea_1.34.0            fs_1.6.6                fastmatch_1.1-6        
- [82] cowplot_1.1.3           grid_4.5.0              ape_5.8-1              
+ [76] lazyeval_0.2.2          tools_4.5.0             data.table_1.17.4      
+ [79] fgsea_1.34.2            fs_1.6.6                fastmatch_1.1-6        
+ [82] cowplot_1.2.0           grid_4.5.0              ape_5.8-1              
  [85] nlme_3.1-168            patchwork_1.3.0         GenomeInfoDbData_1.2.14
  [88] cli_3.6.5               gtable_0.3.6            R.methodsS3_1.8.2      
  [91] yulab.utils_0.2.0       sass_0.4.10             digest_0.6.37          
