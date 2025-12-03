@@ -1,0 +1,64 @@
+---
+title: "Bartlett's Test"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Bartlett's test is used to assess whether multiple groups have equal variances (homogeneity of variance). It is sensitive to departures from normality, and should therefore be used primarily when the assumption of normality is reasonable.
+
+## Example
+
+Simulate three groups with different variances.
+
+```{r eg1}
+set.seed(1984)
+
+group1 <- rnorm(50, mean = 10, sd = 1)
+group2 <- rnorm(50, mean = 10, sd = 3)
+group3 <- rnorm(50, mean = 10, sd = 5)
+
+my_groups <- factor(rep(c("Group 1", "Group 2", "Group 3"), each = 50))
+my_values <- c(group1, group2, group3)
+eg1 <- data.frame(my_groups, my_values)
+head(eg1)
+```
+
+Apply Bartlett's test to evaluate whether the variances are equal across groups.
+
+```{r eg1_test}
+bartlett.test(my_values ~ my_groups, data = eg1)
+```
+
+The null hypothesis is that all groups have equal variances and the alternative hypothesis is that at least one group has a different variance. Here the extremely small p-value suggests rejecting the null, i.e., variances differ between groups.
+
+```{r eg1_boxplot}
+ggplot(eg1, aes(my_groups, my_values)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(x = '', y = 'Values')
+```
+
+Same variance.
+
+```{r eg2}
+set.seed(1984)
+
+group1 <- rnorm(50, mean = 9,  sd = 2.1)
+group2 <- rnorm(50, mean = 10, sd = 2)
+group3 <- rnorm(50, mean = 11, sd = 1.9)
+
+my_groups <- factor(rep(c("Group 1", "Group 2", "Group 3"), each = 50))
+my_values <- c(group1, group2, group3)
+eg2 <- data.frame(my_groups, my_values)
+
+bartlett.test(my_values ~ my_groups, data = eg2)
+```
