@@ -11,16 +11,124 @@ library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Introduction
+
+Fisher's Exact Test is a statistical method for determining whether there is a significant association between two categorical variables. It is particularly useful when:
+
+* Sample sizes are small
+* Expected cell frequencies are low (< 5 in any cell)
+* You need precise p-values, i.e., an exact test, without relying on large-sample approximations
+
+The test examines whether the observed pattern in your data could reasonably occur by chance alone, or whether it suggests a genuine relationship between the variables. It works with data organised in contingency tables (most commonly 2×2, but applicable to larger tables as well).
+
+Some guidelines for when to use Fisher's Exact Test:
+
+* Any cell has an **expected count** less than 5
+* Total sample size less than 20-40
+* The test works for any sample size, but may be overkill for large datasets
+
+Regarding expected counts, this is not the same as observed values in the data.
+
+```{r eg1}
+eg1 <- matrix(
+  c(8, 3, 2, 7), 
+  nrow = 2,
+  dimnames = list(
+    c("A", "B"),
+    c("Success", "Failure")
+  )
+)
+eg1
+```
+
+The observed counts are 8, 3, 2, 7 and the expected counts are what you would expect if there were no association between the groups and outcomes.
+
+Expected Count = (Row Total * Column Total) / Grand Total.
+
+```{r eg1_expected_count}
+row_totals <- rowSums(eg1)
+col_totals <- colSums(eg1)
+grand_total <- sum(eg1)
+
+expected_counts <- matrix(0, nrow = 2, ncol = 2, dimnames = dimnames(eg1))
+
+for(i in 1:2) {
+  for(j in 1:2) {
+    expected_counts[i,j] <- row_totals[i] * col_totals[j] / grand_total
+  }
+}
+
+expected_counts
+```
+
+* Cell (Group A, Success): (10 × 11) / 20 = 5.5
+* Cell (Group A, Failure): (10 × 9) / 20 = 4.5
+* Cell (Group B, Success): (10 × 11) / 20 = 5.5
+* Cell (Group B, Failure): (10 × 9) / 20 = 4.5
+
+Since two cells have expected counts < 5, Fisher's Exact Test is appropriate for this data. The chi-square test approximation relies on expected frequencies being large enough (>= 5). When expected counts are small, the chi-square approximation becomes unreliable, and Fisher's Exact Test should be used instead.
+
+Calculate expected counts with a Chi-square test.
+
+```{r chisq_test}
+chisq_test <- chisq.test(eg1)
+chisq_test$expected
+```
+
+## Clinical trial
+
+Imagine a small clinical trial to test a new drug for migraines. 20 patients are recruited and randomly assigned to whether they will receive the new drug or a placebo. After the treatment, whether patient experienced relief from their migraine was recorded.
+
+```{r clinical_data}
+clinical_data <- matrix(
+  c(8, 3, 2, 7), 
+  nrow = 2,
+  dimnames = list(
+    c("New Drug", "Placebo"),
+    c("Relief", "No Relief")
+  )
+)
+clinical_data
+```
+
+We can use Fisher's Exact Test to test "What is the probability of seeing a pattern this strong (or stronger) if the drug had no effect?"
+
+Imagine there are 11 "Relief" cards and 9 "No Relief" cards and you randomly deal 10 cards to "New Drug" group and 10 to "Placebo" group. Fisher's test asks: "If I shuffled these cards randomly many times, how often would I see a split as extreme as 8-2 vs 3-7?"
+
+```{r fisher_test_clinical_data}
+res <- fisher.test(clinical_data)
+res
+```
+
+If the drug had no effect, there's only about a 0.06978% chance you'd see a pattern this extreme or more extreme by random chance.
+
+## Exact test
+
+Unlike other statistical tests that use approximations, Fisher's Exact test:
+
+* Counts every single possible outcome
+* Calculates precise probabilities for each
+* No approximations
+
+## Comparing with Chi-Square Test
+
+Let's see what happens if we use chi-square test (an approximation) on our small dataset:
+
+```{r chisq_test_clinical_data}
+chisq_result <- chisq.test(clinical_data)
+chisq_result
+```
+
 ## Global test
 
-If you have more than two clusters, Fisher's Exact Test becomes a generalised Fisher's Exact Test (also known as Fisher-Freeman-Halton test), because the regular Fisher's test is for 2x2 tables.
+If you have more than two categories, Fisher's Exact Test becomes a generalised Fisher's Exact Test (also known as Fisher-Freeman-Halton test), because the regular Fisher's test is for 2x2 tables.
 
-For larger tables, people often use:
+As noted above, for larger tables people often use:
 
 * Chi-squared test (if counts are not too small)
 * Generalised Fisher's Exact Test (exact test and have a small sample)
 
-Create cluster table.
+Create cell cluster table.
 
 ```{r cluster_table}
 treated   <- c(50, 60, 40, 30, 80, 90, 20, 15, 70, 45)
