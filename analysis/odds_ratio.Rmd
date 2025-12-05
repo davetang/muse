@@ -1,0 +1,101 @@
+---
+title: "Odds Ratio"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Odds ratios are widely used to measure **the strength of association between two variables**. Odds and probability are related but they are different:
+
+* Probability: Chance of something happening out of all possibilities
+* Odds: Ratio of something happening to it NOT happening
+
+```{r odds-vs-prob}
+sick <- 2
+healthy <- 8
+total <- sick + healthy
+
+probability <- sick / total
+probability
+
+odds <- sick / healthy
+odds
+```
+
+**An odds ratio compares the odds of an event between two groups**.
+
+## Smoking and Lung Cancer
+
+A sample of 200 people broken down into four categories.
+
+```{r smoking_example}
+data <- matrix(
+  c(20, 80, 2, 98),
+  nrow = 2,
+  byrow = TRUE,
+  dimnames = list(
+    c("Smokers", "Non-smokers"),
+    c("Cancer", "No Cancer")
+  )
+)
+
+data
+```
+
+Calculate odds of cancer for the two groups.
+
+```{r smoking_example_odds}
+odds_smokers <- data[1, 1] / data[1, 2]
+odds_nonsmokers <- data[2, 1] / data[2, 2]
+
+odds_smokers
+odds_nonsmokers
+```
+
+Calculate odds ratio.
+
+
+```{r smoking_example_odds_ratio}
+odds_ratio <- odds_smokers / odds_nonsmokers
+odds_ratio
+```
+
+Smokers have `r odds_ratio` times the odds of lung cancer compared to non-smokers.
+
+## Using Fisher's Exact Test
+
+Use `fisher.test()` for calculating odds ratios with confidence intervals.
+
+```{r fishers-test}
+fisher.test(data)
+```
+
+## Logistic Regression Example
+
+Odds ratios from logistic regression models.
+
+```{r logistic_regression_eg}
+set.seed(1984)
+n <- 200
+age <- rnorm(n, mean = 50, sd = 15)
+smoker <- rbinom(n, 1, 0.3)
+disease <- rbinom(n, 1, plogis(-5 + 0.05*age + 2*smoker))
+
+model <- glm(disease ~ age + smoker, family = binomial)
+summary(model)
+```
+
+Odds ratios.
+
+```{r logistic_regression_odds_ratios}
+or_coef <- exp(coef(model))
+or_coef
+```
