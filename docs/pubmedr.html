@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-01-05" />
+
+<title>Using the pubmedR package</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Using the pubmedR package</h1>
+<h4 class="date">2026-01-05</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-01-05
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6eafc4d60101428fbebf558d8a1173b668158175targetblank6eafc4da">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/6eafc4d60101428fbebf558d8a1173b668158175" target="_blank">6eafc4d</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6eafc4d60101428fbebf558d8a1173b668158175targetblank6eafc4da"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/6eafc4d60101428fbebf558d8a1173b668158175" target="_blank">6eafc4d</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.4.1/
+    Ignored:    r_packages_4.5.0/
+
+Untracked files:
+    Untracked:  analysis/bioc.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/likelihood.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
+    Untracked:  m3/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/isoform_switch_analyzer.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/pubmedr.Rmd</code>) and HTML
+(<code>docs/pubmedr.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/6eafc4d60101428fbebf558d8a1173b668158175/analysis/pubmedr.Rmd" target="_blank">6eafc4d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-05
+</td>
+<td>
+Using the pubmedR package
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>Following the <a
+href="https://cran.r-project.org/web/packages/pubmedR/vignettes/A_Brief_Example.html">brief
+demo</a>.</p>
+<pre class="r"><code>install.packages(&quot;pubmedR&quot;)
+install.packages(&quot;bibliometrix&quot;)</code></pre>
+<p>Load library.</p>
+<pre class="r"><code>library(pubmedR)
+packageVersion(&quot;pubmedR&quot;)</code></pre>
+<pre><code>[1] &#39;0.0.3&#39;</code></pre>
+<p>Perform a query.</p>
+<pre class="r"><code>query &lt;- &quot;bibliometric*[Title/Abstract] AND english[LA] AND Journal Article[PT] AND 2000:2020[DP]&quot;
+res &lt;- pmQueryTotalCount(query = query)
+res$total_count</code></pre>
+<pre><code>[1] 3748</code></pre>
+<p><a href="https://pubmed.ncbi.nlm.nih.gov/help/#search-tags">Search
+field tags</a>:</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td>Affiliation [ad]</td>
+<td>Full Investigator Name [fir]</td>
+<td>Pagination [pg]</td>
+</tr>
+<tr class="even">
+<td>All Fields [all]</td>
+<td>Grants and Funding [gr]</td>
+<td>Personal Name as Subject [ps]</td>
+</tr>
+<tr class="odd">
+<td>Article Identifier [aid]</td>
+<td>Investigator [ir]</td>
+<td>Pharmacological Action [pa]</td>
+</tr>
+<tr class="even">
+<td>Author [au]</td>
+<td>ISBN [isbn]</td>
+<td>Place of Publication [pl]</td>
+</tr>
+<tr class="odd">
+<td>Author Identifier [auid]</td>
+<td>Issue [ip]</td>
+<td>PMCID and MID</td>
+</tr>
+<tr class="even">
+<td>Book [book]</td>
+<td>Journal [ta]</td>
+<td>PMID [pmid]</td>
+</tr>
+<tr class="odd">
+<td>Comment Correction Type</td>
+<td>Language [la]</td>
+<td>Publication Date [dp]</td>
+</tr>
+<tr class="even">
+<td>Completion Date [dcom]</td>
+<td>Last Author Name [lastau]</td>
+<td>Publication Type [pt]</td>
+</tr>
+<tr class="odd">
+<td>Conflict of Interest Statement [cois]</td>
+<td>Location ID [lid]</td>
+<td>Publisher [pubn]</td>
+</tr>
+<tr class="even">
+<td>Corporate Author [cn]</td>
+<td>MeSH Date [mhda]</td>
+<td>Secondary Source ID [si]</td>
+</tr>
+<tr class="odd">
+<td>Create Date [crdt]</td>
+<td>MeSH Major Topic [majr]</td>
+<td>Subset [sb]</td>
+</tr>
+<tr class="even">
+<td>EC/RN Number [rn]</td>
+<td>MeSH Subheadings [sh]</td>
+<td>Supplementary Concept [nm]</td>
+</tr>
+<tr class="odd">
+<td>Editor [ed]</td>
+<td>MeSH Terms [mh]</td>
+<td>Text Words [tw]</td>
+</tr>
+<tr class="even">
+<td>Entry Date [edat]</td>
+<td>Modification Date [lr]</td>
+<td>Title [ti]</td>
+</tr>
+<tr class="odd">
+<td>Filter [filter] [sb]</td>
+<td>NLM Unique ID [jid]</td>
+<td>Title/Abstract [tiab]</td>
+</tr>
+<tr class="even">
+<td>First Author Name [1au]</td>
+<td>Other Term [ot]</td>
+<td>Transliterated Title [tt]</td>
+</tr>
+<tr class="odd">
+<td>Full Author Name [fau]</td>
+<td>Owner</td>
+<td>Volume [vi]</td>
+</tr>
+</tbody>
+</table>
+<p>Search for some dude called Dave Tang.</p>
+<pre class="r"><code>query &lt;- &quot;Dave Tang[fau]&quot;
+res &lt;- pmQueryTotalCount(query = query)
+res</code></pre>
+<pre><code>$total_count
+[1] 22
+
+$query_translation
+[1] &quot;tang, dave[Author]&quot;
+
+$web_history
+Web history object (QueryKey = 1, WebEnv = MCID_695b52f...)</code></pre>
+<p>Download the collection of document metadata.</p>
+<pre class="r"><code>D &lt;- pmApiRequest(query = query, limit = res$total_count, api_key = NULL)</code></pre>
+<pre><code>Documents  22  of  22 </code></pre>
+<pre class="r"><code>M &lt;- pmApi2df(D)</code></pre>
+<pre><code>================================================================================</code></pre>
+<p>Use some {bibliometrix} functions to get an overview of the
+bibliographic collection.</p>
+<pre class="r"><code>suppressPackageStartupMessages(library(bibliometrix))
+M &lt;- convert2df(D, dbsource = &quot;pubmed&quot;, format = &quot;api&quot;)</code></pre>
+<pre><code>
+Converting your pubmed collection into a bibliographic dataframe
+
+================================================================================
+Done!</code></pre>
+<pre class="r"><code>results &lt;- biblioAnalysis(M)
+summary(results)</code></pre>
+<pre><code>
+
+MAIN INFORMATION ABOUT DATA
+
+ Timespan                              2008 : 2020 
+ Sources (Journals, Books, etc)        14 
+ Documents                             21 
+ Annual Growth Rate %                  0 
+ Document Average Age                  12.5 
+ Average citations per doc             0 
+ Average citations per year per doc    0 
+ References                            1 
+ 
+DOCUMENT TYPES                     
+ case reports           2 
+ comparative study      1 
+ dataset                1 
+ journal article        17 
+ 
+DOCUMENT CONTENTS
+ Keywords Plus (ID)                    179 
+ Author&#39;s Keywords (DE)                28 
+ 
+AUTHORS
+ Authors                               194 
+ Author Appearances                    269 
+ Authors of single-authored docs       0 
+ 
+AUTHORS COLLABORATION
+ Single-authored docs                  0 
+ Documents per Author                  0.108 
+ Co-Authors per Doc                    12.8 
+ International co-authorships %        0 
+ 
+
+Annual Scientific Production
+
+ Year    Articles
+    2008        2
+    2009        3
+    2010        2
+    2011        1
+    2012        2
+    2014        1
+    2015        1
+    2016        4
+    2017        2
+    2018        1
+    2020        2
+
+Annual Percentage Growth Rate 0 
+
+
+Most Productive Authors
+
+   Authors        Articles Authors        Articles Fractionalized
+1    TANG D             17   TANG D                         1.673
+2    LASSMANN T          6   CARNINCI P                     0.680
+3    CARNINCI P          5   TANG DT                        0.597
+4    GRIMMOND SM         5   GRIMMOND SM                    0.474
+5    BLACKWELL JM        4   SAXENA A                       0.444
+6    CHIU HS             4   LASSMANN T                     0.410
+7    LITTLE MH           4   CHIU HS                        0.331
+8    TANG DT             4   LITTLE MH                      0.331
+9    ANDERSON D          3   BLACKWELL JM                   0.308
+10   GEORGAS KM          3   ANDERSON D                     0.303
+
+
+Top manuscripts per citations
+
+                                 Paper                                 DOI TC TCperYear NTC
+1  LASSMANN T, 2020, NPJ GENOM MED              10.1038/s41525-020-00161-w  0         0 NaN
+2  ANDERSON D, 2020, SCI REP                    10.1038/s41598-020-76157-4  0         0 NaN
+3  BERTUZZI M, 2018, HUM MUTAT                  10.1002/humu.23974          0         0 NaN
+4  TANG D, 2017, SCI REP                        10.1038/s41598-018-29279-9  0         0 NaN
+5  ROTHACKER KM, 2017, INT J PEDIATR ENDOCRINOL 10.1186/s13633-018-0056-3   0         0 NaN
+6  ROUDNICKY F, 2016, J PATHOL                  10.1002/path.4892           0         0 NaN
+7  HON CC, 2016, NATURE                         10.1038/nature21374         0         0 NaN
+8  ABRAHAM MB, 2016, INT J PEDIATR ENDOCRINOL   10.1186/s13633-016-0041-7   0         0 NaN
+9  BAYNAM G, 2016, ORPHANET J RARE DIS          10.1186/s13023-016-0462-7   0         0 NaN
+10 TANG D, 2015, SCI DATA                       10.1038/sdata.2016.23       0         0 NaN
+
+
+Corresponding Author&#39;s Countries
+
+  Country Articles Freq SCP MCP MCP_Ratio
+1      NA       21    1  21   0         0
+
+
+SCP: Single Country Publications
+
+MCP: Multiple Country Publications
+
+
+Total Citations per Country
+
+  Country      Total Citations Average Article Citations
+1           NA               0                         0
+
+
+Most Relevant Sources
+
+                                     Sources        Articles
+1  SCIENTIFIC REPORTS                                      3
+2  BMC GENOMICS                                            2
+3  DEVELOPMENTAL BIOLOGY                                   2
+4  INTERNATIONAL JOURNAL OF PEDIATRIC ENDOCRINOLOGY        2
+5  NATURE                                                  2
+6  PLOS ONE                                                2
+7  BIOINFORMATICS (OXFORD ENGLAND)                         1
+8  DISEASE MARKERS                                         1
+9  HUMAN MUTATION                                          1
+10 NPJ GENOMIC MEDICINE                                    1
+
+
+Most Relevant Keywords
+
+     Author Keywords (DE)      Articles                Keywords-Plus (ID)     Articles
+1  ANGIOGENESIS                       1 ANIMALS                                     11
+2  BLADDER CANCER                     1 HUMANS                                      11
+3  BLOOD TRANSCRIPTOMICS              1 MICE                                         8
+4  CLINICAL BEST PRACTICE             1 GENOMICS                                     5
+5  DESERT HEDGEHOG                    1 GENE EXPRESSION PROFILING                    4
+6  DHH                                1 GENOME-WIDE ASSOCIATION STUDY                4
+7  DIAGNOSIS                          1 HIGH-THROUGHPUT NUCLEOTIDE SEQUENCING        4
+8  DIAGNOSTIC ODYSSEY                 1 POLYMORPHISM  SINGLE NUCLEOTIDE              4
+9  DISORDER OF SEX DEVELOPMENT        1 SEQUENCE ANALYSIS  RNA                       4
+10 FAM111A GENE                       1 AUSTRALIA                                    3</code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.3 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C               LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8    LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C             LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] bibliometrix_5.0.1 pubmedR_0.0.3      lubridate_1.9.4    forcats_1.0.0      stringr_1.5.1      dplyr_1.1.4       
+ [7] purrr_1.0.4        readr_2.1.5        tidyr_1.3.1        tibble_3.3.0       ggplot2_3.5.2      tidyverse_2.0.0   
+[13] workflowr_1.7.1   
+
+loaded via a namespace (and not attached):
+ [1] tidyselect_1.2.1       viridisLite_0.4.2      farver_2.1.2           fastmap_1.2.0          lazyeval_0.2.2        
+ [6] janeaustenr_1.0.0      promises_1.3.3         XML_3.99-0.18          digest_0.6.37          timechange_0.3.0      
+[11] mime_0.13              lifecycle_1.0.4        tokenizers_0.3.0       processx_3.8.6         magrittr_2.0.3        
+[16] compiler_4.5.0         rlang_1.1.6            sass_0.4.10            tools_4.5.0            igraph_2.1.4          
+[21] yaml_2.3.10            tidytext_0.4.2         data.table_1.17.4      knitr_1.50             htmlwidgets_1.6.4     
+[26] curl_6.4.0             plyr_1.8.9             RColorBrewer_1.1-3     ca_0.71.1              withr_3.0.2           
+[31] grid_4.5.0             git2r_0.36.2           xtable_1.8-4           scales_1.4.0           cli_3.6.5             
+[36] rmarkdown_2.29         generics_0.1.4         stringdist_0.9.15      rstudioapi_0.17.1      httr_1.4.7            
+[41] tzdb_0.5.0             visNetwork_2.1.2       readxl_1.4.5           cachem_1.1.0           rscopus_0.8.1         
+[46] parallel_4.5.0         cellranger_1.1.0       vctrs_0.6.5            Matrix_1.7-3           jsonlite_2.0.0        
+[51] callr_3.7.6            hms_1.1.3              ggrepel_0.9.6          plotly_4.11.0          jquerylib_0.1.4       
+[56] glue_1.8.0             ps_1.9.1               DT_0.33                stringi_1.8.7          gtable_0.3.6          
+[61] later_1.4.2            pillar_1.10.2          htmltools_0.5.8.1      bibliometrixData_0.3.0 R6_2.6.1              
+[66] rprojroot_2.0.4        evaluate_1.0.3         shiny_1.11.1           lattice_0.22-6         rentrez_1.2.4         
+[71] SnowballC_0.7.1        openxlsx_4.2.8         openalexR_2.0.1        httpuv_1.6.16          bslib_0.9.0           
+[76] Rcpp_1.0.14            zip_2.3.3              whisker_0.4.1          dimensionsR_0.0.3      xfun_0.52             
+[81] fs_1.6.6               getPass_0.2-4          pkgconfig_2.0.3       </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
