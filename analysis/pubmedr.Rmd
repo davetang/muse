@@ -1,0 +1,80 @@
+---
+title: "Using the pubmedR package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Following the [brief demo](https://cran.r-project.org/web/packages/pubmedR/vignettes/A_Brief_Example.html).
+
+```{r install, eval=FALSE}
+install.packages("pubmedR")
+install.packages("bibliometrix")
+```
+
+Load library.
+
+```{r load_library}
+library(pubmedR)
+packageVersion("pubmedR")
+```
+
+Perform a query.
+
+```{r query}
+query <- "bibliometric*[Title/Abstract] AND english[LA] AND Journal Article[PT] AND 2000:2020[DP]"
+res <- pmQueryTotalCount(query = query)
+res$total_count
+```
+
+[Search field tags](https://pubmed.ncbi.nlm.nih.gov/help/#search-tags):
+
+| | | |
+| - | - | - |
+| Affiliation [ad]                      | Full Investigator Name [fir] | Pagination [pg] |
+| All Fields [all]                      | Grants and Funding [gr]      | Personal Name as Subject [ps] |
+| Article Identifier [aid]              | Investigator [ir]            | Pharmacological Action [pa] |
+| Author [au]                           | ISBN [isbn]                  | Place of Publication [pl] |
+| Author Identifier [auid]              | Issue [ip]                   | PMCID and MID |
+| Book [book]                           | Journal [ta]                 | PMID [pmid] |
+| Comment Correction Type               | Language [la]                | Publication Date [dp] |
+| Completion Date [dcom]                | Last Author Name [lastau]    | Publication Type [pt] |
+| Conflict of Interest Statement [cois] | Location ID [lid]            | Publisher [pubn] |
+| Corporate Author [cn]                 | MeSH Date [mhda]             | Secondary Source ID [si] |
+| Create Date [crdt]                    | MeSH Major Topic [majr]      | Subset [sb] |
+| EC/RN Number [rn]                     | MeSH Subheadings [sh]        | Supplementary Concept [nm] |
+| Editor [ed]                           | MeSH Terms [mh]              | Text Words [tw] |
+| Entry Date [edat]                     | Modification Date [lr]       | Title [ti] |
+| Filter [filter] [sb]                  | NLM Unique ID [jid]          | Title/Abstract [tiab] |
+| First Author Name [1au]               | Other Term [ot]              | Transliterated Title [tt] |
+| Full Author Name [fau]                | Owner                        | Volume [vi] |
+
+Search for some dude called Dave Tang.
+
+```{r query_fau}
+query <- "Dave Tang[fau]"
+res <- pmQueryTotalCount(query = query)
+res
+```
+
+Download the collection of document metadata.
+
+```{r download_metadata}
+D <- pmApiRequest(query = query, limit = res$total_count, api_key = NULL)
+M <- pmApi2df(D)
+```
+
+Use some {bibliometrix} functions to get an overview of the bibliographic collection.
+
+```{r load_bibliometrix}
+suppressPackageStartupMessages(library(bibliometrix))
+M <- convert2df(D, dbsource = "pubmed", format = "api")
+results <- biblioAnalysis(M)
+summary(results)
+```
