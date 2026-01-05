@@ -78,3 +78,20 @@ M <- convert2df(D, dbsource = "pubmed", format = "api")
 results <- biblioAnalysis(M)
 summary(results)
 ```
+
+Metadata.
+
+```{r results_metadata}
+names(results)
+```
+
+Affiliations.
+
+```{r results_affiliation}
+results$Affiliations |>
+  as.data.frame() |>
+  dplyr::pull(AFF) |>
+  as.vector() |>
+  unique() |>
+  head(10)
+```
