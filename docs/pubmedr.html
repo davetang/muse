@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6eafc4d60101428fbebf558d8a1173b668158175targetblank6eafc4da">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb5e26c016107b8bc77e0688ee2ea9c721e484447targetblankb5e26c0a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/6eafc4d60101428fbebf558d8a1173b668158175" target="_blank">6eafc4d</a>
+<a href="https://github.com/davetang/muse/tree/b5e26c016107b8bc77e0688ee2ea9c721e484447" target="_blank">b5e26c0</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6eafc4d60101428fbebf558d8a1173b668158175targetblank6eafc4da"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb5e26c016107b8bc77e0688ee2ea9c721e484447targetblankb5e26c0a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/6eafc4d60101428fbebf558d8a1173b668158175" target="_blank">6eafc4d</a>.
+<a href="https://github.com/davetang/muse/tree/b5e26c016107b8bc77e0688ee2ea9c721e484447" target="_blank">b5e26c0</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -647,6 +647,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/b5e26c016107b8bc77e0688ee2ea9c721e484447/analysis/pubmedr.Rmd" target="_blank">b5e26c0</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-05
+</td>
+<td>
+Affiliations
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/f3e07e6675d3e87143b84196856c440984a7da8a/docs/pubmedr.html" target="_blank">f3e07e6</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -792,7 +826,7 @@ $query_translation
 [1] &quot;tang, dave[Author]&quot;
 
 $web_history
-Web history object (QueryKey = 1, WebEnv = MCID_695b52f...)</code></pre>
+Web history object (QueryKey = 1, WebEnv = MCID_695b57a...)</code></pre>
 <p>Download the collection of document metadata.</p>
 <pre class="r"><code>D &lt;- pmApiRequest(query = query, limit = res$total_count, api_key = NULL)</code></pre>
 <pre><code>Documents  22  of  22 </code></pre>
@@ -937,6 +971,31 @@ Most Relevant Keywords
 8  DIAGNOSTIC ODYSSEY                 1 POLYMORPHISM  SINGLE NUCLEOTIDE              4
 9  DISORDER OF SEX DEVELOPMENT        1 SEQUENCE ANALYSIS  RNA                       4
 10 FAM111A GENE                       1 AUSTRALIA                                    3</code></pre>
+<p>Metadata.</p>
+<pre class="r"><code>names(results)</code></pre>
+<pre><code> [1] &quot;Articles&quot;             &quot;Authors&quot;              &quot;AuthorsFrac&quot;          &quot;FirstAuthors&quot;         &quot;nAUperPaper&quot;         
+ [6] &quot;Appearances&quot;          &quot;nAuthors&quot;             &quot;AuMultiAuthoredArt&quot;   &quot;AuSingleAuthoredArt&quot;  &quot;MostCitedPapers&quot;     
+[11] &quot;Years&quot;                &quot;FirstAffiliation&quot;     &quot;Affiliations&quot;         &quot;Aff_frac&quot;             &quot;CO&quot;                  
+[16] &quot;Countries&quot;            &quot;CountryCollaboration&quot; &quot;TotalCitation&quot;        &quot;TCperYear&quot;            &quot;Sources&quot;             
+[21] &quot;DE&quot;                   &quot;ID&quot;                   &quot;Documents&quot;            &quot;IntColl&quot;              &quot;nReferences&quot;         
+[26] &quot;DB&quot;                  </code></pre>
+<p>Affiliations.</p>
+<pre class="r"><code>results$Affiliations |&gt;
+  as.data.frame() |&gt;
+  dplyr::pull(AFF) |&gt;
+  as.vector() |&gt;
+  unique() |&gt;
+  head(10)</code></pre>
+<pre><code> [1] &quot;GENETIC SERVICES OF WESTERN AUSTRALIA, DEPARTMENT OF HEALTH, GOVERNMENT OF WESTERN AUSTRALIA, PERTH, WA, AUSTRALIA.&quot;                                                                                                                                                    
+ [2] &quot;RIKEN CENTER FOR LIFE SCIENCE TECHNOLOGIES (DIVISION OF GENOMIC TECHNOLOGIES), 1-7-22 SUEHIRO-CHO, TSURUMI-KU, YOKOHAMA, 230-0045 JAPAN.&quot;                                                                                                                               
+ [3] &quot;RIKEN OMICS SCIENCE CENTER (OSC), 1-7-22 SUEHIRO-CHO, TSURUMI-KU, YOKOHAMA 230-0045, JAPAN.&quot;                                                                                                                                                                            
+ [4] &quot;TELETHON KIDS INSTITUTE, UNIVERSITY OF WESTERN AUSTRALIA, PERTH, WA, AUSTRALIA.&quot;                                                                                                                                                                                        
+ [5] &quot;TELETHON KIDS INSTITUTE, THE UNIVERSITY OF WESTERN AUSTRALIA, PERTH, WA, AUSTRALIA.&quot;                                                                                                                                                                                    
+ [6] &quot;TELETHON KIDS INSTITUTE, THE UNIVERSITY OF WESTERN AUSTRALIA, SUBIACO, WESTERN AUSTRALIA 6008, AUSTRALIA.&quot;                                                                                                                                                              
+ [7] &quot;TELETHON KIDS INSTITUTE, THE UNIVERSITY OF WESTERN AUSTRALIA, SUBIACO, WESTERN AUSTRALIA, 6008, AUSTRALIA.&quot;                                                                                                                                                             
+ [8] &quot;AREA OF NEUROSCIENCE, SISSA, TRIESTE, ITALY.&quot;                                                                                                                                                                                                                           
+ [9] &quot;INSTITUTE OF PHARMACEUTICAL SCIENCES, ETH ZURICH, ZURICH, SWITZERLAND.&quot;                                                                                                                                                                                                 
+[10] &quot;1] OMICS SCIENCE CENTER, RIKEN YOKOHAMA INSTITUTE, 1-7-22 SUEHIRO-CHO TSURUMI-KU YOKOHAMA, KANAGAWA, 230-0045 JAPAN [2] RIKEN CENTER FOR LIFE SCIENCE TECHNOLOGIES, DIVISION OF GENOMIC TECHNOLOGIES, 1-7-22 SUEHIRO-CHO TSURUMI-KU YOKOHAMA, KANAGAWA, 230-0045 JAPAN.&quot;</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
