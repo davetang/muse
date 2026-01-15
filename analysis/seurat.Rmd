@@ -14,7 +14,8 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 
 This post follows the Peripheral Blood Mononuclear Cells (PBMCs) [tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial) for 2,700 single cells. It was written while I was going through the tutorial and contains my notes. The dataset for this tutorial can be downloaded from the [10X Genomics dataset page](https://support.10xgenomics.com/single-cell-gene-expression/datasets/1.1.0/pbmc3k) but it is also hosted on Amazon (see below). The PBMCs, which are primary cells with relatively small amounts of RNA (around 1pg RNA/cell), come from a healthy donor. There were 2,700 cells detected and sequencing was performed on an Illumina NextSeq 500 with around 69,000 reads per cell. To get started [install Seurat](https://satijalab.org/seurat/articles/install.html) by using install.packages() and the [presto](https://github.com/immunogenomics/presto) package, which will be used finding markers. (The [bench](https://github.com/r-lib/bench) package is also installed for timing some steps.)
 
-```{r install_seurat, eval=FALSE}
+```{r install_deps, eval=FALSE}
+install.packages("remotes")
 install.packages("Seurat")
 remotes::install_github("immunogenomics/presto")
 install.packages("bench")
@@ -528,6 +529,25 @@ Look at cluster IDs of the first 5 cells
 
 ```{r head_cluster_ids}
 head(Idents(pbmc), 5)
+```
+
+Columns in the meta data.
+
+```{r meta_data_columns}
+names(pbmc@meta.data)
+```
+
+[Find subclusters under one cluster](https://satijalab.org/seurat/reference/findsubcluster).
+
+```{r find_sub_cluster}
+pbmc <- FindSubCluster(pbmc, '0', 'RNA_snn')
+names(pbmc@meta.data)
+```
+
+Sub clusters.
+
+```{r sub_cluster}
+str(pbmc@meta.data$sub.cluster)
 ```
 
 ## Non-linear dimensional reduction
