@@ -520,8 +520,12 @@ As in PhenoGraph, a KNN graph is constructed based on the Euclidean distance in 
 
 To cluster the cells, modularity optimisation techniques are applied such as the Louvain algorithm (default) or SLM [SLM, Blondel et al., Journal of Statistical Mechanics], to iteratively group cells together, with the goal of optimising the standard modularity function. The `FindClusters()` function implements this procedure, and contains a resolution parameter that sets the "granularity" of the downstream clustering, with higher values leading to a greater number of clusters. Setting this parameter between 0.4-1.2 typically returns good results for single-cell datasets of around 3K cells. Optimal resolution often increases for larger datasets. The clusters can be found using the `Idents()` function.
 
+[Graph class](https://satijalab.github.io/seurat-object/reference/Graph-class.html).
+
 ```{r find_neighbours_and_clusters}
+pbmc@graphs
 pbmc <- FindNeighbors(pbmc, dims = 1:10, verbose = FALSE)
+str(pbmc@graphs)
 pbmc <- FindClusters(pbmc, resolution = 0.5, verbose = FALSE)
 ```
 
@@ -539,7 +543,7 @@ names(pbmc@meta.data)
 
 [Find subclusters under one cluster](https://satijalab.org/seurat/reference/findsubcluster).
 
-```{r find_sub_cluster}
+```{r find_sub_cluster_0}
 pbmc <- FindSubCluster(pbmc, '0', 'RNA_snn')
 names(pbmc@meta.data)
 ```
@@ -549,6 +553,15 @@ Sub clusters.
 ```{r sub_cluster}
 str(pbmc@meta.data$sub.cluster)
 ```
+
+Run `FindSubCluster()` again for cluster 1.
+
+```{r find_sub_cluster_1}
+pbmc <- FindSubCluster(pbmc, '1', 'RNA_snn')
+str(pbmc@meta.data$sub.cluster)
+```
+
+Note that the previous sub cluster results are over-written.
 
 ## Non-linear dimensional reduction
 
