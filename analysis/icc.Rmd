@@ -32,6 +32,22 @@ install.packages("irr")
 
 ## Example
 
+The data `anxiety` contains anxiety ratings by different raters:
+
+> The data frame contains the anxiety ratings of 20 subjects, rated by 3 raters. Values are ranging from 1 (not anxious at all) to 6 (extremely anxious).
+
+```{r anxiety}
+data(anxiety)
+head(anxiety)
+```
+
+Correlation of raters.
+
+```{r cor_anxiety}
+cor(anxiety)
+pairs(anxiety, pch = 16)
+```
+
 The `icc()` function:
 
 > Computes single score or average score ICCs as an index of interrater reliability of quantitative data. Additionally, F-test and confidence interval are computed.
@@ -43,9 +59,7 @@ Takes:
 * `type` - a character string specifying if "consistency" (default) or "agreement" between raters should be estimated. If a "oneway" model is used, only "consistency" could be computed. You can specify just the initial letter.
 * `unit` - a character string specifying the unit of analysis: Must be one of "single" (default) or "average". You can specify just the initial letter.
 
-```{r anxiety}
-data(anxiety)
-head(anxiety)
+```{r icc_anxiety}
 icc(anxiety, model="twoway", type="agreement")
 ```
 
