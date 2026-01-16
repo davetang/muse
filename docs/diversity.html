@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree898022415254d426af18eb166d69bce00c77c763targetblank8980224a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1a324bb44452381faf4f7a29f3cca1560532f531targetblank1a324bba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/898022415254d426af18eb166d69bce00c77c763" target="_blank">8980224</a>
+<a href="https://github.com/davetang/muse/tree/1a324bb44452381faf4f7a29f3cca1560532f531" target="_blank">1a324bb</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree898022415254d426af18eb166d69bce00c77c763targetblank8980224a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1a324bb44452381faf4f7a29f3cca1560532f531targetblank1a324bba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/898022415254d426af18eb166d69bce00c77c763" target="_blank">8980224</a>.
+<a href="https://github.com/davetang/muse/tree/1a324bb44452381faf4f7a29f3cca1560532f531" target="_blank">1a324bb</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -654,6 +654,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/1a324bb44452381faf4f7a29f3cca1560532f531/analysis/diversity.Rmd" target="_blank">1a324bb</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-16
+</td>
+<td>
+Show composition plot above summary metrics
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/c84b3012afd58ed2f9e2a411f128bee1671a21bf/docs/diversity.html" target="_blank">c84b301</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-16
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/898022415254d426af18eb166d69bce00c77c763/analysis/diversity.Rmd" target="_blank">8980224</a>
 </td>
 <td>
@@ -745,8 +779,47 @@ ggplot(prop_df, aes(x = method, y = proportion, fill = cell_type)) +
     y = &quot;Proportion&quot;,
     x = &quot;Method&quot;
   ) +
-  scale_fill_brewer(palette = &quot;Set3&quot;)</code></pre>
+  scale_fill_brewer(palette = &quot;Set3&quot;) -&gt; composition_plot
+
+composition_plot</code></pre>
 <p><img src="figure/diversity.Rmd/composition-1.png" width="960" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-composition-1">
+Past versions of composition-1.png
+</button>
+</p>
+<div id="fig-composition-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/c84b3012afd58ed2f9e2a411f128bee1671a21bf/docs/figure/diversity.Rmd/composition-1.png" target="_blank">c84b301</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-16
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="diversity-metrics" class="section level1">
 <h1>Diversity Metrics</h1>
@@ -910,7 +983,9 @@ e      e        0.278</code></pre>
   BergerParker = base::round(berger_parker, 3)
 )
 
-summary_df</code></pre>
+composition_plot</code></pre>
+<p><img src="figure/diversity.Rmd/summary_df-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>summary_df</code></pre>
 <pre><code>  Richness Shannon Simpson InvSimpson Pielou BergerParker
 a        8   2.073   0.873       7.90  0.997        0.150
 b        8   1.768   0.768       4.32  0.850        0.421
