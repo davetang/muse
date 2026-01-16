@@ -1,0 +1,259 @@
+---
+title: "Diversity metrics"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(vegan)
+})
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+This notebook demonstrates various diversity metrics. Install packages, if necessary.
+
+```{r install_deps, eval=FALSE}
+install.packages("vegan")
+```
+
+# Data
+
+Creating a simulated cell type by organoid count matrix representing scRNA-seq data from organoids generated using 5 different methods.
+
+```{r eg1}
+set.seed(1984)
+
+cell_types <- c(
+  "Neural Progenitors",
+  "Neurons",
+  "Astrocytes", 
+  "Oligodendrocytes",
+  "Microglia",
+  "Endothelial",
+  "Radial Glia",
+  "Intermediate Progenitors"
+)
+
+count_matrix <- base::matrix(c(
+  450, 480, 420, 380, 350, 340, 400, 380,
+  200, 800, 150, 120, 80, 100, 250, 200,
+  100, 1200, 50, 30, 20, 40, 80, 60,
+  500, 300, 250, 200, 150, 100, 80, 50,
+  300, 500, 200, 180, 150, 120, 200, 150
+), nrow = 8, ncol = 5, byrow = FALSE)
+count_matrix
+
+base::rownames(count_matrix) <- cell_types
+base::colnames(count_matrix) <- letters[1:ncol(count_matrix)]
+
+count_matrix
+```
+
+# Composition
+
+Visualise the composition.
+
+```{r composition, fig.width=10, fig.height=6}
+prop_matrix <- apply(count_matrix, 2, \(x) x/sum(x))
+
+prop_df <- base::as.data.frame(prop_matrix) |>
+  tibble::rownames_to_column("cell_type") |>
+  tidyr::pivot_longer(-cell_type, names_to = "method", values_to = "proportion")
+
+ggplot(prop_df, aes(x = method, y = proportion, fill = cell_type)) +
+  geom_bar(stat = "identity") +
+  theme_bw() +
+  theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)) +
+  labs(
+    title = "Cell type composition by method",
+    y = "Proportion",
+    x = "Method"
+  ) +
+  scale_fill_brewer(palette = "Set3")
+```
+
+# Diversity Metrics
+
+## Species Richness (S)
+
+**What it measures:** Simply the number of different cell types present (with >0 cells).
+
+**Interpretation:** Higher values indicate more cell types are present.
+
+**Key characteristic:** Does NOT account for abundance - treats rare and common types equally.
+
+```{r richness}
+richness <- vegan::specnumber(base::t(count_matrix))
+
+richness_df <- base::data.frame(
+  Method = base::names(richness),
+  Richness = richness
+)
+
+richness_df
+```
+
+## Shannon Diversity Index
+
+**What it measures:** Both richness and evenness combined. Quantifies uncertainty in predicting the cell type of a randomly selected cell.
+
+**Interpretation:** 
+- Higher values indicate greater diversity
+- Ranges from 0 (one cell type only) to ln(S) (all types equally abundant)
+- Values typically between 1.5-3.5 for biological communities
+
+**Key characteristic:** More sensitive to rare types than Simpson's index.
+
+```{r shannon}
+shannon <- vegan::diversity(base::t(count_matrix), index = "shannon")
+
+shannon_df <- base::data.frame(
+  Method = base::names(shannon),
+  Shannon = base::round(shannon, 3)
+)
+
+shannon_df
+```
+
+## Simpson Diversity Index
+
+**What it measures:** The probability that two randomly selected cells are of different types.
+
+**Interpretation:**
+- Ranges from 0 to 1
+- Higher values indicate greater diversity
+- Less sensitive to rare species than Shannon
+
+**Key characteristic:** Emphasizes dominant cell types more than Shannon.
+
+```{r simpson}
+simpson <- vegan::diversity(base::t(count_matrix), index = "simpson")
+
+simpson_df <- base::data.frame(
+  Method = base::names(simpson),
+  Simpson = base::round(simpson, 3)
+)
+
+simpson_df
+```
+
+## Inverse Simpson
+
+**What it measures:** The effective number of cell types. Represents the number of equally abundant types needed to produce the observed diversity.
+
+**Interpretation:**
+- Minimum value of 1 (only one type)
+- Maximum value equals richness (S) when all types equally abundant
+- More intuitive than Simpson's D
+
+**Key characteristic:** Can be directly compared to species richness.
+
+```{r inverse-simpson}
+inv_simpson <- vegan::diversity(base::t(count_matrix), index = "invsimpson")
+
+inv_simpson_df <- base::data.frame(
+  Method = base::names(inv_simpson),
+  InvSimpson = base::round(inv_simpson, 2)
+)
+
+inv_simpson_df
+```
+
+## Pielou's Evenness Index
+
+**What it measures:** How evenly cells are distributed among different types, independent of richness.
+
+**Interpretation:**
+- Ranges from 0 to 1
+- 1 indicates perfect evenness (all types equally abundant)
+- 0 indicates complete unevenness (one type dominates)
+
+**Key characteristic:** Separates evenness from richness, useful for comparing samples with different numbers of cell types.
+
+```{r pielou}
+pielou <- shannon / base::log(richness)
+
+pielou_df <- base::data.frame(
+  Method = base::names(pielou),
+  Pielou = base::round(pielou, 3)
+)
+
+pielou_df
+```
+
+## Berger-Parker Dominance Index
+
+**What it measures:** The proportion of the most abundant cell type.
+
+**Interpretation:**
+- Ranges from 0 to 1
+- Higher values indicate one type strongly dominates
+- Inverse of diversity (high dominance = low diversity)
+
+**Key characteristic:** Simple, intuitive measure focusing only on the most abundant type.
+
+```{r berger-parker}
+berger_parker <- base::apply(count_matrix, 2, \(x) base::max(x) / base::sum(x))
+
+bp_df <- base::data.frame(
+  Method = base::names(berger_parker),
+  BergerParker = base::round(berger_parker, 3)
+)
+
+bp_df
+```
+
+# Comparison
+
+Summary.
+
+```{r summary_df}
+summary_df <- base::data.frame(
+  Richness = richness,
+  Shannon = base::round(shannon, 3),
+  Simpson = base::round(simpson, 3),
+  InvSimpson = base::round(inv_simpson, 2),
+  Pielou = base::round(pielou, 3),
+  BergerParker = base::round(berger_parker, 3)
+)
+
+summary_df
+```
+
+# Key Differences Between Metrics
+
+* Richness vs. Diversity Indices
+   * **Richness** only counts types (presence/absence)
+   * **Shannon, Simpson, Inverse Simpson** combine richness and evenness
+
+* Shannon vs. Simpson
+    * **Shannon** is more sensitive to rare cell types
+    * **Simpson** emphasizes dominant cell types
+    * **Shannon** ranges 0 to ln(S); **Simpson** ranges 0 to 1
+
+* Simpson vs. Inverse Simpson
+    * Same information, different scale
+    * **Inverse Simpson** is more intuitive (effective number of types)
+
+* Evenness vs. Diversity
+    * **Pielou's J'** isolates evenness from richness
+    * Allows comparing organoids with different numbers of cell types
+
+* Dominance vs. Diversity
+    * **Berger-Parker** focuses only on the most abundant type
+    * Opposite of diversity (high dominance = low diversity)
+
+# Conclusion
+
+1. **For overall diversity:** Use **Shannon** or **Inverse Simpson**
+2. **For evenness specifically:** Use **Pielou's J'**
+3. **To identify dominant types:** Use **Berger-Parker**
+4. **For simple comparison:** Use **Richness** and **Inverse Simpson** together
