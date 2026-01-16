@@ -9,8 +9,11 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-suppressPackageStartupMessages(library(tidyverse))
-suppressPackageStartupMessages(library(vegan))
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(vegan)
+  library(ggdendro)
+})
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -24,9 +27,10 @@ Install {vegan}.
 
 ```{r install_irr, eval=FALSE}
 install.packages("vegan")
+install.packages("ggdendro")
 ```
 
-## Horn-Morisita index
+## Dissimilarity indices
 
 `?vegdist`:
 
@@ -54,4 +58,129 @@ Horn-Morisita dissimilarity indices for the first six sites.
 
 ```{r varespec_horn}
 vegdist(varespec[1:6, ], method = "horn")
+```
+
+Note that:
+
+* Diversity indices measure variation **within** a single sample.
+* Similarity (and dissimilarity) indices measure how alike or different two samples are.
+
+## Example data
+
+Count matrix.
+
+```{r eg1}
+set.seed(1984)
+
+cell_types <- c(
+  "Neural Progenitors",
+  "Neurons",
+  "Astrocytes", 
+  "Oligodendrocytes",
+  "Microglia",
+  "Endothelial",
+  "Radial Glia",
+  "Intermediate Progenitors"
+)
+
+count_matrix <- base::matrix(c(
+  450, 480, 420, 380, 350, 340, 400, 380,
+  200, 800, 150, 120, 80, 100, 250, 200,
+  100, 1200, 50, 30, 20, 40, 80, 60,
+  500, 300, 250, 200, 150, 100, 80, 50,
+  300, 500, 200, 180, 150, 120, 200, 150
+), nrow = 8, ncol = 5, byrow = FALSE)
+count_matrix
+
+base::rownames(count_matrix) <- cell_types
+base::colnames(count_matrix) <- letters[1:ncol(count_matrix)]
+
+count_matrix
+```
+
+## Similarity versus dissimilarity
+
+* **Similarity indices** range from 0 (completely different) to 1 (identical)
+* **Dissimilarity/Distance indices** range from 0 (identical) to higher values (more different)
+
+**Conversion:** Dissimilarity = 1 - Similarity (for indices scaled 0-1)
+
+### Bray-Curtis Dissimilarity
+
+**What it measures:** The absolute difference in cell type abundances between two organoids, normalised by total abundance.
+
+**Interpretation:**
+* Ranges from 0 (identical) to 1 (completely different)
+* 0.3-0.5 often considered moderately similar
+* Sensitive to both presence/absence and abundance differences
+
+**Key characteristic:** Most widely used in ecology; emphasises absolute differences in abundances. Does NOT account for sampling effects.
+
+```{r bray_curtis, fig.width=10, fig.height=8}
+bray_dist <- vegan::vegdist(base::t(count_matrix), method = "bray")
+bray_matrix <- base::as.matrix(bray_dist)
+bray_similarity <- 1 - bray_matrix
+bray_similarity
+
+pheatmap::pheatmap(
+  bray_similarity,
+  cluster_rows = TRUE,
+  cluster_cols = TRUE,
+  display_numbers = base::round(bray_similarity, 2),
+  main = "Bray-Curtis Similarity",
+  color = grDevices::colorRampPalette(c("white", "yellow", "orange", "red"))(50)
+)
+```
+
+### Horn-Morisita Index
+
+**What it measures:** The probability that two randomly selected cells (one from each organoid) belong to the same cell type.
+
+**Formula:** Based on Morisita's index but modified by Horn to be independent of sample size and species diversity.
+
+**Interpretation:**
+* Ranges from 0 (no overlap) to 1 (identical composition)
+* > 0.6 typically indicates high similarity
+* > 0.75 indicates very high similarity
+
+**Key characteristic:** Robust to differences in sample size. Less affected by species richness than Bray-Curtis. Better for comparing samples with different total abundances.
+
+```{r horn-morisita, fig.width=10, fig.height=8}
+horn_dist <- vegan::vegdist(base::t(count_matrix), method = "horn")
+horn_matrix <- base::as.matrix(horn_dist)
+horn_similarity <- 1 - horn_matrix
+
+pheatmap::pheatmap(
+  horn_similarity,
+  cluster_rows = TRUE,
+  cluster_cols = TRUE,
+  display_numbers = base::round(horn_similarity, 2),
+  main = "Horn-Morisita Similarity",
+  color = grDevices::colorRampPalette(c("white", "yellow", "orange", "red"))(50)
+)
+```
+
+### Euclidean Distance
+
+**What it measures:** The straight-line distance between two organoids in multidimensional space (one dimension per cell type).
+
+**Interpretation:**
+* Ranges from 0 (identical) to infinity
+* Larger values = more different
+* No upper bound (not scaled to 1)
+
+**Key characteristic:** Sensitive to total abundance and scale. Square root of sum of squared differences. Common in general clustering but less ideal for compositional data.
+
+```{r euclidean, fig.width=10, fig.height=8}
+euclidean_dist <- stats::dist(base::t(count_matrix), method = "euclidean")
+euclidean_matrix <- base::as.matrix(euclidean_dist)
+
+pheatmap::pheatmap(
+  euclidean_matrix,
+  cluster_rows = TRUE,
+  cluster_cols = TRUE,
+  display_numbers = base::round(euclidean_matrix, 0),
+  main = "Euclidean Distance",
+  color = grDevices::colorRampPalette(c("red", "orange", "yellow", "white"))(50)
+)
 ```
