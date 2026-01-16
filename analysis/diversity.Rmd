@@ -77,7 +77,9 @@ ggplot(prop_df, aes(x = method, y = proportion, fill = cell_type)) +
     y = "Proportion",
     x = "Method"
   ) +
-  scale_fill_brewer(palette = "Set3")
+  scale_fill_brewer(palette = "Set3") -> composition_plot
+
+composition_plot
 ```
 
 # Diversity Metrics
@@ -225,6 +227,7 @@ summary_df <- base::data.frame(
   BergerParker = base::round(berger_parker, 3)
 )
 
+composition_plot
 summary_df
 ```
 
