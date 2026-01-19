@@ -205,6 +205,53 @@ CV (Coefficient of Variation) measures how variable gene expression is relative 
 * High mean CV across genes: Cells in this cluster have diverse transcriptional states - they're expressing different genes at different levels
 * Low mean CV across genes: Cells in this cluster have consistent transcriptional states - they're expressing genes at similar levels
 
+### WSS and BSS
+
+Within-cluster sum of squares (WSS) and Between-cluster sum of squares (BSS).
+
+```{r wss_and_bss}
+pca_embeddings <- Seurat::Embeddings(seurat_obj, reduction = "pca")[, 1:30]
+clusters <- seurat_obj$seurat_clusters
+
+# Calculate overall centroid (mean of all cells)
+overall_centroid <- colMeans(pca_embeddings)
+
+total_wss <- 0
+total_bss <- 0
+
+# Calculate for each cluster
+for (cl in unique(clusters)) {
+  # Get cells in this cluster
+  cells_in_cluster <- which(clusters == cl)
+  cluster_data <- pca_embeddings[cells_in_cluster, ]
+  
+  # Cluster centroid
+  cluster_centroid <- colMeans(cluster_data)
+  
+  # Within-cluster sum of squares (WSS)
+  wss <- sum(apply(cluster_data, 1, function(x) sum((x - cluster_centroid)^2)))
+  total_wss <- total_wss + wss
+  
+  # Between-cluster sum of squares (BSS)
+  n_cells <- nrow(cluster_data)
+  bss <- n_cells * sum((cluster_centroid - overall_centroid)^2)
+  total_bss <- total_bss + bss
+}
+
+cat("Within-Cluster Sum of Squares (WSS):", round(total_wss, 2), "\n")
+cat("Between-Cluster Sum of Squares (BSS):", round(total_bss, 2), "\n")
+cat("Total Sum of Squares (TSS):", round(total_wss + total_bss, 2), "\n")
+cat("BSS/TSS Ratio:", round(total_bss / (total_wss + total_bss), 4), 
+    "(higher is better, closer to 1 = better clustering)\n")
+```
+
+Typically, the WSS and BSS are compared across different clustering results; the goal is to:
+
+* Minimise WSS (tight, homogeneous clusters).
+* Maximise BSS (well-separated clusters).
+* Maximise BSS/TSS (clustering explains most of the variation).
+
+
 ## Intra-Cluster Distances in PCA Space
 
 * **What it measures:** The average distance between cells within the same cluster in reduced dimension space.
@@ -261,52 +308,6 @@ ggplot(pca_dist_summary, aes(x = reorder(cluster, mean_distance),
   theme_minimal() +
   theme(legend.position = "none")
 ```
-
-### WSS and BSS
-
-Within-cluster sum of squares (WSS) and Between-cluster sum of squares (BSS).
-
-```{r wss_and_bss}
-pca_embeddings <- Seurat::Embeddings(seurat_obj, reduction = "pca")[, 1:30]
-clusters <- seurat_obj$seurat_clusters
-
-# Calculate overall centroid (mean of all cells)
-overall_centroid <- colMeans(pca_embeddings)
-
-total_wss <- 0
-total_bss <- 0
-
-# Calculate for each cluster
-for (cl in unique(clusters)) {
-  # Get cells in this cluster
-  cells_in_cluster <- which(clusters == cl)
-  cluster_data <- pca_embeddings[cells_in_cluster, ]
-  
-  # Cluster centroid
-  cluster_centroid <- colMeans(cluster_data)
-  
-  # Within-cluster sum of squares (WSS)
-  wss <- sum(apply(cluster_data, 1, function(x) sum((x - cluster_centroid)^2)))
-  total_wss <- total_wss + wss
-  
-  # Between-cluster sum of squares (BSS)
-  n_cells <- nrow(cluster_data)
-  bss <- n_cells * sum((cluster_centroid - overall_centroid)^2)
-  total_bss <- total_bss + bss
-}
-
-cat("Within-Cluster Sum of Squares (WSS):", round(total_wss, 2), "\n")
-cat("Between-Cluster Sum of Squares (BSS):", round(total_bss, 2), "\n")
-cat("Total Sum of Squares (TSS):", round(total_wss + total_bss, 2), "\n")
-cat("BSS/TSS Ratio:", round(total_bss / (total_wss + total_bss), 4), 
-    "(higher is better, closer to 1 = better clustering)\n")
-```
-
-Typically, the WSS and BSS are compared across different clustering results; the goal is to:
-
-* Minimise WSS (tight, homogeneous clusters).
-* Maximise BSS (well-separated clusters).
-* Maximise BSS/TSS (clustering explains most of the variation).
 
 ## Shannon Entropy
 
