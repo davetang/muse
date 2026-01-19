@@ -78,14 +78,14 @@ table(seurat_obj$seurat_clusters)
 
 ## Silhouette Scores
 
-**What it measures:** How similar each cell is to cells in its own cluster compared to cells in other clusters.
+* **What it measures:** How similar each cell is to cells in its own cluster compared to cells in other clusters.
 
-**Interpretation:** 
-- Score close to **1** = cell is very similar to its cluster and different from others (good clustering, low heterogeneity)
-- Score close to **0** = cell is on the border between clusters
-- Score close to **-1** = cell might be in the wrong cluster
+* **Interpretation:** 
+    * Score close to **1** = cell is very similar to its cluster and different from others (good clustering, low heterogeneity)
+    * Score close to **0** = cell is on the border between clusters
+    * Score close to **-1** = cell might be in the wrong cluster
 
-**Why it matters:** Higher average silhouette scores for a cluster indicate it's well-separated and homogeneous.
+* **Why it matters:** Higher average silhouette scores for a cluster indicate it's well-separated and homogeneous.
 
 The function `cluster::silhouette()` computes silhouette information according to a given clustering in k clusters.
 
@@ -147,17 +147,18 @@ It is important to note that a cluster can have a high silhouette score for two 
 
 ## Within-Cluster Variance and Coefficient of Variation
 
-**What it measures:** How much gene expression varies among cells within each cluster.
+* **What it measures:** How much gene expression varies among cells within each cluster.
 
-**Interpretation:**
-- **Variance** = absolute spread of expression values
-- **Coefficient of Variation (CV)** = variance relative to mean (more comparable across genes)
-- Higher values = more heterogeneous gene expression within the cluster
+* **Interpretation:**
+    * **Variance** = absolute spread of expression values
+    * **Coefficient of Variation (CV)** = variance relative to mean (more comparable across genes)
+    * Higher values = more heterogeneous gene expression within the cluster
 
-**Why it matters:** Some cell types naturally have more variable expression (e.g., transitioning cells) while others are more stable (e.g., terminally differentiated cells).
+* **Why it matters:** Some cell types naturally have more variable expression (e.g., transitioning cells) while others are more stable (e.g., terminally differentiated cells).
 
 ```{r variance}
-expr_data <- Seurat::GetAssayData(seurat_obj, slot = "data")
+expr_data <- Seurat::GetAssayData(seurat_obj, assay = 'RNA', layer = "data")
+
 variable_genes <- Seurat::VariableFeatures(seurat_obj)
 expr_data <- expr_data[variable_genes, ]
 
@@ -206,13 +207,13 @@ CV (Coefficient of Variation) measures how variable gene expression is relative 
 
 ## Intra-Cluster Distances in PCA Space
 
-**What it measures:** The average distance between cells within the same cluster in reduced dimension space.
+* **What it measures:** The average distance between cells within the same cluster in reduced dimension space.
 
-**Interpretation:**
-- **Smaller distances** = cells are tightly clustered together (low heterogeneity)
-- **Larger distances** = cells are spread out (high heterogeneity)
+* **Interpretation:**
+    * **Smaller distances** = cells are tightly clustered together (low heterogeneity)
+    * **Larger distances** = cells are spread out (high heterogeneity)
 
-**Why it matters:** This gives you a spatial sense of cluster compactness. We calculate this in both PCA (captures biological variance) and UMAP (optimized for visualization).
+* **Why it matters:** This gives you a spatial sense of cluster compactness. We calculate this in both PCA (captures biological variance) and UMAP (optimized for visualization).
 
 ```{r distances_pca}
 # Function to calculate intra-cluster distances
@@ -263,13 +264,13 @@ ggplot(pca_dist_summary, aes(x = reorder(cluster, mean_distance),
 
 ## Shannon Entropy
 
-**What it measures:** The diversity of gene expression distributions within each cluster.
+* **What it measures:** The diversity of gene expression distributions within each cluster.
 
-**Interpretation:**
-- **Higher entropy** = gene expression is more evenly distributed across many values (high heterogeneity)
-- **Lower entropy** = gene expression is concentrated around specific values (low heterogeneity)
+* **Interpretation:**
+    * **Higher entropy** = gene expression is more evenly distributed across many values (high heterogeneity)
+    * **Lower entropy** = gene expression is concentrated around specific values (low heterogeneity)
 
-**Why it matters:** Entropy captures whether cells have uniform or variable transcriptional states. It's particularly useful for identifying transitional or stressed cell populations.
+* **Why it matters:** Entropy captures whether cells have uniform or variable transcriptional states. It's particularly useful for identifying transitional or stressed cell populations.
 
 ```{r entropy}
 shannon_entropy <- function(x) {
@@ -321,13 +322,13 @@ ggplot(entropy_results, aes(x = reorder(cluster, mean_entropy),
 
 ## Cluster Compactness Metrics
 
-**What it measures:** How tightly packed a cluster is relative to how far it is from other clusters.
+* **What it measures:** How tightly packed a cluster is relative to how far it is from other clusters.
 
-**Interpretation:**
-- **Lower compactness ratio** = cluster is tight and well-separated (low heterogeneity, good clustering)
-- **Higher compactness ratio** = cluster is spread out or close to other clusters (high heterogeneity or poor separation)
+* **Interpretation:**
+    * **Lower compactness ratio** = cluster is tight and well-separated (low heterogeneity, good clustering)
+    * **Higher compactness ratio** = cluster is spread out or close to other clusters (high heterogeneity or poor separation)
 
-**Why it matters:** This metric combines within-cluster spread with between-cluster separation, giving you a sense of both heterogeneity and cluster quality.
+* **Why it matters:** This metric combines within-cluster spread with between-cluster separation, giving you a sense of both heterogeneity and cluster quality.
 
 Calculate centroid (average position) for each cluster and plot the centroids.
 
