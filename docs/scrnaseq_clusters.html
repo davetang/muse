@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeca08f192611c67bb99c65a5ea7b0c77173644080targetblankca08f19a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree904fc565407ddc3dd7d4f1ec4490511ca8ab4ff1targetblank904fc56a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/ca08f192611c67bb99c65a5ea7b0c77173644080" target="_blank">ca08f19</a>
+<a href="https://github.com/davetang/muse/tree/904fc565407ddc3dd7d4f1ec4490511ca8ab4ff1" target="_blank">904fc56</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeca08f192611c67bb99c65a5ea7b0c77173644080targetblankca08f19a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree904fc565407ddc3dd7d4f1ec4490511ca8ab4ff1targetblank904fc56a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/ca08f192611c67bb99c65a5ea7b0c77173644080" target="_blank">ca08f19</a>.
+<a href="https://github.com/davetang/muse/tree/904fc565407ddc3dd7d4f1ec4490511ca8ab4ff1" target="_blank">904fc56</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -655,6 +655,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/904fc565407ddc3dd7d4f1ec4490511ca8ab4ff1/analysis/scrnaseq_clusters.Rmd" target="_blank">904fc56</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+<td>
+Fix formatting
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/29f3c2edbb253b68c72decc74a513a72059c5e10/docs/scrnaseq_clusters.html" target="_blank">29f3c2e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/ca08f192611c67bb99c65a5ea7b0c77173644080/analysis/scrnaseq_clusters.Rmd" target="_blank">ca08f19</a>
 </td>
 <td>
@@ -735,15 +769,22 @@ This message will be shown once per session</code></pre>
 </div>
 <div id="silhouette-scores" class="section level2">
 <h2>Silhouette Scores</h2>
-<p><strong>What it measures:</strong> How similar each cell is to cells
-in its own cluster compared to cells in other clusters.</p>
-<p><strong>Interpretation:</strong> - Score close to <strong>1</strong>
-= cell is very similar to its cluster and different from others (good
-clustering, low heterogeneity) - Score close to <strong>0</strong> =
-cell is on the border between clusters - Score close to
-<strong>-1</strong> = cell might be in the wrong cluster</p>
-<p><strong>Why it matters:</strong> Higher average silhouette scores for
-a cluster indicate it’s well-separated and homogeneous.</p>
+<ul>
+<li><p><strong>What it measures:</strong> How similar each cell is to
+cells in its own cluster compared to cells in other clusters.</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li>Score close to <strong>1</strong> = cell is very similar to its
+cluster and different from others (good clustering, low
+heterogeneity)</li>
+<li>Score close to <strong>0</strong> = cell is on the border between
+clusters</li>
+<li>Score close to <strong>-1</strong> = cell might be in the wrong
+cluster</li>
+</ul></li>
+<li><p><strong>Why it matters:</strong> Higher average silhouette scores
+for a cluster indicate it’s well-separated and homogeneous.</p></li>
+</ul>
 <p>The function <code>cluster::silhouette()</code> computes silhouette
 information according to a given clustering in k clusters.</p>
 <blockquote>
@@ -794,6 +835,43 @@ sil_summary |&gt; dplyr::arrange(-avg_silhouette)</code></pre>
   theme_minimal() +
   theme(legend.position = &quot;none&quot;)</code></pre>
 <p><img src="figure/scrnaseq_clusters.Rmd/sil_summary_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-sil_summary_plot-1">
+Past versions of sil_summary_plot-1.png
+</button>
+</p>
+<div id="fig-sil_summary_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/29f3c2edbb253b68c72decc74a513a72059c5e10/docs/figure/scrnaseq_clusters.Rmd/sil_summary_plot-1.png" target="_blank">29f3c2e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Higher scores = more distinct/homogeneous clusters means two
 things:</p>
 <ul>
@@ -825,23 +903,25 @@ score for two reasons:</p>
 <div id="within-cluster-variance-and-coefficient-of-variation"
 class="section level2">
 <h2>Within-Cluster Variance and Coefficient of Variation</h2>
-<p><strong>What it measures:</strong> How much gene expression varies
-among cells within each cluster.</p>
-<p><strong>Interpretation:</strong> - <strong>Variance</strong> =
-absolute spread of expression values - <strong>Coefficient of Variation
-(CV)</strong> = variance relative to mean (more comparable across genes)
-- Higher values = more heterogeneous gene expression within the
-cluster</p>
-<p><strong>Why it matters:</strong> Some cell types naturally have more
-variable expression (e.g., transitioning cells) while others are more
-stable (e.g., terminally differentiated cells).</p>
-<pre class="r"><code>expr_data &lt;- Seurat::GetAssayData(seurat_obj, slot = &quot;data&quot;)</code></pre>
-<pre><code>Warning: The `slot` argument of `GetAssayData()` is deprecated as of SeuratObject 5.0.0.
-ℹ Please use the `layer` argument instead.
-This warning is displayed once every 8 hours.
-Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-generated.</code></pre>
-<pre class="r"><code>variable_genes &lt;- Seurat::VariableFeatures(seurat_obj)
+<ul>
+<li><p><strong>What it measures:</strong> How much gene expression
+varies among cells within each cluster.</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>Variance</strong> = absolute spread of expression
+values</li>
+<li><strong>Coefficient of Variation (CV)</strong> = variance relative
+to mean (more comparable across genes)</li>
+<li>Higher values = more heterogeneous gene expression within the
+cluster</li>
+</ul></li>
+<li><p><strong>Why it matters:</strong> Some cell types naturally have
+more variable expression (e.g., transitioning cells) while others are
+more stable (e.g., terminally differentiated cells).</p></li>
+</ul>
+<pre class="r"><code>expr_data &lt;- Seurat::GetAssayData(seurat_obj, assay = &#39;RNA&#39;, layer = &quot;data&quot;)
+
+variable_genes &lt;- Seurat::VariableFeatures(seurat_obj)
 expr_data &lt;- expr_data[variable_genes, ]
 
 # Calculate variance and CV for each cluster
@@ -886,6 +966,43 @@ variance_results |&gt;
   theme_minimal() +
   theme(legend.position = &quot;none&quot;)</code></pre>
 <p><img src="figure/scrnaseq_clusters.Rmd/variance_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-variance_plot-1">
+Past versions of variance_plot-1.png
+</button>
+</p>
+<div id="fig-variance_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/29f3c2edbb253b68c72decc74a513a72059c5e10/docs/figure/scrnaseq_clusters.Rmd/variance_plot-1.png" target="_blank">29f3c2e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>CV (Coefficient of Variation) measures how variable gene expression
 is relative to the average expression level. A low CV (e.g., 0.3 or
 30%): Gene expression values are tightly clustered around the mean; a
@@ -902,15 +1019,20 @@ transcriptional states - they’re expressing genes at similar levels</li>
 </div>
 <div id="intra-cluster-distances-in-pca-space" class="section level2">
 <h2>Intra-Cluster Distances in PCA Space</h2>
-<p><strong>What it measures:</strong> The average distance between cells
-within the same cluster in reduced dimension space.</p>
-<p><strong>Interpretation:</strong> - <strong>Smaller distances</strong>
-= cells are tightly clustered together (low heterogeneity) -
-<strong>Larger distances</strong> = cells are spread out (high
-heterogeneity)</p>
-<p><strong>Why it matters:</strong> This gives you a spatial sense of
-cluster compactness. We calculate this in both PCA (captures biological
-variance) and UMAP (optimized for visualization).</p>
+<ul>
+<li><p><strong>What it measures:</strong> The average distance between
+cells within the same cluster in reduced dimension space.</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>Smaller distances</strong> = cells are tightly clustered
+together (low heterogeneity)</li>
+<li><strong>Larger distances</strong> = cells are spread out (high
+heterogeneity)</li>
+</ul></li>
+<li><p><strong>Why it matters:</strong> This gives you a spatial sense
+of cluster compactness. We calculate this in both PCA (captures
+biological variance) and UMAP (optimized for visualization).</p></li>
+</ul>
 <pre class="r"><code># Function to calculate intra-cluster distances
 calc_intra_cluster_dist &lt;- function(embeddings, labels) {
   results &lt;- lapply(unique(labels), function(cl) {
@@ -961,18 +1083,61 @@ pca_dist_summary |&gt;
   theme_minimal() +
   theme(legend.position = &quot;none&quot;)</code></pre>
 <p><img src="figure/scrnaseq_clusters.Rmd/distances_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-distances_plot-1">
+Past versions of distances_plot-1.png
+</button>
+</p>
+<div id="fig-distances_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/29f3c2edbb253b68c72decc74a513a72059c5e10/docs/figure/scrnaseq_clusters.Rmd/distances_plot-1.png" target="_blank">29f3c2e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="shannon-entropy" class="section level2">
 <h2>Shannon Entropy</h2>
-<p><strong>What it measures:</strong> The diversity of gene expression
-distributions within each cluster.</p>
-<p><strong>Interpretation:</strong> - <strong>Higher entropy</strong> =
-gene expression is more evenly distributed across many values (high
-heterogeneity) - <strong>Lower entropy</strong> = gene expression is
-concentrated around specific values (low heterogeneity)</p>
-<p><strong>Why it matters:</strong> Entropy captures whether cells have
-uniform or variable transcriptional states. It’s particularly useful for
-identifying transitional or stressed cell populations.</p>
+<ul>
+<li><p><strong>What it measures:</strong> The diversity of gene
+expression distributions within each cluster.</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>Higher entropy</strong> = gene expression is more evenly
+distributed across many values (high heterogeneity)</li>
+<li><strong>Lower entropy</strong> = gene expression is concentrated
+around specific values (low heterogeneity)</li>
+</ul></li>
+<li><p><strong>Why it matters:</strong> Entropy captures whether cells
+have uniform or variable transcriptional states. It’s particularly
+useful for identifying transitional or stressed cell
+populations.</p></li>
+</ul>
 <pre class="r"><code>shannon_entropy &lt;- function(x) {
   # Bin expression values into 10 bins
   breaks &lt;- seq(min(x), max(x), length.out = 11)
@@ -1024,19 +1189,60 @@ entropy_results |&gt;
   theme_minimal() +
   theme(legend.position = &quot;none&quot;)</code></pre>
 <p><img src="figure/scrnaseq_clusters.Rmd/entropy_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-entropy_plot-1">
+Past versions of entropy_plot-1.png
+</button>
+</p>
+<div id="fig-entropy_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/29f3c2edbb253b68c72decc74a513a72059c5e10/docs/figure/scrnaseq_clusters.Rmd/entropy_plot-1.png" target="_blank">29f3c2e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="cluster-compactness-metrics" class="section level2">
 <h2>Cluster Compactness Metrics</h2>
-<p><strong>What it measures:</strong> How tightly packed a cluster is
-relative to how far it is from other clusters.</p>
-<p><strong>Interpretation:</strong> - <strong>Lower compactness
-ratio</strong> = cluster is tight and well-separated (low heterogeneity,
-good clustering) - <strong>Higher compactness ratio</strong> = cluster
-is spread out or close to other clusters (high heterogeneity or poor
-separation)</p>
-<p><strong>Why it matters:</strong> This metric combines within-cluster
-spread with between-cluster separation, giving you a sense of both
-heterogeneity and cluster quality.</p>
+<ul>
+<li><p><strong>What it measures:</strong> How tightly packed a cluster
+is relative to how far it is from other clusters.</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>Lower compactness ratio</strong> = cluster is tight and
+well-separated (low heterogeneity, good clustering)</li>
+<li><strong>Higher compactness ratio</strong> = cluster is spread out or
+close to other clusters (high heterogeneity or poor separation)</li>
+</ul></li>
+<li><p><strong>Why it matters:</strong> This metric combines
+within-cluster spread with between-cluster separation, giving you a
+sense of both heterogeneity and cluster quality.</p></li>
+</ul>
 <p>Calculate centroid (average position) for each cluster and plot the
 centroids.</p>
 <pre class="r"><code>centroids &lt;- do.call(rbind, lapply(unique(clusters), function(cl) {
@@ -1053,6 +1259,43 @@ centroids |&gt;
 DimPlot(seurat_obj, reduction = &#39;pca&#39;) +
   geom_text(data = centroids_1_2, aes(PC_1, PC_2, label=cluster))</code></pre>
 <p><img src="figure/scrnaseq_clusters.Rmd/centroids-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-centroids-1">
+Past versions of centroids-1.png
+</button>
+</p>
+<div id="fig-centroids-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/29f3c2edbb253b68c72decc74a513a72059c5e10/docs/figure/scrnaseq_clusters.Rmd/centroids-1.png" target="_blank">29f3c2e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Calculate compactness metrics for each cluster.</p>
 <pre class="r"><code>compactness_results &lt;- lapply(unique(clusters), function(cl) {
   # Get cells in this cluster
@@ -1107,6 +1350,43 @@ compactness_results |&gt;
   theme_minimal() +
   theme(legend.position = &quot;none&quot;)</code></pre>
 <p><img src="figure/scrnaseq_clusters.Rmd/compactness_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-compactness_plot-1">
+Past versions of compactness_plot-1.png
+</button>
+</p>
+<div id="fig-compactness_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/29f3c2edbb253b68c72decc74a513a72059c5e10/docs/figure/scrnaseq_clusters.Rmd/compactness_plot-1.png" target="_blank">29f3c2e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="comparing-metrics" class="section level2">
 <h2>Comparing Metrics</h2>
@@ -1139,6 +1419,43 @@ summary_comparison</code></pre>
   as.matrix() |&gt;
   pheatmap(scale = &quot;column&quot;)</code></pre>
 <p><img src="figure/scrnaseq_clusters.Rmd/summary_heatmap-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-summary_heatmap-1">
+Past versions of summary_heatmap-1.png
+</button>
+</p>
+<div id="fig-summary_heatmap-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/29f3c2edbb253b68c72decc74a513a72059c5e10/docs/figure/scrnaseq_clusters.Rmd/summary_heatmap-1.png" target="_blank">29f3c2e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="interpretation-guide" class="section level2">
 <h2>Interpretation Guide</h2>
@@ -1249,7 +1566,7 @@ loaded via a namespace (and not attached):
 [106] spatstat.random_3.4-1  png_0.1-8              spatstat.univar_3.1-4 
 [109] parallel_4.5.0         dotCall64_1.2          listenv_0.9.1         
 [112] viridisLite_0.4.2      scales_1.4.0           ggridges_0.5.6        
-[115] crayon_1.5.3           rlang_1.1.6            cowplot_1.2.0         </code></pre>
+[115] rlang_1.1.6            cowplot_1.2.0         </code></pre>
 </div>
 </div>
 </div>
