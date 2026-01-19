@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-01-19" />
+
+<title>fpc: Flexible Procedures for Clustering</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">fpc: Flexible Procedures for
+Clustering</h1>
+<h4 class="date">2026-01-19</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-01-19
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec1411485f28c7ff5227120aeaa3835313115e19atargetblankc141148a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/c1411485f28c7ff5227120aeaa3835313115e19a" target="_blank">c141148</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec1411485f28c7ff5227120aeaa3835313115e19atargetblankc141148a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/c1411485f28c7ff5227120aeaa3835313115e19a" target="_blank">c141148</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.4.1/
+    Ignored:    r_packages_4.5.0/
+
+Untracked files:
+    Untracked:  analysis/bioc.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/likelihood.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
+    Untracked:  m3/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/icc.Rmd
+    Modified:   analysis/isoform_switch_analyzer.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/fpc.Rmd</code>) and HTML
+(<code>docs/fpc.html</code>) files. If you’ve configured a remote Git
+repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
+in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/c1411485f28c7ff5227120aeaa3835313115e19a/analysis/fpc.Rmd" target="_blank">c141148</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+<td>
+Flexible Procedures for Clustering
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>This notebook uses the <code>{fpc}</code> package’s
+<code>cluster.stats()</code> function to comprehensively assess cluster
+quality and heterogeneity in scRNA-seq data. This function calculates
+dozens of clustering validation metrics in a single call.</p>
+</div>
+<div id="dependencies" class="section level2">
+<h2>Dependencies</h2>
+<pre class="r"><code>install.packages(&quot;fpc&quot;)</code></pre>
+</div>
+<div id="seurat-workflow" class="section level2">
+<h2>Seurat workflow</h2>
+<p>Import raw pbmc3k dataset from my server.</p>
+<pre class="r"><code>seurat_obj &lt;- readRDS(url(&quot;https://davetang.org/file/pbmc3k_seurat.rds&quot;, &quot;rb&quot;))
+seurat_obj</code></pre>
+<pre><code>An object of class Seurat 
+32738 features across 2700 samples within 1 assay 
+Active assay: RNA (32738 features, 0 variable features)
+ 1 layer present: counts</code></pre>
+<p>Filter.</p>
+<pre class="r"><code>seurat_obj &lt;- CreateSeuratObject(
+  counts = seurat_obj@assays$RNA$counts,
+  min.cells = 3,
+  min.features = 200,
+  project = &quot;pbmc3k&quot;
+)
+seurat_obj</code></pre>
+<pre><code>An object of class Seurat 
+13714 features across 2700 samples within 1 assay 
+Active assay: RNA (13714 features, 0 variable features)
+ 1 layer present: counts</code></pre>
+<p>Process with the Seurat 4 workflow.</p>
+<pre class="r"><code>seurat_wf_v4 &lt;- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
+  
+  seurat_obj &lt;- NormalizeData(seurat_obj, normalization.method = &quot;LogNormalize&quot;, scale.factor = scale_factor, verbose = debug_flag)
+  seurat_obj &lt;- FindVariableFeatures(seurat_obj, selection.method = &#39;vst&#39;, nfeatures = num_features, verbose = debug_flag)
+  seurat_obj &lt;- ScaleData(seurat_obj, verbose = debug_flag)
+  seurat_obj &lt;- RunPCA(seurat_obj, verbose = debug_flag)
+  seurat_obj &lt;- RunUMAP(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj &lt;- FindNeighbors(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj &lt;- FindClusters(seurat_obj, resolution = cluster_res, verbose = debug_flag)
+  
+  seurat_obj
+}
+
+seurat_obj &lt;- seurat_wf_v4(seurat_obj)</code></pre>
+<pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
+This message will be shown once per session</code></pre>
+</div>
+<div id="cluster-statistics" class="section level2">
+<h2>Cluster statistics</h2>
+<p>Cluster results are in <code>seurat_clusters</code>.</p>
+<pre class="r"><code>table(seurat_obj$seurat_clusters)</code></pre>
+<pre><code>
+   0    1    2    3    4    5    6    7 
+1187  491  351  301  163  161   32   14 </code></pre>
+<p>Calculate cluster statistics.</p>
+<pre class="r"><code>pca_embeddings &lt;- Seurat::Embeddings(seurat_obj, reduction = &quot;pca&quot;)[, 1:30]
+clusters &lt;- as.numeric(seurat_obj$seurat_clusters)
+
+# Calculate distance matrix
+dist_matrix &lt;- stats::dist(pca_embeddings)
+
+# Calculate comprehensive cluster statistics
+stats &lt;- fpc::cluster.stats(d = dist_matrix, clustering = clusters)
+
+names(stats)</code></pre>
+<pre><code> [1] &quot;n&quot;                  &quot;cluster.number&quot;     &quot;cluster.size&quot;      
+ [4] &quot;min.cluster.size&quot;   &quot;noisen&quot;             &quot;diameter&quot;          
+ [7] &quot;average.distance&quot;   &quot;median.distance&quot;    &quot;separation&quot;        
+[10] &quot;average.toother&quot;    &quot;separation.matrix&quot;  &quot;ave.between.matrix&quot;
+[13] &quot;average.between&quot;    &quot;average.within&quot;     &quot;n.between&quot;         
+[16] &quot;n.within&quot;           &quot;max.diameter&quot;       &quot;min.separation&quot;    
+[19] &quot;within.cluster.ss&quot;  &quot;clus.avg.silwidths&quot; &quot;avg.silwidth&quot;      
+[22] &quot;g2&quot;                 &quot;g3&quot;                 &quot;pearsongamma&quot;      
+[25] &quot;dunn&quot;               &quot;dunn2&quot;              &quot;entropy&quot;           
+[28] &quot;wb.ratio&quot;           &quot;ch&quot;                 &quot;cwidegap&quot;          
+[31] &quot;widestgap&quot;          &quot;sindex&quot;             &quot;corrected.rand&quot;    
+[34] &quot;vi&quot;                </code></pre>
+</div>
+<div id="global-clustering-quality-metrics" class="section level2">
+<h2>Global Clustering Quality Metrics</h2>
+<p>These metrics evaluate the overall quality of the clustering
+solution.</p>
+<pre class="r"><code>global_metrics &lt;- data.frame(
+  Metric = c(&quot;Number of Clusters&quot;, 
+             &quot;Cluster Sizes (min, mean, max)&quot;,
+             &quot;Dunn Index&quot;,
+             &quot;Dunn2 Index&quot;,
+             &quot;Average Silhouette Width&quot;,
+             &quot;Average Distance Within Clusters&quot;,
+             &quot;Average Distance Between Clusters&quot;,
+             &quot;Within/Between Ratio&quot;,
+             &quot;Calinski-Harabasz Index&quot;,
+             &quot;Pearson Gamma&quot;),
+  Value = c(
+    stats$cluster.number,
+    paste(min(stats$cluster.size), round(mean(stats$cluster.size), 1), 
+          max(stats$cluster.size), sep = &quot; / &quot;),
+    round(stats$dunn, 4),
+    round(stats$dunn2, 4),
+    round(stats$avg.silwidth, 4),
+    round(stats$average.within, 2),
+    round(stats$average.between, 2),
+    round(stats$wb.ratio, 4),
+    round(stats$ch, 2),
+    round(stats$pearsongamma, 4)
+  ),
+  Interpretation = c(
+    &quot;Total number of clusters identified&quot;,
+    &quot;Range and average cluster sizes&quot;,
+    &quot;Higher is better (&gt;1 is good, &gt;2 is excellent)&quot;,
+    &quot;Alternative Dunn index, similar interpretation&quot;,
+    &quot;Higher is better (-1 to 1, &gt;0.5 is good)&quot;,
+    &quot;Lower is better (compact clusters)&quot;,
+    &quot;Higher is better (well-separated clusters)&quot;,
+    &quot;Lower is better (ratio of within to between distance)&quot;,
+    &quot;Higher is better (well-separated, compact clusters)&quot;,
+    &quot;Correlation between distances and clustering (higher is better)&quot;
+  )
+)
+
+knitr::kable(global_metrics)</code></pre>
+<table>
+<colgroup>
+<col width="29%" />
+<col width="15%" />
+<col width="55%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Metric</th>
+<th align="left">Value</th>
+<th align="left">Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Number of Clusters</td>
+<td align="left">8</td>
+<td align="left">Total number of clusters identified</td>
+</tr>
+<tr class="even">
+<td align="left">Cluster Sizes (min, mean, max)</td>
+<td align="left">14 / 337.5 / 1187</td>
+<td align="left">Range and average cluster sizes</td>
+</tr>
+<tr class="odd">
+<td align="left">Dunn Index</td>
+<td align="left">0.0828</td>
+<td align="left">Higher is better (&gt;1 is good, &gt;2 is
+excellent)</td>
+</tr>
+<tr class="even">
+<td align="left">Dunn2 Index</td>
+<td align="left">0.4506</td>
+<td align="left">Alternative Dunn index, similar interpretation</td>
+</tr>
+<tr class="odd">
+<td align="left">Average Silhouette Width</td>
+<td align="left">0.1966</td>
+<td align="left">Higher is better (-1 to 1, &gt;0.5 is good)</td>
+</tr>
+<tr class="even">
+<td align="left">Average Distance Within Clusters</td>
+<td align="left">12.74</td>
+<td align="left">Lower is better (compact clusters)</td>
+</tr>
+<tr class="odd">
+<td align="left">Average Distance Between Clusters</td>
+<td align="left">20.32</td>
+<td align="left">Higher is better (well-separated clusters)</td>
+</tr>
+<tr class="even">
+<td align="left">Within/Between Ratio</td>
+<td align="left">0.6269</td>
+<td align="left">Lower is better (ratio of within to between
+distance)</td>
+</tr>
+<tr class="odd">
+<td align="left">Calinski-Harabasz Index</td>
+<td align="left">402.79</td>
+<td align="left">Higher is better (well-separated, compact
+clusters)</td>
+</tr>
+<tr class="even">
+<td align="left">Pearson Gamma</td>
+<td align="left">0.5376</td>
+<td align="left">Correlation between distances and clustering (higher is
+better)</td>
+</tr>
+</tbody>
+</table>
+<div id="key-global-metrics-explained" class="section level3">
+<h3>Key Global Metrics Explained:</h3>
+<div id="dunn-index-dunn-dunn2" class="section level4">
+<h4><strong>Dunn Index</strong> (<code>dunn</code>,
+<code>dunn2</code>)</h4>
+<ul>
+<li><p><strong>What it measures:</strong> Ratio of minimum inter-cluster
+distance to maximum intra-cluster diameter.</p></li>
+<li><p><strong>Formula:</strong> Dunn = (min distance between clusters)
+/ (max distance within clusters)</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>Higher values = better clustering</strong></li>
+<li>Values &gt; 1: clusters are well-separated</li>
+<li>Values &gt; 2: excellent separation</li>
+<li><code>dunn2</code> is a more robust alternative calculation</li>
+</ul></li>
+</ul>
+<pre class="r"><code>cat(paste(&quot;Dunn Index:&quot;, round(stats$dunn, 4), &quot;\n&quot;))</code></pre>
+<pre><code>Dunn Index: 0.0828 </code></pre>
+<pre class="r"><code>cat(paste(&quot;Dunn2 Index:&quot;, round(stats$dunn2, 4), &quot;\n&quot;))</code></pre>
+<pre><code>Dunn2 Index: 0.4506 </code></pre>
+<pre class="r"><code>if (stats$dunn &gt; 2) {
+  cat(&quot;Excellent cluster separation\n&quot;)
+} else if (stats$dunn &gt; 1) {
+  cat(&quot;Good cluster separation\n&quot;)
+} else {
+  cat(&quot;Clusters may be overlapping or poorly defined\n&quot;)
+}</code></pre>
+<pre><code>Clusters may be overlapping or poorly defined</code></pre>
+</div>
+<div id="average-silhouette-width-avg.silwidth" class="section level4">
+<h4><strong>Average Silhouette Width</strong>
+(<code>avg.silwidth</code>)</h4>
+<ul>
+<li><p><strong>What it measures:</strong> How similar each point is to
+its own cluster compared to other clusters.</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>1.0</strong>: Perfect clustering</li>
+<li><strong>0.7-1.0</strong>: Strong structure</li>
+<li><strong>0.5-0.7</strong>: Reasonable structure</li>
+<li><strong>0.25-0.5</strong>: Weak structure</li>
+<li><strong>&lt; 0.25</strong>: No substantial structure</li>
+</ul></li>
+</ul>
+<pre class="r"><code>cat(paste(&quot;Average Silhouette Width:&quot;, round(stats$avg.silwidth, 4), &quot;\n&quot;))</code></pre>
+<pre><code>Average Silhouette Width: 0.1966 </code></pre>
+<pre class="r"><code>if (stats$avg.silwidth &gt; 0.7) {
+  cat(&quot;Strong cluster structure\n&quot;)
+} else if (stats$avg.silwidth &gt; 0.5) {
+  cat(&quot;Reasonable cluster structure\n&quot;)
+} else if (stats$avg.silwidth &gt; 0.25) {
+  cat(&quot;Weak cluster structure\n&quot;)
+} else {
+  cat(&quot;Very weak or no substantial structure\n&quot;)
+}</code></pre>
+<pre><code>Very weak or no substantial structure</code></pre>
+</div>
+<div id="calinski-harabasz-index-ch" class="section level4">
+<h4><strong>Calinski-Harabasz Index</strong> (<code>ch</code>)</h4>
+<ul>
+<li><p><strong>What it measures:</strong> Ratio of between-cluster
+variance to within-cluster variance.</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>Higher values = better clustering</strong></li>
+<li>No absolute threshold, use for comparing different clustering
+solutions</li>
+<li>Combines compactness and separation</li>
+</ul></li>
+</ul>
+<pre class="r"><code>cat(paste(&quot;Calinski-Harabasz Index:&quot;, round(stats$ch, 2), &quot;\n&quot;))</code></pre>
+<pre><code>Calinski-Harabasz Index: 402.79 </code></pre>
+<pre class="r"><code>cat(&quot;Higher values indicate better-defined clusters\n&quot;)</code></pre>
+<pre><code>Higher values indicate better-defined clusters</code></pre>
+<pre class="r"><code>cat(&quot;Use this to compare different clustering resolutions\n&quot;)</code></pre>
+<pre><code>Use this to compare different clustering resolutions</code></pre>
+</div>
+<div id="withinbetween-cluster-distance-ratio-wb.ratio"
+class="section level4">
+<h4><strong>Within/Between Cluster Distance Ratio</strong>
+(<code>wb.ratio</code>)</h4>
+<ul>
+<li><p><strong>What it measures:</strong> Ratio of average
+within-cluster distance to average between-cluster distance.</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>Lower values = better clustering</strong></li>
+<li>&lt; 0.5: Very good separation</li>
+<li>0.5-1.0: Moderate separation</li>
+<li><blockquote>
+<p>1.0: Poor separation (clusters overlap)</p>
+</blockquote></li>
+</ul></li>
+</ul>
+<pre class="r"><code>cat(paste(&quot;Within/Between Ratio:&quot;, round(stats$wb.ratio, 4), &quot;\n&quot;))</code></pre>
+<pre><code>Within/Between Ratio: 0.6269 </code></pre>
+<pre class="r"><code>cat(paste(&quot;Average distance within clusters:&quot;, round(stats$average.within, 2), &quot;\n&quot;))</code></pre>
+<pre><code>Average distance within clusters: 12.74 </code></pre>
+<pre class="r"><code>cat(paste(&quot;Average distance between clusters:&quot;, round(stats$average.between, 2), &quot;\n&quot;))</code></pre>
+<pre><code>Average distance between clusters: 20.32 </code></pre>
+<pre class="r"><code>if (stats$wb.ratio &lt; 0.5) {
+  cat(&quot;Very good cluster separation\n&quot;)
+} else if (stats$wb.ratio &lt; 1.0) {
+  cat(&quot;Moderate cluster separation\n&quot;)
+} else {
+  cat(&quot;Poor cluster separation - clusters may overlap\n&quot;)
+}</code></pre>
+<pre><code>Moderate cluster separation</code></pre>
+</div>
+</div>
+</div>
+<div id="per-cluster-metrics" class="section level2">
+<h2>Per-Cluster Metrics</h2>
+<p>These metrics evaluate each cluster individually.</p>
+<pre class="r"><code># Get cluster labels back to original format
+cluster_labels &lt;- levels(seurat_obj$seurat_clusters)
+
+# Create per-cluster summary
+per_cluster_summary &lt;- data.frame(
+  cluster = cluster_labels,
+  n_cells = stats$cluster.size,
+  avg_silwidth = stats$clus.avg.silwidths,
+  diameter = stats$diameter,
+  average_distance = stats$average.distance,
+  separation = stats$separation
+)
+
+print(&quot;Per-Cluster Metrics:&quot;)</code></pre>
+<pre><code>[1] &quot;Per-Cluster Metrics:&quot;</code></pre>
+<pre class="r"><code>print(per_cluster_summary)</code></pre>
+<pre><code>  cluster n_cells avg_silwidth diameter average_distance separation
+1       0    1187   0.23125232 30.15910         11.06922   6.382385
+2       1     491   0.21488745 26.83629         12.98647   7.319883
+3       2     351   0.22471219 42.72548         13.05064   7.626182
+4       3     301   0.05981687 27.61723         13.44704   6.382385
+5       4     163   0.01407852 59.51402         20.08154   9.216088
+6       5     161   0.22205239 27.09877         13.06556   7.319883
+7       6      32   0.32047942 26.71827         13.63669   9.250153
+8       7      14   0.39537997 77.12201         31.91325  13.835638</code></pre>
+<div id="per-cluster-metrics-explained" class="section level3">
+<h3>Per-Cluster Metrics Explained:</h3>
+<div id="cluster-size-cluster.size" class="section level4">
+<h4><strong>Cluster Size</strong> (<code>cluster.size</code>)</h4>
+<ul>
+<li><p><strong>What it measures:</strong> Number of cells in each
+cluster.</p></li>
+<li><p><strong>Why it matters:</strong> Very small clusters may be
+outliers; very large clusters may need sub-clustering.</p></li>
+</ul>
+<pre class="r"><code>ggplot(per_cluster_summary, aes(x = cluster, y = n_cells, fill = cluster)) +
+  geom_bar(stat = &quot;identity&quot;) +
+  labs(title = &quot;Cluster Sizes&quot;,
+       x = &quot;Cluster&quot;, y = &quot;Number of Cells&quot;) +
+  theme_minimal() +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="figure/fpc.Rmd/cluster_size_viz-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="average-silhouette-width-per-cluster-clus.avg.silwidths"
+class="section level4">
+<h4><strong>Average Silhouette Width per Cluster</strong>
+(<code>clus.avg.silwidths</code>)</h4>
+<ul>
+<li><p><strong>What it measures:</strong> How well-defined each cluster
+is.</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>Higher values = more homogeneous and well-separated
+cluster</strong></li>
+<li>Values close to 1: Very tight, well-separated cluster</li>
+<li>Values close to 0: Cluster on the boundary with others</li>
+<li>Negative values: Cells may be in the wrong cluster</li>
+</ul></li>
+</ul>
+<pre class="r"><code>ggplot(per_cluster_summary, aes(x = reorder(cluster, avg_silwidth), 
+                                                   y = avg_silwidth, fill = cluster)) +
+  geom_bar(stat = &quot;identity&quot;) +
+  coord_flip() +
+  labs(title = &quot;Average Silhouette Width by Cluster&quot;,
+       subtitle = &quot;Higher = better defined cluster, &lt;0 = potential misclassification&quot;,
+       x = &quot;Cluster&quot;, y = &quot;Average Silhouette Width&quot;) +
+  theme_minimal() +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="figure/fpc.Rmd/silwidth_per_cluster-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="cluster-diameter-diameter" class="section level4">
+<h4><strong>Cluster Diameter</strong> (<code>diameter</code>)</h4>
+<ul>
+<li><p><strong>What it measures:</strong> Maximum distance between any
+two points in the cluster.</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>Lower values = more compact/homogeneous
+cluster</strong></li>
+<li><strong>Higher values = more spread out/heterogeneous
+cluster</strong></li>
+<li>Larger clusters naturally tend to have larger diameters</li>
+</ul></li>
+</ul>
+<pre class="r"><code>ggplot(per_cluster_summary, aes(x = reorder(cluster, diameter), 
+                                y = diameter, fill = cluster)) +
+  geom_bar(stat = &quot;identity&quot;) +
+  coord_flip() +
+  labs(title = &quot;Cluster Diameter (Maximum Within-Cluster Distance)&quot;,
+       subtitle = &quot;Higher = more heterogeneous/spread out cluster&quot;,
+       x = &quot;Cluster&quot;, y = &quot;Diameter&quot;) +
+  theme_minimal() +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="figure/fpc.Rmd/diameter_viz-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="average-distance-within-cluster-average.distance"
+class="section level4">
+<h4><strong>Average Distance Within Cluster</strong>
+(<code>average.distance</code>)</h4>
+<ul>
+<li><p><strong>What it measures:</strong> Mean pairwise distance between
+all points in the cluster.</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>Lower values = more compact cluster</strong></li>
+<li><strong>Higher values = more dispersed cluster</strong></li>
+<li>More robust than diameter (not affected by single outliers)</li>
+</ul></li>
+</ul>
+<pre class="r"><code>ggplot(per_cluster_summary, aes(x = reorder(cluster, average_distance), 
+                                y = average_distance, fill = cluster)) +
+  geom_bar(stat = &quot;identity&quot;) +
+  coord_flip() +
+  labs(title = &quot;Average Within-Cluster Distance&quot;,
+       subtitle = &quot;Higher = more heterogeneous cluster&quot;,
+       x = &quot;Cluster&quot;, y = &quot;Average Distance&quot;) +
+  theme_minimal() +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="figure/fpc.Rmd/avg_dist_viz-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># Identify most and least heterogeneous clusters
+most_heterogeneous &lt;- per_cluster_summary %&gt;% 
+  dplyr::arrange(desc(average_distance)) %&gt;% 
+  dplyr::slice(1:3)
+
+least_heterogeneous &lt;- per_cluster_summary %&gt;% 
+  dplyr::arrange(average_distance) %&gt;% 
+  dplyr::slice(1:3)
+
+cat(&quot;\nMost heterogeneous clusters (highest average distance):\n&quot;)</code></pre>
+<pre><code>
+Most heterogeneous clusters (highest average distance):</code></pre>
+<pre class="r"><code>print(most_heterogeneous %&gt;% dplyr::select(cluster, average_distance, diameter))</code></pre>
+<pre><code>  cluster average_distance diameter
+8       7         31.91325 77.12201
+5       4         20.08154 59.51402
+7       6         13.63669 26.71827</code></pre>
+<pre class="r"><code>cat(&quot;\nLeast heterogeneous clusters (lowest average distance):\n&quot;)</code></pre>
+<pre><code>
+Least heterogeneous clusters (lowest average distance):</code></pre>
+<pre class="r"><code>print(least_heterogeneous %&gt;% dplyr::select(cluster, average_distance, diameter))</code></pre>
+<pre><code>  cluster average_distance diameter
+1       0         11.06922 30.15910
+2       1         12.98647 26.83629
+3       2         13.05064 42.72548</code></pre>
+</div>
+<div id="cluster-separation-separation" class="section level4">
+<h4><strong>Cluster Separation</strong> (<code>separation</code>)</h4>
+<ul>
+<li><p><strong>What it measures:</strong> Minimum distance from each
+cluster to any other cluster.</p></li>
+<li><p><strong>Interpretation:</strong></p>
+<ul>
+<li><strong>Higher values = better separated from other
+clusters</strong></li>
+<li><strong>Lower values = close to other clusters, potential
+overlap</strong></li>
+<li>Combined with diameter, helps assess cluster quality</li>
+</ul></li>
+</ul>
+<pre class="r"><code>ggplot(per_cluster_summary, aes(x = reorder(cluster, separation), 
+                                y = separation, fill = cluster)) +
+  geom_bar(stat = &quot;identity&quot;) +
+  coord_flip() +
+  labs(title = &quot;Cluster Separation (Distance to Nearest Cluster)&quot;,
+       subtitle = &quot;Higher = better separated from other clusters&quot;,
+       x = &quot;Cluster&quot;, y = &quot;Separation&quot;) +
+  theme_minimal() +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="figure/fpc.Rmd/separation_viz-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+</div>
+<div id="cluster-quality-assessment" class="section level2">
+<h2>Cluster Quality Assessment</h2>
+<p>Combining diameter and separation gives a comprehensive view of
+cluster quality.</p>
+<pre class="r"><code># Calculate a simple quality metric: separation / diameter
+# Higher values = well-separated and compact
+per_cluster_summary &lt;- per_cluster_summary |&gt;
+  dplyr::mutate(quality_ratio = separation / diameter)
+
+ggplot(per_cluster_summary, aes(x = diameter, y = separation, 
+                                                   color = cluster, size = n_cells)) +
+  geom_point(alpha = 0.7) +
+  geom_text(ggplot2::aes(label = cluster), hjust = -0.3, size = 3, show.legend = FALSE) +
+  geom_abline(slope = 1, intercept = 0, linetype = &quot;dashed&quot;, color = &quot;gray&quot;) +
+  labs(title = &quot;Cluster Quality: Separation vs Diameter&quot;,
+                subtitle = &quot;Points above the diagonal = well-separated and compact&quot;,
+                x = &quot;Diameter (within-cluster spread)&quot;,
+                y = &quot;Separation (distance to nearest cluster)&quot;,
+                size = &quot;Cluster Size&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/fpc.Rmd/quality_assessment-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>cat(&quot;\nCluster Quality Ratios (Separation/Diameter):\n&quot;)</code></pre>
+<pre><code>
+Cluster Quality Ratios (Separation/Diameter):</code></pre>
+<pre class="r"><code>cat(&quot;Higher values indicate better quality (compact and well-separated)\n\n&quot;)</code></pre>
+<pre><code>Higher values indicate better quality (compact and well-separated)</code></pre>
+<pre class="r"><code>print(per_cluster_summary |&gt;
+        dplyr::select(cluster, diameter, separation, quality_ratio) |&gt;
+        dplyr::arrange(desc(quality_ratio)))</code></pre>
+<pre><code>  cluster diameter separation quality_ratio
+7       6 26.71827   9.250153     0.3462107
+2       1 26.83629   7.319883     0.2727606
+6       5 27.09877   7.319883     0.2701186
+4       3 27.61723   6.382385     0.2311016
+1       0 30.15910   6.382385     0.2116238
+8       7 77.12201  13.835638     0.1793993
+3       2 42.72548   7.626182     0.1784926
+5       4 59.51402   9.216088     0.1548558</code></pre>
+</div>
+<div id="summary-and-recommendations" class="section level2">
+<h2>Summary and Recommendations</h2>
+<pre class="r"><code>cat(&quot;=== CLUSTERING QUALITY SUMMARY ===\n\n&quot;)</code></pre>
+<pre><code>=== CLUSTERING QUALITY SUMMARY ===</code></pre>
+<pre class="r"><code>cat(&quot;Overall Assessment:\n&quot;)</code></pre>
+<pre><code>Overall Assessment:</code></pre>
+<pre class="r"><code>cat(paste(&quot;  Number of clusters:&quot;, stats$cluster.number, &quot;\n&quot;))</code></pre>
+<pre><code>  Number of clusters: 8 </code></pre>
+<pre class="r"><code>cat(paste(&quot;  Average Silhouette Width:&quot;, round(stats$avg.silwidth, 3), 
+          ifelse(stats$avg.silwidth &gt; 0.5, &quot;✓ Good&quot;, &quot;⚠ Needs review&quot;), &quot;\n&quot;))</code></pre>
+<pre><code>  Average Silhouette Width: 0.197 ⚠ Needs review </code></pre>
+<pre class="r"><code>cat(paste(&quot;  Dunn Index:&quot;, round(stats$dunn, 3), 
+          ifelse(stats$dunn &gt; 1, &quot;✓ Good separation&quot;, &quot;⚠ Weak separation&quot;), &quot;\n&quot;))</code></pre>
+<pre><code>  Dunn Index: 0.083 ⚠ Weak separation </code></pre>
+<pre class="r"><code>cat(paste(&quot;  Within/Between Ratio:&quot;, round(stats$wb.ratio, 3),
+          ifelse(stats$wb.ratio &lt; 1, &quot;✓ Good&quot;, &quot;⚠ Overlapping&quot;), &quot;\n&quot;))</code></pre>
+<pre><code>  Within/Between Ratio: 0.627 ✓ Good </code></pre>
+<pre class="r"><code>cat(&quot;\nClusters Needing Review:\n&quot;)</code></pre>
+<pre><code>
+Clusters Needing Review:</code></pre>
+<pre class="r"><code>problem_clusters &lt;- per_cluster_summary %&gt;%
+  dplyr::filter(avg_silwidth &lt; 0.25 | quality_ratio &lt; 0.5)
+
+if (nrow(problem_clusters) &gt; 0) {
+  print(problem_clusters %&gt;% 
+          dplyr::select(cluster, avg_silwidth, quality_ratio))
+  cat(&quot;\nThese clusters may benefit from:\n&quot;)
+  cat(&quot;  - Sub-clustering (if large and heterogeneous)\n&quot;)
+  cat(&quot;  - Merging with similar clusters (if poorly separated)\n&quot;)
+  cat(&quot;  - Removal as outliers (if very small)\n&quot;)
+} else {
+  cat(&quot;  All clusters show reasonable quality metrics ✓\n&quot;)
+}</code></pre>
+<pre><code>  cluster avg_silwidth quality_ratio
+1       0   0.23125232     0.2116238
+2       1   0.21488745     0.2727606
+3       2   0.22471219     0.1784926
+4       3   0.05981687     0.2311016
+5       4   0.01407852     0.1548558
+6       5   0.22205239     0.2701186
+7       6   0.32047942     0.3462107
+8       7   0.39537997     0.1793993
+
+These clusters may benefit from:
+  - Sub-clustering (if large and heterogeneous)
+  - Merging with similar clusters (if poorly separated)
+  - Removal as outliers (if very small)</code></pre>
+<pre class="r"><code>cat(&quot;\nMost Heterogeneous Clusters (consider sub-clustering):\n&quot;)</code></pre>
+<pre><code>
+Most Heterogeneous Clusters (consider sub-clustering):</code></pre>
+<pre class="r"><code>print(per_cluster_summary %&gt;% 
+        dplyr::arrange(desc(average_distance)) %&gt;%
+        dplyr::select(cluster, n_cells, diameter, average_distance) %&gt;%
+        dplyr::slice(1:3))</code></pre>
+<pre><code>  cluster n_cells diameter average_distance
+8       7      14 77.12201         31.91325
+5       4     163 59.51402         20.08154
+7       6      32 26.71827         13.63669</code></pre>
+</div>
+<div id="interpretation-guide" class="section level2">
+<h2>Interpretation Guide</h2>
+<ul>
+<li>When to trust your clustering:
+<ul>
+<li>Average Silhouette Width &gt; 0.5</li>
+<li>Dunn Index &gt; 1</li>
+<li>Within/Between Ratio &lt; 1</li>
+<li>Most clusters have positive silhouette widths</li>
+</ul></li>
+<li>Red flags:
+<ul>
+<li>Negative average silhouette widths for clusters</li>
+<li>Dunn Index &lt; 0.5</li>
+<li>Within/Between Ratio &gt; 1</li>
+<li>Very large differences in cluster sizes (unless biologically
+expected)</li>
+</ul></li>
+<li>What to do about heterogeneous clusters:</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li><strong>High diameter/average distance</strong>: Consider
+sub-clustering</li>
+<li><strong>Low separation</strong>: May need to merge with nearby
+clusters</li>
+<li><strong>Negative silhouette</strong>: Cells may be misassigned</li>
+<li><strong>Very small clusters</strong>: May be outliers or rare cell
+types (requires biological interpretation)</li>
+</ol>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.3 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] future_1.58.0      fpc_2.2-13         Seurat_5.3.0       SeuratObject_5.1.0
+ [5] sp_2.2-0           lubridate_1.9.4    forcats_1.0.0      stringr_1.5.1     
+ [9] dplyr_1.1.4        purrr_1.0.4        readr_2.1.5        tidyr_1.3.1       
+[13] tibble_3.3.0       ggplot2_3.5.2      tidyverse_2.0.0    workflowr_1.7.1   
+
+loaded via a namespace (and not attached):
+  [1] RColorBrewer_1.1-3     rstudioapi_0.17.1      jsonlite_2.0.0        
+  [4] magrittr_2.0.3         modeltools_0.2-24      spatstat.utils_3.1-5  
+  [7] farver_2.1.2           rmarkdown_2.29         fs_1.6.6              
+ [10] vctrs_0.6.5            ROCR_1.0-11            spatstat.explore_3.5-2
+ [13] htmltools_0.5.8.1      sass_0.4.10            sctransform_0.4.2     
+ [16] parallelly_1.45.0      KernSmooth_2.23-26     bslib_0.9.0           
+ [19] htmlwidgets_1.6.4      ica_1.0-3              plyr_1.8.9            
+ [22] plotly_4.11.0          zoo_1.8-14             cachem_1.1.0          
+ [25] whisker_0.4.1          igraph_2.1.4           mime_0.13             
+ [28] lifecycle_1.0.4        pkgconfig_2.0.3        Matrix_1.7-3          
+ [31] R6_2.6.1               fastmap_1.2.0          fitdistrplus_1.2-4    
+ [34] shiny_1.11.1           digest_0.6.37          colorspace_2.1-1      
+ [37] patchwork_1.3.0        ps_1.9.1               rprojroot_2.0.4       
+ [40] tensor_1.5.1           RSpectra_0.16-2        irlba_2.3.5.1         
+ [43] labeling_0.4.3         progressr_0.15.1       spatstat.sparse_3.1-0 
+ [46] timechange_0.3.0       httr_1.4.7             polyclip_1.10-7       
+ [49] abind_1.4-8            compiler_4.5.0         withr_3.0.2           
+ [52] fastDummies_1.7.5      MASS_7.3-65            tools_4.5.0           
+ [55] lmtest_0.9-40          prabclus_2.3-4         httpuv_1.6.16         
+ [58] future.apply_1.20.0    nnet_7.3-20            goftest_1.2-3         
+ [61] glue_1.8.0             callr_3.7.6            nlme_3.1-168          
+ [64] promises_1.3.3         grid_4.5.0             Rtsne_0.17            
+ [67] getPass_0.2-4          cluster_2.1.8.1        reshape2_1.4.4        
+ [70] generics_0.1.4         gtable_0.3.6           spatstat.data_3.1-6   
+ [73] tzdb_0.5.0             class_7.3-23           data.table_1.17.4     
+ [76] hms_1.1.3              flexmix_2.3-20         spatstat.geom_3.5-0   
+ [79] RcppAnnoy_0.0.22       ggrepel_0.9.6          RANN_2.6.2            
+ [82] pillar_1.10.2          spam_2.11-1            RcppHNSW_0.6.0        
+ [85] later_1.4.2            robustbase_0.99-4-1    splines_4.5.0         
+ [88] lattice_0.22-6         survival_3.8-3         deldir_2.0-4          
+ [91] tidyselect_1.2.1       miniUI_0.1.2           pbapply_1.7-4         
+ [94] knitr_1.50             git2r_0.36.2           gridExtra_2.3         
+ [97] scattermore_1.2        stats4_4.5.0           xfun_0.52             
+[100] diptest_0.77-1         matrixStats_1.5.0      DEoptimR_1.1-3-1      
+[103] stringi_1.8.7          lazyeval_0.2.2         yaml_2.3.10           
+[106] evaluate_1.0.3         codetools_0.2-20       kernlab_0.9-33        
+[109] cli_3.6.5              uwot_0.2.3             xtable_1.8-4          
+[112] reticulate_1.43.0      processx_3.8.6         jquerylib_0.1.4       
+[115] Rcpp_1.0.14            globals_0.18.0         spatstat.random_3.4-1 
+[118] png_0.1-8              spatstat.univar_3.1-4  parallel_4.5.0        
+[121] mclust_6.1.1           dotCall64_1.2          listenv_0.9.1         
+[124] viridisLite_0.4.2      scales_1.4.0           ggridges_0.5.6        
+[127] rlang_1.1.6            cowplot_1.2.0         </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
