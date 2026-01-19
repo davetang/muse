@@ -1,0 +1,453 @@
+---
+title: "fpc: Flexible Procedures for Clustering"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(Seurat)
+  library(fpc)
+})
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This notebook uses the `{fpc}` package's `cluster.stats()` function to comprehensively assess cluster quality and heterogeneity in scRNA-seq data. This function calculates dozens of clustering validation metrics in a single call.
+
+## Dependencies
+
+```{r install, eval=FALSE}
+install.packages("fpc")
+```
+
+## Seurat workflow
+
+Import raw pbmc3k dataset from my server.
+
+```{r seurat_obj_raw}
+seurat_obj <- readRDS(url("https://davetang.org/file/pbmc3k_seurat.rds", "rb"))
+seurat_obj
+```
+
+Filter.
+
+```{r seurat_obj}
+seurat_obj <- CreateSeuratObject(
+  counts = seurat_obj@assays$RNA$counts,
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k"
+)
+seurat_obj
+```
+
+Process with the Seurat 4 workflow.
+
+```{r pbmc3k_v4}
+seurat_wf_v4 <- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
+  
+  seurat_obj <- NormalizeData(seurat_obj, normalization.method = "LogNormalize", scale.factor = scale_factor, verbose = debug_flag)
+  seurat_obj <- FindVariableFeatures(seurat_obj, selection.method = 'vst', nfeatures = num_features, verbose = debug_flag)
+  seurat_obj <- ScaleData(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunPCA(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunUMAP(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindNeighbors(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindClusters(seurat_obj, resolution = cluster_res, verbose = debug_flag)
+  
+  seurat_obj
+}
+
+seurat_obj <- seurat_wf_v4(seurat_obj)
+```
+
+## Cluster statistics
+
+Cluster results are in `seurat_clusters`.
+
+```{r seurat_clusters}
+table(seurat_obj$seurat_clusters)
+```
+
+Calculate cluster statistics.
+
+```{r calculate_stats}
+pca_embeddings <- Seurat::Embeddings(seurat_obj, reduction = "pca")[, 1:30]
+clusters <- as.numeric(seurat_obj$seurat_clusters)
+
+# Calculate distance matrix
+dist_matrix <- stats::dist(pca_embeddings)
+
+# Calculate comprehensive cluster statistics
+stats <- fpc::cluster.stats(d = dist_matrix, clustering = clusters)
+
+names(stats)
+```
+
+## Global Clustering Quality Metrics
+
+These metrics evaluate the overall quality of the clustering solution.
+
+```{r global_metrics}
+global_metrics <- data.frame(
+  Metric = c("Number of Clusters", 
+             "Cluster Sizes (min, mean, max)",
+             "Dunn Index",
+             "Dunn2 Index",
+             "Average Silhouette Width",
+             "Average Distance Within Clusters",
+             "Average Distance Between Clusters",
+             "Within/Between Ratio",
+             "Calinski-Harabasz Index",
+             "Pearson Gamma"),
+  Value = c(
+    stats$cluster.number,
+    paste(min(stats$cluster.size), round(mean(stats$cluster.size), 1), 
+          max(stats$cluster.size), sep = " / "),
+    round(stats$dunn, 4),
+    round(stats$dunn2, 4),
+    round(stats$avg.silwidth, 4),
+    round(stats$average.within, 2),
+    round(stats$average.between, 2),
+    round(stats$wb.ratio, 4),
+    round(stats$ch, 2),
+    round(stats$pearsongamma, 4)
+  ),
+  Interpretation = c(
+    "Total number of clusters identified",
+    "Range and average cluster sizes",
+    "Higher is better (>1 is good, >2 is excellent)",
+    "Alternative Dunn index, similar interpretation",
+    "Higher is better (-1 to 1, >0.5 is good)",
+    "Lower is better (compact clusters)",
+    "Higher is better (well-separated clusters)",
+    "Lower is better (ratio of within to between distance)",
+    "Higher is better (well-separated, compact clusters)",
+    "Correlation between distances and clustering (higher is better)"
+  )
+)
+
+knitr::kable(global_metrics)
+```
+
+### Key Global Metrics Explained:
+
+#### **Dunn Index** (`dunn`, `dunn2`)
+
+* **What it measures:** Ratio of minimum inter-cluster distance to maximum intra-cluster diameter.
+
+* **Formula:** Dunn = (min distance between clusters) / (max distance within clusters)
+
+* **Interpretation:**
+    * **Higher values = better clustering**
+    * Values > 1: clusters are well-separated
+    * Values > 2: excellent separation
+    * `dunn2` is a more robust alternative calculation
+
+```{r dunn_viz}
+cat(paste("Dunn Index:", round(stats$dunn, 4), "\n"))
+cat(paste("Dunn2 Index:", round(stats$dunn2, 4), "\n"))
+
+if (stats$dunn > 2) {
+  cat("Excellent cluster separation\n")
+} else if (stats$dunn > 1) {
+  cat("Good cluster separation\n")
+} else {
+  cat("Clusters may be overlapping or poorly defined\n")
+}
+```
+
+#### **Average Silhouette Width** (`avg.silwidth`)
+
+* **What it measures:** How similar each point is to its own cluster compared to other clusters.
+
+* **Interpretation:**
+    * **1.0**: Perfect clustering
+    * **0.7-1.0**: Strong structure
+    * **0.5-0.7**: Reasonable structure
+    * **0.25-0.5**: Weak structure
+    * **< 0.25**: No substantial structure
+
+```{r silhouette_viz}
+cat(paste("Average Silhouette Width:", round(stats$avg.silwidth, 4), "\n"))
+
+if (stats$avg.silwidth > 0.7) {
+  cat("Strong cluster structure\n")
+} else if (stats$avg.silwidth > 0.5) {
+  cat("Reasonable cluster structure\n")
+} else if (stats$avg.silwidth > 0.25) {
+  cat("Weak cluster structure\n")
+} else {
+  cat("Very weak or no substantial structure\n")
+}
+```
+
+#### **Calinski-Harabasz Index** (`ch`)
+
+* **What it measures:** Ratio of between-cluster variance to within-cluster variance.
+
+* **Interpretation:**
+    * **Higher values = better clustering**
+    * No absolute threshold, use for comparing different clustering solutions
+    * Combines compactness and separation
+
+```{r ch_viz}
+cat(paste("Calinski-Harabasz Index:", round(stats$ch, 2), "\n"))
+cat("Higher values indicate better-defined clusters\n")
+cat("Use this to compare different clustering resolutions\n")
+```
+
+#### **Within/Between Cluster Distance Ratio** (`wb.ratio`)
+
+* **What it measures:** Ratio of average within-cluster distance to average between-cluster distance.
+
+* **Interpretation:**
+    * **Lower values = better clustering**
+    * < 0.5: Very good separation
+    * 0.5-1.0: Moderate separation
+    * > 1.0: Poor separation (clusters overlap)
+
+```{r wb_ratio_viz}
+cat(paste("Within/Between Ratio:", round(stats$wb.ratio, 4), "\n"))
+cat(paste("Average distance within clusters:", round(stats$average.within, 2), "\n"))
+cat(paste("Average distance between clusters:", round(stats$average.between, 2), "\n"))
+
+if (stats$wb.ratio < 0.5) {
+  cat("Very good cluster separation\n")
+} else if (stats$wb.ratio < 1.0) {
+  cat("Moderate cluster separation\n")
+} else {
+  cat("Poor cluster separation - clusters may overlap\n")
+}
+```
+
+## Per-Cluster Metrics
+
+These metrics evaluate each cluster individually.
+
+```{r per_cluster_metrics}
+# Get cluster labels back to original format
+cluster_labels <- levels(seurat_obj$seurat_clusters)
+
+# Create per-cluster summary
+per_cluster_summary <- data.frame(
+  cluster = cluster_labels,
+  n_cells = stats$cluster.size,
+  avg_silwidth = stats$clus.avg.silwidths,
+  diameter = stats$diameter,
+  average_distance = stats$average.distance,
+  separation = stats$separation
+)
+
+print("Per-Cluster Metrics:")
+print(per_cluster_summary)
+```
+
+### Per-Cluster Metrics Explained:
+
+#### **Cluster Size** (`cluster.size`)
+
+* **What it measures:** Number of cells in each cluster.
+
+* **Why it matters:** Very small clusters may be outliers; very large clusters may need sub-clustering.
+
+```{r cluster_size_viz}
+ggplot(per_cluster_summary, aes(x = cluster, y = n_cells, fill = cluster)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Cluster Sizes",
+       x = "Cluster", y = "Number of Cells") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+#### **Average Silhouette Width per Cluster** (`clus.avg.silwidths`)
+
+* **What it measures:** How well-defined each cluster is.
+
+* **Interpretation:**
+    * **Higher values = more homogeneous and well-separated cluster**
+    * Values close to 1: Very tight, well-separated cluster
+    * Values close to 0: Cluster on the boundary with others
+    * Negative values: Cells may be in the wrong cluster
+
+```{r silwidth_per_cluster}
+ggplot(per_cluster_summary, aes(x = reorder(cluster, avg_silwidth), 
+                                                   y = avg_silwidth, fill = cluster)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Average Silhouette Width by Cluster",
+       subtitle = "Higher = better defined cluster, <0 = potential misclassification",
+       x = "Cluster", y = "Average Silhouette Width") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+#### **Cluster Diameter** (`diameter`)
+
+* **What it measures:** Maximum distance between any two points in the cluster.
+
+* **Interpretation:**
+    * **Lower values = more compact/homogeneous cluster**
+    * **Higher values = more spread out/heterogeneous cluster**
+    * Larger clusters naturally tend to have larger diameters
+
+```{r diameter_viz}
+ggplot(per_cluster_summary, aes(x = reorder(cluster, diameter), 
+                                y = diameter, fill = cluster)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Cluster Diameter (Maximum Within-Cluster Distance)",
+       subtitle = "Higher = more heterogeneous/spread out cluster",
+       x = "Cluster", y = "Diameter") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+#### **Average Distance Within Cluster** (`average.distance`)
+
+* **What it measures:** Mean pairwise distance between all points in the cluster.
+
+* **Interpretation:**
+    * **Lower values = more compact cluster**
+    * **Higher values = more dispersed cluster**
+    * More robust than diameter (not affected by single outliers)
+
+```{r avg_dist_viz}
+ggplot(per_cluster_summary, aes(x = reorder(cluster, average_distance), 
+                                y = average_distance, fill = cluster)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Average Within-Cluster Distance",
+       subtitle = "Higher = more heterogeneous cluster",
+       x = "Cluster", y = "Average Distance") +
+  theme_minimal() +
+  theme(legend.position = "none")
+
+# Identify most and least heterogeneous clusters
+most_heterogeneous <- per_cluster_summary %>% 
+  dplyr::arrange(desc(average_distance)) %>% 
+  dplyr::slice(1:3)
+
+least_heterogeneous <- per_cluster_summary %>% 
+  dplyr::arrange(average_distance) %>% 
+  dplyr::slice(1:3)
+
+cat("\nMost heterogeneous clusters (highest average distance):\n")
+print(most_heterogeneous %>% dplyr::select(cluster, average_distance, diameter))
+
+cat("\nLeast heterogeneous clusters (lowest average distance):\n")
+print(least_heterogeneous %>% dplyr::select(cluster, average_distance, diameter))
+```
+
+#### **Cluster Separation** (`separation`)
+
+* **What it measures:** Minimum distance from each cluster to any other cluster.
+
+* **Interpretation:**
+    * **Higher values = better separated from other clusters**
+    * **Lower values = close to other clusters, potential overlap**
+    * Combined with diameter, helps assess cluster quality
+
+```{r separation_viz}
+ggplot(per_cluster_summary, aes(x = reorder(cluster, separation), 
+                                y = separation, fill = cluster)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Cluster Separation (Distance to Nearest Cluster)",
+       subtitle = "Higher = better separated from other clusters",
+       x = "Cluster", y = "Separation") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## Cluster Quality Assessment
+
+Combining diameter and separation gives a comprehensive view of cluster quality.
+
+```{r quality_assessment}
+# Calculate a simple quality metric: separation / diameter
+# Higher values = well-separated and compact
+per_cluster_summary <- per_cluster_summary |>
+  dplyr::mutate(quality_ratio = separation / diameter)
+
+ggplot(per_cluster_summary, aes(x = diameter, y = separation, 
+                                                   color = cluster, size = n_cells)) +
+  geom_point(alpha = 0.7) +
+  geom_text(ggplot2::aes(label = cluster), hjust = -0.3, size = 3, show.legend = FALSE) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "gray") +
+  labs(title = "Cluster Quality: Separation vs Diameter",
+                subtitle = "Points above the diagonal = well-separated and compact",
+                x = "Diameter (within-cluster spread)",
+                y = "Separation (distance to nearest cluster)",
+                size = "Cluster Size") +
+  theme_minimal()
+
+cat("\nCluster Quality Ratios (Separation/Diameter):\n")
+cat("Higher values indicate better quality (compact and well-separated)\n\n")
+print(per_cluster_summary |>
+        dplyr::select(cluster, diameter, separation, quality_ratio) |>
+        dplyr::arrange(desc(quality_ratio)))
+```
+
+## Summary and Recommendations
+
+```{r summary}
+cat("=== CLUSTERING QUALITY SUMMARY ===\n\n")
+
+cat("Overall Assessment:\n")
+cat(paste("  Number of clusters:", stats$cluster.number, "\n"))
+cat(paste("  Average Silhouette Width:", round(stats$avg.silwidth, 3), 
+          ifelse(stats$avg.silwidth > 0.5, "✓ Good", "⚠ Needs review"), "\n"))
+cat(paste("  Dunn Index:", round(stats$dunn, 3), 
+          ifelse(stats$dunn > 1, "✓ Good separation", "⚠ Weak separation"), "\n"))
+cat(paste("  Within/Between Ratio:", round(stats$wb.ratio, 3),
+          ifelse(stats$wb.ratio < 1, "✓ Good", "⚠ Overlapping"), "\n"))
+
+cat("\nClusters Needing Review:\n")
+problem_clusters <- per_cluster_summary %>%
+  dplyr::filter(avg_silwidth < 0.25 | quality_ratio < 0.5)
+
+if (nrow(problem_clusters) > 0) {
+  print(problem_clusters %>% 
+          dplyr::select(cluster, avg_silwidth, quality_ratio))
+  cat("\nThese clusters may benefit from:\n")
+  cat("  - Sub-clustering (if large and heterogeneous)\n")
+  cat("  - Merging with similar clusters (if poorly separated)\n")
+  cat("  - Removal as outliers (if very small)\n")
+} else {
+  cat("  All clusters show reasonable quality metrics ✓\n")
+}
+
+cat("\nMost Heterogeneous Clusters (consider sub-clustering):\n")
+print(per_cluster_summary %>% 
+        dplyr::arrange(desc(average_distance)) %>%
+        dplyr::select(cluster, n_cells, diameter, average_distance) %>%
+        dplyr::slice(1:3))
+```
+
+## Interpretation Guide
+
+* When to trust your clustering:
+    * Average Silhouette Width > 0.5
+    * Dunn Index > 1
+    * Within/Between Ratio < 1
+    * Most clusters have positive silhouette widths
+
+* Red flags:
+    * Negative average silhouette widths for clusters
+    * Dunn Index < 0.5
+    * Within/Between Ratio > 1
+    * Very large differences in cluster sizes (unless biologically expected)
+
+* What to do about heterogeneous clusters:
+
+1. **High diameter/average distance**: Consider sub-clustering
+2. **Low separation**: May need to merge with nearby clusters
+3. **Negative silhouette**: Cells may be misassigned
+4. **Very small clusters**: May be outliers or rare cell types (requires biological interpretation)
