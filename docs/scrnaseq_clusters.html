@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree037c0d97c90b425e57d32448e75c4e81874c0be9targetblank037c0d9a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2dee4950227630ff98fe62f0e95144011bb4a62btargetblank2dee495a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/037c0d97c90b425e57d32448e75c4e81874c0be9" target="_blank">037c0d9</a>
+<a href="https://github.com/davetang/muse/tree/2dee4950227630ff98fe62f0e95144011bb4a62b" target="_blank">2dee495</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree037c0d97c90b425e57d32448e75c4e81874c0be9targetblank037c0d9a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2dee4950227630ff98fe62f0e95144011bb4a62btargetblank2dee495a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/037c0d97c90b425e57d32448e75c4e81874c0be9" target="_blank">037c0d9</a>.
+<a href="https://github.com/davetang/muse/tree/2dee4950227630ff98fe62f0e95144011bb4a62b" target="_blank">2dee495</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -650,6 +650,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/2dee4950227630ff98fe62f0e95144011bb4a62b/analysis/scrnaseq_clusters.Rmd" target="_blank">2dee495</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+<td>
+Move WSS and BSS to correct section
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/15464cdd200e6af3fcf61fc97687d5fc4d0043c6/docs/scrnaseq_clusters.html" target="_blank">15464cd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -1050,6 +1084,55 @@ levels</li>
 <li>Low mean CV across genes: Cells in this cluster have consistent
 transcriptional states - they’re expressing genes at similar levels</li>
 </ul>
+<div id="wss-and-bss" class="section level3">
+<h3>WSS and BSS</h3>
+<p>Within-cluster sum of squares (WSS) and Between-cluster sum of
+squares (BSS).</p>
+<pre class="r"><code>pca_embeddings &lt;- Seurat::Embeddings(seurat_obj, reduction = &quot;pca&quot;)[, 1:30]
+clusters &lt;- seurat_obj$seurat_clusters
+
+# Calculate overall centroid (mean of all cells)
+overall_centroid &lt;- colMeans(pca_embeddings)
+
+total_wss &lt;- 0
+total_bss &lt;- 0
+
+# Calculate for each cluster
+for (cl in unique(clusters)) {
+  # Get cells in this cluster
+  cells_in_cluster &lt;- which(clusters == cl)
+  cluster_data &lt;- pca_embeddings[cells_in_cluster, ]
+  
+  # Cluster centroid
+  cluster_centroid &lt;- colMeans(cluster_data)
+  
+  # Within-cluster sum of squares (WSS)
+  wss &lt;- sum(apply(cluster_data, 1, function(x) sum((x - cluster_centroid)^2)))
+  total_wss &lt;- total_wss + wss
+  
+  # Between-cluster sum of squares (BSS)
+  n_cells &lt;- nrow(cluster_data)
+  bss &lt;- n_cells * sum((cluster_centroid - overall_centroid)^2)
+  total_bss &lt;- total_bss + bss
+}
+
+cat(&quot;Within-Cluster Sum of Squares (WSS):&quot;, round(total_wss, 2), &quot;\n&quot;)</code></pre>
+<pre><code>Within-Cluster Sum of Squares (WSS): 247793.1 </code></pre>
+<pre class="r"><code>cat(&quot;Between-Cluster Sum of Squares (BSS):&quot;, round(total_bss, 2), &quot;\n&quot;)</code></pre>
+<pre><code>Between-Cluster Sum of Squares (BSS): 259529.5 </code></pre>
+<pre class="r"><code>cat(&quot;Total Sum of Squares (TSS):&quot;, round(total_wss + total_bss, 2), &quot;\n&quot;)</code></pre>
+<pre><code>Total Sum of Squares (TSS): 507322.6 </code></pre>
+<pre class="r"><code>cat(&quot;BSS/TSS Ratio:&quot;, round(total_bss / (total_wss + total_bss), 4), 
+    &quot;(higher is better, closer to 1 = better clustering)\n&quot;)</code></pre>
+<pre><code>BSS/TSS Ratio: 0.5116 (higher is better, closer to 1 = better clustering)</code></pre>
+<p>Typically, the WSS and BSS are compared across different clustering
+results; the goal is to:</p>
+<ul>
+<li>Minimise WSS (tight, homogeneous clusters).</li>
+<li>Maximise BSS (well-separated clusters).</li>
+<li>Maximise BSS/TSS (clustering explains most of the variation).</li>
+</ul>
+</div>
 </div>
 <div id="intra-cluster-distances-in-pca-space" class="section level2">
 <h2>Intra-Cluster Distances in PCA Space</h2>
@@ -1153,55 +1236,6 @@ Dave Tang
 </tbody>
 </table>
 </div>
-</div>
-<div id="wss-and-bss" class="section level3">
-<h3>WSS and BSS</h3>
-<p>Within-cluster sum of squares (WSS) and Between-cluster sum of
-squares (BSS).</p>
-<pre class="r"><code>pca_embeddings &lt;- Seurat::Embeddings(seurat_obj, reduction = &quot;pca&quot;)[, 1:30]
-clusters &lt;- seurat_obj$seurat_clusters
-
-# Calculate overall centroid (mean of all cells)
-overall_centroid &lt;- colMeans(pca_embeddings)
-
-total_wss &lt;- 0
-total_bss &lt;- 0
-
-# Calculate for each cluster
-for (cl in unique(clusters)) {
-  # Get cells in this cluster
-  cells_in_cluster &lt;- which(clusters == cl)
-  cluster_data &lt;- pca_embeddings[cells_in_cluster, ]
-  
-  # Cluster centroid
-  cluster_centroid &lt;- colMeans(cluster_data)
-  
-  # Within-cluster sum of squares (WSS)
-  wss &lt;- sum(apply(cluster_data, 1, function(x) sum((x - cluster_centroid)^2)))
-  total_wss &lt;- total_wss + wss
-  
-  # Between-cluster sum of squares (BSS)
-  n_cells &lt;- nrow(cluster_data)
-  bss &lt;- n_cells * sum((cluster_centroid - overall_centroid)^2)
-  total_bss &lt;- total_bss + bss
-}
-
-cat(&quot;Within-Cluster Sum of Squares (WSS):&quot;, round(total_wss, 2), &quot;\n&quot;)</code></pre>
-<pre><code>Within-Cluster Sum of Squares (WSS): 247793.1 </code></pre>
-<pre class="r"><code>cat(&quot;Between-Cluster Sum of Squares (BSS):&quot;, round(total_bss, 2), &quot;\n&quot;)</code></pre>
-<pre><code>Between-Cluster Sum of Squares (BSS): 259529.5 </code></pre>
-<pre class="r"><code>cat(&quot;Total Sum of Squares (TSS):&quot;, round(total_wss + total_bss, 2), &quot;\n&quot;)</code></pre>
-<pre><code>Total Sum of Squares (TSS): 507322.6 </code></pre>
-<pre class="r"><code>cat(&quot;BSS/TSS Ratio:&quot;, round(total_bss / (total_wss + total_bss), 4), 
-    &quot;(higher is better, closer to 1 = better clustering)\n&quot;)</code></pre>
-<pre><code>BSS/TSS Ratio: 0.5116 (higher is better, closer to 1 = better clustering)</code></pre>
-<p>Typically, the WSS and BSS are compared across different clustering
-results; the goal is to:</p>
-<ul>
-<li>Minimise WSS (tight, homogeneous clusters).</li>
-<li>Maximise BSS (well-separated clusters).</li>
-<li>Maximise BSS/TSS (clustering explains most of the variation).</li>
-</ul>
 </div>
 </div>
 <div id="shannon-entropy" class="section level2">
