@@ -1,0 +1,448 @@
+---
+title: "scRNA-seq clusters"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(Seurat)
+  library(cluster)
+  library(pheatmap)
+})
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+Access the heterogeneity in scRNA-seq clusters where heterogeneity refers to how variable or diverse cells are within a given cluster. High heterogeneity means cells in that cluster are quite different from each other, while low heterogeneity means they're very similar.
+
+## Dependencies
+
+```{r install, eval=FALSE}
+install.packages(c("Seurat", "cluster", "pheatmap"))
+```
+
+## Seurat workflow
+
+Import raw pbmc3k dataset from my server.
+
+```{r seurat_obj_raw}
+seurat_obj <- readRDS(url("https://davetang.org/file/pbmc3k_seurat.rds", "rb"))
+seurat_obj
+```
+
+Filter.
+
+```{r seurat_obj}
+seurat_obj <- CreateSeuratObject(
+  counts = seurat_obj@assays$RNA$counts,
+  min.cells = 3,
+  min.features = 200,
+  project = "pbmc3k"
+)
+seurat_obj
+```
+
+Process with the Seurat 4 workflow.
+
+```{r pbmc3k_v4}
+seurat_wf_v4 <- function(seurat_obj, scale_factor = 1e4, num_features = 2000, num_pcs = 30, cluster_res = 0.5, debug_flag = FALSE){
+  
+  seurat_obj <- NormalizeData(seurat_obj, normalization.method = "LogNormalize", scale.factor = scale_factor, verbose = debug_flag)
+  seurat_obj <- FindVariableFeatures(seurat_obj, selection.method = 'vst', nfeatures = num_features, verbose = debug_flag)
+  seurat_obj <- ScaleData(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunPCA(seurat_obj, verbose = debug_flag)
+  seurat_obj <- RunUMAP(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindNeighbors(seurat_obj, dims = 1:num_pcs, verbose = debug_flag)
+  seurat_obj <- FindClusters(seurat_obj, resolution = cluster_res, verbose = debug_flag)
+  
+  seurat_obj
+}
+
+seurat_obj <- seurat_wf_v4(seurat_obj)
+```
+
+## Clusters
+
+Cluster results are in `seurat_clusters`.
+
+```{r seurat_clusters}
+table(seurat_obj$seurat_clusters)
+```
+
+## Silhouette Scores
+
+**What it measures:** How similar each cell is to cells in its own cluster compared to cells in other clusters.
+
+**Interpretation:** 
+- Score close to **1** = cell is very similar to its cluster and different from others (good clustering, low heterogeneity)
+- Score close to **0** = cell is on the border between clusters
+- Score close to **-1** = cell might be in the wrong cluster
+
+**Why it matters:** Higher average silhouette scores for a cluster indicate it's well-separated and homogeneous.
+
+The function `cluster::silhouette()` computes silhouette information according to a given clustering in k clusters.
+
+> silhouette(x, dist, dmatrix, ...)
+
+where `x` is an object of appropriate class; for the default method an integer vector with $k$ different integer cluster codes or a list with such an `x$clustering` component.
+
+```{r sil_score}
+pca_embeddings <- Seurat::Embeddings(seurat_obj, reduction = "pca")[, 1:30]
+dist_matrix <- stats::dist(pca_embeddings)
+clusters <- seurat_obj$seurat_clusters
+cluster_numeric <- as.numeric(clusters)
+sil_scores <- cluster::silhouette(cluster_numeric, dist_matrix)
+
+head(sil_scores)
+```
+
+Calculate average silhouette width per cluster.
+
+```{r sil_summary}
+sil_scores |>
+  as.data.frame() |>
+  dplyr::summarise(avg_silhouette = mean(sil_width), .by = 'cluster') |>
+  dplyr::arrange(-avg_silhouette) |>
+  dplyr::mutate(cluster = as.factor(cluster-1)) -> sil_summary
+
+sil_summary |> dplyr::arrange(-avg_silhouette)
+```
+
+Plot silhouette scores.
+
+```{r sil_summary_plot}
+ggplot(sil_summary, aes(x = reorder(cluster, avg_silhouette), y = avg_silhouette, fill = cluster)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Cluster Quality: Silhouette Scores",
+                subtitle = "Higher scores = more distinct/homogeneous clusters",
+                x = "Cluster", y = "Average Silhouette Width") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+Higher scores = more distinct/homogeneous clusters means two things:
+
+* Distinct (well-separated from other clusters): Cells in this cluster are far away from cells in other clusters.
+* Homogeneous (internally similar): Cells within this cluster are close to each other.
+
+The silhouette score combines both concepts:
+
+* It measures how similar a cell is to its own cluster (homogeneity)
+* Compared to how similar it is to the nearest neighboring cluster (distinctness/separation)
+
+For example a high silhouette score (e.g., 0.8) means cells in cluster A are tightly packed together AND far from cluster B -> cluster A is both homogeneous internally and well-separated from others. A low silhouette score (e.g., 0.2) means cells in cluster A are either spread out OR very close to cluster B (or both) -> poor clustering quality.
+
+It is important to note that a cluster can have a high silhouette score for two reasons:
+
+* Low heterogeneity (cells are very similar to each other).
+* Good separation from other clusters.
+
+## Within-Cluster Variance and Coefficient of Variation
+
+**What it measures:** How much gene expression varies among cells within each cluster.
+
+**Interpretation:**
+- **Variance** = absolute spread of expression values
+- **Coefficient of Variation (CV)** = variance relative to mean (more comparable across genes)
+- Higher values = more heterogeneous gene expression within the cluster
+
+**Why it matters:** Some cell types naturally have more variable expression (e.g., transitioning cells) while others are more stable (e.g., terminally differentiated cells).
+
+```{r variance}
+expr_data <- Seurat::GetAssayData(seurat_obj, slot = "data")
+variable_genes <- Seurat::VariableFeatures(seurat_obj)
+expr_data <- expr_data[variable_genes, ]
+
+# Calculate variance and CV for each cluster
+variance_results <- lapply(unique(clusters), function(cl) {
+  # Get cells in this cluster
+  cells_in_cluster <- which(clusters == cl)
+  cluster_expr <- expr_data[, cells_in_cluster]
+  
+  # Calculate metrics for each gene
+  gene_means <- apply(cluster_expr, 1, mean)
+  gene_vars <- apply(cluster_expr, 1, var)
+  gene_cv <- sqrt(gene_vars) / (gene_means + 0.01)  # Add small constant to avoid division by zero
+  
+  data.frame(
+    cluster = cl,
+    mean_variance = mean(gene_vars),
+    mean_cv = mean(gene_cv),
+    median_variance = median(gene_vars),
+    median_cv = median(gene_cv)
+  )
+}) |> dplyr::bind_rows()
+
+variance_results |>
+  dplyr::arrange(-mean_cv)
+```
+
+Plot.
+
+```{r variance_plot}
+ggplot(variance_results, ggplot2::aes(x = reorder(cluster, mean_cv), 
+                                      y = mean_cv, fill = cluster)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Within-Cluster Gene Expression Variability",
+       subtitle = "Higher CV = more heterogeneous expression patterns",
+       x = "Cluster", y = "Mean Coefficient of Variation") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+CV (Coefficient of Variation) measures how variable gene expression is relative to the average expression level. A low CV (e.g., 0.3 or 30%): Gene expression values are tightly clustered around the mean; a high CV (e.g., 1.5 or 150%): Gene expression values are spread widely around the mean. CV is normalised by the mean, so it's comparable across genes with different expression levels.
+
+* High mean CV across genes: Cells in this cluster have diverse transcriptional states - they're expressing different genes at different levels
+* Low mean CV across genes: Cells in this cluster have consistent transcriptional states - they're expressing genes at similar levels
+
+## Intra-Cluster Distances in PCA Space
+
+**What it measures:** The average distance between cells within the same cluster in reduced dimension space.
+
+**Interpretation:**
+- **Smaller distances** = cells are tightly clustered together (low heterogeneity)
+- **Larger distances** = cells are spread out (high heterogeneity)
+
+**Why it matters:** This gives you a spatial sense of cluster compactness. We calculate this in both PCA (captures biological variance) and UMAP (optimized for visualization).
+
+```{r distances_pca}
+# Function to calculate intra-cluster distances
+calc_intra_cluster_dist <- function(embeddings, labels) {
+  results <- lapply(unique(labels), function(cl) {
+    # Get cells in this cluster
+    cells_in_cluster <- which(labels == cl)
+    cluster_embeddings <- embeddings[cells_in_cluster, ]
+    
+    # Calculate all pairwise distances within cluster
+    dist_within <- stats::dist(cluster_embeddings)
+    
+    data.frame(
+      cluster = cl,
+      n_cells = length(cells_in_cluster),
+      mean_distance = mean(dist_within),
+      median_distance = median(dist_within),
+      sd_distance = sd(dist_within)
+    )
+  }) |> dplyr::bind_rows()
+  
+  return(results)
+}
+
+pca_embeddings <- Seurat::Embeddings(seurat_obj, reduction = "pca")[, 1:30]
+pca_dist_summary <- calc_intra_cluster_dist(pca_embeddings, clusters)
+
+pca_dist_summary |>
+  dplyr::arrange(desc(mean_distance))
+```
+
+Plot.
+
+```{r distances_plot}
+ggplot(pca_dist_summary, aes(x = reorder(cluster, mean_distance), 
+                             y = mean_distance, fill = cluster)) +
+  geom_bar(stat = "identity") +
+  geom_errorbar(ggplot2::aes(ymin = mean_distance - sd_distance, 
+                             ymax = mean_distance + sd_distance), 
+                width = 0.2) +
+  coord_flip() +
+  labs(title = "Cluster Spread in PCA Space",
+       subtitle = "Higher distance = more spread out cells = higher heterogeneity",
+       x = "Cluster", y = "Mean Pairwise Distance") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## Shannon Entropy
+
+**What it measures:** The diversity of gene expression distributions within each cluster.
+
+**Interpretation:**
+- **Higher entropy** = gene expression is more evenly distributed across many values (high heterogeneity)
+- **Lower entropy** = gene expression is concentrated around specific values (low heterogeneity)
+
+**Why it matters:** Entropy captures whether cells have uniform or variable transcriptional states. It's particularly useful for identifying transitional or stressed cell populations.
+
+```{r entropy}
+shannon_entropy <- function(x) {
+  # Bin expression values into 10 bins
+  breaks <- seq(min(x), max(x), length.out = 11)
+  hist_data <- hist(x, breaks = breaks, plot = FALSE)
+  
+  # Calculate probability of each bin
+  probs <- hist_data$counts / sum(hist_data$counts)
+  probs <- probs[probs > 0]  # Remove zeros to avoid log(0)
+  
+  # Shannon entropy formula: -sum(p * log2(p))
+  return(-sum(probs * log2(probs)))
+}
+
+entropy_results <- lapply(unique(clusters), function(cl) {
+  # Get cells in this cluster
+  cells_in_cluster <- which(clusters == cl)
+  cluster_expr <- expr_data[, cells_in_cluster]
+  
+  # Calculate entropy for each gene
+  gene_entropies <- apply(cluster_expr, 1, shannon_entropy)
+  
+  data.frame(
+    cluster = cl,
+    mean_entropy = mean(gene_entropies),
+    median_entropy = median(gene_entropies),
+    sd_entropy = sd(gene_entropies)
+  )
+}) |> dplyr::bind_rows()
+
+entropy_results |>
+  dplyr::arrange(desc(mean_entropy))
+```
+
+Plot.
+
+```{r entropy_plot}
+ggplot(entropy_results, aes(x = reorder(cluster, mean_entropy), 
+                            y = mean_entropy, fill = cluster)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Expression Distribution Diversity",
+       subtitle = "Higher entropy = more diverse/heterogeneous expression patterns",
+       x = "Cluster", y = "Mean Shannon Entropy") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## Cluster Compactness Metrics
+
+**What it measures:** How tightly packed a cluster is relative to how far it is from other clusters.
+
+**Interpretation:**
+- **Lower compactness ratio** = cluster is tight and well-separated (low heterogeneity, good clustering)
+- **Higher compactness ratio** = cluster is spread out or close to other clusters (high heterogeneity or poor separation)
+
+**Why it matters:** This metric combines within-cluster spread with between-cluster separation, giving you a sense of both heterogeneity and cluster quality.
+
+Calculate centroid (average position) for each cluster and plot the centroids.
+
+```{r centroids}
+centroids <- do.call(rbind, lapply(unique(clusters), function(cl) {
+  cells_in_cluster <- which(clusters == cl)
+  colMeans(pca_embeddings[cells_in_cluster, ])
+}))
+rownames(centroids) <- unique(clusters)
+
+centroids |>
+  as.data.frame() |>
+  dplyr::select(PC_1, PC_2) |>
+  tibble::rownames_to_column('cluster') -> centroids_1_2
+
+DimPlot(seurat_obj, reduction = 'pca') +
+  geom_text(data = centroids_1_2, aes(PC_1, PC_2, label=cluster))
+```
+
+Calculate compactness metrics for each cluster.
+
+```{r compactness}
+compactness_results <- lapply(unique(clusters), function(cl) {
+  # Get cells in this cluster
+  cells_in_cluster <- which(clusters == cl)
+  cluster_embeddings <- pca_embeddings[cells_in_cluster, ]
+  centroid <- centroids[as.character(cl), ]
+  
+  # Average distance from each cell to its cluster centroid
+  distances_to_centroid <- sqrt(apply(cluster_embeddings, 1, function(x) {
+    sum((x - centroid)^2)
+  }))
+  avg_dist_to_centroid <- mean(distances_to_centroid)
+  
+  # Find distance to nearest other cluster centroid
+  other_centroids <- centroids[rownames(centroids) != as.character(cl), , drop = FALSE]
+  distances_to_others <- sqrt(apply(other_centroids, 1, function(x) {
+    sum((x - centroid)^2)
+  }))
+  min_dist_to_other <- min(distances_to_others)
+  
+  # Compactness ratio: within-cluster spread / between-cluster separation
+  # Lower is better (tight cluster, well separated)
+  compactness_ratio <- avg_dist_to_centroid / min_dist_to_other
+  
+  data.frame(
+    cluster = cl,
+    avg_dist_to_centroid = avg_dist_to_centroid,
+    min_dist_to_other_cluster = min_dist_to_other,
+    compactness_ratio = compactness_ratio
+  )
+}) |> dplyr::bind_rows()
+
+compactness_results |>
+  dplyr::arrange(compactness_ratio)
+```
+
+Plot.
+
+```{r compactness_plot}
+ggplot(compactness_results, aes(x = reorder(cluster, -compactness_ratio), 
+                                y = compactness_ratio, fill = cluster)) +
+  geom_bar(stat = "identity") +
+  coord_flip() +
+  labs(title = "Cluster Compactness Ratio",
+       subtitle = "Lower ratio = more compact cluster = lower heterogeneity",
+       x = "Cluster", y = "Compactness Ratio") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+## Comparing Metrics
+
+Combine all metrics into one table.
+
+```{r summary}
+summary_comparison <- sil_summary |>
+  dplyr::left_join(variance_results, by = "cluster") |>
+  dplyr::left_join(pca_dist_summary |> dplyr::select(cluster, mean_distance), 
+                   by = "cluster") |>
+  dplyr::left_join(entropy_results |> dplyr::select(cluster, mean_entropy), 
+                   by = "cluster") |>
+  dplyr::left_join(compactness_results |> dplyr::select(cluster, compactness_ratio), 
+                   by = "cluster")
+
+summary_comparison <- summary_comparison |>
+  dplyr::select(cluster, avg_silhouette, mean_cv, mean_distance, mean_entropy, compactness_ratio)
+
+summary_comparison
+```
+
+As a heatmap.
+
+```{r summary_heatmap}
+summary_comparison |>
+  tibble::column_to_rownames('cluster') |>
+  as.matrix() |>
+  pheatmap(scale = "column")
+```
+
+## Interpretation Guide
+
+Each metric captures a different aspect of heterogeneity:
+
+1. **Silhouette scores**: Overall cluster quality and separation
+   - Best for: Identifying poorly defined or overlapping clusters
+
+2. **Coefficient of Variation (CV)**: Gene expression variability
+   - Best for: Understanding transcriptional diversity within cell types
+
+3. **Intra-cluster distances**: Spatial spread in reduced dimensions
+   - Best for: Visual/geometric sense of cluster compactness
+
+4. **Shannon entropy**: Distribution diversity of expression values
+   - Best for: Detecting transitional states or stressed populations
+
+5. **Compactness ratio**: Spread relative to cluster separation
+   - Best for: Combined measure of internal heterogeneity and cluster quality
