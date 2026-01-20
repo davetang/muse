@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb96f7986c585ae7fe14e58bcef4dc85452d3132btargetblankb96f798a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed4f77278a260ff72c5f5530066628815c9043185targetblankd4f7727a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/b96f7986c585ae7fe14e58bcef4dc85452d3132b" target="_blank">b96f798</a>
+<a href="https://github.com/davetang/muse/tree/d4f77278a260ff72c5f5530066628815c9043185" target="_blank">d4f7727</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb96f7986c585ae7fe14e58bcef4dc85452d3132btargetblankb96f798a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed4f77278a260ff72c5f5530066628815c9043185targetblankd4f7727a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/b96f7986c585ae7fe14e58bcef4dc85452d3132b" target="_blank">b96f798</a>.
+<a href="https://github.com/davetang/muse/tree/d4f77278a260ff72c5f5530066628815c9043185" target="_blank">d4f7727</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -650,6 +650,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/d4f77278a260ff72c5f5530066628815c9043185/analysis/information.Rmd" target="_blank">d4f7727</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-20
+</td>
+<td>
+Explain dmi() results
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/4d49404a333604f61eeb49c4623a95526c1e2f1f/docs/information.html" target="_blank">4d49404</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -825,6 +859,8 @@ given variable.</p>
 </div>
 <div id="examples" class="section level2">
 <h2>Examples</h2>
+<div id="mtcars" class="section level3">
+<h3>mtcars</h3>
 <p>Exploring a group of categorical variables (from the examples in the
 documentation of the <code>dmi()</code> function).</p>
 <ul>
@@ -872,6 +908,59 @@ vs    3.393378 30.3263950 -0.1011464  1.223818  3.409049
 am    1.058222 -0.1011464 19.9920905  5.522984  1.381430
 gear  2.244308  1.2238177  5.5229835 14.478527  1.583226
 carb  7.474051  3.4090490  1.3814296  1.583226 10.791836</code></pre>
+<p>Each matrix is symmetric (5×5), where rows and columns represent the
+same variables in the same order. The diagonal represents each variable
+with itself.</p>
+<ul>
+<li><p><code>$mi</code> is the raw mutual information and these are the
+uncorrected MI values in bits.</p></li>
+<li><p>Diagonal (e.g., <code>cyl</code> with itself = 1.06): This is the
+entropy of each variable—how much uncertainty/information it
+contains</p></li>
+<li><p>Off-diagonal (e.g., <code>cyl-vs</code> = 0.43): How much
+information they share</p></li>
+<li><p><code>cyl-carb</code> (0.51): Knowing cylinders tells you a lot
+about carburetors</p></li>
+<li><p><code>cyl-vs</code> (0.43): Cylinders and engine shape are
+related</p></li>
+<li><p><code>gear-am</code> (0.44): Gears and transmission type are
+connected</p></li>
+<li><p><code>vs-am</code> (0.014): Engine shape and transmission are
+nearly independent</p></li>
+<li><p><code>$bcmi</code> is the bias-corrected MI; after the jackknife
+correction:</p></li>
+<li><p>Values are generally similar to raw MI</p></li>
+<li><p><code>vs-am</code> = -0.003: The negative value indicates the raw
+MI was entirely due to sampling bias; these variables are essentially
+independent</p></li>
+<li><p>The correction is more pronounced for weaker
+associations</p></li>
+<li><p><code>$zvalues</code> show the statistical significance</p></li>
+</ul>
+<p>The null hypothesis is that there is no association between
+variables.</p>
+<p>Rule of thumb:</p>
+<ul>
+<li>|z| &gt; 1.96 suggests significance at alpha = 0.05</li>
+<li>|z| &gt; 2.58 suggests significance at alpha = 0.01</li>
+</ul>
+<p>Highly significant associations (|z| &gt; 3) include:</p>
+<ul>
+<li><code>cyl-carb</code> (z = 7.47): Strong evidence cylinders and
+carburetors are related</li>
+<li><code>cyl-vs</code> (z = 3.39): Cylinders and engine shape are
+associated</li>
+<li><code>gear-am</code> (z = 5.52): Gears and transmission are
+related</li>
+<li><code>vs-am</code> (z = -0.10): Confirms independence</li>
+<li><code>cyl-am</code> (z = 1.06): Weak/no association</li>
+</ul>
+<p>Cars with more cylinders tend to have more carburetors and V-shaped
+engines. Manual transmissions are associated with different gear
+configurations but engine shape doesn’t predict transmission type.</p>
+</div>
+<div id="random" class="section level3">
+<h3>Random</h3>
 <p>Two random variables.</p>
 <pre class="r"><code>set.seed(1984)
 n &lt;- 1000
@@ -970,6 +1059,7 @@ loaded via a namespace (and not attached):
 [41] Rcpp_1.0.14        xfun_0.52          tidyselect_1.2.1   rstudioapi_0.17.1 
 [45] knitr_1.50         farver_2.1.2       htmltools_0.5.8.1  rmarkdown_2.29    
 [49] compiler_4.5.0     getPass_0.2-4     </code></pre>
+</div>
 </div>
 </div>
 </div>
