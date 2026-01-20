@@ -66,6 +66,8 @@ The results of `dmi()` are in many ways similar to a correlation matrix, with ea
 
 ## Examples
 
+### mtcars
+
 Exploring a group of categorical variables (from the examples in the documentation of the `dmi()` function).
 
 * `cyl` - Number of cylinders
@@ -89,6 +91,45 @@ add_names <- function(res, names){
 
 add_names(discresults, my_vars)
 ```
+
+Each matrix is symmetric (5×5), where rows and columns represent the same variables in the same order. The diagonal represents each variable with itself.
+
+* `$mi` is the raw mutual information and these are the uncorrected MI values in bits.
+
+* Diagonal (e.g., `cyl` with itself = 1.06): This is the entropy of each variable—how much uncertainty/information it contains
+- Off-diagonal (e.g., `cyl-vs` = 0.43): How much information they share
+
+* `cyl-carb` (0.51): Knowing cylinders tells you a lot about carburetors
+* `cyl-vs` (0.43): Cylinders and engine shape are related
+* `gear-am` (0.44): Gears and transmission type are connected
+* `vs-am` (0.014): Engine shape and transmission are nearly independent
+
+* `$bcmi` is the bias-corrected MI; after the jackknife correction:
+
+* Values are generally similar to raw MI
+* `vs-am` = -0.003: The negative value indicates the raw MI was entirely due to sampling bias; these variables are essentially independent
+* The correction is more pronounced for weaker associations
+
+* `$zvalues` show the statistical significance
+
+The null hypothesis is that there is no association between variables.
+
+Rule of thumb:
+
+* |z| > 1.96 suggests significance at alpha = 0.05
+* |z| > 2.58 suggests significance at alpha = 0.01
+
+Highly significant associations (|z| > 3) include:
+
+* `cyl-carb` (z = 7.47): Strong evidence cylinders and carburetors are related
+* `cyl-vs` (z = 3.39): Cylinders and engine shape are associated
+* `gear-am` (z = 5.52): Gears and transmission are related
+* `vs-am` (z = -0.10): Confirms independence
+* `cyl-am` (z = 1.06): Weak/no association
+
+Cars with more cylinders tend to have more carburetors and V-shaped engines. Manual transmissions are associated with different gear configurations but engine shape doesn't predict transmission type.
+
+### Random
 
 Two random variables.
 
