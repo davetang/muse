@@ -46,19 +46,25 @@ $$
 
 If $I(X;Y) = 0$, $X$ and $Y$ are independent (no shared information); larger values mean stronger statistical dependence.
 
-## Setup
+## mpmi
 
-Install the dependencies required to render this document.
+The [Mixed-Pair Mutual Information Estimators](https://cran.r-project.org/web/packages/mpmi/index.html) {mpmi} package:
+
+> Uses a kernel smoothing approach to calculate Mutual Information for comparisons between all types of variables including continuous vs continuous, continuous vs discrete and discrete vs discrete. Uses a nonparametric bias correction giving Bias Corrected Mutual Information (BCMI). Implemented efficiently in Fortran 95 with OpenMP and suited to large genomic datasets. 
 
 ```{r install_dep, eval=FALSE}
 install.packages('mpmi')
 ```
 
-## Examples
-
 The `dmi()` function calculates MI and BCMI between a set of discrete variables held as columns in a matrix. It also performs jackknife bias correction and provides a z-score for the hypothesis of no association. Also included are the `*.pw` functions that calculate MI between two vectors only. The `*njk` functions do not perform the jackknife and are therefore faster.
 
+MI quantifies the reduction in uncertainty about one variable given knowledge of another. It's measured in bits (or nats, depending on the logarithm base) and ranges from 0 (variables are independent) to min(H(X), H(Y)) where H is entropy. Unlike correlation, MI captures non-linear relationships and works naturally with categorical data.
+
+MI estimates from finite samples are positively biased; they tend to overestimate the true MI. The jackknife procedure systematically removes each observation, recalculates MI, and uses these values to estimate and subtract the bias. This is particularly important for small sample sizes or sparse contingency tables.
+
 The results of `dmi()` are in many ways similar to a correlation matrix, with each row and column index corresponding to a given variable.
+
+## Examples
 
 Exploring a group of categorical variables (from the examples in the documentation of the `dmi()` function).
 
