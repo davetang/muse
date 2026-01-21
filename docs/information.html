@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2026-01-20" />
+<meta name="date" content="2026-01-21" />
 
 <title>Information</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Information</h1>
-<h4 class="date">2026-01-20</h4>
+<h4 class="date">2026-01-21</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-01-20
+<strong>Last updated:</strong> 2026-01-21
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed4f77278a260ff72c5f5530066628815c9043185targetblankd4f7727a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7155a312825c105ebf248c6877973bb0c17015c2targetblank7155a31a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/d4f77278a260ff72c5f5530066628815c9043185" target="_blank">d4f7727</a>
+<a href="https://github.com/davetang/muse/tree/7155a312825c105ebf248c6877973bb0c17015c2" target="_blank">7155a31</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed4f77278a260ff72c5f5530066628815c9043185targetblankd4f7727a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7155a312825c105ebf248c6877973bb0c17015c2targetblank7155a31a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/d4f77278a260ff72c5f5530066628815c9043185" target="_blank">d4f7727</a>.
+<a href="https://github.com/davetang/muse/tree/7155a312825c105ebf248c6877973bb0c17015c2" target="_blank">7155a31</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -650,6 +650,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/7155a312825c105ebf248c6877973bb0c17015c2/analysis/information.Rmd" target="_blank">7155a31</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-21
+</td>
+<td>
+Explaining the unit of measurement in information theory
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/131e2a86b8b6273997ac371ca12b99f22a72515f/docs/information.html" target="_blank">131e2a8</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-20
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -803,6 +837,34 @@ measure combined or conditional uncertainties.</li>
 <li><em>Channel capacity</em>: The maximum rate at which information can
 be transmitted over a noisy channel with arbitrarily low error.</li>
 </ul>
+<div id="bits" class="section level3">
+<h3>Bits</h3>
+<p>Information theory quantifies uncertainty using bits (binary digits)
+as the unit of measurement. One bit represents the amount of information
+needed to resolve a binary choice, such as answering a single yes/no
+question. This binary framework serves as the fundamental building block
+because any complex decision can be decomposed into a series of binary
+choices.</p>
+<p>For example, consider flipping a coin. Before the flip, there are two
+equally likely outcomes: heads or tails. This uncertainty can be
+resolved with a single binary question: “Is it heads?” Once you observe
+the result, this question is answered, and all uncertainty is
+eliminated. Since resolving this uncertainty required one binary
+question, the coin flip provides exactly 1 bit of information.</p>
+<p>In general:</p>
+<ul>
+<li>Resolving between 2 equally likely options = 1 bit</li>
+<li>Resolving between 4 equally likely options = 2 bits</li>
+<li>Resolving between 8 equally likely options = 3 bits</li>
+<li>Resolving between N equally likely options = log2(N) bits</li>
+</ul>
+<pre class="r"><code>log2(2)</code></pre>
+<pre><code>[1] 1</code></pre>
+<pre class="r"><code>log2(4)</code></pre>
+<pre><code>[1] 2</code></pre>
+<pre class="r"><code>log2(8)</code></pre>
+<pre><code>[1] 3</code></pre>
+</div>
 <div id="mutual-information" class="section level3">
 <h3>Mutual Information</h3>
 <p><a href="https://en.wikipedia.org/wiki/Mutual_information">Mutual
