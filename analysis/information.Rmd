@@ -30,6 +30,25 @@ Key concepts include:
 * *Joint entropy & conditional entropy*: Extensions that measure combined or conditional uncertainties.
 * *Channel capacity*: The maximum rate at which information can be transmitted over a noisy channel with arbitrarily low error.
 
+### Bits
+
+Information theory quantifies uncertainty using bits (binary digits) as the unit of measurement. One bit represents the amount of information needed to resolve a binary choice, such as answering a single yes/no question. This binary framework serves as the fundamental building block because any complex decision can be decomposed into a series of binary choices.
+
+For example, consider flipping a coin. Before the flip, there are two equally likely outcomes: heads or tails. This uncertainty can be resolved with a single binary question: "Is it heads?" Once you observe the result, this question is answered, and all uncertainty is eliminated. Since resolving this uncertainty required one binary question, the coin flip provides exactly 1 bit of information.
+
+In general:
+
+* Resolving between 2 equally likely options = 1 bit
+* Resolving between 4 equally likely options = 2 bits
+* Resolving between 8 equally likely options = 3 bits
+* Resolving between N equally likely options = log2(N) bits
+
+```{r bit_eg}
+log2(2)
+log2(4)
+log2(8)
+```
+
 ### Mutual Information
 
 [Mutual information](https://en.wikipedia.org/wiki/Mutual_information) between two random variables $X$ and $Y$ measures how much knowing one reduces uncertainty about the other.
