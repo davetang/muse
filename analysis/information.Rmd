@@ -63,7 +63,15 @@ $$
 I(X;Y) = H(X) - H(X|Y) = H(Y) - H(Y|X).
 $$
 
-If $I(X;Y) = 0$, $X$ and $Y$ are independent (no shared information); larger values mean stronger statistical dependence.
+where $H(X)$ is the entropy (uncertainty) of $X$, and $H(X|Y)$ is the conditional entropy of $X$ given $Y$. If $I(X;Y) = 0$, $X$ and $Y$ are independent (no shared information); larger values indicate stronger statistical dependence.
+
+Consider two coins, $X$ and $Y$:
+
+* Independent coins: If both coins are fair and flipped independently, knowing the outcome of $X$ (heads or tails) tells you nothing about $Y$. Here, $H(X) = H(Y) = 1$ bit, $H(X,Y) = 2$ bits, and $I(X;Y) = 1 + 1 - 2 = 0$ bits.
+
+* Identical coins: If $Y$ always shows the same result as $X$ (they are linked), then knowing $X$ completely determines $Y$. Here, $H(X) = H(Y) = 1$ bit, but $H(X,Y) = 1$ bit (only one bit of combined uncertainty since they always match), giving $I(X;Y) = 1 + 1 - 1 = 1$ bit. Knowing $X$ eliminates all uncertainty about $Y$.
+
+* Opposite coins: If $Y$ always shows the opposite of $X$, mutual information is also $I(X;Y) = 1$ bit; knowing $X$ still completely determines $Y$, just with the opposite value.
 
 ## mpmi
 
