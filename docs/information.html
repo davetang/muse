@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7155a312825c105ebf248c6877973bb0c17015c2targetblank7155a31a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree661277b26685dd5fcdc72418724a83c9638e940atargetblank661277ba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/7155a312825c105ebf248c6877973bb0c17015c2" target="_blank">7155a31</a>
+<a href="https://github.com/davetang/muse/tree/661277b26685dd5fcdc72418724a83c9638e940a" target="_blank">661277b</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7155a312825c105ebf248c6877973bb0c17015c2targetblank7155a31a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree661277b26685dd5fcdc72418724a83c9638e940atargetblank661277ba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/7155a312825c105ebf248c6877973bb0c17015c2" target="_blank">7155a31</a>.
+<a href="https://github.com/davetang/muse/tree/661277b26685dd5fcdc72418724a83c9638e940a" target="_blank">661277b</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -650,6 +650,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/661277b26685dd5fcdc72418724a83c9638e940a/analysis/information.Rmd" target="_blank">661277b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-21
+</td>
+<td>
+Mutual information example with coin flips
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/078fd7bb82e0aabcff3f283fd522b8830e8399a8/docs/information.html" target="_blank">078fd7b</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -879,10 +913,42 @@ I(X;Y) = H(X) + H(Y) - H(X, Y)
 <p><span class="math display">\[
 I(X;Y) = H(X) - H(X|Y) = H(Y) - H(Y|X).
 \]</span></p>
-<p>If <span class="math inline">\(I(X;Y) = 0\)</span>, <span
-class="math inline">\(X\)</span> and <span
+<p>where <span class="math inline">\(H(X)\)</span> is the entropy
+(uncertainty) of <span class="math inline">\(X\)</span>, and <span
+class="math inline">\(H(X|Y)\)</span> is the conditional entropy of
+<span class="math inline">\(X\)</span> given <span
+class="math inline">\(Y\)</span>. If <span class="math inline">\(I(X;Y)
+= 0\)</span>, <span class="math inline">\(X\)</span> and <span
 class="math inline">\(Y\)</span> are independent (no shared
-information); larger values mean stronger statistical dependence.</p>
+information); larger values indicate stronger statistical
+dependence.</p>
+<p>Consider two coins, <span class="math inline">\(X\)</span> and <span
+class="math inline">\(Y\)</span>:</p>
+<ul>
+<li><p>Independent coins: If both coins are fair and flipped
+independently, knowing the outcome of <span
+class="math inline">\(X\)</span> (heads or tails) tells you nothing
+about <span class="math inline">\(Y\)</span>. Here, <span
+class="math inline">\(H(X) = H(Y) = 1\)</span> bit, <span
+class="math inline">\(H(X,Y) = 2\)</span> bits, and <span
+class="math inline">\(I(X;Y) = 1 + 1 - 2 = 0\)</span> bits.</p></li>
+<li><p>Identical coins: If <span class="math inline">\(Y\)</span> always
+shows the same result as <span class="math inline">\(X\)</span> (they
+are linked), then knowing <span class="math inline">\(X\)</span>
+completely determines <span class="math inline">\(Y\)</span>. Here,
+<span class="math inline">\(H(X) = H(Y) = 1\)</span> bit, but <span
+class="math inline">\(H(X,Y) = 1\)</span> bit (only one bit of combined
+uncertainty since they always match), giving <span
+class="math inline">\(I(X;Y) = 1 + 1 - 1 = 1\)</span> bit. Knowing <span
+class="math inline">\(X\)</span> eliminates all uncertainty about <span
+class="math inline">\(Y\)</span>.</p></li>
+<li><p>Opposite coins: If <span class="math inline">\(Y\)</span> always
+shows the opposite of <span class="math inline">\(X\)</span>, mutual
+information is also <span class="math inline">\(I(X;Y) = 1\)</span> bit;
+knowing <span class="math inline">\(X\)</span> still completely
+determines <span class="math inline">\(Y\)</span>, just with the
+opposite value.</p></li>
+</ul>
 </div>
 </div>
 <div id="mpmi" class="section level2">
