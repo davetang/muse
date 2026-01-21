@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree661277b26685dd5fcdc72418724a83c9638e940atargetblank661277ba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecd7dde9b2a36c2080268f9811da9a7e60e5a5230targetblankcd7dde9a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/661277b26685dd5fcdc72418724a83c9638e940a" target="_blank">661277b</a>
+<a href="https://github.com/davetang/muse/tree/cd7dde9b2a36c2080268f9811da9a7e60e5a5230" target="_blank">cd7dde9</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree661277b26685dd5fcdc72418724a83c9638e940atargetblank661277ba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreecd7dde9b2a36c2080268f9811da9a7e60e5a5230targetblankcd7dde9a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/661277b26685dd5fcdc72418724a83c9638e940a" target="_blank">661277b</a>.
+<a href="https://github.com/davetang/muse/tree/cd7dde9b2a36c2080268f9811da9a7e60e5a5230" target="_blank">cd7dde9</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -650,6 +650,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/cd7dde9b2a36c2080268f9811da9a7e60e5a5230/analysis/information.Rmd" target="_blank">cd7dde9</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-21
+</td>
+<td>
+Coin flip example to illustrate mutual information
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/bb05a90eed468d5cf3f128d7b0e41d714dcee502/docs/information.html" target="_blank">bb05a90</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-21
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -987,6 +1021,99 @@ given variable.</p>
 </div>
 <div id="examples" class="section level2">
 <h2>Examples</h2>
+<div id="coin-flips" class="section level3">
+<h3>Coin flips</h3>
+<p>Independent coins.</p>
+<pre class="r"><code>set.seed(1984)
+n &lt;- 1000
+X &lt;- rbinom(n, 1, 0.5)
+Y &lt;- rbinom(n, 1, 0.5)
+mat_independent &lt;- cbind(X, Y)
+dmi(mat_independent)</code></pre>
+<pre><code>$mi
+             [,1]         [,2]
+[1,] 0.6926971130 0.0008345847
+[2,] 0.0008345847 0.6923469671
+
+$bcmi
+             [,1]         [,2]
+[1,] 0.6931976142 0.0003330715
+[2,] 0.0003330715 0.6928474687
+
+$zvalues
+            [,1]        [,2]
+[1,] 729.7075031   0.2572701
+[2,]   0.2572701 547.0678525</code></pre>
+<p>Identical coins.</p>
+<pre class="r"><code>set.seed(1984)
+n &lt;- 1000
+X &lt;- rbinom(n, 1, 0.5)
+Y &lt;- X
+mat_identical &lt;- cbind(X, Y)
+dmi(mat_identical)</code></pre>
+<pre><code>$mi
+          [,1]      [,2]
+[1,] 0.6926971 0.6926971
+[2,] 0.6926971 0.6926971
+
+$bcmi
+          [,1]      [,2]
+[1,] 0.6931976 0.6931976
+[2,] 0.6931976 0.6931976
+
+$zvalues
+         [,1]     [,2]
+[1,] 729.7075 729.7075
+[2,] 729.7075 729.7075</code></pre>
+<p>Opposite coins.</p>
+<pre class="r"><code>set.seed(1984)
+n &lt;- 1000
+X &lt;- rbinom(n, 1, 0.5)
+Y &lt;- 1 - X
+mat_opposite &lt;- cbind(X, Y)
+dmi(mat_opposite)</code></pre>
+<pre><code>$mi
+          [,1]      [,2]
+[1,] 0.6926971 0.6926971
+[2,] 0.6926971 0.6926971
+
+$bcmi
+          [,1]      [,2]
+[1,] 0.6931976 0.6931976
+[2,] 0.6931976 0.6931976
+
+$zvalues
+         [,1]     [,2]
+[1,] 729.7075 729.7075
+[2,] 729.7075 729.7075</code></pre>
+<p>{mpmi} uses natural log instead of log2?</p>
+<pre class="r"><code>log(2)</code></pre>
+<pre><code>[1] 0.6931472</code></pre>
+<p>Four outcomes.</p>
+<pre class="r"><code>set.seed(1984)
+n &lt;- 10000
+X &lt;- sample(0:3, n, replace = TRUE)
+Y &lt;- X
+
+mat_test &lt;- cbind(X, Y)
+dmi(mat_test)</code></pre>
+<pre><code>$mi
+         [,1]     [,2]
+[1,] 1.386195 1.386195
+[2,] 1.386195 1.386195
+
+$bcmi
+         [,1]     [,2]
+[1,] 1.386345 1.386345
+[2,] 1.386345 1.386345
+
+$zvalues
+         [,1]     [,2]
+[1,] 9858.231 9858.231
+[2,] 9858.231 9858.231</code></pre>
+<pre class="r"><code>log(4)</code></pre>
+<pre><code>[1] 1.386294</code></pre>
+</div>
 <div id="mtcars" class="section level3">
 <h3>mtcars</h3>
 <p>Exploring a group of categorical variables (from the examples in the
@@ -1086,56 +1213,6 @@ related</li>
 <p>Cars with more cylinders tend to have more carburetors and V-shaped
 engines. Manual transmissions are associated with different gear
 configurations but engine shape doesn’t predict transmission type.</p>
-</div>
-<div id="random" class="section level3">
-<h3>Random</h3>
-<p>Two random variables.</p>
-<pre class="r"><code>set.seed(1984)
-n &lt;- 1000
-X &lt;- rbinom(n, 1, 0.5)
-Y &lt;- rbinom(n, 1, 0.5)
-xy &lt;- c(&#39;X&#39;, &#39;Y&#39;)
-
-my_mat &lt;- matrix(data = c(X,Y), nrow = n)
-add_names(dmi(my_mat), xy)</code></pre>
-<pre><code>$mi
-             X            Y
-X 0.6926971130 0.0008345847
-Y 0.0008345847 0.6923469671
-
-$bcmi
-             X            Y
-X 0.6931976142 0.0003330715
-Y 0.0003330715 0.6928474687
-
-$zvalues
-            X           Y
-X 729.7075031   0.2572701
-Y   0.2572701 547.0678525</code></pre>
-<p>80% of the time make Y the same as X; the other 20% of the time make
-Y 1 less than X.</p>
-<pre class="r"><code>set.seed(1984)
-n &lt;- 1000
-X &lt;- rbinom(n, 1, 0.5)
-Y &lt;- ifelse(runif(n) &lt; 0.8, X, 1 - X)
-xy &lt;- c(&#39;X&#39;, &#39;Y&#39;)
-
-my_mat &lt;- matrix(data = c(X,Y), nrow = n)
-add_names(dmi(my_mat), xy)</code></pre>
-<pre><code>$mi
-          X         Y
-X 0.6926971 0.2080063
-Y 0.2080063 0.6910978
-
-$bcmi
-          X         Y
-X 0.6931976 0.2075030
-Y 0.2075030 0.6915983
-
-$zvalues
-         X        Y
-X 729.7075  11.4776
-Y  11.4776 341.4429</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
