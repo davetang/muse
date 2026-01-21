@@ -93,6 +93,61 @@ The results of `dmi()` are in many ways similar to a correlation matrix, with ea
 
 ## Examples
 
+### Coin flips
+
+Independent coins.
+
+```{r eg1}
+set.seed(1984)
+n <- 1000
+X <- rbinom(n, 1, 0.5)
+Y <- rbinom(n, 1, 0.5)
+mat_independent <- cbind(X, Y)
+dmi(mat_independent)
+```
+
+Identical coins.
+
+```{r eg2}
+set.seed(1984)
+n <- 1000
+X <- rbinom(n, 1, 0.5)
+Y <- X
+mat_identical <- cbind(X, Y)
+dmi(mat_identical)
+```
+
+Opposite coins.
+
+```{r eg3}
+set.seed(1984)
+n <- 1000
+X <- rbinom(n, 1, 0.5)
+Y <- 1 - X
+mat_opposite <- cbind(X, Y)
+dmi(mat_opposite)
+```
+
+{mpmi} uses natural log instead of log2?
+
+```{r mpmi_log_check}
+log(2)
+```
+
+Four outcomes.
+
+```{r eg4}
+set.seed(1984)
+n <- 10000
+X <- sample(0:3, n, replace = TRUE)
+Y <- X
+
+mat_test <- cbind(X, Y)
+dmi(mat_test)
+
+log(4)
+```
+
 ### mtcars
 
 Exploring a group of categorical variables (from the examples in the documentation of the `dmi()` function).
@@ -103,7 +158,7 @@ Exploring a group of categorical variables (from the examples in the documentati
 * `gear` - Number of forward gears
 * `carb` - Number of carburetors (a device used by a gasoline internal combustion engine to control and mix air and fuel entering the engine)
 
-```{r discrete_example}
+```{r mtcars}
 my_vars <- c("cyl","vs","am","gear","carb")
 dat <- mtcars[, my_vars]
 discresults <- dmi(dat)
@@ -155,31 +210,3 @@ Highly significant associations (|z| > 3) include:
 * `cyl-am` (z = 1.06): Weak/no association
 
 Cars with more cylinders tend to have more carburetors and V-shaped engines. Manual transmissions are associated with different gear configurations but engine shape doesn't predict transmission type.
-
-### Random
-
-Two random variables.
-
-```{r eg2}
-set.seed(1984)
-n <- 1000
-X <- rbinom(n, 1, 0.5)
-Y <- rbinom(n, 1, 0.5)
-xy <- c('X', 'Y')
-
-my_mat <- matrix(data = c(X,Y), nrow = n)
-add_names(dmi(my_mat), xy)
-```
-
-80% of the time make Y the same as X; the other 20% of the time make Y 1 less than X.
-
-```{r eg3}
-set.seed(1984)
-n <- 1000
-X <- rbinom(n, 1, 0.5)
-Y <- ifelse(runif(n) < 0.8, X, 1 - X)
-xy <- c('X', 'Y')
-
-my_mat <- matrix(data = c(X,Y), nrow = n)
-add_names(dmi(my_mat), xy)
-```
