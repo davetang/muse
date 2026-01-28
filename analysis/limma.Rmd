@@ -1,0 +1,578 @@
+---
+title: "Linear Models for Microarray and Omics Data"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(limma)
+})
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+- Understand basic linear models and how they're represented mathematically
+- Learn about design matrices and how they encode experimental conditions
+- Understand contrast matrices and how they specify comparisons of interest
+- See how limma uses linear models for microarray and RNA-seq data
+- Understand how edgeR uses generalized linear models for count data
+- Learn the practical application of these concepts in differential expression analysis
+
+# Linear Model
+
+A linear model is a statistical model that assumes a linear relationship between:
+
+* Response variable, also known as, dependent variable, $y$
+* Predictor variables, also known as independent variables, explanatory variables, $x_1, x_2, ..., x_p$
+
+The general form of a linear model is:
+
+$$
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p + \varepsilon
+$$
+
+Where:
+
+- $y$ is the response variable (what we're trying to explain)
+- $\beta_0$ is the **intercept**
+- $\beta_1, ..., \beta_p$ are coefficients (parameters we estimate)
+- $x_1, ..., x_p$ are predictor variables
+- $\varepsilon$ is the error term (residual), assumed to be normally distributed
+
+## Simple Linear Regression
+
+Let's start with the simplest case: one predictor variable.
+
+```{r simple_lm}
+set.seed(1984)
+x <- 1:20
+y <- 2 + 3*x + rnorm(20, 0, 5)  # y = 2 + 3*x + noise
+
+model1 <- lm(y ~ x)
+summary(model1)
+```
+
+Plot `x` versus `y`.
+
+```{r simple_lm_plot}
+plot(x, y, pch = 19, col = "steelblue", 
+     main = "Simple Linear Regression",
+     xlab = "Predictor (x)", ylab = "Response (y)")
+abline(model1, col = "red", lwd = 2)
+```
+
+* `lm(y ~ x)` fits the model: $y = \beta_0 + \beta_1 x + \varepsilon$
+* The `~` operator means "is modeled as"
+* We estimate $\beta_0$ (intercept) and $\beta_1$ (slope)
+* The true value for $\beta_0$ is 2 and $\beta_1$ is 3
+
+```{r simple_lm_coeff}
+model1$coefficients
+```
+
+## Matrix Form
+
+Linear models can be expressed in matrix notation; so instead of:
+
+$$
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p + \varepsilon
+$$
+
+we have:
+
+$$\mathbf{y} = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}$$
+
+Where:
+
+- $\mathbf{y}$ is an $n \times 1$ vector of responses (observations)
+- $\mathbf{X}$ is an $n \times p$ design matrix, also called model matrix
+- $\boldsymbol{\beta}$ is a $p \times 1$ vector of coefficients
+- $\boldsymbol{\varepsilon}$ is an $n \times 1$ vector of errors
+
+The design matrix for our simple model.
+
+* Column 1 is all 1's (for the intercept)
+* Column 2 contains our predictor variable `x`
+
+```{r design_matrix_simple}
+set.seed(1984)
+x <- sample(x = 1:20)
+X <- model.matrix(~ x)
+X
+```
+
+The design matrix $\mathbf{X}$ encodes the structure of our experiment. Each row represents an observation, and each column represents a parameter in the model.
+
+## Categorical Variables
+
+Linear models can handle categorical variables.
+
+```{r categorical_predictor}
+set.seed(1984)
+group <- factor(rep(c("Control", "Treatment"), each = 10))
+expression <- c(
+  rnorm(10, mean = 5, sd = 1),
+  rnorm(10, mean = 8, sd = 1)
+)
+
+model2 <- lm(expression ~ group)
+summary(model2)
+```
+
+Plot.
+
+```{r categorical_predictor_plot}
+boxplot(
+  expression ~ group,
+  col = c("lightblue", "lightcoral"),
+  main = "Gene Expression by Group",
+  ylab = "Expression Level"
+)
+points(jitter(as.numeric(group)), expression, pch = 19)
+```
+
+When R encounters a categorical variable, it creates dummy variables and by default, R uses treatment contrasts, where:
+
+* One level is chosen as the reference
+* Other levels are compared to the reference
+
+Examine the design matrix:
+
+* `(Intercept)` column (all 1s)
+* `groupTreatment` column (0 for reference, 1 for other level)
+
+```{r design_matrix_categorical}
+X2 <- model.matrix(~ group)
+print(X2)
+```
+
+The model is: $y_i = \beta_0 + \beta_1 \cdot \text{(Treatment)} + \varepsilon_i$
+
+Where:
+
+* $\beta_0$ = mean of Control group
+* $\beta_1$ = difference between Treatment and Control (Treatment - Control)
+* When Treatment = 0 (Control): $y = \beta_0$
+* When Treatment = 1 (Treatment): $y = \beta_0 + \beta_1$
+
+## Multiple Groups
+
+Let's extend to three groups:
+
+```{r three_groups}
+set.seed(1984)
+treatment <- factor(rep(c("Control", "DrugA", "DrugB"), each = 8))
+gene_expr <- c(
+  rnorm(8, mean = 5, sd = 0.8),
+  rnorm(8, mean = 7, sd = 0.8),
+  rnorm(8, mean = 6, sd = 0.8)
+)
+
+model3 <- lm(gene_expr ~ treatment)
+summary(model3)
+```
+
+Plot.
+
+```{r three_groups_plot}
+boxplot(
+  gene_expr ~ treatment, col = c("lightblue", "lightgreen", "lightcoral"),
+  main = "Gene Expression Across Treatments",
+  ylab = "Expression Level"
+)
+```
+
+Model matrix.
+
+```{r three_groups_mm}
+X3 <- model.matrix(~ treatment)
+print(X3)
+```
+
+With three groups, the design matrix has:
+
+* 1 intercept column
+* 2 dummy variable columns (for DrugA and DrugB)
+* Control is the reference level
+
+The model is:
+$$y_i = \beta_0 + \beta_1 \cdot \text{DrugA}_i + \beta_2 \cdot \text{DrugB}_i + \varepsilon_i$$
+
+Where:
+
+- $\beta_0$ = mean of Control
+- $\beta_1$ = DrugA - Control
+- $\beta_2$ = DrugB - Control
+
+## Design Matrix Summary
+
+The design matrix or model matrix is the **bridge between your experimental design and the statistical model**. It's a matrix where:
+
+* Rows = samples/observations
+* Columns = parameters in the model (coefficients to estimate)
+
+The design matrix tells the model:
+
+1. What groups/conditions each sample belongs to
+2. What parameters need to be estimated
+3. How to structure the comparison
+
+### Types of Design Matrices
+
+There are two main parameterizations:
+
+* Treatment Contrast (Default in R)
+
+```{r treatment_contrast}
+groups <- factor(rep(c("A", "B", "C"), each = 4))
+
+design_treatment <- model.matrix(~groups)
+colnames(design_treatment)
+design_treatment
+```
+
+* `(Intercept)`: mean of group A (reference)
+* `groupsB`: difference B - A
+* `groupsC`: difference C - A
+
+Cell means model - design matrix with no intercept, all groups explicit
+
+```{r cell_means}
+design_means <- model.matrix(~ 0 + groups)
+colnames(design_means)
+design_means
+```
+
+**Each coefficient directly represents a group mean**; this is useful when you want to make custom comparisons:
+
+* `groupsA`: mean of group A
+* `groupsB`: mean of group B
+* `groupsC`: mean of group C
+
+### Creating Design Matrices
+
+2 genotypes by 2 treatments.
+
+```{r two_genotype_by_two_treat}
+genotype <- factor(rep(c("WT", "Mutant"), each = 6))
+treatment <- factor(rep(rep(c("Control", "Treated"), each = 3), 2))
+
+samples <- data.frame(
+  Sample = paste0("S", 1:12),
+  Genotype = genotype,
+  Treatment = treatment
+)
+
+samples
+```
+
+Design matrix with interaction.
+
+```{r two_genotype_by_two_treat_design}
+design_interaction <- model.matrix(~ Genotype * Treatment, data = samples)
+design_interaction
+```
+
+The model with interaction:
+
+$$
+y = \beta_0 + \beta_1 \cdot \text{Mutant} + \beta_2 \cdot \text{Treated} + \beta_3 \cdot \text{Mutant:Treated} + \varepsilon
+$$
+
+Where:
+
+* $\beta_0$ = WT Control mean
+* $\beta_1$ = (Mutant Control) - (WT Control)
+* $\beta_2$ = (WT Treated) - (WT Control)
+* $\beta_3$ = interaction effect (additional effect of treatment in Mutant beyond additive)
+
+# Contrast Matrices
+
+A **contrast** is a linear combination of parameters that represents a specific biological question or comparison of interest.
+
+Mathematically, a contrast is: $\psi = c_1\beta_1 + c_2\beta_2 + ... + c_p\beta_p$
+
+Where $c_1, c_2, ..., c_p$ are the **contrast coefficients**.
+
+The model parameters might not directly answer your biological question. Contrasts allow you to:
+
+1. Test specific hypotheses
+2. Make comparisons not directly represented in the model
+3. Test combinations of effects
+
+## Simple Contrasts Example
+
+Using the 3 group example, where the coefficients are:
+
+* 0 = Control mean
+* 1 = DrugA - Control
+* 2 = DrugB - Control
+
+Compare DrugA vs DrugB.
+
+```{r simple_contrasts}
+contrast_A_vs_B <- c(0, 1, -1)
+names(contrast_A_vs_B) <- c("Intercept", "DrugA", "DrugB")
+contrast_A_vs_B
+```
+
+## Contrast Matrix
+
+When there are multiple contrasts, they are organised into a **contrast matrix**:
+
+* Rows = parameters in the model
+* Columns = different contrasts (comparisons)
+
+If we are interested in DrugA versus DrugB, we need to construct the contrast:
+
+1. DrugA vs Control (already in model)
+2. DrugB vs Control (already in model)
+3. DrugA vs DrugB (need to construct)
+
+```{r contrast_matrix}
+contrast_matrix <- matrix(
+  c(
+    0,0,0,
+    1,0,1,
+    0,1,-1
+  ),
+  nrow = 3,
+  ncol = 3,
+  byrow = FALSE
+)
+
+rownames(contrast_matrix) <- c("Intercept", "DrugA", "DrugB")
+colnames(contrast_matrix) <- c("DrugA_vs_Control", "DrugB_vs_Control", "DrugA_vs_DrugB")
+contrast_matrix
+```
+
+## Making Contrasts with Cell Means Model
+
+Contrasts are often more intuitive with a cell means model (no intercept).
+
+* 1 = mean of A
+* 2 = mean of B  
+* 3 = mean of C
+
+```{r contrasts_cell_means}
+groups_contrast <- matrix(
+  c(
+    1,1,0,0.5,
+    -1,0,1,0.5,
+    0,-1,-1,-1
+  ),
+  nrow = 3,
+  ncol = 4,
+  byrow = FALSE
+)
+
+rownames(groups_contrast) <- c("groupA", "groupB", "groupC")
+colnames(groups_contrast) <- c("A_vs_B", "A_vs_C", "B_vs_C", "AvgAB_vs_C")
+groups_contrast
+```
+
+Contrasts allow you to test any comparison.
+
+# Gene Expression Data
+
+Gene expression experiments measure the expression level of thousands of genes across multiple samples. The data structure in R is typically:
+
+* Rows = genes (features)
+* Columns = samples (observations)
+* Values = expression measurements (counts, intensities, etc.)
+
+A small gene expression dataset.
+
+```{r gene_expression_sample_info}
+set.seed(1984)
+n_genes <- 8
+n_samples <- 12
+
+sample_info <- data.frame(
+  Sample = paste0("S", 1:n_samples),
+  Genotype = factor(rep(c("WT", "Mutant"), each = 6)),
+  Treatment = factor(rep(rep(c("Control", "Treated"), each = 3), 2))
+)
+sample_info
+```
+
+Expression data.
+
+```{r expr_data}
+expr_data <- matrix(
+  rnorm(n_genes * n_samples, mean = 7, sd = 0.5), 
+  nrow = n_genes,
+  ncol = n_samples
+)
+
+rownames(expr_data) <- paste0("Gene", 1:n_genes)
+colnames(expr_data) <- sample_info$Sample
+
+expr_data[1, sample_info$Treatment == "Treated"] <- 
+  expr_data[1, sample_info$Treatment == "Treated"] + 2
+
+expr_data[2, sample_info$Genotype == "Mutant"] <- 
+  expr_data[2, sample_info$Genotype == "Mutant"] + 1.5
+
+expr_data[3, sample_info$Genotype == "Mutant" & sample_info$Treatment == "Treated"] <- 
+  expr_data[3, sample_info$Genotype == "Mutant" & sample_info$Treatment == "Treated"] + 2
+
+round(expr_data, 2)
+```
+
+## Many Genes but Few Samples
+
+In typical gene expression experiments:
+
+* Tens of thousands of genes
+* Relatively few samples (often < 10 per group)
+* Need to fit a **separate model for each gene**
+
+This creates statistical challenges:
+
+1. Multiple testing: Testing thousands of genes inflates false positive rates
+2. Low power: Few samples means less ability to detect true differences
+3. Variance estimation: Hard to estimate variance reliably with few samples
+
+The packages **limma** and **edgeR** use empirical Bayes methods to borrow information across genes.
+
+# Linear Models for Microarray and Omics Data
+
+Linear Models for Microarray and Omics Data (limma) uses linear models to analyse gene expression data. It was originally designed for microarrays but can now be used for different types of omics datasets.
+
+* Fits a linear model to each gene
+* Uses empirical Bayes methods to borrow information across genes
+* Improves variance estimates (moderated t-statistics)
+* Handles complex experimental designs easily
+
+The typical limma workflow:
+
+1. Create design matrix - encode experimental design
+2. Fit linear model - estimate coefficients for each gene
+3. Define contrasts - specify comparisons of interest
+4. Apply empirical Bayes - moderate variance estimates
+5. Test significance - compute p-values and adjusted p-values
+
+Install {limma} if not already.
+
+```{r install_limma, eval=FALSE}
+BiocManager::install("limma")
+```
+
+## Design Matrix
+
+Create cell means model design matrix.
+
+```{r limma_design}
+design <- model.matrix(~ 0 + Genotype + Treatment, data = sample_info)
+colnames(design) <- c("WT", "Mutant", "Treated")
+design
+```
+
+## Fit Linear Model to Each Gene
+
+Fit the model to all genes.
+
+```{r limma_fit}
+fit <- lmFit(expr_data, design)
+fit$coefficients[1:4, ]
+```
+
+The `lmFit` function fits a linear model to each gene (each row) using the same design matrix.
+
+## Define Contrasts
+
+We want to test:
+
+1. Treatment effect (Treated vs Control, averaging over genotypes)
+2. Genotype effect (Mutant vs WT, averaging over treatments)
+3. Interaction (is treatment effect different in Mutant vs WT?)
+
+`makeContrasts()` creates a contrast matrix.
+
+```{r limma_contrasts}
+contrast_matrix <- makeContrasts(
+  TreatmentEffect = Treated,
+  GenotypeEffect = Mutant - WT,
+  levels = design
+)
+contrast_matrix
+```
+
+Apply contrasts to the fit.
+
+```{r limma_fit2}
+fit2 <- contrasts.fit(fit, contrast_matrix)
+```
+
+`contrasts.fit` computes the contrasts for each gene and `fit2` contains the effect sizes for our comparisons of interest.
+
+## Empirical Bayes Moderation
+
+Apply empirical Bayes moderation using `eBayes()`:
+
+* Estimate a prior distribution for variances across all genes
+* Shrink each gene's variance estimate toward this prior
+* This "borrows information" across genes and esults in more stable variance estimates and better power
+
+```{r limma_ebayes}
+fit2 <- eBayes(fit2)
+```
+
+This is important because:
+
+* With few samples, variance estimates are unreliable
+* Some genes might have very small estimated variance just by chance
+* This leads to huge (false positive) t-statistics
+* Empirical Bayes shrinks extreme variances toward the average
+* This reduces false positives while maintaining power
+
+## Extract Results
+
+Get results for treatment effect.
+
+```{r limma_results_treatment}
+results_treatment <- topTable(
+  fit2,
+  coef = "TreatmentEffect", 
+  number = Inf,
+  sort.by = "P"
+)
+results_treatment
+```
+
+Get results for genotype effect.
+
+```{r limma_results_genotype}
+results_genotype <- topTable(
+  fit2,
+  coef = "GenotypeEffect", 
+  number = Inf,
+  sort.by = "P"
+)
+
+results_genotype
+```
+
+The columns
+
+* `logFC`: log2 fold change (effect size from the contrast)
+* `AveExpr`: average expression level across all samples
+* `t`: moderated t-statistic
+* `P.Value`: p-value from moderated t-statistic
+* `adj.P.Val`: adjusted p-value (controls false discovery rate)
+* `B`: log-odds of differential expression
+
+limma can also be used for RNA-seq count data with the **voom** transformation.
+
+# Summary
+
+1. Linear models represent relationships as: $y = \mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}$
+2. Design matrices ($\mathbf{X}$) encode experimental structure
+3. Contrasts specify biological questions as linear combinations of parameters
+4. limma uses linear models with empirical Bayes for continuous gene expression data
