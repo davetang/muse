@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-01-28" />
+
+<title>Linear Models for Microarray and Omics Data</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Linear Models for Microarray and Omics
+Data</h1>
+<h4 class="date">2026-01-28</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-01-28
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1e1a825fccbcad902a9b2b701d477d222f45dc7ftargetblank1e1a825a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/1e1a825fccbcad902a9b2b701d477d222f45dc7f" target="_blank">1e1a825</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1e1a825fccbcad902a9b2b701d477d222f45dc7ftargetblank1e1a825a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/1e1a825fccbcad902a9b2b701d477d222f45dc7f" target="_blank">1e1a825</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.4.1/
+    Ignored:    r_packages_4.5.0/
+
+Untracked files:
+    Untracked:  analysis/bioc.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/likelihood.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
+    Untracked:  m3/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/icc.Rmd
+    Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/limma.Rmd</code>) and HTML
+(<code>docs/limma.html</code>) files. If you’ve configured a remote Git
+repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
+in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/1e1a825fccbcad902a9b2b701d477d222f45dc7f/analysis/limma.Rmd" target="_blank">1e1a825</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-28
+</td>
+<td>
+Understanding limma
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<ul>
+<li>Understand basic linear models and how they’re represented
+mathematically</li>
+<li>Learn about design matrices and how they encode experimental
+conditions</li>
+<li>Understand contrast matrices and how they specify comparisons of
+interest</li>
+<li>See how limma uses linear models for microarray and RNA-seq
+data</li>
+<li>Understand how edgeR uses generalized linear models for count
+data</li>
+<li>Learn the practical application of these concepts in differential
+expression analysis</li>
+</ul>
+</div>
+<div id="linear-model" class="section level1">
+<h1>Linear Model</h1>
+<p>A linear model is a statistical model that assumes a linear
+relationship between:</p>
+<ul>
+<li>Response variable, also known as, dependent variable, <span
+class="math inline">\(y\)</span></li>
+<li>Predictor variables, also known as independent variables,
+explanatory variables, <span class="math inline">\(x_1, x_2, ...,
+x_p\)</span></li>
+</ul>
+<p>The general form of a linear model is:</p>
+<p><span class="math display">\[
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p +
+\varepsilon
+\]</span></p>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(y\)</span> is the response variable
+(what we’re trying to explain)</li>
+<li><span class="math inline">\(\beta_0\)</span> is the
+<strong>intercept</strong></li>
+<li><span class="math inline">\(\beta_1, ..., \beta_p\)</span> are
+coefficients (parameters we estimate)</li>
+<li><span class="math inline">\(x_1, ..., x_p\)</span> are predictor
+variables</li>
+<li><span class="math inline">\(\varepsilon\)</span> is the error term
+(residual), assumed to be normally distributed</li>
+</ul>
+<div id="simple-linear-regression" class="section level2">
+<h2>Simple Linear Regression</h2>
+<p>Let’s start with the simplest case: one predictor variable.</p>
+<pre class="r"><code>set.seed(1984)
+x &lt;- 1:20
+y &lt;- 2 + 3*x + rnorm(20, 0, 5)  # y = 2 + 3*x + noise
+
+model1 &lt;- lm(y ~ x)
+summary(model1)</code></pre>
+<pre><code>
+Call:
+lm(formula = y ~ x)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-10.6578  -3.3266   0.9095   3.5601   8.6517 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)   3.9134     2.4460     1.6    0.127    
+x             2.8784     0.2042    14.1 3.63e-11 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 5.265 on 18 degrees of freedom
+Multiple R-squared:  0.9169,    Adjusted R-squared:  0.9123 
+F-statistic: 198.7 on 1 and 18 DF,  p-value: 3.626e-11</code></pre>
+<p>Plot <code>x</code> versus <code>y</code>.</p>
+<pre class="r"><code>plot(x, y, pch = 19, col = &quot;steelblue&quot;, 
+     main = &quot;Simple Linear Regression&quot;,
+     xlab = &quot;Predictor (x)&quot;, ylab = &quot;Response (y)&quot;)
+abline(model1, col = &quot;red&quot;, lwd = 2)</code></pre>
+<p><img src="figure/limma.Rmd/simple_lm_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<ul>
+<li><code>lm(y ~ x)</code> fits the model: <span class="math inline">\(y
+= \beta_0 + \beta_1 x + \varepsilon\)</span></li>
+<li>The <code>~</code> operator means “is modeled as”</li>
+<li>We estimate <span class="math inline">\(\beta_0\)</span> (intercept)
+and <span class="math inline">\(\beta_1\)</span> (slope)</li>
+<li>The true value for <span class="math inline">\(\beta_0\)</span> is 2
+and <span class="math inline">\(\beta_1\)</span> is 3</li>
+</ul>
+<pre class="r"><code>model1$coefficients</code></pre>
+<pre><code>(Intercept)           x 
+   3.913423    2.878431 </code></pre>
+</div>
+<div id="matrix-form" class="section level2">
+<h2>Matrix Form</h2>
+<p>Linear models can be expressed in matrix notation; so instead of:</p>
+<p><span class="math display">\[
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_p x_p +
+\varepsilon
+\]</span></p>
+<p>we have:</p>
+<p><span class="math display">\[\mathbf{y} =
+\mathbf{X}\boldsymbol{\beta} + \boldsymbol{\varepsilon}\]</span></p>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(\mathbf{y}\)</span> is an <span
+class="math inline">\(n \times 1\)</span> vector of responses
+(observations)</li>
+<li><span class="math inline">\(\mathbf{X}\)</span> is an <span
+class="math inline">\(n \times p\)</span> design matrix, also called
+model matrix</li>
+<li><span class="math inline">\(\boldsymbol{\beta}\)</span> is a <span
+class="math inline">\(p \times 1\)</span> vector of coefficients</li>
+<li><span class="math inline">\(\boldsymbol{\varepsilon}\)</span> is an
+<span class="math inline">\(n \times 1\)</span> vector of errors</li>
+</ul>
+<p>The design matrix for our simple model.</p>
+<ul>
+<li>Column 1 is all 1’s (for the intercept)</li>
+<li>Column 2 contains our predictor variable <code>x</code></li>
+</ul>
+<pre class="r"><code>set.seed(1984)
+x &lt;- sample(x = 1:20)
+X &lt;- model.matrix(~ x)
+X</code></pre>
+<pre><code>   (Intercept)  x
+1            1  8
+2            1 17
+3            1 14
+4            1 15
+5            1 20
+6            1  1
+7            1 13
+8            1  4
+9            1 16
+10           1 19
+11           1 18
+12           1  6
+13           1  7
+14           1  5
+15           1 12
+16           1  2
+17           1  9
+18           1 10
+19           1 11
+20           1  3
+attr(,&quot;assign&quot;)
+[1] 0 1</code></pre>
+<p>The design matrix <span class="math inline">\(\mathbf{X}\)</span>
+encodes the structure of our experiment. Each row represents an
+observation, and each column represents a parameter in the model.</p>
+</div>
+<div id="categorical-variables" class="section level2">
+<h2>Categorical Variables</h2>
+<p>Linear models can handle categorical variables.</p>
+<pre class="r"><code>set.seed(1984)
+group &lt;- factor(rep(c(&quot;Control&quot;, &quot;Treatment&quot;), each = 10))
+expression &lt;- c(
+  rnorm(10, mean = 5, sd = 1),
+  rnorm(10, mean = 8, sd = 1)
+)
+
+model2 &lt;- lm(expression ~ group)
+summary(model2)</code></pre>
+<pre><code>
+Call:
+lm(formula = expression ~ group)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.0079 -0.5356  0.1920  0.7560  1.6310 
+
+Coefficients:
+               Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)      5.1618     0.3361  15.358 8.68e-12 ***
+groupTreatment   2.9313     0.4753   6.167 8.02e-06 ***
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 1.063 on 18 degrees of freedom
+Multiple R-squared:  0.6788,    Adjusted R-squared:  0.6609 
+F-statistic: 38.03 on 1 and 18 DF,  p-value: 8.016e-06</code></pre>
+<p>Plot.</p>
+<pre class="r"><code>boxplot(
+  expression ~ group,
+  col = c(&quot;lightblue&quot;, &quot;lightcoral&quot;),
+  main = &quot;Gene Expression by Group&quot;,
+  ylab = &quot;Expression Level&quot;
+)
+points(jitter(as.numeric(group)), expression, pch = 19)</code></pre>
+<p><img src="figure/limma.Rmd/categorical_predictor_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>When R encounters a categorical variable, it creates dummy variables
+and by default, R uses treatment contrasts, where:</p>
+<ul>
+<li>One level is chosen as the reference</li>
+<li>Other levels are compared to the reference</li>
+</ul>
+<p>Examine the design matrix:</p>
+<ul>
+<li><code>(Intercept)</code> column (all 1s)</li>
+<li><code>groupTreatment</code> column (0 for reference, 1 for other
+level)</li>
+</ul>
+<pre class="r"><code>X2 &lt;- model.matrix(~ group)
+print(X2)</code></pre>
+<pre><code>   (Intercept) groupTreatment
+1            1              0
+2            1              0
+3            1              0
+4            1              0
+5            1              0
+6            1              0
+7            1              0
+8            1              0
+9            1              0
+10           1              0
+11           1              1
+12           1              1
+13           1              1
+14           1              1
+15           1              1
+16           1              1
+17           1              1
+18           1              1
+19           1              1
+20           1              1
+attr(,&quot;assign&quot;)
+[1] 0 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$group
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>The model is: <span class="math inline">\(y_i = \beta_0 + \beta_1
+\cdot \text{(Treatment)} + \varepsilon_i\)</span></p>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(\beta_0\)</span> = mean of Control
+group</li>
+<li><span class="math inline">\(\beta_1\)</span> = difference between
+Treatment and Control (Treatment - Control)</li>
+<li>When Treatment = 0 (Control): <span class="math inline">\(y =
+\beta_0\)</span></li>
+<li>When Treatment = 1 (Treatment): <span class="math inline">\(y =
+\beta_0 + \beta_1\)</span></li>
+</ul>
+</div>
+<div id="multiple-groups" class="section level2">
+<h2>Multiple Groups</h2>
+<p>Let’s extend to three groups:</p>
+<pre class="r"><code>set.seed(1984)
+treatment &lt;- factor(rep(c(&quot;Control&quot;, &quot;DrugA&quot;, &quot;DrugB&quot;), each = 8))
+gene_expr &lt;- c(
+  rnorm(8, mean = 5, sd = 0.8),
+  rnorm(8, mean = 7, sd = 0.8),
+  rnorm(8, mean = 6, sd = 0.8)
+)
+
+model3 &lt;- lm(gene_expr ~ treatment)
+summary(model3)</code></pre>
+<pre><code>
+Call:
+lm(formula = gene_expr ~ treatment)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.5497 -0.4135  0.2303  0.5132  1.1252 
+
+Coefficients:
+               Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)      5.0728     0.2771  18.306 2.18e-14 ***
+treatmentDrugA   2.4335     0.3919   6.209 3.69e-06 ***
+treatmentDrugB   0.7956     0.3919   2.030   0.0552 .  
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+
+Residual standard error: 0.7838 on 21 degrees of freedom
+Multiple R-squared:  0.6563,    Adjusted R-squared:  0.6236 
+F-statistic: 20.05 on 2 and 21 DF,  p-value: 1.349e-05</code></pre>
+<p>Plot.</p>
+<pre class="r"><code>boxplot(
+  gene_expr ~ treatment, col = c(&quot;lightblue&quot;, &quot;lightgreen&quot;, &quot;lightcoral&quot;),
+  main = &quot;Gene Expression Across Treatments&quot;,
+  ylab = &quot;Expression Level&quot;
+)</code></pre>
+<p><img src="figure/limma.Rmd/three_groups_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Model matrix.</p>
+<pre class="r"><code>X3 &lt;- model.matrix(~ treatment)
+print(X3)</code></pre>
+<pre><code>   (Intercept) treatmentDrugA treatmentDrugB
+1            1              0              0
+2            1              0              0
+3            1              0              0
+4            1              0              0
+5            1              0              0
+6            1              0              0
+7            1              0              0
+8            1              0              0
+9            1              1              0
+10           1              1              0
+11           1              1              0
+12           1              1              0
+13           1              1              0
+14           1              1              0
+15           1              1              0
+16           1              1              0
+17           1              0              1
+18           1              0              1
+19           1              0              1
+20           1              0              1
+21           1              0              1
+22           1              0              1
+23           1              0              1
+24           1              0              1
+attr(,&quot;assign&quot;)
+[1] 0 1 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$treatment
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>With three groups, the design matrix has:</p>
+<ul>
+<li>1 intercept column</li>
+<li>2 dummy variable columns (for DrugA and DrugB)</li>
+<li>Control is the reference level</li>
+</ul>
+<p>The model is: <span class="math display">\[y_i = \beta_0 + \beta_1
+\cdot \text{DrugA}_i + \beta_2 \cdot \text{DrugB}_i +
+\varepsilon_i\]</span></p>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(\beta_0\)</span> = mean of Control</li>
+<li><span class="math inline">\(\beta_1\)</span> = DrugA - Control</li>
+<li><span class="math inline">\(\beta_2\)</span> = DrugB - Control</li>
+</ul>
+</div>
+<div id="design-matrix-summary" class="section level2">
+<h2>Design Matrix Summary</h2>
+<p>The design matrix or model matrix is the <strong>bridge between your
+experimental design and the statistical model</strong>. It’s a matrix
+where:</p>
+<ul>
+<li>Rows = samples/observations</li>
+<li>Columns = parameters in the model (coefficients to estimate)</li>
+</ul>
+<p>The design matrix tells the model:</p>
+<ol style="list-style-type: decimal">
+<li>What groups/conditions each sample belongs to</li>
+<li>What parameters need to be estimated</li>
+<li>How to structure the comparison</li>
+</ol>
+<div id="types-of-design-matrices" class="section level3">
+<h3>Types of Design Matrices</h3>
+<p>There are two main parameterizations:</p>
+<ul>
+<li>Treatment Contrast (Default in R)</li>
+</ul>
+<pre class="r"><code>groups &lt;- factor(rep(c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;), each = 4))
+
+design_treatment &lt;- model.matrix(~groups)
+colnames(design_treatment)</code></pre>
+<pre><code>[1] &quot;(Intercept)&quot; &quot;groupsB&quot;     &quot;groupsC&quot;    </code></pre>
+<pre class="r"><code>design_treatment</code></pre>
+<pre><code>   (Intercept) groupsB groupsC
+1            1       0       0
+2            1       0       0
+3            1       0       0
+4            1       0       0
+5            1       1       0
+6            1       1       0
+7            1       1       0
+8            1       1       0
+9            1       0       1
+10           1       0       1
+11           1       0       1
+12           1       0       1
+attr(,&quot;assign&quot;)
+[1] 0 1 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$groups
+[1] &quot;contr.treatment&quot;</code></pre>
+<ul>
+<li><code>(Intercept)</code>: mean of group A (reference)</li>
+<li><code>groupsB</code>: difference B - A</li>
+<li><code>groupsC</code>: difference C - A</li>
+</ul>
+<p>Cell means model - design matrix with no intercept, all groups
+explicit</p>
+<pre class="r"><code>design_means &lt;- model.matrix(~ 0 + groups)
+colnames(design_means)</code></pre>
+<pre><code>[1] &quot;groupsA&quot; &quot;groupsB&quot; &quot;groupsC&quot;</code></pre>
+<pre class="r"><code>design_means</code></pre>
+<pre><code>   groupsA groupsB groupsC
+1        1       0       0
+2        1       0       0
+3        1       0       0
+4        1       0       0
+5        0       1       0
+6        0       1       0
+7        0       1       0
+8        0       1       0
+9        0       0       1
+10       0       0       1
+11       0       0       1
+12       0       0       1
+attr(,&quot;assign&quot;)
+[1] 1 1 1
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$groups
+[1] &quot;contr.treatment&quot;</code></pre>
+<p><strong>Each coefficient directly represents a group mean</strong>;
+this is useful when you want to make custom comparisons:</p>
+<ul>
+<li><code>groupsA</code>: mean of group A</li>
+<li><code>groupsB</code>: mean of group B</li>
+<li><code>groupsC</code>: mean of group C</li>
+</ul>
+</div>
+<div id="creating-design-matrices" class="section level3">
+<h3>Creating Design Matrices</h3>
+<p>2 genotypes by 2 treatments.</p>
+<pre class="r"><code>genotype &lt;- factor(rep(c(&quot;WT&quot;, &quot;Mutant&quot;), each = 6))
+treatment &lt;- factor(rep(rep(c(&quot;Control&quot;, &quot;Treated&quot;), each = 3), 2))
+
+samples &lt;- data.frame(
+  Sample = paste0(&quot;S&quot;, 1:12),
+  Genotype = genotype,
+  Treatment = treatment
+)
+
+samples</code></pre>
+<pre><code>   Sample Genotype Treatment
+1      S1       WT   Control
+2      S2       WT   Control
+3      S3       WT   Control
+4      S4       WT   Treated
+5      S5       WT   Treated
+6      S6       WT   Treated
+7      S7   Mutant   Control
+8      S8   Mutant   Control
+9      S9   Mutant   Control
+10    S10   Mutant   Treated
+11    S11   Mutant   Treated
+12    S12   Mutant   Treated</code></pre>
+<p>Design matrix with interaction.</p>
+<pre class="r"><code>design_interaction &lt;- model.matrix(~ Genotype * Treatment, data = samples)
+design_interaction</code></pre>
+<pre><code>   (Intercept) GenotypeWT TreatmentTreated GenotypeWT:TreatmentTreated
+1            1          1                0                           0
+2            1          1                0                           0
+3            1          1                0                           0
+4            1          1                1                           1
+5            1          1                1                           1
+6            1          1                1                           1
+7            1          0                0                           0
+8            1          0                0                           0
+9            1          0                0                           0
+10           1          0                1                           0
+11           1          0                1                           0
+12           1          0                1                           0
+attr(,&quot;assign&quot;)
+[1] 0 1 2 3
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$Genotype
+[1] &quot;contr.treatment&quot;
+
+attr(,&quot;contrasts&quot;)$Treatment
+[1] &quot;contr.treatment&quot;</code></pre>
+<p>The model with interaction:</p>
+<p><span class="math display">\[
+y = \beta_0 + \beta_1 \cdot \text{Mutant} + \beta_2 \cdot \text{Treated}
++ \beta_3 \cdot \text{Mutant:Treated} + \varepsilon
+\]</span></p>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(\beta_0\)</span> = WT Control mean</li>
+<li><span class="math inline">\(\beta_1\)</span> = (Mutant Control) -
+(WT Control)</li>
+<li><span class="math inline">\(\beta_2\)</span> = (WT Treated) - (WT
+Control)</li>
+<li><span class="math inline">\(\beta_3\)</span> = interaction effect
+(additional effect of treatment in Mutant beyond additive)</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="contrast-matrices" class="section level1">
+<h1>Contrast Matrices</h1>
+<p>A <strong>contrast</strong> is a linear combination of parameters
+that represents a specific biological question or comparison of
+interest.</p>
+<p>Mathematically, a contrast is: <span class="math inline">\(\psi =
+c_1\beta_1 + c_2\beta_2 + ... + c_p\beta_p\)</span></p>
+<p>Where <span class="math inline">\(c_1, c_2, ..., c_p\)</span> are the
+<strong>contrast coefficients</strong>.</p>
+<p>The model parameters might not directly answer your biological
+question. Contrasts allow you to:</p>
+<ol style="list-style-type: decimal">
+<li>Test specific hypotheses</li>
+<li>Make comparisons not directly represented in the model</li>
+<li>Test combinations of effects</li>
+</ol>
+<div id="simple-contrasts-example" class="section level2">
+<h2>Simple Contrasts Example</h2>
+<p>Using the 3 group example, where the coefficients are:</p>
+<ul>
+<li>0 = Control mean</li>
+<li>1 = DrugA - Control</li>
+<li>2 = DrugB - Control</li>
+</ul>
+<p>Compare DrugA vs DrugB.</p>
+<pre class="r"><code>contrast_A_vs_B &lt;- c(0, 1, -1)
+names(contrast_A_vs_B) &lt;- c(&quot;Intercept&quot;, &quot;DrugA&quot;, &quot;DrugB&quot;)
+contrast_A_vs_B</code></pre>
+<pre><code>Intercept     DrugA     DrugB 
+        0         1        -1 </code></pre>
+</div>
+<div id="contrast-matrix" class="section level2">
+<h2>Contrast Matrix</h2>
+<p>When there are multiple contrasts, they are organised into a
+<strong>contrast matrix</strong>:</p>
+<ul>
+<li>Rows = parameters in the model</li>
+<li>Columns = different contrasts (comparisons)</li>
+</ul>
+<p>If we are interested in DrugA versus DrugB, we need to construct the
+contrast:</p>
+<ol style="list-style-type: decimal">
+<li>DrugA vs Control (already in model)</li>
+<li>DrugB vs Control (already in model)</li>
+<li>DrugA vs DrugB (need to construct)</li>
+</ol>
+<pre class="r"><code>contrast_matrix &lt;- matrix(
+  c(
+    0,0,0,
+    1,0,1,
+    0,1,-1
+  ),
+  nrow = 3,
+  ncol = 3,
+  byrow = FALSE
+)
+
+rownames(contrast_matrix) &lt;- c(&quot;Intercept&quot;, &quot;DrugA&quot;, &quot;DrugB&quot;)
+colnames(contrast_matrix) &lt;- c(&quot;DrugA_vs_Control&quot;, &quot;DrugB_vs_Control&quot;, &quot;DrugA_vs_DrugB&quot;)
+contrast_matrix</code></pre>
+<pre><code>          DrugA_vs_Control DrugB_vs_Control DrugA_vs_DrugB
+Intercept                0                1              0
+DrugA                    0                0              1
+DrugB                    0                1             -1</code></pre>
+</div>
+<div id="making-contrasts-with-cell-means-model" class="section level2">
+<h2>Making Contrasts with Cell Means Model</h2>
+<p>Contrasts are often more intuitive with a cell means model (no
+intercept).</p>
+<ul>
+<li>1 = mean of A</li>
+<li>2 = mean of B<br />
+</li>
+<li>3 = mean of C</li>
+</ul>
+<pre class="r"><code>groups_contrast &lt;- matrix(
+  c(
+    1,1,0,0.5,
+    -1,0,1,0.5,
+    0,-1,-1,-1
+  ),
+  nrow = 3,
+  ncol = 4,
+  byrow = FALSE
+)
+
+rownames(groups_contrast) &lt;- c(&quot;groupA&quot;, &quot;groupB&quot;, &quot;groupC&quot;)
+colnames(groups_contrast) &lt;- c(&quot;A_vs_B&quot;, &quot;A_vs_C&quot;, &quot;B_vs_C&quot;, &quot;AvgAB_vs_C&quot;)
+groups_contrast</code></pre>
+<pre><code>       A_vs_B A_vs_C B_vs_C AvgAB_vs_C
+groupA      1    0.5    1.0         -1
+groupB      1   -1.0    0.5         -1
+groupC      0    0.0    0.0         -1</code></pre>
+<p>Contrasts allow you to test any comparison.</p>
+</div>
+</div>
+<div id="gene-expression-data" class="section level1">
+<h1>Gene Expression Data</h1>
+<p>Gene expression experiments measure the expression level of thousands
+of genes across multiple samples. The data structure in R is
+typically:</p>
+<ul>
+<li>Rows = genes (features)</li>
+<li>Columns = samples (observations)</li>
+<li>Values = expression measurements (counts, intensities, etc.)</li>
+</ul>
+<p>A small gene expression dataset.</p>
+<pre class="r"><code>set.seed(1984)
+n_genes &lt;- 8
+n_samples &lt;- 12
+
+sample_info &lt;- data.frame(
+  Sample = paste0(&quot;S&quot;, 1:n_samples),
+  Genotype = factor(rep(c(&quot;WT&quot;, &quot;Mutant&quot;), each = 6)),
+  Treatment = factor(rep(rep(c(&quot;Control&quot;, &quot;Treated&quot;), each = 3), 2))
+)
+sample_info</code></pre>
+<pre><code>   Sample Genotype Treatment
+1      S1       WT   Control
+2      S2       WT   Control
+3      S3       WT   Control
+4      S4       WT   Treated
+5      S5       WT   Treated
+6      S6       WT   Treated
+7      S7   Mutant   Control
+8      S8   Mutant   Control
+9      S9   Mutant   Control
+10    S10   Mutant   Treated
+11    S11   Mutant   Treated
+12    S12   Mutant   Treated</code></pre>
+<p>Expression data.</p>
+<pre class="r"><code>expr_data &lt;- matrix(
+  rnorm(n_genes * n_samples, mean = 7, sd = 0.5), 
+  nrow = n_genes,
+  ncol = n_samples
+)
+
+rownames(expr_data) &lt;- paste0(&quot;Gene&quot;, 1:n_genes)
+colnames(expr_data) &lt;- sample_info$Sample
+
+expr_data[1, sample_info$Treatment == &quot;Treated&quot;] &lt;- 
+  expr_data[1, sample_info$Treatment == &quot;Treated&quot;] + 2
+
+expr_data[2, sample_info$Genotype == &quot;Mutant&quot;] &lt;- 
+  expr_data[2, sample_info$Genotype == &quot;Mutant&quot;] + 1.5
+
+expr_data[3, sample_info$Genotype == &quot;Mutant&quot; &amp; sample_info$Treatment == &quot;Treated&quot;] &lt;- 
+  expr_data[3, sample_info$Genotype == &quot;Mutant&quot; &amp; sample_info$Treatment == &quot;Treated&quot;] + 2
+
+round(expr_data, 2)</code></pre>
+<pre><code>        S1   S2   S3   S4   S5   S6   S7   S8   S9  S10  S11   S12
+Gene1 7.20 6.74 7.06 8.99 9.30 9.02 6.67 6.68 7.81 9.15 9.10 10.11
+Gene2 6.84 7.71 6.11 7.12 7.48 7.40 9.05 8.09 8.36 8.22 8.78  8.45
+Gene3 7.32 7.14 7.06 7.05 7.15 6.95 7.62 6.66 6.73 8.79 8.77  8.96
+Gene4 6.08 7.14 6.14 7.41 6.57 6.33 6.68 6.99 6.69 6.87 6.28  6.71
+Gene5 7.48 7.42 7.62 6.71 8.25 7.62 6.51 6.63 7.06 7.25 7.08  6.08
+Gene6 7.59 7.51 7.21 7.50 6.86 7.59 6.41 7.33 7.45 6.81 7.59  7.58
+Gene7 7.27 7.01 6.68 6.45 6.83 6.77 6.81 7.83 6.75 6.62 6.76  7.62
+Gene8 6.58 7.86 7.45 6.26 7.12 7.57 6.22 6.83 6.46 6.76 6.56  7.37</code></pre>
+<div id="many-genes-but-few-samples" class="section level2">
+<h2>Many Genes but Few Samples</h2>
+<p>In typical gene expression experiments:</p>
+<ul>
+<li>Tens of thousands of genes</li>
+<li>Relatively few samples (often &lt; 10 per group)</li>
+<li>Need to fit a <strong>separate model for each gene</strong></li>
+</ul>
+<p>This creates statistical challenges:</p>
+<ol style="list-style-type: decimal">
+<li>Multiple testing: Testing thousands of genes inflates false positive
+rates</li>
+<li>Low power: Few samples means less ability to detect true
+differences</li>
+<li>Variance estimation: Hard to estimate variance reliably with few
+samples</li>
+</ol>
+<p>The packages <strong>limma</strong> and <strong>edgeR</strong> use
+empirical Bayes methods to borrow information across genes.</p>
+</div>
+</div>
+<div id="linear-models-for-microarray-and-omics-data"
+class="section level1">
+<h1>Linear Models for Microarray and Omics Data</h1>
+<p>Linear Models for Microarray and Omics Data (limma) uses linear
+models to analyse gene expression data. It was originally designed for
+microarrays but can now be used for different types of omics
+datasets.</p>
+<ul>
+<li>Fits a linear model to each gene</li>
+<li>Uses empirical Bayes methods to borrow information across genes</li>
+<li>Improves variance estimates (moderated t-statistics)</li>
+<li>Handles complex experimental designs easily</li>
+</ul>
+<p>The typical limma workflow:</p>
+<ol style="list-style-type: decimal">
+<li>Create design matrix - encode experimental design</li>
+<li>Fit linear model - estimate coefficients for each gene</li>
+<li>Define contrasts - specify comparisons of interest</li>
+<li>Apply empirical Bayes - moderate variance estimates</li>
+<li>Test significance - compute p-values and adjusted p-values</li>
+</ol>
+<p>Install {limma} if not already.</p>
+<pre class="r"><code>BiocManager::install(&quot;limma&quot;)</code></pre>
+<div id="design-matrix" class="section level2">
+<h2>Design Matrix</h2>
+<p>Create cell means model design matrix.</p>
+<pre class="r"><code>design &lt;- model.matrix(~ 0 + Genotype + Treatment, data = sample_info)
+colnames(design) &lt;- c(&quot;WT&quot;, &quot;Mutant&quot;, &quot;Treated&quot;)
+design</code></pre>
+<pre><code>   WT Mutant Treated
+1   0      1       0
+2   0      1       0
+3   0      1       0
+4   0      1       1
+5   0      1       1
+6   0      1       1
+7   1      0       0
+8   1      0       0
+9   1      0       0
+10  1      0       1
+11  1      0       1
+12  1      0       1
+attr(,&quot;assign&quot;)
+[1] 1 1 2
+attr(,&quot;contrasts&quot;)
+attr(,&quot;contrasts&quot;)$Genotype
+[1] &quot;contr.treatment&quot;
+
+attr(,&quot;contrasts&quot;)$Treatment
+[1] &quot;contr.treatment&quot;</code></pre>
+</div>
+<div id="fit-linear-model-to-each-gene" class="section level2">
+<h2>Fit Linear Model to Each Gene</h2>
+<p>Fit the model to all genes.</p>
+<pre class="r"><code>fit &lt;- lmFit(expr_data, design)
+fit$coefficients[1:4, ]</code></pre>
+<pre><code>            WT   Mutant    Treated
+Gene1 7.124410 6.926501 2.25463755
+Gene2 8.384105 7.002418 0.21553041
+Gene3 7.493739 6.682573 0.85548382
+Gene4 6.665348 6.576641 0.07290393</code></pre>
+<p>The <code>lmFit</code> function fits a linear model to each gene
+(each row) using the same design matrix.</p>
+</div>
+<div id="define-contrasts" class="section level2">
+<h2>Define Contrasts</h2>
+<p>We want to test:</p>
+<ol style="list-style-type: decimal">
+<li>Treatment effect (Treated vs Control, averaging over genotypes)</li>
+<li>Genotype effect (Mutant vs WT, averaging over treatments)</li>
+<li>Interaction (is treatment effect different in Mutant vs WT?)</li>
+</ol>
+<p><code>makeContrasts()</code> creates a contrast matrix.</p>
+<pre class="r"><code>contrast_matrix &lt;- makeContrasts(
+  TreatmentEffect = Treated,
+  GenotypeEffect = Mutant - WT,
+  levels = design
+)
+contrast_matrix</code></pre>
+<pre><code>         Contrasts
+Levels    TreatmentEffect GenotypeEffect
+  WT                    0             -1
+  Mutant                0              1
+  Treated               1              0</code></pre>
+<p>Apply contrasts to the fit.</p>
+<pre class="r"><code>fit2 &lt;- contrasts.fit(fit, contrast_matrix)</code></pre>
+<p><code>contrasts.fit</code> computes the contrasts for each gene and
+<code>fit2</code> contains the effect sizes for our comparisons of
+interest.</p>
+</div>
+<div id="empirical-bayes-moderation" class="section level2">
+<h2>Empirical Bayes Moderation</h2>
+<p>Apply empirical Bayes moderation using <code>eBayes()</code>:</p>
+<ul>
+<li>Estimate a prior distribution for variances across all genes</li>
+<li>Shrink each gene’s variance estimate toward this prior</li>
+<li>This “borrows information” across genes and esults in more stable
+variance estimates and better power</li>
+</ul>
+<pre class="r"><code>fit2 &lt;- eBayes(fit2)</code></pre>
+<p>This is important because:</p>
+<ul>
+<li>With few samples, variance estimates are unreliable</li>
+<li>Some genes might have very small estimated variance just by
+chance</li>
+<li>This leads to huge (false positive) t-statistics</li>
+<li>Empirical Bayes shrinks extreme variances toward the average</li>
+<li>This reduces false positives while maintaining power</li>
+</ul>
+</div>
+<div id="extract-results" class="section level2">
+<h2>Extract Results</h2>
+<p>Get results for treatment effect.</p>
+<pre class="r"><code>results_treatment &lt;- topTable(
+  fit2,
+  coef = &quot;TreatmentEffect&quot;, 
+  number = Inf,
+  sort.by = &quot;P&quot;
+)
+results_treatment</code></pre>
+<pre><code>            logFC  AveExpr          t      P.Value    adj.P.Val         B
+Gene1  2.25463755 8.152774  7.9703249 1.741914e-11 1.393531e-10 24.473675
+Gene3  0.85548382 7.515898  3.0242040 3.453543e-03 1.381417e-02 -2.519759
+Gene7 -0.21567877 6.949564 -0.7624418 4.482870e-01 8.908495e-01 -6.771026
+Gene2  0.21553041 7.801027  0.7619173 4.485980e-01 8.908495e-01 -6.771423
+Gene4  0.07290393 6.657446  0.2577213 7.973572e-01 8.908495e-01 -7.026612
+Gene6  0.06980816 7.286444  0.2467775 8.057827e-01 8.908495e-01 -7.029353
+Gene5  0.04478622 7.141997  0.1583229 8.746456e-01 8.908495e-01 -7.047140
+Gene8  0.03895690 6.921294  0.1377158 8.908495e-01 8.908495e-01 -7.050168</code></pre>
+<p>Get results for genotype effect.</p>
+<pre class="r"><code>results_genotype &lt;- topTable(
+  fit2,
+  coef = &quot;GenotypeEffect&quot;, 
+  number = Inf,
+  sort.by = &quot;P&quot;
+)
+
+results_genotype</code></pre>
+<pre><code>            logFC  AveExpr          t      P.Value    adj.P.Val         B
+Gene2 -1.38168673 7.801027 -4.8843736 6.067869e-06 4.854295e-05  5.128926
+Gene3 -0.81116587 7.515898 -2.8675365 5.422740e-03 2.169096e-02 -2.537630
+Gene5  0.74801262 7.141997  2.6442847 1.004222e-02 2.677925e-02 -3.141038
+Gene8  0.44348055 6.921294  1.5677394 1.213267e-01 2.426534e-01 -5.364573
+Gene7 -0.23149404 6.949564 -0.8183500 4.158576e-01 5.893500e-01 -6.241402
+Gene1 -0.19790915 8.152774 -0.6996247 4.864160e-01 5.893500e-01 -6.329777
+Gene6  0.18478829 7.286444  0.6532415 5.156813e-01 5.893500e-01 -6.360547
+Gene4 -0.08870715 6.657446 -0.3135869 7.547415e-01 7.547415e-01 -6.521578</code></pre>
+<p>The columns</p>
+<ul>
+<li><code>logFC</code>: log2 fold change (effect size from the
+contrast)</li>
+<li><code>AveExpr</code>: average expression level across all
+samples</li>
+<li><code>t</code>: moderated t-statistic</li>
+<li><code>P.Value</code>: p-value from moderated t-statistic</li>
+<li><code>adj.P.Val</code>: adjusted p-value (controls false discovery
+rate)</li>
+<li><code>B</code>: log-odds of differential expression</li>
+</ul>
+<p>limma can also be used for RNA-seq count data with the
+<strong>voom</strong> transformation.</p>
+</div>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<ol style="list-style-type: decimal">
+<li>Linear models represent relationships as: <span
+class="math inline">\(y = \mathbf{X}\boldsymbol{\beta} +
+\boldsymbol{\varepsilon}\)</span></li>
+<li>Design matrices (<span class="math inline">\(\mathbf{X}\)</span>)
+encode experimental structure</li>
+<li>Contrasts specify biological questions as linear combinations of
+parameters</li>
+<li>limma uses linear models with empirical Bayes for continuous gene
+expression data</li>
+</ol>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.3 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] limma_3.64.3    lubridate_1.9.4 forcats_1.0.0   stringr_1.5.1  
+ [5] dplyr_1.1.4     purrr_1.0.4     readr_2.1.5     tidyr_1.3.1    
+ [9] tibble_3.3.0    ggplot2_3.5.2   tidyverse_2.0.0 workflowr_1.7.1
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      hms_1.1.3         
+ [5] digest_0.6.37      magrittr_2.0.3     timechange_0.3.0   evaluate_1.0.3    
+ [9] grid_4.5.0         RColorBrewer_1.1-3 fastmap_1.2.0      rprojroot_2.0.4   
+[13] jsonlite_2.0.0     processx_3.8.6     whisker_0.4.1      ps_1.9.1          
+[17] promises_1.3.3     httr_1.4.7         scales_1.4.0       jquerylib_0.1.4   
+[21] cli_3.6.5          rlang_1.1.6        withr_3.0.2        cachem_1.1.0      
+[25] yaml_2.3.10        tools_4.5.0        tzdb_0.5.0         httpuv_1.6.16     
+[29] vctrs_0.6.5        R6_2.6.1           lifecycle_1.0.4    git2r_0.36.2      
+[33] fs_1.6.6           pkgconfig_2.0.3    callr_3.7.6        pillar_1.10.2     
+[37] bslib_0.9.0        later_1.4.2        gtable_0.3.6       glue_1.8.0        
+[41] Rcpp_1.0.14        statmod_1.5.0      xfun_0.52          tidyselect_1.2.1  
+[45] rstudioapi_0.17.1  knitr_1.50         farver_2.1.2       htmltools_0.5.8.1 
+[49] rmarkdown_2.29     compiler_4.5.0     getPass_0.2-4     </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
