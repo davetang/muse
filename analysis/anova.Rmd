@@ -11,16 +11,293 @@ library(tidyverse)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+## Introduction
+
 ANOVA (Analysis of Variance) is a statistical test used to compare the **means** of three or more groups to see if at least one group is significantly different. If you have only two groups, a _t_-test is usually better because it is simpler and more powerful for two-group comparisons. However, the _t_-test can only compare two groups at a time. ANOVA checks for overall differences among all groups.
 
-If gene expression is measured across different conditions (e.g., Control, Treatment A, Treatment B), ANOVA tests whether the **average expression levels** differ significantly across these conditions.  
+If gene expression is measured across different conditions (e.g., Control, Treatment A, Treatment B), ANOVA tests whether the **average expression levels** differ significantly across these conditions.
 
 In scRNA-seq, ANOVA can be useful when analysing gene expression differences across multiple conditions or cell types. If we have three conditions (Control, A, and B) we can use ANOVA to check whether a gene's expression significantly changes across the conditions. Note that the ANOVA test will indicate that there's a difference, but not which groups are different (a post-hoc test like Tukey's HSD can be used). Tukey's HSD (Honestly Significant Difference) test can be used to determine which specific groups are significantly different from each other. It compares all possible group pairs and controls for multiple testing.
+
+## The Mathematics Behind ANOVA
+
+### What is Sum of Squares?
+
+**Sum of Squares (SS)** measures the total amount of variation in data. It is calculated by summing the squared differences between each observation and a reference point (usually a mean). We square the differences so that positive and negative deviations don't cancel out.
+
+$$SS = \sum(x_i - \bar{x})^2$$
+
+The key insight of ANOVA is that we can **partition** the total variation into meaningful components:
+
+$$SS_{total} = SS_{between} + SS_{within}$$
+
+This partitioning allows us to ask: "How much of the total variation is due to differences *between* groups versus variation *within* groups?"
+
+### Understanding Between-group and Within-group Variance
+
+```{r ss_visualisation, echo=FALSE, fig.height=6, fig.width=10}
+# Create example data to visualise the concepts
+set.seed(42)
+example_data <- data.frame(
+  value = c(rnorm(8, mean = 20, sd = 2),
+            rnorm(8, mean = 30, sd = 2),
+            rnorm(8, mean = 40, sd = 2)),
+  group = factor(rep(c("A", "B", "C"), each = 8))
+)
+
+grand_mean <- mean(example_data$value)
+group_means <- tapply(example_data$value, example_data$group, mean)
+
+par(mfrow = c(1, 3))
+
+# Plot 1: Total variation
+plot(1:24, example_data$value, pch = 19, col = rep(c("red", "blue", "green"), each = 8),
+     xlab = "Observation", ylab = "Value", main = "Total Variation (SS_total)",
+     ylim = c(10, 50))
+abline(h = grand_mean, lty = 2, lwd = 2)
+text(12, grand_mean + 2, paste("Grand Mean =", round(grand_mean, 1)), cex = 0.9)
+for(i in 1:24) {
+  segments(i, example_data$value[i], i, grand_mean, col = "gray", lty = 3)
+}
+legend("topleft", legend = c("Group A", "Group B", "Group C"),
+       pch = 19, col = c("red", "blue", "green"), cex = 0.8)
+
+# Plot 2: Between-group variation
+plot(1:24, example_data$value, pch = 19, col = rep(c("red", "blue", "green"), each = 8),
+     xlab = "Observation", ylab = "Value", main = "Between-group Variation (SS_between)",
+     ylim = c(10, 50))
+abline(h = grand_mean, lty = 2, lwd = 2)
+abline(h = group_means["A"], col = "red", lwd = 2)
+abline(h = group_means["B"], col = "blue", lwd = 2)
+abline(h = group_means["C"], col = "green", lwd = 2)
+# Show distance from group means to grand mean
+arrows(2, grand_mean, 2, group_means["A"], col = "red", lwd = 2, length = 0.1, code = 3)
+arrows(12, grand_mean, 12, group_means["B"], col = "blue", lwd = 2, length = 0.1, code = 3)
+arrows(22, grand_mean, 22, group_means["C"], col = "green", lwd = 2, length = 0.1, code = 3)
+
+# Plot 3: Within-group variation
+plot(1:24, example_data$value, pch = 19, col = rep(c("red", "blue", "green"), each = 8),
+     xlab = "Observation", ylab = "Value", main = "Within-group Variation (SS_within)",
+     ylim = c(10, 50))
+abline(h = group_means["A"], col = "red", lwd = 2)
+abline(h = group_means["B"], col = "blue", lwd = 2)
+abline(h = group_means["C"], col = "green", lwd = 2)
+for(i in 1:8) {
+  segments(i, example_data$value[i], i, group_means["A"], col = "red", lty = 3)
+}
+for(i in 9:16) {
+  segments(i, example_data$value[i], i, group_means["B"], col = "blue", lty = 3)
+}
+for(i in 17:24) {
+  segments(i, example_data$value[i], i, group_means["C"], col = "green", lty = 3)
+}
+
+par(mfrow = c(1, 1))
+```
+
+#### Between-group Variance ($SS_{between}$)
+
+**Between-group variance** measures how much the group means differ from the overall (grand) mean. It answers: *"How spread out are the group averages?"*
+
+- If all groups have similar means → $SS_{between}$ is **small**
+- If group means are very different → $SS_{between}$ is **large**
+
+This is the variation we are interested in - it represents the effect of our experimental factor (e.g., treatment).
+
+#### Within-group Variance ($SS_{within}$)
+
+**Within-group variance** measures how much individual observations vary around their own group mean. It answers: *"How spread out are observations within each group?"*
+
+- This represents **random variation** or **measurement error**
+- Also called "residual" or "error" variance
+- It's the baseline noise we compare our signal against
+
+#### The Key Intuition
+
+ANOVA compares these two sources of variation:
+
+- **If $SS_{between}$ >> $SS_{within}$**: The differences between groups are much larger than the random variation within groups → groups are likely truly different
+- **If $SS_{between}$ ≈ $SS_{within}$**: The differences between groups are similar to random variation → groups may not be truly different
+
+```{r intuition_example, echo=FALSE, fig.height=4, fig.width=10}
+set.seed(123)
+par(mfrow = c(1, 2))
+
+# High between, low within (significant)
+high_between <- data.frame(
+  value = c(rnorm(15, 20, 2), rnorm(15, 35, 2), rnorm(15, 50, 2)),
+  group = factor(rep(c("A", "B", "C"), each = 15))
+)
+boxplot(value ~ group, data = high_between, col = c("lightcoral", "lightblue", "lightgreen"),
+        main = "Large SS_between, Small SS_within\n(Groups clearly different)",
+        ylab = "Value")
+
+# Low between, high within (not significant)
+low_between <- data.frame(
+  value = c(rnorm(15, 30, 12), rnorm(15, 33, 12), rnorm(15, 36, 12)),
+  group = factor(rep(c("A", "B", "C"), each = 15))
+)
+boxplot(value ~ group, data = low_between, col = c("lightcoral", "lightblue", "lightgreen"),
+        main = "Small SS_between, Large SS_within\n(Groups overlap substantially)",
+        ylab = "Value")
+
+par(mfrow = c(1, 1))
+```
+
+### The Formulas
+
+Now that we understand the concepts, here are the formal definitions:
+
+**Total Sum of Squares** - deviation of each observation from the grand mean:
+$$SS_{total} = \sum_{i=1}^{k}\sum_{j=1}^{n_i}(x_{ij} - \bar{x}_{grand})^2$$
+
+**Between-group Sum of Squares** - deviation of group means from the grand mean (weighted by group size):
+$$SS_{between} = \sum_{i=1}^{k}n_i(\bar{x}_i - \bar{x}_{grand})^2$$
+
+**Within-group Sum of Squares** - deviation of observations from their group mean:
+$$SS_{within} = \sum_{i=1}^{k}\sum_{j=1}^{n_i}(x_{ij} - \bar{x}_i)^2$$
+
+Where:
+
+* $k$ = number of groups
+* $n_i$ = sample size of group $i$
+* $x_{ij}$ = observation $j$ in group $i$
+* $\bar{x}_i$ = mean of group $i$
+* $\bar{x}_{grand}$ = grand mean (mean of all observations)
+
+### The F-statistic
+
+The F-statistic is calculated as the ratio of between-group variance to within-group variance:
+
+$$F = \frac{MS_{between}}{MS_{within}} = \frac{SS_{between}/df_{between}}{SS_{within}/df_{within}}$$
+
+Where:
+
+* $df_{between} = k - 1$ (number of groups minus 1)
+* $df_{within} = N - k$ (total observations minus number of groups)
+* $MS$ = Mean Square (sum of squares divided by degrees of freedom)
+
+A large F-statistic indicates that the between-group variance is larger than expected by chance, suggesting the group means differ.
+
+### Manual Calculation Example
+
+Let's calculate ANOVA by hand to understand the mechanics:
+
+```{r manual_anova}
+# Three groups with 5 observations each
+group_a <- c(23, 25, 27, 22, 24)
+group_b <- c(30, 32, 28, 31, 29)
+group_c <- c(35, 38, 36, 34, 37)
+
+# Combine data
+all_data <- c(group_a, group_b, group_c)
+groups <- factor(rep(c("A", "B", "C"), each = 5))
+
+# Calculate means
+grand_mean <- mean(all_data)
+group_means <- c(mean(group_a), mean(group_b), mean(group_c))
+n_per_group <- 5
+k <- 3  # number of groups
+N <- length(all_data)
+
+cat("Grand mean:", grand_mean, "\n")
+cat("Group means:", group_means, "\n")
+
+# Calculate Sum of Squares
+ss_between <- sum(n_per_group * (group_means - grand_mean)^2)
+ss_within <- sum((group_a - group_means[1])^2) +
+             sum((group_b - group_means[2])^2) +
+             sum((group_c - group_means[3])^2)
+ss_total <- sum((all_data - grand_mean)^2)
+
+cat("\nSum of Squares:\n")
+cat("SS_between:", ss_between, "\n")
+cat("SS_within:", ss_within, "\n")
+cat("SS_total:", ss_total, "\n")
+cat("SS_between + SS_within =", ss_between + ss_within, "(should equal SS_total)\n")
+
+# Calculate degrees of freedom
+df_between <- k - 1
+df_within <- N - k
+
+# Calculate Mean Squares
+ms_between <- ss_between / df_between
+ms_within <- ss_within / df_within
+
+cat("\nMean Squares:\n")
+cat("MS_between:", ms_between, "\n")
+cat("MS_within:", ms_within, "\n")
+
+# Calculate F-statistic
+f_stat <- ms_between / ms_within
+p_value <- pf(f_stat, df_between, df_within, lower.tail = FALSE)
+
+cat("\nF-statistic:", f_stat, "\n")
+cat("p-value:", p_value, "\n")
+```
+
+Verify with R's `aov()` function:
+
+```{r verify_manual}
+df <- data.frame(value = all_data, group = groups)
+anova_result <- aov(value ~ group, data = df)
+summary(anova_result)
+```
+
+## Assumptions of ANOVA
+
+ANOVA has several assumptions that should be checked:
+
+### 1. Independence of observations
+
+Observations should be independent of each other. This is a study design issue.
+
+### 2. Normality
+
+The residuals should be approximately normally distributed. Check with:
+
+```{r normality_check}
+# Using the manual example data
+shapiro.test(residuals(anova_result))
+
+# Q-Q plot
+par(mfrow = c(1, 2))
+plot(anova_result, which = 2)
+hist(residuals(anova_result), main = "Histogram of Residuals",
+     xlab = "Residuals", col = "lightblue")
+par(mfrow = c(1, 1))
+```
+
+### 3. Homogeneity of Variances (Homoscedasticity)
+
+The variance should be approximately equal across groups. Check with Levene's test or Bartlett's test:
+
+```{r homogeneity_check}
+# Bartlett's test (sensitive to non-normality)
+bartlett.test(value ~ group, data = df)
+
+# Visual check
+boxplot(value ~ group, data = df, main = "Variance by Group",
+        col = c("lightblue", "lightgreen", "lightyellow"))
+```
+
+### What if Assumptions are Violated?
+
+| Violation | Solution |
+|-----------|----------|
+| Non-normality | Use Kruskal-Wallis test (non-parametric) |
+| Unequal variances | Use Welch's ANOVA |
+| Both | Use Kruskal-Wallis test |
+
+```{r welch_anova}
+# Welch's ANOVA (doesn't assume equal variances)
+oneway.test(value ~ group, data = df, var.equal = FALSE)
+```
 
 
 ## One-way ANOVA for Gene Expression
 
-Simple example.
+One-way ANOVA tests for differences in means across groups defined by a single factor.
 
 ```{r simple_example}
 gene_expr <- data.frame(
@@ -29,16 +306,372 @@ gene_expr <- data.frame(
 )
 
 ggplot(gene_expr, aes(Condition, Expression)) +
-  geom_boxplot() +
-  theme_minimal()
+  geom_boxplot(fill = "lightblue") +
+  geom_jitter(width = 0.1, alpha = 0.7) +
+  theme_minimal() +
+  labs(title = "Gene Expression by Condition")
 
 anova_result <- aov(Expression ~ Condition, data = gene_expr)
 summary(anova_result)
 ```
 
-Tukey's HSD.
+### Understanding the ANOVA Table
+
+| Column | Meaning |
+|--------|---------|
+| **Df** | Degrees of freedom |
+| **Sum Sq** | Sum of Squares |
+| **Mean Sq** | Mean Square (Sum Sq / Df) |
+| **F value** | F-statistic (ratio of Mean Sq) |
+| **Pr(>F)** | p-value |
+
+In this example:
+
+* The F-value is large (50.17)
+* The p-value is very small (0.00178)
+* Conclusion: There is a statistically significant difference in gene expression between at least two conditions
+
+## Post-hoc Tests
+
+ANOVA tells us that groups differ, but not which groups. Post-hoc tests identify specific differences.
+
+### Tukey's HSD (Honestly Significant Difference)
+
+Tukey's HSD compares all pairs of groups while controlling for multiple testing:
 
 ```{r tukeys_hsd}
 tukey_result <- TukeyHSD(anova_result)
 tukey_result
 ```
+
+Interpretation:
+
+* `diff` = difference between group means
+* `lwr` and `upr` = 95% confidence interval for the difference
+* `p adj` = adjusted p-value
+
+If the confidence interval doesn't include 0, the difference is significant.
+
+```{r tukey_plot}
+plot(tukey_result, las = 1, col = "blue")
+```
+
+### Other Post-hoc Tests
+
+```{r pairwise_t}
+# Pairwise t-tests with Bonferroni correction
+pairwise.t.test(gene_expr$Expression, gene_expr$Condition, p.adjust.method = "bonferroni")
+
+# Pairwise t-tests with Holm correction (less conservative)
+pairwise.t.test(gene_expr$Expression, gene_expr$Condition, p.adjust.method = "holm")
+```
+
+## Effect Size
+
+Statistical significance doesn't tell us about practical importance. Effect size measures help:
+
+### Eta-squared ($\eta^2$)
+
+Eta-squared represents the proportion of variance explained by the factor:
+
+$$\eta^2 = \frac{SS_{between}}{SS_{total}}$$
+
+```{r eta_squared}
+# Extract sum of squares from ANOVA
+ss <- summary(anova_result)[[1]]$`Sum Sq`
+ss_between <- ss[1]
+ss_total <- sum(ss)
+
+eta_squared <- ss_between / ss_total
+cat("Eta-squared:", round(eta_squared, 3), "\n")
+```
+
+### Omega-squared ($\omega^2$)
+
+Omega-squared is a less biased estimate:
+
+$$\omega^2 = \frac{SS_{between} - df_{between} \times MS_{within}}{SS_{total} + MS_{within}}$$
+
+```{r omega_squared}
+ms_within <- ss[2] / summary(anova_result)[[1]]$Df[2]
+df_between <- summary(anova_result)[[1]]$Df[1]
+
+omega_squared <- (ss_between - df_between * ms_within) / (ss_total + ms_within)
+cat("Omega-squared:", round(omega_squared, 3), "\n")
+```
+
+### Interpretation Guidelines
+
+| Effect Size | $\eta^2$ / $\omega^2$ |
+|-------------|----------------------|
+| Small | 0.01 |
+| Medium | 0.06 |
+| Large | 0.14 |
+
+## Two-way ANOVA
+
+Two-way ANOVA examines the effect of two factors and their interaction.
+
+```{r two_way_data}
+# Simulated experiment: Drug effect across different cell types
+set.seed(42)
+two_way_data <- expand.grid(
+  Drug = c("Placebo", "Drug_A", "Drug_B"),
+  CellType = c("Type1", "Type2"),
+  Replicate = 1:5
+)
+
+# Simulate expression values with main effects and interaction
+two_way_data$Expression <- with(two_way_data, {
+  base <- 10
+  drug_effect <- ifelse(Drug == "Placebo", 0,
+                        ifelse(Drug == "Drug_A", 3, 5))
+  cell_effect <- ifelse(CellType == "Type1", 0, 2)
+  # Interaction: Drug_B works better in Type2 cells
+  interaction <- ifelse(Drug == "Drug_B" & CellType == "Type2", 3, 0)
+  base + drug_effect + cell_effect + interaction + rnorm(nrow(two_way_data), 0, 1)
+})
+
+head(two_way_data)
+```
+
+```{r two_way_visualise}
+ggplot(two_way_data, aes(Drug, Expression, fill = CellType)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Two-way ANOVA: Drug Effect by Cell Type")
+```
+
+### Running Two-way ANOVA
+
+```{r two_way_anova}
+# Two-way ANOVA with interaction
+two_way_result <- aov(Expression ~ Drug * CellType, data = two_way_data)
+summary(two_way_result)
+```
+
+Interpretation:
+
+* **Drug**: Main effect of drug treatment
+* **CellType**: Main effect of cell type
+* **Drug:CellType**: Interaction effect (does the drug effect depend on cell type?)
+
+A significant interaction means the effect of one factor depends on the level of the other factor.
+
+### Interaction Plot
+
+```{r interaction_plot}
+# Calculate means for interaction plot
+interaction_means <- two_way_data %>%
+  group_by(Drug, CellType) %>%
+  summarise(Mean = mean(Expression), .groups = "drop")
+
+ggplot(interaction_means, aes(Drug, Mean, color = CellType, group = CellType)) +
+  geom_point(size = 3) +
+  geom_line(linewidth = 1) +
+  theme_minimal() +
+  labs(title = "Interaction Plot", y = "Mean Expression")
+```
+
+Non-parallel lines suggest an interaction. Here, Drug_B shows a stronger effect in Type2 cells.
+
+### Post-hoc for Two-way ANOVA
+
+```{r two_way_posthoc}
+TukeyHSD(two_way_result, which = "Drug")
+```
+
+## Repeated Measures ANOVA
+
+When the same subjects are measured multiple times (e.g., before and after treatment), use repeated measures ANOVA.
+
+```{r repeated_measures}
+# Simulated longitudinal data
+set.seed(123)
+n_subjects <- 10
+repeated_data <- data.frame(
+  Subject = factor(rep(1:n_subjects, 3)),
+  Time = factor(rep(c("Baseline", "Week1", "Week2"), each = n_subjects)),
+  Expression = c(
+    rnorm(n_subjects, 10, 2),           # Baseline
+    rnorm(n_subjects, 12, 2),           # Week 1 (slight increase)
+    rnorm(n_subjects, 15, 2)            # Week 2 (larger increase)
+  )
+)
+
+# Add subject-specific variation
+subject_effect <- rep(rnorm(n_subjects, 0, 3), 3)
+repeated_data$Expression <- repeated_data$Expression + subject_effect
+
+head(repeated_data)
+```
+
+```{r repeated_plot}
+ggplot(repeated_data, aes(Time, Expression, group = Subject)) +
+  geom_line(alpha = 0.5) +
+  geom_point() +
+  stat_summary(aes(group = 1), fun = mean, geom = "line",
+               color = "red", linewidth = 2) +
+  stat_summary(aes(group = 1), fun = mean, geom = "point",
+               color = "red", size = 3) +
+  theme_minimal() +
+  labs(title = "Repeated Measures: Expression Over Time",
+       subtitle = "Red line shows group mean")
+```
+
+```{r repeated_anova}
+# Repeated measures ANOVA (using Error term for subject)
+repeated_result <- aov(Expression ~ Time + Error(Subject/Time), data = repeated_data)
+summary(repeated_result)
+```
+
+## Non-parametric Alternative: Kruskal-Wallis Test
+
+When ANOVA assumptions are violated, use the Kruskal-Wallis test:
+
+```{r kruskal_wallis}
+# Using the gene expression data
+kruskal.test(Expression ~ Condition, data = gene_expr)
+```
+
+Post-hoc for Kruskal-Wallis using Dunn's test:
+
+```{r dunn_test, message=FALSE}
+# Pairwise Wilcoxon tests with correction
+pairwise.wilcox.test(gene_expr$Expression, gene_expr$Condition,
+                     p.adjust.method = "BH")
+```
+
+## Example: PlantGrowth Dataset
+
+R's built-in `PlantGrowth` dataset provides a good example:
+
+```{r plantgrowth}
+data(PlantGrowth)
+str(PlantGrowth)
+
+# Visualise
+ggplot(PlantGrowth, aes(group, weight, fill = group)) +
+  geom_boxplot() +
+  geom_jitter(width = 0.1, alpha = 0.5) +
+  theme_minimal() +
+  labs(title = "Plant Growth by Treatment Group",
+       x = "Treatment", y = "Dried Weight")
+```
+
+```{r plantgrowth_anova}
+# ANOVA
+plant_aov <- aov(weight ~ group, data = PlantGrowth)
+summary(plant_aov)
+
+# Effect size
+plant_ss <- summary(plant_aov)[[1]]$`Sum Sq`
+cat("\nEta-squared:", round(plant_ss[1] / sum(plant_ss), 3), "\n")
+
+# Post-hoc
+TukeyHSD(plant_aov)
+```
+
+## Example: Simulating Different Scenarios
+
+### Scenario 1: No Difference Between Groups
+
+```{r no_difference}
+set.seed(1)
+no_diff <- data.frame(
+  value = rnorm(30, mean = 50, sd = 10),
+  group = factor(rep(c("A", "B", "C"), each = 10))
+)
+
+ggplot(no_diff, aes(group, value)) +
+  geom_boxplot(fill = "lightgray") +
+  theme_minimal() +
+  labs(title = "No Difference Between Groups")
+
+summary(aov(value ~ group, data = no_diff))
+```
+
+### Scenario 2: One Group Different
+
+```{r one_different}
+set.seed(2)
+one_diff <- data.frame(
+  value = c(rnorm(10, 50, 5), rnorm(10, 50, 5), rnorm(10, 65, 5)),
+  group = factor(rep(c("A", "B", "C"), each = 10))
+)
+
+ggplot(one_diff, aes(group, value)) +
+  geom_boxplot(fill = "lightblue") +
+  theme_minimal() +
+  labs(title = "Group C Different from A and B")
+
+summary(aov(value ~ group, data = one_diff))
+TukeyHSD(aov(value ~ group, data = one_diff))
+```
+
+### Scenario 3: All Groups Different
+
+```{r all_different}
+set.seed(3)
+all_diff <- data.frame(
+  value = c(rnorm(10, 40, 3), rnorm(10, 50, 3), rnorm(10, 60, 3)),
+  group = factor(rep(c("A", "B", "C"), each = 10))
+)
+
+ggplot(all_diff, aes(group, value)) +
+  geom_boxplot(fill = "lightgreen") +
+  theme_minimal() +
+  labs(title = "All Groups Different")
+
+summary(aov(value ~ group, data = all_diff))
+TukeyHSD(aov(value ~ group, data = all_diff))
+```
+
+## ANOVA vs. Linear Regression
+
+ANOVA and linear regression are mathematically equivalent for comparing group means:
+
+```{r anova_vs_lm}
+# Using PlantGrowth data
+# ANOVA approach
+aov_result <- aov(weight ~ group, data = PlantGrowth)
+
+# Linear regression approach
+lm_result <- lm(weight ~ group, data = PlantGrowth)
+
+# Compare F-statistics
+cat("ANOVA F-statistic:\n")
+summary(aov_result)
+
+cat("\nLinear Model F-statistic:\n")
+summary(lm_result)
+
+# The anova() function on lm gives same result
+anova(lm_result)
+```
+
+## Summary
+
+Key points about ANOVA:
+
+1. **Purpose**: Compare means across 3+ groups
+2. **Null hypothesis**: All group means are equal
+3. **F-statistic**: Ratio of between-group to within-group variance
+4. **Assumptions**: Independence, normality, homogeneity of variances
+5. **Post-hoc tests**: Required to identify which groups differ
+6. **Effect size**: Report $\eta^2$ or $\omega^2$ alongside p-values
+
+### Quick Reference
+
+| Situation | Test |
+|-----------|------|
+| Compare 2 groups | t-test |
+| Compare 3+ groups, 1 factor | One-way ANOVA |
+| Compare groups, 2 factors | Two-way ANOVA |
+| Same subjects measured repeatedly | Repeated measures ANOVA |
+| Assumptions violated | Kruskal-Wallis test |
+| Unequal variances | Welch's ANOVA |
+
+### Reporting ANOVA Results
+
+Example: "A one-way ANOVA revealed a statistically significant difference in gene expression between conditions, F(2, 6) = 50.17, p = 0.002, $\eta^2$ = 0.94. Post-hoc Tukey HSD tests showed that treated2 had significantly higher expression than control (p = 0.002) and treated1 (p = 0.047)."
