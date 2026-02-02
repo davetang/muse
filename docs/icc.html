@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2026-01-15" />
+<meta name="date" content="2026-02-02" />
 
 <title>Intraclass correlation coefficient</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Intraclass correlation coefficient</h1>
-<h4 class="date">2026-01-15</h4>
+<h4 class="date">2026-02-02</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-01-15
+<strong>Last updated:</strong> 2026-02-02
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree45cd414189017c5799f6b63478f30d521965663atargetblank45cd414a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3df3f26e7905acbbabebaff00cb64cde03c46386targetblank3df3f26a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/45cd414189017c5799f6b63478f30d521965663a" target="_blank">45cd414</a>
+<a href="https://github.com/davetang/muse/tree/3df3f26e7905acbbabebaff00cb64cde03c46386" target="_blank">3df3f26</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree45cd414189017c5799f6b63478f30d521965663atargetblank45cd414a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3df3f26e7905acbbabebaff00cb64cde03c46386targetblank3df3f26a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/45cd414189017c5799f6b63478f30d521965663a" target="_blank">45cd414</a>.
+<a href="https://github.com/davetang/muse/tree/3df3f26e7905acbbabebaff00cb64cde03c46386" target="_blank">3df3f26</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -590,8 +590,11 @@ Ignored files:
     Ignored:    r_packages_4.5.0/
 
 Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
     Untracked:  analysis/bioc.Rmd
     Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
     Untracked:  analysis/likelihood.Rmd
     Untracked:  bpcells_matrix/
     Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
@@ -605,6 +608,7 @@ Untracked files:
 
 Unstaged changes:
     Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
 
 </code></pre>
 <p>
@@ -648,6 +652,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/3df3f26e7905acbbabebaff00cb64cde03c46386/analysis/icc.Rmd" target="_blank">3df3f26</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-02-02
+</td>
+<td>
+More comprehensive guide
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/919a3e658e609ed3129c3020c085855a01f1fd64/docs/icc.html" target="_blank">919a3e6</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-15
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -754,45 +792,111 @@ rather than data structured as paired observations.</p>
 </blockquote>
 <p>For categorical data use <a href="rater.html">Cohen’s or Fleiss’
 Kappa</a>.</p>
+<p>The Intraclass Correlation Coefficient (ICC) measures the
+<strong>reliability</strong> or <strong>consistency</strong> of
+measurements made by different observers, instruments, or different
+methods. The method aims to provide an indication of “how much of the
+variation observed is due to true differences between samples versus
+random noise/measurement error?”</p>
+<p>For example, if we used three different scales to weigh an item:</p>
+<ul>
+<li>A high ICC (close to 1) would indicate that the three scales give
+you nearly the same weight, i.e., the scales are reliable, most
+variation is due to actual size differences.</li>
+<li>A low ICC (close to 0) would indicate that the three scales gave
+very different readings for the same item, i.e., the scales are
+unreliable and most variation is measurement error.</li>
+</ul>
 </div>
-<div id="setup" class="section level2">
-<h2>Setup</h2>
-<p>Install {irr}.</p>
-<pre class="r"><code>install.packages(&quot;irr&quot;)</code></pre>
-</div>
-<div id="example" class="section level2">
-<h2>Example</h2>
-<p>The data <code>anxiety</code> contains anxiety ratings by different
-raters:</p>
-<blockquote>
-<p>The data frame contains the anxiety ratings of 20 subjects, rated by
-3 raters. Values are ranging from 1 (not anxious at all) to 6 (extremely
-anxious).</p>
-</blockquote>
-<pre class="r"><code>data(anxiety)
-head(anxiety)</code></pre>
+<div id="the-mathematics-behind-icc" class="section level2">
+<h2>The Mathematics Behind ICC</h2>
+<p>The ICC is fundamentally based on variance decomposition. The basic
+formula is:</p>
+<p><span class="math display">\[ICC =
+\frac{\sigma^2_{between}}{\sigma^2_{between} +
+\sigma^2_{within}}\]</span></p>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(\sigma^2_{between}\)</span> = variance
+between subjects (true variation)</li>
+<li><span class="math inline">\(\sigma^2_{within}\)</span> = variance
+within subjects (measurement error)</li>
+</ul>
+<p>This can be estimated using mean squares from an ANOVA:</p>
+<p><span class="math display">\[ICC = \frac{MS_{between} -
+MS_{within}}{MS_{between} + (k-1) \cdot MS_{within}}\]</span></p>
+<p>Where <span class="math inline">\(k\)</span> is the number of
+raters/measurements per subject.</p>
+<div id="manual-calculation-example" class="section level3">
+<h3>Manual Calculation Example</h3>
+<p>Let’s calculate ICC manually to understand the concept:</p>
+<pre class="r"><code># Three raters measuring 5 subjects
+ratings &lt;- data.frame(
+  rater1 = c(9, 6, 8, 7, 10),
+  rater2 = c(9, 7, 8, 7, 9),
+  rater3 = c(8, 6, 9, 8, 10)
+)
+ratings</code></pre>
 <pre><code>  rater1 rater2 rater3
-1      3      3      2
-2      3      6      1
-3      3      4      4
-4      4      6      4
-5      5      2      3
-6      5      4      2</code></pre>
-<p>Correlation of raters.</p>
-<pre class="r"><code>cor(anxiety)</code></pre>
-<pre><code>           rater1    rater2     rater3
-rater1 1.00000000 0.2997446 0.08324405
-rater2 0.29974464 1.0000000 0.28152874
-rater3 0.08324405 0.2815287 1.00000000</code></pre>
-<pre class="r"><code>pairs(anxiety, pch = 16)</code></pre>
-<p><img src="figure/icc.Rmd/cor_anxiety-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>The <code>icc()</code> function:</p>
+1      9      9      8
+2      6      7      6
+3      8      8      9
+4      7      7      8
+5     10      9     10</code></pre>
+<pre class="r"><code># Calculate using ANOVA
+# Reshape to long format for ANOVA
+ratings_long &lt;- data.frame(
+  subject = factor(rep(1:5, each = 3)),
+  rater = factor(rep(1:3, times = 5)),
+  score = c(t(as.matrix(ratings)))
+)
+
+# One-way ANOVA
+anova_result &lt;- aov(score ~ subject, data = ratings_long)
+summary(anova_result)</code></pre>
+<pre><code>            Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+subject      4 19.600   4.900    14.7 0.000342 ***
+Residuals   10  3.333   0.333                     
+---
+Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code># Extract mean squares
+ms_between &lt;- summary(anova_result)[[1]][&quot;subject&quot;, &quot;Mean Sq&quot;]
+ms_within &lt;- summary(anova_result)[[1]][&quot;Residuals&quot;, &quot;Mean Sq&quot;]
+k &lt;- 3  # number of raters
+
+# Calculate ICC(1,1)
+icc_manual &lt;- (ms_between - ms_within) / (ms_between + (k - 1) * ms_within)
+cat(&quot;Manual ICC(1,1):&quot;, round(icc_manual, 3), &quot;\n&quot;)</code></pre>
+<pre><code>Manual ICC(1,1): 0.82 </code></pre>
+<pre class="r"><code># Verify with irr package
+icc(ratings, model = &quot;oneway&quot;, unit = &quot;single&quot;)$value</code></pre>
+<pre><code>[1] 0.8203593</code></pre>
+</div>
+</div>
+<div id="r-package" class="section level2">
+<h2>R package</h2>
+<p>The <a
+href="https://cran.r-project.org/web/packages/irr/index.html">irr</a>
+package in R can be used to calculate various coefficients of Interrater
+Reliability and Agreement:</p>
+<blockquote>
+<p>Coefficients of Interrater Reliability and Agreement for
+quantitative, ordinal and nominal data: ICC, Finn-Coefficient,
+Robinson’s A, Kendall’s W, Cohen’s Kappa, …</p>
+</blockquote>
+<p>We will use {irr} to calculate the Intraclass Correlation
+Coefficient, so we will need to install the package.</p>
+<pre class="r"><code>install.packages(&quot;irr&quot;)</code></pre>
+<div id="icc" class="section level3">
+<h3>icc</h3>
+<p>Specificially, we will use the <code>icc()</code> function and from
+the documentation:</p>
 <blockquote>
 <p>Computes single score or average score ICCs as an index of interrater
 reliability of quantitative data. Additionally, F-test and confidence
 interval are computed.</p>
 </blockquote>
-<p>Takes:</p>
+<p>The input parameters include:</p>
 <ul>
 <li><code>ratings</code> - <span class="math inline">\(n \times
 m\)</span> matrix or dataframe, <span class="math inline">\(n\)</span>
@@ -809,7 +913,267 @@ specify just the initial letter.</li>
 analysis: Must be one of “single” (default) or “average”. You can
 specify just the initial letter.</li>
 </ul>
-<pre class="r"><code>icc(anxiety, model=&quot;twoway&quot;, type=&quot;agreement&quot;)</code></pre>
+</div>
+</div>
+<div id="practical-example-weighing-items" class="section level2">
+<h2>Practical Example: Weighing Items</h2>
+<p>Let’s create a concrete example where three scales are used to weigh
+10 items:</p>
+<pre class="r"><code>set.seed(1984)
+
+# True weights of 10 items (unknown in practice)
+true_weights &lt;- c(150, 200, 175, 225, 180, 195, 210, 165, 185, 205)
+
+# Scenario 1: Three well-calibrated scales (high ICC expected)
+scale1_good &lt;- true_weights + rnorm(10, mean = 0, sd = 2)
+scale2_good &lt;- true_weights + rnorm(10, mean = 0, sd = 2)
+scale3_good &lt;- true_weights + rnorm(10, mean = 0, sd = 2)
+
+good_scales &lt;- data.frame(
+  scale1 = scale1_good,
+  scale2 = scale2_good,
+  scale3 = scale3_good
+)
+
+cat(&quot;Good scales - ICC:\n&quot;)</code></pre>
+<pre><code>Good scales - ICC:</code></pre>
+<pre class="r"><code>icc(good_scales, model = &quot;twoway&quot;, type = &quot;agreement&quot;)</code></pre>
+<pre><code> Single Score Intraclass Correlation
+
+   Model: twoway 
+   Type : agreement 
+
+   Subjects = 10 
+     Raters = 3 
+   ICC(A,1) = 0.993
+
+ F-Test, H0: r0 = 0 ; H1: r0 &gt; 0 
+  F(9,18.6) = 369 , p = 4.42e-19 
+
+ 95%-Confidence Interval for ICC Population Values:
+  0.979 &lt; ICC &lt; 0.998</code></pre>
+<pre class="r"><code># Scenario 2: Three poorly calibrated scales (low ICC expected)
+scale1_bad &lt;- true_weights + rnorm(10, mean = 0, sd = 20)
+scale2_bad &lt;- true_weights + rnorm(10, mean = 5, sd = 25)
+scale3_bad &lt;- true_weights + rnorm(10, mean = -10, sd = 30)
+
+bad_scales &lt;- data.frame(
+  scale1 = scale1_bad,
+  scale2 = scale2_bad,
+  scale3 = scale3_bad
+)
+
+cat(&quot;\nBad scales - ICC:\n&quot;)</code></pre>
+<pre><code>
+Bad scales - ICC:</code></pre>
+<pre class="r"><code>icc(bad_scales, model = &quot;twoway&quot;, type = &quot;agreement&quot;)</code></pre>
+<pre><code> Single Score Intraclass Correlation
+
+   Model: twoway 
+   Type : agreement 
+
+   Subjects = 10 
+     Raters = 3 
+   ICC(A,1) = 0.211
+
+ F-Test, H0: r0 = 0 ; H1: r0 &gt; 0 
+  F(9,16.8) = 2.24 , p = 0.0737 
+
+ 95%-Confidence Interval for ICC Population Values:
+  -0.058 &lt; ICC &lt; 0.613</code></pre>
+<p>Visualise the difference:</p>
+<pre class="r"><code>par(mfrow = c(1, 2))
+
+# Good scales
+matplot(1:10, good_scales, type = &quot;b&quot;, pch = 1:3, col = 1:3,
+        xlab = &quot;Item&quot;, ylab = &quot;Weight (g)&quot;, main = &quot;Well-calibrated Scales\n(High ICC)&quot;)
+legend(&quot;topleft&quot;, legend = c(&quot;Scale 1&quot;, &quot;Scale 2&quot;, &quot;Scale 3&quot;),
+       pch = 1:3, col = 1:3, cex = 0.8)
+
+# Bad scales
+matplot(1:10, bad_scales, type = &quot;b&quot;, pch = 1:3, col = 1:3,
+        xlab = &quot;Item&quot;, ylab = &quot;Weight (g)&quot;, main = &quot;Poorly-calibrated Scales\n(Low ICC)&quot;)
+legend(&quot;topleft&quot;, legend = c(&quot;Scale 1&quot;, &quot;Scale 2&quot;, &quot;Scale 3&quot;),
+       pch = 1:3, col = 1:3, cex = 0.8)</code></pre>
+<p><img src="figure/icc.Rmd/visualise_scales-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>par(mfrow = c(1, 1))</code></pre>
+</div>
+<div id="icc-vs.-correlation" class="section level2">
+<h2>ICC vs. Correlation</h2>
+<p>ICC and Pearson correlation measure different things. Correlation
+measures the linear relationship between variables, while ICC measures
+agreement.</p>
+<pre class="r"><code># Example: High correlation but low ICC (systematic bias)
+set.seed(1984)
+rater1 &lt;- 1:20
+rater2 &lt;- rater1 + 10  # Same pattern but shifted by 10
+
+biased_ratings &lt;- data.frame(rater1, rater2)
+
+cat(&quot;Pearson correlation:&quot;, cor(rater1, rater2), &quot;\n&quot;)</code></pre>
+<pre><code>Pearson correlation: 1 </code></pre>
+<pre class="r"><code>cat(&quot;ICC (agreement):&quot;, icc(biased_ratings, model = &quot;twoway&quot;, type = &quot;agreement&quot;)$value, &quot;\n&quot;)</code></pre>
+<pre><code>ICC (agreement): 0.4117647 </code></pre>
+<pre class="r"><code>cat(&quot;ICC (consistency):&quot;, icc(biased_ratings, model = &quot;twoway&quot;, type = &quot;consistency&quot;)$value, &quot;\n&quot;)</code></pre>
+<pre><code>ICC (consistency): 1 </code></pre>
+<p>The correlation is perfect (r = 1) because the raters follow the same
+pattern. However, the ICC for agreement is lower because the raters
+systematically differ by 10 units. The ICC for consistency is high
+because the raters are consistent in their relative rankings.</p>
+</div>
+<div id="key-differences-from-similarity-indices"
+class="section level2">
+<h2>Key Differences from Similarity Indices</h2>
+<table>
+<colgroup>
+<col width="16%" />
+<col width="75%" />
+<col width="8%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th>Similarity Indices (Horn-Morisita, etc.)</th>
+<th>ICC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Compares</strong></td>
+<td>Pairs of samples</td>
+<td>Groups of replicates</td>
+</tr>
+<tr class="even">
+<td><strong>Output</strong></td>
+<td>Matrix of all pairwise comparisons</td>
+<td>Single value (0-1)</td>
+</tr>
+<tr class="odd">
+<td><strong>Question</strong></td>
+<td>“How similar are A and B?”</td>
+<td>“How reliable/reproducible is my method?”</td>
+</tr>
+<tr class="even">
+<td><strong>Use case</strong></td>
+<td>Compare specific samples</td>
+<td>Assess overall reproducibility</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="types-of-icc" class="section level2">
+<h2>Types of ICC</h2>
+<p>There are <strong>six different ICC formulas</strong> depending on
+your study design, organised into three models with two variants
+each:</p>
+<div id="model-selection" class="section level3">
+<h3>Model Selection</h3>
+<table>
+<colgroup>
+<col width="21%" />
+<col width="39%" />
+<col width="39%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Model</th>
+<th>Description</th>
+<th>When to Use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>One-way random</strong></td>
+<td>Different raters for each subject</td>
+<td>Raters are randomly sampled from a larger population and each
+subject gets different raters</td>
+</tr>
+<tr class="even">
+<td><strong>Two-way random</strong></td>
+<td>Same raters for all subjects, raters are random sample</td>
+<td>Raters are a random sample from a population of raters</td>
+</tr>
+<tr class="odd">
+<td><strong>Two-way mixed</strong></td>
+<td>Same raters for all subjects, raters are fixed</td>
+<td>These specific raters are the only ones of interest</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="unit-selection" class="section level3">
+<h3>Unit Selection</h3>
+<table>
+<colgroup>
+<col width="20%" />
+<col width="34%" />
+<col width="44%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Unit</th>
+<th>Notation</th>
+<th>When to Use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Single</strong></td>
+<td>ICC(1,1), ICC(2,1), ICC(3,1)</td>
+<td>You want reliability of a single measurement</td>
+</tr>
+<tr class="even">
+<td><strong>Average</strong></td>
+<td>ICC(1,k), ICC(2,k), ICC(3,k)</td>
+<td>You will average multiple raters’ scores</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="choosing-the-right-icc" class="section level3">
+<h3>Choosing the Right ICC</h3>
+<pre class="r"><code># Same data, different ICC types
+data(anxiety)
+
+cat(&quot;ICC(1,1) - One-way, single:\n&quot;)</code></pre>
+<pre><code>ICC(1,1) - One-way, single:</code></pre>
+<pre class="r"><code>print(icc(anxiety, model = &quot;oneway&quot;, unit = &quot;single&quot;))</code></pre>
+<pre><code> Single Score Intraclass Correlation
+
+   Model: oneway 
+   Type : consistency 
+
+   Subjects = 20 
+     Raters = 3 
+     ICC(1) = 0.175
+
+ F-Test, H0: r0 = 0 ; H1: r0 &gt; 0 
+   F(19,40) = 1.64 , p = 0.0939 
+
+ 95%-Confidence Interval for ICC Population Values:
+  -0.077 &lt; ICC &lt; 0.484</code></pre>
+<pre class="r"><code>cat(&quot;\nICC(2,1) - Two-way random, single, consistency:\n&quot;)</code></pre>
+<pre><code>
+ICC(2,1) - Two-way random, single, consistency:</code></pre>
+<pre class="r"><code>print(icc(anxiety, model = &quot;twoway&quot;, type = &quot;consistency&quot;, unit = &quot;single&quot;))</code></pre>
+<pre><code> Single Score Intraclass Correlation
+
+   Model: twoway 
+   Type : consistency 
+
+   Subjects = 20 
+     Raters = 3 
+   ICC(C,1) = 0.216
+
+ F-Test, H0: r0 = 0 ; H1: r0 &gt; 0 
+   F(19,38) = 1.83 , p = 0.0562 
+
+ 95%-Confidence Interval for ICC Population Values:
+  -0.046 &lt; ICC &lt; 0.522</code></pre>
+<pre class="r"><code>cat(&quot;\nICC(2,1) - Two-way random, single, agreement:\n&quot;)</code></pre>
+<pre><code>
+ICC(2,1) - Two-way random, single, agreement:</code></pre>
+<pre class="r"><code>print(icc(anxiety, model = &quot;twoway&quot;, type = &quot;agreement&quot;, unit = &quot;single&quot;))</code></pre>
 <pre><code> Single Score Intraclass Correlation
 
    Model: twoway 
@@ -824,13 +1188,220 @@ specify just the initial letter.</li>
 
  95%-Confidence Interval for ICC Population Values:
   -0.039 &lt; ICC &lt; 0.494</code></pre>
-<p>Another example from the documentation; high consistency.</p>
+<pre class="r"><code>cat(&quot;\nICC(2,k) - Two-way random, average, agreement:\n&quot;)</code></pre>
+<pre><code>
+ICC(2,k) - Two-way random, average, agreement:</code></pre>
+<pre class="r"><code>print(icc(anxiety, model = &quot;twoway&quot;, type = &quot;agreement&quot;, unit = &quot;average&quot;))</code></pre>
+<pre><code> Average Score Intraclass Correlation
+
+   Model: twoway 
+   Type : agreement 
+
+   Subjects = 20 
+     Raters = 3 
+   ICC(A,3) = 0.425
+
+ F-Test, H0: r0 = 0 ; H1: r0 &gt; 0 
+ F(19,37.5) = 1.83 , p = 0.0568 
+
+ 95%-Confidence Interval for ICC Population Values:
+  -0.137 &lt; ICC &lt; 0.746</code></pre>
+<p><strong>General guidance:</strong></p>
+<ul>
+<li>If you have the <strong>same raters for all subjects</strong> (most
+common), use <strong>two-way</strong> model</li>
+<li>If you care about <strong>absolute agreement</strong> (same scores),
+use <strong>type = “agreement”</strong></li>
+<li>If you care about <strong>relative consistency</strong> (same
+ranking), use <strong>type = “consistency”</strong></li>
+<li>If your final measure will <strong>average multiple raters</strong>,
+use <strong>unit = “average”</strong></li>
+</ul>
+</div>
+</div>
+<div id="interpretation-guidelines" class="section level2">
+<h2>Interpretation Guidelines</h2>
+<p><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4913118/">Koo
+and Li (2016)</a> provide commonly cited guidelines:</p>
+<table>
+<thead>
+<tr class="header">
+<th>ICC Value</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>&lt; 0.50</td>
+<td>Poor reliability</td>
+</tr>
+<tr class="even">
+<td>0.50 - 0.75</td>
+<td>Moderate reliability</td>
+</tr>
+<tr class="odd">
+<td>0.75 - 0.90</td>
+<td>Good reliability</td>
+</tr>
+<tr class="even">
+<td>&gt; 0.90</td>
+<td>Excellent reliability</td>
+</tr>
+</tbody>
+</table>
+<p>Note that these are general guidelines. The acceptable ICC depends on
+your specific application. Clinical measurements typically require
+higher reliability (&gt;0.90) than exploratory research.</p>
+<div id="confidence-intervals-matter" class="section level3">
+<h3>Confidence Intervals Matter</h3>
+<p>Always report the confidence interval, not just the point
+estimate:</p>
+<pre class="r"><code>result &lt;- icc(anxiety, model = &quot;twoway&quot;, type = &quot;agreement&quot;)
+cat(&quot;ICC:&quot;, round(result$value, 3), &quot;\n&quot;)</code></pre>
+<pre><code>ICC: 0.198 </code></pre>
+<pre class="r"><code>cat(&quot;95% CI: [&quot;, round(result$lbound, 3), &quot;,&quot;, round(result$ubound, 3), &quot;]\n&quot;)</code></pre>
+<pre><code>95% CI: [ -0.039 , 0.494 ]</code></pre>
+<p>If the confidence interval is wide or crosses interpretation
+thresholds, interpret with caution.</p>
+</div>
+</div>
+<div id="when-to-use-icc-vs.-similarity-indices" class="section level2">
+<h2>When to Use ICC vs. Similarity Indices</h2>
+<p><strong>Use ICC when:</strong></p>
+<ul>
+<li>You want a single number summarising reproducibility</li>
+<li>You have multiple replicates per method</li>
+<li>You’re assessing quality control or measurement reliability</li>
+</ul>
+<p><strong>Use Similarity Indices when:</strong></p>
+<ul>
+<li>You want to know which specific pairs are similar</li>
+<li>You’re comparing different methods to each other</li>
+<li>You want detailed pairwise comparisons</li>
+</ul>
+</div>
+<div id="comparing-multiple-methods" class="section level2">
+<h2>Comparing Multiple Methods</h2>
+<p>ICC can be used to compare the reproducibility of different
+measurement methods:</p>
+<pre class="r"><code>set.seed(1984)
+
+# Simulate three measurement methods with different reliability
+n_subjects &lt;- 20
+n_raters &lt;- 3
+true_values &lt;- rnorm(n_subjects, mean = 50, sd = 10)
+
+# Method A: Highly reliable (small error)
+method_a &lt;- sapply(1:n_raters, function(x) true_values + rnorm(n_subjects, 0, 2))
+
+# Method B: Moderately reliable
+method_b &lt;- sapply(1:n_raters, function(x) true_values + rnorm(n_subjects, 0, 5))
+
+# Method C: Poorly reliable (large error)
+method_c &lt;- sapply(1:n_raters, function(x) true_values + rnorm(n_subjects, 0, 12))
+
+# Calculate ICC for each method
+results &lt;- data.frame(
+  Method = c(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;),
+  ICC = c(
+    icc(method_a, model = &quot;twoway&quot;, type = &quot;agreement&quot;)$value,
+    icc(method_b, model = &quot;twoway&quot;, type = &quot;agreement&quot;)$value,
+    icc(method_c, model = &quot;twoway&quot;, type = &quot;agreement&quot;)$value
+  ),
+  Interpretation = c(&quot;Excellent&quot;, &quot;Good&quot;, &quot;Poor&quot;)
+)
+results</code></pre>
+<pre><code>  Method       ICC Interpretation
+1      A 0.9768376      Excellent
+2      B 0.8667513           Good
+3      C 0.3894430           Poor</code></pre>
+<p>This comparison shows that Method A produces the most reproducible
+measurements.</p>
+</div>
+<div id="example-anxiety-ratings" class="section level2">
+<h2>Example: Anxiety Ratings</h2>
+<p>The <code>anxiety</code> dataset from the {irr} package contains
+anxiety ratings by different raters:</p>
+<blockquote>
+<p>The data frame contains the anxiety ratings of 20 subjects, rated by
+3 raters. Values are ranging from 1 (not anxious at all) to 6 (extremely
+anxious).</p>
+</blockquote>
+<pre class="r"><code>data(anxiety)
+head(anxiety)</code></pre>
+<pre><code>  rater1 rater2 rater3
+1      3      3      2
+2      3      6      1
+3      3      4      4
+4      4      6      4
+5      5      2      3
+6      5      4      2</code></pre>
+<pre class="r"><code>dim(anxiety)</code></pre>
+<pre><code>[1] 20  3</code></pre>
+<div id="exploring-rater-agreement" class="section level3">
+<h3>Exploring Rater Agreement</h3>
+<p>First, let’s examine the correlation between raters:</p>
+<pre class="r"><code>cor(anxiety)</code></pre>
+<pre><code>           rater1    rater2     rater3
+rater1 1.00000000 0.2997446 0.08324405
+rater2 0.29974464 1.0000000 0.28152874
+rater3 0.08324405 0.2815287 1.00000000</code></pre>
+<p>High correlations suggest raters rank subjects similarly, but
+correlation doesn’t tell us about absolute agreement.</p>
+<pre class="r"><code>pairs(anxiety, pch = 16, main = &quot;Pairwise Rater Comparisons&quot;)</code></pre>
+<p><img src="figure/icc.Rmd/pairs_anxiety-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="calculate-icc" class="section level3">
+<h3>Calculate ICC</h3>
+<pre class="r"><code>result &lt;- icc(anxiety, model = &quot;twoway&quot;, type = &quot;agreement&quot;)
+result</code></pre>
+<pre><code> Single Score Intraclass Correlation
+
+   Model: twoway 
+   Type : agreement 
+
+   Subjects = 20 
+     Raters = 3 
+   ICC(A,1) = 0.198
+
+ F-Test, H0: r0 = 0 ; H1: r0 &gt; 0 
+ F(19,39.7) = 1.83 , p = 0.0543 
+
+ 95%-Confidence Interval for ICC Population Values:
+  -0.039 &lt; ICC &lt; 0.494</code></pre>
+</div>
+<div id="understanding-the-output" class="section level3">
+<h3>Understanding the Output</h3>
+<p>The output provides several pieces of information:</p>
+<ul>
+<li><strong>subjects</strong>: Number of subjects being rated (20)</li>
+<li><strong>raters</strong>: Number of raters (3)</li>
+<li><strong>ICC type</strong>: The specific ICC formula used</li>
+<li><strong>value</strong>: The ICC estimate (0.198) - indicates poor
+agreement</li>
+<li><strong>F-test</strong>: Tests if ICC is significantly different
+from 0</li>
+<li><strong>p-value</strong>: Statistical significance of the
+F-test</li>
+<li><strong>lbound/ubound</strong>: 95% confidence interval for ICC</li>
+</ul>
+<p>In this example, the ICC of 0.198 indicates poor inter-rater
+reliability. The raters do not agree well on anxiety levels.</p>
+</div>
+</div>
+<div id="example-consistency-vs.-agreement" class="section level2">
+<h2>Example: Consistency vs. Agreement</h2>
+<p>This example demonstrates the difference between consistency and
+agreement. Three raters measure the same subjects, but each rater has a
+systematic bias (offset).</p>
 <pre class="r"><code>set.seed(1984)
 r1 &lt;- round(rnorm(20, 10, 4))
-r2 &lt;- round(r1 + 10 + rnorm(20, 0, 2))
-r3 &lt;- round(r1 + 20 + rnorm(20, 0, 2))
+r2 &lt;- round(r1 + 10 + rnorm(20, 0, 2))  # Same pattern, +10 offset
+r3 &lt;- round(r1 + 20 + rnorm(20, 0, 2))  # Same pattern, +20 offset
 
-boxplot(data.frame(r1 = r1, r2 = r2, r3 = r3))</code></pre>
+ratings_df &lt;- data.frame(r1 = r1, r2 = r2, r3 = r3)
+boxplot(ratings_df, main = &quot;Raters with Systematic Bias&quot;,
+        ylab = &quot;Rating&quot;, col = c(&quot;lightblue&quot;, &quot;lightgreen&quot;, &quot;lightyellow&quot;))</code></pre>
 <p><img src="figure/icc.Rmd/eg2_twoway-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-eg2_twoway-1">
@@ -869,7 +1440,9 @@ Dave Tang
 </table>
 </div>
 </div>
-<pre class="r"><code>icc(cbind(r1, r2, r3), &quot;twoway&quot;)</code></pre>
+<p><strong>High consistency</strong> - raters rank subjects the same
+way:</p>
+<pre class="r"><code>icc(ratings_df, model = &quot;twoway&quot;, type = &quot;consistency&quot;)</code></pre>
 <pre><code> Single Score Intraclass Correlation
 
    Model: twoway 
@@ -884,22 +1457,148 @@ Dave Tang
 
  95%-Confidence Interval for ICC Population Values:
   0.789 &lt; ICC &lt; 0.952</code></pre>
-<p>Low agreement.</p>
-<pre class="r_twoway_agreement"><code>icc(cbind(r1, r2, r3), &quot;twoway&quot;, &quot;agreement&quot;)</code></pre>
+<p><strong>Low agreement</strong> - raters give different absolute
+values:</p>
+<pre class="r"><code>icc(ratings_df, model = &quot;twoway&quot;, type = &quot;agreement&quot;)</code></pre>
+<pre><code> Single Score Intraclass Correlation
+
+   Model: twoway 
+   Type : agreement 
+
+   Subjects = 20 
+     Raters = 3 
+   ICC(A,1) = 0.151
+
+ F-Test, H0: r0 = 0 ; H1: r0 &gt; 0 
+ F(19,2.26) = 25.8 , p = 0.0272 
+
+ 95%-Confidence Interval for ICC Population Values:
+  -0.001 &lt; ICC &lt; 0.441</code></pre>
+<p>The ICC for consistency (0.898) is much higher than for agreement
+(0.043). This is because the raters are consistent in their relative
+rankings (high consistency) but give systematically different scores
+(low agreement).</p>
 </div>
-<div id="random" class="section level2">
-<h2>Random</h2>
-<p>What values would we expect from random ratings?</p>
+<div id="baseline-random-ratings" class="section level2">
+<h2>Baseline: Random Ratings</h2>
+<p>What values would we expect from completely random ratings (no true
+agreement)?</p>
 <pre class="r"><code>set.seed(1984)
-replicate(
-  n = 100,
+random_iccs &lt;- replicate(
+  n = 1000,
   expr = {
-    x &lt;- sample(x = 1:100, size = 100)
-    y &lt;- sample(x = 1:100, size = 100)
-    icc(cbind(x, y))$value
-  }) |&gt;
-  mean()</code></pre>
-<pre><code>[1] 0.005829892</code></pre>
+    x &lt;- sample(x = 1:100, size = 50)
+    y &lt;- sample(x = 1:100, size = 50)
+    icc(cbind(x, y), model = &quot;twoway&quot;, type = &quot;agreement&quot;)$value
+  }
+)
+
+cat(&quot;Mean ICC from random ratings:&quot;, round(mean(random_iccs), 4), &quot;\n&quot;)</code></pre>
+<pre><code>Mean ICC from random ratings: -0.0087 </code></pre>
+<pre class="r"><code>cat(&quot;SD:&quot;, round(sd(random_iccs), 4), &quot;\n&quot;)</code></pre>
+<pre><code>SD: 0.1483 </code></pre>
+<pre class="r"><code>cat(&quot;Range:&quot;, round(range(random_iccs), 4), &quot;\n&quot;)</code></pre>
+<pre><code>Range: -0.4532 0.4153 </code></pre>
+<pre class="r"><code>hist(random_iccs, breaks = 30, main = &quot;Distribution of ICC from Random Ratings&quot;,
+     xlab = &quot;ICC&quot;, col = &quot;lightgray&quot;, border = &quot;white&quot;)
+abline(v = 0, col = &quot;red&quot;, lwd = 2, lty = 2)</code></pre>
+<p><img src="figure/icc.Rmd/random_hist-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Random ratings produce ICC values centered around 0, as expected.
+Values slightly below or above 0 occur due to sampling variation.</p>
+</div>
+<div id="negative-icc-values" class="section level2">
+<h2>Negative ICC Values</h2>
+<p>ICC can be negative when within-group variance exceeds between-group
+variance. This can occur when:</p>
+<ol style="list-style-type: decimal">
+<li>Raters systematically disagree (one rates high when another rates
+low)</li>
+<li>Random chance with small sample sizes</li>
+<li>Data entry errors</li>
+</ol>
+<pre class="r"><code># Example: Raters who systematically disagree
+set.seed(1984)
+true_scores &lt;- 1:10
+rater_a &lt;- true_scores
+rater_b &lt;- 11 - true_scores  # Reversed ratings
+
+disagreeing_raters &lt;- data.frame(rater_a, rater_b)
+plot(rater_a, rater_b, pch = 16, main = &quot;Systematically Disagreeing Raters&quot;,
+     xlab = &quot;Rater A&quot;, ylab = &quot;Rater B&quot;)</code></pre>
+<p><img src="figure/icc.Rmd/negative_icc-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>icc(disagreeing_raters, model = &quot;twoway&quot;, type = &quot;agreement&quot;)</code></pre>
+<pre><code> Single Score Intraclass Correlation
+
+   Model: twoway 
+   Type : agreement 
+
+   Subjects = 10 
+     Raters = 2 
+   ICC(A,1) = -1.25
+
+ F-Test, H0: r0 = 0 ; H1: r0 &gt; 0 
+   F(9,NaN) = 0 , p = NaN 
+
+ 95%-Confidence Interval for ICC Population Values:
+  NaN &lt; ICC &lt; NaN</code></pre>
+<p>A negative ICC indicates a problem with the data or measurement
+process that should be investigated.</p>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>Key points about ICC:</p>
+<ol style="list-style-type: decimal">
+<li><strong>ICC measures reliability</strong> - how consistent are
+measurements across raters/methods</li>
+<li><strong>Choose the right model</strong> - one-way vs two-way depends
+on your study design</li>
+<li><strong>Agreement vs Consistency</strong> - agreement requires same
+absolute values; consistency requires same relative ranking</li>
+<li><strong>Report confidence intervals</strong> - point estimates alone
+can be misleading</li>
+<li><strong>Interpret in context</strong> - acceptable ICC depends on
+your application</li>
+<li><strong>Sample size matters</strong> - larger samples give more
+precise ICC estimates</li>
+</ol>
+<div id="quick-reference" class="section level3">
+<h3>Quick Reference</h3>
+<table>
+<colgroup>
+<col width="43%" />
+<col width="30%" />
+<col width="26%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Scenario</th>
+<th>Model</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Different raters for each subject</td>
+<td>oneway</td>
+<td>consistency</td>
+</tr>
+<tr class="even">
+<td>Same raters, care about exact values</td>
+<td>twoway</td>
+<td>agreement</td>
+</tr>
+<tr class="odd">
+<td>Same raters, care about ranking</td>
+<td>twoway</td>
+<td>consistency</td>
+</tr>
+<tr class="even">
+<td>Will average multiple measurements</td>
+<td>twoway</td>
+<td>agreement, unit=“average”</td>
+</tr>
+</tbody>
+</table>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -951,6 +1650,7 @@ loaded via a namespace (and not attached):
 [41] Rcpp_1.0.14        xfun_0.52          tidyselect_1.2.1   rstudioapi_0.17.1 
 [45] knitr_1.50         farver_2.1.2       htmltools_0.5.8.1  rmarkdown_2.29    
 [49] compiler_4.5.0     getPass_0.2-4     </code></pre>
+</div>
 </div>
 </div>
 </div>
