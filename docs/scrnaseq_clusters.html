@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2026-01-19" />
+<meta name="date" content="2026-02-02" />
 
 <title>scRNA-seq clusters</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">scRNA-seq clusters</h1>
-<h4 class="date">2026-01-19</h4>
+<h4 class="date">2026-02-02</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-01-19
+<strong>Last updated:</strong> 2026-02-02
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6eb5b10d71051e435dd8b8b830d6e8cc628cbe8ftargetblank6eb5b10a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed6c0747ddb6250ea109252f4818174572059e808targetblankd6c0747a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/6eb5b10d71051e435dd8b8b830d6e8cc628cbe8f" target="_blank">6eb5b10</a>
+<a href="https://github.com/davetang/muse/tree/d6c0747ddb6250ea109252f4818174572059e808" target="_blank">d6c0747</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6eb5b10d71051e435dd8b8b830d6e8cc628cbe8ftargetblank6eb5b10a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed6c0747ddb6250ea109252f4818174572059e808targetblankd6c0747a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/6eb5b10d71051e435dd8b8b830d6e8cc628cbe8f" target="_blank">6eb5b10</a>.
+<a href="https://github.com/davetang/muse/tree/d6c0747ddb6250ea109252f4818174572059e808" target="_blank">d6c0747</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -590,8 +590,11 @@ Ignored files:
     Ignored:    r_packages_4.5.0/
 
 Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
     Untracked:  analysis/bioc.Rmd
     Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
     Untracked:  analysis/likelihood.Rmd
     Untracked:  bpcells_matrix/
     Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
@@ -604,8 +607,8 @@ Untracked files:
     Untracked:  women.json
 
 Unstaged changes:
-    Modified:   analysis/icc.Rmd
     Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
 
 </code></pre>
 <p>
@@ -650,6 +653,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/d6c0747ddb6250ea109252f4818174572059e808/analysis/scrnaseq_clusters.Rmd" target="_blank">d6c0747</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-02-02
+</td>
+<td>
+Correlation between metrics
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/716564829892853477f1e7be65fe323584340b89/docs/scrnaseq_clusters.html" target="_blank">7165648</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-01-19
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -812,7 +849,7 @@ Evaluating scRNA-seq clusters
 </div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>Access the heterogeneity in scRNA-seq clusters where heterogeneity
+<p>Assess the heterogeneity in scRNA-seq clusters where heterogeneity
 refers to how variable or diverse cells are within a given cluster. High
 heterogeneity means cells in that cluster are quite different from each
 other, while low heterogeneity means they’re very similar.</p>
@@ -910,12 +947,18 @@ head(sil_scores)</code></pre>
 [4,]       6        2 -0.00517726
 [5,]       5        4 -0.06343489
 [6,]       1        4  0.28198441</code></pre>
-<p>Calculate average silhouette width per cluster.</p>
-<pre class="r"><code>sil_scores |&gt;
+<p>Calculate average silhouette width per cluster. Note:
+<code>silhouette()</code> uses numeric cluster codes (1, 2, 3, …)
+internally, which correspond to factor levels. Since Seurat clusters are
+0-indexed (0, 1, 2, …), we need to map back to the original labels.</p>
+<pre class="r"><code># Get the mapping from numeric codes to original cluster labels
+cluster_levels &lt;- levels(clusters)
+
+sil_scores |&gt;
   as.data.frame() |&gt;
   dplyr::summarise(avg_silhouette = mean(sil_width), .by = &#39;cluster&#39;) |&gt;
   dplyr::arrange(-avg_silhouette) |&gt;
-  dplyr::mutate(cluster = as.factor(cluster-1)) -&gt; sil_summary
+  dplyr::mutate(cluster = factor(cluster_levels[cluster], levels = cluster_levels)) -&gt; sil_summary
 
 sil_summary |&gt; dplyr::arrange(-avg_silhouette)</code></pre>
 <pre><code>  cluster avg_silhouette
@@ -1181,8 +1224,12 @@ together (low heterogeneity)</li>
 heterogeneity)</li>
 </ul></li>
 <li><p><strong>Why it matters:</strong> This gives you a spatial sense
-of cluster compactness. We calculate this in both PCA (captures
-biological variance) and UMAP (optimized for visualization).</p></li>
+of cluster compactness. We calculate this in PCA space because PCA
+preserves meaningful distances (Euclidean distances relate to expression
+differences). UMAP distances are <strong>not</strong> meaningful for
+quantitative comparisons because UMAP distorts distances to optimise for
+visualisation - nearby points in UMAP may not be truly similar, and
+distant points may not be truly different.</p></li>
 </ul>
 <pre class="r"><code># Function to calculate intra-cluster distances
 calc_intra_cluster_dist &lt;- function(embeddings, labels) {
@@ -1290,14 +1337,20 @@ useful for identifying transitional or stressed cell
 populations.</p></li>
 </ul>
 <pre class="r"><code>shannon_entropy &lt;- function(x) {
+  # Handle edge case: if all values are identical, entropy is 0
+  if (length(unique(x)) == 1 || (max(x) - min(x)) &lt; 1e-10) {
+    return(0)
+  }
+
+
   # Bin expression values into 10 bins
   breaks &lt;- seq(min(x), max(x), length.out = 11)
   hist_data &lt;- hist(x, breaks = breaks, plot = FALSE)
-  
+
   # Calculate probability of each bin
   probs &lt;- hist_data$counts / sum(hist_data$counts)
   probs &lt;- probs[probs &gt; 0]  # Remove zeros to avoid log(0)
-  
+
   # Shannon entropy formula: -sum(p * log2(p))
   return(-sum(probs * log2(probs)))
 }
@@ -1565,10 +1618,57 @@ summary_comparison</code></pre>
 7       3     0.05981687 3.505332      13.44704    0.4712475         1.2704459
 8       4     0.01407852 3.124803      20.08154    0.6069528         1.2348315</code></pre>
 <p>As a heatmap.</p>
+<p><strong>Important:</strong> The metrics have different
+directions:</p>
+<table>
+<colgroup>
+<col width="18%" />
+<col width="41%" />
+<col width="39%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Metric</th>
+<th>High value means</th>
+<th>Low value means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>avg_silhouette</code></td>
+<td>Good separation, low heterogeneity</td>
+<td>Poor separation, high heterogeneity</td>
+</tr>
+<tr class="even">
+<td><code>mean_cv</code></td>
+<td>High heterogeneity</td>
+<td>Low heterogeneity</td>
+</tr>
+<tr class="odd">
+<td><code>mean_distance</code></td>
+<td>High heterogeneity (spread out)</td>
+<td>Low heterogeneity (compact)</td>
+</tr>
+<tr class="even">
+<td><code>mean_entropy</code></td>
+<td>High heterogeneity</td>
+<td>Low heterogeneity</td>
+</tr>
+<tr class="odd">
+<td><code>compactness_ratio</code></td>
+<td>Poor compactness, high heterogeneity</td>
+<td>Good compactness, low heterogeneity</td>
+</tr>
+</tbody>
+</table>
+<p>So <code>avg_silhouette</code> is the only metric where higher =
+better/more homogeneous. For all others, higher = more
+heterogeneous.</p>
 <pre class="r"><code>summary_comparison |&gt;
   tibble::column_to_rownames(&#39;cluster&#39;) |&gt;
   as.matrix() |&gt;
-  pheatmap(scale = &quot;column&quot;)</code></pre>
+  pheatmap(scale = &quot;column&quot;,
+           main = &quot;Cluster Heterogeneity Metrics (column-scaled)&quot;)</code></pre>
 <p><img src="figure/scrnaseq_clusters.Rmd/summary_heatmap-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>
 <button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-summary_heatmap-1">
@@ -1607,6 +1707,36 @@ Dave Tang
 </table>
 </div>
 </div>
+<p>To make comparison easier, we can invert silhouette so all metrics
+point in the same direction (higher = more heterogeneous):</p>
+<pre class="r"><code>summary_inverted &lt;- summary_comparison |&gt;
+  dplyr::mutate(
+    neg_silhouette = -avg_silhouette  # Invert so higher = worse
+  ) |&gt;
+  dplyr::select(cluster, neg_silhouette, mean_cv, mean_distance, mean_entropy, compactness_ratio)
+
+summary_inverted |&gt;
+  tibble::column_to_rownames(&#39;cluster&#39;) |&gt;
+  as.matrix() |&gt;
+  pheatmap(scale = &quot;column&quot;,
+           main = &quot;Cluster Heterogeneity (all metrics: higher = more heterogeneous)&quot;)</code></pre>
+<p><img src="figure/scrnaseq_clusters.Rmd/summary_heatmap_inverted-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="correlation-between-metrics" class="section level2">
+<h2>Correlation Between Metrics</h2>
+<p>It’s useful to see how these metrics relate to each other:</p>
+<pre class="r"><code>cor_matrix &lt;- summary_comparison |&gt;
+  tibble::column_to_rownames(&#39;cluster&#39;) |&gt;
+  cor(method = &quot;spearman&quot;)
+
+pheatmap(cor_matrix,
+         display_numbers = TRUE,
+         number_format = &quot;%.2f&quot;,
+         main = &quot;Spearman Correlation Between Metrics&quot;)</code></pre>
+<p><img src="figure/scrnaseq_clusters.Rmd/metric_correlation-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Metrics that are highly correlated capture similar aspects of
+heterogeneity. Metrics with low correlation provide complementary
+information.</p>
 </div>
 <div id="interpretation-guide" class="section level2">
 <h2>Interpretation Guide</h2>
@@ -1665,6 +1795,77 @@ quality</li>
 <li>Higher = more heterogeneous</li>
 </ul></li>
 </ul>
+</div>
+<div id="biological-interpretation" class="section level2">
+<h2>Biological Interpretation</h2>
+<p>High heterogeneity in a cluster may indicate:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Transitional cell states</strong>: Cells in the process of
+differentiating often show high variability as they transition between
+stable states</li>
+<li><strong>Cell cycle effects</strong>: Proliferating cells may cluster
+together but show heterogeneity due to different cell cycle phases</li>
+<li><strong>Technical artifacts</strong>: Batch effects, doublets, or
+low-quality cells can artificially increase heterogeneity</li>
+<li><strong>Over-clustering</strong>: A single biological population
+split into multiple clusters will appear heterogeneous</li>
+<li><strong>Under-clustering</strong>: Multiple distinct populations
+merged into one cluster</li>
+<li><strong>Activation states</strong>: Immune cells responding to
+stimuli may show high heterogeneity within the same cell type</li>
+</ol>
+<p>Low heterogeneity typically indicates:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Well-defined cell types</strong>: Terminally differentiated
+cells with stable transcriptional programs</li>
+<li><strong>Technical over-clustering</strong>: The clustering algorithm
+may have split a homogeneous population</li>
+<li><strong>Small cluster size</strong>: Be cautious interpreting
+metrics for clusters with very few cells</li>
+</ol>
+</div>
+<div id="caveats-and-limitations" class="section level2">
+<h2>Caveats and Limitations</h2>
+<ol style="list-style-type: decimal">
+<li><p><strong>Cluster size affects metrics</strong>: Larger clusters
+tend to have higher within-cluster distances simply due to having more
+cells. Consider normalising or using size-matched comparisons.</p></li>
+<li><p><strong>Gene selection matters</strong>: We calculated CV and
+entropy on variable genes. Using all genes or marker genes may give
+different results.</p></li>
+<li><p><strong>Dimensionality</strong>: PCA-based metrics depend on the
+number of PCs used. We used 30 PCs, but this choice affects the
+results.</p></li>
+<li><p><strong>Resolution dependency</strong>: These metrics depend on
+clustering resolution. Different resolutions will give different
+heterogeneity patterns.</p></li>
+<li><p><strong>Biological vs technical heterogeneity</strong>: These
+metrics cannot distinguish biological heterogeneity (interesting) from
+technical noise (not interesting).</p></li>
+</ol>
+<pre class="r"><code># Check if metrics correlate with cluster size
+cluster_sizes &lt;- table(clusters)
+size_df &lt;- data.frame(
+  cluster = names(cluster_sizes),
+  n_cells = as.numeric(cluster_sizes)
+)
+
+summary_with_size &lt;- summary_comparison |&gt;
+  dplyr::left_join(size_df, by = &quot;cluster&quot;)
+
+cat(&quot;Correlation of metrics with cluster size:\n&quot;)</code></pre>
+<pre><code>Correlation of metrics with cluster size:</code></pre>
+<pre class="r"><code>cat(&quot;  mean_distance vs n_cells:&quot;,
+    round(cor(summary_with_size$mean_distance, summary_with_size$n_cells, method = &quot;spearman&quot;), 3), &quot;\n&quot;)</code></pre>
+<pre><code>  mean_distance vs n_cells: -0.881 </code></pre>
+<pre class="r"><code>cat(&quot;  mean_cv vs n_cells:&quot;,
+    round(cor(summary_with_size$mean_cv, summary_with_size$n_cells, method = &quot;spearman&quot;), 3), &quot;\n&quot;)</code></pre>
+<pre><code>  mean_cv vs n_cells: 0.976 </code></pre>
+<pre class="r"><code>cat(&quot;  avg_silhouette vs n_cells:&quot;,
+    round(cor(summary_with_size$avg_silhouette, summary_with_size$n_cells, method = &quot;spearman&quot;), 3), &quot;\n&quot;)</code></pre>
+<pre><code>  avg_silhouette vs n_cells: -0.357 </code></pre>
+<p>If metrics strongly correlate with cluster size, interpret with
+caution.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
