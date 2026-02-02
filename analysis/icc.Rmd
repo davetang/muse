@@ -20,79 +20,446 @@ knitr::opts_chunk$set(echo = TRUE)
 
 > [In statistics](https://en.wikipedia.org/wiki/Intraclass_correlation), the intraclass correlation, or the intraclass correlation coefficient (ICC), is a descriptive statistic that can be used when quantitative measurements are made on units that are organized into groups. It describes how strongly units in the same group resemble each other. While it is viewed as a type of correlation, unlike most other correlation measures, it operates on data structured as groups rather than data structured as paired observations.
 
-For categorical data use [Cohen's or Fleiss' Kappa ](rater.html).
+For categorical data use [Cohen's or Fleiss' Kappa](rater.html).
 
-## Setup
+The Intraclass Correlation Coefficient (ICC) measures the **reliability** or **consistency** of measurements made by different observers, instruments, or different methods. The method aims to provide an indication of "how much of the variation observed is due to true differences between samples versus random noise/measurement error?"
 
-Install {irr}.
+For example, if we used three different scales to weigh an item:
+
+* A high ICC (close to 1) would indicate that the three scales give you nearly the same weight, i.e., the scales are reliable, most variation is due to actual size differences.
+* A low ICC (close to 0) would indicate that the three scales gave very different readings for the same item, i.e., the scales are unreliable and most variation is measurement error.
+
+## The Mathematics Behind ICC
+
+The ICC is fundamentally based on variance decomposition. The basic formula is:
+
+$$ICC = \frac{\sigma^2_{between}}{\sigma^2_{between} + \sigma^2_{within}}$$
+
+Where:
+
+* $\sigma^2_{between}$ = variance between subjects (true variation)
+* $\sigma^2_{within}$ = variance within subjects (measurement error)
+
+This can be estimated using mean squares from an ANOVA:
+
+$$ICC = \frac{MS_{between} - MS_{within}}{MS_{between} + (k-1) \cdot MS_{within}}$$
+
+Where $k$ is the number of raters/measurements per subject.
+
+### Manual Calculation Example
+
+Let's calculate ICC manually to understand the concept:
+
+```{r manual_icc}
+# Three raters measuring 5 subjects
+ratings <- data.frame(
+  rater1 = c(9, 6, 8, 7, 10),
+  rater2 = c(9, 7, 8, 7, 9),
+  rater3 = c(8, 6, 9, 8, 10)
+)
+ratings
+
+# Calculate using ANOVA
+# Reshape to long format for ANOVA
+ratings_long <- data.frame(
+  subject = factor(rep(1:5, each = 3)),
+  rater = factor(rep(1:3, times = 5)),
+  score = c(t(as.matrix(ratings)))
+)
+
+# One-way ANOVA
+anova_result <- aov(score ~ subject, data = ratings_long)
+summary(anova_result)
+
+# Extract mean squares
+ms_between <- summary(anova_result)[[1]]["subject", "Mean Sq"]
+ms_within <- summary(anova_result)[[1]]["Residuals", "Mean Sq"]
+k <- 3  # number of raters
+
+# Calculate ICC(1,1)
+icc_manual <- (ms_between - ms_within) / (ms_between + (k - 1) * ms_within)
+cat("Manual ICC(1,1):", round(icc_manual, 3), "\n")
+
+# Verify with irr package
+icc(ratings, model = "oneway", unit = "single")$value
+```
+
+## R package
+
+The [irr](https://cran.r-project.org/web/packages/irr/index.html) package in R can be used to calculate various coefficients of Interrater Reliability and Agreement:
+
+> Coefficients of Interrater Reliability and Agreement for quantitative, ordinal and nominal data: ICC, Finn-Coefficient, Robinson's A, Kendall's W, Cohen's Kappa, ...
+
+We will use {irr} to calculate the Intraclass Correlation Coefficient, so we will need to install the package.
 
 ```{r install_irr, eval=FALSE}
 install.packages("irr")
 ```
 
-## Example
+### icc
 
-The data `anxiety` contains anxiety ratings by different raters:
-
-> The data frame contains the anxiety ratings of 20 subjects, rated by 3 raters. Values are ranging from 1 (not anxious at all) to 6 (extremely anxious).
-
-```{r anxiety}
-data(anxiety)
-head(anxiety)
-```
-
-Correlation of raters.
-
-```{r cor_anxiety}
-cor(anxiety)
-pairs(anxiety, pch = 16)
-```
-
-The `icc()` function:
+Specificially, we will use the `icc()` function and from the documentation:
 
 > Computes single score or average score ICCs as an index of interrater reliability of quantitative data. Additionally, F-test and confidence interval are computed.
 
-Takes:
+The input parameters include:
 
 * `ratings` - $n \times m$ matrix or dataframe, $n$ subjects $m$ raters.
 * `model` - a character string specifying if a "oneway" model (default) with row effects random, or a "twoway" model with column and row effects random should be applied. You can specify just the initial letter.
 * `type` - a character string specifying if "consistency" (default) or "agreement" between raters should be estimated. If a "oneway" model is used, only "consistency" could be computed. You can specify just the initial letter.
 * `unit` - a character string specifying the unit of analysis: Must be one of "single" (default) or "average". You can specify just the initial letter.
 
-```{r icc_anxiety}
-icc(anxiety, model="twoway", type="agreement")
+## Practical Example: Weighing Items
+
+Let's create a concrete example where three scales are used to weigh 10 items:
+
+```{r weights_example}
+set.seed(1984)
+
+# True weights of 10 items (unknown in practice)
+true_weights <- c(150, 200, 175, 225, 180, 195, 210, 165, 185, 205)
+
+# Scenario 1: Three well-calibrated scales (high ICC expected)
+scale1_good <- true_weights + rnorm(10, mean = 0, sd = 2)
+scale2_good <- true_weights + rnorm(10, mean = 0, sd = 2)
+scale3_good <- true_weights + rnorm(10, mean = 0, sd = 2)
+
+good_scales <- data.frame(
+  scale1 = scale1_good,
+  scale2 = scale2_good,
+  scale3 = scale3_good
+)
+
+cat("Good scales - ICC:\n")
+icc(good_scales, model = "twoway", type = "agreement")
+
+# Scenario 2: Three poorly calibrated scales (low ICC expected)
+scale1_bad <- true_weights + rnorm(10, mean = 0, sd = 20)
+scale2_bad <- true_weights + rnorm(10, mean = 5, sd = 25)
+scale3_bad <- true_weights + rnorm(10, mean = -10, sd = 30)
+
+bad_scales <- data.frame(
+  scale1 = scale1_bad,
+  scale2 = scale2_bad,
+  scale3 = scale3_bad
+)
+
+cat("\nBad scales - ICC:\n")
+icc(bad_scales, model = "twoway", type = "agreement")
 ```
 
-Another example from the documentation; high consistency.
+Visualise the difference:
+
+```{r visualise_scales}
+par(mfrow = c(1, 2))
+
+# Good scales
+matplot(1:10, good_scales, type = "b", pch = 1:3, col = 1:3,
+        xlab = "Item", ylab = "Weight (g)", main = "Well-calibrated Scales\n(High ICC)")
+legend("topleft", legend = c("Scale 1", "Scale 2", "Scale 3"),
+       pch = 1:3, col = 1:3, cex = 0.8)
+
+# Bad scales
+matplot(1:10, bad_scales, type = "b", pch = 1:3, col = 1:3,
+        xlab = "Item", ylab = "Weight (g)", main = "Poorly-calibrated Scales\n(Low ICC)")
+legend("topleft", legend = c("Scale 1", "Scale 2", "Scale 3"),
+       pch = 1:3, col = 1:3, cex = 0.8)
+
+par(mfrow = c(1, 1))
+```
+
+## ICC vs. Correlation
+
+ICC and Pearson correlation measure different things. Correlation measures the linear relationship between variables, while ICC measures agreement.
+
+```{r icc_vs_correlation}
+# Example: High correlation but low ICC (systematic bias)
+set.seed(1984)
+rater1 <- 1:20
+rater2 <- rater1 + 10  # Same pattern but shifted by 10
+
+biased_ratings <- data.frame(rater1, rater2)
+
+cat("Pearson correlation:", cor(rater1, rater2), "\n")
+cat("ICC (agreement):", icc(biased_ratings, model = "twoway", type = "agreement")$value, "\n")
+cat("ICC (consistency):", icc(biased_ratings, model = "twoway", type = "consistency")$value, "\n")
+```
+
+The correlation is perfect (r = 1) because the raters follow the same pattern. However, the ICC for agreement is lower because the raters systematically differ by 10 units. The ICC for consistency is high because the raters are consistent in their relative rankings.
+
+## Key Differences from Similarity Indices
+
+| Feature | Similarity Indices (Horn-Morisita, etc.) | ICC |
+|---------|------------------------------------------|-----|
+| **Compares** | Pairs of samples | Groups of replicates |
+| **Output** | Matrix of all pairwise comparisons | Single value (0-1) |
+| **Question** | "How similar are A and B?" | "How reliable/reproducible is my method?" |
+| **Use case** | Compare specific samples | Assess overall reproducibility |
+
+## Types of ICC
+
+There are **six different ICC formulas** depending on your study design, organised into three models with two variants each:
+
+### Model Selection
+
+| Model | Description | When to Use |
+|-------|-------------|-------------|
+| **One-way random** | Different raters for each subject | Raters are randomly sampled from a larger population and each subject gets different raters |
+| **Two-way random** | Same raters for all subjects, raters are random sample | Raters are a random sample from a population of raters |
+| **Two-way mixed** | Same raters for all subjects, raters are fixed | These specific raters are the only ones of interest |
+
+### Unit Selection
+
+| Unit | Notation | When to Use |
+|------|----------|-------------|
+| **Single** | ICC(1,1), ICC(2,1), ICC(3,1) | You want reliability of a single measurement |
+| **Average** | ICC(1,k), ICC(2,k), ICC(3,k) | You will average multiple raters' scores |
+
+### Choosing the Right ICC
+
+```{r icc_types_example}
+# Same data, different ICC types
+data(anxiety)
+
+cat("ICC(1,1) - One-way, single:\n")
+print(icc(anxiety, model = "oneway", unit = "single"))
+
+cat("\nICC(2,1) - Two-way random, single, consistency:\n")
+print(icc(anxiety, model = "twoway", type = "consistency", unit = "single"))
+
+cat("\nICC(2,1) - Two-way random, single, agreement:\n")
+print(icc(anxiety, model = "twoway", type = "agreement", unit = "single"))
+
+cat("\nICC(2,k) - Two-way random, average, agreement:\n")
+print(icc(anxiety, model = "twoway", type = "agreement", unit = "average"))
+```
+
+**General guidance:**
+
+* If you have the **same raters for all subjects** (most common), use **two-way** model
+* If you care about **absolute agreement** (same scores), use **type = "agreement"**
+* If you care about **relative consistency** (same ranking), use **type = "consistency"**
+* If your final measure will **average multiple raters**, use **unit = "average"**
+
+## Interpretation Guidelines
+
+[Koo and Li (2016)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4913118/) provide commonly cited guidelines:
+
+| ICC Value | Interpretation |
+|-----------|----------------|
+| < 0.50 | Poor reliability |
+| 0.50 - 0.75 | Moderate reliability |
+| 0.75 - 0.90 | Good reliability |
+| > 0.90 | Excellent reliability |
+
+Note that these are general guidelines. The acceptable ICC depends on your specific application. Clinical measurements typically require higher reliability (>0.90) than exploratory research.
+
+### Confidence Intervals Matter
+
+Always report the confidence interval, not just the point estimate:
+
+```{r confidence_intervals}
+result <- icc(anxiety, model = "twoway", type = "agreement")
+cat("ICC:", round(result$value, 3), "\n")
+cat("95% CI: [", round(result$lbound, 3), ",", round(result$ubound, 3), "]\n")
+```
+
+If the confidence interval is wide or crosses interpretation thresholds, interpret with caution.
+
+## When to Use ICC vs. Similarity Indices
+
+**Use ICC when:**
+
+- You want a single number summarising reproducibility
+- You have multiple replicates per method
+- You're assessing quality control or measurement reliability
+
+**Use Similarity Indices when:**
+
+- You want to know which specific pairs are similar
+- You're comparing different methods to each other
+- You want detailed pairwise comparisons
+
+## Comparing Multiple Methods
+
+ICC can be used to compare the reproducibility of different measurement methods:
+
+```{r compare_methods}
+set.seed(1984)
+
+# Simulate three measurement methods with different reliability
+n_subjects <- 20
+n_raters <- 3
+true_values <- rnorm(n_subjects, mean = 50, sd = 10)
+
+# Method A: Highly reliable (small error)
+method_a <- sapply(1:n_raters, function(x) true_values + rnorm(n_subjects, 0, 2))
+
+# Method B: Moderately reliable
+method_b <- sapply(1:n_raters, function(x) true_values + rnorm(n_subjects, 0, 5))
+
+# Method C: Poorly reliable (large error)
+method_c <- sapply(1:n_raters, function(x) true_values + rnorm(n_subjects, 0, 12))
+
+# Calculate ICC for each method
+results <- data.frame(
+  Method = c("A", "B", "C"),
+  ICC = c(
+    icc(method_a, model = "twoway", type = "agreement")$value,
+    icc(method_b, model = "twoway", type = "agreement")$value,
+    icc(method_c, model = "twoway", type = "agreement")$value
+  ),
+  Interpretation = c("Excellent", "Good", "Poor")
+)
+results
+```
+
+This comparison shows that Method A produces the most reproducible measurements.
+
+## Example: Anxiety Ratings
+
+The `anxiety` dataset from the {irr} package contains anxiety ratings by different raters:
+
+> The data frame contains the anxiety ratings of 20 subjects, rated by 3 raters. Values are ranging from 1 (not anxious at all) to 6 (extremely anxious).
+
+```{r anxiety}
+data(anxiety)
+head(anxiety)
+dim(anxiety)
+```
+
+### Exploring Rater Agreement
+
+First, let's examine the correlation between raters:
+
+```{r cor_anxiety}
+cor(anxiety)
+```
+
+High correlations suggest raters rank subjects similarly, but correlation doesn't tell us about absolute agreement.
+
+```{r pairs_anxiety}
+pairs(anxiety, pch = 16, main = "Pairwise Rater Comparisons")
+```
+
+### Calculate ICC
+
+```{r icc_anxiety}
+result <- icc(anxiety, model = "twoway", type = "agreement")
+result
+```
+
+### Understanding the Output
+
+The output provides several pieces of information:
+
+* **subjects**: Number of subjects being rated (20)
+* **raters**: Number of raters (3)
+* **ICC type**: The specific ICC formula used
+* **value**: The ICC estimate (0.198) - indicates poor agreement
+* **F-test**: Tests if ICC is significantly different from 0
+* **p-value**: Statistical significance of the F-test
+* **lbound/ubound**: 95% confidence interval for ICC
+
+In this example, the ICC of 0.198 indicates poor inter-rater reliability. The raters do not agree well on anxiety levels.
+
+## Example: Consistency vs. Agreement
+
+This example demonstrates the difference between consistency and agreement. Three raters measure the same subjects, but each rater has a systematic bias (offset).
 
 ```{r eg2_twoway}
 set.seed(1984)
 r1 <- round(rnorm(20, 10, 4))
-r2 <- round(r1 + 10 + rnorm(20, 0, 2))
-r3 <- round(r1 + 20 + rnorm(20, 0, 2))
+r2 <- round(r1 + 10 + rnorm(20, 0, 2))  # Same pattern, +10 offset
+r3 <- round(r1 + 20 + rnorm(20, 0, 2))  # Same pattern, +20 offset
 
-boxplot(data.frame(r1 = r1, r2 = r2, r3 = r3))
-icc(cbind(r1, r2, r3), "twoway")
+ratings_df <- data.frame(r1 = r1, r2 = r2, r3 = r3)
+boxplot(ratings_df, main = "Raters with Systematic Bias",
+        ylab = "Rating", col = c("lightblue", "lightgreen", "lightyellow"))
 ```
 
-Low agreement.
+**High consistency** - raters rank subjects the same way:
 
-```{r_twoway_agreement}
-icc(cbind(r1, r2, r3), "twoway", "agreement")
+```{r consistency}
+icc(ratings_df, model = "twoway", type = "consistency")
 ```
 
-## Random
+**Low agreement** - raters give different absolute values:
 
-What values would we expect from random ratings?
+```{r agreement}
+icc(ratings_df, model = "twoway", type = "agreement")
+```
+
+The ICC for consistency (0.898) is much higher than for agreement (0.043). This is because the raters are consistent in their relative rankings (high consistency) but give systematically different scores (low agreement).
+
+## Baseline: Random Ratings
+
+What values would we expect from completely random ratings (no true agreement)?
 
 ```{r random_ratings}
 set.seed(1984)
-replicate(
-  n = 100,
+random_iccs <- replicate(
+  n = 1000,
   expr = {
-    x <- sample(x = 1:100, size = 100)
-    y <- sample(x = 1:100, size = 100)
-    icc(cbind(x, y))$value
-  }) |>
-  mean()
+    x <- sample(x = 1:100, size = 50)
+    y <- sample(x = 1:100, size = 50)
+    icc(cbind(x, y), model = "twoway", type = "agreement")$value
+  }
+)
+
+cat("Mean ICC from random ratings:", round(mean(random_iccs), 4), "\n")
+cat("SD:", round(sd(random_iccs), 4), "\n")
+cat("Range:", round(range(random_iccs), 4), "\n")
 ```
+
+```{r random_hist}
+hist(random_iccs, breaks = 30, main = "Distribution of ICC from Random Ratings",
+     xlab = "ICC", col = "lightgray", border = "white")
+abline(v = 0, col = "red", lwd = 2, lty = 2)
+```
+
+Random ratings produce ICC values centered around 0, as expected. Values slightly below or above 0 occur due to sampling variation.
+
+## Negative ICC Values
+
+ICC can be negative when within-group variance exceeds between-group variance. This can occur when:
+
+1. Raters systematically disagree (one rates high when another rates low)
+2. Random chance with small sample sizes
+3. Data entry errors
+
+```{r negative_icc}
+# Example: Raters who systematically disagree
+set.seed(1984)
+true_scores <- 1:10
+rater_a <- true_scores
+rater_b <- 11 - true_scores  # Reversed ratings
+
+disagreeing_raters <- data.frame(rater_a, rater_b)
+plot(rater_a, rater_b, pch = 16, main = "Systematically Disagreeing Raters",
+     xlab = "Rater A", ylab = "Rater B")
+
+icc(disagreeing_raters, model = "twoway", type = "agreement")
+```
+
+A negative ICC indicates a problem with the data or measurement process that should be investigated.
+
+## Summary
+
+Key points about ICC:
+
+1. **ICC measures reliability** - how consistent are measurements across raters/methods
+2. **Choose the right model** - one-way vs two-way depends on your study design
+3. **Agreement vs Consistency** - agreement requires same absolute values; consistency requires same relative ranking
+4. **Report confidence intervals** - point estimates alone can be misleading
+5. **Interpret in context** - acceptable ICC depends on your application
+6. **Sample size matters** - larger samples give more precise ICC estimates
+
+### Quick Reference
+
+| Scenario | Model | Type |
+|----------|-------|------|
+| Different raters for each subject | oneway | consistency |
+| Same raters, care about exact values | twoway | agreement |
+| Same raters, care about ranking | twoway | consistency |
+| Will average multiple measurements | twoway | agreement, unit="average" |
