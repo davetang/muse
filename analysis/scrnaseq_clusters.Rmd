@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-Access the heterogeneity in scRNA-seq clusters where heterogeneity refers to how variable or diverse cells are within a given cluster. High heterogeneity means cells in that cluster are quite different from each other, while low heterogeneity means they're very similar.
+Assess the heterogeneity in scRNA-seq clusters where heterogeneity refers to how variable or diverse cells are within a given cluster. High heterogeneity means cells in that cluster are quite different from each other, while low heterogeneity means they're very similar.
 
 ## Dependencies
 
@@ -104,13 +104,17 @@ head(sil_scores)
 ```
 
 Calculate average silhouette width per cluster.
+Note: `silhouette()` uses numeric cluster codes (1, 2, 3, ...) internally, which correspond to factor levels. Since Seurat clusters are 0-indexed (0, 1, 2, ...), we need to map back to the original labels.
 
 ```{r sil_summary}
+# Get the mapping from numeric codes to original cluster labels
+cluster_levels <- levels(clusters)
+
 sil_scores |>
   as.data.frame() |>
   dplyr::summarise(avg_silhouette = mean(sil_width), .by = 'cluster') |>
   dplyr::arrange(-avg_silhouette) |>
-  dplyr::mutate(cluster = as.factor(cluster-1)) -> sil_summary
+  dplyr::mutate(cluster = factor(cluster_levels[cluster], levels = cluster_levels)) -> sil_summary
 
 sil_summary |> dplyr::arrange(-avg_silhouette)
 ```
@@ -260,7 +264,7 @@ Typically, the WSS and BSS are compared across different clustering results; the
     * **Smaller distances** = cells are tightly clustered together (low heterogeneity)
     * **Larger distances** = cells are spread out (high heterogeneity)
 
-* **Why it matters:** This gives you a spatial sense of cluster compactness. We calculate this in both PCA (captures biological variance) and UMAP (optimized for visualization).
+* **Why it matters:** This gives you a spatial sense of cluster compactness. We calculate this in PCA space because PCA preserves meaningful distances (Euclidean distances relate to expression differences). UMAP distances are **not** meaningful for quantitative comparisons because UMAP distorts distances to optimise for visualisation - nearby points in UMAP may not be truly similar, and distant points may not be truly different.
 
 ```{r distances_pca}
 # Function to calculate intra-cluster distances
@@ -321,14 +325,20 @@ ggplot(pca_dist_summary, aes(x = reorder(cluster, mean_distance),
 
 ```{r entropy}
 shannon_entropy <- function(x) {
+  # Handle edge case: if all values are identical, entropy is 0
+  if (length(unique(x)) == 1 || (max(x) - min(x)) < 1e-10) {
+    return(0)
+  }
+
+
   # Bin expression values into 10 bins
   breaks <- seq(min(x), max(x), length.out = 11)
   hist_data <- hist(x, breaks = breaks, plot = FALSE)
-  
+
   # Calculate probability of each bin
   probs <- hist_data$counts / sum(hist_data$counts)
   probs <- probs[probs > 0]  # Remove zeros to avoid log(0)
-  
+
   # Shannon entropy formula: -sum(p * log2(p))
   return(-sum(probs * log2(probs)))
 }
@@ -469,12 +479,58 @@ summary_comparison
 
 As a heatmap.
 
+**Important:** The metrics have different directions:
+
+| Metric | High value means | Low value means |
+|--------|------------------|-----------------|
+| `avg_silhouette` | Good separation, low heterogeneity | Poor separation, high heterogeneity |
+| `mean_cv` | High heterogeneity | Low heterogeneity |
+| `mean_distance` | High heterogeneity (spread out) | Low heterogeneity (compact) |
+| `mean_entropy` | High heterogeneity | Low heterogeneity |
+| `compactness_ratio` | Poor compactness, high heterogeneity | Good compactness, low heterogeneity |
+
+So `avg_silhouette` is the only metric where higher = better/more homogeneous. For all others, higher = more heterogeneous.
+
 ```{r summary_heatmap}
 summary_comparison |>
   tibble::column_to_rownames('cluster') |>
   as.matrix() |>
-  pheatmap(scale = "column")
+  pheatmap(scale = "column",
+           main = "Cluster Heterogeneity Metrics (column-scaled)")
 ```
+
+To make comparison easier, we can invert silhouette so all metrics point in the same direction (higher = more heterogeneous):
+
+```{r summary_heatmap_inverted}
+summary_inverted <- summary_comparison |>
+  dplyr::mutate(
+    neg_silhouette = -avg_silhouette  # Invert so higher = worse
+  ) |>
+  dplyr::select(cluster, neg_silhouette, mean_cv, mean_distance, mean_entropy, compactness_ratio)
+
+summary_inverted |>
+  tibble::column_to_rownames('cluster') |>
+  as.matrix() |>
+  pheatmap(scale = "column",
+           main = "Cluster Heterogeneity (all metrics: higher = more heterogeneous)")
+```
+
+## Correlation Between Metrics
+
+It's useful to see how these metrics relate to each other:
+
+```{r metric_correlation}
+cor_matrix <- summary_comparison |>
+  tibble::column_to_rownames('cluster') |>
+  cor(method = "spearman")
+
+pheatmap(cor_matrix,
+         display_numbers = TRUE,
+         number_format = "%.2f",
+         main = "Spearman Correlation Between Metrics")
+```
+
+Metrics that are highly correlated capture similar aspects of heterogeneity. Metrics with low correlation provide complementary information.
 
 ## Interpretation Guide
 
@@ -509,4 +565,55 @@ Each metric captures a different aspect of heterogeneity:
 * Shannon entropy
     * Distribution diversity of gene expression
     * Higher = more heterogeneous
- 
+
+## Biological Interpretation
+
+High heterogeneity in a cluster may indicate:
+
+1. **Transitional cell states**: Cells in the process of differentiating often show high variability as they transition between stable states
+2. **Cell cycle effects**: Proliferating cells may cluster together but show heterogeneity due to different cell cycle phases
+3. **Technical artifacts**: Batch effects, doublets, or low-quality cells can artificially increase heterogeneity
+4. **Over-clustering**: A single biological population split into multiple clusters will appear heterogeneous
+5. **Under-clustering**: Multiple distinct populations merged into one cluster
+6. **Activation states**: Immune cells responding to stimuli may show high heterogeneity within the same cell type
+
+Low heterogeneity typically indicates:
+
+1. **Well-defined cell types**: Terminally differentiated cells with stable transcriptional programs
+2. **Technical over-clustering**: The clustering algorithm may have split a homogeneous population
+3. **Small cluster size**: Be cautious interpreting metrics for clusters with very few cells
+
+## Caveats and Limitations
+
+1. **Cluster size affects metrics**: Larger clusters tend to have higher within-cluster distances simply due to having more cells. Consider normalising or using size-matched comparisons.
+
+2. **Gene selection matters**: We calculated CV and entropy on variable genes. Using all genes or marker genes may give different results.
+
+3. **Dimensionality**: PCA-based metrics depend on the number of PCs used. We used 30 PCs, but this choice affects the results.
+
+4. **Resolution dependency**: These metrics depend on clustering resolution. Different resolutions will give different heterogeneity patterns.
+
+5. **Biological vs technical heterogeneity**: These metrics cannot distinguish biological heterogeneity (interesting) from technical noise (not interesting).
+
+```{r cluster_size_check}
+# Check if metrics correlate with cluster size
+cluster_sizes <- table(clusters)
+size_df <- data.frame(
+  cluster = names(cluster_sizes),
+  n_cells = as.numeric(cluster_sizes)
+)
+
+summary_with_size <- summary_comparison |>
+  dplyr::left_join(size_df, by = "cluster")
+
+cat("Correlation of metrics with cluster size:\n")
+cat("  mean_distance vs n_cells:",
+    round(cor(summary_with_size$mean_distance, summary_with_size$n_cells, method = "spearman"), 3), "\n")
+cat("  mean_cv vs n_cells:",
+    round(cor(summary_with_size$mean_cv, summary_with_size$n_cells, method = "spearman"), 3), "\n")
+cat("  avg_silhouette vs n_cells:",
+    round(cor(summary_with_size$avg_silhouette, summary_with_size$n_cells, method = "spearman"), 3), "\n")
+```
+
+If metrics strongly correlate with cluster size, interpret with caution.
+
