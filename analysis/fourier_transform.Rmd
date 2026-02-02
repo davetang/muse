@@ -1,0 +1,250 @@
+---
+title: "Introduction to the Fourier Transform"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## What is the Fourier Transform?
+
+The Fourier Transform is a mathematical technique that decomposes a signal into its constituent frequencies. Named after French mathematician Jean-Baptiste Joseph Fourier, it transforms data from the **time domain** (or spatial domain) into the **frequency domain**.
+
+If you hear a musical chord (when you play three or more notes simultaneously to create a harmonic sound), the Fourier Transform can tell you which individual notes make up that chord and how loud each note is.
+
+## Why is it useful?
+
+The Fourier Transform is fundamental in many fields:
+
+* **Signal processing**: Filtering noise from audio or images
+* **Bioinformatics**: Analysing periodic patterns in DNA sequences, spectroscopy data
+* **Image processing**: JPEG compression, edge detection
+* **Physics**: Quantum mechanics, optics, acoustics
+
+## The intuition
+
+Any periodic signal can be represented as a sum of sine and cosine waves of different frequencies. The Fourier Transform finds the amplitude and phase of each frequency component.
+
+Let's start with a simple example: creating a signal from known frequencies.
+
+* Hertz is a unit that measures frequency: how many times something happens per second.
+* 100 Hz means something is happening 100 times per second.
+
+```{r create_signal}
+# Create a time vector (1 second of data sampled at 100 Hz)
+sample_rate <- 100
+duration <- 1
+t <- seq(0, duration, by = 1/sample_rate)
+
+# Create a signal with two frequencies: 5 Hz and 20 Hz
+freq1 <- 5
+freq2 <- 20
+
+signal <- sin(2 * pi * freq1 * t) + 0.5 * sin(2 * pi * freq2 * t)
+
+plot(t, signal, type = "l",
+     xlab = "Time (seconds)",
+     ylab = "Amplitude",
+     main = "Signal with 5 Hz and 20 Hz components")
+```
+
+Looking at this signal, it's not immediately obvious that it's composed of two sine waves. Let's use the Fourier Transform to reveal the hidden frequencies.
+
+## The Fast Fourier Transform (FFT) in R
+
+R provides the `fft()` function which implements the Fast Fourier Transform, an efficient algorithm for computing the Discrete Fourier Transform (DFT).
+
+```{r fft_basic}
+# Compute the FFT
+fft_result <- fft(signal)
+
+# The FFT returns complex numbers
+head(fft_result)
+```
+
+The FFT returns complex numbers. The **magnitude** (absolute value) tells us the amplitude of each frequency component. The **phase** (argument) tells us the phase shift.
+
+```{r fft_magnitude}
+# Calculate magnitude
+magnitude <- Mod(fft_result)
+
+# Create frequency axis
+n <- length(signal)
+freq <- (0:(n-1)) * sample_rate / n
+
+# Plot only the first half (positive frequencies)
+# The FFT output is symmetric for real signals
+half_n <- floor(n/2)
+
+plot(freq[1:half_n], magnitude[1:half_n], type = "h",
+     xlab = "Frequency (Hz)",
+     ylab = "Magnitude",
+     main = "Frequency Spectrum")
+```
+
+Notice the peaks at 5 Hz and 20 Hz - exactly the frequencies we used to create our signal! The peak at 5 Hz is twice as high as the peak at 20 Hz, reflecting the amplitude ratio (1.0 vs 0.5) in our original signal.
+
+## Normalising the FFT output
+
+To get meaningful amplitude values, we need to normalise the FFT output.
+
+```{r fft_normalised}
+# Normalise by the number of samples
+# Multiply by 2 for single-sided spectrum (except DC component)
+magnitude_normalised <- (2 * Mod(fft_result) / n)[1:half_n]
+magnitude_normalised[1] <- magnitude_normalised[1] / 2  # DC component
+
+plot(freq[1:half_n], magnitude_normalised, type = "h",
+     xlab = "Frequency (Hz)",
+     ylab = "Amplitude",
+     main = "Normalised Frequency Spectrum")
+
+# Add points to highlight peaks
+abline(h = 0, col = "gray")
+```
+
+Now the amplitudes approximately match our original signal (1.0 for 5 Hz and 0.5 for 20 Hz).
+
+## A practical example: Removing noise
+
+One common application is filtering noise from a signal. Let's add noise to our signal and then filter it out.
+
+```{r noisy_signal}
+# Add random noise
+set.seed(42)
+noisy_signal <- signal + rnorm(length(signal), sd = 0.5)
+
+par(mfrow = c(2, 1), mar = c(4, 4, 2, 1))
+plot(t, signal, type = "l",
+     xlab = "Time (seconds)", ylab = "Amplitude",
+     main = "Original Signal")
+plot(t, noisy_signal, type = "l",
+     xlab = "Time (seconds)", ylab = "Amplitude",
+     main = "Noisy Signal")
+par(mfrow = c(1, 1))
+```
+
+```{r filter_noise}
+# FFT of noisy signal
+fft_noisy <- fft(noisy_signal)
+
+# Create a low-pass filter (keep frequencies below 25 Hz)
+cutoff <- 25
+filter_mask <- rep(0, n)
+freq_indices <- which(freq <= cutoff | freq >= (sample_rate - cutoff))
+filter_mask[freq_indices] <- 1
+
+# Apply filter
+fft_filtered <- fft_noisy * filter_mask
+
+# Inverse FFT to get back to time domain
+filtered_signal <- Re(fft(fft_filtered, inverse = TRUE) / n)
+
+par(mfrow = c(2, 1), mar = c(4, 4, 2, 1))
+plot(t, noisy_signal, type = "l", col = "gray",
+     xlab = "Time (seconds)", ylab = "Amplitude",
+     main = "Noisy vs Filtered Signal")
+lines(t, filtered_signal, col = "blue", lwd = 2)
+legend("topright", legend = c("Noisy", "Filtered"),
+       col = c("gray", "blue"), lty = 1, lwd = c(1, 2))
+
+plot(t, signal, type = "l", col = "black",
+     xlab = "Time (seconds)", ylab = "Amplitude",
+     main = "Original vs Filtered Signal")
+lines(t, filtered_signal, col = "blue", lwd = 2, lty = 2)
+legend("topright", legend = c("Original", "Filtered"),
+       col = c("black", "blue"), lty = c(1, 2), lwd = c(1, 2))
+par(mfrow = c(1, 1))
+```
+
+## Understanding the mathematics
+
+The Discrete Fourier Transform is defined as:
+
+$$X_k = \sum_{n=0}^{N-1} x_n \cdot e^{-i 2\pi k n / N}$$
+
+Where:
+
+- $x_n$ is the input signal at time point $n$
+- $X_k$ is the complex amplitude at frequency $k$
+- $N$ is the total number of samples
+- $e^{-i 2\pi k n / N}$ represents complex sinusoids (from Euler's formula: $e^{i\theta} = \cos\theta + i\sin\theta$)
+
+The inverse transform reconstructs the original signal:
+
+$$x_n = \frac{1}{N} \sum_{k=0}^{N-1} X_k \cdot e^{i 2\pi k n / N}$$
+
+## Computing DFT manually
+
+Let's verify our understanding by computing the DFT manually for a small signal.
+
+```{r manual_dft}
+# Simple signal
+x <- c(1, 2, 3, 4)
+N <- length(x)
+
+# Manual DFT
+manual_dft <- function(x) {
+  N <- length(x)
+  X <- complex(N)
+  for (k in 0:(N-1)) {
+    for (n in 0:(N-1)) {
+      X[k+1] <- X[k+1] + x[n+1] * exp(-1i * 2 * pi * k * n / N)
+    }
+  }
+  return(X)
+}
+
+# Compare manual vs fft()
+manual_result <- manual_dft(x)
+fft_result <- fft(x)
+
+data.frame(
+  k = 0:(N-1),
+  manual_real = round(Re(manual_result), 6),
+  manual_imag = round(Im(manual_result), 6),
+  fft_real = round(Re(fft_result), 6),
+  fft_imag = round(Im(fft_result), 6)
+)
+```
+
+The results match! The FFT is simply a faster algorithm ($O(N \log N)$ vs $O(N^2)$) for computing the same thing.
+
+## Power spectrum
+
+The power spectrum shows the distribution of signal power across frequencies. It's computed as the squared magnitude of the FFT.
+
+```{r power_spectrum}
+# Create a more complex signal
+t_long <- seq(0, 2, by = 1/sample_rate)
+complex_signal <- sin(2 * pi * 3 * t_long) +
+                  0.7 * sin(2 * pi * 7 * t_long) +
+                  0.3 * sin(2 * pi * 15 * t_long)
+
+# Compute power spectrum
+fft_complex <- fft(complex_signal)
+n_long <- length(complex_signal)
+power <- (Mod(fft_complex)^2) / n_long
+freq_long <- (0:(n_long-1)) * sample_rate / n_long
+
+# Plot
+half_n_long <- floor(n_long/2)
+plot(freq_long[1:half_n_long], power[1:half_n_long], type = "h",
+     xlab = "Frequency (Hz)",
+     ylab = "Power",
+     main = "Power Spectrum")
+```
+
+## Summary
+
+Key takeaways:
+
+1. The Fourier Transform converts signals from time domain to frequency domain
+2. Use `fft()` in R for the Fast Fourier Transform
+3. The FFT returns complex numbers; use `Mod()` for magnitude, `Arg()` for phase
+4. For real signals, the FFT output is symmetric - only the first half is needed
+5. Remember to normalise by dividing by the number of samples
