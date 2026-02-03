@@ -266,6 +266,158 @@ In this heatmap:
 
 Genes that are good markers should show high expression (red) in their target cluster and low expression (blue) in other clusters.
 
+## Alternative parameterisation: Cell means model
+
+The analysis above used a **treatment contrast model** (also called a reference level model), where the intercept represents the baseline group and other coefficients represent deviations from that baseline. An alternative is the **cell means model**, which directly estimates the mean expression for each group without an intercept.
+
+The cell means model has several advantages:
+
+1. **More intuitive contrasts**: Each coefficient directly represents a group mean, making it easier to specify comparisons like "cluster 0 vs cluster 1" or "cluster 0 vs average of all others".
+2. **Symmetric treatment of groups**: No group is arbitrarily designated as the "reference" level.
+3. **Clearer interpretation**: The design matrix directly shows which group each sample belongs to.
+
+The key difference is in the formula:
+
+* Treatment contrast: `~ cluster + donor` (includes intercept)
+* Cell means: `~ 0 + cluster + donor` (no intercept, the `0 +` removes it)
+
+Despite this different parameterisation, both models fit the same data and produce identical results when equivalent contrasts are specified.
+
+### Analysis with a cell means model
+
+Start from the Seurat object and with the same processing steps.
+
+```{r cell_means_data}
+y_cm <- Seurat2PB(so, sample="group", cluster="seurat_clusters")
+keep.samples_cm <- y_cm$samples$lib.size > 5e4
+y_cm <- y_cm[, keep.samples_cm]
+keep.genes_cm <- filterByExpr(y_cm, group=y_cm$samples$cluster)
+y_cm <- y_cm[keep.genes_cm, , keep=FALSE]
+y_cm <- normLibSizes(y_cm)
+```
+
+### Cell means design matrix
+
+The cell means model formula `~ 0 + cluster + donor` creates a design matrix where each cluster has its own column with a 1 indicating membership, rather than having an intercept with deviation coefficients.
+
+```{r cell_means_design}
+donor_cm <- factor(y_cm$samples$sample)
+cluster_cm <- factor(y_cm$samples$cluster)
+
+design_cm <- model.matrix(~ 0 + cluster_cm + donor_cm)
+colnames(design_cm) <- gsub("cluster_cm", "cluster", colnames(design_cm))
+colnames(design_cm) <- gsub("donor_cm", "", colnames(design_cm))
+dim(design_cm)
+```
+
+The design matrix has 19 columns: 7 (one for each cluster) + 12 (donor coefficients) = 19 parameters. Note that this is the same total number of parameters as before; the intercept has been replaced by an additional cluster coefficient.
+
+```{r cell_means_design_head}
+head(design_cm)
+```
+
+Instead of an intercept column with 1s everywhere, we now have separate columns for each cluster.
+
+Dispersion and model fitting
+
+```{r cell_means_fit}
+y_cm <- estimateDisp(y_cm, design_cm, robust=TRUE)
+fit_cm <- glmQLFit(y_cm, design_cm, robust=TRUE)
+```
+
+### Constructing equivalent contrasts
+
+Contrasts are more straightforward to specify with the cell means parameterisation. To compare cluster $k$ against the average of all other clusters, we simply assign:
+
+* Cluster $k$: weight = 1
+* All other clusters: weight = $-1/6$ (so they average to the comparison group)
+* Donor coefficients: weight = 0 (not part of the comparison)
+
+```{r cell_means_contrast}
+ncls_cm <- nlevels(cluster_cm)
+contr_cm <- matrix(0, nrow=ncol(design_cm), ncol=ncls_cm)
+rownames(contr_cm) <- colnames(design_cm)
+colnames(contr_cm) <- paste0("cluster", levels(cluster_cm))
+for(i in 1:ncls_cm) {
+  contr_cm[1:ncls_cm, i] <- -1/(ncls_cm - 1)
+  contr_cm[i, i] <- 1
+}
+contr_cm
+```
+
+Each column clearly shows that the tested cluster gets weight 1 and all other clusters get weight $-1/6$, and donor effects are ignored (weight 0).
+
+Differential expression testing with cell means model
+
+```{r cell_means_test}
+qlf_cm <- list()
+for(i in 1:ncls_cm){
+  qlf_cm[[i]] <- glmQLFTest(fit_cm, contrast=contr_cm[,i])
+  qlf_cm[[i]]$comparison <- paste0("cluster", levels(cluster_cm)[i], "_vs_others")
+}
+```
+
+### Comparing results: Treatment contrast vs Cell means
+
+Verify that both parameterisations produce identical results by comparing the top DE genes for cluster 0 vs others.
+
+```{r compare_top_genes}
+top_tc <- topTags(qlf[[1]], n=10)$table
+top_cm <- topTags(qlf_cm[[1]], n=10)$table
+identical(rownames(top_tc), rownames(top_cm))
+```
+
+Compare the statistical values.
+
+```{r compare_statistics}
+comparison_df <- data.frame(
+  Gene = rownames(top_tc),
+  logFC_treatment = round(top_tc$logFC, 6),
+  logFC_cellmeans = round(top_cm$logFC, 6),
+  FDR_treatment = signif(top_tc$FDR, 6),
+  FDR_cellmeans = signif(top_cm$FDR, 6)
+)
+comparison_df
+```
+
+Compare all logFC values.
+
+```{r compare_all_logfc}
+all_tc <- qlf[[1]]$table
+all_cm <- qlf_cm[[1]]$table
+
+# Ensure same gene order
+all_cm <- all_cm[rownames(all_tc), ]
+
+# Check correlation and maximum difference
+cat("Correlation of logFC values:", cor(all_tc$logFC, all_cm$logFC), "\n")
+cat("Maximum absolute difference in logFC:", max(abs(all_tc$logFC - all_cm$logFC)), "\n")
+cat("Maximum absolute difference in PValue:", max(abs(all_tc$PValue - all_cm$PValue)), "\n")
+```
+
+The results are identical (within numerical precision), confirming that both parameterisations are mathematically equivalent. The choice between them is a matter of convenience and interpretability:
+
+* **Treatment contrasts** are the R default and work well when you have a natural reference group.
+* **Cell means models** make it easier to specify arbitrary contrasts and may be more intuitive for complex comparisons.
+
+### Summary of DE genes comparison
+
+```{r compare_de_summary}
+dt_cm <- lapply(lapply(qlf_cm, decideTests), summary)
+dt_cm.all <- do.call("cbind", dt_cm)
+
+cat("Treatment contrast model:\n")
+print(dt.all)
+
+cat("\nCell means model:\n")
+print(dt_cm.all)
+
+cat("\nDifference (should be all zeros):\n")
+print(dt.all - dt_cm.all)
+```
+
+The identical number of DE genes in each category confirms that both approaches yield the same biological conclusions.
+
 ## Session info
 
 ```{r}
