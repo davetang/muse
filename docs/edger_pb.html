@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree158ac6722e002b197c9822ec0cfdc795fcb54965targetblank158ac67a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee760666455e8bcea30e11531a885827990e5563btargetblanke760666a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/158ac6722e002b197c9822ec0cfdc795fcb54965" target="_blank">158ac67</a>
+<a href="https://github.com/davetang/muse/tree/e760666455e8bcea30e11531a885827990e5563b" target="_blank">e760666</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree158ac6722e002b197c9822ec0cfdc795fcb54965targetblank158ac67a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreee760666455e8bcea30e11531a885827990e5563btargetblanke760666a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/158ac6722e002b197c9822ec0cfdc795fcb54965" target="_blank">158ac67</a>.
+<a href="https://github.com/davetang/muse/tree/e760666455e8bcea30e11531a885827990e5563b" target="_blank">e760666</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -660,6 +660,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/e760666455e8bcea30e11531a885827990e5563b/analysis/edger_pb.Rmd" target="_blank">e760666</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-02-03
+</td>
+<td>
+Include background information
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/8793f37dbee507f1cad476cad624864ee4dfa14a/docs/edger_pb.html" target="_blank">8793f37</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-02-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/158ac6722e002b197c9822ec0cfdc795fcb54965/analysis/edger_pb.Rmd" target="_blank">158ac67</a>
 </td>
 <td>
@@ -679,6 +713,27 @@ Pseudobulk analysis using edgeR
 </div>
 </div>
 </div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Performing differential expression (DE) analysis on scRNA-seq data
+presents unique challenges with the primary problem being that
+individual cells exhibit high variability.</p>
+<p><strong>Pseudobulking</strong> tries to address the issue of
+variability by aggregating counts from cells that share the same
+biological replicate (e.g., donor/sample) and cell type. This
+approach:</p>
+<ol style="list-style-type: decimal">
+<li>Reduces technical noise by averaging across many cells.</li>
+<li>Properly accounts for biological replication at the sample
+level.</li>
+<li>Allows the use of well-established bulk RNA-seq DE methods (e.g.,
+edgeR) that have robust statistical frameworks.</li>
+</ol>
+<p>This notebook demonstrates how to perform pseudobulk differential
+expression analysis using edgeR, following the workflow described in <a
+href="https://www.bioconductor.org/packages/release/bioc/vignettes/edgeR/inst/doc/edgeRUsersGuide.pdf">Section
+4.10 of the edgeR User’s Guide</a>.</p>
+</div>
 <div id="data" class="section level2">
 <h2>Data</h2>
 <p>The single cell RNA-seq data used in this notebook is from the human
@@ -687,7 +742,8 @@ of the data and the complete bioinformatics analyses of the entire atlas
 study are described in detail in Chen et al. Most of the single cell
 analysis, such as dimensionality reduction and integration, were
 performed using Seurat. All the generated Seurat objects are publicly
-available on Figshare.</p>
+available on <a
+href="https://doi.org/10.6084/m9.figshare.17058077">Figshare</a>.</p>
 <p>The Seurat object used in this notebook was downloaded directly from
 the website of the edgeR maintainers. This object contains breast tissue
 micro-environment samples from 13 individual healthy donors. This object
@@ -782,29 +838,73 @@ dim(y$samples)</code></pre>
 [81] &quot;N_0372_total_cluster2&quot;    &quot;N_0372_total_cluster3&quot;   
 [83] &quot;N_0372_total_cluster4&quot;    &quot;N_0372_total_cluster5&quot;   
 [85] &quot;N_0372_total_cluster6&quot;   </code></pre>
-<p>Wide range of expression sums and note that the minimum is not 0.</p>
+<p>The total UMI counts per pseudobulk sample vary considerably,
+reflecting differences in the number of cells aggregated and their
+sequencing depth. Importantly, the minimum is greater than zero,
+confirming that all sample-cluster combinations retained after
+aggregation contain actual expression data.</p>
 <pre class="r"><code>summary(colSums(y$counts))</code></pre>
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
    1352   42181  165537  651543  776854 5011510 </code></pre>
 </div>
 <div id="filtering-and-normalisation" class="section level2">
 <h2>Filtering and normalisation</h2>
-<p>Filter samples that have less than 50,000 total UMI.</p>
+<p>Before differential expression analysis, we apply two filtering steps
+to remove low-quality data that could compromise statistical
+inference.</p>
+<div id="sample-filtering" class="section level3">
+<h3>Sample filtering</h3>
+<p>Pseudobulk samples with very few total counts are unreliable because
+they may represent too few cells or low-quality aggregations. We remove
+samples with fewer than 50,000 total UMI counts.</p>
 <pre class="r"><code>keep.samples &lt;- y$samples$lib.size &gt; 5e4
 y &lt;- y[, keep.samples]
 
 dim(y$samples)</code></pre>
 <pre><code>[1] 59  5</code></pre>
-<p>Filter genes.</p>
+</div>
+<div id="gene-filtering" class="section level3">
+<h3>Gene filtering</h3>
+<p>Genes with very low counts across samples provide little statistical
+information and can adversely affect the multiple testing correction.
+The <code>filterByExpr()</code> function implements edgeR’s recommended
+filtering strategy: it keeps genes that have sufficiently large counts
+to be statistically meaningful in at least some samples. By default, it
+requires a gene to have at least 10 counts (<code>min.count = 10</code>)
+in a minimum number of samples (determined by the smallest group
+size).</p>
 <pre class="r"><code>keep.genes &lt;- filterByExpr(y, group=y$samples$cluster)
 y &lt;- y[keep.genes, , keep=FALSE]</code></pre>
-<p>TMM normalisation.</p>
+</div>
+<div id="tmm-normalisation" class="section level3">
+<h3>TMM normalisation</h3>
+<p>Trimmed Mean of M-values (TMM) normalisation corrects for
+compositional biases between samples. This is important because
+differences in library size alone don’t account for situations where a
+few highly-expressed genes consume a disproportionate share of
+sequencing reads, making other genes appear artificially down-regulated.
+TMM calculates scaling factors that adjust for these composition
+effects.</p>
 <pre class="r"><code>y &lt;- normLibSizes(y)</code></pre>
+</div>
 </div>
 <div id="design-matrix" class="section level2">
 <h2>Design matrix</h2>
 <p>To perform differential expression analysis between cell clusters, we
-create a design matrix using both cluster and donor information.</p>
+create a design matrix that models both the biological effect of
+interest (cluster identity) and a blocking factor (donor). Including
+donor in the model accounts for individual-to-individual variation,
+ensuring that detected cluster differences are not confounded by
+donor-specific effects.</p>
+<p>The formula <code>~ cluster + donor</code> creates an additive model
+where:</p>
+<ul>
+<li><strong>cluster</strong> captures the differences between cell types
+(what we are interested in).</li>
+<li><strong>donor</strong> accounts for baseline expression differences
+between individuals (a “nuisance” variable, as some people call it, we
+want to control for).</li>
+</ul>
 <pre class="r"><code>donor &lt;- factor(y$samples$sample)
 cluster &lt;- as.factor(y$samples$cluster)
 design &lt;- model.matrix(~ cluster + donor)
@@ -812,11 +912,12 @@ colnames(design) &lt;- gsub(&quot;donor&quot;, &quot;&quot;, colnames(design))
 colnames(design)[1] &lt;- &quot;Int&quot;
 dim(design)</code></pre>
 <pre><code>[1] 59 19</code></pre>
-<p>There are 19 columns because 1 + 6 (clusters) + 12 (samples) = 19;
-the first sample + first cluster is the intercept. Each column
-represents one model parameter to be estimated.</p>
-<p>There are 59 rows because each row represents a single sample +
-cluster combination.</p>
+<p>The design matrix has 19 columns: 1 (intercept) + 6 (cluster
+coefficients, with cluster 0 as reference) + 12 (donor coefficients,
+with the first donor as reference) = 19 parameters to estimate. Each
+column represents one model coefficient.</p>
+<p>The 59 rows correspond to the 59 pseudobulk samples (unique
+sample-cluster combinations that passed filtering).</p>
 <pre class="r"><code>head(design)</code></pre>
 <pre><code>  Int cluster1 cluster2 cluster3 cluster4 cluster5 cluster6 N_0021_total
 1   1        0        0        0        0        0        0            0
@@ -846,27 +947,59 @@ cluster combination.</p>
 4            0
 5            0
 6            0</code></pre>
-<p>The first row (<code>cluster0</code> and <code>N_0019_total</code>)
-shows <code>Int</code>=1 and everything else as 0; this is the
-baseline/reference.</p>
-<p>Next we will estimate the dispersion and fit a model using the design
-matrix structure.</p>
+<p>In the design matrix above, the first row represents a sample from
+cluster 0 and donor <code>N_0019_total</code>. It shows
+<code>Int=1</code> (the intercept) with all other coefficients as 0
+because both the cluster and donor for this sample are the reference
+levels. Subsequent rows have 1s in the appropriate cluster and donor
+columns to indicate which combination each pseudobulk sample
+represents.</p>
+</div>
+<div id="dispersion-estimation-and-model-fitting"
+class="section level2">
+<h2>Dispersion estimation and model fitting</h2>
+<p>RNA-seq count data exhibits overdispersion (variance exceeds the
+mean), which the negative binomial distribution models through a
+dispersion parameter. edgeR estimates dispersion using an empirical
+Bayes approach that shares information across genes, improving estimates
+especially when sample sizes are small.</p>
+<p>The <code>robust=TRUE</code> option protects against outlier genes
+that might otherwise inflate dispersion estimates. The quasi-likelihood
+framework (<code>glmQLFit</code>) adds an additional layer of variance
+modelling that accounts for gene-specific variability beyond the
+negative binomial assumption, providing more reliable statistical
+inference.</p>
 <pre class="r"><code>y &lt;- estimateDisp(y, design, robust=TRUE)
 fit &lt;- glmQLFit(y, design, robust=TRUE)</code></pre>
-<p>To confirm the identities of cell clusters, we perform differential
-expression analysis to identify marker genes of each cluster. In
-particular, we compare each cluster with all the other clusters. Since
-there are 7 clusters in total, we construct a contrast matrix as follows
-so that each column of the contrast matrix represents a testing contrast
-for one cell cluster. Each contrast is a different linear combination of
-the same coefficients.</p>
-<p>Each column of the contrast matrix represents one comparison: testing
-whether a specific cluster is different from the average of all other
+</div>
+<div id="contrast-matrix-for-cluster-comparisons"
+class="section level2">
+<h2>Contrast matrix for cluster comparisons</h2>
+<p>To identify marker genes for each cell cluster, we compare each
+cluster against all other clusters combined. This “one versus rest”
+approach reveals genes that are specifically up- or down-regulated in
+each cluster relative to the overall population.</p>
+<div id="understanding-the-contrast-matrix" class="section level3">
+<h3>Understanding the contrast matrix</h3>
+<p>A contrast is a linear combination of model coefficients that defines
+a specific comparison. For 7 clusters, we need 7 contrasts (one per
+cluster). Each contrast tests: “Is this cluster different from the
+average of all other clusters?”</p>
+<p>Mathematically, if we want to compare cluster <span
+class="math inline">\(k\)</span> against the average of the other 6
+clusters, the contrast weights are:</p>
+<ul>
+<li>Cluster <span class="math inline">\(k\)</span>: weight = 1</li>
+<li>All other clusters: weight = <span
+class="math inline">\(\frac{1}{1-7} = -\frac{1}{6}\)</span></li>
+</ul>
+<p>This ensures the contrast sums to zero (a requirement for valid
+hypothesis testing) and compares cluster <span
+class="math inline">\(k\)</span> to the mean of the remaining
 clusters.</p>
-<p>The contrast is only testing cluster effects. The donor effects are
-being controlled for and they are not part of the comparison; all the
-donor rows are 0 meaning that we are not adding or subtracting donor
-effects in this contrast.</p>
+<p>The donor coefficients are set to 0 in the contrast because we’re not
+interested in donor differences; we only want to test cluster effects
+while controlling for donor variation.</p>
 <pre class="r"><code>ncls &lt;- nlevels(cluster)
 contr &lt;- rbind( matrix(1/(1-ncls), ncls, ncls),
 matrix(0, ncol(design)-ncls, ncls) )
@@ -915,9 +1048,16 @@ N_0275_total     0.0000000  0.0000000
 N_0288_total     0.0000000  0.0000000
 N_0342_total     0.0000000  0.0000000
 N_0372_total     0.0000000  0.0000000</code></pre>
-<p>We then perform quasi-likelihood F-test for each testing contrast.
-The results are stored as a list of DGELRT objects, one for each
-comparison.</p>
+<p>In this matrix, each column represents one comparison.</p>
+</div>
+</div>
+<div id="differential-expression-testing" class="section level2">
+<h2>Differential expression testing</h2>
+<p>We perform a quasi-likelihood F-test for each contrast using
+<code>glmQLFTest()</code>. The quasi-likelihood F-test is preferred over
+the likelihood ratio test for bulk RNA-seq-like data because it accounts
+for uncertainty in dispersion estimation, providing better control of
+the false discovery rate when sample sizes are moderate.</p>
 <pre class="r"><code>qlf &lt;- list()
 for(i in 1:ncls){
   qlf[[i]] &lt;- glmQLFTest(fit, contrast=contr[,i])
@@ -926,8 +1066,11 @@ for(i in 1:ncls){
 
 length(qlf)</code></pre>
 <pre><code>[1] 7</code></pre>
-<p>The top most significant DE genes of cluster 0 vs other clusters can
-be examined with topTags.</p>
+<div id="top-differentially-expressed-genes" class="section level3">
+<h3>Top differentially expressed genes</h3>
+<p>The <code>topTags()</code> function returns the most significant DE
+genes, sorted by p-value. Here are the top 10 genes distinguishing
+cluster 0 from all other clusters:</p>
 <pre class="r"><code>topTags(qlf[[1]], n=10L)</code></pre>
 <pre><code>Coefficient:  cluster0_vs_others 
              gene    logFC   logCPM        F       PValue          FDR
@@ -941,7 +1084,24 @@ MFAP4       MFAP4 4.611371 5.947151 451.5254 1.779196e-32 1.999562e-29
 CRABP2     CRABP2 3.948766 6.351154 449.3824 2.162987e-32 2.127027e-29
 CLMP         CLMP 5.951695 7.510977 502.3276 4.276494e-32 3.393508e-29
 MMP2         MMP2 5.377426 6.789111 475.9323 4.313598e-32 3.393508e-29</code></pre>
-<p>The numbers of DE genes under each comparison are shown below</p>
+<p>The output columns are:</p>
+<ul>
+<li><strong>logFC</strong>: log2 fold change (positive = higher in
+cluster 0)</li>
+<li><strong>logCPM</strong>: average log2 counts per million across all
+samples</li>
+<li><strong>F</strong>: F-statistic from the quasi-likelihood test</li>
+<li><strong>PValue</strong>: raw p-value</li>
+<li><strong>FDR</strong>: false discovery rate (Benjamini-Hochberg
+adjusted p-value)</li>
+</ul>
+</div>
+<div id="summary-of-de-genes-across-clusters" class="section level3">
+<h3>Summary of DE genes across clusters</h3>
+<p>The <code>decideTests()</code> function classifies genes as
+significantly up-regulated (1), down-regulated (-1), or not significant
+(0) at FDR &lt; 0.05. The table below shows how many genes fall into
+each category for each cluster comparison:</p>
 <pre class="r"><code>dt &lt;- lapply(lapply(qlf, decideTests), summary)
 dt.all &lt;- do.call(&quot;cbind&quot;, dt)
 dt.all</code></pre>
@@ -957,6 +1117,17 @@ Up                   1871               1320               1045
 Down                 1410
 NotSig               4880
 Up                   1577</code></pre>
+<p>The “Down” row indicates genes significantly lower in that cluster
+compared to others, while “Up” shows genes significantly higher.
+“NotSig” genes show no significant difference.</p>
+</div>
+</div>
+<div id="identifying-cluster-marker-genes" class="section level2">
+<h2>Identifying cluster marker genes</h2>
+<p>To visualise cluster-specific expression patterns, we extract the top
+20 up-regulated genes (positive logFC) from each cluster comparison.
+These represent potential marker genes that characterise each cell
+population.</p>
 <pre class="r"><code>top &lt;- 20
 topMarkers &lt;- list()
 for(i in 1:ncls) {
@@ -989,6 +1160,16 @@ topMarkers</code></pre>
 [121] &quot;SCN3B&quot;    &quot;GATA2&quot;    &quot;CLDN5&quot;    &quot;C2CD4B&quot;   &quot;TFF3&quot;     &quot;ANGPT2&quot;  
 [127] &quot;TSPAN12&quot;  &quot;PRRG4&quot;    &quot;BBC3&quot;     &quot;RASGRP3&quot;  &quot;ARL4A&quot;    &quot;RAB32&quot;   
 [133] &quot;C6orf141&quot; &quot;RAI14&quot;    &quot;PDPN&quot;    </code></pre>
+<p>The combined list of unique marker genes across all clusters provides
+a gene set that should discriminate between cell populations.</p>
+</div>
+<div id="heatmap-visualisation" class="section level2">
+<h2>Heatmap visualisation</h2>
+<p>A heatmap of the marker genes allows us to visually confirm that
+these genes show cluster-specific expression patterns. We use
+log-transformed CPM values (log counts per million) to account for
+library size differences and apply row scaling (z-scores) to highlight
+relative expression patterns rather than absolute expression levels.</p>
 <pre class="r"><code>lcpm &lt;- edgeR::cpm(y, log=TRUE)
 annot &lt;- data.frame(cluster=paste0(&quot;cluster &quot;, cluster))
 rownames(annot) &lt;- colnames(y)
@@ -1001,6 +1182,56 @@ pheatmap::pheatmap(lcpm[topMarkers, ], breaks=seq(-2,2,length.out=101),
                    clustering_method=&quot;ward.D2&quot;, show_colnames=FALSE,
                    annotation_col=annot, annotation_colors=ann_colors)</code></pre>
 <p><img src="figure/edger_pb.Rmd/heatmap-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-heatmap-1">
+Past versions of heatmap-1.png
+</button>
+</p>
+<div id="fig-heatmap-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/8793f37dbee507f1cad476cad624864ee4dfa14a/docs/figure/edger_pb.Rmd/heatmap-1.png" target="_blank">8793f37</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-02-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>In this heatmap:</p>
+<ul>
+<li><strong>Rows</strong> represent marker genes, clustered by
+expression similarity</li>
+<li><strong>Columns</strong> represent pseudobulk samples, clustered
+hierarchically and annotated by cell cluster</li>
+<li><strong>Colours</strong> indicate relative expression (blue = low,
+red = high) after row-wise scaling</li>
+<li>The dendrogram is cut into 7 groups (<code>cutree_cols=7</code>) to
+highlight cluster separation</li>
+</ul>
+<p>Genes that are good markers should show high expression (red) in
+their target cluster and low expression (blue) in other clusters.</p>
 </div>
 <div id="session-info" class="section level2">
 <h2>Session info</h2>
@@ -1078,7 +1309,7 @@ loaded via a namespace (and not attached):
 <p>Time taken to render notebook.</p>
 <pre class="r"><code>end_time &lt;- Sys.time()
 end_time - start_time</code></pre>
-<pre><code>Time difference of 31.12612 secs</code></pre>
+<pre><code>Time difference of 31.12815 secs</code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
