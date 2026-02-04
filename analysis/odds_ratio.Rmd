@@ -13,10 +13,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-Odds ratios are widely used to measure **the strength of association between two variables**. Odds and probability are related but they are different:
+Odds ratios are widely used to measure **the strength of association between two variables**, particularly in medical research, epidemiology, and case-control studies. Before understanding odds ratios, we need to understand the difference between probability and odds.
 
-* Probability: Chance of something happening out of all possibilities
-* Odds: Ratio of something happening to it NOT happening
+## Probability vs Odds
+
+Probability and odds are related but different:
+
+* **Probability**: The chance of something happening out of all possibilities (ranges from 0 to 1)
+* **Odds**: The ratio of something happening to it NOT happening (ranges from 0 to infinity)
 
 ```{r odds-vs-prob}
 sick <- 2
@@ -30,11 +34,61 @@ odds <- sick / healthy
 odds
 ```
 
-**An odds ratio compares the odds of an event between two groups**.
+In this example:
 
-## Smoking and Lung Cancer
+* The probability of being sick is 2/10 = 0.2 (or 20%)
+* The odds of being sick are 2:8 = 0.25 (read as "1 to 4" or "0.25 to 1")
 
-A sample of 200 people broken down into four categories.
+### Converting Between Probability and Odds
+
+You can convert between probability (P) and odds using these formulas:
+
+$$\text{Odds} = \frac{P}{1 - P}$$
+
+$$P = \frac{\text{Odds}}{1 + \text{Odds}}$$
+
+Convert probability to odds.
+
+```{r convert-prob-odds}
+prob <- 0.2
+odds_from_prob <- prob / (1 - prob)
+odds_from_prob
+
+# Convert odds back to probability
+prob_from_odds <- odds_from_prob / (1 + odds_from_prob)
+prob_from_odds
+```
+
+### Example: Different Probability Values
+
+To build intuition, let's see how odds change across different probabilities:
+
+```{r odds-table}
+probs <- c(0.1, 0.2, 0.5, 0.8, 0.9)
+odds_values <- probs / (1 - probs)
+
+data.frame(
+  Probability = probs,
+  Odds = round(odds_values, 3),
+  Interpretation = c("1 to 9", "1 to 4", "1 to 1 (even)", "4 to 1", "9 to 1")
+)
+```
+
+Notice that when P = 0.5, the odds are 1 (even odds). When P > 0.5, odds > 1; when P < 0.5, odds < 1.
+
+## What is an Odds Ratio?
+
+**An odds ratio (OR) compares the odds of an event between two groups**. It answers the question: "How many times higher (or lower) are the odds of the outcome in one group compared to another?"
+
+Interpreting odds ratio values:
+
+* **OR = 1**: No association between exposure and outcome
+* **OR > 1**: Exposure is associated with higher odds of the outcome
+* **OR < 1**: Exposure is associated with lower odds of the outcome
+
+## Smoking and Lung Cancer Example
+
+Let's work through a classic example examining the association between smoking and lung cancer. We have a sample of 200 people broken down into a 2x2 contingency table:
 
 ```{r smoking_example}
 data <- matrix(
@@ -50,52 +104,148 @@ data <- matrix(
 data
 ```
 
-Calculate odds of cancer for the two groups.
+The general structure of a 2x2 table is:
+
+|              | Disease+ | Disease- |
+|--------------|----------|----------|
+| Exposed      | a        | b        |
+| Not Exposed  | c        | d        |
+
+In our example: a=20, b=80, c=2, d=98.
+
+### Step 1: Calculate odds for each group
 
 ```{r smoking_example_odds}
+# Odds of cancer for smokers = a/b
 odds_smokers <- data[1, 1] / data[1, 2]
-odds_nonsmokers <- data[2, 1] / data[2, 2]
-
 odds_smokers
+
+# Odds of cancer for non-smokers = c/d
+odds_nonsmokers <- data[2, 1] / data[2, 2]
 odds_nonsmokers
 ```
 
-Calculate odds ratio.
+* Smokers: 20 have cancer, 80 don't → odds = 20/80 = 0.25 (or 1:4)
+* Non-smokers: 2 have cancer, 98 don't → odds = 2/98 ≈ 0.02 (or about 1:49)
 
+### Step 2: Calculate odds ratio
+
+The odds ratio is simply the ratio of these two odds:
 
 ```{r smoking_example_odds_ratio}
 odds_ratio <- odds_smokers / odds_nonsmokers
 odds_ratio
 ```
 
-Smokers have `r odds_ratio` times the odds of lung cancer compared to non-smokers.
+**Interpretation**: Smokers have `r round(odds_ratio, 1)` times the odds of developing lung cancer compared to non-smokers. This is a strong positive association.
 
-## Using Fisher's Exact Test
+### Cross-Product Formula
 
-Use `fisher.test()` for calculating odds ratios with confidence intervals.
+For a 2x2 table, the odds ratio can also be calculated directly using the cross-product formula:
 
-```{r fishers-test}
-fisher.test(data)
+$$OR = \frac{a \times d}{b \times c}$$
+
+Using the cross-product formula.
+
+```{r cross-product}
+or_cross <- (data[1, 1] * data[2, 2]) / (data[1, 2] * data[2, 1])
+or_cross
 ```
 
-## Logistic Regression Example
+This gives the same result and is often more convenient for quick calculations.
 
-Odds ratios from logistic regression models.
+## Confidence Intervals
+
+A point estimate of the odds ratio alone doesn't tell us how precise our estimate is. We need **confidence intervals** to understand the range of plausible values for the true odds ratio.
+
+### Using Fisher's Exact Test
+
+The `fisher.test()` function calculates the odds ratio with a 95% confidence interval:
+
+```{r fishers-test}
+result <- fisher.test(data)
+result
+```
+
+Key outputs:
+
+* **Odds ratio**: `r round(result$estimate, 2)` (similar to our manual calculation; slight difference due to conditional maximum likelihood estimation)
+* **95% CI**: [`r round(result$conf.int[1], 2)`, `r round(result$conf.int[2], 2)`]
+* **p-value**: `r format.pval(result$p.value, digits = 3)`
+
+**Interpreting the confidence interval**: Since the 95% CI does not include 1, we can conclude there is a statistically significant association between smoking and lung cancer at the 0.05 significance level.
+
+### Rule of Thumb for Confidence Intervals
+
+* If the 95% CI **excludes 1**: The association is statistically significant (p < 0.05)
+* If the 95% CI **includes 1**: The association is not statistically significant
+
+## Logistic Regression and Odds Ratios
+
+Logistic regression is commonly used to model binary outcomes (yes/no, disease/no disease). The coefficients from logistic regression are **log odds ratios**, which can be converted to odds ratios by exponentiation.
+
+### Why Log Odds?
+
+Logistic regression models the **log odds** (also called logit) of the outcome:
+
+$$\log\left(\frac{P}{1-P}\right) = \beta_0 + \beta_1 X_1 + \beta_2 X_2 + ...$$
+
+The coefficients ($\beta$) represent the change in log odds for a one-unit increase in the predictor.
+
+### Example: Disease Prediction
+
+Let's simulate data where disease risk depends on age and smoking status:
 
 ```{r logistic_regression_eg}
 set.seed(1984)
 n <- 200
 age <- rnorm(n, mean = 50, sd = 15)
 smoker <- rbinom(n, 1, 0.3)
+# True model: log odds = -5 + 0.05*age + 2*smoker
 disease <- rbinom(n, 1, plogis(-5 + 0.05*age + 2*smoker))
 
 model <- glm(disease ~ age + smoker, family = binomial)
 summary(model)
 ```
 
-Odds ratios.
+### Converting Coefficients to Odds Ratios
+
+The model coefficients are log odds ratios. To get odds ratios, we exponentiate them:
 
 ```{r logistic_regression_odds_ratios}
 or_coef <- exp(coef(model))
 or_coef
 ```
+
+**Interpretation**:
+
+* **Age**: OR = `r round(or_coef["age"], 3)`. For each additional year of age, the odds of disease increase by about `r round((or_coef["age"] - 1) * 100, 1)`%
+* **Smoker**: OR = `r round(or_coef["smoker"], 2)`. Smokers have about `r round(or_coef["smoker"], 1)` times the odds of disease compared to non-smokers
+
+### Odds Ratios with Confidence Intervals
+
+For a complete picture, we should report odds ratios with confidence intervals:
+
+```{r or-with-ci}
+# Get confidence intervals for coefficients
+ci <- confint(model)
+
+# Combine into a nice table
+or_table <- data.frame(
+  OR = exp(coef(model)),
+  Lower_CI = exp(ci[, 1]),
+  Upper_CI = exp(ci[, 2])
+)
+round(or_table, 3)
+```
+
+## Summary
+
+Key points about odds ratios:
+
+1. **Odds** are the ratio of an event occurring to it not occurring
+2. **Odds ratios** compare odds between two groups
+3. OR = 1 means no association; OR > 1 means positive association; OR < 1 means negative association
+4. Always report confidence intervals alongside point estimates
+5. In logistic regression, exponentiate coefficients to obtain odds ratios
+6. The **cross-product formula** (ad/bc) provides a quick way to calculate OR from 2x2 tables
