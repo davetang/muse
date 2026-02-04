@@ -13,11 +13,33 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-Bartlett's test is used to assess whether multiple groups have equal variances (homogeneity of variance). It is sensitive to departures from normality, and should therefore be used primarily when the assumption of normality is reasonable.
+Bartlett's test is used to assess whether multiple groups have equal variances, a property called **homogeneity of variance** (or homoscedasticity). This is an important assumption for several statistical tests, including:
 
-## Example
+* **One-way ANOVA** - assumes equal variances across groups
+* **Student's t-test** - assumes equal variances between two groups
+* **Linear regression** - assumes constant variance of residuals
 
-Simulate three groups with different variances.
+When these assumptions are violated, the test results may be unreliable.
+
+## The Hypotheses
+
+Bartlett's test evaluates:
+
+* Null hypothesis ($H_0$): All groups have equal variances
+* Alternative hypothesis ($H_1$): At least one group has a different variance
+
+A small p-value (typically < 0.05) suggests rejecting the null hypothesis, indicating that variances are not equal across groups.
+
+## Important Considerations
+
+Bartlett's test is sensitive to departures from normality. If your data is not normally distributed, even slight deviations can cause the test to incorrectly reject the null hypothesis. Therefore:
+
+* Use Bartlett's test when data is approximately normal
+* For non-normal data, consider the Fligner-Killeen test (`fligner.test()`), which is a non-parametric alternative available in base R.
+
+## Example 1: Unequal Variances
+
+Let's simulate three groups that have the **same mean** but **different variances** (standard deviations of 1, 3, and 5):
 
 ```{r eg1}
 set.seed(1984)
@@ -32,22 +54,49 @@ eg1 <- data.frame(my_groups, my_values)
 head(eg1)
 ```
 
-Apply Bartlett's test to evaluate whether the variances are equal across groups.
+First, let's examine the actual sample variances:
+
+```{r eg1_variances}
+eg1 |>
+  group_by(my_groups) |>
+  summarise(
+    n = n(),
+    mean = round(mean(my_values), 2),
+    variance = round(var(my_values), 2),
+    sd = round(sd(my_values), 2)
+  )
+```
+
+Now apply Bartlett's test:
 
 ```{r eg1_test}
 bartlett.test(my_values ~ my_groups, data = eg1)
 ```
 
-The null hypothesis is that all groups have equal variances and the alternative hypothesis is that at least one group has a different variance. Here the extremely small p-value suggests rejecting the null, i.e., variances differ between groups.
+Interpreting the Output:
+
+* **Bartlett's K-squared**: The test statistic. Larger values indicate greater differences in variances.
+* **df**: Degrees of freedom (number of groups - 1)
+* **p-value**: The probability of observing this test statistic if the null hypothesis were true
+
+Here the extremely small p-value (< 0.05) leads us to reject the null hypothesis. We conclude that the variances are significantly different across groups.
+
+### Visualising the Differences
+
+A boxplot clearly shows the different spreads:
 
 ```{r eg1_boxplot}
 ggplot(eg1, aes(my_groups, my_values)) +
   geom_boxplot() +
   theme_minimal() +
-  labs(x = '', y = 'Values')
+  labs(x = '', y = 'Values', title = 'Groups with Unequal Variances')
 ```
 
-Same variance.
+Notice how Group 1 has a narrow spread while Group 3 has a much wider spread, despite all three groups having similar centers (means around 10).
+
+## Example 2: Equal Variances
+
+Now let's simulate three groups with **different means** but **similar variances** (standard deviations of 2.1, 2, and 1.9):
 
 ```{r eg2}
 set.seed(1984)
@@ -59,6 +108,97 @@ group3 <- rnorm(50, mean = 11, sd = 1.9)
 my_groups <- factor(rep(c("Group 1", "Group 2", "Group 3"), each = 50))
 my_values <- c(group1, group2, group3)
 eg2 <- data.frame(my_groups, my_values)
+```
 
+Check the sample variances:
+
+```{r eg2_variances}
+eg2 |>
+  group_by(my_groups) |>
+  summarise(
+    n = n(),
+    mean = round(mean(my_values), 2),
+    variance = round(var(my_values), 2),
+    sd = round(sd(my_values), 2)
+  )
+```
+
+Apply Bartlett's test:
+
+```{r eg2_test}
 bartlett.test(my_values ~ my_groups, data = eg2)
 ```
+
+The p-value is large (> 0.05), so we fail to reject the null hypothesis. There is no evidence that the variances differ across groups. This dataset would satisfy the homogeneity of variance assumption for ANOVA.
+
+```{r eg2_boxplot}
+ggplot(eg2, aes(my_groups, my_values)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(x = '', y = 'Values', title = 'Groups with Equal Variances')
+```
+
+Notice the boxes have similar heights (similar interquartile ranges), reflecting the equal variances—even though the centers differ.
+
+## Real-World Example: InsectSprays Dataset
+
+Let's apply Bartlett's test to the built-in `InsectSprays` dataset, which contains counts of insects after treatment with different sprays:
+
+```{r insect_sprays}
+data(InsectSprays)
+head(InsectSprays)
+
+# Examine the data
+InsectSprays |>
+  group_by(spray) |>
+  summarise(
+    n = n(),
+    mean = round(mean(count), 2),
+    variance = round(var(count), 2)
+  )
+```
+
+```{r insect_bartlett}
+bartlett.test(count ~ spray, data = InsectSprays)
+```
+
+The very small p-value indicates that variances are significantly different across spray types. Before running ANOVA on this data, we would need to address this violation (e.g., transform the data or use Welch's ANOVA).
+
+```{r insect_boxplot}
+ggplot(InsectSprays, aes(spray, count)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(x = 'Spray Type', y = 'Insect Count', title = 'InsectSprays Dataset')
+```
+
+## Alternative: Fligner-Killeen Test
+
+When data is not normally distributed, the **Fligner-Killeen test** is a robust alternative. It is a non-parametric test based on ranks, making it resistant to departures from normality:
+
+```{r fligner}
+fligner.test(my_values ~ my_groups, data = eg1)
+```
+
+Like Bartlett's test, a small p-value indicates unequal variances. The Fligner-Killeen test also rejects the null hypothesis here, confirming that variances differ across groups.
+
+Let's also check the equal variance example:
+
+```{r fligner_eg2}
+fligner.test(my_values ~ my_groups, data = eg2)
+```
+
+As expected, the test does not reject the null hypothesis for the equal variance data.
+
+## Summary
+
+| Test | When to Use | R Function |
+|------|-------------|------------|
+| Bartlett's test | Data is normally distributed | `bartlett.test()` |
+| Fligner-Killeen test | Non-parametric alternative | `fligner.test()` |
+
+Key points:
+
+1. Bartlett's test checks if group variances are equal (homoscedasticity)
+2. It is sensitive to non-normality—use Fligner-Killeen for non-normal data
+3. A significant result (p < 0.05) means variances are unequal
+4. Unequal variances may require data transformation or using robust methods (e.g., Welch's ANOVA)
