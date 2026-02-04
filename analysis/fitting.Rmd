@@ -4,66 +4,188 @@ date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
     toc: true
-editor_options:
-  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
-suppressPackageStartupMessages(library(MASS))
+library(MASS)
+library(ggplot2)
 ```
 
 # Introduction
 
-When a "distribution was fit to" something, it means that we assume that the data comes from some probability distribution and we are estimating the distribution's parameters from the data so that the model best represents the observed values.
+When we say a "distribution was fit to" data, it means we assume the data comes from some probability distribution and we estimate the distribution's parameters so the model best represents the observed values.
 
-# Fitting using {MASS}
+## Why Fit Distributions?
 
-Suppose we have some data:
+Distribution fitting is useful for:
+
+* **Understanding data**: Identifying the underlying process that generated your data
+* **Simulation**: Generating synthetic data with similar properties
+* **Prediction**: Calculating probabilities of future events
+* **Statistical testing**: Many tests assume specific distributions
+* **Quality control**: Monitoring processes in manufacturing and other fields
+
+## Maximum Likelihood Estimation
+
+The most common method for fitting distributions is **Maximum Likelihood Estimation (MLE)**. The idea is to find parameter values that make the observed data most probable.
+
+For example, if we have data and assume it comes from a normal distribution, MLE finds the mean ($\mu$) and standard deviation ($\sigma$) that maximise the likelihood of observing that data.
+
+The likelihood function for n independent observations is:
+
+$$L(\theta | x_1, ..., x_n) = \prod_{i=1}^{n} f(x_i | \theta)$$
+
+where $f$ is the probability density function and $\theta$ represents the parameters. In practice, we maximise the log-likelihood for computational convenience.
+
+# Fitting Distributions with MASS
+
+The `MASS::fitdistr()` function fits univariate distributions using maximum likelihood estimation. Let's work through several examples.
+
+## Example 1: Normal Distribution
+
+The normal (Gaussian) distribution is characterised by two parameters: mean ($\mu$) and standard deviation ($\sigma$).
 
 ```{r eg1}
 set.seed(1984)
 eg1 <- rnorm(100, mean = 5, sd = 2)
 ```
 
-Fit a Normal distribution.
+Fit a normal distribution to the data:
 
 ```{r eg1_fit}
-eg1_fit <- MASS::fitdistr(eg1, "normal")
+eg1_fit <- fitdistr(eg1, "normal")
 eg1_fit
 ```
 
-A Normal distribution was fit to `eg1`, with estimated mean `r eg1_fit$estimate['mean']` and standard deviation `r eg1_fit$estimate['sd']`
+### Understanding the Output
 
-Poisson.
+The output shows:
+
+* **Estimated parameters**: mean = `r round(eg1_fit$estimate['mean'], 3)`, sd = `r round(eg1_fit$estimate['sd'], 3)`
+* **Standard errors**: The values in parentheses indicate uncertainty in the estimates
+
+The true parameters were mean = 5 and sd = 2. Our estimates are close, demonstrating that MLE recovers the true parameters reasonably well with 100 observations.
+
+### Visualising the Fit
+
+It's important to visually verify that the fitted distribution matches the data:
+
+```{r eg1_plot}
+ggplot(data.frame(x = eg1), aes(x)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 20,
+                 fill = "steelblue", colour = "white", alpha = 0.7) +
+  stat_function(fun = dnorm,
+                args = list(mean = eg1_fit$estimate['mean'],
+                            sd = eg1_fit$estimate['sd']),
+                colour = "red", linewidth = 1) +
+  labs(title = "Normal Distribution Fit",
+       subtitle = paste0("Estimated: mean = ", round(eg1_fit$estimate['mean'], 2),
+                        ", sd = ", round(eg1_fit$estimate['sd'], 2)),
+       x = "Value", y = "Density") +
+  theme_minimal()
+```
+
+The red curve shows the fitted normal distribution overlaid on the histogram of our data.
+
+## Example 2: Poisson Distribution
+
+The Poisson distribution models count data and has a single parameter $\lambda$ (lambda), which represents both the mean and variance.
 
 ```{r eg2}
 set.seed(1984)
 eg2 <- rpois(100, lambda = 3)
-eg2_fit <- MASS::fitdistr(eg2, "Poisson")
+eg2_fit <- fitdistr(eg2, "Poisson")
 eg2_fit
 ```
 
-[Gamma distribution](https://en.wikipedia.org/wiki/Gamma_distribution#Occurrence_and_applications).
+The estimated $\lambda$ = `r round(eg2_fit$estimate['lambda'], 3)` is close to the true value of 3.
+
+```{r eg2_plot}
+# Create comparison data
+x_vals <- 0:max(eg2)
+observed <- table(factor(eg2, levels = x_vals)) / length(eg2)
+expected <- dpois(x_vals, lambda = eg2_fit$estimate['lambda'])
+
+plot_data <- data.frame(
+  x = rep(x_vals, 2),
+  probability = c(as.numeric(observed), expected),
+  type = rep(c("Observed", "Fitted"), each = length(x_vals))
+)
+
+ggplot(plot_data, aes(x, probability, fill = type)) +
+  geom_bar(stat = "identity", position = "dodge", alpha = 0.7) +
+  scale_fill_manual(values = c("Observed" = "steelblue", "Fitted" = "red")) +
+  labs(title = "Poisson Distribution Fit",
+       subtitle = paste0("Estimated: lambda = ", round(eg2_fit$estimate['lambda'], 2)),
+       x = "Count", y = "Probability", fill = "") +
+  theme_minimal()
+```
+
+## Example 3: Gamma Distribution
+
+The [gamma distribution](https://en.wikipedia.org/wiki/Gamma_distribution) is useful for modelling positive continuous data, such as waiting times or rainfall amounts. It has two parameters: shape ($\alpha$) and rate ($\beta$).
 
 ```{r eg3}
 set.seed(1984)
-eg3 <- stats::rgamma(300, shape = 2, rate = 3, scale = 1/3)
+eg3 <- rgamma(300, shape = 2, rate = 3)
 
-eg3_fit <- MASS::fitdistr(eg3, "gamma")
+eg3_fit <- fitdistr(eg3, "gamma")
 eg3_fit
 ```
 
-Negative binomial.
+True parameters: shape = 2, rate = 3. The estimates are reasonably close.
+
+```{r eg3_plot}
+ggplot(data.frame(x = eg3), aes(x)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 30,
+                 fill = "steelblue", colour = "white", alpha = 0.7) +
+  stat_function(fun = dgamma,
+                args = list(shape = eg3_fit$estimate['shape'],
+                            rate = eg3_fit$estimate['rate']),
+                colour = "red", linewidth = 1) +
+  labs(title = "Gamma Distribution Fit",
+       subtitle = paste0("Estimated: shape = ", round(eg3_fit$estimate['shape'], 2),
+                        ", rate = ", round(eg3_fit$estimate['rate'], 2)),
+       x = "Value", y = "Density") +
+  theme_minimal()
+```
+
+## Example 4: Negative Binomial Distribution
+
+The negative binomial distribution is useful for overdispersed count data (when variance exceeds the mean). It has two parameters: size ($r$) and mu ($\mu$).
 
 ```{r eg4}
 set.seed(1984)
 eg4 <- rnbinom(100, mu = 10, size = 5)
 
-eg4_fit <- MASS::fitdistr(eg4, "negative binomial")
+eg4_fit <- fitdistr(eg4, "negative binomial")
 eg4_fit
 ```
+
+```{r eg4_plot}
+x_vals <- 0:max(eg4)
+observed <- table(factor(eg4, levels = x_vals)) / length(eg4)
+expected <- dnbinom(x_vals, mu = eg4_fit$estimate['mu'], size = eg4_fit$estimate['size'])
+
+plot_data <- data.frame(
+  x = rep(x_vals, 2),
+  probability = c(as.numeric(observed), expected),
+  type = rep(c("Observed", "Fitted"), each = length(x_vals))
+)
+
+ggplot(plot_data, aes(x, probability, fill = type)) +
+  geom_bar(stat = "identity", position = "dodge", alpha = 0.7) +
+  scale_fill_manual(values = c("Observed" = "steelblue", "Fitted" = "red")) +
+  labs(title = "Negative Binomial Distribution Fit",
+       subtitle = paste0("Estimated: size = ", round(eg4_fit$estimate['size'], 2),
+                        ", mu = ", round(eg4_fit$estimate['mu'], 2)),
+       x = "Count", y = "Probability", fill = "") +
+  theme_minimal()
+```
+
+## Supported Distributions
 
 `MASS::fitdistr()` supports the following distributions:
 
@@ -82,16 +204,217 @@ eg4_fit
 * "t"
 * "weibull"
 
-# Which fits better?
+# Comparing Model Fits
 
-[Akaike Information Criterion](https://en.wikipedia.org/wiki/Akaike_information_criterion) (AIC) is an estimator of prediction error and thereby relative quality of statistical models for a given set of data. Put simply, it's a measure of how well a statistical model fits the data, but with a built-in penalty for model complexity. When comparing models, the one with the lowest AIC is preferred.
+When multiple distributions could plausibly fit your data, you need methods to compare them.
+
+## Akaike Information Criterion (AIC)
+
+The [Akaike Information Criterion](https://en.wikipedia.org/wiki/Akaike_information_criterion) (AIC) measures how well a model fits the data while penalising model complexity:
+
+$$AIC = 2k - 2\ln(L)$$
+
+where $k$ is the number of parameters and $L$ is the maximum likelihood. **Lower AIC values indicate better fit**. The penalty term (2k) prevents overfitting by discouraging unnecessarily complex models.
+
+### Example: Normal vs Exponential
+
+Let's compare normal and exponential fits for our normally distributed data:
 
 ```{r aic}
 set.seed(1984)
 eg1 <- rnorm(100, mean = 5, sd = 2)
 
-eg1_norm <- MASS::fitdistr(eg1, "normal")
-eg1_exp <- MASS::fitdistr(eg1, "exponential")
+eg1_norm <- fitdistr(eg1, "normal")
+eg1_exp <- fitdistr(eg1, "exponential")
 
-stats::AIC(eg1_norm, eg1_exp)
+AIC(eg1_norm, eg1_exp)
 ```
+
+The normal distribution has a much lower AIC, correctly indicating it's a better fit. We can also visualise why:
+
+```{r aic_visual}
+ggplot(data.frame(x = eg1), aes(x)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 20,
+                 fill = "grey70", colour = "white") +
+  stat_function(fun = dnorm,
+                args = list(mean = eg1_norm$estimate['mean'],
+                            sd = eg1_norm$estimate['sd']),
+                aes(colour = "Normal"), linewidth = 1) +
+  stat_function(fun = dexp,
+                args = list(rate = eg1_exp$estimate['rate']),
+                aes(colour = "Exponential"), linewidth = 1) +
+  scale_colour_manual(values = c("Normal" = "blue", "Exponential" = "red")) +
+  labs(title = "Comparing Normal vs Exponential Fit",
+       x = "Value", y = "Density", colour = "Distribution") +
+  theme_minimal()
+```
+
+The exponential distribution clearly doesn't capture the symmetric, bell-shaped nature of the data.
+
+## Bayesian Information Criterion (BIC)
+
+BIC is similar to AIC but applies a stronger penalty for model complexity:
+
+$$BIC = k\ln(n) - 2\ln(L)$$
+
+where $n$ is the sample size. BIC tends to favour simpler models than AIC.
+
+```{r bic}
+BIC(eg1_norm, eg1_exp)
+```
+
+Both criteria agree that the normal distribution is the better fit.
+
+## Example: Choosing Between Related Distributions
+
+Sometimes the choice is less obvious. Consider count data that might follow either a Poisson or negative binomial distribution:
+
+```{r count_comparison}
+set.seed(1984)
+# Generate overdispersed count data
+overdispersed <- rnbinom(200, mu = 5, size = 2)
+
+# Fit both distributions
+pois_fit <- fitdistr(overdispersed, "Poisson")
+nb_fit <- fitdistr(overdispersed, "negative binomial")
+
+# Compare AIC
+AIC(pois_fit, nb_fit)
+```
+
+```{r count_comparison_visual}
+x_vals <- 0:max(overdispersed)
+observed <- table(factor(overdispersed, levels = x_vals)) / length(overdispersed)
+pois_expected <- dpois(x_vals, lambda = pois_fit$estimate['lambda'])
+nb_expected <- dnbinom(x_vals, mu = nb_fit$estimate['mu'], size = nb_fit$estimate['size'])
+
+plot_data <- data.frame(
+  x = rep(x_vals, 3),
+  probability = c(as.numeric(observed), pois_expected, nb_expected),
+  type = rep(c("Observed", "Poisson", "Negative Binomial"), each = length(x_vals))
+)
+
+ggplot(plot_data, aes(x, probability, fill = type)) +
+  geom_bar(stat = "identity", position = "dodge", alpha = 0.7) +
+  scale_fill_manual(values = c("Observed" = "grey50",
+                               "Poisson" = "steelblue",
+                               "Negative Binomial" = "darkred")) +
+  labs(title = "Poisson vs Negative Binomial Fit",
+       subtitle = "For overdispersed count data",
+       x = "Count", y = "Probability", fill = "") +
+  theme_minimal()
+```
+
+The negative binomial has lower AIC because it can accommodate the overdispersion (variance > mean) in the data, which the Poisson cannot.
+
+# Assessing Goodness of Fit
+
+Beyond comparing models, you should assess whether any distribution fits well in absolute terms.
+
+## Q-Q Plots
+
+Quantile-Quantile (Q-Q) plots compare the quantiles of your data against theoretical quantiles. If the data follows the assumed distribution, points should fall along the diagonal line.
+
+```{r qq_plot}
+# Q-Q plot for normal fit
+eg1_sorted <- sort(eg1)
+theoretical_quantiles <- qnorm(ppoints(length(eg1)),
+                               mean = eg1_fit$estimate['mean'],
+                               sd = eg1_fit$estimate['sd'])
+
+ggplot(data.frame(theoretical = theoretical_quantiles, observed = eg1_sorted),
+       aes(theoretical, observed)) +
+  geom_point(alpha = 0.6) +
+  geom_abline(slope = 1, intercept = 0, colour = "red", linetype = "dashed") +
+  labs(title = "Q-Q Plot: Normal Distribution",
+       x = "Theoretical Quantiles", y = "Observed Quantiles") +
+  theme_minimal()
+```
+
+Points closely following the diagonal line indicate a good fit.
+
+## Kolmogorov-Smirnov Test
+
+The Kolmogorov-Smirnov test formally tests whether data comes from a specified distribution:
+
+```{r ks_test}
+ks.test(eg1, "pnorm",
+        mean = eg1_fit$estimate['mean'],
+        sd = eg1_fit$estimate['sd'])
+```
+
+A large p-value (> 0.05) suggests we cannot reject the hypothesis that the data comes from the fitted distribution.
+
+# Practical Considerations
+
+## Sample Size
+
+Larger samples produce more reliable parameter estimates:
+
+```{r sample_size}
+set.seed(1984)
+true_mean <- 10
+true_sd <- 3
+
+# Compare estimates at different sample sizes
+sample_sizes <- c(20, 50, 100, 500, 1000)
+results <- lapply(sample_sizes, function(n) {
+  x <- rnorm(n, mean = true_mean, sd = true_sd)
+  fit <- fitdistr(x, "normal")
+  data.frame(
+    n = n,
+    est_mean = fit$estimate['mean'],
+    est_sd = fit$estimate['sd'],
+    se_mean = fit$sd['mean'],
+    se_sd = fit$sd['sd']
+  )
+})
+
+results_df <- do.call(rbind, results)
+results_df
+```
+
+Notice how standard errors decrease as sample size increases.
+
+## Starting Values
+
+For some distributions, `fitdistr()` may need starting values to converge:
+
+```{r starting_values}
+set.seed(1984)
+weibull_data <- rweibull(100, shape = 2, scale = 5)
+
+# Provide starting values for Weibull
+weibull_fit <- fitdistr(weibull_data, "weibull",
+                        start = list(shape = 1, scale = 1))
+weibull_fit
+```
+
+## Accessing Fit Components
+
+The fitted object contains useful information:
+
+```{r fit_components}
+# Parameter estimates
+eg1_fit$estimate
+
+# Standard errors
+eg1_fit$sd
+
+# Log-likelihood
+eg1_fit$loglik
+
+# Variance-covariance matrix
+eg1_fit$vcov
+```
+
+# Summary
+
+Key points for distribution fitting:
+
+1. **Maximum Likelihood Estimation** finds parameters that make observed data most probable
+2. **Always visualise** the fitted distribution against your data
+3. **Compare models** using AIC or BIC (lower is better)
+4. **Assess goodness of fit** with Q-Q plots or formal tests
+5. **Larger samples** give more reliable estimates
+6. Consider the **theoretical basis** for choosing a distribution, not just statistical fit
