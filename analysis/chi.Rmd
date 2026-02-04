@@ -16,17 +16,64 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-The Chi-squared test checks whether two categorical variables are related. For example:
+The chi-squared ($\chi^2$) test is one of the most widely used statistical tests for categorical data. There are two main types:
 
-* Is smoking related to cancer?
-* Is gender related to favorite ice cream flavor?
-* Is a treatment related to an outcome?
+1. **Chi-squared test of independence**: Tests whether two categorical variables are related
+2. **Chi-squared goodness of fit test**: Tests whether observed frequencies match expected frequencies
 
-A Chi-squared distribution is a probability distribution that arises when a test statistic is built from squared deviations. Squaring measures how large the differences are, treats positive and negative deviations equally, and leads to a distribution with well-understood mathematical properties (the Chi-squared distribution).
+Common applications include:
 
-## Is smoking associated with lung cancer?
+* Is smoking related to lung cancer?
+* Is gender related to voting preference?
+* Does a die produce fair outcomes?
+* Is a treatment associated with recovery?
 
-Create a contingency table
+## The Chi-Squared Distribution
+
+The chi-squared distribution arises when summing squared standard normal random variables. It has one parameter: degrees of freedom (df), which determines its shape.
+
+```{r chi_dist}
+x <- seq(0, 20, length = 200)
+
+plot(x, dchisq(x, df = 1), type = "l", lwd = 2, col = 1,
+     ylim = c(0, 0.5), ylab = "Density", xlab = "Chi-squared value",
+     main = "Chi-squared distributions")
+lines(x, dchisq(x, df = 2), lwd = 2, col = 2)
+lines(x, dchisq(x, df = 5), lwd = 2, col = 3)
+lines(x, dchisq(x, df = 10), lwd = 2, col = 4)
+legend("topright", legend = paste("df =", c(1, 2, 5, 10)),
+       col = 1:4, lwd = 2)
+```
+
+As degrees of freedom increase, the distribution becomes more symmetric and shifts to the right.
+
+# Chi-Squared Test of Independence
+
+This test determines whether there is a statistically significant association between two categorical variables.
+
+## Hypotheses
+
+* **Null hypothesis ($H_0$)**: The two variables are independent (no association)
+* **Alternative hypothesis ($H_1$)**: The two variables are not independent (there is an association)
+
+## The Test Statistic
+
+The chi-squared statistic measures the discrepancy between observed and expected frequencies:
+
+$$\chi^2 = \sum \frac{(O - E)^2}{E}$$
+
+where:
+
+* $O$ = observed frequency in each cell
+* $E$ = expected frequency if variables were independent
+
+The expected frequency for each cell is calculated as:
+
+$$E = \frac{\text{row total} \times \text{column total}}{\text{grand total}}$$
+
+## Example 1: Smoking and Lung Cancer
+
+Let's test whether smoking is associated with lung cancer using a 2x2 contingency table.
 
 ```{r eg1}
 data <- matrix(
@@ -39,40 +86,297 @@ colnames(data) <- c("Cancer", "NoCancer")
 rownames(data) <- c("Smoker", "NonSmoker")
 
 data
-
-chisq.test(data)
 ```
 
-The test statistic is `X-squared = 16.99` and it measures how different your observed table is from what you would expect if the two variables were not related.
+### Step 1: Calculate Expected Values
 
-* Bigger number means bigger difference from no relationship
-* Smaller number means closer to no relationship
+If smoking and cancer were independent, we would expect each cell to have:
 
-The degrees of freedom for a 2×2 table is always 1.
+$$E = \frac{\text{row total} \times \text{column total}}{\text{grand total}}$$
 
-A p-value answers the question:
+```{r expected}
+# Row and column totals
+row_totals <- rowSums(data)
+col_totals <- colSums(data)
+grand_total <- sum(data)
 
-* If there were no real association between the variables, how likely is it to see a difference as extreme as the one we observed?
+row_totals
+col_totals
+grand_total
 
-A p-value of 3.758e-05 means that there's only a 0.0037% chance that this big a difference happened by random chance.
+# Calculate expected values
+expected <- outer(row_totals, col_totals) / grand_total
+expected
+```
+
+For example, the expected count for Smoker + Cancer is:
+$(100 \times 90) / 200 = 45$
+
+### Step 2: Calculate the Chi-Squared Statistic
+
+```{r chi_manual}
+# Chi-squared = sum of (observed - expected)^2 / expected
+chi_sq <- sum((data - expected)^2 / expected)
+chi_sq
+```
+
+### Step 3: Run the Test
+
+```{r eg1_test}
+result <- chisq.test(data)
+result
+```
+
+### Interpreting the Output
+
+* **X-squared = `r round(result$statistic, 2)`**: The test statistic measuring how different observed values are from expected values
+* **df = `r result$parameter`**: Degrees of freedom = (rows - 1) x (columns - 1) = 1 for a 2x2 table
+* **p-value = `r format.pval(result$p.value, digits = 3)`**: Probability of seeing this extreme a result if the null hypothesis were true
+
+Since the p-value is very small (< 0.05), we reject the null hypothesis and conclude that **smoking and lung cancer are associated**.
+
+### Accessing Test Components
+
+The test object contains useful information:
+
+```{r test_components}
+# Observed values
+result$observed
+
+# Expected values (same as our manual calculation)
+result$expected
+
+# Residuals: (observed - expected) / sqrt(expected)
+result$residuals
+```
+
+Residuals show which cells contribute most to the chi-squared statistic. Large positive residuals indicate more observations than expected; large negative residuals indicate fewer.
+
+### Visualising the Result
 
 ```{r dchisq}
-x2 <- chisq.test(data)$statistic
-df <- chisq.test(data)$parameter
+x2 <- result$statistic
+df <- result$parameter
 
-x <- seq(0, x2+3, length = 500)
+x <- seq(0, x2 + 3, length = 500)
 
-plot(
-  x,
-  dchisq(x, df),
-  type = "l",
-  lwd = 2,
-  ylab = "Density",
-  xlab = "Chi-squared value",
-  main = paste0("Chi-squared distribution (df = ", df, ")")
-)
-
+plot(x, dchisq(x, df), type = "l", lwd = 2,
+     ylab = "Density", xlab = "Chi-squared value",
+     main = paste0("Chi-squared distribution (df = ", df, ")"))
 abline(v = x2, col = "red", lwd = 2)
+
+# Shade the rejection region
+x_shade <- seq(x2, x2 + 3, length = 100)
+polygon(c(x_shade, rev(x_shade)),
+        c(dchisq(x_shade, df), rep(0, length(x_shade))),
+        col = rgb(1, 0, 0, 0.3), border = NA)
+text(x2, 0.1, paste("p =", format.pval(result$p.value, digits = 2)),
+     pos = 4, col = "red")
 ```
 
-The Chi-square test statistic always follows a Chi-square distribution if the null hypothesis is true. Therefore by comparing our obtained value (16.99) to the known curve (df = 1), we can calculate the probability of getting such an extreme value by chance. That probability is the p-value.
+The red line shows our test statistic. The shaded area represents the p-value: the probability of getting a value this extreme or more extreme under the null hypothesis.
+
+## Example 2: Larger Contingency Table
+
+Chi-squared tests work for tables larger than 2x2. Let's examine the relationship between education level and job satisfaction:
+
+```{r eg2}
+# Create a 3x3 table
+job_data <- matrix(
+  c(20, 25, 15,    # High school
+    30, 40, 20,    # Bachelor's
+    15, 30, 25),   # Graduate
+  nrow = 3,
+  byrow = TRUE
+)
+
+colnames(job_data) <- c("Low", "Medium", "High")
+rownames(job_data) <- c("HighSchool", "Bachelors", "Graduate")
+
+job_data
+
+result2 <- chisq.test(job_data)
+result2
+```
+
+For a 3x3 table, df = (3-1) x (3-1) = 4.
+
+```{r eg2_expected}
+# View expected values
+round(result2$expected, 1)
+```
+
+The p-value of `r round(result2$p.value, 3)` suggests a marginally significant association between education and job satisfaction.
+
+## Example 3: No Association
+
+To understand what "no association" looks like, let's create data where the variables are independent:
+
+```{r eg3}
+set.seed(1984)
+
+# Generate independent data
+n <- 200
+gender <- sample(c("Male", "Female"), n, replace = TRUE)
+preference <- sample(c("Tea", "Coffee"), n, replace = TRUE)
+
+indep_table <- table(gender, preference)
+indep_table
+
+chisq.test(indep_table)
+```
+
+With a large p-value, we fail to reject the null hypothesis. There is no evidence of an association between gender and beverage preference in this simulated data.
+
+# Chi-Squared Goodness of Fit Test
+
+This test compares observed frequencies to expected frequencies based on a theoretical distribution.
+
+## Example: Is a Die Fair?
+
+Suppose we roll a die 120 times and observe the following counts:
+
+```{r gof}
+observed <- c(18, 23, 16, 21, 24, 18)
+names(observed) <- 1:6
+
+# Expected: equal probability for each face
+expected_prob <- rep(1/6, 6)
+
+# Goodness of fit test
+gof_result <- chisq.test(observed, p = expected_prob)
+gof_result
+```
+
+The large p-value suggests we cannot reject the hypothesis that the die is fair.
+
+```{r gof_plot}
+barplot(
+  rbind(observed, expected_prob * sum(observed)),
+  beside = TRUE,
+  col = c("steelblue", "coral"),
+  names.arg = 1:6,
+  xlab = "Die Face",
+  ylab = "Frequency",
+  main = "Observed vs Expected Frequencies",
+  legend.text = c("Observed", "Expected"),
+  args.legend = list(x = "topright")
+)
+```
+
+## Example: Testing a Genetic Ratio
+
+In genetics, Mendel's law predicts a 9:3:3:1 ratio for certain crosses. Let's test whether observed data follows this ratio:
+
+```{r mendel}
+observed_plants <- c(315, 108, 101, 32)
+names(observed_plants) <- c("Round-Yellow", "Round-Green",
+                            "Wrinkled-Yellow", "Wrinkled-Green")
+
+# Expected ratio 9:3:3:1
+expected_ratio <- c(9, 3, 3, 1) / 16
+
+mendel_test <- chisq.test(observed_plants, p = expected_ratio)
+mendel_test
+```
+
+The p-value of `r round(mendel_test$p.value, 3)` indicates the observed data is consistent with the expected 9:3:3:1 ratio.
+
+# Assumptions and Conditions
+
+The chi-squared test has several assumptions:
+
+1. **Independence**: Observations must be independent
+2. **Random sampling**: Data should come from a random sample
+3. **Expected frequencies**: All expected cell counts should be at least 5
+
+## Checking Expected Frequencies
+
+```{r check_expected}
+# Check expected values
+result$expected
+
+# All expected values >= 5, so assumption is met
+all(result$expected >= 5)
+```
+
+## When Assumptions Are Violated
+
+If expected frequencies are too small (< 5), consider:
+
+* **Fisher's exact test**: For 2x2 tables with small samples
+* **Combining categories**: Merge cells to increase expected counts
+* **Simulation-based p-value**: Use `chisq.test(..., simulate.p.value = TRUE)`
+
+```{r fisher}
+# Small sample example
+small_data <- matrix(c(3, 2, 1, 4), nrow = 2)
+rownames(small_data) <- c("Treatment", "Control")
+colnames(small_data) <- c("Success", "Failure")
+
+small_data
+
+# Chi-squared test warns about small expected values
+chisq.test(small_data)
+
+# Use Fisher's exact test instead
+fisher.test(small_data)
+```
+
+# Effect Size: Cramer's V
+
+A significant p-value tells us an association exists, but not how strong it is. Cramer's V measures effect size for chi-squared tests:
+
+$$V = \sqrt{\frac{\chi^2}{n \times (k - 1)}}$$
+
+where $n$ is the sample size and $k$ is the smaller of the number of rows or columns.
+
+```{r cramers_v}
+# Calculate Cramer's V for the smoking example
+chi_sq <- result$statistic
+n <- sum(data)
+k <- min(nrow(data), ncol(data))
+
+cramers_v <- sqrt(chi_sq / (n * (k - 1)))
+cramers_v
+```
+
+Interpretation guidelines for Cramer's V:
+
+| V | Interpretation |
+|---|----------------|
+| 0.1 | Small effect |
+| 0.3 | Medium effect |
+| 0.5 | Large effect |
+
+A Cramer's V of `r round(cramers_v, 2)` indicates a small to medium effect size.
+# Yates' Continuity Correction
+
+For 2x2 tables, R applies Yates' continuity correction by default. This makes the test more conservative (larger p-values) but can be overly conservative with moderate sample sizes.
+
+```{r yates}
+# With Yates' correction (default)
+chisq.test(data)
+
+# Without Yates' correction
+chisq.test(data, correct = FALSE)
+```
+
+The uncorrected version gives a slightly smaller p-value. For large samples, the difference is negligible.
+
+# Summary
+
+| Test | Purpose | R Function |
+|------|---------|------------|
+| Test of independence | Association between two categorical variables | `chisq.test(table)` |
+| Goodness of fit | Compare observed to expected frequencies | `chisq.test(x, p = prob)` |
+| Fisher's exact test | Small samples (expected < 5) | `fisher.test(table)` |
+
+Key points:
+
+1. Chi-squared tests assess relationships between categorical variables
+2. The test statistic measures how much observed differs from expected
+3. Larger chi-squared values indicate stronger evidence against independence
+4. Check that expected frequencies are at least 5
+5. Use Cramer's V to measure effect size
+6. For small samples, use Fisher's exact test instead
