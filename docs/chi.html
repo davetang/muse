@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-11-14" />
+<meta name="date" content="2026-02-04" />
 
 <title>Chi-squared Tests</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Chi-squared Tests</h1>
-<h4 class="date">2025-11-14</h4>
+<h4 class="date">2026-02-04</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-11-14
+<strong>Last updated:</strong> 2026-02-04
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreedddb71005c91693492208ad9a1e9a83d8c6f3c78targetblankdddb710a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree393faf7251b0709e59f90a38f8009dfc586c6a2etargetblank393faf7a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/dddb71005c91693492208ad9a1e9a83d8c6f3c78" target="_blank">dddb710</a>
+<a href="https://github.com/davetang/muse/tree/393faf7251b0709e59f90a38f8009dfc586c6a2e" target="_blank">393faf7</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreedddb71005c91693492208ad9a1e9a83d8c6f3c78targetblankdddb710a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree393faf7251b0709e59f90a38f8009dfc586c6a2etargetblank393faf7a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/dddb71005c91693492208ad9a1e9a83d8c6f3c78" target="_blank">dddb710</a>.
+<a href="https://github.com/davetang/muse/tree/393faf7251b0709e59f90a38f8009dfc586c6a2e" target="_blank">393faf7</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -572,6 +572,8 @@ Ignored files:
     Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
     Ignored:    data/pbmc20k/
     Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
     Ignored:    data/pbmc3k.h5ad
     Ignored:    data/pbmc3k/
     Ignored:    data/pbmc3k_bpcells_mat/
@@ -588,10 +590,16 @@ Ignored files:
     Ignored:    r_packages_4.5.0/
 
 Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
+    Untracked:  analysis/bioc.Rmd
     Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
     Untracked:  bpcells_matrix/
     Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
     Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SeuratObj.rds
     Untracked:  data/arab.rds
     Untracked:  data/astronomicalunit.csv
     Untracked:  data/femaleMiceWeights.csv
@@ -601,6 +609,7 @@ Untracked files:
 
 Unstaged changes:
     Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
 
 </code></pre>
 <p>
@@ -649,6 +658,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/393faf7251b0709e59f90a38f8009dfc586c6a2e/analysis/chi.Rmd" target="_blank">393faf7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-02-04
+</td>
+<td>
+Update
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/503ceecfbf4d534636f796dc207c51ccbd1298c1/docs/chi.html" target="_blank">503ceec</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-11-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/dddb71005c91693492208ad9a1e9a83d8c6f3c78/analysis/chi.Rmd" target="_blank">dddb710</a>
 </td>
 <td>
@@ -670,21 +713,78 @@ Chi-squared tests
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>The Chi-squared test checks whether two categorical variables are
-related. For example:</p>
+<p>The chi-squared (<span class="math inline">\(\chi^2\)</span>) test is
+one of the most widely used statistical tests for categorical data.
+There are two main types:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Chi-squared test of independence</strong>: Tests whether two
+categorical variables are related</li>
+<li><strong>Chi-squared goodness of fit test</strong>: Tests whether
+observed frequencies match expected frequencies</li>
+</ol>
+<p>Common applications include:</p>
 <ul>
-<li>Is smoking related to cancer?</li>
-<li>Is gender related to favorite ice cream flavor?</li>
-<li>Is a treatment related to an outcome?</li>
+<li>Is smoking related to lung cancer?</li>
+<li>Is gender related to voting preference?</li>
+<li>Does a die produce fair outcomes?</li>
+<li>Is a treatment associated with recovery?</li>
 </ul>
-<p>A Chi-squared distribution is a probability distribution that arises
-when a test statistic is built from squared deviations. Squaring
-measures how large the differences are, treats positive and negative
-deviations equally, and leads to a distribution with well-understood
-mathematical properties (the Chi-squared distribution).</p>
-<div id="is-smoking-associated-with-lung-cancer" class="section level2">
-<h2>Is smoking associated with lung cancer?</h2>
-<p>Create a contingency table</p>
+<div id="the-chi-squared-distribution" class="section level2">
+<h2>The Chi-Squared Distribution</h2>
+<p>The chi-squared distribution arises when summing squared standard
+normal random variables. It has one parameter: degrees of freedom (df),
+which determines its shape.</p>
+<pre class="r"><code>x &lt;- seq(0, 20, length = 200)
+
+plot(x, dchisq(x, df = 1), type = &quot;l&quot;, lwd = 2, col = 1,
+     ylim = c(0, 0.5), ylab = &quot;Density&quot;, xlab = &quot;Chi-squared value&quot;,
+     main = &quot;Chi-squared distributions&quot;)
+lines(x, dchisq(x, df = 2), lwd = 2, col = 2)
+lines(x, dchisq(x, df = 5), lwd = 2, col = 3)
+lines(x, dchisq(x, df = 10), lwd = 2, col = 4)
+legend(&quot;topright&quot;, legend = paste(&quot;df =&quot;, c(1, 2, 5, 10)),
+       col = 1:4, lwd = 2)</code></pre>
+<p><img src="figure/chi.Rmd/chi_dist-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>As degrees of freedom increase, the distribution becomes more
+symmetric and shifts to the right.</p>
+</div>
+</div>
+<div id="chi-squared-test-of-independence" class="section level1">
+<h1>Chi-Squared Test of Independence</h1>
+<p>This test determines whether there is a statistically significant
+association between two categorical variables.</p>
+<div id="hypotheses" class="section level2">
+<h2>Hypotheses</h2>
+<ul>
+<li><strong>Null hypothesis (<span
+class="math inline">\(H_0\)</span>)</strong>: The two variables are
+independent (no association)</li>
+<li><strong>Alternative hypothesis (<span
+class="math inline">\(H_1\)</span>)</strong>: The two variables are not
+independent (there is an association)</li>
+</ul>
+</div>
+<div id="the-test-statistic" class="section level2">
+<h2>The Test Statistic</h2>
+<p>The chi-squared statistic measures the discrepancy between observed
+and expected frequencies:</p>
+<p><span class="math display">\[\chi^2 = \sum \frac{(O -
+E)^2}{E}\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(O\)</span> = observed frequency in each
+cell</li>
+<li><span class="math inline">\(E\)</span> = expected frequency if
+variables were independent</li>
+</ul>
+<p>The expected frequency for each cell is calculated as:</p>
+<p><span class="math display">\[E = \frac{\text{row total} \times
+\text{column total}}{\text{grand total}}\]</span></p>
+</div>
+<div id="example-1-smoking-and-lung-cancer" class="section level2">
+<h2>Example 1: Smoking and Lung Cancer</h2>
+<p>Let’s test whether smoking is associated with lung cancer using a 2x2
+contingency table.</p>
 <pre class="r"><code>data &lt;- matrix(
   c(60, 40, 30, 70),
   nrow = 2,
@@ -698,49 +798,446 @@ data</code></pre>
 <pre><code>          Cancer NoCancer
 Smoker        60       40
 NonSmoker     30       70</code></pre>
-<pre class="r"><code>chisq.test(data)</code></pre>
+<div id="step-1-calculate-expected-values" class="section level3">
+<h3>Step 1: Calculate Expected Values</h3>
+<p>If smoking and cancer were independent, we would expect each cell to
+have:</p>
+<p><span class="math display">\[E = \frac{\text{row total} \times
+\text{column total}}{\text{grand total}}\]</span></p>
+<pre class="r"><code># Row and column totals
+row_totals &lt;- rowSums(data)
+col_totals &lt;- colSums(data)
+grand_total &lt;- sum(data)
+
+row_totals</code></pre>
+<pre><code>   Smoker NonSmoker 
+      100       100 </code></pre>
+<pre class="r"><code>col_totals</code></pre>
+<pre><code>  Cancer NoCancer 
+      90      110 </code></pre>
+<pre class="r"><code>grand_total</code></pre>
+<pre><code>[1] 200</code></pre>
+<pre class="r"><code># Calculate expected values
+expected &lt;- outer(row_totals, col_totals) / grand_total
+expected</code></pre>
+<pre><code>          Cancer NoCancer
+Smoker        45       55
+NonSmoker     45       55</code></pre>
+<p>For example, the expected count for Smoker + Cancer is: <span
+class="math inline">\((100 \times 90) / 200 = 45\)</span></p>
+</div>
+<div id="step-2-calculate-the-chi-squared-statistic"
+class="section level3">
+<h3>Step 2: Calculate the Chi-Squared Statistic</h3>
+<pre class="r"><code># Chi-squared = sum of (observed - expected)^2 / expected
+chi_sq &lt;- sum((data - expected)^2 / expected)
+chi_sq</code></pre>
+<pre><code>[1] 18.18182</code></pre>
+</div>
+<div id="step-3-run-the-test" class="section level3">
+<h3>Step 3: Run the Test</h3>
+<pre class="r"><code>result &lt;- chisq.test(data)
+result</code></pre>
 <pre><code>
     Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
 
 data:  data
 X-squared = 16.99, df = 1, p-value = 3.758e-05</code></pre>
-<p>The test statistic is <code>X-squared = 16.99</code> and it measures
-how different your observed table is from what you would expect if the
-two variables were not related.</p>
+</div>
+<div id="interpreting-the-output" class="section level3">
+<h3>Interpreting the Output</h3>
 <ul>
-<li>Bigger number means bigger difference from no relationship</li>
-<li>Smaller number means closer to no relationship</li>
+<li><strong>X-squared = 16.99</strong>: The test statistic measuring how
+different observed values are from expected values</li>
+<li><strong>df = 1</strong>: Degrees of freedom = (rows - 1) x (columns
+- 1) = 1 for a 2x2 table</li>
+<li><strong>p-value = 3.76e-05</strong>: Probability of seeing this
+extreme a result if the null hypothesis were true</li>
 </ul>
-<p>The degrees of freedom for a 2×2 table is always 1.</p>
-<p>A p-value answers the question:</p>
-<ul>
-<li>If there were no real association between the variables, how likely
-is it to see a difference as extreme as the one we observed?</li>
-</ul>
-<p>A p-value of 3.758e-05 means that there’s only a 0.0037% chance that
-this big a difference happened by random chance.</p>
-<pre class="r"><code>x2 &lt;- chisq.test(data)$statistic
-df &lt;- chisq.test(data)$parameter
+<p>Since the p-value is very small (&lt; 0.05), we reject the null
+hypothesis and conclude that <strong>smoking and lung cancer are
+associated</strong>.</p>
+</div>
+<div id="accessing-test-components" class="section level3">
+<h3>Accessing Test Components</h3>
+<p>The test object contains useful information:</p>
+<pre class="r"><code># Observed values
+result$observed</code></pre>
+<pre><code>          Cancer NoCancer
+Smoker        60       40
+NonSmoker     30       70</code></pre>
+<pre class="r"><code># Expected values (same as our manual calculation)
+result$expected</code></pre>
+<pre><code>          Cancer NoCancer
+Smoker        45       55
+NonSmoker     45       55</code></pre>
+<pre class="r"><code># Residuals: (observed - expected) / sqrt(expected)
+result$residuals</code></pre>
+<pre><code>             Cancer NoCancer
+Smoker     2.236068  -2.0226
+NonSmoker -2.236068   2.0226</code></pre>
+<p>Residuals show which cells contribute most to the chi-squared
+statistic. Large positive residuals indicate more observations than
+expected; large negative residuals indicate fewer.</p>
+</div>
+<div id="visualising-the-result" class="section level3">
+<h3>Visualising the Result</h3>
+<pre class="r"><code>x2 &lt;- result$statistic
+df &lt;- result$parameter
 
-x &lt;- seq(0, x2+3, length = 500)
+x &lt;- seq(0, x2 + 3, length = 500)
 
-plot(
-  x,
-  dchisq(x, df),
-  type = &quot;l&quot;,
-  lwd = 2,
-  ylab = &quot;Density&quot;,
-  xlab = &quot;Chi-squared value&quot;,
-  main = paste0(&quot;Chi-squared distribution (df = &quot;, df, &quot;)&quot;)
+plot(x, dchisq(x, df), type = &quot;l&quot;, lwd = 2,
+     ylab = &quot;Density&quot;, xlab = &quot;Chi-squared value&quot;,
+     main = paste0(&quot;Chi-squared distribution (df = &quot;, df, &quot;)&quot;))
+abline(v = x2, col = &quot;red&quot;, lwd = 2)
+
+# Shade the rejection region
+x_shade &lt;- seq(x2, x2 + 3, length = 100)
+polygon(c(x_shade, rev(x_shade)),
+        c(dchisq(x_shade, df), rep(0, length(x_shade))),
+        col = rgb(1, 0, 0, 0.3), border = NA)
+text(x2, 0.1, paste(&quot;p =&quot;, format.pval(result$p.value, digits = 2)),
+     pos = 4, col = &quot;red&quot;)</code></pre>
+<p><img src="figure/chi.Rmd/dchisq-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-dchisq-1">
+Past versions of dchisq-1.png
+</button>
+</p>
+<div id="fig-dchisq-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/503ceecfbf4d534636f796dc207c51ccbd1298c1/docs/figure/chi.Rmd/dchisq-1.png" target="_blank">503ceec</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-11-14
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The red line shows our test statistic. The shaded area represents the
+p-value: the probability of getting a value this extreme or more extreme
+under the null hypothesis.</p>
+</div>
+</div>
+<div id="example-2-larger-contingency-table" class="section level2">
+<h2>Example 2: Larger Contingency Table</h2>
+<p>Chi-squared tests work for tables larger than 2x2. Let’s examine the
+relationship between education level and job satisfaction:</p>
+<pre class="r"><code># Create a 3x3 table
+job_data &lt;- matrix(
+  c(20, 25, 15,    # High school
+    30, 40, 20,    # Bachelor&#39;s
+    15, 30, 25),   # Graduate
+  nrow = 3,
+  byrow = TRUE
 )
 
-abline(v = x2, col = &quot;red&quot;, lwd = 2)</code></pre>
-<p><img src="figure/chi.Rmd/dchisq-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>The Chi-square test statistic always follows a Chi-square
-distribution if the null hypothesis is true. Therefore by comparing our
-obtained value (16.99) to the known curve (df = 1), we can calculate the
-probability of getting such an extreme value by chance. That probability
-is the p-value.</p>
+colnames(job_data) &lt;- c(&quot;Low&quot;, &quot;Medium&quot;, &quot;High&quot;)
+rownames(job_data) &lt;- c(&quot;HighSchool&quot;, &quot;Bachelors&quot;, &quot;Graduate&quot;)
+
+job_data</code></pre>
+<pre><code>           Low Medium High
+HighSchool  20     25   15
+Bachelors   30     40   20
+Graduate    15     30   25</code></pre>
+<pre class="r"><code>result2 &lt;- chisq.test(job_data)
+result2</code></pre>
+<pre><code>
+    Pearson&#39;s Chi-squared test
+
+data:  job_data
+X-squared = 5.1406, df = 4, p-value = 0.2732</code></pre>
+<p>For a 3x3 table, df = (3-1) x (3-1) = 4.</p>
+<pre class="r"><code># View expected values
+round(result2$expected, 1)</code></pre>
+<pre><code>            Low Medium High
+HighSchool 17.7   25.9 16.4
+Bachelors  26.6   38.9 24.5
+Graduate   20.7   30.2 19.1</code></pre>
+<p>The p-value of 0.273 suggests a marginally significant association
+between education and job satisfaction.</p>
+</div>
+<div id="example-3-no-association" class="section level2">
+<h2>Example 3: No Association</h2>
+<p>To understand what “no association” looks like, let’s create data
+where the variables are independent:</p>
+<pre class="r"><code>set.seed(1984)
+
+# Generate independent data
+n &lt;- 200
+gender &lt;- sample(c(&quot;Male&quot;, &quot;Female&quot;), n, replace = TRUE)
+preference &lt;- sample(c(&quot;Tea&quot;, &quot;Coffee&quot;), n, replace = TRUE)
+
+indep_table &lt;- table(gender, preference)
+indep_table</code></pre>
+<pre><code>        preference
+gender   Coffee Tea
+  Female     53  50
+  Male       51  46</code></pre>
+<pre class="r"><code>chisq.test(indep_table)</code></pre>
+<pre><code>
+    Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+
+data:  indep_table
+X-squared = 0.00028872, df = 1, p-value = 0.9864</code></pre>
+<p>With a large p-value, we fail to reject the null hypothesis. There is
+no evidence of an association between gender and beverage preference in
+this simulated data.</p>
+</div>
+</div>
+<div id="chi-squared-goodness-of-fit-test" class="section level1">
+<h1>Chi-Squared Goodness of Fit Test</h1>
+<p>This test compares observed frequencies to expected frequencies based
+on a theoretical distribution.</p>
+<div id="example-is-a-die-fair" class="section level2">
+<h2>Example: Is a Die Fair?</h2>
+<p>Suppose we roll a die 120 times and observe the following counts:</p>
+<pre class="r"><code>observed &lt;- c(18, 23, 16, 21, 24, 18)
+names(observed) &lt;- 1:6
+
+# Expected: equal probability for each face
+expected_prob &lt;- rep(1/6, 6)
+
+# Goodness of fit test
+gof_result &lt;- chisq.test(observed, p = expected_prob)
+gof_result</code></pre>
+<pre><code>
+    Chi-squared test for given probabilities
+
+data:  observed
+X-squared = 2.5, df = 5, p-value = 0.7765</code></pre>
+<p>The large p-value suggests we cannot reject the hypothesis that the
+die is fair.</p>
+<pre class="r"><code>barplot(
+  rbind(observed, expected_prob * sum(observed)),
+  beside = TRUE,
+  col = c(&quot;steelblue&quot;, &quot;coral&quot;),
+  names.arg = 1:6,
+  xlab = &quot;Die Face&quot;,
+  ylab = &quot;Frequency&quot;,
+  main = &quot;Observed vs Expected Frequencies&quot;,
+  legend.text = c(&quot;Observed&quot;, &quot;Expected&quot;),
+  args.legend = list(x = &quot;topright&quot;)
+)</code></pre>
+<p><img src="figure/chi.Rmd/gof_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="example-testing-a-genetic-ratio" class="section level2">
+<h2>Example: Testing a Genetic Ratio</h2>
+<p>In genetics, Mendel’s law predicts a 9:3:3:1 ratio for certain
+crosses. Let’s test whether observed data follows this ratio:</p>
+<pre class="r"><code>observed_plants &lt;- c(315, 108, 101, 32)
+names(observed_plants) &lt;- c(&quot;Round-Yellow&quot;, &quot;Round-Green&quot;,
+                            &quot;Wrinkled-Yellow&quot;, &quot;Wrinkled-Green&quot;)
+
+# Expected ratio 9:3:3:1
+expected_ratio &lt;- c(9, 3, 3, 1) / 16
+
+mendel_test &lt;- chisq.test(observed_plants, p = expected_ratio)
+mendel_test</code></pre>
+<pre><code>
+    Chi-squared test for given probabilities
+
+data:  observed_plants
+X-squared = 0.47002, df = 3, p-value = 0.9254</code></pre>
+<p>The p-value of 0.925 indicates the observed data is consistent with
+the expected 9:3:3:1 ratio.</p>
+</div>
+</div>
+<div id="assumptions-and-conditions" class="section level1">
+<h1>Assumptions and Conditions</h1>
+<p>The chi-squared test has several assumptions:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Independence</strong>: Observations must be independent</li>
+<li><strong>Random sampling</strong>: Data should come from a random
+sample</li>
+<li><strong>Expected frequencies</strong>: All expected cell counts
+should be at least 5</li>
+</ol>
+<div id="checking-expected-frequencies" class="section level2">
+<h2>Checking Expected Frequencies</h2>
+<pre class="r"><code># Check expected values
+result$expected</code></pre>
+<pre><code>          Cancer NoCancer
+Smoker        45       55
+NonSmoker     45       55</code></pre>
+<pre class="r"><code># All expected values &gt;= 5, so assumption is met
+all(result$expected &gt;= 5)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+</div>
+<div id="when-assumptions-are-violated" class="section level2">
+<h2>When Assumptions Are Violated</h2>
+<p>If expected frequencies are too small (&lt; 5), consider:</p>
+<ul>
+<li><strong>Fisher’s exact test</strong>: For 2x2 tables with small
+samples</li>
+<li><strong>Combining categories</strong>: Merge cells to increase
+expected counts</li>
+<li><strong>Simulation-based p-value</strong>: Use
+<code>chisq.test(..., simulate.p.value = TRUE)</code></li>
+</ul>
+<pre class="r"><code># Small sample example
+small_data &lt;- matrix(c(3, 2, 1, 4), nrow = 2)
+rownames(small_data) &lt;- c(&quot;Treatment&quot;, &quot;Control&quot;)
+colnames(small_data) &lt;- c(&quot;Success&quot;, &quot;Failure&quot;)
+
+small_data</code></pre>
+<pre><code>          Success Failure
+Treatment       3       1
+Control         2       4</code></pre>
+<pre class="r"><code># Chi-squared test warns about small expected values
+chisq.test(small_data)</code></pre>
+<pre><code>Warning in chisq.test(small_data): Chi-squared approximation may be incorrect</code></pre>
+<pre><code>
+    Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+
+data:  small_data
+X-squared = 0.41667, df = 1, p-value = 0.5186</code></pre>
+<pre class="r"><code># Use Fisher&#39;s exact test instead
+fisher.test(small_data)</code></pre>
+<pre><code>
+    Fisher&#39;s Exact Test for Count Data
+
+data:  small_data
+p-value = 0.5238
+alternative hypothesis: true odds ratio is not equal to 1
+95 percent confidence interval:
+   0.218046 390.562917
+sample estimates:
+odds ratio 
+  4.918388 </code></pre>
+</div>
+</div>
+<div id="effect-size-cramers-v" class="section level1">
+<h1>Effect Size: Cramer’s V</h1>
+<p>A significant p-value tells us an association exists, but not how
+strong it is. Cramer’s V measures effect size for chi-squared tests:</p>
+<p><span class="math display">\[V = \sqrt{\frac{\chi^2}{n \times (k -
+1)}}\]</span></p>
+<p>where <span class="math inline">\(n\)</span> is the sample size and
+<span class="math inline">\(k\)</span> is the smaller of the number of
+rows or columns.</p>
+<pre class="r"><code># Calculate Cramer&#39;s V for the smoking example
+chi_sq &lt;- result$statistic
+n &lt;- sum(data)
+k &lt;- min(nrow(data), ncol(data))
+
+cramers_v &lt;- sqrt(chi_sq / (n * (k - 1)))
+cramers_v</code></pre>
+<pre><code>X-squared 
+ 0.291461 </code></pre>
+<p>Interpretation guidelines for Cramer’s V:</p>
+<table>
+<thead>
+<tr class="header">
+<th>V</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>0.1</td>
+<td>Small effect</td>
+</tr>
+<tr class="even">
+<td>0.3</td>
+<td>Medium effect</td>
+</tr>
+<tr class="odd">
+<td>0.5</td>
+<td>Large effect</td>
+</tr>
+</tbody>
+</table>
+<p>A Cramer’s V of 0.29 indicates a small to medium effect size. #
+Yates’ Continuity Correction</p>
+<p>For 2x2 tables, R applies Yates’ continuity correction by default.
+This makes the test more conservative (larger p-values) but can be
+overly conservative with moderate sample sizes.</p>
+<pre class="r"><code># With Yates&#39; correction (default)
+chisq.test(data)</code></pre>
+<pre><code>
+    Pearson&#39;s Chi-squared test with Yates&#39; continuity correction
+
+data:  data
+X-squared = 16.99, df = 1, p-value = 3.758e-05</code></pre>
+<pre class="r"><code># Without Yates&#39; correction
+chisq.test(data, correct = FALSE)</code></pre>
+<pre><code>
+    Pearson&#39;s Chi-squared test
+
+data:  data
+X-squared = 18.182, df = 1, p-value = 2.008e-05</code></pre>
+<p>The uncorrected version gives a slightly smaller p-value. For large
+samples, the difference is negligible.</p>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<table>
+<colgroup>
+<col width="22%" />
+<col width="33%" />
+<col width="44%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Test</th>
+<th>Purpose</th>
+<th>R Function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Test of independence</td>
+<td>Association between two categorical variables</td>
+<td><code>chisq.test(table)</code></td>
+</tr>
+<tr class="even">
+<td>Goodness of fit</td>
+<td>Compare observed to expected frequencies</td>
+<td><code>chisq.test(x, p = prob)</code></td>
+</tr>
+<tr class="odd">
+<td>Fisher’s exact test</td>
+<td>Small samples (expected &lt; 5)</td>
+<td><code>fisher.test(table)</code></td>
+</tr>
+</tbody>
+</table>
+<p>Key points:</p>
+<ol style="list-style-type: decimal">
+<li>Chi-squared tests assess relationships between categorical
+variables</li>
+<li>The test statistic measures how much observed differs from
+expected</li>
+<li>Larger chi-squared values indicate stronger evidence against
+independence</li>
+<li>Check that expected frequencies are at least 5</li>
+<li>Use Cramer’s V to measure effect size</li>
+<li>For small samples, use Fisher’s exact test instead</li>
+</ol>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -791,7 +1288,6 @@ loaded via a namespace (and not attached):
 [41] Rcpp_1.0.14        xfun_0.52          tidyselect_1.2.1   rstudioapi_0.17.1 
 [45] farver_2.1.2       htmltools_0.5.8.1  rmarkdown_2.29     compiler_4.5.0    
 [49] getPass_0.2-4     </code></pre>
-</div>
 </div>
 </div>
 </div>
