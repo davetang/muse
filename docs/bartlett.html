@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-12-03" />
+<meta name="date" content="2026-02-04" />
 
 <title>Bartlett’s Test</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Bartlett’s Test</h1>
-<h4 class="date">2025-12-03</h4>
+<h4 class="date">2026-02-04</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-12-03
+<strong>Last updated:</strong> 2026-02-04
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3526ecbce6a2101ee8a2459989fc2b8689f5958atargetblank3526ecba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree06fbf4307d1036101c70b740c88a555cdcc5695dtargetblank06fbf43a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/3526ecbce6a2101ee8a2459989fc2b8689f5958a" target="_blank">3526ecb</a>
+<a href="https://github.com/davetang/muse/tree/06fbf4307d1036101c70b740c88a555cdcc5695d" target="_blank">06fbf43</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree3526ecbce6a2101ee8a2459989fc2b8689f5958atargetblank3526ecba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree06fbf4307d1036101c70b740c88a555cdcc5695dtargetblank06fbf43a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/3526ecbce6a2101ee8a2459989fc2b8689f5958a" target="_blank">3526ecb</a>.
+<a href="https://github.com/davetang/muse/tree/06fbf4307d1036101c70b740c88a555cdcc5695d" target="_blank">06fbf43</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -572,6 +572,8 @@ Ignored files:
     Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
     Ignored:    data/pbmc20k/
     Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
     Ignored:    data/pbmc3k.h5ad
     Ignored:    data/pbmc3k/
     Ignored:    data/pbmc3k_bpcells_mat/
@@ -588,11 +590,16 @@ Ignored files:
     Ignored:    r_packages_4.5.0/
 
 Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
     Untracked:  analysis/bioc.Rmd
     Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
     Untracked:  bpcells_matrix/
     Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
     Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SeuratObj.rds
     Untracked:  data/arab.rds
     Untracked:  data/astronomicalunit.csv
     Untracked:  data/femaleMiceWeights.csv
@@ -602,6 +609,7 @@ Untracked files:
 
 Unstaged changes:
     Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
 
 </code></pre>
 <p>
@@ -651,6 +659,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/06fbf4307d1036101c70b740c88a555cdcc5695d/analysis/bartlett.Rmd" target="_blank">06fbf43</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-02-04
+</td>
+<td>
+Add more explanations and examples
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/a8aa28e6526ad93263db620c2bfd5dd8d753cb32/docs/bartlett.html" target="_blank">a8aa28e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-12-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/3526ecbce6a2101ee8a2459989fc2b8689f5958a/analysis/bartlett.Rmd" target="_blank">3526ecb</a>
 </td>
 <td>
@@ -673,13 +715,49 @@ Bartlett’s test
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Bartlett’s test is used to assess whether multiple groups have equal
-variances (homogeneity of variance). It is sensitive to departures from
-normality, and should therefore be used primarily when the assumption of
-normality is reasonable.</p>
+variances, a property called <strong>homogeneity of variance</strong>
+(or homoscedasticity). This is an important assumption for several
+statistical tests, including:</p>
+<ul>
+<li><strong>One-way ANOVA</strong> - assumes equal variances across
+groups</li>
+<li><strong>Student’s t-test</strong> - assumes equal variances between
+two groups</li>
+<li><strong>Linear regression</strong> - assumes constant variance of
+residuals</li>
+</ul>
+<p>When these assumptions are violated, the test results may be
+unreliable.</p>
 </div>
-<div id="example" class="section level2">
-<h2>Example</h2>
-<p>Simulate three groups with different variances.</p>
+<div id="the-hypotheses" class="section level2">
+<h2>The Hypotheses</h2>
+<p>Bartlett’s test evaluates:</p>
+<ul>
+<li>Null hypothesis (<span class="math inline">\(H_0\)</span>): All
+groups have equal variances</li>
+<li>Alternative hypothesis (<span class="math inline">\(H_1\)</span>):
+At least one group has a different variance</li>
+</ul>
+<p>A small p-value (typically &lt; 0.05) suggests rejecting the null
+hypothesis, indicating that variances are not equal across groups.</p>
+</div>
+<div id="important-considerations" class="section level2">
+<h2>Important Considerations</h2>
+<p>Bartlett’s test is sensitive to departures from normality. If your
+data is not normally distributed, even slight deviations can cause the
+test to incorrectly reject the null hypothesis. Therefore:</p>
+<ul>
+<li>Use Bartlett’s test when data is approximately normal</li>
+<li>For non-normal data, consider the Fligner-Killeen test
+(<code>fligner.test()</code>), which is a non-parametric alternative
+available in base R.</li>
+</ul>
+</div>
+<div id="example-1-unequal-variances" class="section level2">
+<h2>Example 1: Unequal Variances</h2>
+<p>Let’s simulate three groups that have the <strong>same mean</strong>
+but <strong>different variances</strong> (standard deviations of 1, 3,
+and 5):</p>
 <pre class="r"><code>set.seed(1984)
 
 group1 &lt;- rnorm(50, mean = 10, sd = 1)
@@ -697,24 +775,94 @@ head(eg1)</code></pre>
 4   Group 1  8.153871
 5   Group 1 10.953647
 6   Group 1 11.188490</code></pre>
-<p>Apply Bartlett’s test to evaluate whether the variances are equal
-across groups.</p>
+<p>First, let’s examine the actual sample variances:</p>
+<pre class="r"><code>eg1 |&gt;
+  group_by(my_groups) |&gt;
+  summarise(
+    n = n(),
+    mean = round(mean(my_values), 2),
+    variance = round(var(my_values), 2),
+    sd = round(sd(my_values), 2)
+  )</code></pre>
+<pre><code># A tibble: 3 × 5
+  my_groups     n  mean variance    sd
+  &lt;fct&gt;     &lt;int&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;
+1 Group 1      50 10.2      0.91  0.95
+2 Group 2      50  9.61     7.47  2.73
+3 Group 3      50  9.34    24.7   4.97</code></pre>
+<p>Now apply Bartlett’s test:</p>
 <pre class="r"><code>bartlett.test(my_values ~ my_groups, data = eg1)</code></pre>
 <pre><code>
     Bartlett test of homogeneity of variances
 
 data:  my_values by my_groups
 Bartlett&#39;s K-squared = 101, df = 2, p-value &lt; 2.2e-16</code></pre>
-<p>The null hypothesis is that all groups have equal variances and the
-alternative hypothesis is that at least one group has a different
-variance. Here the extremely small p-value suggests rejecting the null,
-i.e., variances differ between groups.</p>
+<p>Interpreting the Output:</p>
+<ul>
+<li><strong>Bartlett’s K-squared</strong>: The test statistic. Larger
+values indicate greater differences in variances.</li>
+<li><strong>df</strong>: Degrees of freedom (number of groups - 1)</li>
+<li><strong>p-value</strong>: The probability of observing this test
+statistic if the null hypothesis were true</li>
+</ul>
+<p>Here the extremely small p-value (&lt; 0.05) leads us to reject the
+null hypothesis. We conclude that the variances are significantly
+different across groups.</p>
+<div id="visualising-the-differences" class="section level3">
+<h3>Visualising the Differences</h3>
+<p>A boxplot clearly shows the different spreads:</p>
 <pre class="r"><code>ggplot(eg1, aes(my_groups, my_values)) +
   geom_boxplot() +
   theme_minimal() +
-  labs(x = &#39;&#39;, y = &#39;Values&#39;)</code></pre>
+  labs(x = &#39;&#39;, y = &#39;Values&#39;, title = &#39;Groups with Unequal Variances&#39;)</code></pre>
 <p><img src="figure/bartlett.Rmd/eg1_boxplot-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>Same variance.</p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-eg1_boxplot-1">
+Past versions of eg1_boxplot-1.png
+</button>
+</p>
+<div id="fig-eg1_boxplot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/a8aa28e6526ad93263db620c2bfd5dd8d753cb32/docs/figure/bartlett.Rmd/eg1_boxplot-1.png" target="_blank">a8aa28e</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-12-03
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Notice how Group 1 has a narrow spread while Group 3 has a much wider
+spread, despite all three groups having similar centers (means around
+10).</p>
+</div>
+</div>
+<div id="example-2-equal-variances" class="section level2">
+<h2>Example 2: Equal Variances</h2>
+<p>Now let’s simulate three groups with <strong>different means</strong>
+but <strong>similar variances</strong> (standard deviations of 2.1, 2,
+and 1.9):</p>
 <pre class="r"><code>set.seed(1984)
 
 group1 &lt;- rnorm(50, mean = 9,  sd = 2.1)
@@ -723,14 +871,146 @@ group3 &lt;- rnorm(50, mean = 11, sd = 1.9)
 
 my_groups &lt;- factor(rep(c(&quot;Group 1&quot;, &quot;Group 2&quot;, &quot;Group 3&quot;), each = 50))
 my_values &lt;- c(group1, group2, group3)
-eg2 &lt;- data.frame(my_groups, my_values)
-
-bartlett.test(my_values ~ my_groups, data = eg2)</code></pre>
+eg2 &lt;- data.frame(my_groups, my_values)</code></pre>
+<p>Check the sample variances:</p>
+<pre class="r"><code>eg2 |&gt;
+  group_by(my_groups) |&gt;
+  summarise(
+    n = n(),
+    mean = round(mean(my_values), 2),
+    variance = round(var(my_values), 2),
+    sd = round(sd(my_values), 2)
+  )</code></pre>
+<pre><code># A tibble: 3 × 5
+  my_groups     n  mean variance    sd
+  &lt;fct&gt;     &lt;int&gt; &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;
+1 Group 1      50  9.4      4.01  2   
+2 Group 2      50  9.74     3.32  1.82
+3 Group 3      50 10.8      3.57  1.89</code></pre>
+<p>Apply Bartlett’s test:</p>
+<pre class="r"><code>bartlett.test(my_values ~ my_groups, data = eg2)</code></pre>
 <pre><code>
     Bartlett test of homogeneity of variances
 
 data:  my_values by my_groups
 Bartlett&#39;s K-squared = 0.44385, df = 2, p-value = 0.801</code></pre>
+<p>The p-value is large (&gt; 0.05), so we fail to reject the null
+hypothesis. There is no evidence that the variances differ across
+groups. This dataset would satisfy the homogeneity of variance
+assumption for ANOVA.</p>
+<pre class="r"><code>ggplot(eg2, aes(my_groups, my_values)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(x = &#39;&#39;, y = &#39;Values&#39;, title = &#39;Groups with Equal Variances&#39;)</code></pre>
+<p><img src="figure/bartlett.Rmd/eg2_boxplot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Notice the boxes have similar heights (similar interquartile ranges),
+reflecting the equal variances—even though the centers differ.</p>
+</div>
+<div id="real-world-example-insectsprays-dataset"
+class="section level2">
+<h2>Real-World Example: InsectSprays Dataset</h2>
+<p>Let’s apply Bartlett’s test to the built-in <code>InsectSprays</code>
+dataset, which contains counts of insects after treatment with different
+sprays:</p>
+<pre class="r"><code>data(InsectSprays)
+head(InsectSprays)</code></pre>
+<pre><code>  count spray
+1    10     A
+2     7     A
+3    20     A
+4    14     A
+5    14     A
+6    12     A</code></pre>
+<pre class="r"><code># Examine the data
+InsectSprays |&gt;
+  group_by(spray) |&gt;
+  summarise(
+    n = n(),
+    mean = round(mean(count), 2),
+    variance = round(var(count), 2)
+  )</code></pre>
+<pre><code># A tibble: 6 × 4
+  spray     n  mean variance
+  &lt;fct&gt; &lt;int&gt; &lt;dbl&gt;    &lt;dbl&gt;
+1 A        12 14.5     22.3 
+2 B        12 15.3     18.2 
+3 C        12  2.08     3.9 
+4 D        12  4.92     6.27
+5 E        12  3.5      3   
+6 F        12 16.7     38.6 </code></pre>
+<pre class="r"><code>bartlett.test(count ~ spray, data = InsectSprays)</code></pre>
+<pre><code>
+    Bartlett test of homogeneity of variances
+
+data:  count by spray
+Bartlett&#39;s K-squared = 25.96, df = 5, p-value = 9.085e-05</code></pre>
+<p>The very small p-value indicates that variances are significantly
+different across spray types. Before running ANOVA on this data, we
+would need to address this violation (e.g., transform the data or use
+Welch’s ANOVA).</p>
+<pre class="r"><code>ggplot(InsectSprays, aes(spray, count)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(x = &#39;Spray Type&#39;, y = &#39;Insect Count&#39;, title = &#39;InsectSprays Dataset&#39;)</code></pre>
+<p><img src="figure/bartlett.Rmd/insect_boxplot-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="alternative-fligner-killeen-test" class="section level2">
+<h2>Alternative: Fligner-Killeen Test</h2>
+<p>When data is not normally distributed, the <strong>Fligner-Killeen
+test</strong> is a robust alternative. It is a non-parametric test based
+on ranks, making it resistant to departures from normality:</p>
+<pre class="r"><code>fligner.test(my_values ~ my_groups, data = eg1)</code></pre>
+<pre><code>
+    Fligner-Killeen test of homogeneity of variances
+
+data:  my_values by my_groups
+Fligner-Killeen:med chi-squared = 40.611, df = 2, p-value = 1.519e-09</code></pre>
+<p>Like Bartlett’s test, a small p-value indicates unequal variances.
+The Fligner-Killeen test also rejects the null hypothesis here,
+confirming that variances differ across groups.</p>
+<p>Let’s also check the equal variance example:</p>
+<pre class="r"><code>fligner.test(my_values ~ my_groups, data = eg2)</code></pre>
+<pre><code>
+    Fligner-Killeen test of homogeneity of variances
+
+data:  my_values by my_groups
+Fligner-Killeen:med chi-squared = 0.7194, df = 2, p-value = 0.6979</code></pre>
+<p>As expected, the test does not reject the null hypothesis for the
+equal variance data.</p>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<table>
+<thead>
+<tr class="header">
+<th>Test</th>
+<th>When to Use</th>
+<th>R Function</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bartlett’s test</td>
+<td>Data is normally distributed</td>
+<td><code>bartlett.test()</code></td>
+</tr>
+<tr class="even">
+<td>Fligner-Killeen test</td>
+<td>Non-parametric alternative</td>
+<td><code>fligner.test()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Key points:</p>
+<ol style="list-style-type: decimal">
+<li>Bartlett’s test checks if group variances are equal
+(homoscedasticity)</li>
+<li>It is sensitive to non-normality—use Fligner-Killeen for non-normal
+data</li>
+<li>A significant result (p &lt; 0.05) means variances are unequal</li>
+<li>Unequal variances may require data transformation or using robust
+methods (e.g., Welch’s ANOVA)</li>
+</ol>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -768,19 +1048,19 @@ other attached packages:
  [9] ggplot2_3.5.2   tidyverse_2.0.0 workflowr_1.7.1
 
 loaded via a namespace (and not attached):
- [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      hms_1.1.3         
- [5] digest_0.6.37      magrittr_2.0.3     timechange_0.3.0   evaluate_1.0.3    
- [9] grid_4.5.0         RColorBrewer_1.1-3 fastmap_1.2.0      rprojroot_2.0.4   
-[13] jsonlite_2.0.0     processx_3.8.6     whisker_0.4.1      ps_1.9.1          
-[17] promises_1.3.3     httr_1.4.7         scales_1.4.0       jquerylib_0.1.4   
-[21] cli_3.6.5          rlang_1.1.6        withr_3.0.2        cachem_1.1.0      
-[25] yaml_2.3.10        tools_4.5.0        tzdb_0.5.0         httpuv_1.6.16     
-[29] vctrs_0.6.5        R6_2.6.1           lifecycle_1.0.4    git2r_0.36.2      
-[33] fs_1.6.6           pkgconfig_2.0.3    callr_3.7.6        pillar_1.10.2     
-[37] bslib_0.9.0        later_1.4.2        gtable_0.3.6       glue_1.8.0        
-[41] Rcpp_1.0.14        xfun_0.52          tidyselect_1.2.1   rstudioapi_0.17.1 
-[45] knitr_1.50         farver_2.1.2       htmltools_0.5.8.1  labeling_0.4.3    
-[49] rmarkdown_2.29     compiler_4.5.0     getPass_0.2-4     </code></pre>
+ [1] utf8_1.2.6         sass_0.4.10        generics_0.1.4     stringi_1.8.7     
+ [5] hms_1.1.3          digest_0.6.37      magrittr_2.0.3     timechange_0.3.0  
+ [9] evaluate_1.0.3     grid_4.5.0         RColorBrewer_1.1-3 fastmap_1.2.0     
+[13] rprojroot_2.0.4    jsonlite_2.0.0     processx_3.8.6     whisker_0.4.1     
+[17] ps_1.9.1           promises_1.3.3     httr_1.4.7         scales_1.4.0      
+[21] jquerylib_0.1.4    cli_3.6.5          rlang_1.1.6        withr_3.0.2       
+[25] cachem_1.1.0       yaml_2.3.10        tools_4.5.0        tzdb_0.5.0        
+[29] httpuv_1.6.16      vctrs_0.6.5        R6_2.6.1           lifecycle_1.0.4   
+[33] git2r_0.36.2       fs_1.6.6           pkgconfig_2.0.3    callr_3.7.6       
+[37] pillar_1.10.2      bslib_0.9.0        later_1.4.2        gtable_0.3.6      
+[41] glue_1.8.0         Rcpp_1.0.14        xfun_0.52          tidyselect_1.2.1  
+[45] rstudioapi_0.17.1  knitr_1.50         farver_2.1.2       htmltools_0.5.8.1 
+[49] labeling_0.4.3     rmarkdown_2.29     compiler_4.5.0     getPass_0.2-4     </code></pre>
 </div>
 </div>
 </div>
