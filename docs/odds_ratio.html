@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-12-05" />
+<meta name="date" content="2026-02-04" />
 
 <title>Odds Ratio</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Odds Ratio</h1>
-<h4 class="date">2025-12-05</h4>
+<h4 class="date">2026-02-04</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-12-05
+<strong>Last updated:</strong> 2026-02-04
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree222d2c42fb202f10164793526700f625341e9512targetblank222d2c4a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebfee866b0645257af6ea5a9de2c0ea555aa81e45targetblankbfee866a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/222d2c42fb202f10164793526700f625341e9512" target="_blank">222d2c4</a>
+<a href="https://github.com/davetang/muse/tree/bfee866b0645257af6ea5a9de2c0ea555aa81e45" target="_blank">bfee866</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree222d2c42fb202f10164793526700f625341e9512targetblank222d2c4a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreebfee866b0645257af6ea5a9de2c0ea555aa81e45targetblankbfee866a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/222d2c42fb202f10164793526700f625341e9512" target="_blank">222d2c4</a>.
+<a href="https://github.com/davetang/muse/tree/bfee866b0645257af6ea5a9de2c0ea555aa81e45" target="_blank">bfee866</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -572,6 +572,8 @@ Ignored files:
     Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
     Ignored:    data/pbmc20k/
     Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
     Ignored:    data/pbmc3k.h5ad
     Ignored:    data/pbmc3k/
     Ignored:    data/pbmc3k_bpcells_mat/
@@ -588,11 +590,16 @@ Ignored files:
     Ignored:    r_packages_4.5.0/
 
 Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
     Untracked:  analysis/bioc.Rmd
     Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
     Untracked:  bpcells_matrix/
     Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
     Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SeuratObj.rds
     Untracked:  data/arab.rds
     Untracked:  data/astronomicalunit.csv
     Untracked:  data/femaleMiceWeights.csv
@@ -602,6 +609,7 @@ Untracked files:
 
 Unstaged changes:
     Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
 
 </code></pre>
 <p>
@@ -651,6 +659,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/bfee866b0645257af6ea5a9de2c0ea555aa81e45/analysis/odds_ratio.Rmd" target="_blank">bfee866</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-02-04
+</td>
+<td>
+Add more background material
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/34a78edc1d1ec21c5eec77601acdfb6468a3158d/docs/odds_ratio.html" target="_blank">34a78ed</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-12-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/222d2c42fb202f10164793526700f625341e9512/analysis/odds_ratio.Rmd" target="_blank">222d2c4</a>
 </td>
 <td>
@@ -673,12 +715,19 @@ Odds ratio
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <p>Odds ratios are widely used to measure <strong>the strength of
-association between two variables</strong>. Odds and probability are
-related but they are different:</p>
+association between two variables</strong>, particularly in medical
+research, epidemiology, and case-control studies. Before understanding
+odds ratios, we need to understand the difference between probability
+and odds.</p>
+</div>
+<div id="probability-vs-odds" class="section level2">
+<h2>Probability vs Odds</h2>
+<p>Probability and odds are related but different:</p>
 <ul>
-<li>Probability: Chance of something happening out of all
-possibilities</li>
-<li>Odds: Ratio of something happening to it NOT happening</li>
+<li><strong>Probability</strong>: The chance of something happening out
+of all possibilities (ranges from 0 to 1)</li>
+<li><strong>Odds</strong>: The ratio of something happening to it NOT
+happening (ranges from 0 to infinity)</li>
 </ul>
 <pre class="r"><code>sick &lt;- 2
 healthy &lt;- 8
@@ -690,12 +739,74 @@ probability</code></pre>
 <pre class="r"><code>odds &lt;- sick / healthy
 odds</code></pre>
 <pre><code>[1] 0.25</code></pre>
-<p><strong>An odds ratio compares the odds of an event between two
-groups</strong>.</p>
+<p>In this example:</p>
+<ul>
+<li>The probability of being sick is 2/10 = 0.2 (or 20%)</li>
+<li>The odds of being sick are 2:8 = 0.25 (read as “1 to 4” or “0.25 to
+1”)</li>
+</ul>
+<div id="converting-between-probability-and-odds"
+class="section level3">
+<h3>Converting Between Probability and Odds</h3>
+<p>You can convert between probability (P) and odds using these
+formulas:</p>
+<p><span class="math display">\[\text{Odds} = \frac{P}{1 -
+P}\]</span></p>
+<p><span class="math display">\[P = \frac{\text{Odds}}{1 +
+\text{Odds}}\]</span></p>
+<p>Convert probability to odds.</p>
+<pre class="r"><code>prob &lt;- 0.2
+odds_from_prob &lt;- prob / (1 - prob)
+odds_from_prob</code></pre>
+<pre><code>[1] 0.25</code></pre>
+<pre class="r"><code># Convert odds back to probability
+prob_from_odds &lt;- odds_from_prob / (1 + odds_from_prob)
+prob_from_odds</code></pre>
+<pre><code>[1] 0.2</code></pre>
 </div>
-<div id="smoking-and-lung-cancer" class="section level2">
-<h2>Smoking and Lung Cancer</h2>
-<p>A sample of 200 people broken down into four categories.</p>
+<div id="example-different-probability-values" class="section level3">
+<h3>Example: Different Probability Values</h3>
+<p>To build intuition, let’s see how odds change across different
+probabilities:</p>
+<pre class="r"><code>probs &lt;- c(0.1, 0.2, 0.5, 0.8, 0.9)
+odds_values &lt;- probs / (1 - probs)
+
+data.frame(
+  Probability = probs,
+  Odds = round(odds_values, 3),
+  Interpretation = c(&quot;1 to 9&quot;, &quot;1 to 4&quot;, &quot;1 to 1 (even)&quot;, &quot;4 to 1&quot;, &quot;9 to 1&quot;)
+)</code></pre>
+<pre><code>  Probability  Odds Interpretation
+1         0.1 0.111         1 to 9
+2         0.2 0.250         1 to 4
+3         0.5 1.000  1 to 1 (even)
+4         0.8 4.000         4 to 1
+5         0.9 9.000         9 to 1</code></pre>
+<p>Notice that when P = 0.5, the odds are 1 (even odds). When P &gt;
+0.5, odds &gt; 1; when P &lt; 0.5, odds &lt; 1.</p>
+</div>
+</div>
+<div id="what-is-an-odds-ratio" class="section level2">
+<h2>What is an Odds Ratio?</h2>
+<p><strong>An odds ratio (OR) compares the odds of an event between two
+groups</strong>. It answers the question: “How many times higher (or
+lower) are the odds of the outcome in one group compared to
+another?”</p>
+<p>Interpreting odds ratio values:</p>
+<ul>
+<li><strong>OR = 1</strong>: No association between exposure and
+outcome</li>
+<li><strong>OR &gt; 1</strong>: Exposure is associated with higher odds
+of the outcome</li>
+<li><strong>OR &lt; 1</strong>: Exposure is associated with lower odds
+of the outcome</li>
+</ul>
+</div>
+<div id="smoking-and-lung-cancer-example" class="section level2">
+<h2>Smoking and Lung Cancer Example</h2>
+<p>Let’s work through a classic example examining the association
+between smoking and lung cancer. We have a sample of 200 people broken
+down into a 2x2 contingency table:</p>
 <pre class="r"><code>data &lt;- matrix(
   c(20, 80, 2, 98),
   nrow = 2,
@@ -710,26 +821,81 @@ data</code></pre>
 <pre><code>            Cancer No Cancer
 Smokers         20        80
 Non-smokers      2        98</code></pre>
-<p>Calculate odds of cancer for the two groups.</p>
-<pre class="r"><code>odds_smokers &lt;- data[1, 1] / data[1, 2]
-odds_nonsmokers &lt;- data[2, 1] / data[2, 2]
-
+<p>The general structure of a 2x2 table is:</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>Disease+</th>
+<th>Disease-</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Exposed</td>
+<td>a</td>
+<td>b</td>
+</tr>
+<tr class="even">
+<td>Not Exposed</td>
+<td>c</td>
+<td>d</td>
+</tr>
+</tbody>
+</table>
+<p>In our example: a=20, b=80, c=2, d=98.</p>
+<div id="step-1-calculate-odds-for-each-group" class="section level3">
+<h3>Step 1: Calculate odds for each group</h3>
+<pre class="r"><code># Odds of cancer for smokers = a/b
+odds_smokers &lt;- data[1, 1] / data[1, 2]
 odds_smokers</code></pre>
 <pre><code>[1] 0.25</code></pre>
-<pre class="r"><code>odds_nonsmokers</code></pre>
+<pre class="r"><code># Odds of cancer for non-smokers = c/d
+odds_nonsmokers &lt;- data[2, 1] / data[2, 2]
+odds_nonsmokers</code></pre>
 <pre><code>[1] 0.02040816</code></pre>
-<p>Calculate odds ratio.</p>
+<ul>
+<li>Smokers: 20 have cancer, 80 don’t → odds = 20/80 = 0.25 (or
+1:4)</li>
+<li>Non-smokers: 2 have cancer, 98 don’t → odds = 2/98 ≈ 0.02 (or about
+1:49)</li>
+</ul>
+</div>
+<div id="step-2-calculate-odds-ratio" class="section level3">
+<h3>Step 2: Calculate odds ratio</h3>
+<p>The odds ratio is simply the ratio of these two odds:</p>
 <pre class="r"><code>odds_ratio &lt;- odds_smokers / odds_nonsmokers
 odds_ratio</code></pre>
 <pre><code>[1] 12.25</code></pre>
-<p>Smokers have 12.25 times the odds of lung cancer compared to
-non-smokers.</p>
+<p><strong>Interpretation</strong>: Smokers have 12.3 times the odds of
+developing lung cancer compared to non-smokers. This is a strong
+positive association.</p>
 </div>
-<div id="using-fishers-exact-test" class="section level2">
-<h2>Using Fisher’s Exact Test</h2>
-<p>Use <code>fisher.test()</code> for calculating odds ratios with
-confidence intervals.</p>
-<pre class="r"><code>fisher.test(data)</code></pre>
+<div id="cross-product-formula" class="section level3">
+<h3>Cross-Product Formula</h3>
+<p>For a 2x2 table, the odds ratio can also be calculated directly using
+the cross-product formula:</p>
+<p><span class="math display">\[OR = \frac{a \times d}{b \times
+c}\]</span></p>
+<p>Using the cross-product formula.</p>
+<pre class="r"><code>or_cross &lt;- (data[1, 1] * data[2, 2]) / (data[1, 2] * data[2, 1])
+or_cross</code></pre>
+<pre><code>[1] 12.25</code></pre>
+<p>This gives the same result and is often more convenient for quick
+calculations.</p>
+</div>
+</div>
+<div id="confidence-intervals" class="section level2">
+<h2>Confidence Intervals</h2>
+<p>A point estimate of the odds ratio alone doesn’t tell us how precise
+our estimate is. We need <strong>confidence intervals</strong> to
+understand the range of plausible values for the true odds ratio.</p>
+<div id="using-fishers-exact-test" class="section level3">
+<h3>Using Fisher’s Exact Test</h3>
+<p>The <code>fisher.test()</code> function calculates the odds ratio
+with a 95% confidence interval:</p>
+<pre class="r"><code>result &lt;- fisher.test(data)
+result</code></pre>
 <pre><code>
     Fisher&#39;s Exact Test for Count Data
 
@@ -741,14 +907,54 @@ alternative hypothesis: true odds ratio is not equal to 1
 sample estimates:
 odds ratio 
   12.12786 </code></pre>
+<p>Key outputs:</p>
+<ul>
+<li><strong>Odds ratio</strong>: 12.13 (similar to our manual
+calculation; slight difference due to conditional maximum likelihood
+estimation)</li>
+<li><strong>95% CI</strong>: [2.81, 110.22]</li>
+<li><strong>p-value</strong>: 5.09e-05</li>
+</ul>
+<p><strong>Interpreting the confidence interval</strong>: Since the 95%
+CI does not include 1, we can conclude there is a statistically
+significant association between smoking and lung cancer at the 0.05
+significance level.</p>
 </div>
-<div id="logistic-regression-example" class="section level2">
-<h2>Logistic Regression Example</h2>
-<p>Odds ratios from logistic regression models.</p>
+<div id="rule-of-thumb-for-confidence-intervals" class="section level3">
+<h3>Rule of Thumb for Confidence Intervals</h3>
+<ul>
+<li>If the 95% CI <strong>excludes 1</strong>: The association is
+statistically significant (p &lt; 0.05)</li>
+<li>If the 95% CI <strong>includes 1</strong>: The association is not
+statistically significant</li>
+</ul>
+</div>
+</div>
+<div id="logistic-regression-and-odds-ratios" class="section level2">
+<h2>Logistic Regression and Odds Ratios</h2>
+<p>Logistic regression is commonly used to model binary outcomes
+(yes/no, disease/no disease). The coefficients from logistic regression
+are <strong>log odds ratios</strong>, which can be converted to odds
+ratios by exponentiation.</p>
+<div id="why-log-odds" class="section level3">
+<h3>Why Log Odds?</h3>
+<p>Logistic regression models the <strong>log odds</strong> (also called
+logit) of the outcome:</p>
+<p><span class="math display">\[\log\left(\frac{P}{1-P}\right) = \beta_0
++ \beta_1 X_1 + \beta_2 X_2 + ...\]</span></p>
+<p>The coefficients (<span class="math inline">\(\beta\)</span>)
+represent the change in log odds for a one-unit increase in the
+predictor.</p>
+</div>
+<div id="example-disease-prediction" class="section level3">
+<h3>Example: Disease Prediction</h3>
+<p>Let’s simulate data where disease risk depends on age and smoking
+status:</p>
 <pre class="r"><code>set.seed(1984)
 n &lt;- 200
 age &lt;- rnorm(n, mean = 50, sd = 15)
 smoker &lt;- rbinom(n, 1, 0.3)
+# True model: log odds = -5 + 0.05*age + 2*smoker
 disease &lt;- rbinom(n, 1, plogis(-5 + 0.05*age + 2*smoker))
 
 model &lt;- glm(disease ~ age + smoker, family = binomial)
@@ -772,11 +978,58 @@ Residual deviance: 157.34  on 197  degrees of freedom
 AIC: 163.34
 
 Number of Fisher Scoring iterations: 5</code></pre>
-<p>Odds ratios.</p>
+</div>
+<div id="converting-coefficients-to-odds-ratios" class="section level3">
+<h3>Converting Coefficients to Odds Ratios</h3>
+<p>The model coefficients are log odds ratios. To get odds ratios, we
+exponentiate them:</p>
 <pre class="r"><code>or_coef &lt;- exp(coef(model))
 or_coef</code></pre>
 <pre><code>(Intercept)         age      smoker 
  0.01070543  1.04395510  6.29641114 </code></pre>
+<p><strong>Interpretation</strong>:</p>
+<ul>
+<li><strong>Age</strong>: OR = 1.044. For each additional year of age,
+the odds of disease increase by about 4.4%</li>
+<li><strong>Smoker</strong>: OR = 6.3. Smokers have about 6.3 times the
+odds of disease compared to non-smokers</li>
+</ul>
+</div>
+<div id="odds-ratios-with-confidence-intervals" class="section level3">
+<h3>Odds Ratios with Confidence Intervals</h3>
+<p>For a complete picture, we should report odds ratios with confidence
+intervals:</p>
+<pre class="r"><code># Get confidence intervals for coefficients
+ci &lt;- confint(model)</code></pre>
+<pre><code>Waiting for profiling to be done...</code></pre>
+<pre class="r"><code># Combine into a nice table
+or_table &lt;- data.frame(
+  OR = exp(coef(model)),
+  Lower_CI = exp(ci[, 1]),
+  Upper_CI = exp(ci[, 2])
+)
+round(or_table, 3)</code></pre>
+<pre><code>               OR Lower_CI Upper_CI
+(Intercept) 0.011    0.002    0.054
+age         1.044    1.015    1.076
+smoker      6.296    2.878   14.392</code></pre>
+</div>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>Key points about odds ratios:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Odds</strong> are the ratio of an event occurring to it not
+occurring</li>
+<li><strong>Odds ratios</strong> compare odds between two groups</li>
+<li>OR = 1 means no association; OR &gt; 1 means positive association;
+OR &lt; 1 means negative association</li>
+<li>Always report confidence intervals alongside point estimates</li>
+<li>In logistic regression, exponentiate coefficients to obtain odds
+ratios</li>
+<li>The <strong>cross-product formula</strong> (ad/bc) provides a quick
+way to calculate OR from 2x2 tables</li>
+</ol>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
