@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-09-02" />
+<meta name="date" content="2026-02-04" />
 
 <title>Fitting</title>
 
@@ -359,7 +359,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Fitting</h1>
-<h4 class="date">2025-09-02</h4>
+<h4 class="date">2026-02-04</h4>
 
 </div>
 
@@ -388,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-09-02
+<strong>Last updated:</strong> 2026-02-04
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree15473bae75b26188311b56273753be5455f6ca03targetblank15473baa">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2a88aefae8954a5db638a076c9ee26e3ea2aaffetargetblank2a88aefa">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/15473bae75b26188311b56273753be5455f6ca03" target="_blank">15473ba</a>
+<a href="https://github.com/davetang/muse/tree/2a88aefae8954a5db638a076c9ee26e3ea2aaffe" target="_blank">2a88aef</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree15473bae75b26188311b56273753be5455f6ca03targetblank15473baa"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2a88aefae8954a5db638a076c9ee26e3ea2aaffetargetblank2a88aefa"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/15473bae75b26188311b56273753be5455f6ca03" target="_blank">15473ba</a>.
+<a href="https://github.com/davetang/muse/tree/2a88aefae8954a5db638a076c9ee26e3ea2aaffe" target="_blank">2a88aef</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -572,6 +572,8 @@ Ignored files:
     Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
     Ignored:    data/pbmc20k/
     Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
     Ignored:    data/pbmc3k.h5ad
     Ignored:    data/pbmc3k/
     Ignored:    data/pbmc3k_bpcells_mat/
@@ -588,18 +590,26 @@ Ignored files:
     Ignored:    r_packages_4.5.0/
 
 Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
+    Untracked:  analysis/bioc.Rmd
     Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
     Untracked:  bpcells_matrix/
     Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
     Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SeuratObj.rds
     Untracked:  data/arab.rds
     Untracked:  data/astronomicalunit.csv
     Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
     Untracked:  m3/
+    Untracked:  women.json
 
 Unstaged changes:
-    Modified:   analysis/information.Rmd
     Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
 
 </code></pre>
 <p>
@@ -644,6 +654,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/2a88aefae8954a5db638a076c9ee26e3ea2aaffe/analysis/fitting.Rmd" target="_blank">2a88aef</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-02-04
+</td>
+<td>
+Add explanations on fitting
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/b2fed23ececfc6ec376800e6b6515b2ad5fe2249/docs/fitting.html" target="_blank">b2fed23</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2025-09-02
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -738,54 +782,199 @@ Fitting a distribution
 </div>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>When a “distribution was fit to” something, it means that we assume
-that the data comes from some probability distribution and we are
-estimating the distribution’s parameters from the data so that the model
-best represents the observed values.</p>
+<p>When we say a “distribution was fit to” data, it means we assume the
+data comes from some probability distribution and we estimate the
+distribution’s parameters so the model best represents the observed
+values.</p>
+<div id="why-fit-distributions" class="section level2">
+<h2>Why Fit Distributions?</h2>
+<p>Distribution fitting is useful for:</p>
+<ul>
+<li><strong>Understanding data</strong>: Identifying the underlying
+process that generated your data</li>
+<li><strong>Simulation</strong>: Generating synthetic data with similar
+properties</li>
+<li><strong>Prediction</strong>: Calculating probabilities of future
+events</li>
+<li><strong>Statistical testing</strong>: Many tests assume specific
+distributions</li>
+<li><strong>Quality control</strong>: Monitoring processes in
+manufacturing and other fields</li>
+</ul>
 </div>
-<div id="fitting-using-mass" class="section level1">
-<h1>Fitting using {MASS}</h1>
-<p>Suppose we have some data:</p>
+<div id="maximum-likelihood-estimation" class="section level2">
+<h2>Maximum Likelihood Estimation</h2>
+<p>The most common method for fitting distributions is <strong>Maximum
+Likelihood Estimation (MLE)</strong>. The idea is to find parameter
+values that make the observed data most probable.</p>
+<p>For example, if we have data and assume it comes from a normal
+distribution, MLE finds the mean (<span
+class="math inline">\(\mu\)</span>) and standard deviation (<span
+class="math inline">\(\sigma\)</span>) that maximise the likelihood of
+observing that data.</p>
+<p>The likelihood function for n independent observations is:</p>
+<p><span class="math display">\[L(\theta | x_1, ..., x_n) =
+\prod_{i=1}^{n} f(x_i | \theta)\]</span></p>
+<p>where <span class="math inline">\(f\)</span> is the probability
+density function and <span class="math inline">\(\theta\)</span>
+represents the parameters. In practice, we maximise the log-likelihood
+for computational convenience.</p>
+</div>
+</div>
+<div id="fitting-distributions-with-mass" class="section level1">
+<h1>Fitting Distributions with MASS</h1>
+<p>The <code>MASS::fitdistr()</code> function fits univariate
+distributions using maximum likelihood estimation. Let’s work through
+several examples.</p>
+<div id="example-1-normal-distribution" class="section level2">
+<h2>Example 1: Normal Distribution</h2>
+<p>The normal (Gaussian) distribution is characterised by two
+parameters: mean (<span class="math inline">\(\mu\)</span>) and standard
+deviation (<span class="math inline">\(\sigma\)</span>).</p>
 <pre class="r"><code>set.seed(1984)
 eg1 &lt;- rnorm(100, mean = 5, sd = 2)</code></pre>
-<p>Fit a Normal distribution.</p>
-<pre class="r"><code>eg1_fit &lt;- MASS::fitdistr(eg1, &quot;normal&quot;)
+<p>Fit a normal distribution to the data:</p>
+<pre class="r"><code>eg1_fit &lt;- fitdistr(eg1, &quot;normal&quot;)
 eg1_fit</code></pre>
 <pre><code>     mean        sd   
   5.062545   1.873380 
  (0.187338) (0.132468)</code></pre>
-<p>A Normal distribution was fit to <code>eg1</code>, with estimated
-mean 5.0625454 and standard deviation 1.8733798</p>
-<p>Poisson.</p>
+<div id="understanding-the-output" class="section level3">
+<h3>Understanding the Output</h3>
+<p>The output shows:</p>
+<ul>
+<li><strong>Estimated parameters</strong>: mean = 5.063, sd = 1.873</li>
+<li><strong>Standard errors</strong>: The values in parentheses indicate
+uncertainty in the estimates</li>
+</ul>
+<p>The true parameters were mean = 5 and sd = 2. Our estimates are
+close, demonstrating that MLE recovers the true parameters reasonably
+well with 100 observations.</p>
+</div>
+<div id="visualising-the-fit" class="section level3">
+<h3>Visualising the Fit</h3>
+<p>It’s important to visually verify that the fitted distribution
+matches the data:</p>
+<pre class="r"><code>ggplot(data.frame(x = eg1), aes(x)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 20,
+                 fill = &quot;steelblue&quot;, colour = &quot;white&quot;, alpha = 0.7) +
+  stat_function(fun = dnorm,
+                args = list(mean = eg1_fit$estimate[&#39;mean&#39;],
+                            sd = eg1_fit$estimate[&#39;sd&#39;]),
+                colour = &quot;red&quot;, linewidth = 1) +
+  labs(title = &quot;Normal Distribution Fit&quot;,
+       subtitle = paste0(&quot;Estimated: mean = &quot;, round(eg1_fit$estimate[&#39;mean&#39;], 2),
+                        &quot;, sd = &quot;, round(eg1_fit$estimate[&#39;sd&#39;], 2)),
+       x = &quot;Value&quot;, y = &quot;Density&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/fitting.Rmd/eg1_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The red curve shows the fitted normal distribution overlaid on the
+histogram of our data.</p>
+</div>
+</div>
+<div id="example-2-poisson-distribution" class="section level2">
+<h2>Example 2: Poisson Distribution</h2>
+<p>The Poisson distribution models count data and has a single parameter
+<span class="math inline">\(\lambda\)</span> (lambda), which represents
+both the mean and variance.</p>
 <pre class="r"><code>set.seed(1984)
 eg2 &lt;- rpois(100, lambda = 3)
-eg2_fit &lt;- MASS::fitdistr(eg2, &quot;Poisson&quot;)
+eg2_fit &lt;- fitdistr(eg2, &quot;Poisson&quot;)
 eg2_fit</code></pre>
 <pre><code>    lambda  
   3.1000000 
  (0.1760682)</code></pre>
-<p><a
-href="https://en.wikipedia.org/wiki/Gamma_distribution#Occurrence_and_applications">Gamma
-distribution</a>.</p>
+<p>The estimated <span class="math inline">\(\lambda\)</span> = 3.1 is
+close to the true value of 3.</p>
+<pre class="r"><code># Create comparison data
+x_vals &lt;- 0:max(eg2)
+observed &lt;- table(factor(eg2, levels = x_vals)) / length(eg2)
+expected &lt;- dpois(x_vals, lambda = eg2_fit$estimate[&#39;lambda&#39;])
+
+plot_data &lt;- data.frame(
+  x = rep(x_vals, 2),
+  probability = c(as.numeric(observed), expected),
+  type = rep(c(&quot;Observed&quot;, &quot;Fitted&quot;), each = length(x_vals))
+)
+
+ggplot(plot_data, aes(x, probability, fill = type)) +
+  geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;, alpha = 0.7) +
+  scale_fill_manual(values = c(&quot;Observed&quot; = &quot;steelblue&quot;, &quot;Fitted&quot; = &quot;red&quot;)) +
+  labs(title = &quot;Poisson Distribution Fit&quot;,
+       subtitle = paste0(&quot;Estimated: lambda = &quot;, round(eg2_fit$estimate[&#39;lambda&#39;], 2)),
+       x = &quot;Count&quot;, y = &quot;Probability&quot;, fill = &quot;&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/fitting.Rmd/eg2_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="example-3-gamma-distribution" class="section level2">
+<h2>Example 3: Gamma Distribution</h2>
+<p>The <a href="https://en.wikipedia.org/wiki/Gamma_distribution">gamma
+distribution</a> is useful for modelling positive continuous data, such
+as waiting times or rainfall amounts. It has two parameters: shape
+(<span class="math inline">\(\alpha\)</span>) and rate (<span
+class="math inline">\(\beta\)</span>).</p>
 <pre class="r"><code>set.seed(1984)
-eg3 &lt;- stats::rgamma(300, shape = 2, rate = 3, scale = 1/3)</code></pre>
-<pre><code>Warning in stats::rgamma(300, shape = 2, rate = 3, scale = 1/3): specify &#39;rate&#39;
-or &#39;scale&#39; but not both</code></pre>
-<pre class="r"><code>eg3_fit &lt;- MASS::fitdistr(eg3, &quot;gamma&quot;)</code></pre>
+eg3 &lt;- rgamma(300, shape = 2, rate = 3)
+
+eg3_fit &lt;- fitdistr(eg3, &quot;gamma&quot;)</code></pre>
 <pre><code>Warning in densfun(x, parm[1], parm[2], ...): NaNs produced</code></pre>
 <pre class="r"><code>eg3_fit</code></pre>
 <pre><code>     shape       rate   
   2.0425966   3.1910159 
  (0.1550892) (0.2744437)</code></pre>
-<p>Negative binomial.</p>
+<p>True parameters: shape = 2, rate = 3. The estimates are reasonably
+close.</p>
+<pre class="r"><code>ggplot(data.frame(x = eg3), aes(x)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 30,
+                 fill = &quot;steelblue&quot;, colour = &quot;white&quot;, alpha = 0.7) +
+  stat_function(fun = dgamma,
+                args = list(shape = eg3_fit$estimate[&#39;shape&#39;],
+                            rate = eg3_fit$estimate[&#39;rate&#39;]),
+                colour = &quot;red&quot;, linewidth = 1) +
+  labs(title = &quot;Gamma Distribution Fit&quot;,
+       subtitle = paste0(&quot;Estimated: shape = &quot;, round(eg3_fit$estimate[&#39;shape&#39;], 2),
+                        &quot;, rate = &quot;, round(eg3_fit$estimate[&#39;rate&#39;], 2)),
+       x = &quot;Value&quot;, y = &quot;Density&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/fitting.Rmd/eg3_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="example-4-negative-binomial-distribution"
+class="section level2">
+<h2>Example 4: Negative Binomial Distribution</h2>
+<p>The negative binomial distribution is useful for overdispersed count
+data (when variance exceeds the mean). It has two parameters: size
+(<span class="math inline">\(r\)</span>) and mu (<span
+class="math inline">\(\mu\)</span>).</p>
 <pre class="r"><code>set.seed(1984)
 eg4 &lt;- rnbinom(100, mu = 10, size = 5)
 
-eg4_fit &lt;- MASS::fitdistr(eg4, &quot;negative binomial&quot;)
+eg4_fit &lt;- fitdistr(eg4, &quot;negative binomial&quot;)
 eg4_fit</code></pre>
 <pre><code>     size         mu    
   4.9764745   9.7999979 
  (1.0492499) (0.5394329)</code></pre>
+<pre class="r"><code>x_vals &lt;- 0:max(eg4)
+observed &lt;- table(factor(eg4, levels = x_vals)) / length(eg4)
+expected &lt;- dnbinom(x_vals, mu = eg4_fit$estimate[&#39;mu&#39;], size = eg4_fit$estimate[&#39;size&#39;])
+
+plot_data &lt;- data.frame(
+  x = rep(x_vals, 2),
+  probability = c(as.numeric(observed), expected),
+  type = rep(c(&quot;Observed&quot;, &quot;Fitted&quot;), each = length(x_vals))
+)
+
+ggplot(plot_data, aes(x, probability, fill = type)) +
+  geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;, alpha = 0.7) +
+  scale_fill_manual(values = c(&quot;Observed&quot; = &quot;steelblue&quot;, &quot;Fitted&quot; = &quot;red&quot;)) +
+  labs(title = &quot;Negative Binomial Distribution Fit&quot;,
+       subtitle = paste0(&quot;Estimated: size = &quot;, round(eg4_fit$estimate[&#39;size&#39;], 2),
+                        &quot;, mu = &quot;, round(eg4_fit$estimate[&#39;mu&#39;], 2)),
+       x = &quot;Count&quot;, y = &quot;Probability&quot;, fill = &quot;&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/fitting.Rmd/eg4_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="supported-distributions" class="section level2">
+<h2>Supported Distributions</h2>
 <p><code>MASS::fitdistr()</code> supports the following
 distributions:</p>
 <ul>
@@ -805,25 +994,247 @@ distributions:</p>
 <li>“weibull”</li>
 </ul>
 </div>
-<div id="which-fits-better" class="section level1">
-<h1>Which fits better?</h1>
-<p><a
+</div>
+<div id="comparing-model-fits" class="section level1">
+<h1>Comparing Model Fits</h1>
+<p>When multiple distributions could plausibly fit your data, you need
+methods to compare them.</p>
+<div id="akaike-information-criterion-aic" class="section level2">
+<h2>Akaike Information Criterion (AIC)</h2>
+<p>The <a
 href="https://en.wikipedia.org/wiki/Akaike_information_criterion">Akaike
-Information Criterion</a> (AIC) is an estimator of prediction error and
-thereby relative quality of statistical models for a given set of data.
-Put simply, it’s a measure of how well a statistical model fits the
-data, but with a built-in penalty for model complexity. When comparing
-models, the one with the lowest AIC is preferred.</p>
+Information Criterion</a> (AIC) measures how well a model fits the data
+while penalising model complexity:</p>
+<p><span class="math display">\[AIC = 2k - 2\ln(L)\]</span></p>
+<p>where <span class="math inline">\(k\)</span> is the number of
+parameters and <span class="math inline">\(L\)</span> is the maximum
+likelihood. <strong>Lower AIC values indicate better fit</strong>. The
+penalty term (2k) prevents overfitting by discouraging unnecessarily
+complex models.</p>
+<div id="example-normal-vs-exponential" class="section level3">
+<h3>Example: Normal vs Exponential</h3>
+<p>Let’s compare normal and exponential fits for our normally
+distributed data:</p>
 <pre class="r"><code>set.seed(1984)
 eg1 &lt;- rnorm(100, mean = 5, sd = 2)
 
-eg1_norm &lt;- MASS::fitdistr(eg1, &quot;normal&quot;)
-eg1_exp &lt;- MASS::fitdistr(eg1, &quot;exponential&quot;)
+eg1_norm &lt;- fitdistr(eg1, &quot;normal&quot;)
+eg1_exp &lt;- fitdistr(eg1, &quot;exponential&quot;)
 
-stats::AIC(eg1_norm, eg1_exp)</code></pre>
+AIC(eg1_norm, eg1_exp)</code></pre>
 <pre><code>         df      AIC
 eg1_norm  2 413.3365
 eg1_exp   1 526.3739</code></pre>
+<p>The normal distribution has a much lower AIC, correctly indicating
+it’s a better fit. We can also visualise why:</p>
+<pre class="r"><code>ggplot(data.frame(x = eg1), aes(x)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 20,
+                 fill = &quot;grey70&quot;, colour = &quot;white&quot;) +
+  stat_function(fun = dnorm,
+                args = list(mean = eg1_norm$estimate[&#39;mean&#39;],
+                            sd = eg1_norm$estimate[&#39;sd&#39;]),
+                aes(colour = &quot;Normal&quot;), linewidth = 1) +
+  stat_function(fun = dexp,
+                args = list(rate = eg1_exp$estimate[&#39;rate&#39;]),
+                aes(colour = &quot;Exponential&quot;), linewidth = 1) +
+  scale_colour_manual(values = c(&quot;Normal&quot; = &quot;blue&quot;, &quot;Exponential&quot; = &quot;red&quot;)) +
+  labs(title = &quot;Comparing Normal vs Exponential Fit&quot;,
+       x = &quot;Value&quot;, y = &quot;Density&quot;, colour = &quot;Distribution&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/fitting.Rmd/aic_visual-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The exponential distribution clearly doesn’t capture the symmetric,
+bell-shaped nature of the data.</p>
+</div>
+</div>
+<div id="bayesian-information-criterion-bic" class="section level2">
+<h2>Bayesian Information Criterion (BIC)</h2>
+<p>BIC is similar to AIC but applies a stronger penalty for model
+complexity:</p>
+<p><span class="math display">\[BIC = k\ln(n) - 2\ln(L)\]</span></p>
+<p>where <span class="math inline">\(n\)</span> is the sample size. BIC
+tends to favour simpler models than AIC.</p>
+<pre class="r"><code>BIC(eg1_norm, eg1_exp)</code></pre>
+<pre><code>         df      BIC
+eg1_norm  2 418.5469
+eg1_exp   1 528.9791</code></pre>
+<p>Both criteria agree that the normal distribution is the better
+fit.</p>
+</div>
+<div id="example-choosing-between-related-distributions"
+class="section level2">
+<h2>Example: Choosing Between Related Distributions</h2>
+<p>Sometimes the choice is less obvious. Consider count data that might
+follow either a Poisson or negative binomial distribution:</p>
+<pre class="r"><code>set.seed(1984)
+# Generate overdispersed count data
+overdispersed &lt;- rnbinom(200, mu = 5, size = 2)
+
+# Fit both distributions
+pois_fit &lt;- fitdistr(overdispersed, &quot;Poisson&quot;)
+nb_fit &lt;- fitdistr(overdispersed, &quot;negative binomial&quot;)
+
+# Compare AIC
+AIC(pois_fit, nb_fit)</code></pre>
+<pre><code>         df      AIC
+pois_fit  1 1371.432
+nb_fit    2 1081.379</code></pre>
+<pre class="r"><code>x_vals &lt;- 0:max(overdispersed)
+observed &lt;- table(factor(overdispersed, levels = x_vals)) / length(overdispersed)
+pois_expected &lt;- dpois(x_vals, lambda = pois_fit$estimate[&#39;lambda&#39;])
+nb_expected &lt;- dnbinom(x_vals, mu = nb_fit$estimate[&#39;mu&#39;], size = nb_fit$estimate[&#39;size&#39;])
+
+plot_data &lt;- data.frame(
+  x = rep(x_vals, 3),
+  probability = c(as.numeric(observed), pois_expected, nb_expected),
+  type = rep(c(&quot;Observed&quot;, &quot;Poisson&quot;, &quot;Negative Binomial&quot;), each = length(x_vals))
+)
+
+ggplot(plot_data, aes(x, probability, fill = type)) +
+  geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;, alpha = 0.7) +
+  scale_fill_manual(values = c(&quot;Observed&quot; = &quot;grey50&quot;,
+                               &quot;Poisson&quot; = &quot;steelblue&quot;,
+                               &quot;Negative Binomial&quot; = &quot;darkred&quot;)) +
+  labs(title = &quot;Poisson vs Negative Binomial Fit&quot;,
+       subtitle = &quot;For overdispersed count data&quot;,
+       x = &quot;Count&quot;, y = &quot;Probability&quot;, fill = &quot;&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/fitting.Rmd/count_comparison_visual-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>The negative binomial has lower AIC because it can accommodate the
+overdispersion (variance &gt; mean) in the data, which the Poisson
+cannot.</p>
+</div>
+</div>
+<div id="assessing-goodness-of-fit" class="section level1">
+<h1>Assessing Goodness of Fit</h1>
+<p>Beyond comparing models, you should assess whether any distribution
+fits well in absolute terms.</p>
+<div id="q-q-plots" class="section level2">
+<h2>Q-Q Plots</h2>
+<p>Quantile-Quantile (Q-Q) plots compare the quantiles of your data
+against theoretical quantiles. If the data follows the assumed
+distribution, points should fall along the diagonal line.</p>
+<pre class="r"><code># Q-Q plot for normal fit
+eg1_sorted &lt;- sort(eg1)
+theoretical_quantiles &lt;- qnorm(ppoints(length(eg1)),
+                               mean = eg1_fit$estimate[&#39;mean&#39;],
+                               sd = eg1_fit$estimate[&#39;sd&#39;])
+
+ggplot(data.frame(theoretical = theoretical_quantiles, observed = eg1_sorted),
+       aes(theoretical, observed)) +
+  geom_point(alpha = 0.6) +
+  geom_abline(slope = 1, intercept = 0, colour = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+  labs(title = &quot;Q-Q Plot: Normal Distribution&quot;,
+       x = &quot;Theoretical Quantiles&quot;, y = &quot;Observed Quantiles&quot;) +
+  theme_minimal()</code></pre>
+<p><img src="figure/fitting.Rmd/qq_plot-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>Points closely following the diagonal line indicate a good fit.</p>
+</div>
+<div id="kolmogorov-smirnov-test" class="section level2">
+<h2>Kolmogorov-Smirnov Test</h2>
+<p>The Kolmogorov-Smirnov test formally tests whether data comes from a
+specified distribution:</p>
+<pre class="r"><code>ks.test(eg1, &quot;pnorm&quot;,
+        mean = eg1_fit$estimate[&#39;mean&#39;],
+        sd = eg1_fit$estimate[&#39;sd&#39;])</code></pre>
+<pre><code>
+    Asymptotic one-sample Kolmogorov-Smirnov test
+
+data:  eg1
+D = 0.086058, p-value = 0.4494
+alternative hypothesis: two-sided</code></pre>
+<p>A large p-value (&gt; 0.05) suggests we cannot reject the hypothesis
+that the data comes from the fitted distribution.</p>
+</div>
+</div>
+<div id="practical-considerations" class="section level1">
+<h1>Practical Considerations</h1>
+<div id="sample-size" class="section level2">
+<h2>Sample Size</h2>
+<p>Larger samples produce more reliable parameter estimates:</p>
+<pre class="r"><code>set.seed(1984)
+true_mean &lt;- 10
+true_sd &lt;- 3
+
+# Compare estimates at different sample sizes
+sample_sizes &lt;- c(20, 50, 100, 500, 1000)
+results &lt;- lapply(sample_sizes, function(n) {
+  x &lt;- rnorm(n, mean = true_mean, sd = true_sd)
+  fit &lt;- fitdistr(x, &quot;normal&quot;)
+  data.frame(
+    n = n,
+    est_mean = fit$estimate[&#39;mean&#39;],
+    est_sd = fit$estimate[&#39;sd&#39;],
+    se_mean = fit$sd[&#39;mean&#39;],
+    se_sd = fit$sd[&#39;sd&#39;]
+  )
+})
+
+results_df &lt;- do.call(rbind, results)
+results_df</code></pre>
+<pre><code>         n  est_mean   est_sd    se_mean      se_sd
+mean    20 10.382167 3.026534 0.67675348 0.47853697
+mean1   50 10.226157 2.746529 0.38841779 0.27465285
+mean2  100  9.604006 2.743902 0.27439024 0.19402320
+mean3  500  9.804773 3.020142 0.13506485 0.09550527
+mean4 1000  9.954271 3.011147 0.09522084 0.06733130</code></pre>
+<p>Notice how standard errors decrease as sample size increases.</p>
+</div>
+<div id="starting-values" class="section level2">
+<h2>Starting Values</h2>
+<p>For some distributions, <code>fitdistr()</code> may need starting
+values to converge:</p>
+<pre class="r"><code>set.seed(1984)
+weibull_data &lt;- rweibull(100, shape = 2, scale = 5)
+
+# Provide starting values for Weibull
+weibull_fit &lt;- fitdistr(weibull_data, &quot;weibull&quot;,
+                        start = list(shape = 1, scale = 1))</code></pre>
+<pre><code>Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+Warning in densfun(x, parm[1], parm[2], ...): NaNs produced
+Warning in densfun(x, parm[1], parm[2], ...): NaNs produced</code></pre>
+<pre class="r"><code>weibull_fit</code></pre>
+<pre><code>     shape       scale  
+  1.8967375   4.8896060 
+ (0.1458478) (0.2720805)</code></pre>
+</div>
+<div id="accessing-fit-components" class="section level2">
+<h2>Accessing Fit Components</h2>
+<p>The fitted object contains useful information:</p>
+<pre class="r"><code># Parameter estimates
+eg1_fit$estimate</code></pre>
+<pre><code>    mean       sd 
+5.062545 1.873380 </code></pre>
+<pre class="r"><code># Standard errors
+eg1_fit$sd</code></pre>
+<pre><code>    mean       sd 
+0.187338 0.132468 </code></pre>
+<pre class="r"><code># Log-likelihood
+eg1_fit$loglik</code></pre>
+<pre><code>[1] -204.6683</code></pre>
+<pre class="r"><code># Variance-covariance matrix
+eg1_fit$vcov</code></pre>
+<pre><code>           mean         sd
+mean 0.03509552 0.00000000
+sd   0.00000000 0.01754776</code></pre>
+</div>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<p>Key points for distribution fitting:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Maximum Likelihood Estimation</strong> finds parameters that
+make observed data most probable</li>
+<li><strong>Always visualise</strong> the fitted distribution against
+your data</li>
+<li><strong>Compare models</strong> using AIC or BIC (lower is
+better)</li>
+<li><strong>Assess goodness of fit</strong> with Q-Q plots or formal
+tests</li>
+<li><strong>Larger samples</strong> give more reliable estimates</li>
+<li>Consider the <strong>theoretical basis</strong> for choosing a
+distribution, not just statistical fit</li>
+</ol>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -835,7 +1246,7 @@ Session information
 <pre class="r"><code>sessionInfo()</code></pre>
 <pre><code>R version 4.5.0 (2025-04-11)
 Platform: x86_64-pc-linux-gnu
-Running under: Ubuntu 24.04.2 LTS
+Running under: Ubuntu 24.04.3 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -856,20 +1267,22 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
-[1] MASS_7.3-65     workflowr_1.7.1
+[1] ggplot2_3.5.2   MASS_7.3-65     workflowr_1.7.1
 
 loaded via a namespace (and not attached):
- [1] vctrs_0.6.5       httr_1.4.7        cli_3.6.5         knitr_1.50       
- [5] rlang_1.1.6       xfun_0.52         stringi_1.8.7     processx_3.8.6   
- [9] promises_1.3.2    jsonlite_2.0.0    glue_1.8.0        rprojroot_2.0.4  
-[13] git2r_0.36.2      htmltools_0.5.8.1 httpuv_1.6.16     ps_1.9.1         
-[17] sass_0.4.10       rmarkdown_2.29    jquerylib_0.1.4   tibble_3.2.1     
-[21] evaluate_1.0.3    fastmap_1.2.0     yaml_2.3.10       lifecycle_1.0.4  
-[25] whisker_0.4.1     stringr_1.5.1     compiler_4.5.0    fs_1.6.6         
-[29] pkgconfig_2.0.3   Rcpp_1.0.14       rstudioapi_0.17.1 later_1.4.2      
-[33] digest_0.6.37     R6_2.6.1          pillar_1.10.2     callr_3.7.6      
-[37] magrittr_2.0.3    bslib_0.9.0       tools_4.5.0       cachem_1.1.0     
-[41] getPass_0.2-4    </code></pre>
+ [1] gtable_0.3.6       jsonlite_2.0.0     dplyr_1.1.4        compiler_4.5.0    
+ [5] promises_1.3.3     tidyselect_1.2.1   Rcpp_1.0.14        stringr_1.5.1     
+ [9] git2r_0.36.2       callr_3.7.6        later_1.4.2        jquerylib_0.1.4   
+[13] scales_1.4.0       yaml_2.3.10        fastmap_1.2.0      R6_2.6.1          
+[17] labeling_0.4.3     generics_0.1.4     knitr_1.50         tibble_3.3.0      
+[21] rprojroot_2.0.4    RColorBrewer_1.1-3 bslib_0.9.0        pillar_1.10.2     
+[25] rlang_1.1.6        cachem_1.1.0       stringi_1.8.7      httpuv_1.6.16     
+[29] xfun_0.52          getPass_0.2-4      fs_1.6.6           sass_0.4.10       
+[33] cli_3.6.5          withr_3.0.2        magrittr_2.0.3     ps_1.9.1          
+[37] digest_0.6.37      grid_4.5.0         processx_3.8.6     rstudioapi_0.17.1 
+[41] lifecycle_1.0.4    vctrs_0.6.5        evaluate_1.0.3     glue_1.8.0        
+[45] farver_2.1.2       whisker_0.4.1      rmarkdown_2.29     httr_1.4.7        
+[49] tools_4.5.0        pkgconfig_2.0.3    htmltools_0.5.8.1 </code></pre>
 </div>
 </div>
 </div>
