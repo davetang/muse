@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-02-12" />
+
+<title>Readability</title>
+
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Readability</h1>
+<h4 class="date">2026-02-12</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-02-12
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.1). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree45e753cf40d27de29d372c296581edd7c951d64ftargetblank45e753ca">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/45e753cf40d27de29d372c296581edd7c951d64f" target="_blank">45e753c</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree45e753cf40d27de29d372c296581edd7c951d64ftargetblank45e753ca"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/45e753cf40d27de29d372c296581edd7c951d64f" target="_blank">45e753c</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.4.1/
+    Ignored:    r_packages_4.5.0/
+
+Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
+    Untracked:  analysis/.claude/
+    Untracked:  analysis/bioc.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
+    Untracked:  analysis/modelling.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SeuratObj.rds
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
+    Untracked:  m3/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/readability.Rmd</code>) and HTML
+(<code>docs/readability.html</code>) files. If you’ve configured a
+remote Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/45e753cf40d27de29d372c296581edd7c951d64f/analysis/readability.Rmd" target="_blank">45e753c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-02-12
+</td>
+<td>
+Readability metrics
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p><a href="https://en.wikipedia.org/wiki/Readability">Readability</a>
+refers to how easy a piece of text is to read and understand.
+Readability formulas estimate reading difficulty based on surface-level
+features such as word length, sentence length, and syllable count. These
+measures are widely used in education, publishing, and health
+communication to match text complexity to the intended audience.</p>
+<p>The <a
+href="https://quanteda.io/quanteda.textstats/">quanteda.textstats</a>
+package provides <code>textstat_readability()</code>, which calculates a
+wide range of readability indices. It is part of the <a
+href="https://quanteda.io/">quanteda</a> ecosystem for quantitative text
+analysis in R.</p>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<pre class="r"><code>install.packages(c(&quot;quanteda&quot;, &quot;quanteda.textstats&quot;))</code></pre>
+<pre class="r"><code>library(quanteda)</code></pre>
+<pre><code>Package version: 4.3.0
+Unicode version: 15.1
+ICU version: 74.2</code></pre>
+<pre><code>Parallel computing: disabled</code></pre>
+<pre><code>See https://quanteda.io for tutorials and examples.</code></pre>
+<pre class="r"><code>library(quanteda.textstats)
+packageVersion(&quot;quanteda.textstats&quot;)</code></pre>
+<pre><code>[1] &#39;0.97.2&#39;</code></pre>
+</div>
+<div id="basic-usage" class="section level2">
+<h2>Basic usage</h2>
+<p>The <code>textstat_readability()</code> function works on a quanteda
+<code>corpus</code> object. We can create a corpus from a character
+vector.</p>
+<pre class="r"><code>texts &lt;- c(
+  simple = &quot;The cat sat on the mat. It was a good cat.&quot;,
+  medium = &quot;The researcher examined the relationship between variables using a standard regression model.&quot;,
+  hard = &quot;The epistemological ramifications of hermeneutic phenomenology necessitate a reconceptualisation of methodological presuppositions underlying contemporary empirical investigations.&quot;
+)
+
+corp &lt;- corpus(texts)</code></pre>
+<p>By default, <code>textstat_readability()</code> returns the Flesch
+Reading Ease score.</p>
+<pre class="r"><code>textstat_readability(corp)</code></pre>
+<pre><code>  document    Flesch
+1   simple  116.6525
+2   medium   -2.7450
+3     hard -158.3800</code></pre>
+<p>The <a
+href="https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests">Flesch
+Reading Ease</a> score ranges roughly from 0 to 100, where higher scores
+indicate easier text. As a rough guide:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Score</th>
+<th>Difficulty</th>
+<th>Audience</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>90–100</td>
+<td>Very easy</td>
+<td>5th grader</td>
+</tr>
+<tr class="even">
+<td>60–70</td>
+<td>Standard</td>
+<td>8th–9th grader</td>
+</tr>
+<tr class="odd">
+<td>30–50</td>
+<td>Difficult</td>
+<td>College student</td>
+</tr>
+<tr class="even">
+<td>0–30</td>
+<td>Very difficult</td>
+<td>University graduate</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="available-measures" class="section level2">
+<h2>Available measures</h2>
+<p>The <code>measure</code> argument accepts a character vector of
+readability index names. Use <code>"all"</code> to compute every
+available measure.</p>
+<pre class="r"><code>all_measures &lt;- textstat_readability(corp, measure = &quot;all&quot;)
+ncol(all_measures) - 1</code></pre>
+<pre><code>[1] 48</code></pre>
+<pre class="r"><code>names(all_measures)[-1]</code></pre>
+<pre><code> [1] &quot;ARI&quot;                   &quot;ARI.simple&quot;            &quot;ARI.NRI&quot;              
+ [4] &quot;Bormuth.MC&quot;            &quot;Bormuth.GP&quot;            &quot;Coleman&quot;              
+ [7] &quot;Coleman.C2&quot;            &quot;Coleman.Liau.ECP&quot;      &quot;Coleman.Liau.grade&quot;   
+[10] &quot;Coleman.Liau.short&quot;    &quot;Dale.Chall&quot;            &quot;Dale.Chall.old&quot;       
+[13] &quot;Dale.Chall.PSK&quot;        &quot;Danielson.Bryan&quot;       &quot;Danielson.Bryan.2&quot;    
+[16] &quot;Dickes.Steiwer&quot;        &quot;DRP&quot;                   &quot;ELF&quot;                  
+[19] &quot;Farr.Jenkins.Paterson&quot; &quot;Flesch&quot;                &quot;Flesch.PSK&quot;           
+[22] &quot;Flesch.Kincaid&quot;        &quot;FOG&quot;                   &quot;FOG.PSK&quot;              
+[25] &quot;FOG.NRI&quot;               &quot;FORCAST&quot;               &quot;FORCAST.RGL&quot;          
+[28] &quot;Fucks&quot;                 &quot;Linsear.Write&quot;         &quot;LIW&quot;                  
+[31] &quot;nWS&quot;                   &quot;nWS.2&quot;                 &quot;nWS.3&quot;                
+[34] &quot;nWS.4&quot;                 &quot;RIX&quot;                   &quot;Scrabble&quot;             
+[37] &quot;SMOG&quot;                  &quot;SMOG.C&quot;                &quot;SMOG.simple&quot;          
+[40] &quot;SMOG.de&quot;               &quot;Spache&quot;                &quot;Spache.old&quot;           
+[43] &quot;Strain&quot;                &quot;Traenkle.Bailer&quot;       &quot;Traenkle.Bailer.2&quot;    
+[46] &quot;Wheeler.Smith&quot;         &quot;meanSentenceLength&quot;    &quot;meanWordSyllables&quot;    </code></pre>
+<p>Some commonly used indices include:</p>
+<ul>
+<li><strong>Flesch</strong> – Flesch Reading Ease</li>
+<li><strong>Flesch.Kincaid</strong> – Flesch-Kincaid Grade Level
+(estimates the US school grade needed to understand the text)</li>
+<li><strong>FOG</strong> – Gunning Fog Index</li>
+<li><strong>Coleman.Liau</strong> – Coleman-Liau Index</li>
+<li><strong>SMOG</strong> – Simple Measure of Gobbledygook</li>
+<li><strong>ARI</strong> – Automated Readability Index</li>
+</ul>
+<pre class="r"><code>common &lt;- c(&quot;Flesch&quot;, &quot;Flesch.Kincaid&quot;, &quot;FOG&quot;, &quot;Coleman.Liau&quot;, &quot;ARI&quot;)
+textstat_readability(corp, measure = common)</code></pre>
+<pre><code>  document    Flesch Flesch.Kincaid      FOG Coleman.Liau.ECP       ARI
+1   simple  116.6525       -1.64500  2.20000       102.948500 -5.834545
+2   medium   -2.7450       16.62333 21.46667         5.990283 16.362500
+3     hard -158.3800       39.32500 36.40000       -71.365825 34.847500</code></pre>
+<p>All the grade-level measures (Flesch-Kincaid, FOG, Coleman-Liau, ARI)
+roughly agree that the “hard” text requires a post-graduate reading
+level, while the “simple” text is accessible at an elementary level.</p>
+</div>
+<div id="comparing-real-world-texts" class="section level2">
+<h2>Comparing real-world texts</h2>
+<p>A more realistic example: comparing readability across different
+genres. Below we use opening passages from well-known texts.</p>
+<pre class="r"><code>passages &lt;- c(
+  children = &quot;Once upon a time there was a little girl. She lived in a small house near the woods. Every day she went to play with her friends. They liked to run and jump and laugh together.&quot;,
+  news = &quot;The central bank raised interest rates by a quarter of a percentage point on Wednesday, signalling that further increases may be necessary to bring inflation back to its two percent target.&quot;,
+  scientific = &quot;Transcriptomic profiling of single cells revealed substantial heterogeneity in gene expression patterns across phenotypically indistinguishable subpopulations, suggesting that stochastic fluctuations in transcriptional regulatory networks contribute to functional diversification.&quot;,
+  legal = &quot;Notwithstanding any provision of this agreement to the contrary, the indemnifying party shall not be liable for any consequential, incidental, or punitive damages arising out of or relating to any breach of the representations and warranties set forth herein.&quot;
+)
+
+corp_genre &lt;- corpus(passages)
+
+genre_scores &lt;- textstat_readability(
+  corp_genre,
+  measure = c(&quot;Flesch&quot;, &quot;Flesch.Kincaid&quot;, &quot;FOG&quot;, &quot;ARI&quot;)
+)
+genre_scores</code></pre>
+<pre><code>    document     Flesch Flesch.Kincaid       FOG        ARI
+1   children  99.000000       1.686667  5.822222  0.9941667
+2       news  38.918387      15.532258 20.141935 17.9238710
+3 scientific -78.406429      31.151429 34.057143 34.7917857
+4      legal  -4.119231      23.522564 29.958974 24.2769231</code></pre>
+<p>Visualise the Flesch Reading Ease scores.</p>
+<pre class="r"><code>barplot(
+  genre_scores$Flesch,
+  names.arg = genre_scores$document,
+  col = c(&quot;skyblue&quot;, &quot;orange&quot;, &quot;tomato&quot;, &quot;firebrick&quot;),
+  ylab = &quot;Flesch Reading Ease&quot;,
+  main = &quot;Readability across genres&quot;,
+  ylim = c(0, 100),
+  las = 1
+)
+abline(h = c(30, 60), lty = 2, col = &quot;grey40&quot;)
+text(x = 0.7, y = 65, labels = &quot;Standard&quot;, col = &quot;grey40&quot;, cex = 0.8)
+text(x = 0.7, y = 35, labels = &quot;Difficult&quot;, col = &quot;grey40&quot;, cex = 0.8)</code></pre>
+<p><img src="figure/readability.Rmd/plot_genre-1.png" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="sentence-level-readability" class="section level2">
+<h2>Sentence-level readability</h2>
+<p>By default, <code>textstat_readability()</code> treats each document
+as a unit. To get readability at the sentence level, first reshape the
+corpus into sentences using <code>corpus_reshape()</code>.</p>
+<pre class="r"><code>para &lt;- &quot;The quick brown fox jumps over the lazy dog. Pseudopseudohypoparathyroidism is a very long word that is difficult to pronounce. Go.&quot;
+
+corp_para &lt;- corpus(para)
+
+corp_sentences &lt;- corpus_reshape(corp_para, to = &quot;sentences&quot;)
+as.character(corp_sentences)</code></pre>
+<pre><code>                                                                             text1.1 
+                                      &quot;The quick brown fox jumps over the lazy dog.&quot; 
+                                                                             text1.2 
+&quot;Pseudopseudohypoparathyroidism is a very long word that is difficult to pronounce.&quot; 
+                                                                             text1.3 
+                                                                               &quot;Go.&quot; </code></pre>
+<pre class="r"><code>textstat_readability(corp_sentences)</code></pre>
+<pre><code>  document     Flesch
+1  text1.1  94.300000
+2  text1.2   3.397273
+3  text1.3 121.220000</code></pre>
+<p>This is useful for identifying specific sentences that are hard to
+read within a longer document.</p>
+</div>
+<div id="practical-example-improving-readability"
+class="section level2">
+<h2>Practical example: improving readability</h2>
+<p>A common workflow is to identify difficult sentences and revise them.
+Suppose we have a draft paragraph.</p>
+<pre class="r"><code>draft &lt;- c(
+  &quot;We developed a novel methodology for the characterisation of transcriptomic heterogeneity in single-cell populations.&quot;,
+  &quot;The cells were sorted using flow cytometry.&quot;,
+  &quot;Our results demonstrate that the implementation of dimensionality reduction techniques facilitates the identification of previously unrecognised cellular subtypes.&quot;,
+  &quot;We found three new cell types.&quot;
+)
+
+corp_draft &lt;- corpus(draft)
+scores &lt;- textstat_readability(corp_draft, measure = c(&quot;Flesch&quot;, &quot;Flesch.Kincaid&quot;))
+scores</code></pre>
+<pre><code>  document    Flesch Flesch.Kincaid
+1    text1 -33.99000      21.726667
+2    text2  54.70143       7.368571
+3    text3 -60.53500      26.174444
+4    text4 116.14500      -1.450000</code></pre>
+<pre class="r"><code>scores$flag &lt;- ifelse(scores$Flesch &lt; 30, &quot;revise&quot;, &quot;ok&quot;)
+scores[, c(&quot;document&quot;, &quot;Flesch&quot;, &quot;Flesch.Kincaid&quot;, &quot;flag&quot;)]</code></pre>
+<pre><code>  document    Flesch Flesch.Kincaid   flag
+1    text1 -33.99000      21.726667 revise
+2    text2  54.70143       7.368571     ok
+3    text3 -60.53500      26.174444 revise
+4    text4 116.14500      -1.450000     ok</code></pre>
+<p>Sentences flagged for revision tend to have long words and complex
+structure. Shortening sentences and replacing jargon with simpler terms
+will improve the score.</p>
+</div>
+<div id="comparing-measures" class="section level2">
+<h2>Comparing measures</h2>
+<p>Different readability formulas use different features. For example,
+Flesch and Flesch-Kincaid rely on syllable counts, while Coleman-Liau
+uses character counts and ARI uses character and word counts. These can
+sometimes disagree.</p>
+<pre class="r"><code>tricky &lt;- c(
+  short_words = &quot;I do not see how we can go on to do the work we set out to do if we do not get the aid we so need.&quot;,
+  long_words = &quot;Characterisation. Compartmentalisation. Telecommunications. Internationalisation.&quot;
+)
+
+corp_tricky &lt;- corpus(tricky)
+textstat_readability(corp_tricky, measure = c(&quot;Flesch&quot;, &quot;Coleman.Liau&quot;, &quot;ARI&quot;))</code></pre>
+<pre><code>     document   Flesch Coleman.Liau.ECP    ARI
+1 short_words   93.815         92.04907  4.345
+2  long_words -386.380       -147.17020 66.205</code></pre>
+<p>The text with many short words scores as very easy on Flesch (which
+counts syllables) but may score differently on character-based measures.
+The text with only long words is penalised heavily across all measures,
+despite not being a real “hard to understand” text – it is just a list
+of words. This illustrates a key limitation: readability formulas
+measure surface-level features, not comprehension difficulty.</p>
+</div>
+<div id="limitations" class="section level2">
+<h2>Limitations</h2>
+<p>Readability formulas are useful approximations but have well-known
+limitations:</p>
+<ul>
+<li>They rely on proxies (word length, sentence length) rather than
+measuring actual comprehension.</li>
+<li>They do not account for vocabulary familiarity, conceptual
+difficulty, or background knowledge.</li>
+<li>Very short texts (fewer than ~100 words) can produce unreliable
+scores.</li>
+<li>They were originally calibrated for English prose; results for other
+text types (e.g., bullet points, code documentation) should be
+interpreted cautiously.</li>
+</ul>
+<p>Despite these caveats, readability measures remain a practical tool
+for flagging text that is likely too complex for its intended
+audience.</p>
+</div>
+<div id="further-reading" class="section level2">
+<h2>Further reading</h2>
+<ul>
+<li><a href="https://quanteda.io/quanteda.textstats/">quanteda.textstats
+documentation</a></li>
+<li><a
+href="https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests">Flesch-Kincaid
+readability tests (Wikipedia)</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Readability">Readability
+(Wikipedia)</a></li>
+</ul>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.0 (2025-04-11)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.3 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] quanteda.textstats_0.97.2 quanteda_4.3.0           
+[3] workflowr_1.7.1          
+
+loaded via a namespace (and not attached):
+ [1] Matrix_1.7-3      jsonlite_2.0.0    compiler_4.5.0    stopwords_2.3    
+ [5] promises_1.3.3    Rcpp_1.0.14       stringr_1.5.1     git2r_0.36.2     
+ [9] nsyllable_1.0.1   callr_3.7.6       later_1.4.2       jquerylib_0.1.4  
+[13] yaml_2.3.10       fastmap_1.2.0     lattice_0.22-6    R6_2.6.1         
+[17] knitr_1.50        tibble_3.3.0      rprojroot_2.0.4   bslib_0.9.0      
+[21] pillar_1.10.2     rlang_1.1.6       fastmatch_1.1-6   cachem_1.1.0     
+[25] stringi_1.8.7     httpuv_1.6.16     xfun_0.52         getPass_0.2-4    
+[29] fs_1.6.6          sass_0.4.10       cli_3.6.5         magrittr_2.0.3   
+[33] ps_1.9.1          digest_0.6.37     grid_4.5.0        processx_3.8.6   
+[37] rstudioapi_0.17.1 lifecycle_1.0.4   vctrs_0.6.5       evaluate_1.0.3   
+[41] glue_1.8.0        whisker_0.4.1     rmarkdown_2.29    httr_1.4.7       
+[45] tools_4.5.0       pkgconfig_2.0.3   htmltools_0.5.8.1</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
