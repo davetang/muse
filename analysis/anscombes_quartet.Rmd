@@ -1,0 +1,170 @@
+---
+title: "Anscombe's Quartet and the Datasaurus Dozen"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(datasauRus)
+library(tidyverse)
+```
+
+## Introduction
+
+A common pitfall in data analysis is relying on summary statistics without looking at the data. Two datasets can have identical means, standard deviations, and correlations yet look completely different when plotted. This tutorial demonstrates this lesson using two classic examples: [Anscombe's Quartet](https://en.wikipedia.org/wiki/Anscombe%27s_quartet) (1973) and the [Datasaurus Dozen](https://www.autodesk.com/research/publications/same-stats-different-graphs) (2017).
+
+The takeaway is simple but important: **always visualise your data**.
+
+## Anscombe's Quartet
+
+[Francis Anscombe](https://en.wikipedia.org/wiki/Francis_Anscombe) constructed four datasets that have nearly identical statistical properties. The dataset is built into R as `anscombe`.
+
+```{r anscombe_data}
+anscombe
+```
+
+Let's reorganise the data into a long format to make comparisons easier.
+
+```{r anscombe_long}
+datasets <- lapply(1:4, function(i) {
+  data.frame(
+    set = paste("Set", i),
+    x = anscombe[[paste0("x", i)]],
+    y = anscombe[[paste0("y", i)]]
+  )
+})
+anscombe_long <- do.call(rbind, datasets)
+```
+
+### Summary statistics
+
+Now let's compute summary statistics for each dataset.
+
+```{r anscombe_stats}
+stats <- do.call(rbind, lapply(split(anscombe_long, anscombe_long$set), function(d) {
+  data.frame(
+    set = d$set[1],
+    mean_x = round(mean(d$x), 2),
+    mean_y = round(mean(d$y), 2),
+    sd_x = round(sd(d$x), 2),
+    sd_y = round(sd(d$y), 2),
+    cor_xy = round(cor(d$x, d$y), 3)
+  )
+}))
+rownames(stats) <- NULL
+stats
+```
+
+The means, standard deviations, and correlations are nearly identical across all four datasets. The linear regression fits are also very similar.
+
+```{r anscombe_lm}
+for (i in 1:4) {
+  d <- anscombe_long[anscombe_long$set == paste("Set", i), ]
+  fit <- lm(y ~ x, data = d)
+  cat(paste0("Set ", i, ": y = ",
+             round(coef(fit)[1], 2), " + ",
+             round(coef(fit)[2], 2), "x",
+             "  (R² = ", round(summary(fit)$r.squared, 3), ")\n"))
+}
+```
+
+### Plotting reveals the truth
+
+Despite the identical statistics, the four datasets look very different.
+
+```{r anscombe_plot, fig.width=10, fig.height=8}
+par(mfrow = c(2, 2))
+
+for (i in 1:4) {
+  d <- anscombe_long[anscombe_long$set == paste("Set", i), ]
+  plot(d$x, d$y,
+       xlab = "x", ylab = "y",
+       main = paste("Set", i),
+       pch = 19, col = "steelblue",
+       xlim = c(3, 20), ylim = c(2, 14))
+  abline(lm(y ~ x, data = d), col = "tomato", lwd = 2)
+}
+
+par(mfrow = c(1, 1))
+```
+
+- **Set 1**: A straightforward linear relationship — the regression line is appropriate.
+- **Set 2**: A clear curved (quadratic) pattern — a linear model is the wrong choice.
+- **Set 3**: A perfect linear relationship with one outlier that skews the fit.
+- **Set 4**: All points share the same x-value except for one extreme outlier that creates the illusion of a relationship.
+
+The lesson: identical summary statistics can describe fundamentally different datasets.
+
+## The Datasaurus Dozen
+
+In 2017, [Matejka and Fitzmaurice](https://www.autodesk.com/research/publications/same-stats-different-graphs) extended Anscombe's idea by creating 13 datasets that share the same summary statistics (to two decimal places) but produce wildly different scatter plots — including one shaped like a dinosaur.
+
+The datasets are available in the `datasauRus` package.
+
+```{r load_datasaurus}
+```
+
+```{r datasaurus_peek}
+head(datasaurus_dozen)
+unique(datasaurus_dozen$dataset)
+```
+
+### Summary statistics are identical
+
+Let's verify that all 13 datasets have the same summary statistics.
+
+```{r datasaurus_stats}
+datasaurus_dozen %>%
+  group_by(dataset) %>%
+  summarise(
+    mean_x = round(mean(x), 2),
+    mean_y = round(mean(y), 2),
+    sd_x = round(sd(x), 2),
+    sd_y = round(sd(y), 2),
+    cor_xy = round(cor(x, y), 2),
+    .groups = "drop"
+  )
+```
+
+All 13 datasets have essentially the same means, standard deviations, and correlations.
+
+### But the plots tell very different stories
+
+```{r datasaurus_plot, fig.width=12, fig.height=10}
+ggplot(datasaurus_dozen, aes(x = x, y = y)) +
+  geom_point(size = 0.8, alpha = 0.7, colour = "steelblue") +
+  facet_wrap(~ dataset, ncol = 4) +
+  theme_minimal() +
+  labs(title = "The Datasaurus Dozen",
+       subtitle = "All 13 datasets share the same summary statistics")
+```
+
+The "dino" dataset literally spells out a dinosaur, while others form circles, stars, lines, and crosses — all with the same mean, standard deviation, and correlation.
+
+Let's take a closer look at the dinosaur.
+
+```{r dino_plot, fig.width=6, fig.height=5}
+dino <- datasaurus_dozen[datasaurus_dozen$dataset == "dino", ]
+
+ggplot(dino, aes(x = x, y = y)) +
+  geom_point(size = 1.5, colour = "forestgreen") +
+  theme_minimal() +
+  coord_equal() +
+  labs(title = "The Datasaurus",
+       subtitle = paste0("mean(x) = ", round(mean(dino$x), 2),
+                         ", mean(y) = ", round(mean(dino$y), 2),
+                         ", cor = ", round(cor(dino$x, dino$y), 2)))
+```
+
+## Takeaway
+
+Anscombe's Quartet (1973) and the Datasaurus Dozen (2017) both drive home the same point: **summary statistics can hide the true structure of your data**. Two datasets can have the same mean, variance, and correlation yet look nothing alike.
+
+This is why [exploratory data analysis](https://en.wikipedia.org/wiki/Exploratory_data_analysis) — and plotting in particular — is an essential first step in any analysis. As Anscombe himself wrote:
+
+> "A computer should make both calculations and graphs. Both sorts of output should be studied; each will contribute to understanding."
+
+Before you fit a model, compute a p-value, or draw a conclusion: **plot your data**.
