@@ -1,0 +1,201 @@
+---
+title: "Readability"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+[Readability](https://en.wikipedia.org/wiki/Readability) refers to how easy a piece of text is to read and understand. Readability formulas estimate reading difficulty based on surface-level features such as word length, sentence length, and syllable count. These measures are widely used in education, publishing, and health communication to match text complexity to the intended audience.
+
+The [quanteda.textstats](https://quanteda.io/quanteda.textstats/) package provides `textstat_readability()`, which calculates a wide range of readability indices. It is part of the [quanteda](https://quanteda.io/) ecosystem for quantitative text analysis in R.
+
+## Installation
+
+```{r install, eval=FALSE}
+install.packages(c("quanteda", "quanteda.textstats"))
+```
+
+```{r load_packages}
+library(quanteda)
+library(quanteda.textstats)
+packageVersion("quanteda.textstats")
+```
+
+## Basic usage
+
+The `textstat_readability()` function works on a quanteda `corpus` object. We can create a corpus from a character vector.
+
+```{r simple_example}
+texts <- c(
+  simple = "The cat sat on the mat. It was a good cat.",
+  medium = "The researcher examined the relationship between variables using a standard regression model.",
+  hard = "The epistemological ramifications of hermeneutic phenomenology necessitate a reconceptualisation of methodological presuppositions underlying contemporary empirical investigations."
+)
+
+corp <- corpus(texts)
+```
+
+By default, `textstat_readability()` returns the Flesch Reading Ease score.
+
+```{r default_readability}
+textstat_readability(corp)
+```
+
+The [Flesch Reading Ease](https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests) score ranges roughly from 0 to 100, where higher scores indicate easier text. As a rough guide:
+
+| Score     | Difficulty      | Audience                  |
+|-----------|-----------------|---------------------------|
+| 90--100   | Very easy       | 5th grader                |
+| 60--70    | Standard        | 8th--9th grader           |
+| 30--50    | Difficult       | College student           |
+| 0--30     | Very difficult  | University graduate       |
+
+## Available measures
+
+The `measure` argument accepts a character vector of readability index names. Use `"all"` to compute every available measure.
+
+```{r available_measures}
+all_measures <- textstat_readability(corp, measure = "all")
+ncol(all_measures) - 1
+```
+
+```{r measure_names}
+names(all_measures)[-1]
+```
+
+Some commonly used indices include:
+
+* **Flesch** -- Flesch Reading Ease
+* **Flesch.Kincaid** -- Flesch-Kincaid Grade Level (estimates the US school grade needed to understand the text)
+* **FOG** -- Gunning Fog Index
+* **Coleman.Liau** -- Coleman-Liau Index
+* **SMOG** -- Simple Measure of Gobbledygook
+* **ARI** -- Automated Readability Index
+
+```{r common_measures}
+common <- c("Flesch", "Flesch.Kincaid", "FOG", "Coleman.Liau", "ARI")
+textstat_readability(corp, measure = common)
+```
+
+All the grade-level measures (Flesch-Kincaid, FOG, Coleman-Liau, ARI) roughly agree that the "hard" text requires a post-graduate reading level, while the "simple" text is accessible at an elementary level.
+
+## Comparing real-world texts
+
+A more realistic example: comparing readability across different genres. Below we use opening passages from well-known texts.
+
+```{r real_texts}
+passages <- c(
+  children = "Once upon a time there was a little girl. She lived in a small house near the woods. Every day she went to play with her friends. They liked to run and jump and laugh together.",
+  news = "The central bank raised interest rates by a quarter of a percentage point on Wednesday, signalling that further increases may be necessary to bring inflation back to its two percent target.",
+  scientific = "Transcriptomic profiling of single cells revealed substantial heterogeneity in gene expression patterns across phenotypically indistinguishable subpopulations, suggesting that stochastic fluctuations in transcriptional regulatory networks contribute to functional diversification.",
+  legal = "Notwithstanding any provision of this agreement to the contrary, the indemnifying party shall not be liable for any consequential, incidental, or punitive damages arising out of or relating to any breach of the representations and warranties set forth herein."
+)
+
+corp_genre <- corpus(passages)
+
+genre_scores <- textstat_readability(
+  corp_genre,
+  measure = c("Flesch", "Flesch.Kincaid", "FOG", "ARI")
+)
+genre_scores
+```
+
+Visualise the Flesch Reading Ease scores.
+
+```{r plot_genre, fig.width=7, fig.height=5}
+barplot(
+  genre_scores$Flesch,
+  names.arg = genre_scores$document,
+  col = c("skyblue", "orange", "tomato", "firebrick"),
+  ylab = "Flesch Reading Ease",
+  main = "Readability across genres",
+  ylim = c(0, 100),
+  las = 1
+)
+abline(h = c(30, 60), lty = 2, col = "grey40")
+text(x = 0.7, y = 65, labels = "Standard", col = "grey40", cex = 0.8)
+text(x = 0.7, y = 35, labels = "Difficult", col = "grey40", cex = 0.8)
+```
+
+## Sentence-level readability
+
+By default, `textstat_readability()` treats each document as a unit. To get readability at the sentence level, first reshape the corpus into sentences using `corpus_reshape()`.
+
+```{r sentence_level}
+para <- "The quick brown fox jumps over the lazy dog. Pseudopseudohypoparathyroidism is a very long word that is difficult to pronounce. Go."
+
+corp_para <- corpus(para)
+
+corp_sentences <- corpus_reshape(corp_para, to = "sentences")
+as.character(corp_sentences)
+```
+
+```{r sentence_readability}
+textstat_readability(corp_sentences)
+```
+
+This is useful for identifying specific sentences that are hard to read within a longer document.
+
+## Practical example: improving readability
+
+A common workflow is to identify difficult sentences and revise them. Suppose we have a draft paragraph.
+
+```{r revise_draft}
+draft <- c(
+  "We developed a novel methodology for the characterisation of transcriptomic heterogeneity in single-cell populations.",
+  "The cells were sorted using flow cytometry.",
+  "Our results demonstrate that the implementation of dimensionality reduction techniques facilitates the identification of previously unrecognised cellular subtypes.",
+  "We found three new cell types."
+)
+
+corp_draft <- corpus(draft)
+scores <- textstat_readability(corp_draft, measure = c("Flesch", "Flesch.Kincaid"))
+scores
+```
+
+```{r flag_difficult}
+scores$flag <- ifelse(scores$Flesch < 30, "revise", "ok")
+scores[, c("document", "Flesch", "Flesch.Kincaid", "flag")]
+```
+
+Sentences flagged for revision tend to have long words and complex structure. Shortening sentences and replacing jargon with simpler terms will improve the score.
+
+## Comparing measures
+
+Different readability formulas use different features. For example, Flesch and Flesch-Kincaid rely on syllable counts, while Coleman-Liau uses character counts and ARI uses character and word counts. These can sometimes disagree.
+
+```{r compare_measures}
+tricky <- c(
+  short_words = "I do not see how we can go on to do the work we set out to do if we do not get the aid we so need.",
+  long_words = "Characterisation. Compartmentalisation. Telecommunications. Internationalisation."
+)
+
+corp_tricky <- corpus(tricky)
+textstat_readability(corp_tricky, measure = c("Flesch", "Coleman.Liau", "ARI"))
+```
+
+The text with many short words scores as very easy on Flesch (which counts syllables) but may score differently on character-based measures. The text with only long words is penalised heavily across all measures, despite not being a real "hard to understand" text -- it is just a list of words. This illustrates a key limitation: readability formulas measure surface-level features, not comprehension difficulty.
+
+## Limitations
+
+Readability formulas are useful approximations but have well-known limitations:
+
+* They rely on proxies (word length, sentence length) rather than measuring actual comprehension.
+* They do not account for vocabulary familiarity, conceptual difficulty, or background knowledge.
+* Very short texts (fewer than ~100 words) can produce unreliable scores.
+* They were originally calibrated for English prose; results for other text types (e.g., bullet points, code documentation) should be interpreted cautiously.
+
+Despite these caveats, readability measures remain a practical tool for flagging text that is likely too complex for its intended audience.
+
+## Further reading
+
+* [quanteda.textstats documentation](https://quanteda.io/quanteda.textstats/)
+* [Flesch-Kincaid readability tests (Wikipedia)](https://en.wikipedia.org/wiki/Flesch%E2%80%93Kincaid_readability_tests)
+* [Readability (Wikipedia)](https://en.wikipedia.org/wiki/Readability)
