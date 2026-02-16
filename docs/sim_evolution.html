@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-02-16" />
+
+<title>Simulating evolution</title>
+
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Simulating evolution</h1>
+<h4 class="date">2026-02-16</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-02-16
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefd05fc4cf9a3382ff2fc881ee0692d8bb4b563c9targetblankfd05fc4a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/fd05fc4cf9a3382ff2fc881ee0692d8bb4b563c9" target="_blank">fd05fc4</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreefd05fc4cf9a3382ff2fc881ee0692d8bb4b563c9targetblankfd05fc4a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/fd05fc4cf9a3382ff2fc881ee0692d8bb4b563c9" target="_blank">fd05fc4</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.5.2/
+
+Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
+    Untracked:  analysis/.claude/
+    Untracked:  analysis/bioc.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
+    Untracked:  analysis/modelling.Rmd
+    Untracked:  analysis/wordpress_readability.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SeuratObj.rds
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/davetang039sblog.WordPress.2026-02-12.xml
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
+    Untracked:  m3/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/sim_evolution.Rmd</code>) and
+HTML (<code>docs/sim_evolution.html</code>) files. If you’ve configured
+a remote Git repository (see <code>?wflow_git_remote</code>), click on
+the hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/fd05fc4cf9a3382ff2fc881ee0692d8bb4b563c9/analysis/sim_evolution.Rmd" target="_blank">fd05fc4</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-02-16
+</td>
+<td>
+Simulating evolution
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p><a
+href="https://en.wikipedia.org/wiki/Population_genetics">Population
+genetics</a> studies how allele frequencies change in populations over
+time. The key forces driving these changes are <strong>genetic
+drift</strong> (random sampling), <strong>natural selection</strong>
+(differential fitness), and <strong>mutation</strong> (introduction of
+new variants). Analytical solutions exist for simple models, but
+simulation is a powerful way to build intuition about how these forces
+interact, especially in finite populations where randomness plays a
+large role.</p>
+<p>Here, we will simulate evolution using only base R. We will start
+with drift alone, then layer on selection and mutation to see how each
+force shapes allele frequency trajectories.</p>
+</div>
+<div id="genetic-drift" class="section level2">
+<h2>Genetic drift</h2>
+<p>Genetic drift is the random change in allele frequencies that occurs
+because populations are finite. Imagine a population of <code>N</code>
+diploid individuals (so <code>2N</code> gene copies). Each generation,
+the next generation is formed by randomly sampling <code>2N</code>
+alleles from the current pool; like drawing marbles from a bag with
+replacement.</p>
+<p>The function <code>sim_drift()</code> below simulates this process.
+It takes three parameters:</p>
+<ul>
+<li><code>p0</code> - the initial frequency of allele A (between 0 and
+1)</li>
+<li><code>N</code> - the number of diploid individuals in the population
+(so there are <code>2N</code> gene copies)</li>
+<li><code>generations</code> - the number of generations to
+simulate</li>
+</ul>
+<p>Each generation, the function draws the number of A alleles in the
+next generation from a binomial distribution:
+<code>rbinom(1, size = 2*N, prob = p)</code>, where <code>p</code> is
+the current frequency of A. This is equivalent to each of the
+<code>2N</code> gene copies in the new generation independently choosing
+to be A with probability <code>p</code> - the same as sampling with
+replacement from the current allele pool. The new frequency is then the
+count divided by <code>2N</code>. This random binomial sampling is what
+produces genetic drift: even if the “true” probability of A is
+<code>p</code>, the realised frequency will fluctuate due to finite
+sampling.</p>
+<p>Note that this model (the Wright-Fisher model) operates on the allele
+pool directly and does not track individual genotypes (AA, Aa, aa). It
+only tracks the frequency of allele A; the frequency of the other allele
+(a) is implicitly <code>1 - p</code>. This means a starting frequency of
+<code>p0 = 0.5</code> does not imply all individuals are heterozygous;
+it simply means half the allele copies in the population are A, which
+could arise from any combination of genotypes that produces that overall
+frequency. The binomial sampling each generation implicitly assumes
+random mating (Hardy-Weinberg).</p>
+<p>Track the frequency of allele “A” (as opposed to “a”) over 100
+generations.</p>
+<pre class="r"><code>set.seed(1984)
+
+sim_drift &lt;- function(p0, N, generations) {
+  freq &lt;- numeric(generations + 1)
+  freq[1] &lt;- p0
+  for (g in seq_len(generations)) {
+    n_A &lt;- rbinom(1, size = 2 * N, prob = freq[g])
+    freq[g + 1] &lt;- n_A / (2 * N)
+  }
+  freq
+}
+
+generations &lt;- 100
+p0 &lt;- 0.5
+N &lt;- 50
+
+# Run 10 replicate populations
+n_reps &lt;- 10
+cols &lt;- rainbow(n_reps)
+
+plot(0:generations, sim_drift(p0, N, generations),
+     type = &quot;n&quot;, ylim = c(0, 1),
+     xlab = &quot;Generation&quot;, ylab = &quot;Frequency of A&quot;,
+     main = paste(&quot;Genetic drift: N =&quot;, N))
+abline(h = p0, lty = 2, col = &quot;grey50&quot;)
+
+for (i in seq_len(n_reps)) {
+  lines(0:generations, sim_drift(p0, N, generations), col = cols[i])
+}</code></pre>
+<p><img src="figure/sim_evolution.Rmd/drift_single-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>Each coloured line is an independent replicate population. They all
+start at the same frequency (0.5) but wander apart due to random
+sampling. Some may reach 0 (allele A lost) or 1 (allele A fixed).</p>
+<div id="population-size-matters" class="section level3">
+<h3>Population size matters</h3>
+<p>Smaller populations experience stronger drift. Let’s compare
+<code>N = 20</code> versus <code>N = 500</code>.</p>
+<pre class="r"><code>par(mfrow = c(1, 2))
+
+for (N_val in c(20, 500)) {
+  plot(0:generations, rep(NA, generations + 1),
+       type = &quot;n&quot;, ylim = c(0, 1),
+       xlab = &quot;Generation&quot;, ylab = &quot;Frequency of A&quot;,
+       main = paste(&quot;N =&quot;, N_val))
+  abline(h = p0, lty = 2, col = &quot;grey50&quot;)
+  for (i in seq_len(n_reps)) {
+    lines(0:generations, sim_drift(p0, N_val, generations), col = cols[i])
+  }
+}</code></pre>
+<p><img src="figure/sim_evolution.Rmd/drift_size_comparison-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>par(mfrow = c(1, 1))</code></pre>
+<p>With <code>N = 20</code> the trajectories are wild and several reach
+fixation or loss within 100 generations. With <code>N = 500</code> the
+trajectories stay much closer to the starting frequency.</p>
+</div>
+</div>
+<div id="drift-leads-to-fixation" class="section level2">
+<h2>Drift leads to fixation</h2>
+<p>A fundamental result of drift theory is that the probability of an
+allele eventually reaching fixation equals its starting frequency. If
+allele A starts at frequency <code>p</code>, then across many replicate
+populations, the fraction that fix for A should be approximately
+<code>p</code>.</p>
+<p>This is because drift is an unbiased process; on average, the allele
+frequency does not change from one generation to the next. The binomial
+sampling is centred on the current frequency, so drift has no preferred
+direction. However, once an allele reaches a frequency of 0 or 1, it
+stays there permanently (there is no mutation to bring it back in this
+model). These are <strong>absorbing states</strong>. So while drift does
+not favour either allele, every population will eventually wander into
+one of these absorbing states. The expected time to fixation scales with
+population size; specifically, the average time for a neutral allele to
+fix (conditional on fixation occurring) is approximately <span
+class="math inline">\(4N\)</span> generations.</p>
+<p>The fact that fixation probability equals starting frequency also has
+a useful corollary: a new mutation present as a single copy in a diploid
+population of size <code>N</code> has a fixation probability of <span
+class="math inline">\(1/(2N)\)</span>. In a population of 1,000
+individuals, any given neutral mutation has only a 0.05% chance of
+eventually reaching fixation - the vast majority are lost to drift.</p>
+<p>Let’s test the fixation probability result by running 1,000 replicate
+populations and letting them run until fixation (or a maximum of 5N
+generations, which is usually enough).</p>
+<pre class="r"><code>set.seed(42)
+
+p0 &lt;- 0.3
+N &lt;- 50
+max_gen &lt;- 5 * 2 * N  # 5 * 2N is a typical timescale for fixation
+n_reps &lt;- 1000
+
+final_freq &lt;- replicate(n_reps, {
+  traj &lt;- sim_drift(p0, N, max_gen)
+  traj[max_gen + 1]
+})
+
+fixed_A &lt;- sum(final_freq == 1)
+lost_A &lt;- sum(final_freq == 0)
+still_seg &lt;- n_reps - fixed_A - lost_A
+
+barplot(
+  c(&quot;Fixed (A)&quot; = fixed_A, &quot;Lost (a)&quot; = lost_A, &quot;Segregating&quot; = still_seg),
+  col = c(&quot;steelblue&quot;, &quot;tomato&quot;, &quot;grey70&quot;),
+  main = paste0(&quot;Fixation outcomes (p0 = &quot;, p0, &quot;, N = &quot;, N, &quot;, &quot;, n_reps, &quot; reps)&quot;),
+  ylab = &quot;Number of populations&quot;
+)
+abline(h = n_reps * p0, lty = 2)
+legend(&quot;topright&quot;, legend = paste(&quot;Expected fixations:&quot;, n_reps * p0), lty = 2, bty = &quot;n&quot;)</code></pre>
+<p><img src="figure/sim_evolution.Rmd/drift_fixation-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>The number of populations that fixed for A is close to 273, compared
+to the expected value of 300. The remaining 8 populations haven’t
+reached fixation yet but would eventually do so given more time.</p>
+</div>
+<div id="natural-selection" class="section level2">
+<h2>Natural selection</h2>
+<p>Natural selection occurs when different alleles confer different
+fitness. We can model this by giving allele A a selective advantage
+<code>s</code>. In a simple haploid model, the probability that an A
+allele is sampled into the next generation is proportional to
+<code>1 + s</code> relative to allele a (fitness 1).</p>
+<p>The function <code>sim_selection()</code> below extends
+<code>sim_drift()</code> by adding a selection step before the binomial
+sampling. It takes an additional parameter <code>s</code>, the selection
+coefficient, which represents the fitness advantage of allele A. The key
+line is:</p>
+<p><span class="math display">\[p_{\text{sel}} = \frac{p \cdot (1 +
+s)}{p \cdot (1 + s) + (1 - p)}\]</span></p>
+<p>This is a fitness-weighted frequency. The numerator is the total
+fitness contribution of A alleles (frequency <code>p</code> times
+fitness <code>1 + s</code>) and the denominator is the total fitness of
+the entire population (A’s contribution plus a’s contribution at fitness
+1). The result <code>p_sel</code> is always slightly higher than
+<code>p</code> when <code>s &gt; 0</code>, giving A a systematic push
+upward each generation. This adjusted frequency is then passed to
+<code>rbinom()</code> instead of the raw frequency, so selection biases
+the sampling while drift still adds randomness around that biased
+expectation.</p>
+<p>For example, if <code>p = 0.5</code> and <code>s = 0.05</code>, then
+<code>p_sel = (0.5 * 1.05) / (0.5 * 1.05 + 0.5) = 0.525 / 1.025 ≈ 0.512</code>.
+The shift is small in any single generation, but it accumulates over
+time.</p>
+<pre class="r"><code>set.seed(1984)
+
+sim_selection &lt;- function(p0, N, generations, s) {
+  freq &lt;- numeric(generations + 1)
+  freq[1] &lt;- p0
+  for (g in seq_len(generations)) {
+    p &lt;- freq[g]
+    # Fitness-weighted frequency
+    p_sel &lt;- (p * (1 + s)) / (p * (1 + s) + (1 - p))
+    n_A &lt;- rbinom(1, size = 2 * N, prob = p_sel)
+    freq[g + 1] &lt;- n_A / (2 * N)
+  }
+  freq
+}
+
+generations &lt;- 100
+p0 &lt;- 0.1
+N &lt;- 100
+s &lt;- 0.05
+
+plot(0:generations, rep(NA, generations + 1),
+     type = &quot;n&quot;, ylim = c(0, 1),
+     xlab = &quot;Generation&quot;, ylab = &quot;Frequency of A&quot;,
+     main = &quot;Drift only (grey) vs. Selection s = 0.05 (blue)&quot;)
+
+# Drift only (grey)
+for (i in 1:10) {
+  lines(0:generations, sim_drift(p0, N, generations), col = &quot;grey70&quot;)
+}
+
+# Selection (blue)
+for (i in 1:10) {
+  lines(0:generations, sim_selection(p0, N, generations, s), col = &quot;steelblue&quot;)
+}
+
+abline(h = p0, lty = 2)
+legend(&quot;topleft&quot;, legend = c(&quot;Drift only&quot;, &quot;Selection (s = 0.05)&quot;),
+       col = c(&quot;grey70&quot;, &quot;steelblue&quot;), lwd = 2, bty = &quot;n&quot;)</code></pre>
+<p><img src="figure/sim_evolution.Rmd/selection_sim-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>With selection, allele A tends to increase in frequency over time.
+Drift still introduces randomness, but the selective advantage biases
+the trajectory upward. Some drift-only replicates may coincidentally
+rise, but on average only the selected allele shows a consistent upward
+trend.</p>
+<div id="strength-of-selection-versus-drift" class="section level3">
+<h3>Strength of selection versus drift</h3>
+<p>Selection is effective when <code>s</code> is much larger than
+<code>1/(2N)</code>. When <code>s</code> is on the order of
+<code>1/(2N)</code> or smaller, drift dominates and selection is
+essentially neutral. The intuition is that drift causes random frequency
+changes of order <span class="math inline">\(1/\sqrt{2N}\)</span> each
+generation. If the deterministic push from selection (<code>s</code>) is
+much smaller than this random noise, the allele behaves as though it
+were neutral - selection simply cannot be “heard” above the stochastic
+fluctuations.</p>
+<p>The critical threshold is <span class="math inline">\(s \approx
+1/(2N)\)</span>. This defines two regimes:</p>
+<ul>
+<li><strong>Effectively neutral</strong> (<span class="math inline">\(s
+\ll 1/(2N)\)</span>): the allele’s fate is governed almost entirely by
+drift. Its fixation probability is close to the neutral expectation of
+<span class="math inline">\(p\)</span>.</li>
+<li><strong>Effectively selected</strong> (<span class="math inline">\(s
+\gg 1/(2N)\)</span>): selection dominates and the allele is driven
+toward fixation (if beneficial) or loss (if deleterious) in a largely
+predictable way.</li>
+</ul>
+<p>For example, with <code>N = 50</code> the threshold is <span
+class="math inline">\(1/(2 \times 50) = 0.01\)</span>. A selection
+coefficient of <code>s = 0.01</code> would sit right at the boundary,
+while <code>s = 0.1</code> (ten times larger) would be firmly in the
+selection-dominated regime. The simulation below compares these two
+cases.</p>
+<pre class="r"><code>set.seed(42)
+
+N &lt;- 50
+p0 &lt;- 0.5
+generations &lt;- 200
+
+par(mfrow = c(1, 2))
+
+# Weak selection: s ~ 1/(2N)
+s_weak &lt;- 1 / (2 * N)
+plot(0:generations, rep(NA, generations + 1), type = &quot;n&quot;, ylim = c(0, 1),
+     xlab = &quot;Generation&quot;, ylab = &quot;Frequency of A&quot;,
+     main = paste0(&quot;Weak selection (s = &quot;, round(s_weak, 4), &quot;)&quot;))
+for (i in 1:10) {
+  lines(0:generations, sim_selection(p0, N, generations, s_weak), col = &quot;steelblue&quot;, lwd = 0.8)
+}
+abline(h = p0, lty = 2)
+
+# Strong selection: s &gt;&gt; 1/(2N)
+s_strong &lt;- 0.1
+plot(0:generations, rep(NA, generations + 1), type = &quot;n&quot;, ylim = c(0, 1),
+     xlab = &quot;Generation&quot;, ylab = &quot;Frequency of A&quot;,
+     main = paste0(&quot;Strong selection (s = &quot;, s_strong, &quot;)&quot;))
+for (i in 1:10) {
+  lines(0:generations, sim_selection(p0, N, generations, s_strong), col = &quot;tomato&quot;, lwd = 0.8)
+}
+abline(h = p0, lty = 2)</code></pre>
+<p><img src="figure/sim_evolution.Rmd/selection_vs_drift-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>par(mfrow = c(1, 1))</code></pre>
+<p>With weak selection (left panel), the trajectories look almost
+indistinguishable from pure drift. With strong selection (right panel),
+allele A rapidly fixes in most replicates.</p>
+</div>
+</div>
+<div id="mutation" class="section level2">
+<h2>Mutation</h2>
+<p>Mutation introduces new genetic variation. We model this with two
+rates: <code>mu</code> (A mutates to a) and <code>nu</code> (a mutates
+to A). After selection (or drift) determines the allele frequency,
+mutation adjusts it:</p>
+<p><span class="math display">\[p&#39; = p \cdot (1 - \mu) + (1 - p)
+\cdot \nu\]</span></p>
+<p>This means some A alleles become a (at rate <code>mu</code>) and some
+a alleles become A (at rate <code>nu</code>). The first term, <span
+class="math inline">\(p \cdot (1 - \mu)\)</span>, is the fraction of A
+alleles that survive without mutating. The second term, <span
+class="math inline">\((1 - p) \cdot \nu\)</span>, is the fraction of a
+alleles that mutate into A. Together they give the post-mutation
+frequency of A.</p>
+<p>The function <code>sim_drift_mutation()</code> below adds two
+parameters to the drift model:</p>
+<ul>
+<li><code>mu</code> - the per-generation probability that an A allele
+mutates to a (forward mutation rate)</li>
+<li><code>nu</code> - the per-generation probability that an a allele
+mutates to A (back mutation rate)</li>
+</ul>
+<p>Each generation, the mutation formula is applied first to compute an
+adjusted frequency <code>p_mut</code>, which is then passed to
+<code>rbinom()</code> for the drift step. This ordering means mutation
+shifts the expected frequency slightly before random sampling introduces
+noise.</p>
+<p>An important consequence of bidirectional mutation is that the system
+has a <strong>stable equilibrium</strong>. Setting <span
+class="math inline">\(p&#39; = p\)</span> in the mutation equation and
+solving gives <span class="math inline">\(\hat{p} = \nu / (\mu +
+\nu)\)</span>. When <code>mu</code> and <code>nu</code> are equal, the
+equilibrium is 0.5. Unlike pure drift, mutation prevents the allele from
+ever permanently fixing or being lost - if A drifts to 0, the back
+mutation rate <code>nu</code> reintroduces it; if A drifts to 1, the
+forward rate <code>mu</code> erodes it. Typical mutation rates in
+biology are very small (<span class="math inline">\(10^{-6}\)</span> to
+<span class="math inline">\(10^{-9}\)</span> per base per generation),
+but we use larger values here so the effect is visible over a tractable
+number of generations.</p>
+<pre class="r"><code>set.seed(1984)
+
+sim_drift_mutation &lt;- function(p0, N, generations, mu, nu) {
+  freq &lt;- numeric(generations + 1)
+  freq[1] &lt;- p0
+  for (g in seq_len(generations)) {
+    p &lt;- freq[g]
+    # Mutation
+    p_mut &lt;- p * (1 - mu) + (1 - p) * nu
+    # Drift
+    n_A &lt;- rbinom(1, size = 2 * N, prob = p_mut)
+    freq[g + 1] &lt;- n_A / (2 * N)
+  }
+  freq
+}
+
+N &lt;- 50
+p0 &lt;- 0.5
+generations &lt;- 500
+mu &lt;- 0.01
+nu &lt;- 0.01
+
+# Expected equilibrium frequency: nu / (mu + nu)
+p_eq &lt;- nu / (mu + nu)
+
+plot(0:generations, rep(NA, generations + 1), type = &quot;n&quot;, ylim = c(0, 1),
+     xlab = &quot;Generation&quot;, ylab = &quot;Frequency of A&quot;,
+     main = &quot;Drift + Mutation&quot;)
+
+for (i in 1:10) {
+  lines(0:generations, sim_drift_mutation(p0, N, generations, mu, nu),
+        col = adjustcolor(&quot;steelblue&quot;, alpha.f = 0.6))
+}
+
+abline(h = p_eq, lty = 2, col = &quot;red&quot;, lwd = 2)
+legend(&quot;topright&quot;, legend = paste(&quot;Expected equilibrium:&quot;, p_eq),
+       lty = 2, col = &quot;red&quot;, lwd = 2, bty = &quot;n&quot;)</code></pre>
+<p><img src="figure/sim_evolution.Rmd/mutation_sim-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>Mutation prevents fixation! Even in a small population, the allele
+frequency fluctuates around the equilibrium value <span
+class="math inline">\(\hat{p} = \nu / (\mu + \nu)\)</span>. With equal
+forward and backward mutation rates, this equilibrium is 0.5.</p>
+<div id="mutation-maintains-variation" class="section level3">
+<h3>Mutation maintains variation</h3>
+<p>Without mutation, drift will eventually fix or lose alleles. With
+mutation, polymorphism is maintained. This is a fundamental distinction:
+drift alone is a process that destroys genetic variation (by pushing
+alleles to fixation or loss), while mutation is the ultimate source of
+new variation.</p>
+<p>In the drift-only model, 0 and 1 are absorbing states - once an
+allele is fixed or lost, the population stays there forever. With
+mutation, these states are no longer absorbing. If A is lost (frequency
+= 0), the back mutation term <span class="math inline">\((1 - p) \cdot
+\nu = \nu\)</span> ensures that A is reintroduced at a low rate each
+generation. Similarly, if A reaches fixation (frequency = 1), the
+forward mutation term <span class="math inline">\(p \cdot (1 - \mu) = 1
+- \mu\)</span> pulls it back below 1. The allele frequency therefore
+bounces around the equilibrium indefinitely rather than settling at a
+boundary.</p>
+<p>The balance between drift and mutation determines how much variation
+is maintained. The key parameter is <span class="math inline">\(\theta =
+4N\mu\)</span> (for a diploid population), known as the
+<strong>population-scaled mutation rate</strong>. When <span
+class="math inline">\(\theta\)</span> is large (large population or high
+mutation rate), allele frequencies cluster tightly around the
+equilibrium. When <span class="math inline">\(\theta\)</span> is small,
+drift dominates and frequencies swing widely, occasionally approaching 0
+or 1 before mutation pulls them back. The simulation below uses
+<code>N = 30</code> and <code>mu = nu = 0.01</code>, giving <span
+class="math inline">\(\theta = 4 \times 30 \times 0.01 = 1.2\)</span>,
+which produces noticeable fluctuations but prevents fixation.</p>
+<pre class="r"><code>set.seed(42)
+
+N &lt;- 30
+p0 &lt;- 0.5
+generations &lt;- 300
+
+par(mfrow = c(1, 2))
+
+# Drift only
+plot(0:generations, rep(NA, generations + 1), type = &quot;n&quot;, ylim = c(0, 1),
+     xlab = &quot;Generation&quot;, ylab = &quot;Frequency of A&quot;,
+     main = &quot;Drift only (N = 30)&quot;)
+for (i in 1:10) {
+  lines(0:generations, sim_drift(p0, N, generations),
+        col = adjustcolor(&quot;grey40&quot;, alpha.f = 0.6))
+}
+
+# Drift + mutation
+plot(0:generations, rep(NA, generations + 1), type = &quot;n&quot;, ylim = c(0, 1),
+     xlab = &quot;Generation&quot;, ylab = &quot;Frequency of A&quot;,
+     main = &quot;Drift + Mutation (N = 30)&quot;)
+for (i in 1:10) {
+  lines(0:generations, sim_drift_mutation(p0, N, generations, 0.01, 0.01),
+        col = adjustcolor(&quot;steelblue&quot;, alpha.f = 0.6))
+}
+abline(h = 0.5, lty = 2, col = &quot;red&quot;)</code></pre>
+<p><img src="figure/sim_evolution.Rmd/mutation_comparison-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>par(mfrow = c(1, 1))</code></pre>
+<p>In the drift-only case (left), most populations hit 0 or 1 and stay
+there. With mutation (right), no population can stay fixed because
+mutation keeps reintroducing the lost allele.</p>
+</div>
+</div>
+<div id="bringing-it-together" class="section level2">
+<h2>Bringing it together</h2>
+<p>Now let’s combine all three forces - drift, selection, and mutation -
+in a single simulation. We give allele A a selective advantage and
+include bidirectional mutation.</p>
+<pre class="r"><code>sim_evolution &lt;- function(p0, N, generations, s = 0, mu = 0, nu = 0) {
+  freq &lt;- numeric(generations + 1)
+  freq[1] &lt;- p0
+  for (g in seq_len(generations)) {
+    p &lt;- freq[g]
+    # Selection
+    p_sel &lt;- (p * (1 + s)) / (p * (1 + s) + (1 - p))
+    # Mutation
+    p_mut &lt;- p_sel * (1 - mu) + (1 - p_sel) * nu
+    # Drift
+    n_A &lt;- rbinom(1, size = 2 * N, prob = p_mut)
+    freq[g + 1] &lt;- n_A / (2 * N)
+  }
+  freq
+}</code></pre>
+<p>Let’s compare four scenarios side by side.</p>
+<pre class="r"><code>set.seed(1984)
+
+N &lt;- 100
+p0 &lt;- 0.1
+generations &lt;- 300
+n_reps &lt;- 10
+
+scenarios &lt;- list(
+  &quot;Drift only&quot; = list(s = 0, mu = 0, nu = 0),
+  &quot;Selection only (s = 0.03)&quot; = list(s = 0.03, mu = 0, nu = 0),
+  &quot;Mutation only (mu = nu = 0.005)&quot; = list(s = 0, mu = 0.005, nu = 0.005),
+  &quot;All forces combined&quot; = list(s = 0.03, mu = 0.005, nu = 0.005)
+)
+
+par(mfrow = c(2, 2))
+
+for (name in names(scenarios)) {
+  params &lt;- scenarios[[name]]
+  plot(0:generations, rep(NA, generations + 1), type = &quot;n&quot;, ylim = c(0, 1),
+       xlab = &quot;Generation&quot;, ylab = &quot;Frequency of A&quot;, main = name)
+  abline(h = p0, lty = 2, col = &quot;grey50&quot;)
+  for (i in seq_len(n_reps)) {
+    traj &lt;- sim_evolution(p0, N, generations,
+                          s = params$s, mu = params$mu, nu = params$nu)
+    lines(0:generations, traj, col = adjustcolor(&quot;steelblue&quot;, alpha.f = 0.5))
+  }
+}</code></pre>
+<p><img src="figure/sim_evolution.Rmd/combined_plot-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>par(mfrow = c(1, 1))</code></pre>
+<p>Some observations:</p>
+<ul>
+<li><strong>Drift only</strong>: allele frequencies wander randomly;
+some replicates drift toward fixation or loss.</li>
+<li><strong>Selection only</strong>: allele A rises toward fixation
+thanks to its fitness advantage, though drift adds variability in the
+path.</li>
+<li><strong>Mutation only</strong>: frequencies fluctuate around the
+equilibrium <span class="math inline">\(\nu / (\mu + \nu) = 0.5\)</span>
+and fixation is prevented.</li>
+<li><strong>All forces combined</strong>: selection pushes A upward, but
+mutation prevents complete fixation - the frequency equilibrates at a
+value determined by the balance between selection and mutation.</li>
+</ul>
+<p>These simulations illustrate a core insight of population genetics:
+evolution is not a single force but an interplay of deterministic forces
+(selection, mutation) and stochastic processes (drift). The relative
+strengths of these forces, governed by population size and the
+magnitudes of <code>s</code>, <code>mu</code>, and <code>nu</code>,
+determine the evolutionary outcome.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] workflowr_1.7.2
+
+loaded via a namespace (and not attached):
+ [1] vctrs_0.7.1       httr_1.4.8        cli_3.6.5         knitr_1.51       
+ [5] rlang_1.1.7       xfun_0.56         stringi_1.8.7     otel_0.2.0       
+ [9] processx_3.8.6    promises_1.5.0    jsonlite_2.0.0    glue_1.8.0       
+[13] rprojroot_2.1.1   git2r_0.36.2      htmltools_0.5.9   httpuv_1.6.16    
+[17] ps_1.9.1          sass_0.4.10       rmarkdown_2.30    jquerylib_0.1.4  
+[21] tibble_3.3.1      evaluate_1.0.5    fastmap_1.2.0     yaml_2.3.12      
+[25] lifecycle_1.0.5   whisker_0.4.1     stringr_1.6.0     compiler_4.5.2   
+[29] fs_1.6.6          pkgconfig_2.0.3   Rcpp_1.1.1        rstudioapi_0.18.0
+[33] later_1.4.6       digest_0.6.39     R6_2.6.1          pillar_1.11.1    
+[37] callr_3.7.6       magrittr_2.0.4    bslib_0.10.0      tools_4.5.2      
+[41] cachem_1.1.0      getPass_0.2-4    </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
