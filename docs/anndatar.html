@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-02-16" />
+
+<title>Using the anndataR package</title>
+
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Using the anndataR package</h1>
+<h4 class="date">2026-02-16</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-02-16
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb345a9c8186060deb5a1fe77ddc85dc22d1a7573targetblankb345a9ca">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/b345a9c8186060deb5a1fe77ddc85dc22d1a7573" target="_blank">b345a9c</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeb345a9c8186060deb5a1fe77ddc85dc22d1a7573targetblankb345a9ca"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/b345a9c8186060deb5a1fe77ddc85dc22d1a7573" target="_blank">b345a9c</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.5.2/
+
+Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
+    Untracked:  analysis/.claude/
+    Untracked:  analysis/bioc.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
+    Untracked:  analysis/modelling.Rmd
+    Untracked:  analysis/sim_evolution.Rmd
+    Untracked:  analysis/wordpress_readability.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SeuratObj.rds
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/davetang039sblog.WordPress.2026-02-12.xml
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
+    Untracked:  m3/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/anndatar.Rmd</code>) and HTML
+(<code>docs/anndatar.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/b345a9c8186060deb5a1fe77ddc85dc22d1a7573/analysis/anndatar.Rmd" target="_blank">b345a9c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-02-16
+</td>
+<td>
+Using the anndataR package
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<p>The <a
+href="https://bioconductor.org/packages/release/bioc/html/anndataR.html">anndataR
+package</a> brings the <a
+href="https://anndata.readthedocs.io/">AnnData</a> data structure into
+R:</p>
+<blockquote>
+<p>anndataR provides a native R implementation of the AnnData data
+model, enabling R users to read, write, manipulate, and convert .h5ad
+files without requiring Python dependencies for core operations.</p>
+</blockquote>
+<p>The AnnData format is the standard container for single-cell genomics
+data in the Python/scverse ecosystem (used by scanpy, scvi-tools, etc.).
+anndataR bridges the gap between R and Python single-cell workflows by
+providing bidirectional conversion with both SingleCellExperiment and
+Seurat objects.</p>
+<div id="installation" class="section level2">
+<h2>Installation</h2>
+<p>Install from Bioconductor.</p>
+<pre class="r"><code>if (!require(&quot;BiocManager&quot;, quietly = TRUE))
+    install.packages(&quot;BiocManager&quot;)
+
+BiocManager::install(&quot;anndataR&quot;)</code></pre>
+<p>Optional dependencies for reading/writing <code>.h5ad</code> files
+and converting to other formats.</p>
+<pre class="r"><code>BiocManager::install(&quot;rhdf5&quot;)
+BiocManager::install(&quot;SingleCellExperiment&quot;)
+install.packages(&quot;Seurat&quot;)
+install.packages(&quot;SeuratObject&quot;)</code></pre>
+</div>
+<div id="package" class="section level2">
+<h2>Package</h2>
+<p>Load package.</p>
+<pre class="r"><code>packageVersion(&quot;anndataR&quot;)</code></pre>
+<pre><code>[1] &#39;1.0.1&#39;</code></pre>
+<pre class="r"><code>suppressPackageStartupMessages(library(anndataR))</code></pre>
+</div>
+<div id="the-anndata-data-model" class="section level2">
+<h2>The AnnData data model</h2>
+<p>AnnData stores single-cell data in a structured format with nine
+slots:</p>
+<table>
+<colgroup>
+<col width="31%" />
+<col width="68%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Slot</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>X</code></td>
+<td>Primary expression matrix (observations x variables, i.e. cells x
+genes)</td>
+</tr>
+<tr class="even">
+<td><code>obs</code></td>
+<td>Observation (cell) metadata as a data.frame</td>
+</tr>
+<tr class="odd">
+<td><code>var</code></td>
+<td>Variable (gene) metadata as a data.frame</td>
+</tr>
+<tr class="even">
+<td><code>obs_names</code></td>
+<td>Character vector of cell identifiers</td>
+</tr>
+<tr class="odd">
+<td><code>var_names</code></td>
+<td>Character vector of gene identifiers</td>
+</tr>
+<tr class="even">
+<td><code>layers</code></td>
+<td>Named list of alternative matrices (same dimensions as X)</td>
+</tr>
+<tr class="odd">
+<td><code>obsm</code></td>
+<td>Named list of multi-dimensional observation annotations
+(e.g. embeddings)</td>
+</tr>
+<tr class="even">
+<td><code>varm</code></td>
+<td>Named list of multi-dimensional variable annotations
+(e.g. loadings)</td>
+</tr>
+<tr class="odd">
+<td><code>obsp</code></td>
+<td>Named list of pairwise observation matrices (e.g. cell-cell
+distances)</td>
+</tr>
+<tr class="even">
+<td><code>varp</code></td>
+<td>Named list of pairwise variable matrices</td>
+</tr>
+<tr class="odd">
+<td><code>uns</code></td>
+<td>Arbitrary unstructured metadata</td>
+</tr>
+</tbody>
+</table>
+<p>A key difference from R conventions: AnnData stores matrices as
+<strong>observations x variables</strong> (cells x genes), while
+SingleCellExperiment and Seurat store them as <strong>variables x
+observations</strong> (genes x cells). anndataR handles this
+transposition automatically during conversions.</p>
+</div>
+<div id="creating-an-anndata-object" class="section level2">
+<h2>Creating an AnnData object</h2>
+<p>Use the <code>AnnData()</code> constructor to create an in-memory
+AnnData object.</p>
+<pre class="r"><code>n_obs &lt;- 100
+n_vars &lt;- 50
+
+set.seed(1984)
+counts &lt;- matrix(rpois(n_obs * n_vars, lambda = 5), nrow = n_obs)
+rownames(counts) &lt;- paste0(&quot;cell_&quot;, seq_len(n_obs))
+colnames(counts) &lt;- paste0(&quot;gene_&quot;, seq_len(n_vars))
+
+adata &lt;- AnnData(
+  X = counts,
+  obs = data.frame(
+    row.names = paste0(&quot;cell_&quot;, seq_len(n_obs)),
+    cell_type = factor(sample(c(&quot;T cell&quot;, &quot;B cell&quot;, &quot;Monocyte&quot;), n_obs, replace = TRUE)),
+    total_counts = rowSums(counts),
+    n_genes = rowSums(counts &gt; 0)
+  ),
+  var = data.frame(
+    row.names = paste0(&quot;gene_&quot;, seq_len(n_vars)),
+    gene_name = paste0(&quot;Gene&quot;, seq_len(n_vars)),
+    highly_variable = sample(c(TRUE, FALSE), n_vars, replace = TRUE)
+  )
+)
+
+adata</code></pre>
+<pre><code>InMemoryAnnData object with n_obs × n_vars = 100 × 50
+    obs: &#39;cell_type&#39;, &#39;total_counts&#39;, &#39;n_genes&#39;
+    var: &#39;gene_name&#39;, &#39;highly_variable&#39;</code></pre>
+</div>
+<div id="exploring-the-object" class="section level2">
+<h2>Exploring the object</h2>
+<p>Access the dimensions and slot keys.</p>
+<pre class="r"><code>dim(adata)</code></pre>
+<pre><code>[1] 100  50</code></pre>
+<pre class="r"><code>adata$n_obs</code></pre>
+<pre><code>function () 
+{
+    nrow(self$obs)
+}
+&lt;environment: 0x56491f221560&gt;</code></pre>
+<pre class="r"><code>adata$n_vars</code></pre>
+<pre><code>function () 
+{
+    nrow(self$var)
+}
+&lt;environment: 0x56491f221560&gt;</code></pre>
+<p>Observation names and variable names.</p>
+<pre class="r"><code>head(adata$obs_names)</code></pre>
+<pre><code>[1] &quot;cell_1&quot; &quot;cell_2&quot; &quot;cell_3&quot; &quot;cell_4&quot; &quot;cell_5&quot; &quot;cell_6&quot;</code></pre>
+<pre class="r"><code>head(adata$var_names)</code></pre>
+<pre><code>[1] &quot;gene_1&quot; &quot;gene_2&quot; &quot;gene_3&quot; &quot;gene_4&quot; &quot;gene_5&quot; &quot;gene_6&quot;</code></pre>
+<p>Cell metadata stored in <code>obs</code>.</p>
+<pre class="r"><code>head(adata$obs)</code></pre>
+<pre><code>       cell_type total_counts n_genes
+cell_1    B cell          259      50
+cell_2  Monocyte          250      49
+cell_3    T cell          256      50
+cell_4    B cell          229      50
+cell_5    B cell          259      50
+cell_6    B cell          253      50</code></pre>
+<pre class="r"><code>table(adata$obs$cell_type)</code></pre>
+<pre><code>
+  B cell Monocyte   T cell 
+      39       34       27 </code></pre>
+<p>Gene metadata stored in <code>var</code>.</p>
+<pre class="r"><code>head(adata$var)</code></pre>
+<pre><code>       gene_name highly_variable
+gene_1     Gene1           FALSE
+gene_2     Gene2            TRUE
+gene_3     Gene3            TRUE
+gene_4     Gene4           FALSE
+gene_5     Gene5            TRUE
+gene_6     Gene6            TRUE</code></pre>
+<pre class="r"><code>sum(adata$var$highly_variable)</code></pre>
+<pre><code>[1] 27</code></pre>
+<p>The expression matrix stored in <code>X</code> has cells as rows and
+genes as columns.</p>
+<pre class="r"><code>dim(adata$X)</code></pre>
+<pre><code>[1] 100  50</code></pre>
+<pre class="r"><code>adata$X[1:5, 1:5]</code></pre>
+<pre><code>       gene_1 gene_2 gene_3 gene_4 gene_5
+cell_1      6      8      5      4      4
+cell_2      4      6      7      6      7
+cell_3      4      3      3      7      5
+cell_4      4      4      3      5      3
+cell_5      6      3      6      7      3</code></pre>
+</div>
+<div id="adding-layers" class="section level2">
+<h2>Adding layers</h2>
+<p>Layers store alternative representations of the data with the same
+dimensions as <code>X</code>. A common use case is storing raw counts
+alongside normalised values.</p>
+<pre class="r"><code>log_norm &lt;- log1p(sweep(counts, 1, rowSums(counts), &quot;/&quot;) * 1e4)
+
+adata$layers &lt;- list(
+  log_norm = log_norm
+)
+
+adata$layers_keys</code></pre>
+<pre><code>function () 
+{
+    names(self$layers)
+}
+&lt;environment: 0x56491f221560&gt;</code></pre>
+<pre class="r"><code>adata$layers[[&quot;log_norm&quot;]][1:5, 1:5]</code></pre>
+<pre><code>         gene_1   gene_2   gene_3   gene_4   gene_5
+cell_1 5.449579 5.736186 5.268117 5.046261 5.046261
+cell_2 5.081404 5.484797 5.638355 5.484797 5.638355
+cell_3 5.057837 4.772272 4.772272 5.614724 5.279708
+cell_4 5.168621 5.168621 4.882835 5.390626 4.882835
+cell_5 5.449579 4.760721 5.449579 5.603116 4.760721</code></pre>
+</div>
+<div id="adding-embeddings" class="section level2">
+<h2>Adding embeddings</h2>
+<p>Dimensionality reductions are stored in <code>obsm</code> (one entry
+per cell). Let’s compute a simple PCA and store it.</p>
+<pre class="r"><code>pca_result &lt;- prcomp(log_norm, center = TRUE, scale. = TRUE, rank. = 20)
+
+adata$obsm &lt;- list(
+  X_pca = pca_result$x
+)
+
+adata$obsm_keys</code></pre>
+<pre><code>function () 
+{
+    names(self$obsm)
+}
+&lt;environment: 0x56491f221560&gt;</code></pre>
+<pre class="r"><code>dim(adata$obsm[[&quot;X_pca&quot;]])</code></pre>
+<pre><code>[1] 100  20</code></pre>
+<p>Visualise the first two principal components.</p>
+<pre class="r"><code>pca_df &lt;- data.frame(
+  PC1 = pca_result$x[, 1],
+  PC2 = pca_result$x[, 2],
+  cell_type = adata$obs$cell_type
+)
+
+plot(
+  pca_df$PC1, pca_df$PC2,
+  col = as.integer(pca_df$cell_type),
+  pch = 16,
+  xlab = &quot;PC1&quot;,
+  ylab = &quot;PC2&quot;,
+  main = &quot;PCA of simulated data&quot;
+)
+legend(&quot;topright&quot;, levels(pca_df$cell_type), col = seq_along(levels(pca_df$cell_type)), pch = 16)</code></pre>
+<p><img src="figure/anndatar.Rmd/plot_pca-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>Since the data is randomly generated, we do not expect the cell types
+to separate.</p>
+</div>
+<div id="adding-variable-loadings" class="section level2">
+<h2>Adding variable loadings</h2>
+<p>Gene loadings from PCA can be stored in <code>varm</code>.</p>
+<pre class="r"><code>adata$varm &lt;- list(
+  PCs = pca_result$rotation
+)
+
+adata$varm_keys</code></pre>
+<pre><code>function () 
+{
+    names(self$varm)
+}
+&lt;environment: 0x56491f221560&gt;</code></pre>
+<pre class="r"><code>dim(adata$varm[[&quot;PCs&quot;]])</code></pre>
+<pre><code>[1] 50 20</code></pre>
+</div>
+<div id="unstructured-metadata" class="section level2">
+<h2>Unstructured metadata</h2>
+<p>The <code>uns</code> slot stores arbitrary metadata such as colour
+palettes, analysis parameters, or summary statistics.</p>
+<pre class="r"><code>adata$uns &lt;- list(
+  analysis_date = Sys.Date(),
+  cell_type_colours = c(&quot;T cell&quot; = &quot;steelblue&quot;, &quot;B cell&quot; = &quot;tomato&quot;, &quot;Monocyte&quot; = &quot;forestgreen&quot;),
+  pca_variance = summary(pca_result)$importance[2, 1:5]
+)
+
+adata$uns_keys</code></pre>
+<pre><code>function () 
+{
+    names(self$uns)
+}
+&lt;environment: 0x56491f221560&gt;</code></pre>
+<pre class="r"><code>adata$uns[[&quot;cell_type_colours&quot;]]</code></pre>
+<pre><code>       T cell        B cell      Monocyte 
+  &quot;steelblue&quot;      &quot;tomato&quot; &quot;forestgreen&quot; </code></pre>
+</div>
+<div id="subsetting" class="section level2">
+<h2>Subsetting</h2>
+<p>AnnData objects support subsetting with <code>[</code> using logical,
+numeric, or character indices. Subsetting creates a
+<strong>view</strong> that references the parent object without copying
+data.</p>
+<pre class="r"><code>t_cells &lt;- adata[adata$obs$cell_type == &quot;T cell&quot;, ]
+t_cells</code></pre>
+<pre><code>View of InMemoryAnnData object with n_obs × n_vars = 27 × 50
+    obs: &#39;cell_type&#39;, &#39;total_counts&#39;, &#39;n_genes&#39;
+    var: &#39;gene_name&#39;, &#39;highly_variable&#39;
+    uns: &#39;analysis_date&#39;, &#39;cell_type_colours&#39;, &#39;pca_variance&#39;
+    obsm: &#39;X_pca&#39;
+    varm: &#39;PCs&#39;
+    layers: &#39;log_norm&#39;</code></pre>
+<pre class="r"><code>small &lt;- adata[1:10, 1:5]
+dim(small)</code></pre>
+<pre><code>[1] 10  5</code></pre>
+<pre class="r"><code>small$X</code></pre>
+<pre><code>        gene_1 gene_2 gene_3 gene_4 gene_5
+cell_1       6      8      5      4      4
+cell_2       4      6      7      6      7
+cell_3       4      3      3      7      5
+cell_4       4      4      3      5      3
+cell_5       6      3      6      7      3
+cell_6       7      3      4     11      3
+cell_7       1      2      3      7      3
+cell_8       5      5      9      5      6
+cell_9       7      4     11      3      4
+cell_10      3     10      6      3      8</code></pre>
+<pre class="r"><code>selected &lt;- adata[c(&quot;cell_1&quot;, &quot;cell_2&quot;), c(&quot;gene_1&quot;, &quot;gene_10&quot;, &quot;gene_50&quot;)]
+dim(selected)</code></pre>
+<pre><code>[1] 2 3</code></pre>
+<pre class="r"><code>selected$obs</code></pre>
+<pre><code>       cell_type total_counts n_genes
+cell_1    B cell          259      50
+cell_2  Monocyte          250      49</code></pre>
+<p>Subset to highly variable genes.</p>
+<pre class="r"><code>hv_genes &lt;- adata$var_names[adata$var$highly_variable]
+adata_hv &lt;- adata[, hv_genes]
+dim(adata_hv)</code></pre>
+<pre><code>[1] 100  27</code></pre>
+</div>
+<div id="reading-h5ad-files" class="section level2">
+<h2>Reading h5ad files</h2>
+<p>anndataR reads (and writes) <code>.h5ad</code> files using
+Bioconductor’s {rhdf5} package natively, without requiring Python.</p>
+<pre class="r"><code>pbmc3k &lt;- read_h5ad(&quot;data/pbmc3k.h5ad&quot;)
+pbmc3k</code></pre>
+<pre><code>InMemoryAnnData object with n_obs × n_vars = 2700 × 32738
+    var: &#39;gene_ids&#39;</code></pre>
+</div>
+<div id="converting-to-singlecellexperiment" class="section level2">
+<h2>Converting to SingleCellExperiment</h2>
+<p>anndataR provides direct conversion to <a
+href="https://bioconductor.org/packages/SingleCellExperiment/">SingleCellExperiment</a>
+objects, which are widely used in Bioconductor single-cell
+workflows.</p>
+<pre class="r"><code>suppressPackageStartupMessages(library(SingleCellExperiment))
+
+sce &lt;- pbmc3k$as_SingleCellExperiment()
+sce</code></pre>
+<pre><code>class: SingleCellExperiment 
+dim: 32738 2700 
+metadata(0):
+assays(1): X
+rownames(32738): MIR1302-10 FAM138A ... AC002321.2 AC002321.1
+rowData names(1): gene_ids
+colnames(2700): AAACATACAACCAC-1 AAACATTGAGCTAC-1 ... TTTGCATGAGAGGC-1
+  TTTGCATGCCTCAC-1
+colData names(0):
+reducedDimNames(0):
+mainExpName: NULL
+altExpNames(0):</code></pre>
+<p>Note that the matrix is transposed: SingleCellExperiment stores genes
+as rows and cells as columns.</p>
+<pre class="r"><code>dim(sce)</code></pre>
+<pre><code>[1] 32738  2700</code></pre>
+<pre class="r"><code>assayNames(sce)</code></pre>
+<pre><code>[1] &quot;X&quot;</code></pre>
+<pre class="r"><code>head(colData(sce))</code></pre>
+<pre><code>DataFrame with 6 rows and 0 columns</code></pre>
+</div>
+<div id="converting-to-seurat-object" class="section level2">
+<h2>Converting to Seurat object</h2>
+<pre class="r"><code>suppressPackageStartupMessages(library(Seurat))
+
+seurat_obj &lt;- pbmc3k$as_Seurat()</code></pre>
+<pre><code>Warning: No &quot;counts&quot; or &quot;data&quot; layer found in `names(layers_mapping)`, this may lead to
+unexpected results when using the resulting &lt;Seurat&gt; object.</code></pre>
+<pre><code>Warning: Feature names cannot have underscores (&#39;_&#39;), replacing with dashes
+(&#39;-&#39;)</code></pre>
+<pre class="r"><code>seurat_obj</code></pre>
+<pre><code>An object of class Seurat 
+32738 features across 2700 samples within 1 assay 
+Active assay: RNA (32738 features, 0 variable features)
+ 1 layer present: X</code></pre>
+</div>
+<div id="summary" class="section level2">
+<h2>Summary</h2>
+<p>anndataR provides a native R implementation of the AnnData data model
+that:</p>
+<ul>
+<li>Reads and writes <code>.h5ad</code> files without Python via
+{rhdf5}</li>
+<li>Converts bidirectionally with SingleCellExperiment and Seurat</li>
+<li>Supports in-memory, HDF5-backed, and reticulate-based backends</li>
+<li>Creates memory-efficient views when subsetting</li>
+<li>Replaces older packages (<code>anndata</code>,
+<code>zellkonverter</code>, <code>h5ad</code>) with a single unified
+solution</li>
+</ul>
+<p>This makes it straightforward to share single-cell datasets between R
+and Python workflows.</p>
+</div>
+<div id="further-reading" class="section level2">
+<h2>Further reading</h2>
+<ul>
+<li><a href="https://anndatar.data-intuitive.com/">anndataR
+documentation</a></li>
+<li><a
+href="https://anndatar.data-intuitive.com/articles/getting-started.html">Getting
+started vignette</a></li>
+<li><a
+href="https://anndatar.data-intuitive.com/articles/usage_singlecellexperiment.html">SingleCellExperiment
+conversion</a></li>
+<li><a
+href="https://anndatar.data-intuitive.com/articles/usage_seurat.html">Seurat
+conversion</a></li>
+<li><a href="https://github.com/scverse/anndataR">GitHub
+repository</a></li>
+</ul>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] Seurat_5.4.0                SeuratObject_5.3.0         
+ [3] sp_2.2-1                    SingleCellExperiment_1.32.0
+ [5] SummarizedExperiment_1.40.0 Biobase_2.70.0             
+ [7] GenomicRanges_1.62.1        Seqinfo_1.0.0              
+ [9] IRanges_2.44.0              S4Vectors_0.48.0           
+[11] BiocGenerics_0.56.0         generics_0.1.4             
+[13] MatrixGenerics_1.22.0       matrixStats_1.5.0          
+[15] anndataR_1.0.1              workflowr_1.7.2            
+
+loaded via a namespace (and not attached):
+  [1] RColorBrewer_1.1-3     rstudioapi_0.18.0      jsonlite_2.0.0        
+  [4] magrittr_2.0.4         spatstat.utils_3.2-1   farver_2.1.2          
+  [7] rmarkdown_2.30         fs_1.6.6               vctrs_0.7.1           
+ [10] ROCR_1.0-12            spatstat.explore_3.7-0 htmltools_0.5.9       
+ [13] S4Arrays_1.10.1        Rhdf5lib_1.32.0        SparseArray_1.10.8    
+ [16] rhdf5_2.54.1           sass_0.4.10            sctransform_0.4.3     
+ [19] parallelly_1.46.1      KernSmooth_2.23-26     bslib_0.10.0          
+ [22] htmlwidgets_1.6.4      ica_1.0-3              plyr_1.8.9            
+ [25] plotly_4.12.0          zoo_1.8-15             cachem_1.1.0          
+ [28] whisker_0.4.1          igraph_2.2.2           mime_0.13             
+ [31] lifecycle_1.0.5        pkgconfig_2.0.3        Matrix_1.7-4          
+ [34] R6_2.6.1               fastmap_1.2.0          fitdistrplus_1.2-6    
+ [37] future_1.69.0          shiny_1.12.1           digest_0.6.39         
+ [40] patchwork_1.3.2        ps_1.9.1               tensor_1.5.1          
+ [43] rprojroot_2.1.1        RSpectra_0.16-2        irlba_2.3.7           
+ [46] progressr_0.18.0       spatstat.sparse_3.1-0  polyclip_1.10-7       
+ [49] httr_1.4.8             abind_1.4-8            compiler_4.5.2        
+ [52] S7_0.2.1               fastDummies_1.7.5      MASS_7.3-65           
+ [55] DelayedArray_0.36.0    tools_4.5.2            lmtest_0.9-40         
+ [58] otel_0.2.0             httpuv_1.6.16          future.apply_1.20.1   
+ [61] goftest_1.2-3          glue_1.8.0             callr_3.7.6           
+ [64] nlme_3.1-168           rhdf5filters_1.22.0    promises_1.5.0        
+ [67] grid_4.5.2             Rtsne_0.17             getPass_0.2-4         
+ [70] cluster_2.1.8.1        reshape2_1.4.5         spatstat.data_3.1-9   
+ [73] gtable_0.3.6           tidyr_1.3.2            data.table_1.18.2.1   
+ [76] XVector_0.50.0         spatstat.geom_3.7-0    RcppAnnoy_0.0.23      
+ [79] ggrepel_0.9.6          RANN_2.6.2             pillar_1.11.1         
+ [82] stringr_1.6.0          spam_2.11-3            RcppHNSW_0.6.0        
+ [85] later_1.4.6            splines_4.5.2          dplyr_1.2.0           
+ [88] lattice_0.22-7         deldir_2.0-4           survival_3.8-3        
+ [91] tidyselect_1.2.1       miniUI_0.1.2           pbapply_1.7-4         
+ [94] knitr_1.51             git2r_0.36.2           gridExtra_2.3         
+ [97] scattermore_1.2        xfun_0.56              stringi_1.8.7         
+[100] lazyeval_0.2.2         yaml_2.3.12            evaluate_1.0.5        
+[103] codetools_0.2-20       tibble_3.3.1           cli_3.6.5             
+[106] uwot_0.2.4             xtable_1.8-4           reticulate_1.45.0     
+[109] processx_3.8.6         jquerylib_0.1.4        Rcpp_1.1.1            
+[112] spatstat.random_3.4-4  globals_0.19.0         png_0.1-8             
+[115] spatstat.univar_3.1-6  parallel_4.5.2         ggplot2_4.0.2         
+[118] dotCall64_1.2          listenv_0.10.0         viridisLite_0.4.3     
+[121] scales_1.4.0           ggridges_0.5.7         purrr_1.2.1           
+[124] rlang_1.1.7            cowplot_1.2.0         </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
