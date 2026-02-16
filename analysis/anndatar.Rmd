@@ -1,0 +1,302 @@
+---
+title: "Using the anndataR package"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The [anndataR package](https://bioconductor.org/packages/release/bioc/html/anndataR.html) brings the [AnnData](https://anndata.readthedocs.io/) data structure into R:
+
+> anndataR provides a native R implementation of the AnnData data model, enabling R users to read, write, manipulate, and convert .h5ad files without requiring Python dependencies for core operations.
+
+The AnnData format is the standard container for single-cell genomics data in the Python/scverse ecosystem (used by scanpy, scvi-tools, etc.). anndataR bridges the gap between R and Python single-cell workflows by providing bidirectional conversion with both SingleCellExperiment and Seurat objects.
+
+## Installation
+
+Install from Bioconductor.
+
+```{r install_anndatar, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("anndataR")
+```
+
+Optional dependencies for reading/writing `.h5ad` files and converting to other formats.
+
+```{r install_optional, eval=FALSE}
+BiocManager::install("rhdf5")
+BiocManager::install("SingleCellExperiment")
+install.packages("Seurat")
+install.packages("SeuratObject")
+```
+
+## Package
+
+Load package.
+
+```{r load_package}
+packageVersion("anndataR")
+suppressPackageStartupMessages(library(anndataR))
+```
+
+## The AnnData data model
+
+AnnData stores single-cell data in a structured format with nine slots:
+
+| Slot | Description |
+|------|-------------|
+| `X` | Primary expression matrix (observations x variables, i.e. cells x genes) |
+| `obs` | Observation (cell) metadata as a data.frame |
+| `var` | Variable (gene) metadata as a data.frame |
+| `obs_names` | Character vector of cell identifiers |
+| `var_names` | Character vector of gene identifiers |
+| `layers` | Named list of alternative matrices (same dimensions as X) |
+| `obsm` | Named list of multi-dimensional observation annotations (e.g. embeddings) |
+| `varm` | Named list of multi-dimensional variable annotations (e.g. loadings) |
+| `obsp` | Named list of pairwise observation matrices (e.g. cell-cell distances) |
+| `varp` | Named list of pairwise variable matrices |
+| `uns` | Arbitrary unstructured metadata |
+
+A key difference from R conventions: AnnData stores matrices as **observations x variables** (cells x genes), while SingleCellExperiment and Seurat store them as **variables x observations** (genes x cells). anndataR handles this transposition automatically during conversions.
+
+## Creating an AnnData object
+
+Use the `AnnData()` constructor to create an in-memory AnnData object.
+
+```{r create_anndata}
+n_obs <- 100
+n_vars <- 50
+
+set.seed(1984)
+counts <- matrix(rpois(n_obs * n_vars, lambda = 5), nrow = n_obs)
+rownames(counts) <- paste0("cell_", seq_len(n_obs))
+colnames(counts) <- paste0("gene_", seq_len(n_vars))
+
+adata <- AnnData(
+  X = counts,
+  obs = data.frame(
+    row.names = paste0("cell_", seq_len(n_obs)),
+    cell_type = factor(sample(c("T cell", "B cell", "Monocyte"), n_obs, replace = TRUE)),
+    total_counts = rowSums(counts),
+    n_genes = rowSums(counts > 0)
+  ),
+  var = data.frame(
+    row.names = paste0("gene_", seq_len(n_vars)),
+    gene_name = paste0("Gene", seq_len(n_vars)),
+    highly_variable = sample(c(TRUE, FALSE), n_vars, replace = TRUE)
+  )
+)
+
+adata
+```
+
+## Exploring the object
+
+Access the dimensions and slot keys.
+
+```{r explore_dims}
+dim(adata)
+adata$n_obs
+adata$n_vars
+```
+
+Observation names and variable names.
+
+```{r explore_names}
+head(adata$obs_names)
+head(adata$var_names)
+```
+
+Cell metadata stored in `obs`.
+
+```{r explore_obs}
+head(adata$obs)
+table(adata$obs$cell_type)
+```
+
+Gene metadata stored in `var`.
+
+```{r explore_var}
+head(adata$var)
+sum(adata$var$highly_variable)
+```
+
+The expression matrix stored in `X` has cells as rows and genes as columns.
+
+```{r explore_x}
+dim(adata$X)
+adata$X[1:5, 1:5]
+```
+
+## Adding layers
+
+Layers store alternative representations of the data with the same dimensions as `X`. A common use case is storing raw counts alongside normalised values.
+
+```{r add_layers}
+log_norm <- log1p(sweep(counts, 1, rowSums(counts), "/") * 1e4)
+
+adata$layers <- list(
+  log_norm = log_norm
+)
+
+adata$layers_keys
+adata$layers[["log_norm"]][1:5, 1:5]
+```
+
+## Adding embeddings
+
+Dimensionality reductions are stored in `obsm` (one entry per cell). Let's compute a simple PCA and store it.
+
+```{r add_embeddings}
+pca_result <- prcomp(log_norm, center = TRUE, scale. = TRUE, rank. = 20)
+
+adata$obsm <- list(
+  X_pca = pca_result$x
+)
+
+adata$obsm_keys
+dim(adata$obsm[["X_pca"]])
+```
+
+Visualise the first two principal components.
+
+```{r plot_pca}
+pca_df <- data.frame(
+  PC1 = pca_result$x[, 1],
+  PC2 = pca_result$x[, 2],
+  cell_type = adata$obs$cell_type
+)
+
+plot(
+  pca_df$PC1, pca_df$PC2,
+  col = as.integer(pca_df$cell_type),
+  pch = 16,
+  xlab = "PC1",
+  ylab = "PC2",
+  main = "PCA of simulated data"
+)
+legend("topright", levels(pca_df$cell_type), col = seq_along(levels(pca_df$cell_type)), pch = 16)
+```
+
+Since the data is randomly generated, we do not expect the cell types to separate.
+
+## Adding variable loadings
+
+Gene loadings from PCA can be stored in `varm`.
+
+```{r add_varm}
+adata$varm <- list(
+  PCs = pca_result$rotation
+)
+
+adata$varm_keys
+dim(adata$varm[["PCs"]])
+```
+
+## Unstructured metadata
+
+The `uns` slot stores arbitrary metadata such as colour palettes, analysis parameters, or summary statistics.
+
+```{r add_uns}
+adata$uns <- list(
+  analysis_date = Sys.Date(),
+  cell_type_colours = c("T cell" = "steelblue", "B cell" = "tomato", "Monocyte" = "forestgreen"),
+  pca_variance = summary(pca_result)$importance[2, 1:5]
+)
+
+adata$uns_keys
+adata$uns[["cell_type_colours"]]
+```
+
+## Subsetting
+
+AnnData objects support subsetting with `[` using logical, numeric, or character indices. Subsetting creates a **view** that references the parent object without copying data.
+
+```{r subset_logical}
+t_cells <- adata[adata$obs$cell_type == "T cell", ]
+t_cells
+```
+
+```{r subset_numeric}
+small <- adata[1:10, 1:5]
+dim(small)
+small$X
+```
+
+```{r subset_character}
+selected <- adata[c("cell_1", "cell_2"), c("gene_1", "gene_10", "gene_50")]
+dim(selected)
+selected$obs
+```
+
+Subset to highly variable genes.
+
+```{r subset_hv_genes}
+hv_genes <- adata$var_names[adata$var$highly_variable]
+adata_hv <- adata[, hv_genes]
+dim(adata_hv)
+```
+
+## Reading h5ad files
+
+anndataR reads (and writes) `.h5ad` files using Bioconductor's {rhdf5} package natively, without requiring Python.
+
+```{r read_h5ad}
+pbmc3k <- read_h5ad("data/pbmc3k.h5ad")
+pbmc3k
+```
+
+## Converting to SingleCellExperiment
+
+anndataR provides direct conversion to [SingleCellExperiment](https://bioconductor.org/packages/SingleCellExperiment/) objects, which are widely used in Bioconductor single-cell workflows.
+
+```{r to_sce}
+suppressPackageStartupMessages(library(SingleCellExperiment))
+
+sce <- pbmc3k$as_SingleCellExperiment()
+sce
+```
+
+Note that the matrix is transposed: SingleCellExperiment stores genes as rows and cells as columns.
+
+```{r sce_dims}
+dim(sce)
+assayNames(sce)
+head(colData(sce))
+```
+
+## Converting to Seurat object
+
+```{r to_seurat}
+suppressPackageStartupMessages(library(Seurat))
+
+seurat_obj <- pbmc3k$as_Seurat()
+seurat_obj
+```
+
+## Summary
+
+anndataR provides a native R implementation of the AnnData data model that:
+
+* Reads and writes `.h5ad` files without Python via {rhdf5}
+* Converts bidirectionally with SingleCellExperiment and Seurat
+* Supports in-memory, HDF5-backed, and reticulate-based backends
+* Creates memory-efficient views when subsetting
+* Replaces older packages (`anndata`, `zellkonverter`, `h5ad`) with a single unified solution
+
+This makes it straightforward to share single-cell datasets between R and Python workflows.
+
+## Further reading
+
+* [anndataR documentation](https://anndatar.data-intuitive.com/)
+* [Getting started vignette](https://anndatar.data-intuitive.com/articles/getting-started.html)
+* [SingleCellExperiment conversion](https://anndatar.data-intuitive.com/articles/usage_singlecellexperiment.html)
+* [Seurat conversion](https://anndatar.data-intuitive.com/articles/usage_seurat.html)
+* [GitHub repository](https://github.com/scverse/anndataR)
