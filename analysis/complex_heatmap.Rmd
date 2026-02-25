@@ -451,6 +451,142 @@ UpSet(m2, top_annotation = upset_top_annotation(m2, ylim = c(0, max2)),
     column_title = "UpSet2")
 ```
 
+## Exporting to PNG
+
+### The basic pattern
+
+ComplexHeatmap draws via the **grid** graphics system, so you must open a
+graphics device, call `draw()`, and then close the device with `dev.off()`.
+Calling `png()` alone and then printing the heatmap object works too, but
+using `draw()` gives you control over legend placement at export time.
+
+```{r export_basic, eval=FALSE}
+png(
+  filename = "heatmap.png",
+  width    = 8,      # inches
+  height   = 6,      # inches
+  units    = "in",
+  res      = 300,    # dots per inch — 300 is standard for publication
+  bg       = "white" # explicit white background (avoids transparency issues)
+)
+draw(ht_final, heatmap_legend_side = "bottom", annotation_legend_side = "bottom")
+dev.off()
+```
+
+### Key parameters
+
+| Parameter | Typical values | Notes |
+|-----------|---------------|-------|
+| `width` / `height` | 6–14 | In the units given by `units` |
+| `units` | `"in"`, `"cm"`, `"px"` | `"in"` is most intuitive for print |
+| `res` | 72, 150, 300, 600 | See table below |
+| `bg` | `"white"`, `"transparent"` | Journals usually require white |
+| `pointsize` | 8–14 | Base font size in points; default is 12 |
+
+Common `res` (DPI) values and their intended use:
+
+| DPI | Use case |
+|-----|----------|
+| 72  | Screen / web preview |
+| 150 | Draft print, presentations |
+| 300 | Standard publication quality |
+| 600 | High-resolution print / microscopy figures |
+
+### Sizing the image to the heatmap content
+
+A heatmap with many rows needs more height than one with few rows. A simple
+rule of thumb: allocate ~0.25 inches per row and ~0.6 inches per column, then
+add a fixed margin for titles, legends, and annotations.
+
+```{r export_sized, eval=FALSE}
+n_rows <- nrow(mat_z)
+n_cols <- ncol(mat_z)
+
+img_width  <- n_cols * 0.6 + 3   # 3 in of margin for row annotations + legend
+img_height <- n_rows * 0.25 + 3  # 3 in of margin for col annotations + legend
+
+png(
+  filename = "heatmap_sized.png",
+  width    = img_width,
+  height   = img_height,
+  units    = "in",
+  res      = 300,
+  bg       = "white"
+)
+draw(ht_final, heatmap_legend_side = "bottom", annotation_legend_side = "bottom")
+dev.off()
+```
+
+For very large matrices (hundreds of rows) you may want a fixed height with
+`show_row_names = FALSE` rather than scaling linearly.
+
+### Adjusting font sizes for high-resolution output
+
+At 300 DPI the default `pointsize = 12` renders fine. If you increase `res`
+to 600 DPI the plot appears to shrink unless you increase `pointsize` to
+match, or enlarge `width` and `height`. For example, to maintain the same
+visual size at 600 DPI as a 300-DPI export:
+
+```{r export_600dpi, eval=FALSE}
+png(
+  filename  = "heatmap_600dpi.png",
+  width     = img_width * 2,   # double the physical size ...
+  height    = img_height * 2,
+  units     = "in",
+  res       = 600,             # ... at double the DPI = same pixel count
+  pointsize = 16,              # larger base font to stay legible
+  bg        = "white"
+)
+draw(ht_final, heatmap_legend_side = "bottom", annotation_legend_side = "bottom")
+dev.off()
+```
+
+### Vector formats (PDF and SVG)
+
+For formats that require infinite scalability (e.g. figures submitted as PDF
+to a journal), replace `png()` with `pdf()` or `svg()`. These devices ignore
+`res` because they are resolution-independent.
+
+```{r export_pdf, eval=FALSE}
+pdf(
+  file   = "heatmap.pdf",
+  width  = img_width,
+  height = img_height
+)
+draw(ht_final, heatmap_legend_side = "bottom", annotation_legend_side = "bottom")
+dev.off()
+```
+
+```{r export_svg, eval=FALSE}
+svg(
+  filename = "heatmap.svg",
+  width    = img_width,
+  height   = img_height
+)
+draw(ht_final, heatmap_legend_side = "bottom", annotation_legend_side = "bottom")
+dev.off()
+```
+
+### Exporting multiple heatmaps to one file
+
+A concatenated heatmap (created with `+`) is itself a `HeatmapList` object
+and is drawn exactly the same way.
+
+```{r export_multi, eval=FALSE}
+ht_list <- ht_raw + ht_norm   # the two-heatmap object built earlier
+
+png(
+  filename = "two_heatmaps.png",
+  width    = 14,
+  height   = 8,
+  units    = "in",
+  res      = 300,
+  bg       = "white"
+)
+draw(ht_list)
+dev.off()
+```
+
 ## Further reading
 
 * [ComplexHeatmap Complete Reference](https://jokergoo.github.io/ComplexHeatmap-reference/book/) — the authoritative guide by the package author.
