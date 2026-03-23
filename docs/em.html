@@ -1,0 +1,1646 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-03-23" />
+
+<title>The Expectation-Maximisation (EM) Algorithm</title>
+
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">The Expectation-Maximisation (EM)
+Algorithm</h1>
+<h4 class="date">2026-03-23</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-03-23
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree15275c4f04a39ad6c2a95c2e659e04e8a1b10eb3targetblank15275c4a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/15275c4f04a39ad6c2a95c2e659e04e8a1b10eb3" target="_blank">15275c4</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree15275c4f04a39ad6c2a95c2e659e04e8a1b10eb3targetblank15275c4a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/15275c4f04a39ad6c2a95c2e659e04e8a1b10eb3" target="_blank">15275c4</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.5.2/
+
+Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
+    Untracked:  analysis/.claude/
+    Untracked:  analysis/aucc.Rmd
+    Untracked:  analysis/bimodal.Rmd
+    Untracked:  analysis/bioc.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
+    Untracked:  analysis/modelling.Rmd
+    Untracked:  analysis/wordpress_readability.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SeuratObj.rds
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/davetang039sblog.WordPress.2026-02-12.xml
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
+    Untracked:  m3/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/em.Rmd</code>) and HTML
+(<code>docs/em.html</code>) files. If you’ve configured a remote Git
+repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
+in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/15275c4f04a39ad6c2a95c2e659e04e8a1b10eb3/analysis/em.Rmd" target="_blank">15275c4</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+<td>
+The EM algorithm
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>library(ggplot2)</code></pre>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The <strong>Expectation-Maximisation (EM) algorithm</strong> is one
+of the most widely used tools in statistics and machine learning. It
+shows up in Gaussian mixture models, hidden Markov models, missing-data
+problems, and many other settings. But most explanations of EM jump into
+abstract notation very quickly, which makes it feel more complicated
+than it actually is.</p>
+<p>The core idea is simple. EM is for situations where you are trying to
+estimate something, but there is <strong>hidden information</strong>
+that, if you knew it, would make the problem easy. Since you don’t know
+the hidden information, you alternate between:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Guessing</strong> the hidden information (using your current
+parameter estimates).</li>
+<li><strong>Updating</strong> the parameter estimates (using your
+guesses of the hidden information).</li>
+</ol>
+<p>Repeat until things stabilise. That’s it. The rest of this article is
+about building solid intuition for what this means and why it works.</p>
+</div>
+<div id="an-everyday-analogy" class="section level1">
+<h1>An Everyday Analogy</h1>
+<p>Imagine you are a teacher with two teaching assistants, Alice and
+Bob, who grade homework. You receive a stack of graded assignments but
+their names have fallen off — you can see the scores each student
+received, but you do not know which TA graded which assignment.</p>
+<p>You want to figure out each TA’s grading tendency (say, the average
+score they give). If you <strong>knew</strong> who graded each
+assignment, this would be trivial: split the assignments into two piles
+and compute the average for each pile.</p>
+<p>But you don’t know who graded what. So you do the following:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Start with a guess</strong>: maybe Alice grades generously
+(average ~85) and Bob grades strictly (average ~70).</li>
+<li><strong>E-step</strong>: For each assignment, ask: “Given these
+guessed averages, which TA probably graded this one?” An assignment with
+a score of 90 is more likely from Alice; a score of 65 is more likely
+from Bob. A score of 78 could go either way, so you assign
+<strong>partial credit</strong> — maybe 60% chance Alice, 40% chance
+Bob.</li>
+<li><strong>M-step</strong>: Using these soft assignments, recompute the
+averages. Alice’s new average is the weighted mean of all scores,
+weighted by how likely she was to have graded each one. Same for
+Bob.</li>
+<li><strong>Repeat</strong> steps 2 and 3 until the averages stop
+changing.</li>
+</ol>
+<p>That is the EM algorithm. The hidden information is “who graded
+what”, and the parameters are the grading averages.</p>
+</div>
+<div id="the-two-coin-problem" class="section level1">
+<h1>The Two-Coin Problem</h1>
+<p>The classic teaching example for EM involves two coins. This problem
+is small enough to work through by hand, which makes the mechanics
+completely transparent.</p>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<p>You have two coins, <strong>A</strong> and <strong>B</strong>, with
+unknown probabilities of landing heads:</p>
+<ul>
+<li>Coin A lands heads with probability <span
+class="math inline">\(\theta_A\)</span> (unknown).</li>
+<li>Coin B lands heads with probability <span
+class="math inline">\(\theta_B\)</span> (unknown).</li>
+</ul>
+<p>Someone runs 5 rounds of an experiment. In each round, they
+<strong>secretly pick</strong> one of the two coins (you don’t know
+which), flip it 10 times, and tell you how many heads came up. Your job:
+estimate <span class="math inline">\(\theta_A\)</span> and <span
+class="math inline">\(\theta_B\)</span>.</p>
+<p>Here are the results:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Round</th>
+<th>Heads (out of 10)</th>
+<th>Coin used (hidden)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>7</td>
+<td>?</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>3</td>
+<td>?</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>8</td>
+<td>?</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>5</td>
+<td>?</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>9</td>
+<td>?</td>
+</tr>
+</tbody>
+</table>
+<p>If we knew the hidden column, we could just compute the proportion of
+heads for each coin. Since we don’t, we use EM.</p>
+</div>
+<div id="step-by-step" class="section level2">
+<h2>Step by Step</h2>
+<pre class="r"><code>set.seed(1984)
+
+# Observed data: number of heads in each round (10 flips per round)
+heads &lt;- c(7, 3, 8, 5, 9)
+n_flips &lt;- 10
+n_rounds &lt;- length(heads)</code></pre>
+<div id="initial-guess" class="section level3">
+<h3>Initial Guess</h3>
+<p>We need a starting point. Let’s guess <span
+class="math inline">\(\theta_A = 0.6\)</span> and <span
+class="math inline">\(\theta_B = 0.5\)</span>.</p>
+<pre class="r"><code># EM for the two-coin problem
+em_two_coins &lt;- function(heads, n_flips, theta_A_init, theta_B_init,
+                         max_iter = 20, tol = 1e-6) {
+
+  theta_A &lt;- theta_A_init
+  theta_B &lt;- theta_B_init
+  n_rounds &lt;- length(heads)
+  history &lt;- data.frame(
+    iteration = integer(),
+    theta_A = numeric(),
+    theta_B = numeric()
+  )
+  history &lt;- rbind(history, data.frame(
+    iteration = 0, theta_A = theta_A, theta_B = theta_B
+  ))
+
+  for (iter in seq_len(max_iter)) {
+    # --- E-step ---
+    # For each round, compute the probability that coin A was used
+    # P(coin A | data) is proportional to P(data | coin A) * P(coin A)
+    # Assume equal prior: P(coin A) = P(coin B) = 0.5
+
+    # Likelihood of observing the data under each coin (binomial)
+    lik_A &lt;- dbinom(heads, size = n_flips, prob = theta_A)
+    lik_B &lt;- dbinom(heads, size = n_flips, prob = theta_B)
+
+    # Responsibility: probability that coin A generated each round
+    resp_A &lt;- lik_A / (lik_A + lik_B)
+    resp_B &lt;- 1 - resp_A
+
+    # --- M-step ---
+    # Update theta_A: weighted average of head proportions, weighted by resp_A
+    theta_A_new &lt;- sum(resp_A * heads) / sum(resp_A * n_flips)
+    theta_B_new &lt;- sum(resp_B * heads) / sum(resp_B * n_flips)
+
+    history &lt;- rbind(history, data.frame(
+      iteration = iter, theta_A = theta_A_new, theta_B = theta_B_new
+    ))
+
+    # Check convergence
+    if (abs(theta_A_new - theta_A) &lt; tol &amp;&amp; abs(theta_B_new - theta_B) &lt; tol) {
+      theta_A &lt;- theta_A_new
+      theta_B &lt;- theta_B_new
+      break
+    }
+
+    theta_A &lt;- theta_A_new
+    theta_B &lt;- theta_B_new
+  }
+
+  list(
+    theta_A = theta_A,
+    theta_B = theta_B,
+    iterations = iter,
+    history = history
+  )
+}
+
+result &lt;- em_two_coins(heads, n_flips,
+                       theta_A_init = 0.6, theta_B_init = 0.5)
+
+cat(sprintf(&quot;Converged in %d iterations\n&quot;, result$iterations))</code></pre>
+<pre><code>Converged in 17 iterations</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;  theta_A = %.4f\n&quot;, result$theta_A))</code></pre>
+<pre><code>  theta_A = 0.7959</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;  theta_B = %.4f\n&quot;, result$theta_B))</code></pre>
+<pre><code>  theta_B = 0.4449</code></pre>
+</div>
+<div id="what-happened-at-each-iteration" class="section level3">
+<h3>What Happened at Each Iteration</h3>
+<p>Let’s look at the first few iterations in detail to see the E-step
+and M-step playing out.</p>
+<pre class="r"><code># Show detailed E-step and M-step for the first 3 iterations
+theta_A &lt;- 0.6
+theta_B &lt;- 0.5
+
+for (iter in 1:3) {
+  cat(sprintf(&quot;=== Iteration %d ===\n&quot;, iter))
+  cat(sprintf(&quot;Current guesses: theta_A = %.4f, theta_B = %.4f\n\n&quot;, theta_A, theta_B))
+
+  lik_A &lt;- dbinom(heads, size = n_flips, prob = theta_A)
+  lik_B &lt;- dbinom(heads, size = n_flips, prob = theta_B)
+  resp_A &lt;- lik_A / (lik_A + lik_B)
+
+  cat(&quot;E-step — responsibility of coin A for each round:\n&quot;)
+  for (i in seq_along(heads)) {
+    cat(sprintf(&quot;  Round %d (%d heads): P(coin A) = %.3f, P(coin B) = %.3f\n&quot;,
+                i, heads[i], resp_A[i], 1 - resp_A[i]))
+  }
+
+  theta_A &lt;- sum(resp_A * heads) / sum(resp_A * n_flips)
+  theta_B &lt;- sum((1 - resp_A) * heads) / sum((1 - resp_A) * n_flips)
+
+  cat(sprintf(&quot;\nM-step — updated estimates: theta_A = %.4f, theta_B = %.4f\n\n&quot;, theta_A, theta_B))
+}</code></pre>
+<pre><code>=== Iteration 1 ===
+Current guesses: theta_A = 0.6000, theta_B = 0.5000
+
+E-step — responsibility of coin A for each round:
+  Round 1 (7 heads): P(coin A) = 0.647, P(coin B) = 0.353
+  Round 2 (3 heads): P(coin A) = 0.266, P(coin B) = 0.734
+  Round 3 (8 heads): P(coin A) = 0.733, P(coin B) = 0.267
+  Round 4 (5 heads): P(coin A) = 0.449, P(coin B) = 0.551
+  Round 5 (9 heads): P(coin A) = 0.805, P(coin B) = 0.195
+
+M-step — updated estimates: theta_A = 0.7131, theta_B = 0.5389
+
+=== Iteration 2 ===
+Current guesses: theta_A = 0.7131, theta_B = 0.5389
+
+E-step — responsibility of coin A for each round:
+  Round 1 (7 heads): P(coin A) = 0.631, P(coin B) = 0.369
+  Round 2 (3 heads): P(coin A) = 0.077, P(coin B) = 0.923
+  Round 3 (8 heads): P(coin A) = 0.784, P(coin B) = 0.216
+  Round 4 (5 heads): P(coin A) = 0.274, P(coin B) = 0.726
+  Round 5 (9 heads): P(coin A) = 0.886, P(coin B) = 0.114
+
+M-step — updated estimates: theta_A = 0.7640, theta_B = 0.4999
+
+=== Iteration 3 ===
+Current guesses: theta_A = 0.7640, theta_B = 0.4999
+
+E-step — responsibility of coin A for each round:
+  Round 1 (7 heads): P(coin A) = 0.672, P(coin B) = 0.328
+  Round 2 (3 heads): P(coin A) = 0.018, P(coin B) = 0.982
+  Round 3 (8 heads): P(coin A) = 0.869, P(coin B) = 0.131
+  Round 4 (5 heads): P(coin A) = 0.163, P(coin B) = 0.837
+  Round 5 (9 heads): P(coin A) = 0.956, P(coin B) = 0.044
+
+M-step — updated estimates: theta_A = 0.7889, theta_B = 0.4683</code></pre>
+<p>Notice how the responsibilities shift over iterations. In the
+beginning, the guesses are close together so the model is unsure which
+coin generated which round. As the estimates improve, the model becomes
+more confident: rounds with many heads are assigned more strongly to the
+higher-probability coin and vice versa.</p>
+</div>
+<div id="convergence-plot" class="section level3">
+<h3>Convergence Plot</h3>
+<pre class="r"><code>history_long &lt;- data.frame(
+  iteration = rep(result$history$iteration, 2),
+  theta = c(result$history$theta_A, result$history$theta_B),
+  coin = rep(c(&quot;Coin A&quot;, &quot;Coin B&quot;), each = nrow(result$history))
+)
+
+ggplot(history_long, aes(x = iteration, y = theta, colour = coin)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  labs(x = &quot;Iteration&quot;, y = &quot;Estimated Bias (probability of heads)&quot;,
+       colour = &quot;&quot;, title = &quot;EM convergence for the two-coin problem&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/em.Rmd/coins_convergence-1.png" alt="Convergence of coin bias estimates across EM iterations." width="768" />
+<p class="caption">
+Convergence of coin bias estimates across EM iterations.
+</p>
+</div>
+<p>The two estimates start close together and gradually separate as the
+algorithm figures out which rounds go with which coin.</p>
+</div>
+</div>
+</div>
+<div id="em-for-gaussian-mixtures" class="section level1">
+<h1>EM for Gaussian Mixtures</h1>
+<p>The two-coin problem illustrates the logic of EM in a discrete
+setting. The same logic applies to continuous data. The most common
+application is fitting <strong>Gaussian mixture models</strong> (GMMs),
+where you assume your data comes from a blend of several normal
+(bell-curve) distributions and you want to recover their parameters.</p>
+<p>For a detailed treatment of GMMs, see the <a href="gmm.html">Gaussian
+mixture model</a> article. Here we focus on the EM mechanics.</p>
+<div id="simulated-data" class="section level2">
+<h2>Simulated Data</h2>
+<pre class="r"><code>set.seed(1984)
+
+# Two-component Gaussian mixture
+n &lt;- 800
+n1 &lt;- round(n * 0.65)
+n2 &lt;- n - n1
+
+x &lt;- c(rnorm(n1, mean = 2, sd = 0.8),
+       rnorm(n2, mean = 6, sd = 1.0))
+
+true_labels &lt;- c(rep(1, n1), rep(2, n2))</code></pre>
+<pre class="r"><code>ggplot(data.frame(x = x), aes(x = x)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 50,
+                 fill = &quot;steelblue&quot;, colour = &quot;white&quot;, alpha = 0.7) +
+  geom_density(colour = &quot;red&quot;, linewidth = 0.8) +
+  labs(x = &quot;Value&quot;, y = &quot;Density&quot;,
+       title = &quot;Observed data from an unknown mixture&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/em.Rmd/show_data-1.png" alt="Simulated data from two overlapping Gaussian components." width="864" />
+<p class="caption">
+Simulated data from two overlapping Gaussian components.
+</p>
+</div>
+<p>We know this data was generated by two Gaussians, but we will pretend
+we don’t and let EM figure it out.</p>
+</div>
+<div id="watching-em-iterate" class="section level2">
+<h2>Watching EM Iterate</h2>
+<p>To see exactly what EM is doing, we’ll record the state at each
+iteration and plot it.</p>
+<pre class="r"><code>em_gaussian &lt;- function(x, K = 2, max_iter = 30, tol = 1e-6) {
+  n &lt;- length(x)
+
+  # Initialise: spread means across the data range
+  mu &lt;- quantile(x, probs = seq(0.3, 0.7, length.out = K))
+  sigma &lt;- rep(sd(x), K)
+  pi_k &lt;- rep(1 / K, K)
+
+  snapshots &lt;- list()
+
+  for (iter in seq_len(max_iter)) {
+    # E-step
+    resp &lt;- matrix(0, nrow = n, ncol = K)
+    for (k in seq_len(K)) {
+      resp[, k] &lt;- pi_k[k] * dnorm(x, mean = mu[k], sd = sigma[k])
+    }
+    resp &lt;- resp / rowSums(resp)
+
+    # M-step
+    N_k &lt;- colSums(resp)
+    mu_new &lt;- colSums(resp * x) / N_k
+    sigma_new &lt;- sqrt(colSums(resp * outer(x, mu_new, &quot;-&quot;)^2) / N_k)
+    pi_new &lt;- N_k / n
+
+    # Record snapshot
+    snapshots[[iter]] &lt;- list(
+      iter = iter, mu = mu_new, sigma = sigma_new,
+      pi_k = pi_new, resp = resp
+    )
+
+    if (max(abs(mu_new - mu)) &lt; tol) break
+    mu &lt;- mu_new
+    sigma &lt;- sigma_new
+    pi_k &lt;- pi_new
+  }
+
+  list(mu = mu_new, sigma = sigma_new, pi_k = pi_new,
+       resp = resp, snapshots = snapshots, iterations = iter)
+}
+
+fit &lt;- em_gaussian(x, K = 2)
+cat(sprintf(&quot;Converged in %d iterations\n\n&quot;, fit$iterations))</code></pre>
+<pre><code>Converged in 30 iterations</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;Component 1: mean = %.2f, sd = %.2f, weight = %.2f\n&quot;,
+            fit$mu[1], fit$sigma[1], fit$pi_k[1]))</code></pre>
+<pre><code>Component 1: mean = 1.95, sd = 0.76, weight = 0.64</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;Component 2: mean = %.2f, sd = %.2f, weight = %.2f\n&quot;,
+            fit$mu[2], fit$sigma[2], fit$pi_k[2]))</code></pre>
+<pre><code>Component 2: mean = 5.83, sd = 1.06, weight = 0.36</code></pre>
+<pre class="r"><code># Select a few iterations to visualise
+show_iters &lt;- c(1, 3, 5, fit$iterations)
+show_iters &lt;- unique(pmin(show_iters, fit$iterations))
+
+x_grid &lt;- seq(min(x) - 1, max(x) + 1, length.out = 500)
+
+plot_data &lt;- do.call(rbind, lapply(show_iters, function(i) {
+  s &lt;- fit$snapshots[[i]]
+  data.frame(
+    x = rep(x_grid, 3),
+    density = c(
+      s$pi_k[1] * dnorm(x_grid, s$mu[1], s$sigma[1]),
+      s$pi_k[2] * dnorm(x_grid, s$mu[2], s$sigma[2]),
+      s$pi_k[1] * dnorm(x_grid, s$mu[1], s$sigma[1]) +
+        s$pi_k[2] * dnorm(x_grid, s$mu[2], s$sigma[2])
+    ),
+    curve = rep(c(&quot;Component 1&quot;, &quot;Component 2&quot;, &quot;Mixture&quot;), each = length(x_grid)),
+    iteration = paste(&quot;Iteration&quot;, i)
+  )
+}))
+
+plot_data$iteration &lt;- factor(plot_data$iteration,
+                              levels = paste(&quot;Iteration&quot;, show_iters))
+
+ggplot() +
+  geom_histogram(data = data.frame(x = x), aes(x = x, y = after_stat(density)),
+                 bins = 50, fill = &quot;grey80&quot;, colour = &quot;white&quot;) +
+  geom_line(data = plot_data, aes(x = x, y = density, colour = curve),
+            linewidth = 0.9) +
+  scale_colour_manual(values = c(&quot;Component 1&quot; = &quot;#E69F00&quot;,
+                                  &quot;Component 2&quot; = &quot;#56B4E9&quot;,
+                                  &quot;Mixture&quot; = &quot;red&quot;)) +
+  facet_wrap(~iteration, ncol = 2) +
+  labs(x = &quot;Value&quot;, y = &quot;Density&quot;, colour = &quot;&quot;,
+       title = &quot;EM algorithm iteration by iteration&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/em.Rmd/em_iterations_plot-1.png" alt="EM at iterations 1, 3, 5, and after convergence. The two Gaussian components (orange and blue curves) gradually separate and fit the data." width="960" />
+<p class="caption">
+EM at iterations 1, 3, 5, and after convergence. The two Gaussian
+components (orange and blue curves) gradually separate and fit the data.
+</p>
+</div>
+<p>At iteration 1, the two components are poorly placed — they are too
+close together and too wide. By iteration 3, they have started to
+separate. By convergence, each component sits neatly over one of the two
+humps and the combined mixture (red) traces the overall shape of the
+data.</p>
+</div>
+<div id="how-responsibilities-evolve" class="section level2">
+<h2>How Responsibilities Evolve</h2>
+<p>The E-step assigns each data point a responsibility (a probability
+between 0 and 1) for each component. Let’s see how these
+responsibilities sharpen over iterations.</p>
+<pre class="r"><code>resp_iters &lt;- c(1, 3, fit$iterations)
+resp_iters &lt;- unique(pmin(resp_iters, fit$iterations))
+
+resp_data &lt;- do.call(rbind, lapply(resp_iters, function(i) {
+  data.frame(
+    x = x,
+    resp_2 = fit$snapshots[[i]]$resp[, 2],
+    iteration = paste(&quot;Iteration&quot;, i)
+  )
+}))
+
+resp_data$iteration &lt;- factor(resp_data$iteration,
+                              levels = paste(&quot;Iteration&quot;, resp_iters))
+
+ggplot(resp_data, aes(x = x, y = resp_2)) +
+  geom_point(alpha = 0.4, size = 0.8, colour = &quot;steelblue&quot;) +
+  geom_hline(yintercept = 0.5, linetype = &quot;dashed&quot;, colour = &quot;grey50&quot;) +
+  facet_wrap(~iteration, ncol = 1) +
+  labs(x = &quot;Value&quot;, y = &quot;P(Component 2)&quot;,
+       title = &quot;How responsibilities sharpen over iterations&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/em.Rmd/responsibilities_evolve-1.png" alt="Responsibilities at different iterations. Early on (top), the model is uncertain about most points. By convergence (bottom), assignments are crisp except in the overlap region." width="960" />
+<p class="caption">
+Responsibilities at different iterations. Early on (top), the model is
+uncertain about most points. By convergence (bottom), assignments are
+crisp except in the overlap region.
+</p>
+</div>
+<p>The dashed line at 0.5 marks the decision boundary. Points above the
+line are assigned to component 2; points below to component 1. In early
+iterations, many points cluster near 0.5 (the model is uncertain). By
+convergence, most points are pushed close to 0 or 1, with only the
+overlap region retaining genuine ambiguity.</p>
+</div>
+</div>
+<div id="why-does-em-work" class="section level1">
+<h1>Why Does EM Work?</h1>
+<p>You might wonder: why does this iterative guessing game converge to a
+good answer instead of going in circles? There is a mathematical
+guarantee.</p>
+<div id="the-log-likelihood-never-decreases" class="section level2">
+<h2>The Log-Likelihood Never Decreases</h2>
+<p>At each iteration, EM is guaranteed to <strong>increase</strong> (or
+at least not decrease) the <strong>log-likelihood</strong> of the data.
+The log-likelihood measures how well the current parameters explain the
+observed data. Think of it as a score: higher is better.</p>
+<pre class="r"><code># Compute log-likelihood at each iteration
+compute_ll &lt;- function(x, mu, sigma, pi_k) {
+  K &lt;- length(mu)
+  ll &lt;- 0
+  for (i in seq_along(x)) {
+    p &lt;- 0
+    for (k in seq_len(K)) {
+      p &lt;- p + pi_k[k] * dnorm(x[i], mu[k], sigma[k])
+    }
+    ll &lt;- ll + log(p)
+  }
+  ll
+}
+
+ll_values &lt;- sapply(fit$snapshots, function(s) {
+  compute_ll(x, s$mu, s$sigma, s$pi_k)
+})
+
+df_ll &lt;- data.frame(iteration = seq_along(ll_values), log_likelihood = ll_values)
+
+ggplot(df_ll, aes(x = iteration, y = log_likelihood)) +
+  geom_line(linewidth = 1, colour = &quot;darkgreen&quot;) +
+  geom_point(size = 2, colour = &quot;darkgreen&quot;) +
+  labs(x = &quot;Iteration&quot;, y = &quot;Log-Likelihood&quot;,
+       title = &quot;Log-likelihood increases at every EM iteration&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/em.Rmd/log_likelihood_trace-1.png" alt="The log-likelihood increases at every EM iteration and plateaus at convergence." width="768" />
+<p class="caption">
+The log-likelihood increases at every EM iteration and plateaus at
+convergence.
+</p>
+</div>
+<p>The curve goes up steeply at first (big improvements) then levels off
+(fine-tuning). EM stops when the improvements become negligibly
+small.</p>
+</div>
+<div id="local-optima" class="section level2">
+<h2>Local Optima</h2>
+<p>One important caveat: EM is guaranteed to find <strong>a</strong>
+peak in the log-likelihood, but not necessarily the
+<strong>highest</strong> peak. The log-likelihood surface can have
+multiple peaks (local optima), and which one EM finds depends on where
+it starts.</p>
+<p>This means <strong>initialisation matters</strong>. Let’s demonstrate
+this by running EM with two different starting points.</p>
+<pre class="r"><code># Good initialisation
+fit_good &lt;- em_gaussian(x, K = 2)
+
+# Force a bad initialisation by hacking the function
+em_gaussian_custom &lt;- function(x, mu_init, sigma_init, pi_init,
+                               max_iter = 30, tol = 1e-6) {
+  n &lt;- length(x)
+  K &lt;- length(mu_init)
+  mu &lt;- mu_init
+  sigma &lt;- sigma_init
+  pi_k &lt;- pi_init
+
+  for (iter in seq_len(max_iter)) {
+    resp &lt;- matrix(0, nrow = n, ncol = K)
+    for (k in seq_len(K)) {
+      resp[, k] &lt;- pi_k[k] * dnorm(x, mean = mu[k], sd = sigma[k])
+    }
+    resp &lt;- resp / rowSums(resp)
+
+    N_k &lt;- colSums(resp)
+    mu_new &lt;- colSums(resp * x) / N_k
+    sigma_new &lt;- sqrt(colSums(resp * outer(x, mu_new, &quot;-&quot;)^2) / N_k)
+    pi_new &lt;- N_k / n
+
+    if (max(abs(mu_new - mu)) &lt; tol) break
+    mu &lt;- mu_new
+    sigma &lt;- sigma_new
+    pi_k &lt;- pi_new
+  }
+  list(mu = mu_new, sigma = sigma_new, pi_k = pi_new)
+}
+
+# Bad initialisation: both means on the same side
+fit_bad &lt;- em_gaussian_custom(x,
+  mu_init = c(5.5, 6.5),
+  sigma_init = c(1, 1),
+  pi_init = c(0.5, 0.5)
+)
+
+# Plot both results
+x_grid &lt;- seq(min(x) - 1, max(x) + 1, length.out = 500)
+
+df_good &lt;- data.frame(
+  x = x_grid,
+  density = fit_good$pi_k[1] * dnorm(x_grid, fit_good$mu[1], fit_good$sigma[1]) +
+    fit_good$pi_k[2] * dnorm(x_grid, fit_good$mu[2], fit_good$sigma[2]),
+  init = &quot;Good initialisation&quot;
+)
+df_bad &lt;- data.frame(
+  x = x_grid,
+  density = fit_bad$pi_k[1] * dnorm(x_grid, fit_bad$mu[1], fit_bad$sigma[1]) +
+    fit_bad$pi_k[2] * dnorm(x_grid, fit_bad$mu[2], fit_bad$sigma[2]),
+  init = &quot;Bad initialisation&quot;
+)
+
+df_inits &lt;- rbind(df_good, df_bad)
+
+ggplot() +
+  geom_histogram(data = data.frame(x = x), aes(x = x, y = after_stat(density)),
+                 bins = 50, fill = &quot;grey80&quot;, colour = &quot;white&quot;) +
+  geom_line(data = df_inits, aes(x = x, y = density, colour = init),
+            linewidth = 1) +
+  labs(x = &quot;Value&quot;, y = &quot;Density&quot;, colour = &quot;&quot;,
+       title = &quot;The same algorithm, two different starting points&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/em.Rmd/local_optima-1.png" alt="Different starting points can lead to different solutions. Here, a poor initialisation gets stuck." width="864" />
+<p class="caption">
+Different starting points can lead to different solutions. Here, a poor
+initialisation gets stuck.
+</p>
+</div>
+<pre class="r"><code>cat(&quot;Good initialisation:\n&quot;)</code></pre>
+<pre><code>Good initialisation:</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;  Component 1: mean = %.2f, sd = %.2f\n&quot;, fit_good$mu[1], fit_good$sigma[1]))</code></pre>
+<pre><code>  Component 1: mean = 1.95, sd = 0.76</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;  Component 2: mean = %.2f, sd = %.2f\n\n&quot;, fit_good$mu[2], fit_good$sigma[2]))</code></pre>
+<pre><code>  Component 2: mean = 5.83, sd = 1.06</code></pre>
+<pre class="r"><code>cat(&quot;Bad initialisation:\n&quot;)</code></pre>
+<pre><code>Bad initialisation:</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;  Component 1: mean = %.2f, sd = %.2f\n&quot;, fit_bad$mu[1], fit_bad$sigma[1]))</code></pre>
+<pre><code>  Component 1: mean = 1.95, sd = 0.76</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;  Component 2: mean = %.2f, sd = %.2f\n&quot;, fit_bad$mu[2], fit_bad$sigma[2]))</code></pre>
+<pre><code>  Component 2: mean = 5.83, sd = 1.06</code></pre>
+<p>In practice, the standard defence against local optima is to run EM
+multiple times with different random starting points and keep the result
+with the highest log-likelihood. Packages like <code>mclust</code> in R
+do this automatically.</p>
+</div>
+</div>
+<div id="the-general-pattern" class="section level1">
+<h1>The General Pattern</h1>
+<p>EM always follows the same template, regardless of the specific
+model:</p>
+<table style="width:100%;">
+<colgroup>
+<col width="9%" />
+<col width="20%" />
+<col width="28%" />
+<col width="41%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>What you do</th>
+<th>Two-coin example</th>
+<th>Gaussian mixture example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Hidden data</strong></td>
+<td>Identify what is unobserved</td>
+<td>Which coin was used in each round</td>
+<td>Which component generated each data point</td>
+</tr>
+<tr class="even">
+<td><strong>Initialise</strong></td>
+<td>Make an initial guess for the parameters</td>
+<td><span class="math inline">\(\theta_A = 0.6\)</span>, <span
+class="math inline">\(\theta_B = 0.5\)</span></td>
+<td>Means, SDs, and weights</td>
+</tr>
+<tr class="odd">
+<td><strong>E-step</strong></td>
+<td>Compute the expected value of the hidden data, given current
+parameters</td>
+<td>P(coin A | round data) for each round</td>
+<td>P(component <span class="math inline">\(k\)</span> | data point) for
+each point</td>
+</tr>
+<tr class="even">
+<td><strong>M-step</strong></td>
+<td>Re-estimate parameters, treating the expected hidden data as if it
+were real</td>
+<td>Weighted proportion of heads for each coin</td>
+<td>Weighted mean, SD, and proportion for each component</td>
+</tr>
+<tr class="odd">
+<td><strong>Repeat</strong></td>
+<td>Until parameters stop changing</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>The beauty of EM is that both the E-step and the M-step are usually
+<strong>easy problems on their own</strong>. The E-step is just plugging
+numbers into a formula. The M-step is often a familiar calculation (like
+computing a mean). It is only the combination — the fact that you don’t
+know the hidden data — that makes the original problem hard. EM turns
+one hard problem into a sequence of easy ones.</p>
+</div>
+<div id="common-pitfalls" class="section level1">
+<h1>Common Pitfalls</h1>
+<div id="choosing-k" class="section level2">
+<h2>Choosing K</h2>
+<p>EM assumes you already know the number of components <span
+class="math inline">\(K\)</span>. In the two-coin problem, we knew there
+were 2 coins. In practice, you may not know <span
+class="math inline">\(K\)</span>. Common approaches:</p>
+<ul>
+<li><strong>BIC (Bayesian Information Criterion)</strong>: fit models
+with different values of <span class="math inline">\(K\)</span> and pick
+the one with the best BIC, which balances fit against model complexity.
+This is what <code>mclust</code> does in R.</li>
+<li><strong>Domain knowledge</strong>: sometimes the number of groups is
+known from the subject matter (e.g., two sexes, three treatment
+arms).</li>
+</ul>
+</div>
+<div id="convergence-speed" class="section level2">
+<h2>Convergence Speed</h2>
+<p>EM can be slow when components overlap heavily. In such cases, the
+responsibilities stay uncertain for many iterations, and the parameters
+update by tiny amounts. This is usually not a problem in practice
+(modern computers handle thousands of iterations quickly), but it is
+worth knowing.</p>
+</div>
+<div id="degenerate-solutions" class="section level2">
+<h2>Degenerate Solutions</h2>
+<p>If a Gaussian component collapses onto a single data point (mean
+equals that point, standard deviation shrinks to zero), the likelihood
+goes to infinity. This is a degenerate solution. Well-implemented
+packages guard against this by adding small regularisation terms or
+using constrained covariance structures.</p>
+</div>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Concept</th>
+<th>Plain-language meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>EM algorithm</strong></td>
+<td>An iterative method for estimating parameters when there is hidden
+(unobserved) information</td>
+</tr>
+<tr class="even">
+<td><strong>E-step</strong></td>
+<td>“Given my current guesses, how should I fill in the blanks?” —
+compute soft assignments of hidden variables</td>
+</tr>
+<tr class="odd">
+<td><strong>M-step</strong></td>
+<td>“Given the filled-in blanks, what are the best parameter estimates?”
+— update parameters using standard formulas</td>
+</tr>
+<tr class="even">
+<td><strong>Responsibility</strong></td>
+<td>The probability that a particular hidden state generated a
+particular data point</td>
+</tr>
+<tr class="odd">
+<td><strong>Log-likelihood</strong></td>
+<td>A score that measures how well the current parameters explain the
+data; EM never decreases it</td>
+</tr>
+<tr class="even">
+<td><strong>Local optimum</strong></td>
+<td>EM finds a peak, but not necessarily the highest peak; run it
+multiple times with different starting points</td>
+</tr>
+<tr class="odd">
+<td><strong>Convergence</strong></td>
+<td>When the parameter updates become negligibly small, the algorithm
+stops</td>
+</tr>
+</tbody>
+</table>
+<p>The EM algorithm is not magic. It is a disciplined way of handling
+the chicken-and-egg problem that arises whenever you have incomplete
+data. Once you see it as “guess the hidden stuff, update your
+parameters, repeat”, the notation in textbooks becomes much less
+intimidating.</p>
+</div>
+<div id="session-info" class="section level1">
+<h1>Session Info</h1>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggplot2_4.0.2   workflowr_1.7.2
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.6       jsonlite_2.0.0     dplyr_1.2.0        compiler_4.5.2    
+ [5] promises_1.5.0     tidyselect_1.2.1   Rcpp_1.1.1         stringr_1.6.0     
+ [9] git2r_0.36.2       callr_3.7.6        later_1.4.7        jquerylib_0.1.4   
+[13] scales_1.4.0       yaml_2.3.12        fastmap_1.2.0      R6_2.6.1          
+[17] labeling_0.4.3     generics_0.1.4     knitr_1.51         tibble_3.3.1      
+[21] rprojroot_2.1.1    RColorBrewer_1.1-3 bslib_0.10.0       pillar_1.11.1     
+[25] rlang_1.1.7        cachem_1.1.0       stringi_1.8.7      httpuv_1.6.16     
+[29] xfun_0.56          S7_0.2.1           getPass_0.2-4      fs_1.6.6          
+[33] sass_0.4.10        otel_0.2.0         cli_3.6.5          withr_3.0.2       
+[37] magrittr_2.0.4     ps_1.9.1           digest_0.6.39      grid_4.5.2        
+[41] processx_3.8.6     rstudioapi_0.18.0  lifecycle_1.0.5    vctrs_0.7.1       
+[45] evaluate_1.0.5     glue_1.8.0         farver_2.1.2       whisker_0.4.1     
+[49] rmarkdown_2.30     httr_1.4.8         tools_4.5.2        pkgconfig_2.0.3   
+[53] htmltools_0.5.9   </code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggplot2_4.0.2   workflowr_1.7.2
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.6       jsonlite_2.0.0     dplyr_1.2.0        compiler_4.5.2    
+ [5] promises_1.5.0     tidyselect_1.2.1   Rcpp_1.1.1         stringr_1.6.0     
+ [9] git2r_0.36.2       callr_3.7.6        later_1.4.7        jquerylib_0.1.4   
+[13] scales_1.4.0       yaml_2.3.12        fastmap_1.2.0      R6_2.6.1          
+[17] labeling_0.4.3     generics_0.1.4     knitr_1.51         tibble_3.3.1      
+[21] rprojroot_2.1.1    RColorBrewer_1.1-3 bslib_0.10.0       pillar_1.11.1     
+[25] rlang_1.1.7        cachem_1.1.0       stringi_1.8.7      httpuv_1.6.16     
+[29] xfun_0.56          S7_0.2.1           getPass_0.2-4      fs_1.6.6          
+[33] sass_0.4.10        otel_0.2.0         cli_3.6.5          withr_3.0.2       
+[37] magrittr_2.0.4     ps_1.9.1           digest_0.6.39      grid_4.5.2        
+[41] processx_3.8.6     rstudioapi_0.18.0  lifecycle_1.0.5    vctrs_0.7.1       
+[45] evaluate_1.0.5     glue_1.8.0         farver_2.1.2       whisker_0.4.1     
+[49] rmarkdown_2.30     httr_1.4.8         tools_4.5.2        pkgconfig_2.0.3   
+[53] htmltools_0.5.9   </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
