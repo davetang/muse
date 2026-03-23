@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-03-23" />
+
+<title>Introduction to Gaussian Mixture Models</title>
+
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Introduction to Gaussian Mixture
+Models</h1>
+<h4 class="date">2026-03-23</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-03-23
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeeb517000284b88a6e64ed1dd5c77394c58c2629ctargetblankeb51700a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/eb517000284b88a6e64ed1dd5c77394c58c2629c" target="_blank">eb51700</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreeeb517000284b88a6e64ed1dd5c77394c58c2629ctargetblankeb51700a"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/eb517000284b88a6e64ed1dd5c77394c58c2629c" target="_blank">eb51700</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.5.2/
+
+Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
+    Untracked:  analysis/.claude/
+    Untracked:  analysis/aucc.Rmd
+    Untracked:  analysis/bimodal.Rmd
+    Untracked:  analysis/bioc.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
+    Untracked:  analysis/modelling.Rmd
+    Untracked:  analysis/wordpress_readability.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SeuratObj.rds
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/davetang039sblog.WordPress.2026-02-12.xml
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
+    Untracked:  m3/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/gmm.Rmd</code>) and HTML
+(<code>docs/gmm.html</code>) files. If you’ve configured a remote Git
+repository (see <code>?wflow_git_remote</code>), click on the hyperlinks
+in the table below to view the files as they were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/eb517000284b88a6e64ed1dd5c77394c58c2629c/analysis/gmm.Rmd" target="_blank">eb51700</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+<td>
+Gaussian Mixture Models
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>if (!require(&quot;mclust&quot;, quietly = TRUE)) {
+  install.packages(&quot;mclust&quot;)
+}
+
+if (!require(&quot;ggplot2&quot;, quietly = TRUE)) {
+  install.packages(&quot;ggplot2&quot;)
+}
+
+library(mclust)
+library(ggplot2)</code></pre>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Imagine you measure the heights of 1,000 people at a conference and
+plot a histogram. If the conference is all adults from the same
+population, you would probably see a single bell-shaped curve centred
+around the average height. But what if the conference, for whatever
+reason, includes both professional basketball players and professional
+jockeys? You would likely see <strong>two</strong> overlapping bell
+curves: one centred around a taller average and one around a shorter
+average.</p>
+<p>A <strong>Gaussian mixture model</strong> (GMM) is a way to describe
+data that looks like it comes from multiple overlapping bell curves.
+“Gaussian” is another name for the normal distribution (the bell curve),
+and “mixture” means we are combining several of them. The model assumes
+that each data point was generated by one of several Gaussian
+distributions, but we do not know which one generated which point.</p>
+<p>GMMs are useful whenever you suspect your data contains hidden
+subgroups. In biology, different cell types may express a gene at
+different levels. In marketing, customers may fall into distinct
+spending segments. In astronomy, stars may cluster into different
+populations. In all these cases, the observed data is a blend of several
+underlying groups, and a GMM can help you tease them apart.</p>
+</div>
+<div id="the-normal-distribution" class="section level1">
+<h1>The Normal Distribution</h1>
+<p>The <strong>normal</strong> (Gaussian) distribution is the classic
+bell curve. It is defined by two parameters:</p>
+<ul>
+<li><strong>Mean</strong> (<span class="math inline">\(\mu\)</span>):
+the centre of the bell — where the peak is.</li>
+<li><strong>Standard deviation</strong> (<span
+class="math inline">\(\sigma\)</span>): how spread out the bell is. A
+small <span class="math inline">\(\sigma\)</span> gives a tall, narrow
+curve; a large <span class="math inline">\(\sigma\)</span> gives a
+short, wide curve.</li>
+</ul>
+<p>The probability density function is:</p>
+<p><span class="math display">\[f(x \mid \mu, \sigma) =
+\frac{1}{\sigma\sqrt{2\pi}} \exp\left(-\frac{(x -
+\mu)^2}{2\sigma^2}\right)\]</span></p>
+<p>The key idea is that data drawn from a normal distribution clusters
+symmetrically around the mean, with most values falling within a couple
+of standard deviations.</p>
+<pre class="r"><code>set.seed(1984)
+x &lt;- seq(-6, 12, length.out = 500)
+
+df_norm &lt;- data.frame(
+  x = rep(x, 3),
+  density = c(
+    dnorm(x, mean = 0, sd = 1),
+    dnorm(x, mean = 4, sd = 1.5),
+    dnorm(x, mean = 7, sd = 0.7)
+  ),
+  distribution = rep(
+    c(&quot;mean=0, sd=1&quot;, &quot;mean=4, sd=1.5&quot;, &quot;mean=7, sd=0.7&quot;),
+    each = length(x)
+  )
+)
+
+ggplot(df_norm, aes(x = x, y = density, colour = distribution)) +
+  geom_line(linewidth = 1) +
+  labs(x = &quot;Value&quot;, y = &quot;Density&quot;, colour = &quot;Parameters&quot;,
+       title = &quot;Normal distributions with different parameters&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/gmm.Rmd/normal_curves-1.png" alt="Three normal distributions with different means and standard deviations." width="768" />
+<p class="caption">
+Three normal distributions with different means and standard deviations.
+</p>
+</div>
+<p>Each curve above is a single Gaussian. A GMM says: “My data is a
+weighted combination of several of these curves.”</p>
+</div>
+<div id="mixture" class="section level1">
+<h1>Mixture</h1>
+<p>A <strong>mixture distribution</strong> combines multiple component
+distributions. For a Gaussian mixture with <span
+class="math inline">\(K\)</span> components, the overall density is:</p>
+<p><span class="math display">\[p(x) = \sum_{k=1}^{K} \pi_k \; f(x \mid
+\mu_k, \sigma_k)\]</span></p>
+<p>where:</p>
+<ul>
+<li><span class="math inline">\(K\)</span> is the number of components
+(subgroups).</li>
+<li><span class="math inline">\(\pi_k\)</span> is the <strong>mixing
+weight</strong> for component <span class="math inline">\(k\)</span>;
+the proportion of data that belongs to that group. The weights must be
+positive and sum to 1: <span class="math inline">\(\sum_{k=1}^{K} \pi_k
+= 1\)</span>.</li>
+<li><span class="math inline">\(f(x \mid \mu_k, \sigma_k)\)</span> is
+the normal density for component <span class="math inline">\(k\)</span>,
+with its own mean and standard deviation.</li>
+</ul>
+<p>Think of it like a recipe. If 60% of conference attendees are
+basketball players (tall) and 40% are jockeys (shorter), the mixture
+is:</p>
+<p><span class="math display">\[p(\text{height}) = 0.6 \times
+f(\text{height} \mid \mu_{\text{basketball}},
+\sigma_{\text{basketball}}) + 0.4 \times f(\text{height} \mid
+\mu_{\text{jockey}}, \sigma_{\text{jockey}})\]</span></p>
+</div>
+<div id="simulating-a-mixture" class="section level1">
+<h1>Simulating a Mixture</h1>
+<p>The best way to understand a mixture is to build one. Let’s simulate
+data from two Gaussian components and see what the combined distribution
+looks like.</p>
+<pre class="r"><code>set.seed(1984)
+
+n &lt;- 1000
+# Component 1: 60% of the data, mean = 3, sd = 1
+# Component 2: 40% of the data, mean = 7, sd = 1.2
+n1 &lt;- round(n * 0.6)
+n2 &lt;- n - n1
+
+component1 &lt;- rnorm(n1, mean = 3, sd = 1)
+component2 &lt;- rnorm(n2, mean = 7, sd = 1.2)
+
+# The mixture: combine the two samples
+mixture &lt;- c(component1, component2)
+
+# Keep track of the true labels (in practice, we don&#39;t have these)
+true_labels &lt;- c(rep(1, n1), rep(2, n2))</code></pre>
+<pre class="r"><code>df_mix &lt;- data.frame(
+  value = mixture,
+  component = factor(true_labels)
+)
+
+ggplot(df_mix, aes(x = value, fill = component)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 50,
+                 alpha = 0.6, position = &quot;identity&quot;, colour = &quot;white&quot;) +
+  geom_density(aes(colour = component), linewidth = 0.8, fill = NA) +
+  labs(x = &quot;Value&quot;, y = &quot;Density&quot;,
+       title = &quot;Simulated data from a two-component Gaussian mixture&quot;,
+       fill = &quot;True Component&quot;, colour = &quot;True Component&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/gmm.Rmd/plot_mixture-1.png" alt="Histogram of mixture data coloured by true component membership." width="864" />
+<p class="caption">
+Histogram of mixture data coloured by true component membership.
+</p>
+</div>
+<p>You can see two overlapping humps. In practice, we would observe only
+the combined histogram (without the colours) and would need a GMM to
+recover the two underlying groups.</p>
+<pre class="r"><code>ggplot(df_mix, aes(x = value)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 50,
+                 fill = &quot;steelblue&quot;, colour = &quot;white&quot;, alpha = 0.7) +
+  geom_density(linewidth = 0.8, colour = &quot;red&quot;) +
+  labs(x = &quot;Value&quot;, y = &quot;Density&quot;,
+       title = &quot;Observed data (true component labels hidden)&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/gmm.Rmd/plot_combined-1.png" alt="The same data viewed without component labels — this is what we actually observe." width="864" />
+<p class="caption">
+The same data viewed without component labels — this is what we actually
+observe.
+</p>
+</div>
+<p>This is the problem a GMM solves: given only the combined histogram,
+recover the number of components, their means, standard deviations, and
+mixing weights.</p>
+</div>
+<div id="the-em-algorithm" class="section level1">
+<h1>The EM Algorithm</h1>
+<p>Fitting a GMM means estimating all the parameters (<span
+class="math inline">\(\pi_k\)</span>, <span
+class="math inline">\(\mu_k\)</span>, <span
+class="math inline">\(\sigma_k\)</span> for each component). The
+standard approach is the <strong>Expectation-Maximisation (EM)
+algorithm</strong>. The intuition behind EM is surprisingly simple: it
+is an iterative guessing game.</p>
+<div id="the-chicken-and-egg-problem" class="section level2">
+<h2>The Chicken-and-Egg Problem</h2>
+<p>If we <strong>knew</strong> which component each data point belonged
+to, estimating the parameters would be straightforward; just calculate
+the mean and standard deviation for each group separately. But we don’t
+know the group assignments.</p>
+<p>Conversely, if we <strong>knew</strong> the parameters of each
+component, figuring out which group each point probably belongs to would
+be easy; just check which bell curve is taller at that point. But we
+don’t know the parameters either.</p>
+<p>EM breaks this deadlock by alternating between two steps:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>E-step (Expectation)</strong>: Given the current guess at
+the parameters, calculate the <strong>responsibility</strong> of each
+component for each data point. The responsibility is a number between 0
+and 1 that answers: “How likely is it that this point came from
+component <span class="math inline">\(k\)</span>?” A point sitting right
+under the peak of component 1 will have a high responsibility for
+component 1 and a low responsibility for component 2.</p></li>
+<li><p><strong>M-step (Maximisation)</strong>: Given the current
+responsibilities, update the parameters. The new mean of component <span
+class="math inline">\(k\)</span> is the weighted average of all data
+points, where the weights are the responsibilities. Similarly for the
+standard deviation and mixing weight.</p></li>
+</ol>
+<p>These two steps repeat until the estimates stop changing (converge).
+Each iteration is guaranteed to improve the fit (or at least not make it
+worse), so the algorithm homes in on a good solution.</p>
+</div>
+<div id="a-visual-walkthrough" class="section level2">
+<h2>A Visual Walkthrough</h2>
+<p>Let’s watch EM in action. We’ll implement a simple version for our
+simulated data.</p>
+<pre class="r"><code>em_gmm &lt;- function(x, K = 2, max_iter = 50, tol = 1e-6) {
+  n &lt;- length(x)
+
+  # Initialise parameters using random quantiles
+  set.seed(1984)
+  mu &lt;- quantile(x, probs = seq(0.25, 0.75, length.out = K))
+  sigma &lt;- rep(sd(x) / K, K)
+  pi_k &lt;- rep(1 / K, K)
+
+  # Store history for plotting
+  history &lt;- list()
+
+  for (iter in seq_len(max_iter)) {
+    # E-step: compute responsibilities
+    resp &lt;- matrix(0, nrow = n, ncol = K)
+    for (k in seq_len(K)) {
+      resp[, k] &lt;- pi_k[k] * dnorm(x, mean = mu[k], sd = sigma[k])
+    }
+    resp &lt;- resp / rowSums(resp)
+
+    # M-step: update parameters
+    N_k &lt;- colSums(resp)
+    mu_new &lt;- colSums(resp * x) / N_k
+    sigma_new &lt;- sqrt(colSums(resp * outer(x, mu_new, &quot;-&quot;)^2) / N_k)
+    pi_new &lt;- N_k / n
+
+    history[[iter]] &lt;- data.frame(
+      iteration = iter,
+      component = seq_len(K),
+      mu = mu_new,
+      sigma = sigma_new,
+      weight = pi_new
+    )
+
+    # Check convergence
+    if (max(abs(mu_new - mu)) &lt; tol) break
+
+    mu &lt;- mu_new
+    sigma &lt;- sigma_new
+    pi_k &lt;- pi_new
+  }
+
+  list(
+    mu = mu_new,
+    sigma = sigma_new,
+    weights = pi_new,
+    responsibilities = resp,
+    history = do.call(rbind, history),
+    iterations = iter
+  )
+}
+
+fit &lt;- em_gmm(mixture, K = 2)
+
+cat(&quot;EM converged in&quot;, fit$iterations, &quot;iterations\n\n&quot;)</code></pre>
+<pre><code>EM converged in 50 iterations</code></pre>
+<pre class="r"><code>cat(&quot;Estimated parameters:\n&quot;)</code></pre>
+<pre><code>Estimated parameters:</code></pre>
+<pre class="r"><code>for (k in 1:2) {
+  cat(sprintf(&quot;  Component %d: mean = %.2f, sd = %.2f, weight = %.2f\n&quot;,
+              k, fit$mu[k], fit$sigma[k], fit$weights[k]))
+}</code></pre>
+<pre><code>  Component 1: mean = 2.94, sd = 0.97, weight = 0.59
+  Component 2: mean = 6.90, sd = 1.25, weight = 0.41</code></pre>
+<pre class="r"><code>cat(&quot;\nTrue parameters:\n&quot;)</code></pre>
+<pre><code>
+True parameters:</code></pre>
+<pre class="r"><code>cat(&quot;  Component 1: mean = 3.00, sd = 1.00, weight = 0.60\n&quot;)</code></pre>
+<pre><code>  Component 1: mean = 3.00, sd = 1.00, weight = 0.60</code></pre>
+<pre class="r"><code>cat(&quot;  Component 2: mean = 7.00, sd = 1.20, weight = 0.40\n&quot;)</code></pre>
+<pre><code>  Component 2: mean = 7.00, sd = 1.20, weight = 0.40</code></pre>
+<p>The estimated values should be close to the true parameters we used
+to simulate the data.</p>
+<pre class="r"><code>ggplot(fit$history, aes(x = iteration, y = mu,
+                        colour = factor(component))) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  geom_hline(yintercept = c(3, 7), linetype = &quot;dashed&quot;, colour = &quot;grey40&quot;) +
+  annotate(&quot;text&quot;, x = max(fit$history$iteration), y = 3.2,
+           label = &quot;True mean = 3&quot;, hjust = 1, colour = &quot;grey40&quot;) +
+  annotate(&quot;text&quot;, x = max(fit$history$iteration), y = 7.2,
+           label = &quot;True mean = 7&quot;, hjust = 1, colour = &quot;grey40&quot;) +
+  labs(x = &quot;Iteration&quot;, y = &quot;Estimated Mean&quot;,
+       colour = &quot;Component&quot;,
+       title = &quot;EM algorithm convergence&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/gmm.Rmd/em_convergence-1.png" alt="Convergence of mean estimates across EM iterations." width="864" />
+<p class="caption">
+Convergence of mean estimates across EM iterations.
+</p>
+</div>
+</div>
+</div>
+<div id="visualising-the-fitted-model" class="section level1">
+<h1>Visualising the Fitted Model</h1>
+<p>Now let’s overlay the estimated Gaussian components on the data.</p>
+<pre class="r"><code>x_grid &lt;- seq(min(mixture) - 1, max(mixture) + 1, length.out = 500)
+
+df_fitted &lt;- data.frame(
+  x = rep(x_grid, 3),
+  density = c(
+    fit$weights[1] * dnorm(x_grid, fit$mu[1], fit$sigma[1]),
+    fit$weights[2] * dnorm(x_grid, fit$mu[2], fit$sigma[2]),
+    fit$weights[1] * dnorm(x_grid, fit$mu[1], fit$sigma[1]) +
+      fit$weights[2] * dnorm(x_grid, fit$mu[2], fit$sigma[2])
+  ),
+  curve = rep(c(&quot;Component 1&quot;, &quot;Component 2&quot;, &quot;Mixture&quot;),
+              each = length(x_grid))
+)
+
+ggplot() +
+  geom_histogram(data = df_mix, aes(x = value, y = after_stat(density)),
+                 bins = 50, fill = &quot;steelblue&quot;, colour = &quot;white&quot;, alpha = 0.5) +
+  geom_line(data = df_fitted, aes(x = x, y = density, colour = curve),
+            linewidth = 1) +
+  scale_colour_manual(values = c(&quot;Component 1&quot; = &quot;#E69F00&quot;,
+                                  &quot;Component 2&quot; = &quot;#56B4E9&quot;,
+                                  &quot;Mixture&quot; = &quot;red&quot;)) +
+  labs(x = &quot;Value&quot;, y = &quot;Density&quot;, colour = &quot;&quot;,
+       title = &quot;Fitted Gaussian mixture model&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/gmm.Rmd/fitted_overlay-1.png" alt="Observed data with fitted Gaussian components overlaid." width="864" />
+<p class="caption">
+Observed data with fitted Gaussian components overlaid.
+</p>
+</div>
+<p>The red curve (overall mixture) follows the shape of the histogram,
+while the orange and blue curves show the two estimated components. Each
+component captures one of the two humps in the data.</p>
+</div>
+<div id="soft-vs-hard-clustering" class="section level1">
+<h1>Soft vs Hard Clustering</h1>
+<p>A distinctive feature of GMMs is <strong>soft</strong>
+(probabilistic) clustering. Instead of assigning each point to exactly
+one group, a GMM gives each point a probability of belonging to each
+component. Points in the overlap region between two Gaussians will have
+intermediate probabilities.</p>
+<pre class="r"><code>df_resp &lt;- data.frame(
+  value = mixture,
+  responsibility = fit$responsibilities[, 2]
+)
+
+ggplot(df_resp, aes(x = value, y = 0, colour = responsibility)) +
+  geom_jitter(height = 0.4, size = 0.8, alpha = 0.7) +
+  scale_colour_gradient(low = &quot;#E69F00&quot;, high = &quot;#56B4E9&quot;,
+                        name = &quot;P(Component 2)&quot;) +
+  labs(x = &quot;Value&quot;, y = &quot;&quot;,
+       title = &quot;Soft assignments: each point has a probability for each component&quot;) +
+  theme_minimal() +
+  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank())</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/gmm.Rmd/soft_clustering-1.png" alt="Data points coloured by their responsibility (probability of belonging to component 2)." width="864" />
+<p class="caption">
+Data points coloured by their responsibility (probability of belonging
+to component 2).
+</p>
+</div>
+<p>Points clearly on the left (low values) are coloured orange — the
+model is confident they belong to component 1. Points on the right are
+blue — confidently component 2. Points in the middle have intermediate
+colours, reflecting genuine uncertainty.</p>
+<p>If you need <strong>hard</strong> assignments (each point in exactly
+one group), you simply assign each point to the component with the
+highest responsibility:</p>
+<pre class="r"><code>hard_labels &lt;- apply(fit$responsibilities, 1, which.max)
+agreement &lt;- mean(hard_labels == true_labels)
+cat(sprintf(&quot;Agreement with true labels: %.1f%%\n&quot;, agreement * 100))</code></pre>
+<pre><code>Agreement with true labels: 96.9%</code></pre>
+</div>
+<div id="using-mclust" class="section level1">
+<h1>Using mclust</h1>
+<p>In practice, you would not write the EM algorithm yourself. The
+<code>mclust</code> package in R provides a robust, well-tested
+implementation that also handles:</p>
+<ul>
+<li><strong>Choosing the number of components</strong> automatically
+using the Bayesian Information Criterion (BIC).</li>
+<li><strong>Multivariate data</strong> (multiple dimensions).</li>
+<li><strong>Different covariance structures</strong> (components can
+have different shapes and orientations).</li>
+</ul>
+<pre class="r"><code>mc &lt;- Mclust(mixture)
+summary(mc)</code></pre>
+<pre><code>---------------------------------------------------- 
+Gaussian finite mixture model fitted by EM algorithm 
+---------------------------------------------------- 
+
+Mclust V (univariate, unequal variance) model with 2 components: 
+
+ log-likelihood    n df       BIC       ICL
+       -2073.08 1000  5 -4180.699 -4261.851
+
+Clustering table:
+  1   2 
+595 405 </code></pre>
+<p><code>Mclust</code> tests a range of component numbers (by default 1
+to 9) and selects the one with the best BIC. Let’s see the BIC
+values.</p>
+<pre class="r"><code>plot(mc, what = &quot;BIC&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/gmm.Rmd/bic_plot-1.png" alt="BIC values for different numbers of components. Higher BIC is better in mclust's convention." width="768" />
+<p class="caption">
+BIC values for different numbers of components. Higher BIC is better in
+mclust’s convention.
+</p>
+</div>
+<p>The model with 2 components should have the highest BIC, matching the
+truth.</p>
+<div id="what-is-bic" class="section level2">
+<h2>What Is BIC?</h2>
+<p>The <strong>Bayesian Information Criterion</strong> (BIC) balances
+two competing goals:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Fit</strong>: A model with more components can always fit
+the data more closely (just as a higher-degree polynomial can wiggle
+through more points).</li>
+<li><strong>Simplicity</strong>: More components means more parameters,
+which risks <strong>overfitting</strong> — fitting noise rather than
+real structure.</li>
+</ol>
+<p>BIC penalises model complexity:</p>
+<p><span class="math display">\[\text{BIC} = 2 \ln(\hat{L}) - p
+\ln(n)\]</span></p>
+<p>where <span class="math inline">\(\hat{L}\)</span> is the maximised
+likelihood, <span class="math inline">\(p\)</span> is the number of
+parameters, and <span class="math inline">\(n\)</span> is the sample
+size. The penalty <span class="math inline">\(p \ln(n)\)</span> grows
+with the number of parameters, discouraging unnecessarily complex
+models. We pick the model with the <strong>highest</strong> BIC (in
+<code>mclust</code>’s sign convention).</p>
+</div>
+<div id="extracting-results" class="section level2">
+<h2>Extracting Results</h2>
+<pre class="r"><code>cat(&quot;Selected number of components:&quot;, mc$G, &quot;\n\n&quot;)</code></pre>
+<pre><code>Selected number of components: 2 </code></pre>
+<pre class="r"><code>cat(&quot;Estimated means:\n&quot;)</code></pre>
+<pre><code>Estimated means:</code></pre>
+<pre class="r"><code>print(round(mc$parameters$mean, 2))</code></pre>
+<pre><code>   1    2 
+2.93 6.88 </code></pre>
+<pre class="r"><code>cat(&quot;\nEstimated mixing weights:\n&quot;)</code></pre>
+<pre><code>
+Estimated mixing weights:</code></pre>
+<pre class="r"><code>print(round(mc$parameters$pro, 2))</code></pre>
+<pre><code>[1] 0.59 0.41</code></pre>
+<pre class="r"><code>cat(&quot;\nEstimated variances:\n&quot;)</code></pre>
+<pre><code>
+Estimated variances:</code></pre>
+<pre class="r"><code>print(round(mc$parameters$variance$sigmasq, 2))</code></pre>
+<pre><code>[1] 0.93 1.59</code></pre>
+<pre class="r"><code>df_mclust &lt;- data.frame(
+  value = mixture,
+  classified = factor(mc$classification),
+  uncertainty = mc$uncertainty
+)
+
+ggplot(df_mclust, aes(x = value, fill = classified)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 50,
+                 alpha = 0.6, position = &quot;identity&quot;, colour = &quot;white&quot;) +
+  labs(x = &quot;Value&quot;, y = &quot;Density&quot;, fill = &quot;Assigned Component&quot;,
+       title = &quot;mclust classification of mixture data&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/gmm.Rmd/mclust_classification-1.png" alt="mclust classification of the mixture data." width="864" />
+<p class="caption">
+mclust classification of the mixture data.
+</p>
+</div>
+<p><code>mclust</code> also provides an <strong>uncertainty</strong>
+measure for each point. Points in the overlap zone will have higher
+uncertainty.</p>
+<pre class="r"><code>ggplot(df_mclust, aes(x = value, y = uncertainty, colour = classified)) +
+  geom_point(alpha = 0.5, size = 1) +
+  labs(x = &quot;Value&quot;, y = &quot;Uncertainty&quot;, colour = &quot;Component&quot;,
+       title = &quot;Classification uncertainty&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/gmm.Rmd/uncertainty_plot-1.png" alt="Classification uncertainty is highest where the two components overlap." width="864" />
+<p class="caption">
+Classification uncertainty is highest where the two components overlap.
+</p>
+</div>
+</div>
+</div>
+<div id="a-more-realistic-example-old-faithful" class="section level1">
+<h1>A More Realistic Example: Old Faithful</h1>
+<p>The <code>faithful</code> dataset in R records eruption durations and
+waiting times for the Old Faithful geyser in Yellowstone National Park.
+It is a classic example of bimodal data: there are short eruptions with
+short waiting times and long eruptions with long waiting times.</p>
+<pre class="r"><code>ggplot(faithful, aes(x = eruptions, y = waiting)) +
+  geom_point(alpha = 0.6) +
+  labs(x = &quot;Eruption Duration (minutes)&quot;, y = &quot;Waiting Time (minutes)&quot;,
+       title = &quot;Old Faithful Geyser Data&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/gmm.Rmd/faithful_scatter-1.png" alt="Old Faithful eruption data showing two clusters." width="672" />
+<p class="caption">
+Old Faithful eruption data showing two clusters.
+</p>
+</div>
+<p>Let’s fit a GMM to this two-dimensional data.</p>
+<pre class="r"><code>mc_faithful &lt;- Mclust(faithful)
+summary(mc_faithful)</code></pre>
+<pre><code>---------------------------------------------------- 
+Gaussian finite mixture model fitted by EM algorithm 
+---------------------------------------------------- 
+
+Mclust EEE (ellipsoidal, equal volume, shape and orientation) model with 3
+components: 
+
+ log-likelihood   n df       BIC       ICL
+      -1126.326 272 11 -2314.316 -2357.824
+
+Clustering table:
+  1   2   3 
+ 40  97 135 </code></pre>
+<pre class="r"><code>df_faithful &lt;- data.frame(
+  eruptions = faithful$eruptions,
+  waiting = faithful$waiting,
+  component = factor(mc_faithful$classification),
+  uncertainty = mc_faithful$uncertainty
+)
+
+ggplot(df_faithful, aes(x = eruptions, y = waiting,
+                        colour = component, size = uncertainty)) +
+  geom_point(alpha = 0.7) +
+  scale_size_continuous(range = c(1, 4), name = &quot;Uncertainty&quot;) +
+  labs(x = &quot;Eruption Duration (minutes)&quot;, y = &quot;Waiting Time (minutes)&quot;,
+       colour = &quot;Component&quot;,
+       title = &quot;GMM classification of Old Faithful data&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/gmm.Rmd/faithful_classification-1.png" alt="Old Faithful data classified by a Gaussian mixture model." width="672" />
+<p class="caption">
+Old Faithful data classified by a Gaussian mixture model.
+</p>
+</div>
+<p>The GMM separates the two eruption types cleanly. Points at the
+boundary between groups are displayed larger because they have higher
+classification uncertainty.</p>
+</div>
+<div id="when-to-use-gmms" class="section level1">
+<h1>When to Use GMMs</h1>
+<p>GMMs are a good choice when:</p>
+<ul>
+<li>You believe your data contains <strong>subgroups</strong> that each
+follow an approximately normal distribution.</li>
+<li>You want <strong>soft</strong> (probabilistic) cluster assignments
+rather than hard boundaries.</li>
+<li>You want a <strong>principled way to choose the number of
+clusters</strong> (via BIC), rather than relying on visual
+inspection.</li>
+<li>You need a <strong>generative model</strong> — once fitted, a GMM
+can simulate new data that resembles the original.</li>
+</ul>
+<p>GMMs may not be ideal when:</p>
+<ul>
+<li>Your subgroups are not roughly Gaussian-shaped (e.g., crescent or
+ring-shaped clusters). In such cases, consider kernel density methods or
+non-parametric approaches.</li>
+<li>You have very high-dimensional data without dimensionality
+reduction. The number of parameters in a GMM grows quickly with
+dimensionality.</li>
+<li>The components overlap so heavily that they are effectively
+indistinguishable.</li>
+</ul>
+</div>
+<div id="summary" class="section level1">
+<h1>Summary</h1>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Concept</th>
+<th>What it means</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Gaussian</strong></td>
+<td>The normal (bell curve) distribution, defined by a mean and standard
+deviation</td>
+</tr>
+<tr class="even">
+<td><strong>Mixture</strong></td>
+<td>A weighted combination of several distributions</td>
+</tr>
+<tr class="odd">
+<td><strong>Component</strong></td>
+<td>One of the Gaussian distributions in the mixture</td>
+</tr>
+<tr class="even">
+<td><strong>Mixing weight</strong> (<span
+class="math inline">\(\pi_k\)</span>)</td>
+<td>The proportion of data belonging to component <span
+class="math inline">\(k\)</span></td>
+</tr>
+<tr class="odd">
+<td><strong>EM algorithm</strong></td>
+<td>An iterative procedure that alternates between estimating group
+memberships (E-step) and updating parameters (M-step)</td>
+</tr>
+<tr class="even">
+<td><strong>Responsibility</strong></td>
+<td>The probability that a data point belongs to a particular
+component</td>
+</tr>
+<tr class="odd">
+<td><strong>BIC</strong></td>
+<td>A criterion for choosing the number of components, balancing fit and
+simplicity</td>
+</tr>
+</tbody>
+</table>
+<p>The core idea is straightforward: if your data looks like it was
+generated by several overlapping bell curves, a GMM can recover those
+curves and tell you which data points likely belong to which group. The
+EM algorithm does the heavy lifting, and tools like <code>mclust</code>
+make it accessible in just a few lines of R code.</p>
+</div>
+<div id="session-info" class="section level1">
+<h1>Session Info</h1>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggplot2_4.0.2   mclust_6.1.2    workflowr_1.7.2
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.6       jsonlite_2.0.0     dplyr_1.2.0        compiler_4.5.2    
+ [5] promises_1.5.0     tidyselect_1.2.1   Rcpp_1.1.1         stringr_1.6.0     
+ [9] git2r_0.36.2       callr_3.7.6        later_1.4.7        jquerylib_0.1.4   
+[13] scales_1.4.0       yaml_2.3.12        fastmap_1.2.0      R6_2.6.1          
+[17] labeling_0.4.3     generics_0.1.4     knitr_1.51         tibble_3.3.1      
+[21] rprojroot_2.1.1    RColorBrewer_1.1-3 bslib_0.10.0       pillar_1.11.1     
+[25] rlang_1.1.7        cachem_1.1.0       stringi_1.8.7      httpuv_1.6.16     
+[29] xfun_0.56          S7_0.2.1           getPass_0.2-4      fs_1.6.6          
+[33] sass_0.4.10        otel_0.2.0         cli_3.6.5          withr_3.0.2       
+[37] magrittr_2.0.4     ps_1.9.1           grid_4.5.2         digest_0.6.39     
+[41] processx_3.8.6     rstudioapi_0.18.0  lifecycle_1.0.5    vctrs_0.7.1       
+[45] evaluate_1.0.5     glue_1.8.0         farver_2.1.2       whisker_0.4.1     
+[49] rmarkdown_2.30     httr_1.4.8         tools_4.5.2        pkgconfig_2.0.3   
+[53] htmltools_0.5.9   </code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] ggplot2_4.0.2   mclust_6.1.2    workflowr_1.7.2
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.6       jsonlite_2.0.0     dplyr_1.2.0        compiler_4.5.2    
+ [5] promises_1.5.0     tidyselect_1.2.1   Rcpp_1.1.1         stringr_1.6.0     
+ [9] git2r_0.36.2       callr_3.7.6        later_1.4.7        jquerylib_0.1.4   
+[13] scales_1.4.0       yaml_2.3.12        fastmap_1.2.0      R6_2.6.1          
+[17] labeling_0.4.3     generics_0.1.4     knitr_1.51         tibble_3.3.1      
+[21] rprojroot_2.1.1    RColorBrewer_1.1-3 bslib_0.10.0       pillar_1.11.1     
+[25] rlang_1.1.7        cachem_1.1.0       stringi_1.8.7      httpuv_1.6.16     
+[29] xfun_0.56          S7_0.2.1           getPass_0.2-4      fs_1.6.6          
+[33] sass_0.4.10        otel_0.2.0         cli_3.6.5          withr_3.0.2       
+[37] magrittr_2.0.4     ps_1.9.1           grid_4.5.2         digest_0.6.39     
+[41] processx_3.8.6     rstudioapi_0.18.0  lifecycle_1.0.5    vctrs_0.7.1       
+[45] evaluate_1.0.5     glue_1.8.0         farver_2.1.2       whisker_0.4.1     
+[49] rmarkdown_2.30     httr_1.4.8         tools_4.5.2        pkgconfig_2.0.3   
+[53] htmltools_0.5.9   </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
