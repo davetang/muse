@@ -1,0 +1,285 @@
+---
+title: "What is an Algorithm?"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r packages, message=FALSE}
+library(ggplot2)
+```
+
+# Introduction
+
+An **algorithm** is a set of step-by-step instructions for solving a problem. That definition covers everything from a recipe for making toast to the code that recommends your next video. But in statistics and data science, the word "algorithm" almost always means something more specific: a procedure that **repeats a simple operation over and over** until it arrives at an answer.
+
+This article introduces the idea using a concrete example that requires nothing more than basic arithmetic: computing square roots by hand.
+
+# A Problem You Already Understand
+
+What is $\sqrt{7}$? You know the answer is somewhere between 2 and 3 (because $2^2 = 4$ and $3^2 = 9$). But how would you find the precise value without a calculator's square root button?
+
+One approach: **guess and improve**. This is the **Babylonian method** (also known as Heron's method), one of the oldest known algorithms, dating back roughly 4,000 years. The rule is:
+
+1. Start with any guess $g$ (as long as it is positive).
+2. Compute a new, better guess: $g_{\text{new}} = \frac{1}{2}\left(g + \frac{x}{g}\right)$, where $x$ is the number whose square root you want.
+3. Repeat until the guess stops changing.
+
+That is the entire algorithm. Let's see why the update rule works.
+
+## Why the Update Rule Makes Sense
+
+Suppose you are looking for $\sqrt{x}$ and your current guess $g$ is **too large**. Then $g > \sqrt{x}$, which means $\frac{x}{g} < \sqrt{x}$. In other words, $g$ overshoots and $\frac{x}{g}$ undershoots. Averaging them lands you closer to the true answer.
+
+The same logic works if $g$ is too small: then $\frac{x}{g}$ is too large, and their average is still closer. No matter which side you start on, the average pulls you toward the answer.
+
+# Step by Step: $\sqrt{7}$
+
+Let's trace through the algorithm by hand, starting with the deliberately rough guess $g = 1$.
+
+```{r sqrt7_manual}
+x <- 7
+g <- 1
+
+for (i in 1:6) {
+  g_new <- (g + x / g) / 2
+  error <- abs(g_new^2 - x)
+  cat(sprintf(
+    "Iteration %d:  guess = %.10f   guess² = %.10f   error = %.2e\n",
+    i, g_new, g_new^2, error
+  ))
+  g <- g_new
+}
+
+cat(sprintf("\nR's built-in sqrt(7) = %.10f\n", sqrt(7)))
+```
+
+Even starting from 1 — a terrible guess — the algorithm reaches 10-digit accuracy within a handful of iterations. Each step roughly **doubles** the number of correct digits, which is why it converges so quickly.
+
+# What is Convergence?
+
+**Convergence** means that the sequence of guesses settles down to a fixed value. After enough iterations, the new guess is essentially identical to the old one — the algorithm has nothing left to improve.
+
+We can visualise this by plotting the guess at each iteration.
+
+```{r convergence_plot, fig.width=8, fig.height=5, fig.cap="The guess converges rapidly to the true square root of 7."}
+x <- 7
+g <- 1
+max_iter <- 8
+
+history <- data.frame(iteration = 0, guess = g)
+
+for (i in seq_len(max_iter)) {
+  g <- (g + x / g) / 2
+  history <- rbind(history, data.frame(iteration = i, guess = g))
+}
+
+ggplot(history, aes(x = iteration, y = guess)) +
+  geom_line(linewidth = 1, colour = "steelblue") +
+  geom_point(size = 3, colour = "steelblue") +
+  geom_hline(yintercept = sqrt(7), linetype = "dashed", colour = "red") +
+  annotate("text", x = max_iter, y = sqrt(7) + 0.15,
+           label = paste0("sqrt(7) = ", round(sqrt(7), 4)),
+           hjust = 1, colour = "red") +
+  labs(x = "Iteration", y = "Guess",
+       title = "Convergence of the Babylonian method") +
+  theme_minimal()
+```
+
+The guess drops sharply at first, then flattens out as it reaches the true value (dashed red line). This "steep drop then plateau" shape is characteristic of convergence and you will see it in many iterative algorithms.
+
+# Knowing When to Stop
+
+An algorithm that runs forever is not very useful. We need a **stopping rule** — a way to decide that the current guess is good enough.
+
+The most common approach is to define a **tolerance**: a small number $\varepsilon$ (say $10^{-8}$). At each iteration, you check whether the change from the previous guess is smaller than $\varepsilon$. If so, you stop.
+
+```{r stopping_rule}
+sqrt_babylonian <- function(x, guess = x / 2, tol = 1e-8, max_iter = 100) {
+  history <- data.frame(
+    iteration = 0,
+    guess = guess,
+    change = NA_real_
+  )
+
+  for (i in seq_len(max_iter)) {
+    guess_new <- (guess + x / guess) / 2
+    change <- abs(guess_new - guess)
+
+    history <- rbind(history, data.frame(
+      iteration = i, guess = guess_new, change = change
+    ))
+
+    if (change < tol) {
+      cat(sprintf("Converged at iteration %d (change = %.2e < tol = %.2e)\n",
+                  i, change, tol))
+      return(list(result = guess_new, history = history))
+    }
+
+    guess <- guess_new
+  }
+
+  warning("Did not converge within max_iter iterations")
+  list(result = guess, history = history)
+}
+```
+
+Let's test it on several numbers.
+
+```{r test_stopping}
+for (val in c(2, 50, 1000, 0.03)) {
+  out <- sqrt_babylonian(val)
+  cat(sprintf("  sqrt(%.2f) = %.10f  (R says %.10f)\n\n", val, out$result, sqrt(val)))
+}
+```
+
+The algorithm converges in very few iterations regardless of the input, and the results match R's built-in `sqrt()` function.
+
+# How the Tolerance Affects the Result
+
+A stricter (smaller) tolerance means more iterations but a more precise answer. Let's see the trade-off.
+
+```{r tolerance_comparison, fig.width=9, fig.height=5, fig.cap="Stricter tolerances require more iterations but produce more accurate results."}
+x <- 7
+
+tolerances <- c(1e-2, 1e-4, 1e-8, 1e-12)
+
+results <- do.call(rbind, lapply(tolerances, function(tol) {
+  out <- sqrt_babylonian(x, guess = 1, tol = tol)
+  h <- out$history
+  h$tolerance <- paste0("tol = ", format(tol, scientific = TRUE))
+  h
+}))
+
+# Remove iteration 0 for the change plot
+results_change <- results[!is.na(results$change), ]
+
+ggplot(results_change, aes(x = iteration, y = change, colour = tolerance)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  geom_hline(yintercept = tolerances, linetype = "dotted", colour = "grey50") +
+  scale_y_log10() +
+  labs(x = "Iteration", y = "Change from previous guess (log scale)",
+       colour = "",
+       title = "Stricter tolerance = more iterations") +
+  theme_minimal()
+```
+
+On the log scale, the change drops in a nearly straight line — this reflects the rapid convergence of this particular algorithm. The dotted horizontal lines show each tolerance threshold. The algorithm stops as soon as the change dips below its threshold.
+
+# The Anatomy of an Iterative Algorithm
+
+Every iterative algorithm shares the same skeleton:
+
+```
+1. Start with an initial guess
+2. Repeat:
+   a. Compute a new, improved guess using some update rule
+   b. Check a stopping condition
+   c. If satisfied, stop; otherwise, go back to 2a
+3. Return the final guess
+```
+
+What changes between algorithms is the **update rule** and the **stopping condition**. The Babylonian method uses the averaging rule $g_{\text{new}} = \frac{1}{2}(g + x/g)$. Other algorithms use different rules — for instance, gradient descent subtracts a fraction of the slope, and the EM algorithm alternates between estimating hidden variables and updating parameters — but the overall structure is identical.
+
+Let's make this concrete by writing a general-purpose iterative solver and plugging in different update rules.
+
+```{r general_solver}
+iterate <- function(update_fn, guess, tol = 1e-8, max_iter = 100) {
+  for (i in seq_len(max_iter)) {
+    guess_new <- update_fn(guess)
+    if (abs(guess_new - guess) < tol) {
+      return(list(result = guess_new, iterations = i))
+    }
+    guess <- guess_new
+  }
+  warning("Did not converge")
+  list(result = guess, iterations = max_iter)
+}
+```
+
+Now we can solve different problems by swapping the update function.
+
+```{r general_examples}
+# Square root of 7 (Babylonian method)
+out1 <- iterate(update_fn = function(g) (g + 7 / g) / 2, guess = 1)
+cat(sprintf("sqrt(7)     = %.10f  (%d iterations)\n", out1$result, out1$iterations))
+
+# Cube root of 27 (Newton's method for x^3 = 27)
+# Update: g_new = g - (g^3 - 27) / (3 * g^2) = (2*g + 27/g^2) / 3
+out2 <- iterate(update_fn = function(g) (2 * g + 27 / g^2) / 3, guess = 1)
+cat(sprintf("cbrt(27)    = %.10f  (%d iterations)\n", out2$result, out2$iterations))
+
+# Golden ratio: the fixed point of f(x) = 1 + 1/x
+out3 <- iterate(update_fn = function(g) 1 + 1 / g, guess = 1)
+cat(sprintf("Golden ratio = %.10f  (%d iterations)\n", out3$result, out3$iterations))
+
+cat(sprintf("\nFor reference: (1 + sqrt(5)) / 2 = %.10f\n", (1 + sqrt(5)) / 2))
+```
+
+The same three-line loop solved three completely different problems. The only thing that changed was the update rule.
+
+# What Can Go Wrong?
+
+Iterative algorithms do not always behave nicely. Here are two things to watch out for.
+
+## Bad Starting Points
+
+Some update rules only work if the starting guess is reasonable. For the Babylonian method this is not a concern (any positive guess works), but other algorithms can diverge or oscillate if started in the wrong place.
+
+```{r divergence_example}
+# Newton's method for finding the root of x^3 - 2x + 2 = 0
+# Update: g_new = g - (g^3 - 2g + 2) / (3g^2 - 2)
+# Starting near g = 0 is problematic because the derivative is near zero
+
+newton_cubic <- function(g) {
+  f <- g^3 - 2 * g + 2
+  f_prime <- 3 * g^2 - 2
+  g - f / f_prime
+}
+
+# Good start
+out_good <- iterate(newton_cubic, guess = -2)
+cat(sprintf("From guess = -2: root = %.6f (%d iterations)\n",
+            out_good$result, out_good$iterations))
+
+# Show what happens near g = 0 (derivative close to 0 causes large jumps)
+g <- 0.5
+cat("\nFrom guess = 0.5, first few iterations:\n")
+for (i in 1:8) {
+  g_new <- newton_cubic(g)
+  cat(sprintf("  Iteration %d: guess = %12.4f\n", i, g_new))
+  g <- g_new
+}
+```
+
+When the derivative is near zero, Newton's method takes enormous steps and can bounce around wildly before (if ever) settling down. This is why good initialisation matters.
+
+## Not Everything Converges
+
+Sometimes the update rule sends the guess on a loop that never settles. The `max_iter` safeguard prevents infinite loops, but it means you should always check whether the algorithm actually converged rather than just ran out of patience.
+
+# Summary
+
+| Concept | What it means |
+|---|---|
+| **Algorithm** | A step-by-step procedure for solving a problem |
+| **Iterative algorithm** | An algorithm that repeatedly improves a guess using an update rule |
+| **Update rule** | The formula that produces a new guess from the current one |
+| **Convergence** | The guesses settle down to a stable value |
+| **Tolerance** | A threshold for "close enough" — the algorithm stops when the change between iterations falls below this |
+| **Initialisation** | The starting guess; some algorithms are sensitive to it, others are not |
+
+The key takeaway: many problems in statistics and data science are solved by algorithms that **start with a guess, improve it, and repeat until convergence**. The Babylonian method is the simplest example, but the same pattern shows up in linear regression (iteratively reweighted least squares), clustering (k-means), mixture models (EM algorithm), and neural network training (gradient descent). Once you are comfortable with the guess-improve-repeat loop, these more advanced methods are easier to understand because the skeleton is always the same.
+
+# Session Info
+
+```{r session_info}
+sessionInfo()
+```
