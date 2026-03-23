@@ -199,6 +199,190 @@ ggplot(history_long, aes(x = iteration, y = theta, colour = coin)) +
 
 The two estimates start close together and gradually separate as the algorithm figures out which rounds go with which coin.
 
+# The Grading Example — Made Concrete
+
+Earlier we described a teacher trying to figure out whether Alice or Bob graded each assignment, given only the scores. Let's turn that analogy into a full worked example with simulated data.
+
+## Setting the Scene
+
+Alice is a generous grader — her scores tend to cluster around 82 with some spread. Bob is stricter — his scores cluster around 65. Over the semester, they graded 200 assignments between them (Alice graded about 55%, Bob about 45%). Unfortunately the TA names fell off, so all we have is a pile of 200 scores.
+
+```{r grading_simulate}
+set.seed(1984)
+
+n_alice <- 110
+n_bob <- 90
+
+alice_scores <- rnorm(n_alice, mean = 82, sd = 7)
+bob_scores <- rnorm(n_bob, mean = 65, sd = 6)
+
+# What we observe: a single pile of scores with no labels
+scores <- c(alice_scores, bob_scores)
+true_grader <- c(rep("Alice", n_alice), rep("Bob", n_bob))
+```
+
+```{r grading_hist, fig.width=9, fig.height=5, fig.cap="The pile of 200 scores. Two overlapping humps hint at two graders, but we don't know who graded what."}
+ggplot(data.frame(score = scores), aes(x = score)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 30,
+                 fill = "steelblue", colour = "white", alpha = 0.7) +
+  geom_density(colour = "red", linewidth = 0.8) +
+  labs(x = "Score", y = "Density",
+       title = "All 200 assignment scores (grader unknown)") +
+  theme_minimal()
+```
+
+The histogram shows a hint of two humps. EM will try to recover the two grading distributions.
+
+## Running EM
+
+The parameters we want to estimate are:
+
+- $\mu_A$, $\sigma_A$: Alice's average score and spread.
+- $\mu_B$, $\sigma_B$: Bob's average score and spread.
+- $\pi_A$: the proportion of assignments Alice graded (and $\pi_B = 1 - \pi_A$).
+
+We start with a rough guess: grader 1 averages around 75 and grader 2 averages around 70 — intentionally mediocre starting values.
+
+```{r grading_em}
+em_grading <- function(scores, max_iter = 50, tol = 1e-6) {
+  n <- length(scores)
+
+  # Initial guesses (deliberately rough)
+  mu <- c(75, 70)
+  sigma <- c(10, 10)
+  pi_k <- c(0.5, 0.5)
+
+  history <- list()
+
+  for (iter in seq_len(max_iter)) {
+    # E-step: for each score, how likely is it from grader 1 vs grader 2?
+    lik_1 <- pi_k[1] * dnorm(scores, mean = mu[1], sd = sigma[1])
+    lik_2 <- pi_k[2] * dnorm(scores, mean = mu[2], sd = sigma[2])
+    resp_1 <- lik_1 / (lik_1 + lik_2)
+    resp_2 <- 1 - resp_1
+
+    # M-step: re-estimate parameters using responsibilities as weights
+    N_1 <- sum(resp_1)
+    N_2 <- sum(resp_2)
+
+    mu_new <- c(sum(resp_1 * scores) / N_1,
+                sum(resp_2 * scores) / N_2)
+    sigma_new <- c(sqrt(sum(resp_1 * (scores - mu_new[1])^2) / N_1),
+                   sqrt(sum(resp_2 * (scores - mu_new[2])^2) / N_2))
+    pi_new <- c(N_1 / n, N_2 / n)
+
+    history[[iter]] <- data.frame(
+      iteration = iter,
+      grader = c("Grader 1", "Grader 2"),
+      mu = mu_new,
+      sigma = sigma_new,
+      weight = pi_new
+    )
+
+    if (max(abs(mu_new - mu)) < tol) break
+    mu <- mu_new
+    sigma <- sigma_new
+    pi_k <- pi_new
+  }
+
+  list(mu = mu_new, sigma = sigma_new, pi_k = pi_new,
+       resp_1 = resp_1, history = do.call(rbind, history),
+       iterations = iter)
+}
+
+fit_grade <- em_grading(scores)
+
+cat(sprintf("Converged in %d iterations\n\n", fit_grade$iterations))
+cat("Estimated parameters:\n")
+cat(sprintf("  Grader 1: mean = %.1f, sd = %.1f, proportion = %.0f%%\n",
+            fit_grade$mu[1], fit_grade$sigma[1], fit_grade$pi_k[1] * 100))
+cat(sprintf("  Grader 2: mean = %.1f, sd = %.1f, proportion = %.0f%%\n",
+            fit_grade$mu[2], fit_grade$sigma[2], fit_grade$pi_k[2] * 100))
+cat("\nTrue parameters:\n")
+cat(sprintf("  Alice:    mean = 82.0, sd = 7.0, proportion = 55%%\n"))
+cat(sprintf("  Bob:      mean = 65.0, sd = 6.0, proportion = 45%%\n"))
+```
+
+EM recovers values close to the truth, despite starting with guesses that were well off.
+
+## Watching It Converge
+
+```{r grading_convergence, fig.width=9, fig.height=5, fig.cap="The estimated grading averages converge from the initial guesses (75 and 70) toward the true values."}
+ggplot(fit_grade$history, aes(x = iteration, y = mu, colour = grader)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  geom_hline(yintercept = 82, linetype = "dashed", colour = "grey40") +
+  geom_hline(yintercept = 65, linetype = "dashed", colour = "grey40") +
+  annotate("text", x = max(fit_grade$history$iteration), y = 83.5,
+           label = "Alice's true mean (82)", hjust = 1, colour = "grey40") +
+  annotate("text", x = max(fit_grade$history$iteration), y = 63.5,
+           label = "Bob's true mean (65)", hjust = 1, colour = "grey40") +
+  labs(x = "Iteration", y = "Estimated Mean Score",
+       colour = "", title = "EM convergence for the grading problem") +
+  theme_minimal()
+```
+
+The two estimates start close together (75 and 70) and separate rapidly as EM figures out the two grading styles.
+
+## Looking at Individual Assignments
+
+After convergence, each assignment has a responsibility — the probability that grader 1 (Alice) gave that score. Let's look at a few assignments to see how EM reasons about them.
+
+```{r grading_individual}
+# Pick a few illustrative assignments
+examples <- c(
+  which.max(scores),                          # highest score
+  which.min(scores),                          # lowest score
+  which.min(abs(scores - mean(scores)))       # most ambiguous (near overall mean)
+)
+
+cat("How EM assigns individual assignments:\n\n")
+for (i in examples) {
+  cat(sprintf(
+    "  Score = %.1f → P(Alice) = %.1f%%, P(Bob) = %.1f%%  [truly graded by %s]\n",
+    scores[i],
+    fit_grade$resp_1[i] * 100,
+    (1 - fit_grade$resp_1[i]) * 100,
+    true_grader[i]
+  ))
+}
+```
+
+High scores are confidently assigned to Alice (the generous grader), low scores to Bob (the strict grader), and middle scores are genuinely ambiguous.
+
+```{r grading_assignments, fig.width=9, fig.height=5, fig.cap="Each assignment coloured by EM's confidence that Alice graded it. Scores in the overlap region (around 70-75) are genuinely uncertain."}
+df_assign <- data.frame(
+  score = scores,
+  p_alice = fit_grade$resp_1,
+  true_grader = true_grader
+)
+
+ggplot(df_assign, aes(x = score, y = p_alice, colour = true_grader)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_hline(yintercept = 0.5, linetype = "dashed", colour = "grey50") +
+  labs(x = "Score", y = "P(Alice graded this)",
+       colour = "True Grader",
+       title = "EM's soft assignments vs the truth") +
+  theme_minimal()
+```
+
+Points above the dashed line are assigned to Alice; points below to Bob. The colour shows the truth. Most assignments are classified correctly, with mistakes concentrated in the overlap region where the two graders' score distributions blend together — exactly where you would expect genuine uncertainty.
+
+## How Accurate Are the Hard Assignments?
+
+If we assign each paper to whichever grader has the higher responsibility, how often do we get it right?
+
+```{r grading_accuracy}
+hard_assignment <- ifelse(fit_grade$resp_1 > 0.5, "Alice", "Bob")
+accuracy <- mean(hard_assignment == true_grader)
+cat(sprintf("Classification accuracy: %.1f%%\n", accuracy * 100))
+
+cat("\nConfusion matrix:\n")
+print(table(Predicted = hard_assignment, True = true_grader))
+```
+
+The errors are concentrated among scores in the 70--78 range where Alice's low scores and Bob's high scores overlap. No method can perfectly separate those, because the data genuinely looks the same regardless of which grader produced it.
+
 # EM for Gaussian Mixtures
 
 The two-coin problem illustrates the logic of EM in a discrete setting. The same logic applies to continuous data. The most common application is fitting **Gaussian mixture models** (GMMs), where you assume your data comes from a blend of several normal (bell-curve) distributions and you want to recover their parameters.
@@ -486,13 +670,13 @@ In practice, the standard defence against local optima is to run EM multiple tim
 
 EM always follows the same template, regardless of the specific model:
 
-| Step | What you do | Two-coin example | Gaussian mixture example |
-|------|-------------|------------------|--------------------------|
-| **Hidden data** | Identify what is unobserved | Which coin was used in each round | Which component generated each data point |
-| **Initialise** | Make an initial guess for the parameters | $\theta_A = 0.6$, $\theta_B = 0.5$ | Means, SDs, and weights |
-| **E-step** | Compute the expected value of the hidden data, given current parameters | P(coin A \| round data) for each round | P(component $k$ \| data point) for each point |
-| **M-step** | Re-estimate parameters, treating the expected hidden data as if it were real | Weighted proportion of heads for each coin | Weighted mean, SD, and proportion for each component |
-| **Repeat** | Until parameters stop changing | — | — |
+| Step | What you do | Two-coin example | Grading example | Gaussian mixture |
+|------|-------------|------------------|-----------------|------------------|
+| **Hidden data** | Identify what is unobserved | Which coin was used in each round | Which TA graded each assignment | Which component generated each data point |
+| **Initialise** | Make an initial guess for the parameters | $\theta_A = 0.6$, $\theta_B = 0.5$ | Mean scores of 75 and 70 | Means, SDs, and weights |
+| **E-step** | Compute the expected value of the hidden data, given current parameters | P(coin A \| round data) for each round | P(Alice \| score) for each assignment | P(component $k$ \| data point) for each point |
+| **M-step** | Re-estimate parameters, treating the expected hidden data as if it were real | Weighted proportion of heads for each coin | Weighted mean score for each TA | Weighted mean, SD, and proportion for each component |
+| **Repeat** | Until parameters stop changing | — | — | — |
 
 The beauty of EM is that both the E-step and the M-step are usually **easy problems on their own**. The E-step is just plugging numbers into a formula. The M-step is often a familiar calculation (like computing a mean). It is only the combination — the fact that you don't know the hidden data — that makes the original problem hard. EM turns one hard problem into a sequence of easy ones.
 
