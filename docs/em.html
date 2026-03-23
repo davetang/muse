@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree15275c4f04a39ad6c2a95c2e659e04e8a1b10eb3targetblank15275c4a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7753a73317b0f052be3278a232eb3dddbfca8466targetblank7753a73a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/15275c4f04a39ad6c2a95c2e659e04e8a1b10eb3" target="_blank">15275c4</a>
+<a href="https://github.com/davetang/muse/tree/7753a73317b0f052be3278a232eb3dddbfca8466" target="_blank">7753a73</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree15275c4f04a39ad6c2a95c2e659e04e8a1b10eb3targetblank15275c4a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7753a73317b0f052be3278a232eb3dddbfca8466targetblank7753a73a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/15275c4f04a39ad6c2a95c2e659e04e8a1b10eb3" target="_blank">15275c4</a>.
+<a href="https://github.com/davetang/muse/tree/7753a73317b0f052be3278a232eb3dddbfca8466" target="_blank">7753a73</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -659,6 +659,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/7753a73317b0f052be3278a232eb3dddbfca8466/analysis/em.Rmd" target="_blank">7753a73</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+<td>
+Grading example made concrete
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/ab2ee65407e6bb4eced1b06b7aec63f2a8e0d7bc/docs/em.html" target="_blank">ab2ee65</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -964,9 +998,271 @@ ggplot(history_long, aes(x = iteration, y = theta, colour = coin)) +
 Convergence of coin bias estimates across EM iterations.
 </p>
 </div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-coins_convergence-1">
+Past versions of coins_convergence-1.png
+</button>
+</p>
+<div id="fig-coins_convergence-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/ab2ee65407e6bb4eced1b06b7aec63f2a8e0d7bc/docs/figure/em.Rmd/coins_convergence-1.png" target="_blank">ab2ee65</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The two estimates start close together and gradually separate as the
 algorithm figures out which rounds go with which coin.</p>
 </div>
+</div>
+</div>
+<div id="the-grading-example-made-concrete" class="section level1">
+<h1>The Grading Example — Made Concrete</h1>
+<p>Earlier we described a teacher trying to figure out whether Alice or
+Bob graded each assignment, given only the scores. Let’s turn that
+analogy into a full worked example with simulated data.</p>
+<div id="setting-the-scene" class="section level2">
+<h2>Setting the Scene</h2>
+<p>Alice is a generous grader — her scores tend to cluster around 82
+with some spread. Bob is stricter — his scores cluster around 65. Over
+the semester, they graded 200 assignments between them (Alice graded
+about 55%, Bob about 45%). Unfortunately the TA names fell off, so all
+we have is a pile of 200 scores.</p>
+<pre class="r"><code>set.seed(1984)
+
+n_alice &lt;- 110
+n_bob &lt;- 90
+
+alice_scores &lt;- rnorm(n_alice, mean = 82, sd = 7)
+bob_scores &lt;- rnorm(n_bob, mean = 65, sd = 6)
+
+# What we observe: a single pile of scores with no labels
+scores &lt;- c(alice_scores, bob_scores)
+true_grader &lt;- c(rep(&quot;Alice&quot;, n_alice), rep(&quot;Bob&quot;, n_bob))</code></pre>
+<pre class="r"><code>ggplot(data.frame(score = scores), aes(x = score)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 30,
+                 fill = &quot;steelblue&quot;, colour = &quot;white&quot;, alpha = 0.7) +
+  geom_density(colour = &quot;red&quot;, linewidth = 0.8) +
+  labs(x = &quot;Score&quot;, y = &quot;Density&quot;,
+       title = &quot;All 200 assignment scores (grader unknown)&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/em.Rmd/grading_hist-1.png" alt="The pile of 200 scores. Two overlapping humps hint at two graders, but we don't know who graded what." width="864" />
+<p class="caption">
+The pile of 200 scores. Two overlapping humps hint at two graders, but
+we don’t know who graded what.
+</p>
+</div>
+<p>The histogram shows a hint of two humps. EM will try to recover the
+two grading distributions.</p>
+</div>
+<div id="running-em" class="section level2">
+<h2>Running EM</h2>
+<p>The parameters we want to estimate are:</p>
+<ul>
+<li><span class="math inline">\(\mu_A\)</span>, <span
+class="math inline">\(\sigma_A\)</span>: Alice’s average score and
+spread.</li>
+<li><span class="math inline">\(\mu_B\)</span>, <span
+class="math inline">\(\sigma_B\)</span>: Bob’s average score and
+spread.</li>
+<li><span class="math inline">\(\pi_A\)</span>: the proportion of
+assignments Alice graded (and <span class="math inline">\(\pi_B = 1 -
+\pi_A\)</span>).</li>
+</ul>
+<p>We start with a rough guess: grader 1 averages around 75 and grader 2
+averages around 70 — intentionally mediocre starting values.</p>
+<pre class="r"><code>em_grading &lt;- function(scores, max_iter = 50, tol = 1e-6) {
+  n &lt;- length(scores)
+
+  # Initial guesses (deliberately rough)
+  mu &lt;- c(75, 70)
+  sigma &lt;- c(10, 10)
+  pi_k &lt;- c(0.5, 0.5)
+
+  history &lt;- list()
+
+  for (iter in seq_len(max_iter)) {
+    # E-step: for each score, how likely is it from grader 1 vs grader 2?
+    lik_1 &lt;- pi_k[1] * dnorm(scores, mean = mu[1], sd = sigma[1])
+    lik_2 &lt;- pi_k[2] * dnorm(scores, mean = mu[2], sd = sigma[2])
+    resp_1 &lt;- lik_1 / (lik_1 + lik_2)
+    resp_2 &lt;- 1 - resp_1
+
+    # M-step: re-estimate parameters using responsibilities as weights
+    N_1 &lt;- sum(resp_1)
+    N_2 &lt;- sum(resp_2)
+
+    mu_new &lt;- c(sum(resp_1 * scores) / N_1,
+                sum(resp_2 * scores) / N_2)
+    sigma_new &lt;- c(sqrt(sum(resp_1 * (scores - mu_new[1])^2) / N_1),
+                   sqrt(sum(resp_2 * (scores - mu_new[2])^2) / N_2))
+    pi_new &lt;- c(N_1 / n, N_2 / n)
+
+    history[[iter]] &lt;- data.frame(
+      iteration = iter,
+      grader = c(&quot;Grader 1&quot;, &quot;Grader 2&quot;),
+      mu = mu_new,
+      sigma = sigma_new,
+      weight = pi_new
+    )
+
+    if (max(abs(mu_new - mu)) &lt; tol) break
+    mu &lt;- mu_new
+    sigma &lt;- sigma_new
+    pi_k &lt;- pi_new
+  }
+
+  list(mu = mu_new, sigma = sigma_new, pi_k = pi_new,
+       resp_1 = resp_1, history = do.call(rbind, history),
+       iterations = iter)
+}
+
+fit_grade &lt;- em_grading(scores)
+
+cat(sprintf(&quot;Converged in %d iterations\n\n&quot;, fit_grade$iterations))</code></pre>
+<pre><code>Converged in 50 iterations</code></pre>
+<pre class="r"><code>cat(&quot;Estimated parameters:\n&quot;)</code></pre>
+<pre><code>Estimated parameters:</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;  Grader 1: mean = %.1f, sd = %.1f, proportion = %.0f%%\n&quot;,
+            fit_grade$mu[1], fit_grade$sigma[1], fit_grade$pi_k[1] * 100))</code></pre>
+<pre><code>  Grader 1: mean = 81.9, sd = 7.1, proportion = 54%</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;  Grader 2: mean = %.1f, sd = %.1f, proportion = %.0f%%\n&quot;,
+            fit_grade$mu[2], fit_grade$sigma[2], fit_grade$pi_k[2] * 100))</code></pre>
+<pre><code>  Grader 2: mean = 65.2, sd = 6.3, proportion = 46%</code></pre>
+<pre class="r"><code>cat(&quot;\nTrue parameters:\n&quot;)</code></pre>
+<pre><code>
+True parameters:</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;  Alice:    mean = 82.0, sd = 7.0, proportion = 55%%\n&quot;))</code></pre>
+<pre><code>  Alice:    mean = 82.0, sd = 7.0, proportion = 55%</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;  Bob:      mean = 65.0, sd = 6.0, proportion = 45%%\n&quot;))</code></pre>
+<pre><code>  Bob:      mean = 65.0, sd = 6.0, proportion = 45%</code></pre>
+<p>EM recovers values close to the truth, despite starting with guesses
+that were well off.</p>
+</div>
+<div id="watching-it-converge" class="section level2">
+<h2>Watching It Converge</h2>
+<pre class="r"><code>ggplot(fit_grade$history, aes(x = iteration, y = mu, colour = grader)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  geom_hline(yintercept = 82, linetype = &quot;dashed&quot;, colour = &quot;grey40&quot;) +
+  geom_hline(yintercept = 65, linetype = &quot;dashed&quot;, colour = &quot;grey40&quot;) +
+  annotate(&quot;text&quot;, x = max(fit_grade$history$iteration), y = 83.5,
+           label = &quot;Alice&#39;s true mean (82)&quot;, hjust = 1, colour = &quot;grey40&quot;) +
+  annotate(&quot;text&quot;, x = max(fit_grade$history$iteration), y = 63.5,
+           label = &quot;Bob&#39;s true mean (65)&quot;, hjust = 1, colour = &quot;grey40&quot;) +
+  labs(x = &quot;Iteration&quot;, y = &quot;Estimated Mean Score&quot;,
+       colour = &quot;&quot;, title = &quot;EM convergence for the grading problem&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/em.Rmd/grading_convergence-1.png" alt="The estimated grading averages converge from the initial guesses (75 and 70) toward the true values." width="864" />
+<p class="caption">
+The estimated grading averages converge from the initial guesses (75 and
+70) toward the true values.
+</p>
+</div>
+<p>The two estimates start close together (75 and 70) and separate
+rapidly as EM figures out the two grading styles.</p>
+</div>
+<div id="looking-at-individual-assignments" class="section level2">
+<h2>Looking at Individual Assignments</h2>
+<p>After convergence, each assignment has a responsibility — the
+probability that grader 1 (Alice) gave that score. Let’s look at a few
+assignments to see how EM reasons about them.</p>
+<pre class="r"><code># Pick a few illustrative assignments
+examples &lt;- c(
+  which.max(scores),                          # highest score
+  which.min(scores),                          # lowest score
+  which.min(abs(scores - mean(scores)))       # most ambiguous (near overall mean)
+)
+
+cat(&quot;How EM assigns individual assignments:\n\n&quot;)</code></pre>
+<pre><code>How EM assigns individual assignments:</code></pre>
+<pre class="r"><code>for (i in examples) {
+  cat(sprintf(
+    &quot;  Score = %.1f → P(Alice) = %.1f%%, P(Bob) = %.1f%%  [truly graded by %s]\n&quot;,
+    scores[i],
+    fit_grade$resp_1[i] * 100,
+    (1 - fit_grade$resp_1[i]) * 100,
+    true_grader[i]
+  ))
+}</code></pre>
+<pre><code>  Score = 99.5 → P(Alice) = 100.0%, P(Bob) = 0.0%  [truly graded by Alice]
+  Score = 49.1 → P(Alice) = 0.1%, P(Bob) = 99.9%  [truly graded by Bob]
+  Score = 74.2 → P(Alice) = 61.9%, P(Bob) = 38.1%  [truly graded by Alice]</code></pre>
+<p>High scores are confidently assigned to Alice (the generous grader),
+low scores to Bob (the strict grader), and middle scores are genuinely
+ambiguous.</p>
+<pre class="r"><code>df_assign &lt;- data.frame(
+  score = scores,
+  p_alice = fit_grade$resp_1,
+  true_grader = true_grader
+)
+
+ggplot(df_assign, aes(x = score, y = p_alice, colour = true_grader)) +
+  geom_point(alpha = 0.6, size = 2) +
+  geom_hline(yintercept = 0.5, linetype = &quot;dashed&quot;, colour = &quot;grey50&quot;) +
+  labs(x = &quot;Score&quot;, y = &quot;P(Alice graded this)&quot;,
+       colour = &quot;True Grader&quot;,
+       title = &quot;EM&#39;s soft assignments vs the truth&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/em.Rmd/grading_assignments-1.png" alt="Each assignment coloured by EM's confidence that Alice graded it. Scores in the overlap region (around 70-75) are genuinely uncertain." width="864" />
+<p class="caption">
+Each assignment coloured by EM’s confidence that Alice graded it. Scores
+in the overlap region (around 70-75) are genuinely uncertain.
+</p>
+</div>
+<p>Points above the dashed line are assigned to Alice; points below to
+Bob. The colour shows the truth. Most assignments are classified
+correctly, with mistakes concentrated in the overlap region where the
+two graders’ score distributions blend together — exactly where you
+would expect genuine uncertainty.</p>
+</div>
+<div id="how-accurate-are-the-hard-assignments" class="section level2">
+<h2>How Accurate Are the Hard Assignments?</h2>
+<p>If we assign each paper to whichever grader has the higher
+responsibility, how often do we get it right?</p>
+<pre class="r"><code>hard_assignment &lt;- ifelse(fit_grade$resp_1 &gt; 0.5, &quot;Alice&quot;, &quot;Bob&quot;)
+accuracy &lt;- mean(hard_assignment == true_grader)
+cat(sprintf(&quot;Classification accuracy: %.1f%%\n&quot;, accuracy * 100))</code></pre>
+<pre><code>Classification accuracy: 93.0%</code></pre>
+<pre class="r"><code>cat(&quot;\nConfusion matrix:\n&quot;)</code></pre>
+<pre><code>
+Confusion matrix:</code></pre>
+<pre class="r"><code>print(table(Predicted = hard_assignment, True = true_grader))</code></pre>
+<pre><code>         True
+Predicted Alice Bob
+    Alice   101   5
+    Bob       9  85</code></pre>
+<p>The errors are concentrated among scores in the 70–78 range where
+Alice’s low scores and Bob’s high scores overlap. No method can
+perfectly separate those, because the data genuinely looks the same
+regardless of which grader produced it.</p>
 </div>
 </div>
 <div id="em-for-gaussian-mixtures" class="section level1">
@@ -1003,6 +1299,43 @@ true_labels &lt;- c(rep(1, n1), rep(2, n2))</code></pre>
 <p class="caption">
 Simulated data from two overlapping Gaussian components.
 </p>
+</div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-show_data-1">
+Past versions of show_data-1.png
+</button>
+</p>
+<div id="fig-show_data-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/ab2ee65407e6bb4eced1b06b7aec63f2a8e0d7bc/docs/figure/em.Rmd/show_data-1.png" target="_blank">ab2ee65</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <p>We know this data was generated by two Gaussians, but we will pretend
 we don’t and let EM figure it out.</p>
@@ -1103,6 +1436,43 @@ EM at iterations 1, 3, 5, and after convergence. The two Gaussian
 components (orange and blue curves) gradually separate and fit the data.
 </p>
 </div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-em_iterations_plot-1">
+Past versions of em_iterations_plot-1.png
+</button>
+</p>
+<div id="fig-em_iterations_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/ab2ee65407e6bb4eced1b06b7aec63f2a8e0d7bc/docs/figure/em.Rmd/em_iterations_plot-1.png" target="_blank">ab2ee65</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>At iteration 1, the two components are poorly placed — they are too
 close together and too wide. By iteration 3, they have started to
 separate. By convergence, each component sits neatly over one of the two
@@ -1142,6 +1512,43 @@ Responsibilities at different iterations. Early on (top), the model is
 uncertain about most points. By convergence (bottom), assignments are
 crisp except in the overlap region.
 </p>
+</div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-responsibilities_evolve-1">
+Past versions of responsibilities_evolve-1.png
+</button>
+</p>
+<div id="fig-responsibilities_evolve-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/ab2ee65407e6bb4eced1b06b7aec63f2a8e0d7bc/docs/figure/em.Rmd/responsibilities_evolve-1.png" target="_blank">ab2ee65</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <p>The dashed line at 0.5 marks the decision boundary. Points above the
 line are assigned to component 2; points below to component 1. In early
@@ -1193,6 +1600,43 @@ ggplot(df_ll, aes(x = iteration, y = log_likelihood)) +
 The log-likelihood increases at every EM iteration and plateaus at
 convergence.
 </p>
+</div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-log_likelihood_trace-1">
+Past versions of log_likelihood_trace-1.png
+</button>
+</p>
+<div id="fig-log_likelihood_trace-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/ab2ee65407e6bb4eced1b06b7aec63f2a8e0d7bc/docs/figure/em.Rmd/log_likelihood_trace-1.png" target="_blank">ab2ee65</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <p>The curve goes up steeply at first (big improvements) then levels off
 (fine-tuning). EM stops when the improvements become negligibly
@@ -1279,6 +1723,43 @@ Different starting points can lead to different solutions. Here, a poor
 initialisation gets stuck.
 </p>
 </div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-local_optima-1">
+Past versions of local_optima-1.png
+</button>
+</p>
+<div id="fig-local_optima-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/ab2ee65407e6bb4eced1b06b7aec63f2a8e0d7bc/docs/figure/em.Rmd/local_optima-1.png" target="_blank">ab2ee65</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>cat(&quot;Good initialisation:\n&quot;)</code></pre>
 <pre><code>Good initialisation:</code></pre>
 <pre class="r"><code>cat(sprintf(&quot;  Component 1: mean = %.2f, sd = %.2f\n&quot;, fit_good$mu[1], fit_good$sigma[1]))</code></pre>
@@ -1301,19 +1782,21 @@ do this automatically.</p>
 <h1>The General Pattern</h1>
 <p>EM always follows the same template, regardless of the specific
 model:</p>
-<table style="width:100%;">
+<table>
 <colgroup>
-<col width="9%" />
-<col width="20%" />
-<col width="28%" />
-<col width="41%" />
+<col width="8%" />
+<col width="18%" />
+<col width="25%" />
+<col width="23%" />
+<col width="25%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th>Step</th>
 <th>What you do</th>
 <th>Two-coin example</th>
-<th>Gaussian mixture example</th>
+<th>Grading example</th>
+<th>Gaussian mixture</th>
 </tr>
 </thead>
 <tbody>
@@ -1321,6 +1804,7 @@ model:</p>
 <td><strong>Hidden data</strong></td>
 <td>Identify what is unobserved</td>
 <td>Which coin was used in each round</td>
+<td>Which TA graded each assignment</td>
 <td>Which component generated each data point</td>
 </tr>
 <tr class="even">
@@ -1328,6 +1812,7 @@ model:</p>
 <td>Make an initial guess for the parameters</td>
 <td><span class="math inline">\(\theta_A = 0.6\)</span>, <span
 class="math inline">\(\theta_B = 0.5\)</span></td>
+<td>Mean scores of 75 and 70</td>
 <td>Means, SDs, and weights</td>
 </tr>
 <tr class="odd">
@@ -1335,6 +1820,7 @@ class="math inline">\(\theta_B = 0.5\)</span></td>
 <td>Compute the expected value of the hidden data, given current
 parameters</td>
 <td>P(coin A | round data) for each round</td>
+<td>P(Alice | score) for each assignment</td>
 <td>P(component <span class="math inline">\(k\)</span> | data point) for
 each point</td>
 </tr>
@@ -1343,11 +1829,13 @@ each point</td>
 <td>Re-estimate parameters, treating the expected hidden data as if it
 were real</td>
 <td>Weighted proportion of heads for each coin</td>
+<td>Weighted mean score for each TA</td>
 <td>Weighted mean, SD, and proportion for each component</td>
 </tr>
 <tr class="odd">
 <td><strong>Repeat</strong></td>
 <td>Until parameters stop changing</td>
+<td>—</td>
 <td>—</td>
 <td>—</td>
 </tr>
