@@ -1,0 +1,534 @@
+---
+title: "The Expectation-Maximisation (EM) Algorithm"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r packages, message=FALSE}
+library(ggplot2)
+```
+
+# Introduction
+
+The **Expectation-Maximisation (EM) algorithm** is one of the most widely used tools in statistics and machine learning. It shows up in Gaussian mixture models, hidden Markov models, missing-data problems, and many other settings. But most explanations of EM jump into abstract notation very quickly, which makes it feel more complicated than it actually is.
+
+The core idea is simple. EM is for situations where you are trying to estimate something, but there is **hidden information** that, if you knew it, would make the problem easy. Since you don't know the hidden information, you alternate between:
+
+1. **Guessing** the hidden information (using your current parameter estimates).
+2. **Updating** the parameter estimates (using your guesses of the hidden information).
+
+Repeat until things stabilise. That's it. The rest of this article is about building solid intuition for what this means and why it works.
+
+# An Everyday Analogy
+
+Imagine you are a teacher with two teaching assistants, Alice and Bob, who grade homework. You receive a stack of graded assignments but their names have fallen off — you can see the scores each student received, but you do not know which TA graded which assignment.
+
+You want to figure out each TA's grading tendency (say, the average score they give). If you **knew** who graded each assignment, this would be trivial: split the assignments into two piles and compute the average for each pile.
+
+But you don't know who graded what. So you do the following:
+
+1. **Start with a guess**: maybe Alice grades generously (average ~85) and Bob grades strictly (average ~70).
+2. **E-step**: For each assignment, ask: "Given these guessed averages, which TA probably graded this one?" An assignment with a score of 90 is more likely from Alice; a score of 65 is more likely from Bob. A score of 78 could go either way, so you assign **partial credit** — maybe 60% chance Alice, 40% chance Bob.
+3. **M-step**: Using these soft assignments, recompute the averages. Alice's new average is the weighted mean of all scores, weighted by how likely she was to have graded each one. Same for Bob.
+4. **Repeat** steps 2 and 3 until the averages stop changing.
+
+That is the EM algorithm. The hidden information is "who graded what", and the parameters are the grading averages.
+
+# The Two-Coin Problem
+
+The classic teaching example for EM involves two coins. This problem is small enough to work through by hand, which makes the mechanics completely transparent.
+
+## Setup
+
+You have two coins, **A** and **B**, with unknown probabilities of landing heads:
+
+- Coin A lands heads with probability $\theta_A$ (unknown).
+- Coin B lands heads with probability $\theta_B$ (unknown).
+
+Someone runs 5 rounds of an experiment. In each round, they **secretly pick** one of the two coins (you don't know which), flip it 10 times, and tell you how many heads came up. Your job: estimate $\theta_A$ and $\theta_B$.
+
+Here are the results:
+
+| Round | Heads (out of 10) | Coin used (hidden) |
+|-------|-------------------|-------------------|
+| 1     | 7                 | ?                 |
+| 2     | 3                 | ?                 |
+| 3     | 8                 | ?                 |
+| 4     | 5                 | ?                 |
+| 5     | 9                 | ?                 |
+
+If we knew the hidden column, we could just compute the proportion of heads for each coin. Since we don't, we use EM.
+
+## Step by Step
+
+```{r two_coins_setup}
+set.seed(1984)
+
+# Observed data: number of heads in each round (10 flips per round)
+heads <- c(7, 3, 8, 5, 9)
+n_flips <- 10
+n_rounds <- length(heads)
+```
+
+### Initial Guess
+
+We need a starting point. Let's guess $\theta_A = 0.6$ and $\theta_B = 0.5$.
+
+```{r two_coins_em}
+# EM for the two-coin problem
+em_two_coins <- function(heads, n_flips, theta_A_init, theta_B_init,
+                         max_iter = 20, tol = 1e-6) {
+
+  theta_A <- theta_A_init
+  theta_B <- theta_B_init
+  n_rounds <- length(heads)
+  history <- data.frame(
+    iteration = integer(),
+    theta_A = numeric(),
+    theta_B = numeric()
+  )
+  history <- rbind(history, data.frame(
+    iteration = 0, theta_A = theta_A, theta_B = theta_B
+  ))
+
+  for (iter in seq_len(max_iter)) {
+    # --- E-step ---
+    # For each round, compute the probability that coin A was used
+    # P(coin A | data) is proportional to P(data | coin A) * P(coin A)
+    # Assume equal prior: P(coin A) = P(coin B) = 0.5
+
+    # Likelihood of observing the data under each coin (binomial)
+    lik_A <- dbinom(heads, size = n_flips, prob = theta_A)
+    lik_B <- dbinom(heads, size = n_flips, prob = theta_B)
+
+    # Responsibility: probability that coin A generated each round
+    resp_A <- lik_A / (lik_A + lik_B)
+    resp_B <- 1 - resp_A
+
+    # --- M-step ---
+    # Update theta_A: weighted average of head proportions, weighted by resp_A
+    theta_A_new <- sum(resp_A * heads) / sum(resp_A * n_flips)
+    theta_B_new <- sum(resp_B * heads) / sum(resp_B * n_flips)
+
+    history <- rbind(history, data.frame(
+      iteration = iter, theta_A = theta_A_new, theta_B = theta_B_new
+    ))
+
+    # Check convergence
+    if (abs(theta_A_new - theta_A) < tol && abs(theta_B_new - theta_B) < tol) {
+      theta_A <- theta_A_new
+      theta_B <- theta_B_new
+      break
+    }
+
+    theta_A <- theta_A_new
+    theta_B <- theta_B_new
+  }
+
+  list(
+    theta_A = theta_A,
+    theta_B = theta_B,
+    iterations = iter,
+    history = history
+  )
+}
+
+result <- em_two_coins(heads, n_flips,
+                       theta_A_init = 0.6, theta_B_init = 0.5)
+
+cat(sprintf("Converged in %d iterations\n", result$iterations))
+cat(sprintf("  theta_A = %.4f\n", result$theta_A))
+cat(sprintf("  theta_B = %.4f\n", result$theta_B))
+```
+
+### What Happened at Each Iteration
+
+Let's look at the first few iterations in detail to see the E-step and M-step playing out.
+
+```{r first_iterations}
+# Show detailed E-step and M-step for the first 3 iterations
+theta_A <- 0.6
+theta_B <- 0.5
+
+for (iter in 1:3) {
+  cat(sprintf("=== Iteration %d ===\n", iter))
+  cat(sprintf("Current guesses: theta_A = %.4f, theta_B = %.4f\n\n", theta_A, theta_B))
+
+  lik_A <- dbinom(heads, size = n_flips, prob = theta_A)
+  lik_B <- dbinom(heads, size = n_flips, prob = theta_B)
+  resp_A <- lik_A / (lik_A + lik_B)
+
+  cat("E-step — responsibility of coin A for each round:\n")
+  for (i in seq_along(heads)) {
+    cat(sprintf("  Round %d (%d heads): P(coin A) = %.3f, P(coin B) = %.3f\n",
+                i, heads[i], resp_A[i], 1 - resp_A[i]))
+  }
+
+  theta_A <- sum(resp_A * heads) / sum(resp_A * n_flips)
+  theta_B <- sum((1 - resp_A) * heads) / sum((1 - resp_A) * n_flips)
+
+  cat(sprintf("\nM-step — updated estimates: theta_A = %.4f, theta_B = %.4f\n\n", theta_A, theta_B))
+}
+```
+
+Notice how the responsibilities shift over iterations. In the beginning, the guesses are close together so the model is unsure which coin generated which round. As the estimates improve, the model becomes more confident: rounds with many heads are assigned more strongly to the higher-probability coin and vice versa.
+
+### Convergence Plot
+
+```{r coins_convergence, fig.width=8, fig.height=5, fig.cap="Convergence of coin bias estimates across EM iterations."}
+history_long <- data.frame(
+  iteration = rep(result$history$iteration, 2),
+  theta = c(result$history$theta_A, result$history$theta_B),
+  coin = rep(c("Coin A", "Coin B"), each = nrow(result$history))
+)
+
+ggplot(history_long, aes(x = iteration, y = theta, colour = coin)) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  labs(x = "Iteration", y = "Estimated Bias (probability of heads)",
+       colour = "", title = "EM convergence for the two-coin problem") +
+  theme_minimal()
+```
+
+The two estimates start close together and gradually separate as the algorithm figures out which rounds go with which coin.
+
+# EM for Gaussian Mixtures
+
+The two-coin problem illustrates the logic of EM in a discrete setting. The same logic applies to continuous data. The most common application is fitting **Gaussian mixture models** (GMMs), where you assume your data comes from a blend of several normal (bell-curve) distributions and you want to recover their parameters.
+
+For a detailed treatment of GMMs, see the [Gaussian mixture model](gmm.html) article. Here we focus on the EM mechanics.
+
+## Simulated Data
+
+```{r simulate_gmm}
+set.seed(1984)
+
+# Two-component Gaussian mixture
+n <- 800
+n1 <- round(n * 0.65)
+n2 <- n - n1
+
+x <- c(rnorm(n1, mean = 2, sd = 0.8),
+       rnorm(n2, mean = 6, sd = 1.0))
+
+true_labels <- c(rep(1, n1), rep(2, n2))
+```
+
+```{r show_data, fig.width=9, fig.height=4, fig.cap="Simulated data from two overlapping Gaussian components."}
+ggplot(data.frame(x = x), aes(x = x)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 50,
+                 fill = "steelblue", colour = "white", alpha = 0.7) +
+  geom_density(colour = "red", linewidth = 0.8) +
+  labs(x = "Value", y = "Density",
+       title = "Observed data from an unknown mixture") +
+  theme_minimal()
+```
+
+We know this data was generated by two Gaussians, but we will pretend we don't and let EM figure it out.
+
+## Watching EM Iterate
+
+To see exactly what EM is doing, we'll record the state at each iteration and plot it.
+
+```{r em_gmm_detailed}
+em_gaussian <- function(x, K = 2, max_iter = 30, tol = 1e-6) {
+  n <- length(x)
+
+  # Initialise: spread means across the data range
+  mu <- quantile(x, probs = seq(0.3, 0.7, length.out = K))
+  sigma <- rep(sd(x), K)
+  pi_k <- rep(1 / K, K)
+
+  snapshots <- list()
+
+  for (iter in seq_len(max_iter)) {
+    # E-step
+    resp <- matrix(0, nrow = n, ncol = K)
+    for (k in seq_len(K)) {
+      resp[, k] <- pi_k[k] * dnorm(x, mean = mu[k], sd = sigma[k])
+    }
+    resp <- resp / rowSums(resp)
+
+    # M-step
+    N_k <- colSums(resp)
+    mu_new <- colSums(resp * x) / N_k
+    sigma_new <- sqrt(colSums(resp * outer(x, mu_new, "-")^2) / N_k)
+    pi_new <- N_k / n
+
+    # Record snapshot
+    snapshots[[iter]] <- list(
+      iter = iter, mu = mu_new, sigma = sigma_new,
+      pi_k = pi_new, resp = resp
+    )
+
+    if (max(abs(mu_new - mu)) < tol) break
+    mu <- mu_new
+    sigma <- sigma_new
+    pi_k <- pi_new
+  }
+
+  list(mu = mu_new, sigma = sigma_new, pi_k = pi_new,
+       resp = resp, snapshots = snapshots, iterations = iter)
+}
+
+fit <- em_gaussian(x, K = 2)
+cat(sprintf("Converged in %d iterations\n\n", fit$iterations))
+cat(sprintf("Component 1: mean = %.2f, sd = %.2f, weight = %.2f\n",
+            fit$mu[1], fit$sigma[1], fit$pi_k[1]))
+cat(sprintf("Component 2: mean = %.2f, sd = %.2f, weight = %.2f\n",
+            fit$mu[2], fit$sigma[2], fit$pi_k[2]))
+```
+
+```{r em_iterations_plot, fig.width=10, fig.height=10, fig.cap="EM at iterations 1, 3, 5, and after convergence. The two Gaussian components (orange and blue curves) gradually separate and fit the data."}
+# Select a few iterations to visualise
+show_iters <- c(1, 3, 5, fit$iterations)
+show_iters <- unique(pmin(show_iters, fit$iterations))
+
+x_grid <- seq(min(x) - 1, max(x) + 1, length.out = 500)
+
+plot_data <- do.call(rbind, lapply(show_iters, function(i) {
+  s <- fit$snapshots[[i]]
+  data.frame(
+    x = rep(x_grid, 3),
+    density = c(
+      s$pi_k[1] * dnorm(x_grid, s$mu[1], s$sigma[1]),
+      s$pi_k[2] * dnorm(x_grid, s$mu[2], s$sigma[2]),
+      s$pi_k[1] * dnorm(x_grid, s$mu[1], s$sigma[1]) +
+        s$pi_k[2] * dnorm(x_grid, s$mu[2], s$sigma[2])
+    ),
+    curve = rep(c("Component 1", "Component 2", "Mixture"), each = length(x_grid)),
+    iteration = paste("Iteration", i)
+  )
+}))
+
+plot_data$iteration <- factor(plot_data$iteration,
+                              levels = paste("Iteration", show_iters))
+
+ggplot() +
+  geom_histogram(data = data.frame(x = x), aes(x = x, y = after_stat(density)),
+                 bins = 50, fill = "grey80", colour = "white") +
+  geom_line(data = plot_data, aes(x = x, y = density, colour = curve),
+            linewidth = 0.9) +
+  scale_colour_manual(values = c("Component 1" = "#E69F00",
+                                  "Component 2" = "#56B4E9",
+                                  "Mixture" = "red")) +
+  facet_wrap(~iteration, ncol = 2) +
+  labs(x = "Value", y = "Density", colour = "",
+       title = "EM algorithm iteration by iteration") +
+  theme_minimal()
+```
+
+At iteration 1, the two components are poorly placed — they are too close together and too wide. By iteration 3, they have started to separate. By convergence, each component sits neatly over one of the two humps and the combined mixture (red) traces the overall shape of the data.
+
+## How Responsibilities Evolve
+
+The E-step assigns each data point a responsibility (a probability between 0 and 1) for each component. Let's see how these responsibilities sharpen over iterations.
+
+```{r responsibilities_evolve, fig.width=10, fig.height=8, fig.cap="Responsibilities at different iterations. Early on (top), the model is uncertain about most points. By convergence (bottom), assignments are crisp except in the overlap region."}
+resp_iters <- c(1, 3, fit$iterations)
+resp_iters <- unique(pmin(resp_iters, fit$iterations))
+
+resp_data <- do.call(rbind, lapply(resp_iters, function(i) {
+  data.frame(
+    x = x,
+    resp_2 = fit$snapshots[[i]]$resp[, 2],
+    iteration = paste("Iteration", i)
+  )
+}))
+
+resp_data$iteration <- factor(resp_data$iteration,
+                              levels = paste("Iteration", resp_iters))
+
+ggplot(resp_data, aes(x = x, y = resp_2)) +
+  geom_point(alpha = 0.4, size = 0.8, colour = "steelblue") +
+  geom_hline(yintercept = 0.5, linetype = "dashed", colour = "grey50") +
+  facet_wrap(~iteration, ncol = 1) +
+  labs(x = "Value", y = "P(Component 2)",
+       title = "How responsibilities sharpen over iterations") +
+  theme_minimal()
+```
+
+The dashed line at 0.5 marks the decision boundary. Points above the line are assigned to component 2; points below to component 1. In early iterations, many points cluster near 0.5 (the model is uncertain). By convergence, most points are pushed close to 0 or 1, with only the overlap region retaining genuine ambiguity.
+
+# Why Does EM Work?
+
+You might wonder: why does this iterative guessing game converge to a good answer instead of going in circles? There is a mathematical guarantee.
+
+## The Log-Likelihood Never Decreases
+
+At each iteration, EM is guaranteed to **increase** (or at least not decrease) the **log-likelihood** of the data. The log-likelihood measures how well the current parameters explain the observed data. Think of it as a score: higher is better.
+
+```{r log_likelihood_trace, fig.width=8, fig.height=5, fig.cap="The log-likelihood increases at every EM iteration and plateaus at convergence."}
+# Compute log-likelihood at each iteration
+compute_ll <- function(x, mu, sigma, pi_k) {
+  K <- length(mu)
+  ll <- 0
+  for (i in seq_along(x)) {
+    p <- 0
+    for (k in seq_len(K)) {
+      p <- p + pi_k[k] * dnorm(x[i], mu[k], sigma[k])
+    }
+    ll <- ll + log(p)
+  }
+  ll
+}
+
+ll_values <- sapply(fit$snapshots, function(s) {
+  compute_ll(x, s$mu, s$sigma, s$pi_k)
+})
+
+df_ll <- data.frame(iteration = seq_along(ll_values), log_likelihood = ll_values)
+
+ggplot(df_ll, aes(x = iteration, y = log_likelihood)) +
+  geom_line(linewidth = 1, colour = "darkgreen") +
+  geom_point(size = 2, colour = "darkgreen") +
+  labs(x = "Iteration", y = "Log-Likelihood",
+       title = "Log-likelihood increases at every EM iteration") +
+  theme_minimal()
+```
+
+The curve goes up steeply at first (big improvements) then levels off (fine-tuning). EM stops when the improvements become negligibly small.
+
+## Local Optima
+
+One important caveat: EM is guaranteed to find **a** peak in the log-likelihood, but not necessarily the **highest** peak. The log-likelihood surface can have multiple peaks (local optima), and which one EM finds depends on where it starts.
+
+This means **initialisation matters**. Let's demonstrate this by running EM with two different starting points.
+
+```{r local_optima, fig.width=9, fig.height=5, fig.cap="Different starting points can lead to different solutions. Here, a poor initialisation gets stuck."}
+# Good initialisation
+fit_good <- em_gaussian(x, K = 2)
+
+# Force a bad initialisation by hacking the function
+em_gaussian_custom <- function(x, mu_init, sigma_init, pi_init,
+                               max_iter = 30, tol = 1e-6) {
+  n <- length(x)
+  K <- length(mu_init)
+  mu <- mu_init
+  sigma <- sigma_init
+  pi_k <- pi_init
+
+  for (iter in seq_len(max_iter)) {
+    resp <- matrix(0, nrow = n, ncol = K)
+    for (k in seq_len(K)) {
+      resp[, k] <- pi_k[k] * dnorm(x, mean = mu[k], sd = sigma[k])
+    }
+    resp <- resp / rowSums(resp)
+
+    N_k <- colSums(resp)
+    mu_new <- colSums(resp * x) / N_k
+    sigma_new <- sqrt(colSums(resp * outer(x, mu_new, "-")^2) / N_k)
+    pi_new <- N_k / n
+
+    if (max(abs(mu_new - mu)) < tol) break
+    mu <- mu_new
+    sigma <- sigma_new
+    pi_k <- pi_new
+  }
+  list(mu = mu_new, sigma = sigma_new, pi_k = pi_new)
+}
+
+# Bad initialisation: both means on the same side
+fit_bad <- em_gaussian_custom(x,
+  mu_init = c(5.5, 6.5),
+  sigma_init = c(1, 1),
+  pi_init = c(0.5, 0.5)
+)
+
+# Plot both results
+x_grid <- seq(min(x) - 1, max(x) + 1, length.out = 500)
+
+df_good <- data.frame(
+  x = x_grid,
+  density = fit_good$pi_k[1] * dnorm(x_grid, fit_good$mu[1], fit_good$sigma[1]) +
+    fit_good$pi_k[2] * dnorm(x_grid, fit_good$mu[2], fit_good$sigma[2]),
+  init = "Good initialisation"
+)
+df_bad <- data.frame(
+  x = x_grid,
+  density = fit_bad$pi_k[1] * dnorm(x_grid, fit_bad$mu[1], fit_bad$sigma[1]) +
+    fit_bad$pi_k[2] * dnorm(x_grid, fit_bad$mu[2], fit_bad$sigma[2]),
+  init = "Bad initialisation"
+)
+
+df_inits <- rbind(df_good, df_bad)
+
+ggplot() +
+  geom_histogram(data = data.frame(x = x), aes(x = x, y = after_stat(density)),
+                 bins = 50, fill = "grey80", colour = "white") +
+  geom_line(data = df_inits, aes(x = x, y = density, colour = init),
+            linewidth = 1) +
+  labs(x = "Value", y = "Density", colour = "",
+       title = "The same algorithm, two different starting points") +
+  theme_minimal()
+```
+
+```{r print_both_fits}
+cat("Good initialisation:\n")
+cat(sprintf("  Component 1: mean = %.2f, sd = %.2f\n", fit_good$mu[1], fit_good$sigma[1]))
+cat(sprintf("  Component 2: mean = %.2f, sd = %.2f\n\n", fit_good$mu[2], fit_good$sigma[2]))
+
+cat("Bad initialisation:\n")
+cat(sprintf("  Component 1: mean = %.2f, sd = %.2f\n", fit_bad$mu[1], fit_bad$sigma[1]))
+cat(sprintf("  Component 2: mean = %.2f, sd = %.2f\n", fit_bad$mu[2], fit_bad$sigma[2]))
+```
+
+In practice, the standard defence against local optima is to run EM multiple times with different random starting points and keep the result with the highest log-likelihood. Packages like `mclust` in R do this automatically.
+
+# The General Pattern
+
+EM always follows the same template, regardless of the specific model:
+
+| Step | What you do | Two-coin example | Gaussian mixture example |
+|------|-------------|------------------|--------------------------|
+| **Hidden data** | Identify what is unobserved | Which coin was used in each round | Which component generated each data point |
+| **Initialise** | Make an initial guess for the parameters | $\theta_A = 0.6$, $\theta_B = 0.5$ | Means, SDs, and weights |
+| **E-step** | Compute the expected value of the hidden data, given current parameters | P(coin A \| round data) for each round | P(component $k$ \| data point) for each point |
+| **M-step** | Re-estimate parameters, treating the expected hidden data as if it were real | Weighted proportion of heads for each coin | Weighted mean, SD, and proportion for each component |
+| **Repeat** | Until parameters stop changing | — | — |
+
+The beauty of EM is that both the E-step and the M-step are usually **easy problems on their own**. The E-step is just plugging numbers into a formula. The M-step is often a familiar calculation (like computing a mean). It is only the combination — the fact that you don't know the hidden data — that makes the original problem hard. EM turns one hard problem into a sequence of easy ones.
+
+# Common Pitfalls
+
+## Choosing K
+
+EM assumes you already know the number of components $K$. In the two-coin problem, we knew there were 2 coins. In practice, you may not know $K$. Common approaches:
+
+- **BIC (Bayesian Information Criterion)**: fit models with different values of $K$ and pick the one with the best BIC, which balances fit against model complexity. This is what `mclust` does in R.
+- **Domain knowledge**: sometimes the number of groups is known from the subject matter (e.g., two sexes, three treatment arms).
+
+## Convergence Speed
+
+EM can be slow when components overlap heavily. In such cases, the responsibilities stay uncertain for many iterations, and the parameters update by tiny amounts. This is usually not a problem in practice (modern computers handle thousands of iterations quickly), but it is worth knowing.
+
+## Degenerate Solutions
+
+If a Gaussian component collapses onto a single data point (mean equals that point, standard deviation shrinks to zero), the likelihood goes to infinity. This is a degenerate solution. Well-implemented packages guard against this by adding small regularisation terms or using constrained covariance structures.
+
+# Summary
+
+| Concept | Plain-language meaning |
+|---|---|
+| **EM algorithm** | An iterative method for estimating parameters when there is hidden (unobserved) information |
+| **E-step** | "Given my current guesses, how should I fill in the blanks?" — compute soft assignments of hidden variables |
+| **M-step** | "Given the filled-in blanks, what are the best parameter estimates?" — update parameters using standard formulas |
+| **Responsibility** | The probability that a particular hidden state generated a particular data point |
+| **Log-likelihood** | A score that measures how well the current parameters explain the data; EM never decreases it |
+| **Local optimum** | EM finds a peak, but not necessarily the highest peak; run it multiple times with different starting points |
+| **Convergence** | When the parameter updates become negligibly small, the algorithm stops |
+
+The EM algorithm is not magic. It is a disciplined way of handling the chicken-and-egg problem that arises whenever you have incomplete data. Once you see it as "guess the hidden stuff, update your parameters, repeat", the notation in textbooks becomes much less intimidating.
+
+# Session Info
+
+```{r session_info}
+sessionInfo()
+```
