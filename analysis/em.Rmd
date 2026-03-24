@@ -52,30 +52,42 @@ You have two coins, **A** and **B**, with unknown probabilities of landing heads
 - Coin A lands heads with probability $\theta_A$ (unknown).
 - Coin B lands heads with probability $\theta_B$ (unknown).
 
-Someone runs 5 rounds of an experiment. In each round, they **secretly pick** one of the two coins (you don't know which), flip it 10 times, and tell you how many heads came up. Your job: estimate $\theta_A$ and $\theta_B$.
+Someone runs several rounds of an experiment. In each round, they **secretly pick** one of the two coins (you don't know which), flip it 10 times, and tell you how many heads came up. Your job: estimate $\theta_A$ and $\theta_B$.
 
-Here are the results:
-
-| Round | Heads (out of 10) | Coin used (hidden) |
-|-------|-------------------|-------------------|
-| 1     | 7                 | ?                 |
-| 2     | 3                 | ?                 |
-| 3     | 8                 | ?                 |
-| 4     | 5                 | ?                 |
-| 5     | 9                 | ?                 |
-
-If we knew the hidden column, we could just compute the proportion of heads for each coin. Since we don't, we use EM.
-
-## Step by Step
+Let's simulate this. We'll set the true biases to $\theta_A = 0.8$ and $\theta_B = 0.3$, generate the data, and then see how close EM can get — pretending we don't know the true values.
 
 ```{r two_coins_setup}
 set.seed(1984)
 
-# Observed data: number of heads in each round (10 flips per round)
-heads <- c(7, 3, 8, 5, 9)
+# True (hidden) parameters
+true_theta_A <- 0.8
+true_theta_B <- 0.3
+
+# Simulate 10 rounds: randomly pick a coin, flip it 10 times
+n_rounds <- 10
 n_flips <- 10
-n_rounds <- length(heads)
+
+coin_used <- sample(c("A", "B"), n_rounds, replace = TRUE)
+heads <- ifelse(
+  coin_used == "A",
+  rbinom(n_rounds, size = n_flips, prob = true_theta_A),
+  rbinom(n_rounds, size = n_flips, prob = true_theta_B)
+)
 ```
+
+Here is what the experimenter tells us — just the number of heads per round. The coin column is hidden from us.
+
+```{r two_coins_table}
+data.frame(
+  Round = seq_len(n_rounds),
+  Heads = heads,
+  Coin_used = paste0(coin_used, " (hidden)")
+)
+```
+
+If we knew the hidden column, we could just compute the proportion of heads for each coin. Since we don't, we use EM.
+
+## Step by Step
 
 ### Initial Guess
 
@@ -143,10 +155,12 @@ em_two_coins <- function(heads, n_flips, theta_A_init, theta_B_init,
 result <- em_two_coins(heads, n_flips,
                        theta_A_init = 0.6, theta_B_init = 0.5)
 
-cat(sprintf("Converged in %d iterations\n", result$iterations))
-cat(sprintf("  theta_A = %.4f\n", result$theta_A))
-cat(sprintf("  theta_B = %.4f\n", result$theta_B))
+cat(sprintf("Converged in %d iterations\n\n", result$iterations))
+cat(sprintf("  Estimated: theta_A = %.4f   True: %.4f\n", result$theta_A, true_theta_A))
+cat(sprintf("  Estimated: theta_B = %.4f   True: %.4f\n", result$theta_B, true_theta_B))
 ```
+
+With only `r n_rounds` rounds of data, the estimates may not be perfect — but they should be in the right ballpark. EM correctly identifies which coin is biased toward heads and which toward tails.
 
 ### What Happened at Each Iteration
 
@@ -182,7 +196,7 @@ Notice how the responsibilities shift over iterations. In the beginning, the gue
 
 ### Convergence Plot
 
-```{r coins_convergence, fig.width=8, fig.height=5, fig.cap="Convergence of coin bias estimates across EM iterations."}
+```{r coins_convergence, fig.width=8, fig.height=5, fig.cap="Convergence of coin bias estimates across EM iterations. Dashed lines show the true values."}
 history_long <- data.frame(
   iteration = rep(result$history$iteration, 2),
   theta = c(result$history$theta_A, result$history$theta_B),
@@ -192,12 +206,67 @@ history_long <- data.frame(
 ggplot(history_long, aes(x = iteration, y = theta, colour = coin)) +
   geom_line(linewidth = 1) +
   geom_point(size = 2) +
+  geom_hline(yintercept = true_theta_A, linetype = "dashed", colour = "grey40") +
+  geom_hline(yintercept = true_theta_B, linetype = "dashed", colour = "grey40") +
+  annotate("text", x = max(history_long$iteration), y = true_theta_A + 0.03,
+           label = paste0("True theta_A = ", true_theta_A),
+           hjust = 1, colour = "grey40") +
+  annotate("text", x = max(history_long$iteration), y = true_theta_B - 0.03,
+           label = paste0("True theta_B = ", true_theta_B),
+           hjust = 1, colour = "grey40") +
   labs(x = "Iteration", y = "Estimated Bias (probability of heads)",
        colour = "", title = "EM convergence for the two-coin problem") +
   theme_minimal()
 ```
 
-The two estimates start close together and gradually separate as the algorithm figures out which rounds go with which coin.
+The two estimates start close together and gradually separate as the algorithm figures out which rounds go with which coin. The dashed lines show the true biases we used to simulate the data.
+
+## More Data, Better Estimates
+
+With only `r n_rounds` rounds, the estimates are reasonable but not exact. What happens if we give EM more data? Just as you would get a better estimate of a coin's bias by flipping it more times, EM gets closer to the truth with more rounds.
+
+```{r more_rounds, fig.width=9, fig.height=5, fig.cap="EM estimates improve as the number of rounds increases. With enough data, the estimates converge to the true values."}
+round_sizes <- c(10, 25, 50, 100, 250, 500)
+n_reps <- 50  # repeat each size to show variability
+
+sim_results <- do.call(rbind, lapply(round_sizes, function(nr) {
+  do.call(rbind, lapply(seq_len(n_reps), function(rep) {
+    coin <- sample(c("A", "B"), nr, replace = TRUE)
+    h <- ifelse(
+      coin == "A",
+      rbinom(nr, size = n_flips, prob = true_theta_A),
+      rbinom(nr, size = n_flips, prob = true_theta_B)
+    )
+    fit <- em_two_coins(h, n_flips, theta_A_init = 0.6, theta_B_init = 0.5)
+
+    # EM may swap the labels — assign higher estimate to coin A
+    tA <- max(fit$theta_A, fit$theta_B)
+    tB <- min(fit$theta_A, fit$theta_B)
+
+    data.frame(n_rounds = nr, rep = rep, theta_A = tA, theta_B = tB)
+  }))
+}))
+
+sim_long <- data.frame(
+  n_rounds = rep(sim_results$n_rounds, 2),
+  estimate = c(sim_results$theta_A, sim_results$theta_B),
+  coin = rep(c("Coin A", "Coin B"), each = nrow(sim_results))
+)
+
+ggplot(sim_long, aes(x = factor(n_rounds), y = estimate, fill = coin)) +
+  geom_boxplot(alpha = 0.7, outlier.size = 0.8) +
+  geom_hline(yintercept = true_theta_A, linetype = "dashed", colour = "grey30") +
+  geom_hline(yintercept = true_theta_B, linetype = "dashed", colour = "grey30") +
+  annotate("text", x = 6.4, y = true_theta_A + 0.02,
+           label = paste0("True = ", true_theta_A), colour = "grey30", hjust = 1) +
+  annotate("text", x = 6.4, y = true_theta_B - 0.02,
+           label = paste0("True = ", true_theta_B), colour = "grey30", hjust = 1) +
+  labs(x = "Number of Rounds", y = "Estimated Bias",
+       fill = "", title = "EM estimates improve with more data") +
+  theme_minimal()
+```
+
+With 10 rounds, the estimates are noisy — each repetition of the experiment gives a somewhat different answer. By 100 rounds, the boxes have tightened considerably. By 500 rounds, the estimates are tightly clustered around the true values. This is a general property: EM is a **consistent** estimator, meaning it converges to the truth given enough data.
 
 # The Grading Example — Made Concrete
 
