@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2022-04-14" />
+<meta name="date" content="2026-03-24" />
 
 <title>Distance metrics</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -33,15 +33,16 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<script src="site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
-<script src="site_libs/plotly-binding-4.10.0/plotly.js"></script>
+<link href="site_libs/htmltools-fill-0.5.9/fill.css" rel="stylesheet" />
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.12.0/plotly.js"></script>
 <script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
-<link href="site_libs/crosstalk-1.2.0/css/crosstalk.min.css" rel="stylesheet" />
-<script src="site_libs/crosstalk-1.2.0/js/crosstalk.min.js"></script>
-<link href="site_libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="site_libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
-<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link href="site_libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -80,6 +81,7 @@ if (window.hljs) {
 
 
 
+
 <style type = "text/css">
 .main-container {
   max-width: 940px;
@@ -100,6 +102,9 @@ button.code-folding-btn:focus {
 }
 summary {
   display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
 }
 pre code {
   padding: 0;
@@ -157,11 +162,15 @@ $(document).ready(function () {
     href = "index.html";
   var menuAnchor = $('a[href="' + href + '"]');
 
-  // mark it active
-  menuAnchor.tab('show');
-
-  // if it's got a parent navbar menu mark it active as well
-  menuAnchor.closest('li.dropdown').addClass('active');
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
 
   // Navbar adjustments
   var navHeight = $(".navbar").first().height() + 15;
@@ -190,8 +199,8 @@ $(document).ready(function () {
   border-radius: 4px;
 }
 
-.tabset-dropdown > .nav-tabs > li.active:before {
-  content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
   font-family: 'Glyphicons Halflings';
   display: inline-block;
   padding: 10px;
@@ -199,16 +208,9 @@ $(document).ready(function () {
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-  content: "&#xe258;";
-  border: none;
-}
-
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-  content: "";
+  content: "\e258";
   font-family: 'Glyphicons Halflings';
-  display: inline-block;
-  padding: 10px;
-  border-right: 1px solid #ddd;
+  border: none;
 }
 
 .tabset-dropdown > .nav-tabs > li.active {
@@ -252,7 +254,7 @@ $(document).ready(function () {
 <div class="navbar navbar-default  navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
@@ -289,14 +291,16 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Distance metrics</h1>
-<h4 class="date">2022-04-14</h4>
+<h4 class="date">2026-03-24</h4>
 
 </div>
 
 
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
-<span class="glyphicon glyphicon-list" aria-hidden="true"></span> workflowr <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
 </button>
 </p>
 <div id="workflowr-report" class="collapse">
@@ -305,7 +309,9 @@ $(document).ready(function () {
 <a data-toggle="tab" href="#summary">Summary</a>
 </li>
 <li>
-<a data-toggle="tab" href="#checks"> Checks <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> </a>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
 </li>
 <li>
 <a data-toggle="tab" href="#versions">Past versions</a>
@@ -314,17 +320,27 @@ $(document).ready(function () {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2022-04-14
+<strong>Last updated:</strong> 2026-03-24
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
 </p>
 <p>
-<strong>Knit directory:</strong> <code>muse/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
 </p>
 <p>
-This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysis was created with <a
-  href="https://github.com/workflowr/workflowr">workflowr</a> (version 1.7.0). The <em>Checks</em> tab describes the reproducibility checks that were applied when the results were created. The <em>Past versions</em> tab lists the development history.
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
 </p>
 <hr>
 </div>
@@ -333,104 +349,212 @@ This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a> analysi
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
 </p>
 </div>
-<div id="strongRMarkdownfilestronguptodate" class="panel-collapse collapse">
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great! Since the R Markdown file has been committed to the Git repository, you know the exact version of the code that produced these results.</p>
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
 </p>
 </div>
 <div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20200712)</code> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
 </p>
 </div>
-<div id="strongSeedstrongcodesetseed20200712code" class="panel-collapse collapse">
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
 <div class="panel-body">
-<p>The command <code>set.seed(20200712)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
 </p>
 </div>
-<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
 </p>
 </div>
 <div id="strongCachestrongnone" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
 </p>
 </div>
 <div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
 <div class="panel-body">
-<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
 </div>
 </div>
 </div>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea9f5e22bfb4c585d025e62dc52299fdb8491277dtargetblanka9f5e22a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/davetang/muse/tree/a9f5e22bfb4c585d025e62dc52299fdb8491277d" target="_blank">a9f5e22</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8e62e535e199f78e5655ebdfc0ce7314c1ac28bbtargetblank8e62e53a">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/8e62e535e199f78e5655ebdfc0ce7314c1ac28bb" target="_blank">8e62e53</a>
+</a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea9f5e22bfb4c585d025e62dc52299fdb8491277dtargetblanka9f5e22a" class="panel-collapse collapse">
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8e62e535e199f78e5655ebdfc0ce7314c1ac28bbtargetblank8e62e53a"
+class="panel-collapse collapse">
 <div class="panel-body">
 <p>
-Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/davetang/muse/tree/a9f5e22bfb4c585d025e62dc52299fdb8491277d" target="_blank">a9f5e22</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/8e62e535e199f78e5655ebdfc0ce7314c1ac28bb" target="_blank">8e62e53</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
 </p>
 <p>
-Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
 </p>
 <pre><code>
 Ignored files:
-    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    r_packages_4.1.2/
+    Ignored:    analysis/figure/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.5.2/
 
 Untracked files:
-    Untracked:  analysis/cell_ranger.Rmd
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
+    Untracked:  analysis/.claude/
+    Untracked:  analysis/aucc.Rmd
+    Untracked:  analysis/bimodal.Rmd
+    Untracked:  analysis/bioc.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
+    Untracked:  analysis/modelling.Rmd
+    Untracked:  analysis/sampleqc.Rmd
+    Untracked:  analysis/wordpress_readability.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SeuratObj.rds
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/davetang039sblog.WordPress.2026-02-12.xml
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
+    Untracked:  m3/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
 
 </code></pre>
 <p>
-Note that any generated files, e.g. HTML, png, CSS, etc., are not included in this status report because it is ok for generated content to have uncommitted changes.
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
 </p>
 </div>
 </div>
@@ -439,9 +563,13 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in t
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
-These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/distance.Rmd</code>) and HTML (<code>docs/distance.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/distance.Rmd</code>) and HTML
+(<code>docs/distance.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
 </p>
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
@@ -470,6 +598,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/8e62e535e199f78e5655ebdfc0ce7314c1ac28bb/analysis/distance.Rmd" target="_blank">8e62e53</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-24
+</td>
+<td>
+Mahalanobis Distance
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/d334dbdada984c6154ca542f528a02c3b13fbb6f/docs/distance.html" target="_blank">d334dbd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-04-14
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/a9f5e22bfb4c585d025e62dc52299fdb8491277d/analysis/distance.Rmd" target="_blank">a9f5e22</a>
 </td>
 <td>
@@ -489,7 +651,10 @@ Distance metrics
 </div>
 </div>
 </div>
-<p>The <code>dist</code> function in R computes and returns a distance matrix computed between the rows of a data matrix. The available distance measures include: “euclidean”, “maximum”, “manhattan”, “canberra”, “binary” or “minkowski”.</p>
+<p>The <code>dist</code> function in R computes and returns a distance
+matrix computed between the rows of a data matrix. The available
+distance measures include: “euclidean”, “maximum”, “manhattan”,
+“canberra”, “binary” or “minkowski”.</p>
 <p>Prepare a small dataset for calculating the distances.</p>
 <pre class="r"><code>set.seed(123)
 eg1 &lt;- data.frame(
@@ -507,7 +672,8 @@ eg1</code></pre>
 5 1842 5107 9982
 6 9334 9145 2980
 7 3371 9209 1614</code></pre>
-<p>Plot in 3D and we can see that points 4 and 6 are far away from each other.</p>
+<p>Plot in 3D and we can see that points 4 and 6 are far away from each
+other.</p>
 <pre class="r"><code>plot_ly(
   eg1,
   x = ~x,
@@ -518,12 +684,20 @@ eg1</code></pre>
 ) %&gt;%
   add_markers(marker = list(size = 10)) %&gt;%
   add_text(showlegend = FALSE)</code></pre>
-<div id="htmlwidget-502a66744b8e1fe96c06" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-502a66744b8e1fe96c06">{"x":{"visdat":{"cdf4ce71dfb":["function () ","plotlyVisDat"]},"cur_data":"cdf4ce71dfb","attrs":{"cdf4ce71dfb":{"x":{},"y":{},"z":{},"text":["1","2","3","4","5","6","7"],"color":["1","2","3","4","5","6","7"],"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","marker":{"size":10},"inherit":true},"cdf4ce71dfb.1":{"x":{},"y":{},"z":{},"text":["1","2","3","4","5","6","7"],"color":["1","2","3","4","5","6","7"],"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"text","showlegend":false,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[2463],"y":[4761],"z":[2888],"text":"1","type":"scatter3d","mode":"markers","marker":{"color":"rgba(102,194,165,1)","size":10,"line":{"color":"rgba(102,194,165,1)"}},"name":"1","textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[2511],"y":[6746],"z":[6170],"text":"2","type":"scatter3d","mode":"markers","marker":{"color":"rgba(252,141,98,1)","size":10,"line":{"color":"rgba(252,141,98,1)"}},"name":"2","textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[8718],"y":[9819],"z":[2567],"text":"3","type":"scatter3d","mode":"markers","marker":{"color":"rgba(141,160,203,1)","size":10,"line":{"color":"rgba(141,160,203,1)"}},"name":"3","textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null},{"x":[2986],"y":[2757],"z":[9642],"text":"4","type":"scatter3d","mode":"markers","marker":{"color":"rgba(231,138,195,1)","size":10,"line":{"color":"rgba(231,138,195,1)"}},"name":"4","textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"frame":null},{"x":[1842],"y":[5107],"z":[9982],"text":"5","type":"scatter3d","mode":"markers","marker":{"color":"rgba(166,216,84,1)","size":10,"line":{"color":"rgba(166,216,84,1)"}},"name":"5","textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"frame":null},{"x":[9334],"y":[9145],"z":[2980],"text":"6","type":"scatter3d","mode":"markers","marker":{"color":"rgba(255,217,47,1)","size":10,"line":{"color":"rgba(255,217,47,1)"}},"name":"6","textfont":{"color":"rgba(255,217,47,1)"},"error_y":{"color":"rgba(255,217,47,1)"},"error_x":{"color":"rgba(255,217,47,1)"},"line":{"color":"rgba(255,217,47,1)"},"frame":null},{"x":[3371],"y":[9209],"z":[1614],"text":"7","type":"scatter3d","mode":"markers","marker":{"color":"rgba(229,196,148,1)","size":10,"line":{"color":"rgba(229,196,148,1)"}},"name":"7","textfont":{"color":"rgba(229,196,148,1)"},"error_y":{"color":"rgba(229,196,148,1)"},"error_x":{"color":"rgba(229,196,148,1)"},"line":{"color":"rgba(229,196,148,1)"},"frame":null},{"x":[2463],"y":[4761],"z":[2888],"text":"1","type":"scatter3d","mode":"text","showlegend":false,"name":"1","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[2511],"y":[6746],"z":[6170],"text":"2","type":"scatter3d","mode":"text","showlegend":false,"name":"2","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[8718],"y":[9819],"z":[2567],"text":"3","type":"scatter3d","mode":"text","showlegend":false,"name":"3","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null},{"x":[2986],"y":[2757],"z":[9642],"text":"4","type":"scatter3d","mode":"text","showlegend":false,"name":"4","marker":{"color":"rgba(231,138,195,1)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"frame":null},{"x":[1842],"y":[5107],"z":[9982],"text":"5","type":"scatter3d","mode":"text","showlegend":false,"name":"5","marker":{"color":"rgba(166,216,84,1)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"frame":null},{"x":[9334],"y":[9145],"z":[2980],"text":"6","type":"scatter3d","mode":"text","showlegend":false,"name":"6","marker":{"color":"rgba(255,217,47,1)","line":{"color":"rgba(255,217,47,1)"}},"textfont":{"color":"rgba(255,217,47,1)"},"error_y":{"color":"rgba(255,217,47,1)"},"error_x":{"color":"rgba(255,217,47,1)"},"line":{"color":"rgba(255,217,47,1)"},"frame":null},{"x":[3371],"y":[9209],"z":[1614],"text":"7","type":"scatter3d","mode":"text","showlegend":false,"name":"7","marker":{"color":"rgba(229,196,148,1)","line":{"color":"rgba(229,196,148,1)"}},"textfont":{"color":"rgba(229,196,148,1)"},"error_y":{"color":"rgba(229,196,148,1)"},"error_x":{"color":"rgba(229,196,148,1)"},"line":{"color":"rgba(229,196,148,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div class="plotly html-widget html-fill-item" id="htmlwidget-502a66744b8e1fe96c06" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-502a66744b8e1fe96c06">{"x":{"visdat":{"5e324dd86a50":["function () ","plotlyVisDat"]},"cur_data":"5e324dd86a50","attrs":{"5e324dd86a50":{"x":{},"y":{},"z":{},"text":["1","2","3","4","5","6","7"],"color":["1","2","3","4","5","6","7"],"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"markers","marker":{"size":10},"inherit":true},"5e324dd86a50.1":{"x":{},"y":{},"z":{},"text":["1","2","3","4","5","6","7"],"color":["1","2","3","4","5","6","7"],"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter3d","mode":"text","showlegend":false,"inherit":true}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"scene":{"xaxis":{"title":"x"},"yaxis":{"title":"y"},"zaxis":{"title":"z"}},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[2463],"y":[4761],"z":[2888],"text":"1","type":"scatter3d","mode":"markers","marker":{"color":"rgba(102,194,165,1)","size":10,"line":{"color":"rgba(102,194,165,1)"}},"name":"1","textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[2511],"y":[6746],"z":[6170],"text":"2","type":"scatter3d","mode":"markers","marker":{"color":"rgba(252,141,98,1)","size":10,"line":{"color":"rgba(252,141,98,1)"}},"name":"2","textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[8718],"y":[9819],"z":[2567],"text":"3","type":"scatter3d","mode":"markers","marker":{"color":"rgba(141,160,203,1)","size":10,"line":{"color":"rgba(141,160,203,1)"}},"name":"3","textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null},{"x":[2986],"y":[2757],"z":[9642],"text":"4","type":"scatter3d","mode":"markers","marker":{"color":"rgba(231,138,195,1)","size":10,"line":{"color":"rgba(231,138,195,1)"}},"name":"4","textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"frame":null},{"x":[1842],"y":[5107],"z":[9982],"text":"5","type":"scatter3d","mode":"markers","marker":{"color":"rgba(166,216,84,1)","size":10,"line":{"color":"rgba(166,216,84,1)"}},"name":"5","textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"frame":null},{"x":[9334],"y":[9145],"z":[2980],"text":"6","type":"scatter3d","mode":"markers","marker":{"color":"rgba(255,217,47,1)","size":10,"line":{"color":"rgba(255,217,47,1)"}},"name":"6","textfont":{"color":"rgba(255,217,47,1)"},"error_y":{"color":"rgba(255,217,47,1)"},"error_x":{"color":"rgba(255,217,47,1)"},"line":{"color":"rgba(255,217,47,1)"},"frame":null},{"x":[3371],"y":[9209],"z":[1614],"text":"7","type":"scatter3d","mode":"markers","marker":{"color":"rgba(229,196,148,1)","size":10,"line":{"color":"rgba(229,196,148,1)"}},"name":"7","textfont":{"color":"rgba(229,196,148,1)"},"error_y":{"color":"rgba(229,196,148,1)"},"error_x":{"color":"rgba(229,196,148,1)"},"line":{"color":"rgba(229,196,148,1)"},"frame":null},{"x":[2463],"y":[4761],"z":[2888],"text":"1","type":"scatter3d","mode":"text","showlegend":false,"name":"1","marker":{"color":"rgba(102,194,165,1)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,1)"},"error_y":{"color":"rgba(102,194,165,1)"},"error_x":{"color":"rgba(102,194,165,1)"},"line":{"color":"rgba(102,194,165,1)"},"frame":null},{"x":[2511],"y":[6746],"z":[6170],"text":"2","type":"scatter3d","mode":"text","showlegend":false,"name":"2","marker":{"color":"rgba(252,141,98,1)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,1)"},"error_y":{"color":"rgba(252,141,98,1)"},"error_x":{"color":"rgba(252,141,98,1)"},"line":{"color":"rgba(252,141,98,1)"},"frame":null},{"x":[8718],"y":[9819],"z":[2567],"text":"3","type":"scatter3d","mode":"text","showlegend":false,"name":"3","marker":{"color":"rgba(141,160,203,1)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,1)"},"error_y":{"color":"rgba(141,160,203,1)"},"error_x":{"color":"rgba(141,160,203,1)"},"line":{"color":"rgba(141,160,203,1)"},"frame":null},{"x":[2986],"y":[2757],"z":[9642],"text":"4","type":"scatter3d","mode":"text","showlegend":false,"name":"4","marker":{"color":"rgba(231,138,195,1)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,1)"},"error_y":{"color":"rgba(231,138,195,1)"},"error_x":{"color":"rgba(231,138,195,1)"},"line":{"color":"rgba(231,138,195,1)"},"frame":null},{"x":[1842],"y":[5107],"z":[9982],"text":"5","type":"scatter3d","mode":"text","showlegend":false,"name":"5","marker":{"color":"rgba(166,216,84,1)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,1)"},"error_y":{"color":"rgba(166,216,84,1)"},"error_x":{"color":"rgba(166,216,84,1)"},"line":{"color":"rgba(166,216,84,1)"},"frame":null},{"x":[9334],"y":[9145],"z":[2980],"text":"6","type":"scatter3d","mode":"text","showlegend":false,"name":"6","marker":{"color":"rgba(255,217,47,1)","line":{"color":"rgba(255,217,47,1)"}},"textfont":{"color":"rgba(255,217,47,1)"},"error_y":{"color":"rgba(255,217,47,1)"},"error_x":{"color":"rgba(255,217,47,1)"},"line":{"color":"rgba(255,217,47,1)"},"frame":null},{"x":[3371],"y":[9209],"z":[1614],"text":"7","type":"scatter3d","mode":"text","showlegend":false,"name":"7","marker":{"color":"rgba(229,196,148,1)","line":{"color":"rgba(229,196,148,1)"}},"textfont":{"color":"rgba(229,196,148,1)"},"error_y":{"color":"rgba(229,196,148,1)"},"error_x":{"color":"rgba(229,196,148,1)"},"line":{"color":"rgba(229,196,148,1)"},"frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 <div id="euclidean-distance" class="section level2">
 <h2>Euclidean distance</h2>
-<p>The first distance metric is the <a href="https://en.wikipedia.org/wiki/Euclidean_distance">Euclidean distance</a>, which is the default of <code>dist</code>. The Euclidean distance is simply the distance one would physically measure, say with a ruler. For <span class="math inline">\(n\)</span> dimensions the formula for the Euclidean distance between points <span class="math inline">\(p\)</span> and <span class="math inline">\(q\)</span> is:</p>
-<p><span class="math display">\[ d(p,q) = d(q,p) = \sqrt{\sum^n_{i=1} (p_i - q_i)^2} \]</span></p>
+<p>The first distance metric is the <a
+href="https://en.wikipedia.org/wiki/Euclidean_distance">Euclidean
+distance</a>, which is the default of <code>dist</code>. The Euclidean
+distance is simply the distance one would physically measure, say with a
+ruler. For <span class="math inline">\(n\)</span> dimensions the formula
+for the Euclidean distance between points <span
+class="math inline">\(p\)</span> and <span
+class="math inline">\(q\)</span> is:</p>
+<p><span class="math display">\[ d(p,q) = d(q,p) = \sqrt{\sum^n_{i=1}
+(p_i - q_i)^2} \]</span></p>
 <p>We create a function that calculates the Euclidean distance.</p>
 <pre class="r"><code>euclid_dist &lt;- function(p, q){
    as.numeric(sqrt(sum((p - q)^2)))
@@ -536,10 +710,12 @@ eg1</code></pre>
 <p>The Euclidean distances in two dimensions between two points.</p>
 <pre class="r"><code>euclid_dist(p = c(2, 2), q = c(5.535534, 5.535534))</code></pre>
 <pre><code>[1] 5</code></pre>
-<p>The Euclidean distances in three dimensions between points 4 and 6.</p>
+<p>The Euclidean distances in three dimensions between points 4 and
+6.</p>
 <pre class="r"><code>euclid_dist(eg1[4,], eg1[6,])</code></pre>
 <pre><code>[1] 11202.05</code></pre>
-<p>We can calculate all the (row-wise) pairwise distances by providing the entire dataset.</p>
+<p>We can calculate all the (row-wise) pairwise distances by providing
+the entire dataset.</p>
 <pre class="r"><code>dist(eg1)</code></pre>
 <pre><code>          1         2         3         4         5         6
 2  3835.890                                                  
@@ -551,9 +727,11 @@ eg1</code></pre>
 </div>
 <div id="maximum-distance" class="section level2">
 <h2>Maximum distance</h2>
-<p>The documentation for <code>dist</code> describes the maximum distance as:</p>
+<p>The documentation for <code>dist</code> describes the maximum
+distance as:</p>
 <blockquote>
-<p>Maximum distance between two components of x and y (supremum norm)</p>
+<p>Maximum distance between two components of x and y (supremum
+norm)</p>
 </blockquote>
 <p>Let’s create an example to figure out what this means.</p>
 <pre class="r"><code>eg2 &lt;- data.frame(x = c(2, 6), y = c(4, 6))
@@ -563,27 +741,69 @@ plot(eg2, pch = 16)
 lines(c(eg2[1,1], eg2[2,1]), c(eg2[1,2], eg2[2,2]))
 lines(c(eg2[1,1], eg2[2,1]), c(eg2[1,2], eg2[1,2]))
 lines(c(eg2[2,1], eg2[2,1]), c(eg2[1,2], eg2[2,2]))</code></pre>
-<p><img src="figure/distance.Rmd/eg2-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>The Euclidean distance is the hypotenuse, which you can calculate using the Pythagoras theorem.</p>
+<p><img src="figure/distance.Rmd/eg2-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-eg2-1">
+Past versions of eg2-1.png
+</button>
+</p>
+<div id="fig-eg2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/d334dbdada984c6154ca542f528a02c3b13fbb6f/docs/figure/distance.Rmd/eg2-1.png" target="_blank">d334dbd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-04-14
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>The Euclidean distance is the hypotenuse, which you can calculate
+using the Pythagoras theorem.</p>
 <pre class="r"><code>dist(eg2)</code></pre>
 <pre><code>         1
 2 4.472136</code></pre>
-<p>The maximum distance is the longest edge that is not the hypotenuse.</p>
+<p>The maximum distance is the longest edge that is not the
+hypotenuse.</p>
 <pre class="r"><code>dist(eg2, method = &quot;maximum&quot;)</code></pre>
 <pre><code>  1
 2 4</code></pre>
-<p>The maximum distance is maximum distance of all edge distances. In <code>eg1</code> we have three edges between two points.</p>
+<p>The maximum distance is maximum distance of all edge distances. In
+<code>eg1</code> we have three edges between two points.</p>
 <pre class="r"><code>edge_dist &lt;- function(p, q){
   as.numeric(sqrt((p-q)^2))
 }
 
 edge_dist(eg1[1, ], eg1[2, ])</code></pre>
 <pre><code>[1]   48 1985 3282</code></pre>
-<p>The longest edge is between the <code>z</code> coordinates and this is what the maximum distance returns below.</p>
+<p>The longest edge is between the <code>z</code> coordinates and this
+is what the maximum distance returns below.</p>
 <pre class="r"><code>dist(eg1[1:2, ], method = &quot;maximum&quot;)</code></pre>
 <pre><code>     1
 2 3282</code></pre>
-<p>The results using <code>dist</code> and <code>max(edge_dist())</code> are identical.</p>
+<p>The results using <code>dist</code> and <code>max(edge_dist())</code>
+are identical.</p>
 <pre class="r"><code>identical(
   as.vector(dist(eg1[6:7, ], method = &quot;maximum&quot;)),
   max(edge_dist(eg1[6, ], eg1[7, ]))
@@ -606,11 +826,13 @@ identical(
 </div>
 <div id="manhattan-distance" class="section level2">
 <h2>Manhattan distance</h2>
-<p>The documentation for <code>dist</code> describes the Manhattan distance as:</p>
+<p>The documentation for <code>dist</code> describes the Manhattan
+distance as:</p>
 <blockquote>
 <p>Absolute distance between the two vectors (1 norm aka L_1).</p>
 </blockquote>
-<p><a href="https://en.wikipedia.org/wiki/Taxicab_geometry" class="uri">https://en.wikipedia.org/wiki/Taxicab_geometry</a></p>
+<p><a href="https://en.wikipedia.org/wiki/Taxicab_geometry"
+class="uri">https://en.wikipedia.org/wiki/Taxicab_geometry</a></p>
 <p><span class="math display">\[
 \sum^n_{i=1} |p_i - q_i|, \\
 where\ p = (p_1, p_2, \dots, p_n)\ and\ q = (q_1, q_2, \dots, q_n)
@@ -624,7 +846,8 @@ where\ p = (p_1, p_2, \dots, p_n)\ and\ q = (q_1, q_2, \dots, q_n)
 <pre><code>[1] 13540</code></pre>
 <pre class="r"><code>sum(edge_dist(eg3[1, ], eg3[2, ]))</code></pre>
 <pre><code>[1] 13540</code></pre>
-<p>We can calculate all Manhattan distances and confirm the distance between points 1 and 2 in <code>eg3</code>.</p>
+<p>We can calculate all Manhattan distances and confirm the distance
+between points 1 and 2 in <code>eg3</code>.</p>
 <pre class="r"><code>dist(eg3, method=&quot;manhattan&quot;)</code></pre>
 <pre><code>       1     2     3     4     5     6     7     8     9
 2  13540                                                
@@ -639,17 +862,22 @@ where\ p = (p_1, p_2, \dots, p_n)\ and\ q = (q_1, q_2, \dots, q_n)
 </div>
 <div id="canberra-distance" class="section level2">
 <h2>Canberra distance</h2>
-<p>The <a href="https://en.wikipedia.org/wiki/Canberra_distance">Canberra distance</a> is formulated as:</p>
+<p>The <a
+href="https://en.wikipedia.org/wiki/Canberra_distance">Canberra
+distance</a> is formulated as:</p>
 <p><span class="math display">\[
 d(p, q) = \sum^n_{i = 1}\frac{|p_i-q_i|}{|p_i|+|q_i|}, \\
 where\ p = (p_1, p_2, \dots, p_n)\ and\ q = (q_1, q_2, \dots, q_n)
 \]</span></p>
-<p>I guess the name is a play on Manhattan distance, since at least one of the researchers (William T. Williams) that devised the distance worked in Australia (Canberra is the capital of Australia).</p>
+<p>I guess the name is a play on Manhattan distance, since at least one
+of the researchers (William T. Williams) that devised the distance
+worked in Australia (Canberra is the capital of Australia).</p>
 <p>As an R function.</p>
 <pre class="r"><code>canberra_dist &lt;- function(p,q){
   sum( (abs(p-q)) / (abs(p) + abs(q)) )
 }</code></pre>
-<p>The main difference is that the distance is “weighted” by dividing by the sum of two points.</p>
+<p>The main difference is that the distance is “weighted” by dividing by
+the sum of two points.</p>
 <pre class="r"><code>canberra_dist(1, 10)</code></pre>
 <pre><code>[1] 0.8181818</code></pre>
 <p>All Canberra distances.</p>
@@ -664,12 +892,19 @@ where\ p = (p_1, p_2, \dots, p_n)\ and\ q = (q_1, q_2, \dots, q_n)
 </div>
 <div id="minkowski-distance" class="section level2">
 <h2>Minkowski distance</h2>
-<p>The <a href="https://en.wikipedia.org/wiki/Minkowski_distance">Minkowski distance</a> of order <span class="math inline">\(p\)</span> (where <span class="math inline">\(p\)</span> is an integer) is formulated as:</p>
+<p>The <a
+href="https://en.wikipedia.org/wiki/Minkowski_distance">Minkowski
+distance</a> of order <span class="math inline">\(p\)</span> (where
+<span class="math inline">\(p\)</span> is an integer) is formulated
+as:</p>
 <p><span class="math display">\[
 D(X, Y) = \left( \sum^n_{i=1} |x_i - y_i|^p\right)^{\frac{1}{p}}, \\
-where\ X = (x_1, x_2, \dots, x_n)\ and\ Y = (y_1, y_2, \dots, y_n) \in \mathbb{R}^n
+where\ X = (x_1, x_2, \dots, x_n)\ and\ Y = (y_1, y_2, \dots, y_n) \in
+\mathbb{R}^n
 \]</span></p>
-<p>The Minkowski distance is a metric that can be considered as a generalisation of both the Euclidean distance and the Manhattan distance and is named after Hermann Minkowski.</p>
+<p>The Minkowski distance is a metric that can be considered as a
+generalisation of both the Euclidean distance and the Manhattan distance
+and is named after Hermann Minkowski.</p>
 <p>As an R function and check result with <code>dist</code>.</p>
 <pre class="r"><code>minkowski_dist &lt;- function(x, y, p){
   (sum(abs(x -y)^p))^(1/p)
@@ -680,28 +915,171 @@ identical(
   as.vector(dist(eg1[1:2, ], method = &quot;minkowski&quot;, p = 1))
 )</code></pre>
 <pre><code>[1] TRUE</code></pre>
-<p>If <code>p</code> is 1, then the distance is the same as the Manhattan distance.</p>
+<p>If <code>p</code> is 1, then the distance is the same as the
+Manhattan distance.</p>
 <pre class="r"><code>identical(
   minkowski_dist(eg3[1, ], eg3[2, ], 1),
   man_dist(eg3[1, ], eg3[2, ])
 )</code></pre>
 <pre><code>[1] TRUE</code></pre>
-<p>If <code>p</code> is 2, then the distance is the same as the Euclidean distance.</p>
+<p>If <code>p</code> is 2, then the distance is the same as the
+Euclidean distance.</p>
 <pre class="r"><code>identical(
   minkowski_dist(eg3[1, ], eg3[2, ], 2),
   euclid_dist(eg3[1, ], eg3[2, ])
 )</code></pre>
 <pre><code>[1] TRUE</code></pre>
-<p>As we increase <code>p</code>, the Minkowski approaches a limit (and we obtain the <a href="https://en.wikipedia.org/wiki/Chebyshev_distance">Chebyshev distance</a>).</p>
+<p>As we increase <code>p</code>, the Minkowski approaches a limit (and
+we obtain the <a
+href="https://en.wikipedia.org/wiki/Chebyshev_distance">Chebyshev
+distance</a>).</p>
 <pre class="r"><code>sapply(1:20, function(x) minkowski_dist(eg3[1, ], eg3[2, ], p = x))</code></pre>
 <pre><code> [1] 13540.000  8318.523  7522.088  7315.580  7253.782  7234.047  7227.482
  [8]  7225.232  7224.443  7224.162  7224.060  7224.022  7224.008  7224.003
 [15]  7224.001  7224.000  7224.000  7224.000  7224.000  7224.000</code></pre>
 </div>
+<div id="mahalanobis-distance" class="section level2">
+<h2>Mahalanobis distance</h2>
+<p>The distances above treat all dimensions equally and independently.
+But what if your variables are correlated, or measured on different
+scales? Consider heights (in cm) and weights (in kg): a 5-unit
+difference in weight means something very different from a 5-unit
+difference in height. The Euclidean distance would be dominated by
+whichever variable has larger values.</p>
+<p>The <a
+href="https://en.wikipedia.org/wiki/Mahalanobis_distance">Mahalanobis
+distance</a> solves this by accounting for the <strong>covariance
+structure</strong> of the data. It stretches and rotates the space so
+that one unit of distance means the same in every direction. A point
+that is 2 Mahalanobis distances from the centre is equally “unusual”
+regardless of which direction it lies in.</p>
+<p>For a point <span class="math inline">\(\mathbf{x}\)</span> relative
+to a distribution with mean <span
+class="math inline">\(\boldsymbol{\mu}\)</span> and covariance matrix
+<span class="math inline">\(\mathbf{S}\)</span>, the Mahalanobis
+distance is:</p>
+<p><span class="math display">\[
+D_M(\mathbf{x}, \boldsymbol{\mu}) = \sqrt{(\mathbf{x} -
+\boldsymbol{\mu})^T \mathbf{S}^{-1} (\mathbf{x} - \boldsymbol{\mu})}
+\]</span></p>
+<p>When <span class="math inline">\(\mathbf{S}\)</span> is the identity
+matrix (uncorrelated variables, equal variance), this reduces to the
+Euclidean distance. The covariance matrix <span
+class="math inline">\(\mathbf{S}\)</span> is what makes it “scale-aware”
+and “correlation-aware”.</p>
+<p>As an R function that returns the <strong>squared</strong>
+Mahalanobis distance (to match R’s <code>mahalanobis()</code>).</p>
+<pre class="r"><code>mahal_dist_sq &lt;- function(x, center, cov_matrix) {
+  diff &lt;- as.numeric(x - center)
+  as.numeric(t(diff) %*% solve(cov_matrix) %*% diff)
+}</code></pre>
+<p>Base R provides <code>mahalanobis()</code>, which also returns the
+<strong>squared</strong> distance. Let’s verify our function
+matches.</p>
+<pre class="r"><code># Use the eg1 dataset
+center &lt;- colMeans(eg1)
+cov_matrix &lt;- cov(eg1)
+
+# Our function for the first point
+mahal_dist_sq(eg1[1, ], center, cov_matrix)</code></pre>
+<pre><code>[1] 4.046402</code></pre>
+<pre class="r"><code># Base R for all points
+mahalanobis(eg1, center, cov_matrix)</code></pre>
+<pre><code>[1] 4.0464023 0.9620585 1.8966804 2.9692272 2.7423852 2.4772556 2.9059908</code></pre>
+<pre class="r"><code># Confirm they match
+identical(
+  mahal_dist_sq(eg1[1, ], center, cov_matrix),
+  mahalanobis(eg1, center, cov_matrix)[1]
+)</code></pre>
+<pre><code>[1] TRUE</code></pre>
+<div id="why-does-correlation-matter" class="section level3">
+<h3>Why does correlation matter?</h3>
+<p>To see why the Mahalanobis distance is different from the Euclidean
+distance, consider a dataset where two variables are strongly
+correlated.</p>
+<pre class="r"><code>set.seed(1984)
+n &lt;- 200
+corr_data &lt;- data.frame(
+  x = rnorm(n, mean = 50, sd = 10),
+  y = NA
+)
+corr_data$y &lt;- 0.8 * corr_data$x + rnorm(n, sd = 5)
+
+# Two test points, both at the same Euclidean distance from the mean
+# Point A: along the correlation axis (not unusual)
+# Point B: perpendicular to the correlation axis (unusual)
+point_a &lt;- c(x = 75, y = 0.8 * 75)
+point_b &lt;- c(x = 65, y = 0.8 * 65 - 20)
+
+center &lt;- colMeans(corr_data)
+cov_mat &lt;- cov(corr_data)
+
+euclid_a &lt;- euclid_dist(point_a, center)
+euclid_b &lt;- euclid_dist(point_b, center)
+mahal_a &lt;- sqrt(mahalanobis(rbind(point_a), center, cov_mat))
+mahal_b &lt;- sqrt(mahalanobis(rbind(point_b), center, cov_mat))
+
+plot(corr_data, pch = 16, col = &quot;grey70&quot;,
+     xlim = range(c(corr_data$x, point_a[1], point_b[1])),
+     ylim = range(c(corr_data$y, point_a[2], point_b[2])),
+     main = &quot;Euclidean vs Mahalanobis distance&quot;)
+points(point_a[1], point_a[2], pch = 17, col = &quot;red&quot;, cex = 2)
+points(point_b[1], point_b[2], pch = 17, col = &quot;blue&quot;, cex = 2)
+points(center[1], center[2], pch = 3, col = &quot;black&quot;, cex = 2, lwd = 2)
+legend(&quot;topleft&quot;,
+       legend = c(
+         sprintf(&quot;Point A (red): Euclid = %.1f, Mahal = %.1f&quot;, euclid_a, mahal_a),
+         sprintf(&quot;Point B (blue): Euclid = %.1f, Mahal = %.1f&quot;, euclid_b, mahal_b)
+       ),
+       pch = 17, col = c(&quot;red&quot;, &quot;blue&quot;), cex = 0.9)</code></pre>
+<p><img src="figure/distance.Rmd/mahal_correlation-1.png" alt="" width="864" style="display: block; margin: auto;" /></p>
+<p>Point A lies along the direction of correlation — it is far from the
+centre in Euclidean terms but not unusual given the shape of the data.
+Point B lies off the correlation axis — it is unusual even though its
+Euclidean distance may be similar. The Mahalanobis distance captures
+this: Point B has a larger Mahalanobis distance because it deviates from
+the pattern of the data, not just from the centre.</p>
+</div>
+<div id="outlier-detection" class="section level3">
+<h3>Outlier detection</h3>
+<p>A common application of the Mahalanobis distance is
+<strong>multivariate outlier detection</strong>. Under a multivariate
+normal distribution, the squared Mahalanobis distance follows a
+chi-squared distribution with <span class="math inline">\(p\)</span>
+degrees of freedom (where <span class="math inline">\(p\)</span> is the
+number of variables). Points with a squared Mahalanobis distance
+exceeding the chi-squared critical value are flagged as outliers.</p>
+<pre class="r"><code># Squared Mahalanobis distances for the correlated data
+d_sq &lt;- mahalanobis(corr_data, center, cov_mat)
+
+# Chi-squared threshold at alpha = 0.05 with 2 degrees of freedom
+threshold &lt;- qchisq(0.95, df = ncol(corr_data))
+
+n_outliers &lt;- sum(d_sq &gt; threshold)
+cat(sprintf(&quot;Chi-squared threshold (df = %d, alpha = 0.05): %.2f\n&quot;,
+            ncol(corr_data), threshold))</code></pre>
+<pre><code>Chi-squared threshold (df = 2, alpha = 0.05): 5.99</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;Outliers: %d out of %d (%.1f%%)\n&quot;,
+            n_outliers, nrow(corr_data), 100 * n_outliers / nrow(corr_data)))</code></pre>
+<pre><code>Outliers: 11 out of 200 (5.5%)</code></pre>
+<p>This is exactly the approach used by packages like SampleQC for
+identifying outlier cells in single-cell RNA-seq quality control.</p>
+</div>
+</div>
 <div id="negative-distances" class="section level2">
 <h2>Negative distances</h2>
-<p>I learned of negative distances from the paper <a href="https://pubmed.ncbi.nlm.nih.gov/17218491/">Clustering by Passing Messages Between Data Points</a>, which are specifically called the negative squared Euclidean distance. The R package <code>apcluster</code> contains the function <code>negDistMat</code>, which can be used to calculate the negative squared Euclidean distance (among others). The paper is shared <a href="https://utstat.toronto.edu/reid/sta414/frey-affinity.pdf">here</a> for your reading pleasure.</p>
-<p>As stated in the paper, the negative distance between points <span class="math inline">\(x_i\)</span> and <span class="math inline">\(x_k\)</span> is:</p>
+<p>I learned of negative distances from the paper <a
+href="https://pubmed.ncbi.nlm.nih.gov/17218491/">Clustering by Passing
+Messages Between Data Points</a>, which are specifically called the
+negative squared Euclidean distance. The R package
+<code>apcluster</code> contains the function <code>negDistMat</code>,
+which can be used to calculate the negative squared Euclidean distance
+(among others). The paper is shared <a
+href="https://utstat.toronto.edu/reid/sta414/frey-affinity.pdf">here</a>
+for your reading pleasure.</p>
+<p>As stated in the paper, the negative distance between points <span
+class="math inline">\(x_i\)</span> and <span
+class="math inline">\(x_k\)</span> is:</p>
 <p><span class="math display">\[
 s(i, k) = -||x_i - x_k||^2
 \]</span></p>
@@ -720,14 +1098,11 @@ eg4</code></pre>
 [3,]  0.5  0.7  0.1
 [4,]  0.0  1.0  0.3
 [5,]  1.0  0.8  0.2</code></pre>
-<p>Use <code>negDistMat</code> to calculate the negative distances or just calculate the Euclidean distance and turn it negative.</p>
-<pre class="r"><code>library(apcluster)</code></pre>
-<pre><code>
-Attaching package: &#39;apcluster&#39;</code></pre>
-<pre><code>The following object is masked from &#39;package:stats&#39;:
+<p>Use <code>negDistMat</code> to calculate the negative distances or
+just calculate the Euclidean distance and turn it negative.</p>
+<pre class="r"><code>library(apcluster)
 
-    heatmap</code></pre>
-<pre class="r"><code>identical(
+identical(
   negDistMat(eg4),
   as.matrix(-dist(eg4, diag = TRUE, upper = TRUE))
 )</code></pre>
@@ -735,7 +1110,12 @@ Attaching package: &#39;apcluster&#39;</code></pre>
 </div>
 <div id="clustering-using-different-distances" class="section level2">
 <h2>Clustering using different distances</h2>
-<p>We will perform hierarchical clustering using different distances to compare the results. For plotting the dendrograms, we will use the <a href="https://cran.r-project.org/web/packages/ggdendro/vignettes/ggdendro.html">ggdendro package</a> and use the <a href="https://patchwork.data-imaginist.com/">patchwork package</a> for adding plots together.</p>
+<p>We will perform hierarchical clustering using different distances to
+compare the results. For plotting the dendrograms, we will use the <a
+href="https://cran.r-project.org/web/packages/ggdendro/vignettes/ggdendro.html">ggdendro
+package</a> and use the <a
+href="https://patchwork.data-imaginist.com/">patchwork package</a> for
+adding plots together.</p>
 <pre class="r"><code>library(ggdendro)
 library(patchwork)
 
@@ -750,12 +1130,54 @@ ggdendrogram(hclust(max_d)) + ggtitle(&quot;Maximum distance&quot;) +
 ggdendrogram(hclust(man_d)) + ggtitle(&quot;Manhattan distance&quot;) +
 ggdendrogram(hclust(can_d)) + ggtitle(&quot;Canberra distance&quot;) +
 ggdendrogram(hclust(min_d)) + ggtitle(&quot;Minkowski&quot;)</code></pre>
-<p><img src="figure/distance.Rmd/plot_dendrograms-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/distance.Rmd/plot_dendrograms-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-plot_dendrograms-1">
+Past versions of plot_dendrograms-1.png
+</button>
+</p>
+<div id="fig-plot_dendrograms-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/d334dbdada984c6154ca542f528a02c3b13fbb6f/docs/figure/distance.Rmd/plot_dendrograms-1.png" target="_blank">d334dbd</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2022-04-14
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="correlation-between-distances" class="section level2">
 <h2>Correlation between distances</h2>
-<p>The <a href="https://en.wikipedia.org/wiki/Mantel_test">Mantel test</a> performs a correlation between two distance matrices and this is available in the <a href="https://cran.r-project.org/web/packages/ade4/index.html">ade4 package</a>.</p>
-<p>Let’s compare identical distance matrices and see what results we get.</p>
+<p>The <a href="https://en.wikipedia.org/wiki/Mantel_test">Mantel
+test</a> performs a correlation between two distance matrices and this
+is available in the <a
+href="https://cran.r-project.org/web/packages/ade4/index.html">ade4
+package</a>.</p>
+<p>Let’s compare identical distance matrices and see what results we
+get.</p>
 <pre class="r"><code>library(ade4)
 
 mantel.randtest(euc_d, euc_d, nrepet = 10000)</code></pre>
@@ -765,16 +1187,24 @@ Call: mantel.randtest(m1 = euc_d, m2 = euc_d, nrepet = 10000)
 Observation: 1 
 
 Based on 10000 replicates
-Simulated p-value: 0.00029997 
+Simulated p-value: 0.00059994 
 Alternative hypothesis: greater 
 
-      Std.Obs   Expectation      Variance 
- 4.2633060551 -0.0007816083  0.0551043151 </code></pre>
-<p>The correlation is reported as the observation and the null hypothesis is that there is no relation between the two matrices, which is rejected. The idea of the test is to permute the rows and columns and observe whether the correlation coefficient is affected. From <a href="https://en.wikipedia.org/wiki/Mantel_test">Wikipedia</a>:</p>
+     Std.Obs  Expectation     Variance 
+ 4.285545790 -0.002806077  0.054754729 </code></pre>
+<p>The correlation is reported as the observation and the null
+hypothesis is that there is no relation between the two matrices, which
+is rejected. The idea of the test is to permute the rows and columns and
+observe whether the correlation coefficient is affected. From <a
+href="https://en.wikipedia.org/wiki/Mantel_test">Wikipedia</a>:</p>
 <blockquote>
-<p>The reasoning is that if the null hypothesis of there being no relation between the two matrices is true, then permuting the rows and columns of the matrix should be equally likely to produce a larger or a smaller coefficient.</p>
+<p>The reasoning is that if the null hypothesis of there being no
+relation between the two matrices is true, then permuting the rows and
+columns of the matrix should be equally likely to produce a larger or a
+smaller coefficient.</p>
 </blockquote>
-<p>We can calculate all correlations on the <code>mtcars</code> dataset and see how similar different distances are to each other.</p>
+<p>We can calculate all correlations on the <code>mtcars</code> dataset
+and see how similar different distances are to each other.</p>
 <pre class="r"><code>my_dist &lt;- c(
   &quot;euclidean&quot;,
   &quot;maximum&quot;,
@@ -800,21 +1230,26 @@ Euclidean vs Minkowski   Maximum vs Manhattan    Maximum vs Canberra
              0.9901299              0.7915281              0.9918907 
  Canberra vs Minkowski 
              0.7705224 </code></pre>
-<p>Most distances are similar to each other except the Canberra distance. Since <code>mantel.rtest</code> uses the Pearson correlation, the weighted Canberra distances are less similar to the other unweighted distances.</p>
+<p>Most distances are similar to each other except the Canberra
+distance. Since <code>mantel.rtest</code> uses the Pearson correlation,
+the weighted Canberra distances are less similar to the other unweighted
+distances.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
-<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
 </button>
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.1.2 (2021-11-01)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 20.04.3 LTS
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.4 LTS
 
 Matrix products: default
-BLAS/LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.8.so
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
 
 locale:
  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -824,35 +1259,45 @@ locale:
  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
 [11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
 
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
 attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] ade4_1.7-18     patchwork_1.1.1 ggdendro_0.1.23 apcluster_1.4.9
- [5] plotly_4.10.0   forcats_0.5.1   stringr_1.4.0   dplyr_1.0.7    
- [9] purrr_0.3.4     readr_2.1.1     tidyr_1.1.4     tibble_3.1.6   
-[13] ggplot2_3.3.5   tidyverse_1.3.1 workflowr_1.7.0
+ [1] patchwork_1.3.2  plotly_4.12.0    lubridate_1.9.5  forcats_1.0.1   
+ [5] stringr_1.6.0    dplyr_1.2.0      purrr_1.2.1      readr_2.2.0     
+ [9] tidyr_1.3.2      tibble_3.3.1     ggplot2_4.0.2    tidyverse_2.0.0 
+[13] ggdendro_0.2.0   apcluster_1.4.14 ade4_1.7-24      workflowr_1.7.2 
 
 loaded via a namespace (and not attached):
- [1] httr_1.4.2         jsonlite_1.7.3     viridisLite_0.4.0  modelr_0.1.8      
- [5] assertthat_0.2.1   getPass_0.2-2      highr_0.9          cellranger_1.1.0  
- [9] yaml_2.2.2         pillar_1.6.5       backports_1.4.1    lattice_0.20-45   
-[13] glue_1.6.1         digest_0.6.29      RColorBrewer_1.1-2 promises_1.2.0.1  
-[17] rvest_1.0.2        colorspace_2.0-2   htmltools_0.5.2    httpuv_1.6.5      
-[21] Matrix_1.3-4       pkgconfig_2.0.3    broom_0.7.11       haven_2.4.3       
-[25] scales_1.1.1       processx_3.5.2     whisker_0.4        later_1.3.0       
-[29] tzdb_0.2.0         git2r_0.29.0       generics_0.1.1     farver_2.1.0      
-[33] ellipsis_0.3.2     withr_2.4.3        lazyeval_0.2.2     cli_3.1.1         
-[37] magrittr_2.0.2     crayon_1.4.2       readxl_1.3.1       evaluate_0.14     
-[41] ps_1.6.0           fs_1.5.2           fansi_1.0.2        MASS_7.3-54       
-[45] xml2_1.3.3         tools_4.1.2        data.table_1.14.2  hms_1.1.1         
-[49] lifecycle_1.0.1    munsell_0.5.0      reprex_2.0.1       callr_3.7.0       
-[53] compiler_4.1.2     jquerylib_0.1.4    rlang_1.0.0        grid_4.1.2        
-[57] rstudioapi_0.13    htmlwidgets_1.5.4  crosstalk_1.2.0    labeling_0.4.2    
-[61] rmarkdown_2.11     gtable_0.3.0       DBI_1.1.2          R6_2.5.1          
-[65] lubridate_1.8.0    knitr_1.37         fastmap_1.1.0      utf8_1.2.2        
-[69] rprojroot_2.0.2    stringi_1.7.6      Rcpp_1.0.8         vctrs_0.3.8       
-[73] dbplyr_2.1.1       tidyselect_1.1.1   xfun_0.29         </code></pre>
+ [1] gtable_0.3.6        xfun_0.57           bslib_0.10.0       
+ [4] htmlwidgets_1.6.4   processx_3.8.6      lattice_0.22-7     
+ [7] callr_3.7.6         tzdb_0.5.0          vctrs_0.7.2        
+[10] tools_4.5.2         crosstalk_1.2.2     ps_1.9.1           
+[13] generics_0.1.4      pkgconfig_2.0.3     Matrix_1.7-4       
+[16] data.table_1.18.2.1 RColorBrewer_1.1-3  S7_0.2.1           
+[19] lifecycle_1.0.5     compiler_4.5.2      farver_2.1.2       
+[22] git2r_0.36.2        getPass_0.2-4       httpuv_1.6.17      
+[25] htmltools_0.5.9     sass_0.4.10         yaml_2.3.12        
+[28] lazyeval_0.2.2      later_1.4.8         pillar_1.11.1      
+[31] jquerylib_0.1.4     whisker_0.4.1       MASS_7.3-65        
+[34] cachem_1.1.0        tidyselect_1.2.1    digest_0.6.39      
+[37] stringi_1.8.7       labeling_0.4.3      rprojroot_2.1.1    
+[40] fastmap_1.2.0       grid_4.5.2          cli_3.6.5          
+[43] magrittr_2.0.4      withr_3.0.2         scales_1.4.0       
+[46] promises_1.5.0      timechange_0.4.0    rmarkdown_2.30     
+[49] httr_1.4.8          otel_0.2.0          hms_1.1.4          
+[52] evaluate_1.0.5      knitr_1.51          viridisLite_0.4.3  
+[55] rlang_1.1.7         Rcpp_1.1.1          glue_1.8.0         
+[58] rstudioapi_0.18.0   jsonlite_2.0.0      R6_2.6.1           
+[61] fs_2.0.0           </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 
