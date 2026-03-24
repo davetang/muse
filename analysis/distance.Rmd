@@ -9,6 +9,14 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
+my_packages <- c("ade4", "apcluster", "ggdendro")
+
+for (pkg in my_packages) {
+  if (!require(pkg, character.only = TRUE, quietly = TRUE)) {
+    install.packages(pkg)
+  }
+}
+
 library(tidyverse)
 library(plotly)
 knitr::opts_chunk$set(echo = TRUE)
@@ -267,6 +275,113 @@ As we increase `p`, the Minkowski approaches a limit (and we obtain the [Chebysh
 ```{r minkowski_limit}
 sapply(1:20, function(x) minkowski_dist(eg3[1, ], eg3[2, ], p = x))
 ```
+
+## Mahalanobis distance
+
+The distances above treat all dimensions equally and independently. But what if your variables are correlated, or measured on different scales? Consider heights (in cm) and weights (in kg): a 5-unit difference in weight means something very different from a 5-unit difference in height. The Euclidean distance would be dominated by whichever variable has larger values.
+
+The [Mahalanobis distance](https://en.wikipedia.org/wiki/Mahalanobis_distance) solves this by accounting for the **covariance structure** of the data. It stretches and rotates the space so that one unit of distance means the same in every direction. A point that is 2 Mahalanobis distances from the centre is equally "unusual" regardless of which direction it lies in.
+
+For a point $\mathbf{x}$ relative to a distribution with mean $\boldsymbol{\mu}$ and covariance matrix $\mathbf{S}$, the Mahalanobis distance is:
+
+$$
+D_M(\mathbf{x}, \boldsymbol{\mu}) = \sqrt{(\mathbf{x} - \boldsymbol{\mu})^T \mathbf{S}^{-1} (\mathbf{x} - \boldsymbol{\mu})}
+$$
+
+When $\mathbf{S}$ is the identity matrix (uncorrelated variables, equal variance), this reduces to the Euclidean distance. The covariance matrix $\mathbf{S}$ is what makes it "scale-aware" and "correlation-aware".
+
+As an R function that returns the **squared** Mahalanobis distance (to match R's `mahalanobis()`).
+
+```{r mahal_dist}
+mahal_dist_sq <- function(x, center, cov_matrix) {
+  diff <- as.numeric(x - center)
+  as.numeric(t(diff) %*% solve(cov_matrix) %*% diff)
+}
+```
+
+Base R provides `mahalanobis()`, which also returns the **squared** distance. Let's verify our function matches.
+
+```{r mahal_vs_base}
+# Use the eg1 dataset
+center <- colMeans(eg1)
+cov_matrix <- cov(eg1)
+
+# Our function for the first point
+mahal_dist_sq(eg1[1, ], center, cov_matrix)
+
+# Base R for all points
+mahalanobis(eg1, center, cov_matrix)
+
+# Confirm they match
+identical(
+  mahal_dist_sq(eg1[1, ], center, cov_matrix),
+  mahalanobis(eg1, center, cov_matrix)[1]
+)
+```
+
+### Why does correlation matter?
+
+To see why the Mahalanobis distance is different from the Euclidean distance, consider a dataset where two variables are strongly correlated.
+
+```{r mahal_correlation, fig.width=9, fig.height=5}
+set.seed(1984)
+n <- 200
+corr_data <- data.frame(
+  x = rnorm(n, mean = 50, sd = 10),
+  y = NA
+)
+corr_data$y <- 0.8 * corr_data$x + rnorm(n, sd = 5)
+
+# Two test points, both at the same Euclidean distance from the mean
+# Point A: along the correlation axis (not unusual)
+# Point B: perpendicular to the correlation axis (unusual)
+point_a <- c(x = 75, y = 0.8 * 75)
+point_b <- c(x = 65, y = 0.8 * 65 - 20)
+
+center <- colMeans(corr_data)
+cov_mat <- cov(corr_data)
+
+euclid_a <- euclid_dist(point_a, center)
+euclid_b <- euclid_dist(point_b, center)
+mahal_a <- sqrt(mahalanobis(rbind(point_a), center, cov_mat))
+mahal_b <- sqrt(mahalanobis(rbind(point_b), center, cov_mat))
+
+plot(corr_data, pch = 16, col = "grey70",
+     xlim = range(c(corr_data$x, point_a[1], point_b[1])),
+     ylim = range(c(corr_data$y, point_a[2], point_b[2])),
+     main = "Euclidean vs Mahalanobis distance")
+points(point_a[1], point_a[2], pch = 17, col = "red", cex = 2)
+points(point_b[1], point_b[2], pch = 17, col = "blue", cex = 2)
+points(center[1], center[2], pch = 3, col = "black", cex = 2, lwd = 2)
+legend("topleft",
+       legend = c(
+         sprintf("Point A (red): Euclid = %.1f, Mahal = %.1f", euclid_a, mahal_a),
+         sprintf("Point B (blue): Euclid = %.1f, Mahal = %.1f", euclid_b, mahal_b)
+       ),
+       pch = 17, col = c("red", "blue"), cex = 0.9)
+```
+
+Point A lies along the direction of correlation — it is far from the centre in Euclidean terms but not unusual given the shape of the data. Point B lies off the correlation axis — it is unusual even though its Euclidean distance may be similar. The Mahalanobis distance captures this: Point B has a larger Mahalanobis distance because it deviates from the pattern of the data, not just from the centre.
+
+### Outlier detection
+
+A common application of the Mahalanobis distance is **multivariate outlier detection**. Under a multivariate normal distribution, the squared Mahalanobis distance follows a chi-squared distribution with $p$ degrees of freedom (where $p$ is the number of variables). Points with a squared Mahalanobis distance exceeding the chi-squared critical value are flagged as outliers.
+
+```{r mahal_outlier}
+# Squared Mahalanobis distances for the correlated data
+d_sq <- mahalanobis(corr_data, center, cov_mat)
+
+# Chi-squared threshold at alpha = 0.05 with 2 degrees of freedom
+threshold <- qchisq(0.95, df = ncol(corr_data))
+
+n_outliers <- sum(d_sq > threshold)
+cat(sprintf("Chi-squared threshold (df = %d, alpha = 0.05): %.2f\n",
+            ncol(corr_data), threshold))
+cat(sprintf("Outliers: %d out of %d (%.1f%%)\n",
+            n_outliers, nrow(corr_data), 100 * n_outliers / nrow(corr_data)))
+```
+
+This is exactly the approach used by packages like SampleQC for identifying outlier cells in single-cell RNA-seq quality control.
 
 ## Negative distances
 
