@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2026-03-23" />
+<meta name="date" content="2026-03-24" />
 
 <title>The Expectation-Maximisation (EM) Algorithm</title>
 
@@ -360,7 +360,7 @@ div.tocify {
 
 <h1 class="title toc-ignore">The Expectation-Maximisation (EM)
 Algorithm</h1>
-<h4 class="date">2026-03-23</h4>
+<h4 class="date">2026-03-24</h4>
 
 </div>
 
@@ -389,7 +389,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2026-03-23
+<strong>Last updated:</strong> 2026-03-24
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7753a73317b0f052be3278a232eb3dddbfca8466targetblank7753a73a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed7f7bfb2eb3e0b7687f497d2fa76791f5c7fdf67targetblankd7f7bfba">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/7753a73317b0f052be3278a232eb3dddbfca8466" target="_blank">7753a73</a>
+<a href="https://github.com/davetang/muse/tree/d7f7bfb2eb3e0b7687f497d2fa76791f5c7fdf67" target="_blank">d7f7bfb</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree7753a73317b0f052be3278a232eb3dddbfca8466targetblank7753a73a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed7f7bfb2eb3e0b7687f497d2fa76791f5c7fdf67targetblankd7f7bfba"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/7753a73317b0f052be3278a232eb3dddbfca8466" target="_blank">7753a73</a>.
+<a href="https://github.com/davetang/muse/tree/d7f7bfb2eb3e0b7687f497d2fa76791f5c7fdf67" target="_blank">d7f7bfb</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -664,6 +664,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/d7f7bfb2eb3e0b7687f497d2fa76791f5c7fdf67/analysis/em.Rmd" target="_blank">d7f7bfb</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-24
+</td>
+<td>
+Use simulated data for the two-coin example
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/54767a765893cd9ff09b281ebc4697ed30c22887/docs/em.html" target="_blank">54767a7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/7753a73317b0f052be3278a232eb3dddbfca8466/analysis/em.Rmd" target="_blank">7753a73</a>
 </td>
 <td>
@@ -784,59 +818,55 @@ class="math inline">\(\theta_A\)</span> (unknown).</li>
 <li>Coin B lands heads with probability <span
 class="math inline">\(\theta_B\)</span> (unknown).</li>
 </ul>
-<p>Someone runs 5 rounds of an experiment. In each round, they
+<p>Someone runs several rounds of an experiment. In each round, they
 <strong>secretly pick</strong> one of the two coins (you don’t know
 which), flip it 10 times, and tell you how many heads came up. Your job:
 estimate <span class="math inline">\(\theta_A\)</span> and <span
 class="math inline">\(\theta_B\)</span>.</p>
-<p>Here are the results:</p>
-<table>
-<thead>
-<tr class="header">
-<th>Round</th>
-<th>Heads (out of 10)</th>
-<th>Coin used (hidden)</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1</td>
-<td>7</td>
-<td>?</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>3</td>
-<td>?</td>
-</tr>
-<tr class="odd">
-<td>3</td>
-<td>8</td>
-<td>?</td>
-</tr>
-<tr class="even">
-<td>4</td>
-<td>5</td>
-<td>?</td>
-</tr>
-<tr class="odd">
-<td>5</td>
-<td>9</td>
-<td>?</td>
-</tr>
-</tbody>
-</table>
+<p>Let’s simulate this. We’ll set the true biases to <span
+class="math inline">\(\theta_A = 0.8\)</span> and <span
+class="math inline">\(\theta_B = 0.3\)</span>, generate the data, and
+then see how close EM can get — pretending we don’t know the true
+values.</p>
+<pre class="r"><code>set.seed(1984)
+
+# True (hidden) parameters
+true_theta_A &lt;- 0.8
+true_theta_B &lt;- 0.3
+
+# Simulate 10 rounds: randomly pick a coin, flip it 10 times
+n_rounds &lt;- 10
+n_flips &lt;- 10
+
+coin_used &lt;- sample(c(&quot;A&quot;, &quot;B&quot;), n_rounds, replace = TRUE)
+heads &lt;- ifelse(
+  coin_used == &quot;A&quot;,
+  rbinom(n_rounds, size = n_flips, prob = true_theta_A),
+  rbinom(n_rounds, size = n_flips, prob = true_theta_B)
+)</code></pre>
+<p>Here is what the experimenter tells us — just the number of heads per
+round. The coin column is hidden from us.</p>
+<pre class="r"><code>data.frame(
+  Round = seq_len(n_rounds),
+  Heads = heads,
+  Coin_used = paste0(coin_used, &quot; (hidden)&quot;)
+)</code></pre>
+<pre><code>   Round Heads  Coin_used
+1      1     3 B (hidden)
+2      2     0 B (hidden)
+3      3     3 B (hidden)
+4      4     5 B (hidden)
+5      5     9 A (hidden)
+6      6    10 A (hidden)
+7      7     4 B (hidden)
+8      8     3 B (hidden)
+9      9     6 A (hidden)
+10    10     9 A (hidden)</code></pre>
 <p>If we knew the hidden column, we could just compute the proportion of
 heads for each coin. Since we don’t, we use EM.</p>
 </div>
 <div id="step-by-step" class="section level2">
 <h2>Step by Step</h2>
-<pre class="r"><code>set.seed(1984)
-
-# Observed data: number of heads in each round (10 flips per round)
-heads &lt;- c(7, 3, 8, 5, 9)
-n_flips &lt;- 10
-n_rounds &lt;- length(heads)</code></pre>
 <div id="initial-guess" class="section level3">
 <h3>Initial Guess</h3>
 <p>We need a starting point. Let’s guess <span
@@ -903,12 +933,15 @@ em_two_coins &lt;- function(heads, n_flips, theta_A_init, theta_B_init,
 result &lt;- em_two_coins(heads, n_flips,
                        theta_A_init = 0.6, theta_B_init = 0.5)
 
-cat(sprintf(&quot;Converged in %d iterations\n&quot;, result$iterations))</code></pre>
-<pre><code>Converged in 17 iterations</code></pre>
-<pre class="r"><code>cat(sprintf(&quot;  theta_A = %.4f\n&quot;, result$theta_A))</code></pre>
-<pre><code>  theta_A = 0.7959</code></pre>
-<pre class="r"><code>cat(sprintf(&quot;  theta_B = %.4f\n&quot;, result$theta_B))</code></pre>
-<pre><code>  theta_B = 0.4449</code></pre>
+cat(sprintf(&quot;Converged in %d iterations\n\n&quot;, result$iterations))</code></pre>
+<pre><code>Converged in 16 iterations</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;  Estimated: theta_A = %.4f   True: %.4f\n&quot;, result$theta_A, true_theta_A))</code></pre>
+<pre><code>  Estimated: theta_A = 0.9266   True: 0.8000</code></pre>
+<pre class="r"><code>cat(sprintf(&quot;  Estimated: theta_B = %.4f   True: %.4f\n&quot;, result$theta_B, true_theta_B))</code></pre>
+<pre><code>  Estimated: theta_B = 0.3408   True: 0.3000</code></pre>
+<p>With only 10 rounds of data, the estimates may not be perfect — but
+they should be in the right ballpark. EM correctly identifies which coin
+is biased toward heads and which toward tails.</p>
 </div>
 <div id="what-happened-at-each-iteration" class="section level3">
 <h3>What Happened at Each Iteration</h3>
@@ -941,37 +974,52 @@ for (iter in 1:3) {
 Current guesses: theta_A = 0.6000, theta_B = 0.5000
 
 E-step — responsibility of coin A for each round:
-  Round 1 (7 heads): P(coin A) = 0.647, P(coin B) = 0.353
-  Round 2 (3 heads): P(coin A) = 0.266, P(coin B) = 0.734
-  Round 3 (8 heads): P(coin A) = 0.733, P(coin B) = 0.267
+  Round 1 (3 heads): P(coin A) = 0.266, P(coin B) = 0.734
+  Round 2 (0 heads): P(coin A) = 0.097, P(coin B) = 0.903
+  Round 3 (3 heads): P(coin A) = 0.266, P(coin B) = 0.734
   Round 4 (5 heads): P(coin A) = 0.449, P(coin B) = 0.551
   Round 5 (9 heads): P(coin A) = 0.805, P(coin B) = 0.195
+  Round 6 (10 heads): P(coin A) = 0.861, P(coin B) = 0.139
+  Round 7 (4 heads): P(coin A) = 0.352, P(coin B) = 0.648
+  Round 8 (3 heads): P(coin A) = 0.266, P(coin B) = 0.734
+  Round 9 (6 heads): P(coin A) = 0.550, P(coin B) = 0.450
+  Round 10 (9 heads): P(coin A) = 0.805, P(coin B) = 0.195
 
-M-step — updated estimates: theta_A = 0.7131, theta_B = 0.5389
+M-step — updated estimates: theta_A = 0.6879, theta_B = 0.3701
 
 === Iteration 2 ===
-Current guesses: theta_A = 0.7131, theta_B = 0.5389
+Current guesses: theta_A = 0.6879, theta_B = 0.3701
 
 E-step — responsibility of coin A for each round:
-  Round 1 (7 heads): P(coin A) = 0.631, P(coin B) = 0.369
-  Round 2 (3 heads): P(coin A) = 0.077, P(coin B) = 0.923
-  Round 3 (8 heads): P(coin A) = 0.784, P(coin B) = 0.216
-  Round 4 (5 heads): P(coin A) = 0.274, P(coin B) = 0.726
-  Round 5 (9 heads): P(coin A) = 0.886, P(coin B) = 0.114
+  Round 1 (3 heads): P(coin A) = 0.045, P(coin B) = 0.955
+  Round 2 (0 heads): P(coin A) = 0.001, P(coin B) = 0.999
+  Round 3 (3 heads): P(coin A) = 0.045, P(coin B) = 0.955
+  Round 4 (5 heads): P(coin A) = 0.399, P(coin B) = 0.601
+  Round 5 (9 heads): P(coin A) = 0.992, P(coin B) = 0.008
+  Round 6 (10 heads): P(coin A) = 0.998, P(coin B) = 0.002
+  Round 7 (4 heads): P(coin A) = 0.150, P(coin B) = 0.850
+  Round 8 (3 heads): P(coin A) = 0.045, P(coin B) = 0.955
+  Round 9 (6 heads): P(coin A) = 0.713, P(coin B) = 0.287
+  Round 10 (9 heads): P(coin A) = 0.992, P(coin B) = 0.008
 
-M-step — updated estimates: theta_A = 0.7640, theta_B = 0.4999
+M-step — updated estimates: theta_A = 0.8017, theta_B = 0.3004
 
 === Iteration 3 ===
-Current guesses: theta_A = 0.7640, theta_B = 0.4999
+Current guesses: theta_A = 0.8017, theta_B = 0.3004
 
 E-step — responsibility of coin A for each round:
-  Round 1 (7 heads): P(coin A) = 0.672, P(coin B) = 0.328
-  Round 2 (3 heads): P(coin A) = 0.018, P(coin B) = 0.982
-  Round 3 (8 heads): P(coin A) = 0.869, P(coin B) = 0.131
-  Round 4 (5 heads): P(coin A) = 0.163, P(coin B) = 0.837
-  Round 5 (9 heads): P(coin A) = 0.956, P(coin B) = 0.044
+  Round 1 (3 heads): P(coin A) = 0.003, P(coin B) = 0.997
+  Round 2 (0 heads): P(coin A) = 0.000, P(coin B) = 1.000
+  Round 3 (3 heads): P(coin A) = 0.003, P(coin B) = 0.997
+  Round 4 (5 heads): P(coin A) = 0.198, P(coin B) = 0.802
+  Round 5 (9 heads): P(coin A) = 0.999, P(coin B) = 0.001
+  Round 6 (10 heads): P(coin A) = 1.000, P(coin B) = 0.000
+  Round 7 (4 heads): P(coin A) = 0.026, P(coin B) = 0.974
+  Round 8 (3 heads): P(coin A) = 0.003, P(coin B) = 0.997
+  Round 9 (6 heads): P(coin A) = 0.700, P(coin B) = 0.300
+  Round 10 (9 heads): P(coin A) = 0.999, P(coin B) = 0.001
 
-M-step — updated estimates: theta_A = 0.7889, theta_B = 0.4683</code></pre>
+M-step — updated estimates: theta_A = 0.8473, theta_B = 0.3080</code></pre>
 <p>Notice how the responsibilities shift over iterations. In the
 beginning, the guesses are close together so the model is unsure which
 coin generated which round. As the estimates improve, the model becomes
@@ -989,13 +1037,22 @@ higher-probability coin and vice versa.</p>
 ggplot(history_long, aes(x = iteration, y = theta, colour = coin)) +
   geom_line(linewidth = 1) +
   geom_point(size = 2) +
+  geom_hline(yintercept = true_theta_A, linetype = &quot;dashed&quot;, colour = &quot;grey40&quot;) +
+  geom_hline(yintercept = true_theta_B, linetype = &quot;dashed&quot;, colour = &quot;grey40&quot;) +
+  annotate(&quot;text&quot;, x = max(history_long$iteration), y = true_theta_A + 0.03,
+           label = paste0(&quot;True theta_A = &quot;, true_theta_A),
+           hjust = 1, colour = &quot;grey40&quot;) +
+  annotate(&quot;text&quot;, x = max(history_long$iteration), y = true_theta_B - 0.03,
+           label = paste0(&quot;True theta_B = &quot;, true_theta_B),
+           hjust = 1, colour = &quot;grey40&quot;) +
   labs(x = &quot;Iteration&quot;, y = &quot;Estimated Bias (probability of heads)&quot;,
        colour = &quot;&quot;, title = &quot;EM convergence for the two-coin problem&quot;) +
   theme_minimal()</code></pre>
 <div class="figure" style="text-align: center">
-<img src="figure/em.Rmd/coins_convergence-1.png" alt="Convergence of coin bias estimates across EM iterations." width="768" />
+<img src="figure/em.Rmd/coins_convergence-1.png" alt="Convergence of coin bias estimates across EM iterations. Dashed lines show the true values." width="768" />
 <p class="caption">
-Convergence of coin bias estimates across EM iterations.
+Convergence of coin bias estimates across EM iterations. Dashed lines
+show the true values.
 </p>
 </div>
 <p>
@@ -1036,8 +1093,67 @@ Dave Tang
 </div>
 </div>
 <p>The two estimates start close together and gradually separate as the
-algorithm figures out which rounds go with which coin.</p>
+algorithm figures out which rounds go with which coin. The dashed lines
+show the true biases we used to simulate the data.</p>
 </div>
+</div>
+<div id="more-data-better-estimates" class="section level2">
+<h2>More Data, Better Estimates</h2>
+<p>With only 10 rounds, the estimates are reasonable but not exact. What
+happens if we give EM more data? Just as you would get a better estimate
+of a coin’s bias by flipping it more times, EM gets closer to the truth
+with more rounds.</p>
+<pre class="r"><code>round_sizes &lt;- c(10, 25, 50, 100, 250, 500)
+n_reps &lt;- 50  # repeat each size to show variability
+
+sim_results &lt;- do.call(rbind, lapply(round_sizes, function(nr) {
+  do.call(rbind, lapply(seq_len(n_reps), function(rep) {
+    coin &lt;- sample(c(&quot;A&quot;, &quot;B&quot;), nr, replace = TRUE)
+    h &lt;- ifelse(
+      coin == &quot;A&quot;,
+      rbinom(nr, size = n_flips, prob = true_theta_A),
+      rbinom(nr, size = n_flips, prob = true_theta_B)
+    )
+    fit &lt;- em_two_coins(h, n_flips, theta_A_init = 0.6, theta_B_init = 0.5)
+
+    # EM may swap the labels — assign higher estimate to coin A
+    tA &lt;- max(fit$theta_A, fit$theta_B)
+    tB &lt;- min(fit$theta_A, fit$theta_B)
+
+    data.frame(n_rounds = nr, rep = rep, theta_A = tA, theta_B = tB)
+  }))
+}))
+
+sim_long &lt;- data.frame(
+  n_rounds = rep(sim_results$n_rounds, 2),
+  estimate = c(sim_results$theta_A, sim_results$theta_B),
+  coin = rep(c(&quot;Coin A&quot;, &quot;Coin B&quot;), each = nrow(sim_results))
+)
+
+ggplot(sim_long, aes(x = factor(n_rounds), y = estimate, fill = coin)) +
+  geom_boxplot(alpha = 0.7, outlier.size = 0.8) +
+  geom_hline(yintercept = true_theta_A, linetype = &quot;dashed&quot;, colour = &quot;grey30&quot;) +
+  geom_hline(yintercept = true_theta_B, linetype = &quot;dashed&quot;, colour = &quot;grey30&quot;) +
+  annotate(&quot;text&quot;, x = 6.4, y = true_theta_A + 0.02,
+           label = paste0(&quot;True = &quot;, true_theta_A), colour = &quot;grey30&quot;, hjust = 1) +
+  annotate(&quot;text&quot;, x = 6.4, y = true_theta_B - 0.02,
+           label = paste0(&quot;True = &quot;, true_theta_B), colour = &quot;grey30&quot;, hjust = 1) +
+  labs(x = &quot;Number of Rounds&quot;, y = &quot;Estimated Bias&quot;,
+       fill = &quot;&quot;, title = &quot;EM estimates improve with more data&quot;) +
+  theme_minimal()</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/em.Rmd/more_rounds-1.png" alt="EM estimates improve as the number of rounds increases. With enough data, the estimates converge to the true values." width="864" />
+<p class="caption">
+EM estimates improve as the number of rounds increases. With enough
+data, the estimates converge to the true values.
+</p>
+</div>
+<p>With 10 rounds, the estimates are noisy — each repetition of the
+experiment gives a somewhat different answer. By 100 rounds, the boxes
+have tightened considerably. By 500 rounds, the estimates are tightly
+clustered around the true values. This is a general property: EM is a
+<strong>consistent</strong> estimator, meaning it converges to the truth
+given enough data.</p>
 </div>
 </div>
 <div id="the-grading-example-made-concrete" class="section level1">
@@ -1076,6 +1192,43 @@ true_grader &lt;- c(rep(&quot;Alice&quot;, n_alice), rep(&quot;Bob&quot;, n_bob)
 The pile of 200 scores. Two overlapping humps hint at two graders, but
 we don’t know who graded what.
 </p>
+</div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-grading_hist-1">
+Past versions of grading_hist-1.png
+</button>
+</p>
+<div id="fig-grading_hist-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/54767a765893cd9ff09b281ebc4697ed30c22887/docs/figure/em.Rmd/grading_hist-1.png" target="_blank">54767a7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <p>The histogram shows a hint of two humps. EM will try to recover the
 two grading distributions.</p>
@@ -1185,6 +1338,43 @@ The estimated grading averages converge from the initial guesses (75 and
 70) toward the true values.
 </p>
 </div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-grading_convergence-1">
+Past versions of grading_convergence-1.png
+</button>
+</p>
+<div id="fig-grading_convergence-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/54767a765893cd9ff09b281ebc4697ed30c22887/docs/figure/em.Rmd/grading_convergence-1.png" target="_blank">54767a7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The two estimates start close together (75 and 70) and separate
 rapidly as EM figures out the two grading styles.</p>
 </div>
@@ -1236,6 +1426,43 @@ ggplot(df_assign, aes(x = score, y = p_alice, colour = true_grader)) +
 Each assignment coloured by EM’s confidence that Alice graded it. Scores
 in the overlap region (around 70-75) are genuinely uncertain.
 </p>
+</div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-grading_assignments-1">
+Past versions of grading_assignments-1.png
+</button>
+</p>
+<div id="fig-grading_assignments-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/54767a765893cd9ff09b281ebc4697ed30c22887/docs/figure/em.Rmd/grading_assignments-1.png" target="_blank">54767a7</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-23
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <p>Points above the dashed line are assigned to Alice; points below to
 Bob. The colour shows the truth. Most assignments are classified
