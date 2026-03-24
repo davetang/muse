@@ -89,6 +89,53 @@ If we knew the hidden column, we could just compute the proportion of heads for 
 
 ## Step by Step
 
+Before we look at the code, let's unpack the key ideas that the E-step and M-step rely on.
+
+### Probability vs Likelihood
+
+These two words sound interchangeable, but they ask different questions:
+
+- **Probability** asks: given that I know the coin has bias $\theta = 0.8$, what is the chance of seeing 7 heads in 10 flips? The parameter is fixed and we are asking about the data.
+- **Likelihood** asks: given that I observed 7 heads in 10 flips, how plausible is it that the coin has bias $\theta = 0.8$? The data is fixed and we are asking about the parameter.
+
+Mathematically, the same formula is used for both — the binomial probability mass function `dbinom()`. The difference is in what we treat as known and what we treat as unknown. When we hold the data fixed and vary the parameter, we call the result the **likelihood**.
+
+### Conditional Probability and Bayes' Rule
+
+In the E-step, we need to answer: "Given the heads count in this round **and** our current guesses for $\theta_A$ and $\theta_B$, what is the probability that coin A was used?" This is a **conditional probability** — the probability of one event (coin A was used) given that another event has occurred (we observed a specific number of heads).
+
+Bayes' rule gives us the answer:
+
+$$P(\text{coin A} \mid \text{data}) = \frac{P(\text{data} \mid \text{coin A}) \times P(\text{coin A})}{P(\text{data} \mid \text{coin A}) \times P(\text{coin A}) + P(\text{data} \mid \text{coin B}) \times P(\text{coin B})}$$
+
+Breaking this down:
+
+- $P(\text{data} \mid \text{coin A})$ is the **likelihood**: how probable is this round's outcome if coin A was used? We compute this with `dbinom(heads, size = n_flips, prob = theta_A)`.
+- $P(\text{coin A})$ is the **prior**: before looking at the data, how likely is it that coin A was picked? We assume each coin is equally likely, so $P(\text{coin A}) = P(\text{coin B}) = 0.5$. Because the priors are equal, they cancel out and the formula simplifies to:
+
+$$P(\text{coin A} \mid \text{data}) = \frac{P(\text{data} \mid \text{coin A})}{P(\text{data} \mid \text{coin A}) + P(\text{data} \mid \text{coin B})}$$
+
+This is just "coin A's likelihood divided by the total likelihood". If coin A makes the observed data twice as likely as coin B, then coin A gets twice the credit.
+
+### Responsibility
+
+The result of this calculation — $P(\text{coin A} \mid \text{data})$ — is called the **responsibility**. It is a number between 0 and 1 for each round. A responsibility of 0.9 for coin A means: "given our current parameter guesses, we are 90% confident coin A was used in this round."
+
+### The Weighted Update (M-step)
+
+Once we have responsibilities, we update the bias estimates. The M-step computes:
+
+$$\theta_A^{\text{new}} = \frac{\sum_{i} r_{A,i} \times h_i}{\sum_{i} r_{A,i} \times n}$$
+
+where $r_{A,i}$ is the responsibility of coin A for round $i$, $h_i$ is the number of heads, and $n$ is the number of flips per round.
+
+What does this mean? Consider two extremes:
+
+- If $r_{A,i} = 1$ for some rounds and 0 for others, this becomes the ordinary proportion of heads across only the rounds assigned to coin A. This is what you would compute if you **knew** the labels.
+- If $r_{A,i} = 0.7$ for a round, that round contributes to coin A's estimate with 70% weight and to coin B's with 30%. Each round "splits" its evidence between the two coins according to how likely each coin was.
+
+In this way, the responsibilities act as **soft labels**: instead of assigning each round to exactly one coin, they spread each round's data proportionally across both coins.
+
 ### Initial Guess
 
 We need a starting point. Let's guess $\theta_A = 0.6$ and $\theta_B = 0.5$.
