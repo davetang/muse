@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed7f7bfb2eb3e0b7687f497d2fa76791f5c7fdf67targetblankd7f7bfba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea46f57ce4399831f9f879eb8cf264294e0467adbtargetblanka46f57ca">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/d7f7bfb2eb3e0b7687f497d2fa76791f5c7fdf67" target="_blank">d7f7bfb</a>
+<a href="https://github.com/davetang/muse/tree/a46f57ce4399831f9f879eb8cf264294e0467adb" target="_blank">a46f57c</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreed7f7bfb2eb3e0b7687f497d2fa76791f5c7fdf67targetblankd7f7bfba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreea46f57ce4399831f9f879eb8cf264294e0467adbtargetblanka46f57ca"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/d7f7bfb2eb3e0b7687f497d2fa76791f5c7fdf67" target="_blank">d7f7bfb</a>.
+<a href="https://github.com/davetang/muse/tree/a46f57ce4399831f9f879eb8cf264294e0467adb" target="_blank">a46f57c</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -659,6 +659,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/a46f57ce4399831f9f879eb8cf264294e0467adb/analysis/em.Rmd" target="_blank">a46f57c</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-24
+</td>
+<td>
+Add background material
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/95b39d29619d3c9b6ca4a12bdf6dacead04c0232/docs/em.html" target="_blank">95b39d2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-24
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -867,6 +901,97 @@ heads for each coin. Since we don’t, we use EM.</p>
 </div>
 <div id="step-by-step" class="section level2">
 <h2>Step by Step</h2>
+<p>Before we look at the code, let’s unpack the key ideas that the
+E-step and M-step rely on.</p>
+<div id="probability-vs-likelihood" class="section level3">
+<h3>Probability vs Likelihood</h3>
+<p>These two words sound interchangeable, but they ask different
+questions:</p>
+<ul>
+<li><strong>Probability</strong> asks: given that I know the coin has
+bias <span class="math inline">\(\theta = 0.8\)</span>, what is the
+chance of seeing 7 heads in 10 flips? The parameter is fixed and we are
+asking about the data.</li>
+<li><strong>Likelihood</strong> asks: given that I observed 7 heads in
+10 flips, how plausible is it that the coin has bias <span
+class="math inline">\(\theta = 0.8\)</span>? The data is fixed and we
+are asking about the parameter.</li>
+</ul>
+<p>Mathematically, the same formula is used for both — the binomial
+probability mass function <code>dbinom()</code>. The difference is in
+what we treat as known and what we treat as unknown. When we hold the
+data fixed and vary the parameter, we call the result the
+<strong>likelihood</strong>.</p>
+</div>
+<div id="conditional-probability-and-bayes-rule" class="section level3">
+<h3>Conditional Probability and Bayes’ Rule</h3>
+<p>In the E-step, we need to answer: “Given the heads count in this
+round <strong>and</strong> our current guesses for <span
+class="math inline">\(\theta_A\)</span> and <span
+class="math inline">\(\theta_B\)</span>, what is the probability that
+coin A was used?” This is a <strong>conditional probability</strong> —
+the probability of one event (coin A was used) given that another event
+has occurred (we observed a specific number of heads).</p>
+<p>Bayes’ rule gives us the answer:</p>
+<p><span class="math display">\[P(\text{coin A} \mid \text{data}) =
+\frac{P(\text{data} \mid \text{coin A}) \times P(\text{coin
+A})}{P(\text{data} \mid \text{coin A}) \times P(\text{coin A}) +
+P(\text{data} \mid \text{coin B}) \times P(\text{coin B})}\]</span></p>
+<p>Breaking this down:</p>
+<ul>
+<li><span class="math inline">\(P(\text{data} \mid \text{coin
+A})\)</span> is the <strong>likelihood</strong>: how probable is this
+round’s outcome if coin A was used? We compute this with
+<code>dbinom(heads, size = n_flips, prob = theta_A)</code>.</li>
+<li><span class="math inline">\(P(\text{coin A})\)</span> is the
+<strong>prior</strong>: before looking at the data, how likely is it
+that coin A was picked? We assume each coin is equally likely, so <span
+class="math inline">\(P(\text{coin A}) = P(\text{coin B}) =
+0.5\)</span>. Because the priors are equal, they cancel out and the
+formula simplifies to:</li>
+</ul>
+<p><span class="math display">\[P(\text{coin A} \mid \text{data}) =
+\frac{P(\text{data} \mid \text{coin A})}{P(\text{data} \mid \text{coin
+A}) + P(\text{data} \mid \text{coin B})}\]</span></p>
+<p>This is just “coin A’s likelihood divided by the total likelihood”.
+If coin A makes the observed data twice as likely as coin B, then coin A
+gets twice the credit.</p>
+</div>
+<div id="responsibility" class="section level3">
+<h3>Responsibility</h3>
+<p>The result of this calculation — <span
+class="math inline">\(P(\text{coin A} \mid \text{data})\)</span> — is
+called the <strong>responsibility</strong>. It is a number between 0 and
+1 for each round. A responsibility of 0.9 for coin A means: “given our
+current parameter guesses, we are 90% confident coin A was used in this
+round.”</p>
+</div>
+<div id="the-weighted-update-m-step" class="section level3">
+<h3>The Weighted Update (M-step)</h3>
+<p>Once we have responsibilities, we update the bias estimates. The
+M-step computes:</p>
+<p><span class="math display">\[\theta_A^{\text{new}} = \frac{\sum_{i}
+r_{A,i} \times h_i}{\sum_{i} r_{A,i} \times n}\]</span></p>
+<p>where <span class="math inline">\(r_{A,i}\)</span> is the
+responsibility of coin A for round <span
+class="math inline">\(i\)</span>, <span
+class="math inline">\(h_i\)</span> is the number of heads, and <span
+class="math inline">\(n\)</span> is the number of flips per round.</p>
+<p>What does this mean? Consider two extremes:</p>
+<ul>
+<li>If <span class="math inline">\(r_{A,i} = 1\)</span> for some rounds
+and 0 for others, this becomes the ordinary proportion of heads across
+only the rounds assigned to coin A. This is what you would compute if
+you <strong>knew</strong> the labels.</li>
+<li>If <span class="math inline">\(r_{A,i} = 0.7\)</span> for a round,
+that round contributes to coin A’s estimate with 70% weight and to coin
+B’s with 30%. Each round “splits” its evidence between the two coins
+according to how likely each coin was.</li>
+</ul>
+<p>In this way, the responsibilities act as <strong>soft
+labels</strong>: instead of assigning each round to exactly one coin,
+they spread each round’s data proportionally across both coins.</p>
+</div>
 <div id="initial-guess" class="section level3">
 <h3>Initial Guess</h3>
 <p>We need a starting point. Let’s guess <span
@@ -1079,6 +1204,17 @@ Date
 <tbody>
 <tr>
 <td>
+<a href="https://github.com/davetang/muse/blob/95b39d29619d3c9b6ca4a12bdf6dacead04c0232/docs/figure/em.Rmd/coins_convergence-1.png" target="_blank">95b39d2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-24
+</td>
+</tr>
+<tr>
+<td>
 <a href="https://github.com/davetang/muse/blob/ab2ee65407e6bb4eced1b06b7aec63f2a8e0d7bc/docs/figure/em.Rmd/coins_convergence-1.png" target="_blank">ab2ee65</a>
 </td>
 <td>
@@ -1147,6 +1283,43 @@ ggplot(sim_long, aes(x = factor(n_rounds), y = estimate, fill = coin)) +
 EM estimates improve as the number of rounds increases. With enough
 data, the estimates converge to the true values.
 </p>
+</div>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-more_rounds-1">
+Past versions of more_rounds-1.png
+</button>
+</p>
+<div id="fig-more_rounds-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/95b39d29619d3c9b6ca4a12bdf6dacead04c0232/docs/figure/em.Rmd/more_rounds-1.png" target="_blank">95b39d2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-24
+</td>
+</tr>
+</tbody>
+</table>
+</div>
 </div>
 <p>With 10 rounds, the estimates are noisy — each repetition of the
 experiment gives a somewhat different answer. By 100 rounds, the boxes
