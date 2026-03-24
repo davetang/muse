@@ -1,0 +1,812 @@
+---
+title: "Bayes' Theorem"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+```{r packages, message=FALSE}
+library(ggplot2)
+```
+
+# Introduction
+
+Bayes' theorem is a formula for updating what you believe in light of new evidence. It is one of the most important results in probability and statistics, yet the formula itself is surprisingly short. The difficulty is not the maths — it is building the right intuition for what each piece means and why it matters.
+
+This article starts from the basics of probability, builds up to the theorem, and then shows how it underpins an entire approach to statistics called **Bayesian inference**. The final sections introduce **Markov chain Monte Carlo (MCMC)**, the computational engine that makes modern Bayesian analysis possible.
+
+# Probability Basics
+
+## What Is Probability?
+
+Probability is a number between 0 and 1 that measures how likely something is to happen:
+
+- $P = 0$ means the event is impossible.
+- $P = 1$ means the event is certain.
+- $P = 0.5$ means it is equally likely to happen or not.
+
+```{r dice}
+# Simulate rolling a fair six-sided die 10,000 times
+set.seed(1984)
+rolls <- sample(1:6, size = 10000, replace = TRUE)
+
+# The probability of each face should be close to 1/6
+observed <- table(rolls) / length(rolls)
+expected <- rep(1/6, 6)
+
+df_dice <- data.frame(
+  face = factor(1:6),
+  observed = as.numeric(observed),
+  expected = expected
+)
+
+ggplot(df_dice, aes(x = face)) +
+  geom_col(aes(y = observed), fill = "steelblue", alpha = 0.7, width = 0.6) +
+  geom_point(aes(y = expected), colour = "red", size = 3) +
+  labs(x = "Die Face", y = "Proportion",
+       title = "10,000 rolls of a fair die",
+       subtitle = "Bars = observed proportions, red dots = expected 1/6") +
+  theme_minimal()
+```
+
+## Two Useful Rules
+
+**Complement rule**: the probability that something does *not* happen is one minus the probability that it does.
+
+$$P(\text{not } A) = 1 - P(A)$$
+
+If the probability of rain is 0.3, the probability of no rain is 0.7.
+
+**Addition rule**: for two events that cannot both happen at the same time (mutually exclusive):
+
+$$P(A \text{ or } B) = P(A) + P(B)$$
+
+The probability of rolling a 1 or a 2 on a fair die is $\frac{1}{6} + \frac{1}{6} = \frac{1}{3}$.
+
+If the events *can* overlap, we must subtract the overlap to avoid counting it twice:
+
+$$P(A \text{ or } B) = P(A) + P(B) - P(A \text{ and } B)$$
+
+```{r addition_rule}
+# Drawing a card from a standard deck
+# P(Heart or Face card)?
+# Hearts: 13/52, Face cards: 12/52, Face cards that are Hearts: 3/52
+
+p_heart <- 13 / 52
+p_face <- 12 / 52
+p_heart_and_face <- 3 / 52
+
+p_heart_or_face <- p_heart + p_face - p_heart_and_face
+cat(sprintf("P(Heart or Face card) = %.4f  (= %d/52)\n",
+            p_heart_or_face, round(p_heart_or_face * 52)))
+```
+
+## Joint Probability
+
+The **joint probability** $P(A \text{ and } B)$ is the probability that both $A$ and $B$ happen. If $A$ and $B$ are **independent** (one does not affect the other), the joint probability is simply:
+
+$$P(A \text{ and } B) = P(A) \times P(B)$$
+
+The probability of flipping two coins and getting heads on both is $0.5 \times 0.5 = 0.25$.
+
+But many real-world events are **not** independent. The probability of carrying an umbrella and the probability of rain are related. For dependent events, we need **conditional probability**.
+
+# Conditional Probability
+
+## The Idea
+
+**Conditional probability** answers: "What is the probability of $A$, given that $B$ has already happened?" It is written $P(A \mid B)$ and read "the probability of A given B".
+
+Consider a simple example. A class has 30 students: 18 passed the exam and 12 failed. Among those who passed, 15 studied more than 10 hours and 3 studied less. Among those who failed, 4 studied more than 10 hours and 8 studied less.
+
+```{r cond_prob_table}
+study_data <- data.frame(
+  Outcome = c("Passed", "Passed", "Failed", "Failed"),
+  Study = c(">10 hours", "<=10 hours", ">10 hours", "<=10 hours"),
+  Count = c(15, 3, 4, 8)
+)
+
+cat("         >10 hours   <=10 hours   Total\n")
+cat(sprintf("Passed     %2d           %2d          %2d\n", 15, 3, 18))
+cat(sprintf("Failed     %2d            %2d          %2d\n", 4, 8, 12))
+cat(sprintf("Total      %2d           %2d          %2d\n", 19, 11, 30))
+```
+
+The overall probability of passing is $P(\text{pass}) = 18/30 = 0.60$. But what if we know a student studied more than 10 hours? Now we restrict our attention to the 19 students who studied a lot. Of those, 15 passed:
+
+$$P(\text{pass} \mid \text{>10 hours}) = \frac{15}{19} \approx 0.79$$
+
+Knowing the student studied a lot **increases** the probability of passing from 0.60 to 0.79. That is what conditioning does: it narrows the universe to only the relevant cases and recalculates.
+
+## The Formula
+
+Conditional probability is defined as:
+
+$$P(A \mid B) = \frac{P(A \text{ and } B)}{P(B)}$$
+
+This says: the probability of $A$ given $B$ is the probability that both happen, divided by the probability that $B$ happens. We are "zooming in" on the world where $B$ is true and asking how often $A$ also occurs.
+
+Rearranging gives us the **multiplication rule**:
+
+$$P(A \text{ and } B) = P(A \mid B) \times P(B)$$
+
+This is important — it lets us compute joint probabilities from conditional ones.
+
+```{r cond_prob_example}
+# From our study example
+p_pass_and_study <- 15 / 30
+p_study <- 19 / 30
+p_pass_given_study <- p_pass_and_study / p_study
+
+cat(sprintf("P(pass and >10 hours) = %.4f\n", p_pass_and_study))
+cat(sprintf("P(>10 hours)          = %.4f\n", p_study))
+cat(sprintf("P(pass | >10 hours)   = %.4f\n", p_pass_given_study))
+```
+
+## The Asymmetry of Conditioning
+
+A crucial point: $P(A \mid B)$ is generally **not** the same as $P(B \mid A)$.
+
+- $P(\text{pass} \mid \text{>10 hours}) = 15/19 \approx 0.79$ — if you studied a lot, you probably passed.
+- $P(\text{>10 hours} \mid \text{pass}) = 15/18 \approx 0.83$ — if you passed, you probably studied a lot.
+
+These are different numbers answering different questions. Confusing the two is one of the most common errors in probabilistic reasoning, and it is exactly the problem that Bayes' theorem solves.
+
+# Bayes' Theorem
+
+## Deriving It
+
+We know that:
+
+$$P(A \text{ and } B) = P(A \mid B) \times P(B)$$
+
+But the joint probability is symmetric — $P(A \text{ and } B) = P(B \text{ and } A)$ — so we can also write:
+
+$$P(A \text{ and } B) = P(B \mid A) \times P(A)$$
+
+Setting these equal:
+
+$$P(A \mid B) \times P(B) = P(B \mid A) \times P(A)$$
+
+Dividing both sides by $P(B)$:
+
+$$\boxed{P(A \mid B) = \frac{P(B \mid A) \times P(A)}{P(B)}}$$
+
+That is **Bayes' theorem**. It lets you flip a conditional probability: if you know $P(B \mid A)$, you can compute $P(A \mid B)$.
+
+## The Medical Test Example
+
+This is the most famous application of Bayes' theorem. Suppose:
+
+- A disease affects 1 in 1,000 people: $P(\text{disease}) = 0.001$.
+- A test correctly identifies sick people 99% of the time: $P(\text{positive} \mid \text{disease}) = 0.99$. This is the **sensitivity**.
+- The test correctly identifies healthy people 95% of the time: $P(\text{negative} \mid \text{no disease}) = 0.95$. This is the **specificity**. Equivalently, the **false positive rate** is 5%: $P(\text{positive} \mid \text{no disease}) = 0.05$.
+
+You test positive. What is the probability you actually have the disease?
+
+Most people guess "about 95% or 99%". The actual answer is much lower.
+
+```{r medical_test}
+p_disease <- 0.001
+p_pos_given_disease <- 0.99     # sensitivity
+p_pos_given_healthy <- 0.05     # false positive rate
+
+# P(positive) by the law of total probability
+p_pos <- p_pos_given_disease * p_disease +
+         p_pos_given_healthy * (1 - p_disease)
+
+# Bayes' theorem
+p_disease_given_pos <- (p_pos_given_disease * p_disease) / p_pos
+
+cat(sprintf("P(disease | positive test) = %.4f  (%.2f%%)\n",
+            p_disease_given_pos, p_disease_given_pos * 100))
+```
+
+Less than 2%! This surprises most people, but the logic is clear: the disease is so rare that even a small false positive rate produces many more false alarms than true detections.
+
+Let's visualise what happens in a population of 100,000 people.
+
+```{r medical_visual, fig.width=9, fig.height=5, fig.cap="Out of 100,000 people, only 99 are sick. The test catches nearly all of them (98), but also falsely flags ~5,000 healthy people."}
+pop <- 100000
+n_sick <- round(pop * p_disease)
+n_healthy <- pop - n_sick
+
+true_pos <- round(n_sick * p_pos_given_disease)
+false_neg <- n_sick - true_pos
+false_pos <- round(n_healthy * p_pos_given_healthy)
+true_neg <- n_healthy - false_pos
+
+df_test <- data.frame(
+  result = c("True Positive\n(Sick, test +)",
+             "False Negative\n(Sick, test -)",
+             "False Positive\n(Healthy, test +)",
+             "True Negative\n(Healthy, test -)"),
+  count = c(true_pos, false_neg, false_pos, true_neg),
+  fill = c("Positive", "Negative", "Positive", "Negative")
+)
+
+df_test$result <- factor(df_test$result, levels = df_test$result)
+
+ggplot(df_test, aes(x = result, y = count, fill = fill)) +
+  geom_col(alpha = 0.8, width = 0.6) +
+  geom_text(aes(label = format(count, big.mark = ",")), vjust = -0.5, size = 4) +
+  scale_fill_manual(values = c("Positive" = "#E69F00", "Negative" = "#56B4E9")) +
+  scale_y_log10(labels = scales::comma) +
+  labs(x = "", y = "Count (log scale)", fill = "Test Result",
+       title = "Medical test outcomes in 100,000 people",
+       subtitle = sprintf("Of %s positive tests, only %d are truly sick (%.1f%%)",
+                          format(true_pos + false_pos, big.mark = ","),
+                          true_pos,
+                          100 * true_pos / (true_pos + false_pos))) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 10))
+```
+
+The orange bars are positive test results. The vast majority of them are false positives from the large healthy population. This is why screening tests for rare conditions are often followed by a second, more specific test.
+
+## What If You Test Again?
+
+Here is where Bayes' theorem becomes powerful: after the first positive test, your updated probability of disease is ~2%. If you take **a second, independent test** and it is also positive, that 2% becomes the new prior:
+
+```{r retest}
+# First test: prior is 0.001, posterior is ~0.02
+posterior_1 <- p_disease_given_pos
+
+# Second test: prior is now the posterior from the first test
+p_pos_2 <- p_pos_given_disease * posterior_1 +
+           p_pos_given_healthy * (1 - posterior_1)
+posterior_2 <- (p_pos_given_disease * posterior_1) / p_pos_2
+
+cat(sprintf("After 1 positive test: P(disease) = %.4f  (%.2f%%)\n",
+            posterior_1, posterior_1 * 100))
+cat(sprintf("After 2 positive tests: P(disease) = %.4f  (%.1f%%)\n",
+            posterior_2, posterior_2 * 100))
+```
+
+Two positive tests makes the disease much more likely. Each piece of evidence updates your belief, and Bayes' theorem is the mechanism for that update. This is the essence of **Bayesian reasoning**: beliefs are not fixed; they evolve as evidence accumulates.
+
+# The Bayesian Framework
+
+## Prior, Likelihood, Posterior
+
+In scientific applications, we use Bayes' theorem in a slightly different notation. Instead of events A and B, we write:
+
+$$P(\theta \mid \text{data}) = \frac{P(\text{data} \mid \theta) \times P(\theta)}{P(\text{data})}$$
+
+where $\theta$ represents the parameter(s) we want to estimate. Each piece has a name:
+
+| Term | Name | What it means |
+|------|------|---------------|
+| $P(\theta)$ | **Prior** | What we believed about $\theta$ before seeing data |
+| $P(\text{data} \mid \theta)$ | **Likelihood** | How probable the observed data is under each value of $\theta$ |
+| $P(\theta \mid \text{data})$ | **Posterior** | Our updated belief about $\theta$ after seeing the data |
+| $P(\text{data})$ | **Evidence** (or marginal likelihood) | A normalising constant that ensures the posterior sums/integrates to 1 |
+
+The relationship is often summarised as:
+
+$$\text{Posterior} \propto \text{Likelihood} \times \text{Prior}$$
+
+The "$\propto$" (proportional to) symbol means we can ignore $P(\text{data})$ for most purposes — it is just a scaling factor.
+
+## Frequentist vs Bayesian
+
+The two major schools of statistics differ in how they treat parameters:
+
+- **Frequentist**: Parameters are fixed but unknown constants. We estimate them from data and quantify uncertainty through repeated sampling (confidence intervals, p-values). The question is: "If we repeated this experiment many times, what would happen?"
+- **Bayesian**: Parameters have probability distributions. We start with a prior belief, observe data, and update to a posterior distribution. The question is: "Given the data we observed, what do we believe about the parameter?"
+
+Neither approach is "right" — they answer different questions. But the Bayesian approach has a natural appeal: it directly answers "What should I believe now?" rather than "What would happen if I repeated this?"
+
+## A Coin-Flipping Example
+
+Let's make this concrete. You find a coin on the street and want to know if it is fair. You flip it 20 times and get 14 heads.
+
+A frequentist would compute a p-value or confidence interval. A Bayesian would start with a prior belief about the coin's bias, update it with the data, and report the posterior distribution.
+
+### Choosing a Prior
+
+The **prior** encodes what you believe before seeing data. For a coin's bias $\theta$ (the probability of heads), a natural choice is the **Beta distribution**, which lives on the interval [0, 1].
+
+The Beta distribution has two parameters, $\alpha$ and $\beta$. Different values encode different prior beliefs:
+
+```{r prior_shapes, fig.width=10, fig.height=6, fig.cap="Different Beta priors encode different beliefs about the coin before seeing any data."}
+theta <- seq(0, 1, length.out = 500)
+
+priors <- data.frame(
+  theta = rep(theta, 4),
+  density = c(
+    dbeta(theta, 1, 1),
+    dbeta(theta, 5, 5),
+    dbeta(theta, 2, 8),
+    dbeta(theta, 50, 50)
+  ),
+  prior = rep(c(
+    'Beta(1,1): "I have no idea"',
+    'Beta(5,5): "Probably near 0.5"',
+    'Beta(2,8): "Probably biased toward tails"',
+    'Beta(50,50): "Very confident it\'s fair"'
+  ), each = length(theta))
+)
+
+priors$prior <- factor(priors$prior, levels = unique(priors$prior))
+
+ggplot(priors, aes(x = theta, y = density)) +
+  geom_line(linewidth = 1, colour = "steelblue") +
+  facet_wrap(~prior, scales = "free_y", ncol = 2) +
+  labs(x = expression(theta ~ "(probability of heads)"), y = "Density",
+       title = "Beta priors encode different beliefs about coin bias") +
+  theme_minimal()
+```
+
+- **Beta(1,1)** is the uniform (flat) prior: every bias is equally likely. This says "I know nothing."
+- **Beta(5,5)** gently favours values near 0.5. This says "I think it's roughly fair, but I'm not sure."
+- **Beta(2,8)** favours low values. This says "I think the coin is biased toward tails."
+- **Beta(50,50)** is a strong prior centred on 0.5. This says "I'm very confident the coin is fair."
+
+### Computing the Posterior
+
+For the Beta-Binomial model (Beta prior + Binomial likelihood), the posterior has a closed-form solution — it is another Beta distribution:
+
+$$\text{Prior: } \theta \sim \text{Beta}(\alpha, \beta)$$
+$$\text{Data: } k \text{ heads in } n \text{ flips}$$
+$$\text{Posterior: } \theta \mid \text{data} \sim \text{Beta}(\alpha + k, \beta + n - k)$$
+
+The prior parameters $\alpha$ and $\beta$ can be thought of as "pseudo-observations": $\alpha$ is the number of heads you have already "seen" in your prior experience, and $\beta$ is the number of tails.
+
+```{r coin_posterior, fig.width=10, fig.height=8, fig.cap="The posterior (purple) is a compromise between the prior (blue) and the likelihood (red). Stronger priors resist the data more."}
+k <- 14  # observed heads
+n <- 20  # total flips
+
+# Scaled likelihood (Beta(k+1, n-k+1) shape, for visual comparison)
+lik_alpha <- k + 1
+lik_beta <- n - k + 1
+
+prior_specs <- list(
+  list(a = 1, b = 1, label = 'Flat prior: Beta(1,1)'),
+  list(a = 5, b = 5, label = 'Mild prior: Beta(5,5)'),
+  list(a = 50, b = 50, label = 'Strong prior: Beta(50,50)')
+)
+
+plot_data <- do.call(rbind, lapply(prior_specs, function(spec) {
+  post_a <- spec$a + k
+  post_b <- spec$b + n - k
+
+  data.frame(
+    theta = rep(theta, 3),
+    density = c(
+      dbeta(theta, spec$a, spec$b),
+      dbeta(theta, lik_alpha, lik_beta),
+      dbeta(theta, post_a, post_b)
+    ),
+    curve = rep(c("Prior", "Likelihood", "Posterior"), each = length(theta)),
+    scenario = spec$label
+  )
+}))
+
+plot_data$curve <- factor(plot_data$curve, levels = c("Prior", "Likelihood", "Posterior"))
+plot_data$scenario <- factor(plot_data$scenario,
+                             levels = sapply(prior_specs, `[[`, "label"))
+
+ggplot(plot_data, aes(x = theta, y = density, colour = curve)) +
+  geom_line(linewidth = 1) +
+  scale_colour_manual(values = c("Prior" = "#56B4E9",
+                                  "Likelihood" = "#E69F00",
+                                  "Posterior" = "#9467BD")) +
+  facet_wrap(~scenario, scales = "free_y", ncol = 1) +
+  labs(x = expression(theta), y = "Density", colour = "",
+       title = "How the prior influences the posterior",
+       subtitle = "Data: 14 heads in 20 flips") +
+  theme_minimal()
+```
+
+Three things to notice:
+
+1. **Flat prior** (top): the posterior nearly equals the likelihood. With no prior information, the data speaks for itself.
+2. **Mild prior** (middle): the posterior shifts slightly toward 0.5 compared to the likelihood. The prior gently "pulls" the estimate toward fairness.
+3. **Strong prior** (bottom): the posterior barely budges from 0.5 despite seeing 14/20 heads. The prior is so strong that 20 flips aren't enough to overcome it.
+
+This illustrates a fundamental property: **the posterior is always a compromise between the prior and the data**. With more data, the likelihood dominates and the prior matters less.
+
+### Posterior Summaries
+
+Once we have the posterior distribution, we can extract useful summaries.
+
+```{r posterior_summaries}
+# Using the flat prior: Beta(1,1)
+post_a <- 1 + k
+post_b <- 1 + n - k
+
+# Posterior mean
+post_mean <- post_a / (post_a + post_b)
+
+# Posterior mode (most probable value)
+post_mode <- (post_a - 1) / (post_a + post_b - 2)
+
+# 95% credible interval
+ci <- qbeta(c(0.025, 0.975), post_a, post_b)
+
+cat(sprintf("Posterior mean:  %.4f\n", post_mean))
+cat(sprintf("Posterior mode:  %.4f  (compare to MLE = %d/%d = %.4f)\n",
+            post_mode, k, n, k / n))
+cat(sprintf("95%% credible interval: [%.4f, %.4f]\n", ci[1], ci[2]))
+```
+
+The **credible interval** has a direct interpretation: "There is a 95% probability that the true bias lies in this interval." This is what most people *think* a frequentist confidence interval means, but it is only valid under the Bayesian interpretation.
+
+### The Effect of More Data
+
+As we collect more data, the posterior becomes narrower and the prior matters less. Let's see what happens as we accumulate flips from a coin with a true bias of 0.7.
+
+```{r data_accumulation, fig.width=10, fig.height=8, fig.cap="As data accumulates, the posterior sharpens around the true value and the prior becomes irrelevant."}
+set.seed(1984)
+true_theta <- 0.7
+all_flips <- rbinom(500, size = 1, prob = true_theta)
+
+# Show posterior after 5, 20, 50, 200, and 500 flips
+checkpoints <- c(5, 20, 50, 200, 500)
+
+# Use a mildly wrong prior: Beta(5,5) centred on 0.5
+prior_a <- 5
+prior_b <- 5
+
+accum_data <- do.call(rbind, lapply(checkpoints, function(n_obs) {
+  k_obs <- sum(all_flips[1:n_obs])
+  a <- prior_a + k_obs
+  b <- prior_b + (n_obs - k_obs)
+
+  data.frame(
+    theta = theta,
+    density = dbeta(theta, a, b),
+    label = sprintf("n = %d  (%d heads)", n_obs, k_obs)
+  )
+}))
+
+# Add the prior
+accum_data <- rbind(
+  data.frame(theta = theta, density = dbeta(theta, prior_a, prior_b),
+             label = "Prior: Beta(5,5)"),
+  accum_data
+)
+
+accum_data$label <- factor(accum_data$label, levels = unique(accum_data$label))
+
+ggplot(accum_data, aes(x = theta, y = density)) +
+  geom_line(linewidth = 1, colour = "steelblue") +
+  geom_vline(xintercept = true_theta, linetype = "dashed", colour = "red") +
+  facet_wrap(~label, scales = "free_y", ncol = 2) +
+  labs(x = expression(theta), y = "Density",
+       title = "Posterior sharpens as data accumulates",
+       subtitle = "Red dashed line = true bias (0.7). Prior is centred on 0.5.") +
+  theme_minimal()
+```
+
+After just 5 flips, the posterior is wide and still influenced by the prior (centred on 0.5). By 50 flips, the posterior has found the right neighbourhood. By 500 flips, it is a tight spike around 0.7. The prior has been overwhelmed — **with enough data, Bayesians and frequentists agree**.
+
+# Why Go Bayesian?
+
+At this point, you might wonder: why bother with priors and posteriors when frequentist methods work fine? Here are some genuine advantages of the Bayesian approach:
+
+1. **Direct probability statements**: "There is a 93% probability the treatment effect is positive" is more natural and useful than "the p-value is 0.04."
+
+2. **Incorporating prior knowledge**: in many fields (medicine, engineering), we have genuine prior information. Bayesian analysis lets us use it formally rather than pretending we know nothing.
+
+3. **Natural handling of small samples**: when data is scarce, the prior regularises the estimates and prevents extreme conclusions. This is especially valuable in genomics, where you might have thousands of genes but only a handful of samples per gene.
+
+4. **Sequential updating**: as new data arrives, the current posterior becomes the new prior. There is no need to re-analyse from scratch.
+
+5. **Complex models**: hierarchical models, mixture models, and other structures that are difficult to fit with frequentist methods are often straightforward in a Bayesian framework.
+
+# When Exact Solutions Don't Exist
+
+The coin example was convenient: the Beta-Binomial model has a closed-form posterior. This is called a **conjugate** model — the prior and posterior are from the same family.
+
+But most real problems are not conjugate. Consider a model with multiple parameters, non-standard distributions, or hierarchical structure. The posterior $P(\theta \mid \text{data})$ may be a complicated, high-dimensional surface with no neat formula.
+
+We can still write down Bayes' theorem:
+
+$$P(\theta \mid \text{data}) \propto P(\text{data} \mid \theta) \times P(\theta)$$
+
+We can evaluate the right-hand side for any specific $\theta$. But we cannot write the posterior in closed form, which means we cannot directly compute things like its mean or credible intervals.
+
+The solution: instead of computing the posterior exactly, **draw samples from it**. If we can generate thousands of random values of $\theta$ that are distributed according to the posterior, we can estimate any summary we want (means, medians, intervals) from those samples. This is where **Markov chain Monte Carlo** comes in.
+
+# Markov Chain Monte Carlo (MCMC)
+
+## The Idea
+
+MCMC is a family of algorithms that generate samples from a probability distribution, even when you cannot write that distribution in closed form. All you need is the ability to **evaluate** the distribution (up to a constant) at any point.
+
+The "Markov chain" part means the algorithm generates a sequence of values where each value depends only on the previous one. The "Monte Carlo" part means we use random sampling.
+
+The most intuitive MCMC algorithm is the **Metropolis-Hastings** algorithm.
+
+## The Metropolis-Hastings Algorithm
+
+Imagine you are exploring a mountainous landscape in dense fog. You cannot see the whole terrain — you can only check the elevation at your current position and at any proposed new position. Your goal is to spend time at each location in proportion to its elevation (higher locations = more time).
+
+The algorithm:
+
+1. **Start** at an arbitrary position.
+2. **Propose** a random step (e.g., move left or right by a random amount).
+3. **Evaluate**: is the proposed position higher or lower than the current position?
+   - If **higher** (or equal): always move there.
+   - If **lower**: move there with some probability (proportional to how much lower it is). Sometimes accept a downhill step; often reject it.
+4. **Repeat** thousands of times.
+
+The resulting sequence of positions will, after an initial "burn-in" period, approximate the shape of the landscape. Peaks are visited frequently, valleys rarely — exactly what we want for sampling from a posterior distribution.
+
+## MCMC for Coin Bias
+
+Let's implement Metropolis-Hastings for our coin example and verify that it gives the same answer as the exact Beta posterior.
+
+```{r mcmc_coin}
+metropolis_coin <- function(k, n, prior_a, prior_b,
+                            n_iter = 50000, proposal_sd = 0.1) {
+  # Start at the MLE
+  theta_current <- k / n
+  samples <- numeric(n_iter)
+
+  # Evaluate log-posterior (up to a constant)
+  log_posterior <- function(theta) {
+    if (theta <= 0 || theta >= 1) return(-Inf)
+    dbinom(k, size = n, prob = theta, log = TRUE) +
+      dbeta(theta, prior_a, prior_b, log = TRUE)
+  }
+
+  accepted <- 0
+
+  for (i in seq_len(n_iter)) {
+    # Propose a new value
+    theta_proposed <- theta_current + rnorm(1, mean = 0, sd = proposal_sd)
+
+    # Accept or reject
+    log_ratio <- log_posterior(theta_proposed) - log_posterior(theta_current)
+
+    if (log(runif(1)) < log_ratio) {
+      theta_current <- theta_proposed
+      accepted <- accepted + 1
+    }
+
+    samples[i] <- theta_current
+  }
+
+  list(samples = samples, acceptance_rate = accepted / n_iter)
+}
+
+set.seed(1984)
+mcmc_result <- metropolis_coin(k = 14, n = 20, prior_a = 1, prior_b = 1)
+
+cat(sprintf("Acceptance rate: %.1f%%\n", mcmc_result$acceptance_rate * 100))
+```
+
+### The Trace Plot
+
+A **trace plot** shows the sampled values over iterations. It should look like a "fuzzy caterpillar" — exploring the parameter space without getting stuck.
+
+```{r trace_plot, fig.width=9, fig.height=4, fig.cap="Trace plot of MCMC samples. The chain explores the posterior distribution."}
+df_trace <- data.frame(
+  iteration = seq_along(mcmc_result$samples),
+  theta = mcmc_result$samples
+)
+
+ggplot(df_trace[1:2000, ], aes(x = iteration, y = theta)) +
+  geom_line(alpha = 0.5, linewidth = 0.3) +
+  geom_hline(yintercept = 14/20, linetype = "dashed", colour = "red") +
+  labs(x = "Iteration", y = expression(theta),
+       title = "Trace plot (first 2,000 iterations)") +
+  theme_minimal()
+```
+
+### Comparing MCMC to the Exact Posterior
+
+Let's discard the first 5,000 iterations as "burn-in" (the chain needs time to find the high-density region) and compare the remaining samples to the exact Beta posterior.
+
+```{r mcmc_vs_exact, fig.width=9, fig.height=5, fig.cap="MCMC samples closely match the exact posterior distribution."}
+burn_in <- 5000
+post_samples <- mcmc_result$samples[(burn_in + 1):length(mcmc_result$samples)]
+
+# Exact posterior: Beta(1 + 14, 1 + 6)
+exact_a <- 1 + 14
+exact_b <- 1 + 6
+
+df_mcmc <- data.frame(theta = post_samples)
+
+ggplot(df_mcmc, aes(x = theta)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 60,
+                 fill = "steelblue", colour = "white", alpha = 0.6) +
+  stat_function(fun = dbeta, args = list(shape1 = exact_a, shape2 = exact_b),
+                colour = "red", linewidth = 1.2) +
+  labs(x = expression(theta), y = "Density",
+       title = "MCMC samples vs exact posterior",
+       subtitle = "Histogram = MCMC samples, red curve = exact Beta(15, 7)") +
+  theme_minimal()
+```
+
+The histogram of MCMC samples closely matches the exact posterior curve. This confirms that the algorithm is working — and crucially, MCMC would work just as well for posteriors where no exact formula exists.
+
+```{r mcmc_summaries}
+cat("MCMC estimates (after burn-in):\n")
+cat(sprintf("  Mean:    %.4f  (exact: %.4f)\n",
+            mean(post_samples), exact_a / (exact_a + exact_b)))
+cat(sprintf("  Median:  %.4f  (exact: %.4f)\n",
+            median(post_samples), qbeta(0.5, exact_a, exact_b)))
+cat(sprintf("  95%% CI:  [%.4f, %.4f]\n",
+            quantile(post_samples, 0.025), quantile(post_samples, 0.975)))
+cat(sprintf("  Exact:   [%.4f, %.4f]\n",
+            qbeta(0.025, exact_a, exact_b), qbeta(0.975, exact_a, exact_b)))
+```
+
+## A Problem That Requires MCMC
+
+The coin example was a sanity check — we didn't *need* MCMC for it. Now let's tackle a problem where the exact posterior is not available.
+
+Suppose we have data from two groups and want to estimate the difference in means, with a model that uses a t-distribution for the likelihood (to be robust to outliers). There is no conjugate prior for this model, so MCMC is our only practical option.
+
+```{r mcmc_two_groups}
+set.seed(1984)
+
+# Group A: treatment, Group B: control
+# True difference in means is 2.0
+group_a <- c(rnorm(25, mean = 12, sd = 3), 25)  # one outlier
+group_b <- rnorm(30, mean = 10, sd = 3)
+
+cat("Group A: n =", length(group_a),
+    " mean =", round(mean(group_a), 2),
+    " sd =", round(sd(group_a), 2), "\n")
+cat("Group B: n =", length(group_b),
+    " mean =", round(mean(group_b), 2),
+    " sd =", round(sd(group_b), 2), "\n")
+cat("Observed difference:", round(mean(group_a) - mean(group_b), 2), "\n")
+```
+
+```{r mcmc_robust}
+# Metropolis-Hastings for a robust comparison of two means
+# Parameters: mu_a, mu_b, sigma (shared), df (degrees of freedom for t-distribution)
+
+log_posterior_robust <- function(params, y_a, y_b) {
+  mu_a <- params[1]
+  mu_b <- params[2]
+  log_sigma <- params[3]  # work on log scale to keep sigma positive
+  log_df <- params[4]     # same for degrees of freedom
+
+  sigma <- exp(log_sigma)
+  df <- exp(log_df)
+
+  if (df < 1 || df > 100) return(-Inf)
+
+  # Log-likelihood (t-distribution)
+  ll_a <- sum(dt((y_a - mu_a) / sigma, df = df, log = TRUE) - log(sigma))
+  ll_b <- sum(dt((y_b - mu_b) / sigma, df = df, log = TRUE) - log(sigma))
+
+  # Priors (weakly informative)
+  lp_mu <- dnorm(mu_a, 0, 100, log = TRUE) + dnorm(mu_b, 0, 100, log = TRUE)
+  lp_sigma <- dnorm(log_sigma, 0, 5, log = TRUE)  # log-normal prior
+  lp_df <- dgamma(df, shape = 2, rate = 0.1, log = TRUE)  # favours moderate df
+
+  ll_a + ll_b + lp_mu + lp_sigma + lp_df
+}
+
+set.seed(1984)
+n_iter <- 80000
+params <- c(mean(group_a), mean(group_b), log(sd(c(group_a, group_b))), log(10))
+proposal_sd <- c(0.3, 0.3, 0.05, 0.1)
+chain <- matrix(NA, nrow = n_iter, ncol = 4)
+accepted <- 0
+
+for (i in seq_len(n_iter)) {
+  proposal <- params + rnorm(4, 0, proposal_sd)
+  log_ratio <- log_posterior_robust(proposal, group_a, group_b) -
+               log_posterior_robust(params, group_a, group_b)
+
+  if (log(runif(1)) < log_ratio) {
+    params <- proposal
+    accepted <- accepted + 1
+  }
+  chain[i, ] <- params
+}
+
+cat(sprintf("Acceptance rate: %.1f%%\n", 100 * accepted / n_iter))
+```
+
+```{r mcmc_robust_results, fig.width=9, fig.height=5, fig.cap="Posterior distribution of the difference in means from the robust model. The true difference is 2.0."}
+burn_in <- 10000
+post_chain <- chain[(burn_in + 1):n_iter, ]
+
+# Difference in means
+diff_samples <- post_chain[, 1] - post_chain[, 2]
+
+df_diff <- data.frame(difference = diff_samples)
+
+ggplot(df_diff, aes(x = difference)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 60,
+                 fill = "steelblue", colour = "white", alpha = 0.7) +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey50") +
+  geom_vline(xintercept = 2, linetype = "dashed", colour = "red") +
+  annotate("text", x = 2.1, y = 0, label = "True difference = 2",
+           colour = "red", hjust = 0, vjust = -0.5) +
+  labs(x = "Difference in Means (A - B)", y = "Density",
+       title = "Posterior distribution of the treatment effect") +
+  theme_minimal()
+```
+
+```{r mcmc_robust_summary}
+cat("Posterior summary for difference in means (mu_A - mu_B):\n")
+cat(sprintf("  Mean:    %.2f\n", mean(diff_samples)))
+cat(sprintf("  Median:  %.2f\n", median(diff_samples)))
+cat(sprintf("  95%% CI:  [%.2f, %.2f]\n",
+            quantile(diff_samples, 0.025), quantile(diff_samples, 0.975)))
+cat(sprintf("\n  P(difference > 0): %.3f\n", mean(diff_samples > 0)))
+
+# Compare with a simple t-test
+tt <- t.test(group_a, group_b)
+cat(sprintf("\nFor comparison, frequentist t-test:\n"))
+cat(sprintf("  Estimated difference: %.2f\n", diff(tt$estimate) * -1))
+cat(sprintf("  95%% CI: [%.2f, %.2f]\n", -tt$conf.int[2], -tt$conf.int[1]))
+cat(sprintf("  p-value: %.4f\n", tt$p.value))
+
+cat(sprintf("\nEstimated degrees of freedom (robustness):\n"))
+cat(sprintf("  Posterior median df: %.1f\n", median(exp(post_chain[, 4]))))
+cat("  (Lower df = heavier tails = more robust to outliers)\n")
+```
+
+The Bayesian robust model gives us:
+
+- A full posterior distribution for the treatment effect, not just a point estimate.
+- A direct probability statement: "P(treatment effect > 0)".
+- An estimate of the degrees of freedom, which tells us how much the model needed to accommodate outliers. Lower values mean heavier tails — the model adapts to the data.
+
+# Practical MCMC: Using Stan via R
+
+Writing your own MCMC works for simple models but becomes impractical for complex ones. In practice, most Bayesians use dedicated software:
+
+- **Stan** (via `rstan` or `cmdstanr` in R): a powerful probabilistic programming language. You write the model in Stan syntax and it generates an efficient sampler.
+- **JAGS** (via `rjags`): another popular option, especially in ecology and epidemiology.
+- **brms**: an R package that translates R model formulas into Stan code, making Bayesian regression as easy as `lm()`.
+
+A typical `brms` workflow looks like:
+
+```r
+library(brms)
+
+# Fit a Bayesian linear regression (same syntax as lm!)
+fit <- brm(weight ~ height, data = df,
+           prior = c(prior(normal(0, 10), class = "b")),
+           chains = 4, iter = 2000)
+
+# Summaries
+summary(fit)
+plot(fit)
+```
+
+The syntax is nearly identical to frequentist modelling, but the output is a full posterior distribution for every parameter.
+
+# Summary
+
+| Concept | What it means |
+|---|---|
+| **Probability** | A number between 0 and 1 measuring how likely an event is |
+| **Conditional probability** | The probability of A given that B has occurred: $P(A \mid B)$ |
+| **Bayes' theorem** | $P(A \mid B) = P(B \mid A) \times P(A) \;/\; P(B)$ — a formula for flipping conditional probabilities |
+| **Prior** | What you believe about a parameter before seeing data |
+| **Likelihood** | How probable the observed data is under each parameter value |
+| **Posterior** | Your updated belief after combining the prior with the data |
+| **Credible interval** | An interval with a specified probability of containing the true parameter (the Bayesian analogue of a confidence interval) |
+| **Conjugate prior** | A prior that, combined with a particular likelihood, yields a posterior from the same family (allowing exact computation) |
+| **MCMC** | A family of algorithms that draw samples from a distribution you cannot compute in closed form |
+| **Metropolis-Hastings** | The simplest MCMC algorithm: propose a step, accept or reject based on the posterior ratio |
+| **Burn-in** | The initial samples discarded because the chain has not yet found the high-density region |
+| **Trace plot** | A visual diagnostic showing the chain's path through parameter space |
+
+The journey in this article mirrors the journey of modern statistics: from counting outcomes (basic probability), to updating beliefs with evidence (Bayes' theorem), to estimating parameters with full uncertainty (Bayesian inference), to tackling models too complex for pencil and paper (MCMC). Each step builds naturally on the one before it.
+
+# Session Info
+
+```{r session_info}
+sessionInfo()
+```
