@@ -3,9 +3,7 @@ title: "Learning about antibodies"
 date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
-    toc: false
-editor_options:
-  chunk_output_type: console
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
@@ -94,6 +92,36 @@ expression](https://www.genscript.com/gsfiles/techfiles/Analyzing_antibody_seque
 
 ![](assets/igg.png)
 
+### Antibody structure
+
+Antibodies are composed of two identical **heavy chains** and two identical **light
+chains**, linked by disulfide bonds. Each chain consists of variable (V) and
+constant (C) domains:
+
+* **Heavy chain**: One variable domain (VH) followed by three constant domains
+  (CH1, CH2, CH3) for IgG/IgA/IgD, or four (CH1-CH4) for IgM/IgE.
+* **Light chain**: One variable domain (VL) followed by one constant domain
+  (CL).
+
+Key structural regions:
+
+* **Fab fragment** (Fragment antigen-binding): Contains VH-CH1 paired with
+  VL-CL. Each antibody has two Fab arms.
+* **Fc fragment** (Fragment crystallisable): Contains the CH2 and CH3 domains of
+  both heavy chains. Mediates effector functions such as complement activation
+  and binding to Fc receptors on immune cells.
+* **Hinge region**: A flexible linker between CH1 and CH2 that allows the two
+  Fab arms to move independently, facilitating bivalent antigen binding.
+* **Disulfide bonds**: Inter-chain disulfide bonds in the hinge region link the
+  two heavy chains; additional inter-chain bonds link each heavy chain to its
+  paired light chain.
+
+Each immunoglobulin domain adopts the **immunoglobulin fold**, a characteristic
+beta-sandwich structure of approximately 110 amino acids consisting of two
+beta-sheets stabilised by a conserved intra-domain disulfide bond.
+
+### Antigen-antibody interaction
+
 * Each antibody (Ab) only binds to a specific antigen (Ag).
 * Ab and Ag interact by spatial complementarity.
 * Ab-Ag interaction are based on weak and non-covalent binding between Ab and
@@ -127,6 +155,47 @@ the CDR to the antigen and aid in maintaining the overall structure of the four
 variable domains on the antibody.
 
 ![](assets/Antibody_Structure_and_Antigen_Binding_Regions.jpg)
+
+### Antibody classes (isotypes)
+
+There are five classes of antibodies in humans, distinguished by their heavy
+chain constant regions:
+
+| Isotype | Heavy chain | Molecular form | Serum abundance | Key functions |
+|---------|-------------|----------------|-----------------|---------------|
+| IgG | $\gamma$ (gamma) | Monomer | ~75% (most abundant) | Opsonisation, complement activation, ADCC, crosses placenta |
+| IgA | $\alpha$ (alpha) | Monomer or dimer | ~15% | Mucosal immunity, neutralisation at epithelial surfaces |
+| IgM | $\mu$ (mu) | Pentamer | ~10% | First antibody in primary immune response, strong complement activation |
+| IgD | $\delta$ (delta) | Monomer | <1% | B cell receptor signalling |
+| IgE | $\epsilon$ (epsilon) | Monomer | <0.01% | Allergic responses, anti-parasitic immunity |
+
+### IgG subclasses
+
+IgG is further divided into four subclasses in humans with different effector
+properties:
+
+| Subclass | Abundance | Complement | Fc$\gamma$R binding | Half-life | Typical targets |
+|----------|-----------|------------|--------------|-----------|-----------------|
+| IgG1 | ~60% | +++ | Strong | ~21 days | Protein antigens |
+| IgG2 | ~25% | + | Weak | ~21 days | Polysaccharide antigens |
+| IgG3 | ~5% | +++ | Strong | ~7 days | Protein antigens |
+| IgG4 | ~5% | - | Intermediate | ~21 days | Repeated/chronic antigen exposure |
+
+Most therapeutic monoclonal antibodies, including palivizumab (MEDI-493), use an
+IgG1 framework due to its strong effector functions and long serum half-life.
+
+### Light chain types
+
+There are two types of light chains:
+
+* **Kappa ($\kappa$)**: Encoded on chromosome 2 in humans. ~60% of human antibodies
+  use kappa light chains.
+* **Lambda ($\lambda$)**: Encoded on chromosome 22 in humans. ~40% of human antibodies
+  use lambda light chains.
+
+A given antibody molecule always contains two identical light chains (either both
+kappa or both lambda, never mixed). The choice of light chain type does not
+affect antigen specificity or effector function.
 
 ### Identifying CDRs by sequence
 
@@ -172,3 +241,128 @@ CDR-H3
 * Length - 3 to 25 residues
 
 Leader sequence-FR1-CDR1-FR2-CDR2-FR3-CDR3-FR4-Constant region-Stop codon
+
+## Generating antibody diversity
+
+### V(D)J recombination
+
+Antibody diversity is generated primarily through **V(D)J recombination**, a
+somatic recombination process that occurs during B cell development in the bone
+marrow.
+
+The immunoglobulin heavy chain locus contains multiple gene segments:
+
+* **V** (Variable): ~40 functional segments
+* **D** (Diversity): ~25 functional segments
+* **J** (Joining): 6 functional segments
+
+The light chain loci (kappa and lambda) contain V and J segments but lack D
+segments.
+
+During B cell development, the RAG1/RAG2 recombinase enzymes randomly select and
+join:
+
+1. One D to one J segment
+2. One V to the DJ segment (for heavy chains)
+3. One V to one J segment (for light chains)
+
+Additional diversity is introduced by:
+
+* **Junctional diversity**: Imprecise joining at V-D and D-J junctions,
+  including addition of P-nucleotides and N-nucleotides by terminal
+  deoxynucleotidyl transferase (TdT).
+* **Combinatorial diversity**: Random pairing of heavy and light chains.
+
+Together, these mechanisms generate an estimated theoretical diversity of >10^11
+unique antibodies.
+
+### Somatic hypermutation and affinity maturation
+
+After initial antigen encounter, B cells in germinal centres undergo **somatic
+hypermutation (SHM)**, introducing point mutations at a high rate (~10^-3 per
+base pair per cell division) in the variable regions of immunoglobulin genes.
+This process is mediated by **activation-induced cytidine deaminase (AID)**.
+
+B cells with mutations that improve antigen binding are positively selected
+through interaction with follicular dendritic cells and T follicular helper
+cells, while those with reduced affinity undergo apoptosis. This iterative
+process of mutation and selection is called **affinity maturation** and results
+in antibodies with progressively higher affinity for their target antigen.
+
+**Class switch recombination (CSR)** can also occur in germinal centres, allowing
+B cells to switch from producing IgM to other isotypes (IgG, IgA, IgE) while
+retaining the same antigen specificity.
+
+## Monoclonal vs polyclonal antibodies
+
+* **Polyclonal antibodies**: A mixture of antibodies produced by different B cell
+  clones, recognising multiple epitopes on the same antigen. Generated by
+  immunising an animal and collecting serum. Advantages: high overall avidity,
+  tolerance to minor antigen changes. Disadvantages: batch-to-batch variability,
+  limited supply.
+
+* **Monoclonal antibodies (mAbs)**: Antibodies produced by a single B cell
+  clone, recognising a single epitope. First generated using **hybridoma
+  technology** ([Köhler and Milstein,
+  1975](https://pubmed.ncbi.nlm.nih.gov/1172191/)): B cells from an immunised
+  mouse are fused with myeloma cells to create immortal antibody-producing cell
+  lines. Advantages: high specificity, unlimited reproducible supply, consistent
+  properties. Disadvantages: more complex to generate, may have limited
+  recognition of conformational variants.
+
+## Antibody engineering
+
+Therapeutic antibodies have evolved through several generations of engineering to
+reduce immunogenicity in humans:
+
+1. **Murine antibodies** (-omab): Entirely derived from mouse. Highly
+   immunogenic in humans, eliciting human anti-mouse antibody (HAMA) responses.
+2. **Chimeric antibodies** (-ximab): Mouse variable regions joined to human
+   constant regions. ~33% murine sequence. Example: rituximab.
+3. **Humanised antibodies** (-zumab): Only the CDRs from the mouse antibody are
+   grafted onto a human framework. ~5-10% murine sequence. Key framework
+   residues from the original mouse antibody may be retained (back-mutations) to
+   preserve CDR conformation and binding affinity. Example: palivizumab,
+   trastuzumab.
+4. **Fully human antibodies** (-umab): Entirely human sequence, generated using
+   transgenic mice with human immunoglobulin loci or phage display libraries.
+   Example: adalimumab.
+
+**Palivizumab (MEDI-493) described in this study is a humanised antibody**, with
+CDRs from murine mAb 1129 grafted onto human framework regions (K102 for VL; Cor
+and CE-1 for VH).
+
+> Note: The -mab suffix naming convention was [updated by the
+> WHO/INN](https://www.who.int/publications/m/item/inn-monoclonal-antibodies) in
+> 2021. Newer antibodies may not follow these suffixes.
+
+## Antibody numbering schemes
+
+Several numbering schemes exist for consistently numbering antibody residues
+across different sequences, which is critical for comparing CDR boundaries and
+framework regions:
+
+* **Kabat numbering**: Based on sequence variability analysis of known antibody
+  sequences. The most widely used scheme historically. CDR definitions are based
+  on sequence variability. Used in the CDR identification rules described above.
+* **Chothia numbering**: Based on structural analysis of antibody crystal
+  structures. CDR definitions reflect the actual loop structures. The CDR-H1
+  definition differs significantly from Kabat (Chothia starts 5 residues earlier
+  and ends 1 residue earlier).
+* **IMGT numbering**: Developed by the International ImMunoGeneTics information
+  system. Uses a standardised framework with a fixed number of positions per
+  region, inserting gaps to maintain alignment. Provides the most consistent
+  cross-species comparison.
+* **AHo numbering**: Based on structural alignment of all immunoglobulin and
+  T-cell receptor domains.
+
+| Scheme | CDR-L1 | CDR-L2 | CDR-L3 | CDR-H1 | CDR-H2 | CDR-H3 |
+|--------|--------|--------|--------|--------|--------|--------|
+| Kabat | 24-34 | 50-56 | 89-97 | 31-35B | 50-65 | 95-102 |
+| Chothia | 24-34 | 50-56 | 89-97 | 26-32 | 52-56 | 95-102 |
+| IMGT | 27-38 | 56-65 | 105-117 | 27-38 | 56-65 | 105-117 |
+
+Online tools such as
+[ANARCI](http://opig.stats.ox.ac.uk/webapps/newsabdab/sabpred/anarci/) and
+[AbNum](http://www.bioinf.org.uk/abs/abnum/) can automatically number antibody
+sequences using these schemes.
