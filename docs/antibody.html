@@ -10,11 +10,11 @@
 
 
 
-<meta name="date" content="2023-06-27" />
+<meta name="date" content="2026-03-25" />
 
 <title>Learning about antibodies</title>
 
-<script src="site_libs/header-attrs-2.21/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -30,11 +30,14 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<link href="site_libs/font-awesome-6.4.0/css/all.min.css" rel="stylesheet" />
-<link href="site_libs/font-awesome-6.4.0/css/v4-shims.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
 
 <link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
 <!-- Add a small amount of space between sections. -->
@@ -232,6 +235,69 @@ $(document).ready(function () {
 
 
 
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
 
 </head>
 
@@ -239,6 +305,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -283,7 +359,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Learning about antibodies</h1>
-<h4 class="date">2023-06-27</h4>
+<h4 class="date">2026-03-25</h4>
 
 </div>
 
@@ -312,7 +388,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2023-06-27
+<strong>Last updated:</strong> 2026-03-25
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -330,7 +406,7 @@ title="This is the local directory in which the code in this file was executed."
 This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
 analysis was created with <a
   href="https://github.com/workflowr/workflowr">workflowr</a> (version
-1.7.0). The <em>Checks</em> tab describes the reproducibility checks
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
 that were applied when the results were created. The <em>Past
 versions</em> tab lists the development history.
 </p>
@@ -443,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec90d5b7e3e30abadd7cb2d5aa30f7936c6bf7229targetblankc90d5b7a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1f3563de9b44497974a3ad48cf4484ec0bcefd18targetblank1f3563da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/c90d5b7e3e30abadd7cb2d5aa30f7936c6bf7229" target="_blank">c90d5b7</a>
+<a href="https://github.com/davetang/muse/tree/1f3563de9b44497974a3ad48cf4484ec0bcefd18" target="_blank">1f3563d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetreec90d5b7e3e30abadd7cb2d5aa30f7936c6bf7229targetblankc90d5b7a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1f3563de9b44497974a3ad48cf4484ec0bcefd18targetblank1f3563da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -461,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/c90d5b7e3e30abadd7cb2d5aa30f7936c6bf7229" target="_blank">c90d5b7</a>.
+<a href="https://github.com/davetang/muse/tree/1f3563de9b44497974a3ad48cf4484ec0bcefd18" target="_blank">1f3563d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -476,26 +552,70 @@ were generated:
 </p>
 <pre><code>
 Ignored files:
-    Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    r_packages_4.1.2/
-    Ignored:    r_packages_4.2.0/
-    Ignored:    r_packages_4.2.2/
-    Ignored:    r_packages_4.3.0/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.5.2/
 
 Untracked files:
-    Untracked:  analysis/cell_ranger.Rmd
-    Untracked:  analysis/tss_xgboost.Rmd
-    Untracked:  code/multiz100way/
-    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz
-    Untracked:  data/HG00702_SH089_CHSTrio.chr1.vcf.gz.tbi
-    Untracked:  data/ncrna_NONCODE[v3.0].fasta.tar.gz
-    Untracked:  data/ncrna_noncode_v3.fa
-    Untracked:  data/netmhciipan.out.gz
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
+    Untracked:  analysis/.claude/
+    Untracked:  analysis/aucc.Rmd
+    Untracked:  analysis/bimodal.Rmd
+    Untracked:  analysis/bioc.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
+    Untracked:  analysis/modelling.Rmd
+    Untracked:  analysis/sampleqc.Rmd
+    Untracked:  analysis/wordpress_readability.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SeuratObj.rds
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/davetang039sblog.WordPress.2026-02-12.xml
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
+    Untracked:  m3/
     Untracked:  women.json
 
 Unstaged changes:
-    Modified:   analysis/graph.Rmd
+    Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
 
 </code></pre>
 <p>
@@ -510,7 +630,6 @@ have uncommitted changes.
 <hr>
 </div>
 <div id="versions" class="tab-pane fade">
-
 <p>
 These are the previous versions of the repository in which changes were
 made to the R Markdown (<code>analysis/antibody.Rmd</code>) and HTML
@@ -541,6 +660,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/1f3563de9b44497974a3ad48cf4484ec0bcefd18/analysis/antibody.Rmd" target="_blank">1f3563d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-25
+</td>
+<td>
+Include additional background
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/f6051b24b4b42c8396fe9815bce31f2c2a3522d8/docs/antibody.html" target="_blank">f6051b2</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2023-06-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -675,6 +828,41 @@ CDR).</li>
 <li>Fc region determines the effects.</li>
 </ul>
 <p><img src="assets/igg.png" /></p>
+<div id="antibody-structure" class="section level3">
+<h3>Antibody structure</h3>
+<p>Antibodies are composed of two identical <strong>heavy
+chains</strong> and two identical <strong>light chains</strong>, linked
+by disulfide bonds. Each chain consists of variable (V) and constant (C)
+domains:</p>
+<ul>
+<li><strong>Heavy chain</strong>: One variable domain (VH) followed by
+three constant domains (CH1, CH2, CH3) for IgG/IgA/IgD, or four
+(CH1-CH4) for IgM/IgE.</li>
+<li><strong>Light chain</strong>: One variable domain (VL) followed by
+one constant domain (CL).</li>
+</ul>
+<p>Key structural regions:</p>
+<ul>
+<li><strong>Fab fragment</strong> (Fragment antigen-binding): Contains
+VH-CH1 paired with VL-CL. Each antibody has two Fab arms.</li>
+<li><strong>Fc fragment</strong> (Fragment crystallisable): Contains the
+CH2 and CH3 domains of both heavy chains. Mediates effector functions
+such as complement activation and binding to Fc receptors on immune
+cells.</li>
+<li><strong>Hinge region</strong>: A flexible linker between CH1 and CH2
+that allows the two Fab arms to move independently, facilitating
+bivalent antigen binding.</li>
+<li><strong>Disulfide bonds</strong>: Inter-chain disulfide bonds in the
+hinge region link the two heavy chains; additional inter-chain bonds
+link each heavy chain to its paired light chain.</li>
+</ul>
+<p>Each immunoglobulin domain adopts the <strong>immunoglobulin
+fold</strong>, a characteristic beta-sandwich structure of approximately
+110 amino acids consisting of two beta-sheets stabilised by a conserved
+intra-domain disulfide bond.</p>
+</div>
+<div id="antigen-antibody-interaction" class="section level3">
+<h3>Antigen-antibody interaction</h3>
 <ul>
 <li>Each antibody (Ab) only binds to a specific antigen (Ag).</li>
 <li>Ab and Ag interact by spatial complementarity.</li>
@@ -713,6 +901,145 @@ maintaining the overall structure of the four variable domains on the
 antibody.</p>
 <p><img
 src="assets/Antibody_Structure_and_Antigen_Binding_Regions.jpg" /></p>
+</div>
+<div id="antibody-classes-isotypes" class="section level3">
+<h3>Antibody classes (isotypes)</h3>
+<p>There are five classes of antibodies in humans, distinguished by
+their heavy chain constant regions:</p>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="18%" />
+<col width="22%" />
+<col width="24%" />
+<col width="21%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Isotype</th>
+<th>Heavy chain</th>
+<th>Molecular form</th>
+<th>Serum abundance</th>
+<th>Key functions</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>IgG</td>
+<td><span class="math inline">\(\gamma\)</span> (gamma)</td>
+<td>Monomer</td>
+<td>~75% (most abundant)</td>
+<td>Opsonisation, complement activation, ADCC, crosses placenta</td>
+</tr>
+<tr class="even">
+<td>IgA</td>
+<td><span class="math inline">\(\alpha\)</span> (alpha)</td>
+<td>Monomer or dimer</td>
+<td>~15%</td>
+<td>Mucosal immunity, neutralisation at epithelial surfaces</td>
+</tr>
+<tr class="odd">
+<td>IgM</td>
+<td><span class="math inline">\(\mu\)</span> (mu)</td>
+<td>Pentamer</td>
+<td>~10%</td>
+<td>First antibody in primary immune response, strong complement
+activation</td>
+</tr>
+<tr class="even">
+<td>IgD</td>
+<td><span class="math inline">\(\delta\)</span> (delta)</td>
+<td>Monomer</td>
+<td>&lt;1%</td>
+<td>B cell receptor signalling</td>
+</tr>
+<tr class="odd">
+<td>IgE</td>
+<td><span class="math inline">\(\epsilon\)</span> (epsilon)</td>
+<td>Monomer</td>
+<td>&lt;0.01%</td>
+<td>Allergic responses, anti-parasitic immunity</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="igg-subclasses" class="section level3">
+<h3>IgG subclasses</h3>
+<p>IgG is further divided into four subclasses in humans with different
+effector properties:</p>
+<table>
+<colgroup>
+<col width="13%" />
+<col width="14%" />
+<col width="16%" />
+<col width="18%" />
+<col width="14%" />
+<col width="22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Subclass</th>
+<th>Abundance</th>
+<th>Complement</th>
+<th>Fc<span class="math inline">\(\gamma\)</span>R binding</th>
+<th>Half-life</th>
+<th>Typical targets</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>IgG1</td>
+<td>~60%</td>
+<td>+++</td>
+<td>Strong</td>
+<td>~21 days</td>
+<td>Protein antigens</td>
+</tr>
+<tr class="even">
+<td>IgG2</td>
+<td>~25%</td>
+<td>+</td>
+<td>Weak</td>
+<td>~21 days</td>
+<td>Polysaccharide antigens</td>
+</tr>
+<tr class="odd">
+<td>IgG3</td>
+<td>~5%</td>
+<td>+++</td>
+<td>Strong</td>
+<td>~7 days</td>
+<td>Protein antigens</td>
+</tr>
+<tr class="even">
+<td>IgG4</td>
+<td>~5%</td>
+<td>-</td>
+<td>Intermediate</td>
+<td>~21 days</td>
+<td>Repeated/chronic antigen exposure</td>
+</tr>
+</tbody>
+</table>
+<p>Most therapeutic monoclonal antibodies, including palivizumab
+(MEDI-493), use an IgG1 framework due to its strong effector functions
+and long serum half-life.</p>
+</div>
+<div id="light-chain-types" class="section level3">
+<h3>Light chain types</h3>
+<p>There are two types of light chains:</p>
+<ul>
+<li><strong>Kappa (<span
+class="math inline">\(\kappa\)</span>)</strong>: Encoded on chromosome 2
+in humans. ~60% of human antibodies use kappa light chains.</li>
+<li><strong>Lambda (<span
+class="math inline">\(\lambda\)</span>)</strong>: Encoded on chromosome
+22 in humans. ~40% of human antibodies use lambda light chains.</li>
+</ul>
+<p>A given antibody molecule always contains two identical light chains
+(either both kappa or both lambda, never mixed). The choice of light
+chain type does not affect antigen specificity or effector function.</p>
+</div>
 <div id="identifying-cdrs-by-sequence" class="section level3">
 <h3>Identifying CDRs by sequence</h3>
 <p>CDR-L1</p>
@@ -768,6 +1095,179 @@ Cys-Ala-Arg)</li>
 </ul>
 <p>Leader sequence-FR1-CDR1-FR2-CDR2-FR3-CDR3-FR4-Constant region-Stop
 codon</p>
+</div>
+</div>
+<div id="generating-antibody-diversity" class="section level2">
+<h2>Generating antibody diversity</h2>
+<div id="vdj-recombination" class="section level3">
+<h3>V(D)J recombination</h3>
+<p>Antibody diversity is generated primarily through <strong>V(D)J
+recombination</strong>, a somatic recombination process that occurs
+during B cell development in the bone marrow.</p>
+<p>The immunoglobulin heavy chain locus contains multiple gene
+segments:</p>
+<ul>
+<li><strong>V</strong> (Variable): ~40 functional segments</li>
+<li><strong>D</strong> (Diversity): ~25 functional segments</li>
+<li><strong>J</strong> (Joining): 6 functional segments</li>
+</ul>
+<p>The light chain loci (kappa and lambda) contain V and J segments but
+lack D segments.</p>
+<p>During B cell development, the RAG1/RAG2 recombinase enzymes randomly
+select and join:</p>
+<ol style="list-style-type: decimal">
+<li>One D to one J segment</li>
+<li>One V to the DJ segment (for heavy chains)</li>
+<li>One V to one J segment (for light chains)</li>
+</ol>
+<p>Additional diversity is introduced by:</p>
+<ul>
+<li><strong>Junctional diversity</strong>: Imprecise joining at V-D and
+D-J junctions, including addition of P-nucleotides and N-nucleotides by
+terminal deoxynucleotidyl transferase (TdT).</li>
+<li><strong>Combinatorial diversity</strong>: Random pairing of heavy
+and light chains.</li>
+</ul>
+<p>Together, these mechanisms generate an estimated theoretical
+diversity of &gt;10^11 unique antibodies.</p>
+</div>
+<div id="somatic-hypermutation-and-affinity-maturation"
+class="section level3">
+<h3>Somatic hypermutation and affinity maturation</h3>
+<p>After initial antigen encounter, B cells in germinal centres undergo
+<strong>somatic hypermutation (SHM)</strong>, introducing point
+mutations at a high rate (~10^-3 per base pair per cell division) in the
+variable regions of immunoglobulin genes. This process is mediated by
+<strong>activation-induced cytidine deaminase (AID)</strong>.</p>
+<p>B cells with mutations that improve antigen binding are positively
+selected through interaction with follicular dendritic cells and T
+follicular helper cells, while those with reduced affinity undergo
+apoptosis. This iterative process of mutation and selection is called
+<strong>affinity maturation</strong> and results in antibodies with
+progressively higher affinity for their target antigen.</p>
+<p><strong>Class switch recombination (CSR)</strong> can also occur in
+germinal centres, allowing B cells to switch from producing IgM to other
+isotypes (IgG, IgA, IgE) while retaining the same antigen
+specificity.</p>
+</div>
+</div>
+<div id="monoclonal-vs-polyclonal-antibodies" class="section level2">
+<h2>Monoclonal vs polyclonal antibodies</h2>
+<ul>
+<li><p><strong>Polyclonal antibodies</strong>: A mixture of antibodies
+produced by different B cell clones, recognising multiple epitopes on
+the same antigen. Generated by immunising an animal and collecting
+serum. Advantages: high overall avidity, tolerance to minor antigen
+changes. Disadvantages: batch-to-batch variability, limited
+supply.</p></li>
+<li><p><strong>Monoclonal antibodies (mAbs)</strong>: Antibodies
+produced by a single B cell clone, recognising a single epitope. First
+generated using <strong>hybridoma technology</strong> (<a
+href="https://pubmed.ncbi.nlm.nih.gov/1172191/">Köhler and Milstein,
+1975</a>): B cells from an immunised mouse are fused with myeloma cells
+to create immortal antibody-producing cell lines. Advantages: high
+specificity, unlimited reproducible supply, consistent properties.
+Disadvantages: more complex to generate, may have limited recognition of
+conformational variants.</p></li>
+</ul>
+</div>
+<div id="antibody-engineering" class="section level2">
+<h2>Antibody engineering</h2>
+<p>Therapeutic antibodies have evolved through several generations of
+engineering to reduce immunogenicity in humans:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Murine antibodies</strong> (-omab): Entirely derived from
+mouse. Highly immunogenic in humans, eliciting human anti-mouse antibody
+(HAMA) responses.</li>
+<li><strong>Chimeric antibodies</strong> (-ximab): Mouse variable
+regions joined to human constant regions. ~33% murine sequence. Example:
+rituximab.</li>
+<li><strong>Humanised antibodies</strong> (-zumab): Only the CDRs from
+the mouse antibody are grafted onto a human framework. ~5-10% murine
+sequence. Key framework residues from the original mouse antibody may be
+retained (back-mutations) to preserve CDR conformation and binding
+affinity. Example: palivizumab, trastuzumab.</li>
+<li><strong>Fully human antibodies</strong> (-umab): Entirely human
+sequence, generated using transgenic mice with human immunoglobulin loci
+or phage display libraries. Example: adalimumab.</li>
+</ol>
+<p><strong>Palivizumab (MEDI-493) described in this study is a humanised
+antibody</strong>, with CDRs from murine mAb 1129 grafted onto human
+framework regions (K102 for VL; Cor and CE-1 for VH).</p>
+<blockquote>
+<p>Note: The -mab suffix naming convention was <a
+href="https://www.who.int/publications/m/item/inn-monoclonal-antibodies">updated
+by the WHO/INN</a> in 2021. Newer antibodies may not follow these
+suffixes.</p>
+</blockquote>
+</div>
+<div id="antibody-numbering-schemes" class="section level2">
+<h2>Antibody numbering schemes</h2>
+<p>Several numbering schemes exist for consistently numbering antibody
+residues across different sequences, which is critical for comparing CDR
+boundaries and framework regions:</p>
+<ul>
+<li><strong>Kabat numbering</strong>: Based on sequence variability
+analysis of known antibody sequences. The most widely used scheme
+historically. CDR definitions are based on sequence variability. Used in
+the CDR identification rules described above.</li>
+<li><strong>Chothia numbering</strong>: Based on structural analysis of
+antibody crystal structures. CDR definitions reflect the actual loop
+structures. The CDR-H1 definition differs significantly from Kabat
+(Chothia starts 5 residues earlier and ends 1 residue earlier).</li>
+<li><strong>IMGT numbering</strong>: Developed by the International
+ImMunoGeneTics information system. Uses a standardised framework with a
+fixed number of positions per region, inserting gaps to maintain
+alignment. Provides the most consistent cross-species comparison.</li>
+<li><strong>AHo numbering</strong>: Based on structural alignment of all
+immunoglobulin and T-cell receptor domains.</li>
+</ul>
+<table>
+<thead>
+<tr class="header">
+<th>Scheme</th>
+<th>CDR-L1</th>
+<th>CDR-L2</th>
+<th>CDR-L3</th>
+<th>CDR-H1</th>
+<th>CDR-H2</th>
+<th>CDR-H3</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Kabat</td>
+<td>24-34</td>
+<td>50-56</td>
+<td>89-97</td>
+<td>31-35B</td>
+<td>50-65</td>
+<td>95-102</td>
+</tr>
+<tr class="even">
+<td>Chothia</td>
+<td>24-34</td>
+<td>50-56</td>
+<td>89-97</td>
+<td>26-32</td>
+<td>52-56</td>
+<td>95-102</td>
+</tr>
+<tr class="odd">
+<td>IMGT</td>
+<td>27-38</td>
+<td>56-65</td>
+<td>105-117</td>
+<td>27-38</td>
+<td>56-65</td>
+<td>105-117</td>
+</tr>
+</tbody>
+</table>
+<p>Online tools such as <a
+href="http://opig.stats.ox.ac.uk/webapps/newsabdab/sabpred/anarci/">ANARCI</a>
+and <a href="http://www.bioinf.org.uk/abs/abnum/">AbNum</a> can
+automatically number antibody sequences using these schemes.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -777,13 +1277,13 @@ Session information
 </p>
 <div id="workflowr-sessioninfo" class="collapse">
 <pre class="r"><code>sessionInfo()</code></pre>
-<pre><code>R version 4.3.0 (2023-04-21)
-Platform: x86_64-pc-linux-gnu (64-bit)
-Running under: Ubuntu 22.04.2 LTS
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.4 LTS
 
 Matrix products: default
 BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
-LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so;  LAPACK version 3.10.0
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
 
 locale:
  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
@@ -800,24 +1300,28 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] lubridate_1.9.2 forcats_1.0.0   stringr_1.5.0   dplyr_1.1.2    
- [5] purrr_1.0.1     readr_2.1.4     tidyr_1.3.0     tibble_3.2.1   
- [9] ggplot2_3.4.2   tidyverse_2.0.0 workflowr_1.7.0
+ [1] lubridate_1.9.5 forcats_1.0.1   stringr_1.6.0   dplyr_1.2.0    
+ [5] purrr_1.2.1     readr_2.2.0     tidyr_1.3.2     tibble_3.3.1   
+ [9] ggplot2_4.0.2   tidyverse_2.0.0 workflowr_1.7.2
 
 loaded via a namespace (and not attached):
- [1] sass_0.4.5       utf8_1.2.3       generics_0.1.3   stringi_1.7.12  
- [5] hms_1.1.3        digest_0.6.31    magrittr_2.0.3   timechange_0.2.0
- [9] evaluate_0.20    grid_4.3.0       fastmap_1.1.1    rprojroot_2.0.3 
-[13] jsonlite_1.8.5   processx_3.8.1   whisker_0.4.1    ps_1.7.5        
-[17] promises_1.2.0.1 httr_1.4.5       fansi_1.0.4      scales_1.2.1    
-[21] jquerylib_0.1.4  cli_3.6.1        rlang_1.1.0      munsell_0.5.0   
-[25] withr_2.5.0      cachem_1.0.7     yaml_2.3.7       tools_4.3.0     
-[29] tzdb_0.3.0       colorspace_2.1-0 httpuv_1.6.9     vctrs_0.6.2     
-[33] R6_2.5.1         lifecycle_1.0.3  git2r_0.32.0     fs_1.6.2        
-[37] pkgconfig_2.0.3  callr_3.7.3      pillar_1.9.0     bslib_0.4.2     
-[41] later_1.3.0      gtable_0.3.3     glue_1.6.2       Rcpp_1.0.10     
-[45] xfun_0.39        tidyselect_1.2.0 rstudioapi_0.14  knitr_1.42      
-[49] htmltools_0.5.5  rmarkdown_2.21   compiler_4.3.0   getPass_0.2-2   </code></pre>
+ [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      hms_1.1.4         
+ [5] digest_0.6.39      magrittr_2.0.4     timechange_0.4.0   evaluate_1.0.5    
+ [9] grid_4.5.2         RColorBrewer_1.1-3 fastmap_1.2.0      rprojroot_2.1.1   
+[13] jsonlite_2.0.0     processx_3.8.6     whisker_0.4.1      ps_1.9.1          
+[17] promises_1.5.0     httr_1.4.8         scales_1.4.0       jquerylib_0.1.4   
+[21] cli_3.6.5          rlang_1.1.7        withr_3.0.2        cachem_1.1.0      
+[25] yaml_2.3.12        otel_0.2.0         tools_4.5.2        tzdb_0.5.0        
+[29] httpuv_1.6.17      vctrs_0.7.2        R6_2.6.1           lifecycle_1.0.5   
+[33] git2r_0.36.2       fs_2.0.0           pkgconfig_2.0.3    callr_3.7.6       
+[37] pillar_1.11.1      bslib_0.10.0       later_1.4.8        gtable_0.3.6      
+[41] glue_1.8.0         Rcpp_1.1.1         xfun_0.57          tidyselect_1.2.1  
+[45] rstudioapi_0.18.0  knitr_1.51         farver_2.1.2       htmltools_0.5.9   
+[49] rmarkdown_2.30     compiler_4.5.2     getPass_0.2-4      S7_0.2.1          </code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -838,6 +1342,8 @@ footer is added to webpages before the MathJax javascript. -->
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -870,6 +1376,35 @@ $(document).ready(function () {
 
 <!-- code folding -->
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
