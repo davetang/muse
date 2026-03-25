@@ -1,0 +1,439 @@
+---
+title: "Learning about T cells"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Notes inspired by the landmark study: [Restriction of in vitro T cell-mediated
+cytotoxicity in lymphocytic choriomeningitis within a syngeneic or
+semiallogeneic system](https://pubmed.ncbi.nlm.nih.gov/4133807/) (Zinkernagel
+and Doherty, 1974).
+
+This study demonstrated that cytotoxic T cells can only kill virus-infected
+target cells that share the same major histocompatibility complex (MHC) alleles,
+establishing the concept of **MHC restriction**. This discovery was awarded the
+[Nobel Prize in Physiology or Medicine in
+1996](https://www.nobelprize.org/prizes/medicine/1996/summary/).
+
+## Basics
+
+* T cells (T lymphocytes) are a type of white blood cell that plays a central
+  role in **adaptive immunity**.
+* The "T" stands for **thymus**, the organ where T cells mature.
+* Unlike B cells, which produce soluble antibodies, T cells mediate their
+  effects through direct cell-cell contact or by secreting cytokines.
+* T cells recognise antigen fragments (peptides) presented on the surface of
+  other cells by MHC molecules, rather than recognising free antigen directly.
+
+## T cell receptor (TCR)
+
+### TCR structure
+
+The T cell receptor is a heterodimeric cell-surface protein responsible for
+antigen recognition. There are two forms:
+
+* **$\alpha\beta$ TCR**: Composed of an $\alpha$ chain and a $\beta$ chain.
+  Found on the vast majority (~95%) of T cells. Recognises peptide antigens
+  presented by MHC molecules.
+* **$\gamma\delta$ TCR**: Composed of a $\gamma$ chain and a $\delta$ chain.
+  Found on a minor population (~5%) of T cells. Can recognise non-peptide
+  antigens (e.g., phosphoantigens, lipids) without MHC restriction.
+
+Each TCR chain consists of:
+
+* **Variable (V) region**: Contains the antigen-binding site. Analogous to
+  antibody variable domains.
+* **Constant (C) region**: Anchors the receptor and connects to the signalling
+  complex.
+* **Transmembrane region**: A single-pass transmembrane domain.
+
+Unlike antibodies, the TCR is always membrane-bound and is never secreted. Each
+T cell expresses a single TCR specificity (allelic exclusion).
+
+### CD3 signalling complex
+
+The TCR itself has very short cytoplasmic tails and cannot signal on its own. It
+associates with the **CD3 complex**, which consists of:
+
+* **CD3$\epsilon\gamma$** heterodimer
+* **CD3$\epsilon\delta$** heterodimer
+* **CD3$\zeta\zeta$** ($\zeta$-chain) homodimer
+
+The CD3 chains contain **immunoreceptor tyrosine-based activation motifs
+(ITAMs)** in their cytoplasmic domains. The $\zeta$-chain homodimer alone
+contributes 6 ITAMs. Upon TCR engagement, ITAMs are phosphorylated by the Src
+family kinase Lck, initiating downstream signalling.
+
+### Comparison with antibodies
+
+| Feature | TCR | Antibody (BCR) |
+|---------|-----|----------------|
+| Chains | $\alpha\beta$ or $\gamma\delta$ | Heavy + light |
+| Antigen form | Peptide-MHC complex | Native antigen (any shape) |
+| Secreted form | No | Yes (immunoglobulins) |
+| Somatic hypermutation | No | Yes |
+| Valency | Monovalent | Bivalent (or higher for IgM) |
+| Isotype switching | No | Yes |
+| Diversity mechanism | V(D)J recombination | V(D)J + SHM |
+
+### TCR diversity
+
+TCR diversity is generated through **V(D)J recombination**, the same mechanism
+used by B cells for antibody diversity:
+
+* **$\beta$ chain**: V, D, and J segments (similar to antibody heavy chain)
+* **$\alpha$ chain**: V and J segments only (similar to antibody light chain)
+
+The estimated diversity of the $\alpha\beta$ TCR repertoire is >10^15, driven
+largely by:
+
+* Combinatorial diversity (random segment selection)
+* Junctional diversity (N- and P-nucleotide additions at junctions)
+* $\alpha\beta$ chain pairing
+
+Critically, unlike antibodies, TCRs do **not** undergo somatic hypermutation.
+TCR affinity for antigen is therefore fixed after thymic selection.
+
+## MHC restriction and antigen presentation
+
+### MHC molecules
+
+Major histocompatibility complex (MHC) molecules present peptide fragments on
+the cell surface for T cell recognition. In humans, MHC is called **HLA (human
+leukocyte antigen)**.
+
+| Feature | MHC class I | MHC class II |
+|---------|-------------|--------------|
+| Genes (human) | HLA-A, HLA-B, HLA-C | HLA-DP, HLA-DQ, HLA-DR |
+| Structure | $\alpha$ chain + $\beta_2$-microglobulin | $\alpha$ chain + $\beta$ chain |
+| Expression | All nucleated cells | Professional APCs (dendritic cells, macrophages, B cells) |
+| Peptide source | Intracellular (cytosolic) | Extracellular (endosomal) |
+| Peptide length | 8-10 amino acids | 13-25 amino acids |
+| Recognised by | CD8+ T cells | CD4+ T cells |
+| Binding groove | Closed ends | Open ends |
+
+### Antigen processing pathways
+
+**MHC class I pathway** (endogenous/cytosolic):
+
+1. Intracellular proteins (including viral proteins) are degraded by the
+   **proteasome**.
+2. Peptide fragments are transported into the endoplasmic reticulum (ER) by the
+   **TAP transporter** (transporter associated with antigen processing).
+3. Peptides are loaded onto MHC class I molecules with the help of chaperones
+   (calnexin, calreticulin, tapasin, ERp57).
+4. Peptide-MHC I complexes are transported to the cell surface.
+5. Recognised by **CD8+ cytotoxic T cells**.
+
+**MHC class II pathway** (exogenous/endosomal):
+
+1. Extracellular antigens are internalised by endocytosis or phagocytosis.
+2. Antigens are degraded in acidified endosomal/lysosomal compartments.
+3. MHC class II molecules are synthesised in the ER with **invariant chain
+   (Ii/CD74)** blocking the peptide groove.
+4. In the endosome, invariant chain is degraded, leaving the **CLIP** fragment
+   (class II-associated invariant chain peptide).
+5. **HLA-DM** catalyses exchange of CLIP for antigenic peptide.
+6. Peptide-MHC II complexes are transported to the cell surface.
+7. Recognised by **CD4+ helper T cells**.
+
+**Cross-presentation**: Dendritic cells can present exogenous antigens on MHC
+class I molecules, enabling CD8+ T cell responses to extracellular pathogens and
+tumour antigens. This is critical for anti-tumour immunity and vaccination.
+
+## T cell development
+
+T cell precursors originate in the bone marrow and migrate to the thymus for
+maturation. Thymic development involves several stages:
+
+### Double-negative (DN) stage
+
+Thymocytes initially express neither CD4 nor CD8 (CD4$^-$CD8$^-$). The DN stage
+is subdivided based on CD44 and CD25 expression:
+
+| Stage | CD44 | CD25 | Key events |
+|-------|------|------|------------|
+| DN1 | + | - | Thymic entry, Notch signalling |
+| DN2 | + | + | TCR $\beta$ gene rearrangement begins |
+| DN3 | - | + | $\beta$-selection checkpoint |
+| DN4 | - | - | Proliferation |
+
+**$\beta$-selection**: At DN3, a productive TCR $\beta$ chain rearrangement is
+tested by pairing with a surrogate pre-T$\alpha$ chain. Successful
+$\beta$-selection triggers proliferation and progression to the
+double-positive stage.
+
+### Double-positive (DP) stage
+
+Thymocytes express both CD4 and CD8 (CD4$^+$CD8$^+$). The TCR $\alpha$ chain is
+rearranged, generating a complete $\alpha\beta$ TCR. Two critical selection
+events follow:
+
+**Positive selection** (thymic cortex):
+
+* DP thymocytes interact with cortical thymic epithelial cells (cTECs)
+  presenting self-peptides on MHC.
+* Thymocytes whose TCR binds self-MHC with **moderate affinity** receive
+  survival signals.
+* Thymocytes that fail to recognise self-MHC die by neglect (~90% of DP
+  thymocytes).
+* MHC class I recognition leads to CD8 lineage commitment; MHC class II
+  recognition leads to CD4 lineage.
+
+**Negative selection** (thymic cortex and medulla):
+
+* Thymocytes whose TCR binds self-peptide-MHC with **high affinity** are
+  eliminated by apoptosis (clonal deletion).
+* Medullary thymic epithelial cells (mTECs) express the transcription factor
+  **AIRE** (autoimmune regulator), which drives expression of tissue-restricted
+  self-antigens in the thymus.
+* This process establishes **central tolerance**, eliminating most
+  self-reactive T cells.
+* Some self-reactive CD4+ T cells are diverted to become **regulatory T cells
+  (Tregs)** instead of being deleted.
+
+### Single-positive (SP) stage
+
+Mature thymocytes express either CD4 or CD8 and exit the thymus as naive T cells
+into the peripheral circulation.
+
+## Major T cell subsets
+
+### CD4+ helper T cells
+
+CD4+ T cells recognise peptide-MHC class II complexes and orchestrate immune
+responses by secreting cytokines. Upon activation, naive CD4+ T cells
+differentiate into specialised subsets:
+
+| Subset | Key transcription factor | Signature cytokines | Primary function |
+|--------|------------------------|---------------------|------------------|
+| Th1 | T-bet | IFN-$\gamma$, TNF-$\alpha$ | Intracellular pathogens, macrophage activation |
+| Th2 | GATA-3 | IL-4, IL-5, IL-13 | Helminth defence, allergic responses |
+| Th17 | ROR$\gamma$t | IL-17A, IL-17F, IL-22 | Extracellular bacteria, fungi, mucosal defence |
+| Tfh | Bcl-6 | IL-21, IL-4 | B cell help in germinal centres |
+| Treg | FoxP3 | IL-10, TGF-$\beta$ | Immune suppression, self-tolerance |
+| Th9 | PU.1 | IL-9 | Anti-helminth, allergic inflammation |
+| Th22 | AHR | IL-22 | Epithelial barrier function |
+
+Subset differentiation is driven by the cytokine milieu at the time of T cell
+activation. Plasticity between subsets has been observed, particularly under
+inflammatory conditions.
+
+### CD8+ cytotoxic T cells (CTLs)
+
+CD8+ T cells recognise peptide-MHC class I complexes and directly kill target
+cells (virus-infected cells, tumour cells). Killing mechanisms include:
+
+* **Perforin/granzyme pathway**: Perforin forms pores in the target cell
+  membrane; granzymes (serine proteases) enter through the pores and activate
+  caspases, triggering apoptosis.
+* **Fas/FasL pathway**: FasL (CD95L) on the CTL engages Fas (CD95) on the
+  target cell, activating the extrinsic apoptosis pathway.
+* **Cytokine secretion**: TNF-$\alpha$ and IFN-$\gamma$ contribute to
+  anti-viral and anti-tumour responses.
+
+After pathogen clearance, most effector CD8+ T cells die by apoptosis
+(contraction phase), but a subset survives as **memory T cells**.
+
+### Memory T cells
+
+Memory T cells provide rapid and enhanced responses upon re-encountering the
+same antigen. Key subsets:
+
+* **Central memory T cells (T$_{CM}$)**: Express CCR7 and CD62L. Reside in
+  secondary lymphoid organs. Proliferate rapidly upon restimulation.
+* **Effector memory T cells (T$_{EM}$)**: Lack CCR7 and CD62L. Circulate
+  through peripheral tissues. Provide immediate effector function.
+* **Tissue-resident memory T cells (T$_{RM}$)**: Permanently reside in
+  peripheral tissues (skin, lung, gut) without recirculating. Express CD69 and
+  CD103. Provide frontline defence at barrier sites.
+* **Stem cell memory T cells (T$_{SCM}$)**: Express CD95, CD122, and naive
+  markers (CCR7, CD62L, CD45RA). Self-renewing with multipotent capacity.
+
+### $\gamma\delta$ T cells
+
+$\gamma\delta$ T cells represent ~5% of peripheral blood T cells but are
+enriched at mucosal surfaces (skin, gut, lung). Key features:
+
+* Recognise non-peptide antigens (phosphoantigens, lipids) without classical MHC
+  restriction.
+* Bridge innate and adaptive immunity with rapid effector responses.
+* Can perform cytotoxicity, cytokine production, and antigen presentation.
+* V$\gamma$9V$\delta$2 T cells are the predominant subset in human blood and
+  recognise microbial and endogenous phosphoantigens.
+
+### Other specialised T cell populations
+
+* **NKT cells (natural killer T cells)**: Recognise lipid antigens presented by
+  the MHC class I-like molecule **CD1d**. Express a semi-invariant TCR
+  (V$\alpha$24-J$\alpha$18 in humans). Rapidly produce large amounts of
+  cytokines (IFN-$\gamma$, IL-4) upon activation.
+* **MAIT cells (mucosal-associated invariant T cells)**: Recognise microbial
+  vitamin B metabolites presented by **MR1** (MHC-related protein 1). Express a
+  semi-invariant TCR (V$\alpha$7.2-J$\alpha$33 in humans). Abundant in human
+  blood, liver, and mucosal tissues.
+
+## T cell activation
+
+Naive T cell activation requires three signals:
+
+### Signal 1: TCR engagement
+
+The TCR recognises a specific peptide-MHC complex on an antigen-presenting cell
+(APC). The co-receptors **CD4** or **CD8** bind to conserved regions of MHC
+class II or class I, respectively, stabilising the interaction and bringing the
+kinase **Lck** into proximity with CD3 ITAMs.
+
+Key downstream signalling events:
+
+1. Lck phosphorylates CD3 ITAMs.
+2. **ZAP-70** is recruited and activated.
+3. ZAP-70 phosphorylates **LAT** and **SLP-76**, forming a signalosome.
+4. Three major pathways are activated:
+   * **PLC$\gamma$1** $\rightarrow$ DAG + IP3 $\rightarrow$ NF-$\kappa$B and
+     NFAT activation
+   * **Ras/MAPK** $\rightarrow$ AP-1 activation
+   * **PI3K/Akt** $\rightarrow$ cell survival and metabolism
+
+### Signal 2: Co-stimulation
+
+Co-stimulatory signals are required to prevent T cell anergy (functional
+unresponsiveness). Key co-stimulatory and co-inhibitory molecules:
+
+| Molecule | Ligand | Effect | Expression |
+|----------|--------|--------|------------|
+| **CD28** | CD80 (B7-1), CD86 (B7-2) | Co-stimulation | Constitutive on naive T cells |
+| **CTLA-4** | CD80, CD86 | Co-inhibition | Upregulated after activation |
+| **PD-1** | PD-L1 (B7-H1), PD-L2 (B7-DC) | Co-inhibition | Upregulated after activation |
+| **ICOS** | ICOS-L | Co-stimulation | Upregulated after activation |
+| **4-1BB** (CD137) | 4-1BBL | Co-stimulation | Upregulated after activation |
+| **OX40** (CD134) | OX40L | Co-stimulation | Upregulated after activation |
+| **LAG-3** | MHC class II | Co-inhibition | Upregulated after activation |
+| **TIM-3** | Galectin-9, CEACAM1 | Co-inhibition | Upregulated after activation |
+| **TIGIT** | CD155, CD112 | Co-inhibition | Upregulated after activation |
+
+TCR engagement without co-stimulation (Signal 1 alone) leads to **anergy** or
+**deletion**, a mechanism of peripheral tolerance.
+
+### Signal 3: Cytokines
+
+Cytokines produced by APCs and surrounding cells direct the differentiation
+programme of activated T cells. For example:
+
+* IL-12 + IFN-$\gamma$ $\rightarrow$ Th1 differentiation
+* IL-4 $\rightarrow$ Th2 differentiation
+* TGF-$\beta$ + IL-6 $\rightarrow$ Th17 differentiation
+* TGF-$\beta$ + IL-2 $\rightarrow$ Treg differentiation
+* IL-12 + IL-2 $\rightarrow$ CTL effector differentiation
+
+## T cell exhaustion
+
+Chronic antigen stimulation (persistent viral infections, cancer) drives T cells
+into a dysfunctional state called **exhaustion**. Exhausted T cells are
+characterised by:
+
+* Progressive loss of effector functions (IL-2 production lost first, then
+  TNF-$\alpha$, then IFN-$\gamma$)
+* Sustained expression of multiple inhibitory receptors (PD-1, LAG-3, TIM-3,
+  CTLA-4, TIGIT)
+* Altered transcriptional programme driven by **TOX** and other transcription
+  factors
+* Epigenetic remodelling that distinguishes exhaustion from normal effector or
+  memory states
+* Reduced proliferative capacity and cytotoxicity
+* Metabolic shift from oxidative phosphorylation to dysfunctional states
+
+T cell exhaustion is a major barrier to effective anti-tumour immunity and is the
+target of **immune checkpoint blockade** therapies.
+
+## Key surface markers
+
+Common markers used to identify T cell populations by flow cytometry or
+single-cell RNA sequencing:
+
+| Marker | Expression | Function |
+|--------|------------|----------|
+| CD3 | All T cells | TCR signalling complex |
+| CD4 | Helper T cells | MHC class II co-receptor |
+| CD8 | Cytotoxic T cells | MHC class I co-receptor |
+| CD45RA | Naive and T$_{EMRA}$ cells | Phosphatase isoform |
+| CD45RO | Memory T cells | Phosphatase isoform |
+| CCR7 | Naive and T$_{CM}$ cells | Lymph node homing |
+| CD62L | Naive and T$_{CM}$ cells | Lymph node homing |
+| CD69 | Recently activated, T$_{RM}$ cells | Tissue retention |
+| CD25 | Activated T cells, Tregs | IL-2 receptor $\alpha$ chain |
+| FoxP3 | Tregs | Lineage transcription factor |
+| PD-1 | Activated/exhausted T cells | Inhibitory receptor |
+| Ki-67 | Proliferating cells | Proliferation marker |
+
+## T cell-based immunotherapies
+
+### Immune checkpoint inhibitors
+
+Blocking co-inhibitory receptors can reinvigorate exhausted T cells in the
+tumour microenvironment:
+
+* **Anti-CTLA-4** (ipilimumab): Blocks CTLA-4, enhancing T cell activation and
+  depleting intratumoral Tregs. First checkpoint inhibitor approved (melanoma,
+  2011).
+* **Anti-PD-1** (nivolumab, pembrolizumab): Blocks PD-1, restoring effector
+  function in exhausted T cells. Broadly effective across many cancer types.
+* **Anti-PD-L1** (atezolizumab, durvalumab): Blocks PD-L1 on tumour cells and
+  APCs.
+* **Combination therapies**: Anti-CTLA-4 + anti-PD-1 combinations show improved
+  responses in several cancers (e.g., melanoma, renal cell carcinoma).
+
+The discovery of cancer therapy by inhibition of negative immune regulation was
+awarded the [Nobel Prize in Physiology or Medicine in
+2018](https://www.nobelprize.org/prizes/medicine/2018/summary/) to James Allison
+(CTLA-4) and Tasuku Honjo (PD-1).
+
+### CAR-T cell therapy
+
+**Chimeric antigen receptor (CAR) T cells** are engineered T cells that express
+a synthetic receptor combining:
+
+* An extracellular **single-chain variable fragment (scFv)** derived from an
+  antibody, providing antigen recognition.
+* A **hinge and transmembrane domain** for membrane anchoring.
+* Intracellular **signalling domains** for T cell activation.
+
+CAR generations differ in their intracellular signalling domains:
+
+| Generation | Signalling domains | Features |
+|------------|-------------------|----------|
+| 1st | CD3$\zeta$ only | Poor persistence and expansion |
+| 2nd | CD3$\zeta$ + one co-stimulatory domain (CD28 or 4-1BB) | Improved persistence and efficacy |
+| 3rd | CD3$\zeta$ + two co-stimulatory domains | Enhanced signalling |
+| 4th ("armoured") | 2nd gen + cytokine/ligand expression cassette | Modifies tumour microenvironment |
+
+FDA-approved CAR-T products (as of 2024) target **CD19** (B cell malignancies)
+or **BCMA** (multiple myeloma):
+
+* Tisagenlecleucel (Kymriah) - CD19, 4-1BB/CD3$\zeta$
+* Axicabtagene ciloleucel (Yescarta) - CD19, CD28/CD3$\zeta$
+* Brexucabtagene autoleucel (Tecartus) - CD19, CD28/CD3$\zeta$
+* Lisocabtagene maraleucel (Breyanzi) - CD19, 4-1BB/CD3$\zeta$
+* Idecabtagene vicleucel (Abecma) - BCMA, 4-1BB/CD3$\zeta$
+* Ciltacabtagene autoleucel (Carvykti) - BCMA, 4-1BB/CD3$\zeta$
+
+### TCR-T cell therapy
+
+**TCR-engineered T cells** are modified to express a specific TCR targeting a
+tumour-associated peptide-MHC complex. Unlike CAR-T cells, TCR-T cells can
+recognise intracellular antigens (presented via MHC class I), greatly expanding
+the range of targetable tumour antigens (e.g., NY-ESO-1, MAGE-A4, TP53
+neoantigens).
+
+### Adoptive cell transfer (ACT)
+
+**Tumour-infiltrating lymphocytes (TILs)** are harvested from a patient's
+tumour, expanded ex vivo, and reinfused. TIL therapy has shown durable responses
+in melanoma and was FDA-approved in 2024 (lifileucel/Amtagvi).
