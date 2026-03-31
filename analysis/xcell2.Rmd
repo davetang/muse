@@ -1,0 +1,120 @@
+---
+title: "Cell Type Enrichment Analysis with xCell2"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(xCell2)
+```
+
+> xCell2 provides methods for cell type enrichment analysis using cell type signatures. Cell type enrichment analysis and cellular deconvolution are computational techniques aimed at deciphering the cellular heterogeneity in bulk transcriptomics samples.
+
+[xCell2](https://bioconductor.org/packages/release/bioc/html/xCell2.html) is the successor to the original xCell package (Aran et al., 2017). It leverages the Cell Ontology to map hierarchical relationships between cell types and applies spillover correction to address overlapping signature genes.
+
+## Installation
+
+Install [xCell2](https://bioconductor.org/packages/release/bioc/html/xCell2.html).
+
+```{r install_packages, eval=FALSE}
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("xCell2")
+```
+
+## Reference data
+
+Use pre-trained references from the [xCell2 References Repository](https://github.com/dviraran/xCell2refs).
+
+```{r blueprint_encode}
+bpe_github_pages <- "https://dviraran.github.io/xCell2refs/references/BlueprintEncode.xCell2Ref.rds"
+bpe_github       <- "https://github.com/dviraran/xCell2refs/raw/refs/heads/main/references/BlueprintEncode.xCell2Ref.rds"
+
+BlueprintEncode.xCell2Ref <- readRDS(url(bpe_github_pages, 'rb'))
+test <- readRDS(url(bpe_github, 'rb'))
+
+identical(BlueprintEncode.xCell2Ref, test)
+```
+
+Class.
+
+```{r reference_class}
+class(BlueprintEncode.xCell2Ref)
+```
+
+Structure.
+
+```{r reference_str}
+str(BlueprintEncode.xCell2Ref, max.level = 2)
+```
+
+## Calculating Cell Type Enrichment with xCell2Analysis
+
+Check what identifiers are used.
+
+```{r genes_used}
+data("DICE_demo.xCell2Ref", package = "xCell2")
+genes_ref <- getGenesUsed(DICE_demo.xCell2Ref)
+genes_ref[1:10]
+```
+
+Demo data.
+
+```{r mix_demo}
+data("mix_demo", package = "xCell2")
+head(mix_demo)
+```
+
+Calculate the percentage of overlapping genes
+
+```{r overlapping_genes}
+genes_mix <- rownames(mix_demo)
+overlap_percentage <- round(length(intersect(genes_mix, genes_ref)) / length(genes_ref) * 100, 2)
+print(paste0("Overlap between mixture and reference genes is: ", overlap_percentage, "%"))
+```
+
+Ensure the overlap is sufficient (default minimum: 90%). You can adjust this threshold in `xCell2Analysis` using the minSharedGenes parameter:
+
+```{r xcell2analysis}
+xcell2_results <- xCell2Analysis(
+  mix = mix_demo,
+  xcell2object = DICE_demo.xCell2Ref,
+  minSharedGenes = 0.8 # Allow for a lower overlap threshold
+)
+
+class(xcell2_results)
+```
+
+Key Parameters of `xCell2Analysis`:
+
+* `mix`: The bulk mixture of gene expression matrix to analyze, with genes in rows and samples in columns. The gene nomenclature must match the reference, see Ensuring Gene Compatibility.
+* `xcell2object`: A pre-trained reference object of class xCell2Object, created using the xCell2Train function. Pre-trained references are also available for common use cases. See Using Pre-trained xCell2 References.
+* `minSharedGenes`: The minimum fraction of shared genes required between the bulk mixture (mix) and the reference (xcell2object). The default value is 0.9. If the overlap is insufficient, the function will terminate with an error. Adjust this threshold if necessary, but note that higher overlap ensures more reliable results. To check gene overlap, see Ensuring Gene Compatibility.
+* `rawScores`: A Boolean indicating whether to return raw enrichment scores (default: FALSE). Raw enrichment scores are computed directly from gene signatures without applying linear transformation or spillover correction. This option can be useful for debugging or advanced workflows.
+* `spillover`: A Boolean indicating whether to apply spillover correction on the enrichment scores (default: TRUE). Spillover correction addresses signature genes overlaps between closely related cell types, improving specificity. For details, see How Does xCell2 Correct Spillover?.
+* `spilloverAlpha`: A numeric value (default: 0.5) controlling the strength of spillover correction. Lower values apply weaker correction, while higher values apply stronger correction. Adjust this parameter based on the similarity of cell types in your reference. See Spillover Correction in xCell2.
+* `BPPARAM`: A BiocParallelParam instance that determines the parallelization strategy. This parameter allows you to leverage multi-core processing for faster computation. For more details, see Parallelization in xCell2.
+
+The `xCell2Analysis` function return a **matrix of cell type enrichment scores** with the following structure:
+
+* Rows: Represent individual cell types found in the reference.
+* Columns: Correspond to the samples in your input mixture.
+
+```{r xcell2_results}
+xcell2_results
+```
+
+1. Enrichment Scores Are Not Proportions:
+    * While the raw enrichment scores in xCell2 undergo a linear transformation that makes them resemble proportions, they are not actual proportions.
+    * The transformation ensures that scores are on a linear scale within the range of 0 to 1, but they might not sum to 1 across all cell types in a sample.
+2. Differences from Cellular Deconvolution Methods:
+    * Cellular deconvolution methods typically model bulk expression data as a linear combination of all reference cell type profiles, which forces the estimated proportions to sum to 1.
+    * However, this assumption is often unrealistic, as reference datasets rarely capture all cell type in a complex tissue sample. Missing cell types in the reference can lead to skewed or inaccurate proportions.
+3. Interpreting the Scale of Scores:
+    * Higher scores indicate a stronger enrichment of a cell type in the corresponding sample relative to the others.
+    * Use the scores to compare cell type compositions across samples and identify differences rather than report their absolute value.
