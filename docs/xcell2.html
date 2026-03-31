@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6890ab34635cda0b69eee2f0b1962c7559932f13targetblank6890ab3a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree07ba33d272b46ff45a8dee61865413338af3d4f6targetblank07ba33da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/6890ab34635cda0b69eee2f0b1962c7559932f13" target="_blank">6890ab3</a>
+<a href="https://github.com/davetang/muse/tree/07ba33d272b46ff45a8dee61865413338af3d4f6" target="_blank">07ba33d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree6890ab34635cda0b69eee2f0b1962c7559932f13targetblank6890ab3a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree07ba33d272b46ff45a8dee61865413338af3d4f6targetblank07ba33da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/6890ab34635cda0b69eee2f0b1962c7559932f13" target="_blank">6890ab3</a>.
+<a href="https://github.com/davetang/muse/tree/07ba33d272b46ff45a8dee61865413338af3d4f6" target="_blank">07ba33d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -665,6 +665,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/07ba33d272b46ff45a8dee61865413338af3d4f6/analysis/xcell2.Rmd" target="_blank">07ba33d</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-31
+</td>
+<td>
+Check signatures of references
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/2e2ff6f3c94ce26f96e37c63b96c1d05cdec030a/docs/xcell2.html" target="_blank">2e2ff6f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-03-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/6890ab34635cda0b69eee2f0b1962c7559932f13/analysis/xcell2.Rmd" target="_blank">6890ab3</a>
 </td>
 <td>
@@ -733,6 +767,81 @@ attr(,&quot;package&quot;)
   ..@ spill_mat   : num [1:43, 1:43] 1 0.25 0 0 0 0 0 0 0 0 ...
   .. ..- attr(*, &quot;dimnames&quot;)=List of 2
   ..@ genes_used  : chr [1:19859] &quot;TSPAN6&quot; &quot;TNMD&quot; &quot;DPM1&quot; &quot;SCYL3&quot; ...</code></pre>
+<p>Function to get signature names.</p>
+<pre class="r"><code>get_sig_unique &lt;- function(my_ref){
+  xCell2::getSignatures(my_ref) |&gt;
+    names() |&gt;
+    stringr::str_extract(pattern = &quot;(.*)#&quot;, group = 1) |&gt;
+    unique()
+}
+
+get_sig_unique(BlueprintEncode.xCell2Ref)</code></pre>
+<pre><code> [1] &quot;neutrophil&quot;                                     
+ [2] &quot;monocyte&quot;                                       
+ [3] &quot;megakaryocyte-erythroid progenitor cell&quot;        
+ [4] &quot;CD4-positive, alpha-beta T cell&quot;                
+ [5] &quot;regulatory T cell&quot;                              
+ [6] &quot;central memory CD4-positive, alpha-beta T cell&quot; 
+ [7] &quot;effector memory CD4-positive, alpha-beta T cell&quot;
+ [8] &quot;central memory CD8-positive, alpha-beta T cell&quot; 
+ [9] &quot;effector memory CD8-positive, alpha-beta T cell&quot;
+[10] &quot;natural killer cell&quot;                            
+[11] &quot;naive B cell&quot;                                   
+[12] &quot;memory B cell&quot;                                  
+[13] &quot;class switched memory B cell&quot;                   
+[14] &quot;hematopoietic stem cell&quot;                        
+[15] &quot;hematopoietic multipotent progenitor cell&quot;      
+[16] &quot;common lymphoid progenitor&quot;                     
+[17] &quot;granulocyte monocyte progenitor cell&quot;           
+[18] &quot;macrophage&quot;                                     
+[19] &quot;CD8-positive, alpha-beta T cell&quot;                
+[20] &quot;erythrocyte&quot;                                    
+[21] &quot;megakaryocyte&quot;                                  
+[22] &quot;common myeloid progenitor&quot;                      
+[23] &quot;inflammatory macrophage&quot;                        
+[24] &quot;alternatively activated macrophage&quot;             
+[25] &quot;endothelial cell&quot;                               
+[26] &quot;dendritic cell&quot;                                 
+[27] &quot;eosinophil&quot;                                     
+[28] &quot;plasma cell&quot;                                    
+[29] &quot;chondrocyte&quot;                                    
+[30] &quot;fibroblast&quot;                                     
+[31] &quot;smooth muscle cell&quot;                             
+[32] &quot;epithelial cell&quot;                                
+[33] &quot;melanocyte&quot;                                     
+[34] &quot;cell of skeletal muscle&quot;                        
+[35] &quot;keratinocyte&quot;                                   
+[36] &quot;microvascular endothelial cell&quot;                 
+[37] &quot;muscle cell&quot;                                    
+[38] &quot;fat cell&quot;                                       
+[39] &quot;neuron&quot;                                         
+[40] &quot;pericyte&quot;                                       
+[41] &quot;preadipocyte&quot;                                   
+[42] &quot;astrocyte&quot;                                      
+[43] &quot;mesangial cell&quot;                                 </code></pre>
+<p>ImmGenData reference.</p>
+<pre class="r"><code>bpe_github_base &lt;- &quot;https://github.com/dviraran/xCell2refs/raw/refs/heads/main/references/&quot;
+imm_gene_data &lt;- readRDS(url(paste0(bpe_github_base, &#39;ImmGenData.xCell2Ref.rds&#39;), &#39;rb&#39;))
+get_sig_unique(imm_gene_data)</code></pre>
+<pre><code> [1] &quot;macrophage&quot;                      &quot;monocyte&quot;                       
+ [3] &quot;B cell&quot;                          &quot;dendritic cell&quot;                 
+ [5] &quot;stromal cell&quot;                    &quot;eosinophil&quot;                     
+ [7] &quot;fibroblast&quot;                      &quot;neutrophil&quot;                     
+ [9] &quot;endothelial cell&quot;                &quot;T cell&quot;                         
+[11] &quot;natural killer cell&quot;             &quot;basophil&quot;                       
+[13] &quot;epithelial cell&quot;                 &quot;mast cell&quot;                      
+[15] &quot;stem cell&quot;                       &quot;gamma-delta T cell&quot;             
+[17] &quot;mature NK T cell&quot;                &quot;CD4-positive, alpha-beta T cell&quot;
+[19] &quot;CD8-positive, alpha-beta T cell&quot;</code></pre>
+<p>MouseRNAseqData reference.</p>
+<pre class="r"><code>mouse_rnaseq_data &lt;- readRDS(url(paste0(bpe_github_base, &#39;MouseRNAseqData.xCell2Ref.rds&#39;), &#39;rb&#39;))
+get_sig_unique(mouse_rnaseq_data)</code></pre>
+<pre><code> [1] &quot;fat cell&quot;            &quot;neuron&quot;              &quot;astrocyte&quot;          
+ [4] &quot;endothelial cell&quot;    &quot;erythrocyte&quot;         &quot;fibroblast&quot;         
+ [7] &quot;granulocyte&quot;         &quot;macrophage&quot;          &quot;Microglia&quot;          
+[10] &quot;monocyte&quot;            &quot;natural killer cell&quot; &quot;oligodendrocyte&quot;    
+[13] &quot;T cell&quot;              &quot;Dendritic cells&quot;     &quot;Cardiomyocytes&quot;     
+[16] &quot;hepatocyte&quot;          &quot;B cell&quot;              &quot;epithelial cell&quot;    </code></pre>
 </div>
 <div id="calculating-cell-type-enrichment-with-xcell2analysis"
 class="section level2">
@@ -743,6 +852,10 @@ genes_ref &lt;- getGenesUsed(DICE_demo.xCell2Ref)
 genes_ref[1:10]</code></pre>
 <pre><code> [1] &quot;CD28&quot;  &quot;S100B&quot; &quot;IL2RB&quot; &quot;CD3E&quot;  &quot;KRT72&quot; &quot;CTLA4&quot; &quot;CD3D&quot;  &quot;GNLY&quot;  &quot;IL7R&quot; 
 [10] &quot;MAL&quot;  </code></pre>
+<p>Unique signature names.</p>
+<pre class="r"><code>get_sig_unique(DICE_demo.xCell2Ref)</code></pre>
+<pre><code>[1] &quot;B cells&quot;               &quot;Monocytes&quot;             &quot;NK cells&quot;             
+[4] &quot;T cells, CD8+&quot;         &quot;T cells, CD4+&quot;         &quot;T cells, CD4+, memory&quot;</code></pre>
 <p>Demo data.</p>
 <pre class="r"><code>data(&quot;mix_demo&quot;, package = &quot;xCell2&quot;)
 head(mix_demo)</code></pre>
