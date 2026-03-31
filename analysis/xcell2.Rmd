@@ -53,6 +53,34 @@ Structure.
 str(BlueprintEncode.xCell2Ref, max.level = 2)
 ```
 
+Function to get signature names.
+
+```{r get_sig_unique}
+get_sig_unique <- function(my_ref){
+  xCell2::getSignatures(my_ref) |>
+    names() |>
+    stringr::str_extract(pattern = "(.*)#", group = 1) |>
+    unique()
+}
+
+get_sig_unique(BlueprintEncode.xCell2Ref)
+```
+
+ImmGenData reference.
+
+```{r imm_gen_data}
+bpe_github_base <- "https://github.com/dviraran/xCell2refs/raw/refs/heads/main/references/"
+imm_gene_data <- readRDS(url(paste0(bpe_github_base, 'ImmGenData.xCell2Ref.rds'), 'rb'))
+get_sig_unique(imm_gene_data)
+```
+
+MouseRNAseqData reference.
+
+```{r mouse_rnaseq_data}
+mouse_rnaseq_data <- readRDS(url(paste0(bpe_github_base, 'MouseRNAseqData.xCell2Ref.rds'), 'rb'))
+get_sig_unique(mouse_rnaseq_data)
+```
+
 ## Calculating Cell Type Enrichment with xCell2Analysis
 
 Check what identifiers are used.
@@ -61,6 +89,12 @@ Check what identifiers are used.
 data("DICE_demo.xCell2Ref", package = "xCell2")
 genes_ref <- getGenesUsed(DICE_demo.xCell2Ref)
 genes_ref[1:10]
+```
+
+Unique signature names.
+
+```{r dice_demo_sigs}
+get_sig_unique(DICE_demo.xCell2Ref)
 ```
 
 Demo data.
