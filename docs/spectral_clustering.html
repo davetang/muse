@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-04-06" />
+
+<title>Spectral Clustering</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Spectral Clustering</h1>
+<h4 class="date">2026-04-06</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-04-06
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree639294f7def1d1742453d86b20c1d834bfbca319targetblank639294fa">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/639294f7def1d1742453d86b20c1d834bfbca319" target="_blank">639294f</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree639294f7def1d1742453d86b20c1d834bfbca319targetblank639294fa"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/639294f7def1d1742453d86b20c1d834bfbca319" target="_blank">639294f</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.5.2/
+
+Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
+    Untracked:  analysis/.claude/
+    Untracked:  analysis/aucc.Rmd
+    Untracked:  analysis/bimodal.Rmd
+    Untracked:  analysis/bioc.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
+    Untracked:  analysis/modelling.Rmd
+    Untracked:  analysis/sampleqc.Rmd
+    Untracked:  analysis/wordpress_readability.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SeuratObj.rds
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/davetang039sblog.WordPress.2026-02-12.xml
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
+    Untracked:  m3/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/isoform_switch_analyzer.Rmd
+    Modified:   analysis/linear_models.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/spectral_clustering.Rmd</code>)
+and HTML (<code>docs/spectral_clustering.html</code>) files. If you’ve
+configured a remote Git repository (see <code>?wflow_git_remote</code>),
+click on the hyperlinks in the table below to view the files as they
+were in that past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/639294f7def1d1742453d86b20c1d834bfbca319/analysis/spectral_clustering.Rmd" target="_blank">639294f</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-06
+</td>
+<td>
+Spectral clustering
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<pre class="r"><code>if (!require(&quot;kernlab&quot;, quietly = TRUE)) {
+  install.packages(&quot;kernlab&quot;)
+}
+
+library(kernlab)</code></pre>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>Spectral clustering is a family of methods that use the eigenvalues
+(spectrum) of a similarity matrix to reduce the dimensionality of the
+data before clustering in fewer dimensions. Unlike <em>k</em>-means,
+which assumes clusters are convex (blob-shaped), spectral clustering can
+discover clusters with complex, non-convex shapes, such as concentric
+rings or interleaving spirals.</p>
+<p>The intuition is rooted in graph theory. We treat observations as
+nodes in a graph, connect nearby observations with weighted edges, and
+then find a partition of the graph that cuts the fewest (or
+lowest-weight) edges. The eigenvectors of the graph Laplacian encode
+this connectivity structure and provide a low-dimensional representation
+where standard methods like <em>k</em>-means work well.</p>
+<p>A motivating example comes from single-cell RNA-seq: you have
+thousands of cells measured across thousands of genes and need to
+identify cell types. Some populations form non-standard shapes —
+crescents, elongated streams, intertwined spirals — rather than round
+clusters in UMAP visualisations. Spectral clustering finds clusters
+based on <strong>connectivity</strong> rather than distance to a centre,
+making it well suited for these situations.</p>
+</div>
+<div id="the-limits-of-distance-based-clustering"
+class="section level1">
+<h1>The Limits of Distance-Based Clustering</h1>
+<p>Before diving into spectral clustering, it helps to understand where
+standard methods break down.</p>
+<p><strong><em>k</em>-means</strong> assigns each point to its nearest
+centroid. This works well for round, well-separated blobs, but it will
+always carve the space into convex (roughly spherical) Voronoi regions —
+even when the data does not conform to that geometry.</p>
+<p><strong>DBSCAN</strong> finds clusters by density and can handle
+arbitrary shapes, but requires choosing <span
+class="math inline">\(\varepsilon\)</span> and MinPts. A single global
+density threshold struggles when clusters have varying densities.</p>
+<p>The core question spectral clustering asks instead is: <em>if I built
+a network connecting similar data points, which groups of points are
+tightly connected internally but loosely connected to each other?</em>
+This reframes clustering as a <strong>graph partitioning</strong>
+problem — a shift from geometry (distances, centroids) to topology
+(connections, paths).</p>
+<p>Think of a social network analogy: people (data points) are connected
+by friendships (similarity). Communities (clusters) are groups where
+everyone knows each other but has few friends outside. Finding clusters
+is equivalent to finding communities — cutting the fewest friendships to
+separate the groups.</p>
+</div>
+<div id="algorithm-overview" class="section level1">
+<h1>Algorithm Overview</h1>
+<p>Given <span class="math inline">\(n\)</span> observations and a
+desired number of clusters <span class="math inline">\(k\)</span>:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Build a similarity graph.</strong> Construct an <span
+class="math inline">\(n \times n\)</span> similarity matrix <span
+class="math inline">\(W\)</span> using a kernel function, commonly the
+Gaussian (RBF) kernel: <span class="math inline">\(w_{ij} =
+\exp\!\left(-\frac{\|x_i - x_j\|^2}{2\sigma^2}\right)\)</span>. Close
+points get similarity <span class="math inline">\(\approx 1\)</span>;
+distant points get similarity <span class="math inline">\(\approx
+0\)</span>. Think of <span class="math inline">\(W\)</span> like a
+co-expression matrix: cells with similar expression profiles get a
+strong connection, dissimilar cells get a weak one, and <span
+class="math inline">\(\sigma\)</span> controls how broadly you define
+“similar”.</li>
+<li><strong>Compute the graph Laplacian.</strong> Form the degree matrix
+<span class="math inline">\(D\)</span> where <span
+class="math inline">\(d_{ii} = \sum_j w_{ij}\)</span> and compute the
+normalised Laplacian <span class="math inline">\(L = D^{-1/2}(D -
+W)D^{-1/2}\)</span>. The Laplacian captures the structure of connections
+in the graph.</li>
+<li><strong>Eigendecomposition.</strong> Compute the first <span
+class="math inline">\(k\)</span> eigenvectors of <span
+class="math inline">\(L\)</span> (those corresponding to the smallest
+eigenvalues). If the data has <span class="math inline">\(k\)</span>
+perfectly separated clusters, <span class="math inline">\(L\)</span> has
+exactly <span class="math inline">\(k\)</span> eigenvalues equal to zero
+and the corresponding eigenvectors are indicator vectors — constant
+within each cluster, different between clusters. In practice the
+eigenvectors are approximately piecewise constant. This step is
+analogous to running PCA, but instead of finding directions of maximum
+variance, you find directions that best separate connected components of
+the similarity graph.</li>
+<li><strong>Embed and cluster.</strong> Stack the <span
+class="math inline">\(k\)</span> eigenvectors as columns of a matrix
+<span class="math inline">\(U\)</span>. Each row of <span
+class="math inline">\(U\)</span> gives a new <span
+class="math inline">\(k\)</span>-dimensional representation of one data
+point. Apply <em>k</em>-means to these rows. In this transformed space,
+even complex non-convex clusters are “untangled” into well-separated
+blobs that <em>k</em>-means can handle.</li>
+</ol>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Step</th>
+<th align="left">What happens</th>
+<th align="left">Biological analogy</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">Build similarity matrix <span
+class="math inline">\(W\)</span></td>
+<td align="left">Compute cell–cell similarity from expression</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">Compute graph Laplacian <span
+class="math inline">\(L\)</span></td>
+<td align="left">Encode the cell–cell network structure</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">Find <span class="math inline">\(k\)</span> smallest
+eigenvectors</td>
+<td align="left">Embed cells into a space where clusters are clear</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">Run <em>k</em>-means on eigenvectors</td>
+<td align="left">Assign cell type labels</td>
+</tr>
+</tbody>
+</table>
+<p>The bandwidth parameter <span class="math inline">\(\sigma\)</span>
+controls neighbourhood size: a small <span
+class="math inline">\(\sigma\)</span> only connects very close points,
+while a large <span class="math inline">\(\sigma\)</span> connects more
+distant points. Spectral clustering transforms a hard non-convex problem
+into an easy convex one.</p>
+</div>
+<div id="concentric-circles" class="section level1">
+<h1>Concentric Circles</h1>
+<p><em>k</em>-means fails on non-convex shapes because it partitions
+space into Voronoi cells. Spectral clustering handles this
+naturally.</p>
+<pre class="r"><code>set.seed(1984)
+
+n &lt;- 300
+
+theta_inner &lt;- runif(n / 2, 0, 2 * pi)
+inner &lt;- data.frame(
+  x = cos(theta_inner) + rnorm(n / 2, sd = 0.1),
+  y = sin(theta_inner) + rnorm(n / 2, sd = 0.1),
+  true_cluster = 1L
+)
+
+theta_outer &lt;- runif(n / 2, 0, 2 * pi)
+outer &lt;- data.frame(
+  x = 3 * cos(theta_outer) + rnorm(n / 2, sd = 0.1),
+  y = 3 * sin(theta_outer) + rnorm(n / 2, sd = 0.1),
+  true_cluster = 2L
+)
+
+circles &lt;- rbind(inner, outer)
+
+ggplot(circles, aes(x, y)) +
+  geom_point(size = 1) +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = &quot;Concentric circles data&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/spectral_clustering.Rmd/circles_data-1.png" alt="Two concentric circles — a classic non-convex clustering problem." width="576" />
+<p class="caption">
+Two concentric circles — a classic non-convex clustering problem.
+</p>
+</div>
+<div id="k-means" class="section level2">
+<h2><em>k</em>-means</h2>
+<pre class="r"><code>km &lt;- kmeans(circles[, c(&quot;x&quot;, &quot;y&quot;)], centers = 2, nstart = 25)
+
+circles$kmeans &lt;- factor(km$cluster)
+
+ggplot(circles, aes(x, y, colour = kmeans)) +
+  geom_point(size = 1) +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = &quot;k-means (k = 2)&quot;, colour = &quot;Cluster&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/spectral_clustering.Rmd/circles_kmeans-1.png" alt="k-means splits the data into two halves rather than recognising the rings." width="576" />
+<p class="caption">
+k-means splits the data into two halves rather than recognising the
+rings.
+</p>
+</div>
+</div>
+<div id="spectral-clustering" class="section level2">
+<h2>Spectral clustering</h2>
+<p>The {kernlab} package provides <code>specc()</code>, which implements
+the spectral clustering algorithm using an RBF kernel.</p>
+<pre class="r"><code>sc &lt;- specc(as.matrix(circles[, c(&quot;x&quot;, &quot;y&quot;)]), centers = 2)
+
+circles$spectral &lt;- factor(sc@.Data)
+
+ggplot(circles, aes(x, y, colour = spectral)) +
+  geom_point(size = 1) +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = &quot;Spectral clustering (k = 2)&quot;, colour = &quot;Cluster&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/spectral_clustering.Rmd/circles_spectral-1.png" alt="Spectral clustering correctly identifies the two rings." width="576" />
+<p class="caption">
+Spectral clustering correctly identifies the two rings.
+</p>
+</div>
+</div>
+</div>
+<div id="spirals" class="section level1">
+<h1>Spirals</h1>
+<p>Spirals are another topology where <em>k</em>-means fails badly.</p>
+<pre class="r"><code>set.seed(1984)
+n &lt;- 300
+
+t &lt;- seq(0.5, 4 * pi, length.out = n / 2)
+spiral1 &lt;- data.frame(
+  x = t * cos(t) + rnorm(n / 2, sd = 0.3),
+  y = t * sin(t) + rnorm(n / 2, sd = 0.3),
+  true_cluster = 1L
+)
+
+spiral2 &lt;- data.frame(
+  x = t * cos(t + pi) + rnorm(n / 2, sd = 0.3),
+  y = t * sin(t + pi) + rnorm(n / 2, sd = 0.3),
+  true_cluster = 2L
+)
+
+spirals &lt;- rbind(spiral1, spiral2)
+
+ggplot(spirals, aes(x, y)) +
+  geom_point(size = 1) +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = &quot;Two spirals data&quot;)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/spectral_clustering.Rmd/spirals_data-1.png" alt="Two interleaving spirals." width="576" />
+<p class="caption">
+Two interleaving spirals.
+</p>
+</div>
+<pre class="r"><code>km_spiral &lt;- kmeans(spirals[, c(&quot;x&quot;, &quot;y&quot;)], centers = 2, nstart = 25)
+sc_spiral &lt;- specc(as.matrix(spirals[, c(&quot;x&quot;, &quot;y&quot;)]), centers = 2)
+
+spirals$kmeans &lt;- factor(km_spiral$cluster)
+spirals$spectral &lt;- factor(sc_spiral@.Data)
+
+p1 &lt;- ggplot(spirals, aes(x, y, colour = kmeans)) +
+  geom_point(size = 1) +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = &quot;k-means&quot;, colour = &quot;Cluster&quot;)
+
+p2 &lt;- ggplot(spirals, aes(x, y, colour = spectral)) +
+  geom_point(size = 1) +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = &quot;Spectral clustering&quot;, colour = &quot;Cluster&quot;)
+
+library(patchwork)
+p1 + p2</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/spectral_clustering.Rmd/spirals_comparison-1.png" alt="k-means vs spectral clustering on two spirals." width="960" />
+<p class="caption">
+k-means vs spectral clustering on two spirals.
+</p>
+</div>
+</div>
+<div id="step-by-step" class="section level1">
+<h1>Step by Step</h1>
+<p>To demystify the algorithm, let us implement each step manually on
+the concentric circles data.</p>
+<div id="similarity-matrix" class="section level2">
+<h2>Similarity matrix</h2>
+<pre class="r"><code>X &lt;- as.matrix(circles[, c(&quot;x&quot;, &quot;y&quot;)])
+
+sigma &lt;- 0.5
+dist_sq &lt;- as.matrix(dist(X))^2
+W &lt;- exp(-dist_sq / (2 * sigma^2))
+
+image(
+  W[1:50, 1:50],
+  main = &quot;Similarity matrix (50 x 50 subset)&quot;,
+  xlab = &quot;&quot;,
+  ylab = &quot;&quot;
+)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/spectral_clustering.Rmd/similarity-1.png" alt="Heatmap of the similarity matrix (first 50 observations)." width="576" />
+<p class="caption">
+Heatmap of the similarity matrix (first 50 observations).
+</p>
+</div>
+</div>
+<div id="graph-laplacian" class="section level2">
+<h2>Graph Laplacian</h2>
+<p>We compute the normalised Laplacian <span
+class="math inline">\(L_\text{sym} = I - D^{-1/2} W
+D^{-1/2}\)</span>.</p>
+<p>A useful physical analogy: imagine each data point as a mass and each
+similarity weight as a spring connecting two masses. Strong similarities
+are stiff springs; weak similarities are loose springs. Masses connected
+by stiff springs move together when the system vibrates. The
+lowest-frequency vibration modes (eigenvectors of <span
+class="math inline">\(L\)</span> with the smallest eigenvalues) reveal
+which groups of masses move together — and those groups are the
+clusters.</p>
+<pre class="r"><code>D_vec &lt;- rowSums(W)
+D_inv_sqrt &lt;- diag(1 / sqrt(D_vec))
+
+L_sym &lt;- diag(nrow(W)) - D_inv_sqrt %*% W %*% D_inv_sqrt</code></pre>
+</div>
+<div id="eigenvectors" class="section level2">
+<h2>Eigenvectors</h2>
+<p>The smallest eigenvalue of <span
+class="math inline">\(L_\text{sym}\)</span> is always zero. The next
+<span class="math inline">\(k - 1\)</span> eigenvectors carry the
+clustering information.</p>
+<pre class="r"><code>eig &lt;- eigen(L_sym, symmetric = TRUE)
+
+# Eigenvectors for the two smallest eigenvalues
+U &lt;- eig$vectors[, (ncol(eig$vectors) - 1):ncol(eig$vectors)]
+
+df_eig &lt;- data.frame(
+  ev1 = U[, 1],
+  ev2 = U[, 2],
+  true_cluster = factor(circles$true_cluster)
+)
+
+ggplot(df_eig, aes(ev1, ev2, colour = true_cluster)) +
+  geom_point(size = 1) +
+  theme_minimal() +
+  labs(
+    title = &quot;Laplacian eigenvector embedding&quot;,
+    x = &quot;Eigenvector 1&quot;,
+    y = &quot;Eigenvector 2&quot;,
+    colour = &quot;True cluster&quot;
+  )</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/spectral_clustering.Rmd/eigenvectors-1.png" alt="Observations projected onto the second eigenvector of the Laplacian, coloured by true cluster." width="576" />
+<p class="caption">
+Observations projected onto the second eigenvector of the Laplacian,
+coloured by true cluster.
+</p>
+</div>
+<p>In this embedding the two clusters are linearly separable, so
+<em>k</em>-means works.</p>
+<pre class="r"><code>km_eig &lt;- kmeans(U, centers = 2, nstart = 25)
+
+table(manual = km_eig$cluster, true = circles$true_cluster)</code></pre>
+<pre><code>      true
+manual   1   2
+     1   0 150
+     2 150   0</code></pre>
+</div>
+</div>
+<div id="the-kernel-trick-and-specc" class="section level1">
+<h1>The Kernel Trick and <code>specc()</code></h1>
+<p>A kernel function measures similarity between two data points.
+Formally, <span class="math inline">\(k(x, x&#39;)\)</span> computes a
+dot product in some (possibly infinite-dimensional) feature space
+without explicitly transforming the data. The similarity matrix <span
+class="math inline">\(W\)</span> at the heart of spectral clustering
+<em>is</em> a kernel matrix — different kernels define different notions
+of “similar”.</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Kernel</th>
+<th align="left">Formula</th>
+<th align="left">When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Gaussian RBF</td>
+<td align="left"><span class="math inline">\(\exp\!\left(-\frac{\|x -
+x&#39;\|^2}{2\sigma^2}\right)\)</span></td>
+<td align="left">Most common; general-purpose clustering</td>
+</tr>
+<tr class="even">
+<td align="left">Polynomial</td>
+<td align="left"><span class="math inline">\((s \langle x, x&#39;
+\rangle + c)^d\)</span></td>
+<td align="left">When relationships are polynomial</td>
+</tr>
+<tr class="odd">
+<td align="left">Linear</td>
+<td align="left"><span class="math inline">\(\langle x, x&#39;
+\rangle\)</span></td>
+<td align="left">Equivalent to PCA-based approaches</td>
+</tr>
+</tbody>
+</table>
+<p>Choosing a kernel is like choosing a distance metric for your cells.
+The Gaussian RBF says “cells within a certain neighbourhood are similar,
+and similarity falls off smoothly with distance”. The <span
+class="math inline">\(\sigma\)</span> parameter controls how big that
+neighbourhood is.</p>
+<div id="key-specc-parameters" class="section level2">
+<h2>Key <code>specc()</code> parameters</h2>
+<p>The {kernlab} package uses R’s S4 object system, so results are
+accessed with functions like <code>centers()</code>,
+<code>size()</code>, and <code>withinss()</code> rather than
+<code>$</code> notation.</p>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Parameter</th>
+<th align="left">Default</th>
+<th align="left">What it controls</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>centers</code></td>
+<td align="left">(required)</td>
+<td align="left">Number of clusters <span
+class="math inline">\(k\)</span></td>
+</tr>
+<tr class="even">
+<td align="left"><code>kernel</code></td>
+<td align="left"><code>"rbfdot"</code></td>
+<td align="left">Kernel function for similarity</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>kpar</code></td>
+<td align="left"><code>"automatic"</code></td>
+<td align="left">Kernel hyperparameters; <code>"automatic"</code> uses a
+heuristic; <code>"local"</code> uses per-point adaptive scaling</td>
+</tr>
+<tr class="even">
+<td align="left"><code>iterations</code></td>
+<td align="left">200</td>
+<td align="left">Max iterations for the <em>k</em>-means step</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>nystrom.red</code></td>
+<td align="left"><code>FALSE</code></td>
+<td align="left">Nyström approximation for large datasets</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>sc_demo &lt;- specc(as.matrix(circles[, c(&quot;x&quot;, &quot;y&quot;)]), centers = 2)
+
+centers(sc_demo)     # Cluster centroids (in eigenvector space)</code></pre>
+<pre><code>            [,1]        [,2]
+[1,]  0.03190248  0.04235691
+[2,] -0.22029574 -0.39315947</code></pre>
+<pre class="r"><code>size(sc_demo)        # Number of points per cluster</code></pre>
+<pre><code>[1] 150 150</code></pre>
+<pre class="r"><code>withinss(sc_demo)    # Within-cluster sum of squares</code></pre>
+<pre><code>[1]  151.8515 1336.6020</code></pre>
+<pre class="r"><code>head(sc_demo@.Data)  # Cluster assignments as integer vector</code></pre>
+<pre><code>[1] 1 1 1 1 1 1</code></pre>
+</div>
+<div id="kernel-width-conventions" class="section level2">
+<h2>Kernel width conventions</h2>
+<p>The classical formula uses bandwidth <span
+class="math inline">\(\sigma\)</span> where a larger <span
+class="math inline">\(\sigma\)</span> means a wider neighbourhood.
+However, {kernlab} parameterises the RBF kernel as <span
+class="math inline">\(\sigma_\text{kl} = 1 / (2\sigma^2)\)</span>, so a
+<strong>larger</strong> <code>sigma</code> in {kernlab} means a
+<strong>narrower</strong> neighbourhood (opposite convention). You do
+not need to remember this if you use the automatic settings.</p>
+<p>When <code>kpar = "automatic"</code>, {kernlab} estimates <span
+class="math inline">\(\sigma\)</span> by sampling pairwise distances and
+picking a value between the 0.1 and 0.9 quantiles of <span
+class="math inline">\(\|x - x&#39;\|\)</span> distances. The
+<code>kpar = "local"</code> option computes a local width for each point
+based on neighbourhood density, handling clusters at different densities
+(analogous to how HDBSCAN adapts its density threshold).</p>
+</div>
+</div>
+<div id="effect-of-sigma" class="section level1">
+<h1>Effect of Sigma</h1>
+<p>The bandwidth <span class="math inline">\(\sigma\)</span> has a large
+impact on results. Too small and the graph fragments into many tiny
+clusters; too large and even distant points are considered similar,
+merging everything into one cluster.</p>
+<pre class="r"><code>sigmas &lt;- c(0.1, 0.5, 1, 5)
+
+plots &lt;- lapply(sigmas, function(s) {
+  rbf &lt;- rbfdot(sigma = 1 / (2 * s^2))
+  sc_s &lt;- specc(X, centers = 2, kernel = rbf)
+  df &lt;- data.frame(x = X[, 1], y = X[, 2], cluster = factor(sc_s@.Data))
+  ggplot(df, aes(x, y, colour = cluster)) +
+    geom_point(size = 1) +
+    coord_equal() +
+    theme_minimal() +
+    labs(title = bquote(sigma == .(s)), colour = &quot;Cluster&quot;)
+})
+
+library(patchwork)
+wrap_plots(plots, ncol = 2)</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/spectral_clustering.Rmd/sigma_sweep-1.png" alt="Spectral clustering results for different sigma values on the concentric circles." width="960" />
+<p class="caption">
+Spectral clustering results for different sigma values on the concentric
+circles.
+</p>
+</div>
+</div>
+<div id="the-eigengap-heuristic" class="section level1">
+<h1>The Eigengap Heuristic</h1>
+<p>Spectral clustering requires specifying <span
+class="math inline">\(k\)</span>. The <strong>eigengap
+heuristic</strong> provides a data-driven way to choose it:</p>
+<ol style="list-style-type: decimal">
+<li>Compute all eigenvalues <span class="math inline">\(\lambda_1 \leq
+\lambda_2 \leq \ldots \leq \lambda_n\)</span> of the graph
+Laplacian.</li>
+<li>Plot them in order.</li>
+<li>Look for the largest gap between consecutive eigenvalues.</li>
+</ol>
+<p>If the data has <span class="math inline">\(k\)</span> well-separated
+clusters, the first <span class="math inline">\(k\)</span> eigenvalues
+will be very small (near zero) with a large jump to <span
+class="math inline">\(\lambda_{k+1}\)</span>. For example, eigenvalues
+of 0.01, 0.02, 0.03, <strong>0.8</strong>, 1.2, … suggest 3
+clusters.</p>
+<pre class="r"><code>eigenvalues &lt;- sort(eig$values)
+n_show &lt;- 20
+
+df_eig_vals &lt;- data.frame(
+  index = seq_len(n_show),
+  eigenvalue = eigenvalues[seq_len(n_show)]
+)
+
+ggplot(df_eig_vals, aes(index, eigenvalue)) +
+  geom_point(size = 2) +
+  geom_line() +
+  scale_x_continuous(breaks = seq_len(n_show)) +
+  theme_minimal() +
+  labs(
+    title = &quot;Eigengap heuristic&quot;,
+    x = &quot;Eigenvalue index&quot;,
+    y = &quot;Eigenvalue&quot;
+  )</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/spectral_clustering.Rmd/eigengap-1.png" alt="Eigenvalue spectrum of the graph Laplacian for the concentric circles. The gap after the second eigenvalue indicates k = 2." width="768" />
+<p class="caption">
+Eigenvalue spectrum of the graph Laplacian for the concentric circles.
+The gap after the second eigenvalue indicates k = 2.
+</p>
+</div>
+<p>When clusters are not well separated, the eigengap may be small and
+ambiguous. In such cases, combine with other metrics like silhouette
+scores.</p>
+</div>
+<div id="gene-expression-clustering-example" class="section level1">
+<h1>Gene Expression Clustering Example</h1>
+<p>A common workflow in single-cell analysis is to cluster cells in PCA
+space. Here we simulate three cell types with distinct expression
+programmes across 10 PCs.</p>
+<pre class="r"><code>set.seed(42)
+
+group1 &lt;- matrix(rnorm(80 * 10, mean = 0), ncol = 10)
+group2 &lt;- matrix(rnorm(70 * 10, mean = 3), ncol = 10)
+group3 &lt;- matrix(rnorm(50 * 10, mean = rep(c(0, 3), 5)),
+                 ncol = 10, byrow = TRUE)
+pca_data &lt;- rbind(group1, group2, group3)
+true_labels &lt;- rep(1:3, c(80, 70, 50))
+
+sc_expr &lt;- specc(pca_data, centers = 3)
+
+table(spectral = sc_expr@.Data, true = true_labels)</code></pre>
+<pre><code>        true
+spectral  1  2  3
+       1  0  0 50
+       2  0 70  0
+       3 80  0  0</code></pre>
+<pre class="r"><code>df_expr &lt;- data.frame(
+  PC1 = pca_data[, 1],
+  PC2 = pca_data[, 2],
+  cluster = factor(sc_expr@.Data)
+)
+
+ggplot(df_expr, aes(PC1, PC2, colour = cluster)) +
+  geom_point(size = 1.5) +
+  theme_minimal() +
+  labs(
+    title = &quot;Spectral clustering of cells&quot;,
+    colour = &quot;Cluster&quot;
+  )</code></pre>
+<div class="figure" style="text-align: center">
+<img src="figure/spectral_clustering.Rmd/gene_expression_plot-1.png" alt="Cells coloured by spectral cluster assignment, projected onto the first two PCs." width="672" />
+<p class="caption">
+Cells coloured by spectral cluster assignment, projected onto the first
+two PCs.
+</p>
+</div>
+<div id="adaptive-scaling-with-kpar-local" class="section level2">
+<h2>Adaptive scaling with <code>kpar = "local"</code></h2>
+<p>When clusters have varying densities, the <code>"local"</code> option
+computes a per-point kernel width rather than a single global <span
+class="math inline">\(\sigma\)</span>.</p>
+<pre class="r"><code>sc_local &lt;- specc(pca_data, centers = 3, kpar = &quot;local&quot;)
+
+table(local = sc_local@.Data, true = true_labels)</code></pre>
+<pre><code>     true
+local  1  2  3
+    1  7  0  0
+    2 73  0  0
+    3  0 70 50</code></pre>
+</div>
+</div>
+<div id="scaling-to-large-datasets" class="section level1">
+<h1>Scaling to Large Datasets</h1>
+<p>Spectral clustering computes an <span class="math inline">\(n \times
+n\)</span> similarity matrix and its eigendecomposition, giving <span
+class="math inline">\(O(n^3)\)</span> time complexity. For large
+datasets, {kernlab} provides the <strong>Nyström approximation</strong>,
+which samples a subset of points to approximate the
+eigendecomposition.</p>
+<pre class="r"><code># For a dataset with 50,000 cells
+sc_large &lt;- specc(large_data, centers = 10,
+                  nystrom.red = TRUE,
+                  nystrom.sample = 5000)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Dataset size</th>
+<th align="left">Approach</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><span class="math inline">\(&lt; 5{,}000\)</span>
+points</td>
+<td align="left">Use <code>specc()</code> directly</td>
+</tr>
+<tr class="even">
+<td align="left"><span class="math inline">\(5{,}000\)</span>–<span
+class="math inline">\(50{,}000\)</span></td>
+<td align="left">Enable <code>nystrom.red = TRUE</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><span class="math inline">\(&gt; 50{,}000\)</span></td>
+<td align="left">Consider specialised tools (Spectrum, Specter)</td>
+</tr>
+</tbody>
+</table>
+<p>For very large single-cell datasets, tools like <a
+href="https://cran.r-project.org/package=Spectrum">Spectrum</a>
+(density-aware spectral clustering) and Specter are optimised for
+hundreds of thousands of cells.</p>
+</div>
+<div id="applications-in-biology" class="section level1">
+<h1>Applications in Biology</h1>
+<div id="single-cell-rna-seq" class="section level2">
+<h2>Single-cell RNA-seq</h2>
+<ul>
+<li><strong>Cell type identification.</strong> After dimensionality
+reduction (PCA), spectral clustering identifies cell types forming
+non-spherical clusters. Kernel-based similarity captures relationships
+that simple Euclidean distance misses.</li>
+<li><strong>Trajectory analysis.</strong> Cells along developmental
+trajectories form elongated, branching structures. Spectral clustering
+identifies groups because it reasons about connectivity, not centroid
+distance.</li>
+<li><strong>Multi-omic integration.</strong> Spectrum extends spectral
+clustering to combine RNA-seq, ATAC-seq, and protein data using multiple
+similarity kernels.</li>
+</ul>
+<p>Spectral clustering gives you direct control over <span
+class="math inline">\(k\)</span> and uses a mathematically principled
+eigendecomposition, while Louvain/Leiden resolution parameters have a
+less direct interpretation.</p>
+</div>
+<div id="spatial-biology" class="section level2">
+<h2>Spatial biology</h2>
+<p>Spatial transcriptomics data can combine spatial coordinates with
+gene expression to define similarity. Spectral clustering identifies
+tissue domains coherent in both space and expression, and the kernel can
+weight spatial and molecular similarity differently.</p>
+</div>
+<div id="protein-structure" class="section level2">
+<h2>Protein structure</h2>
+<p>Residue–residue contact maps define a natural graph. Spectral
+clustering of this graph identifies protein domains — structurally
+compact units that fold semi-independently.</p>
+</div>
+<div id="ecological-communities" class="section level2">
+<h2>Ecological communities</h2>
+<p>Species co-occurrence data defines a network. Spectral clustering of
+the co-occurrence graph identifies ecological communities — groups of
+species that tend to appear together. This works because community
+boundaries are rarely spherical in species-space.</p>
+</div>
+</div>
+<div id="common-pitfalls" class="section level1">
+<h1>Common Pitfalls</h1>
+<ol style="list-style-type: decimal">
+<li><p><strong>Ignoring the kernel width parameter.</strong> Using
+<code>kpar = "automatic"</code> without checking may give poor results.
+Always visualise your clusters and consider trying
+<code>kpar = "local"</code> if clusters have varying densities.</p></li>
+<li><p><strong>Forgetting to scale features.</strong> Like
+<em>k</em>-means, spectral clustering is affected by feature scales.
+High-magnitude features dominate similarity computation. Standardise
+first, or work with PCA components (which have consistent
+units).</p></li>
+<li><p><strong>Wrong number of clusters.</strong> Use the eigengap
+heuristic or combine with silhouette analysis — do not just
+guess.</p></li>
+<li><p><strong>Assuming it handles noise like DBSCAN.</strong> Spectral
+clustering assigns every point to a cluster with no built-in noise
+detection. Outliers are forced into the nearest cluster. Pre-filter
+problematic cells (doublets, damaged cells) before clustering.</p></li>
+<li><p><strong>Running on too many features.</strong> Spectral
+clustering works best in low to moderate dimensions. On raw gene
+expression (thousands of features), the similarity matrix becomes noisy.
+Always reduce dimensions first (PCA) and then cluster the top
+components.</p></li>
+</ol>
+</div>
+<div id="spectral-clustering-vs-other-methods" class="section level1">
+<h1>Spectral Clustering vs Other Methods</h1>
+<table>
+<colgroup>
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+<col width="20%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Criterion</th>
+<th align="left"><em>k</em>-Means</th>
+<th align="left">DBSCAN</th>
+<th align="left">Spectral</th>
+<th align="left">Louvain/Leiden</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Cluster shape</td>
+<td align="left">Spherical</td>
+<td align="left">Arbitrary</td>
+<td align="left">Arbitrary</td>
+<td align="left">Arbitrary</td>
+</tr>
+<tr class="even">
+<td align="left">Must specify <span
+class="math inline">\(k\)</span></td>
+<td align="left">Yes</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+<td align="left">No (resolution)</td>
+</tr>
+<tr class="odd">
+<td align="left">Noise handling</td>
+<td align="left">None</td>
+<td align="left">Built-in</td>
+<td align="left">None</td>
+<td align="left">None</td>
+</tr>
+<tr class="even">
+<td align="left">Varying density</td>
+<td align="left">Poor</td>
+<td align="left">Poor</td>
+<td align="left">Moderate (local scaling)</td>
+<td align="left">Good</td>
+</tr>
+<tr class="odd">
+<td align="left">Scalability</td>
+<td align="left">Excellent</td>
+<td align="left">Good</td>
+<td align="left">Moderate (Nyström helps)</td>
+<td align="left">Excellent</td>
+</tr>
+<tr class="even">
+<td align="left">Non-convex clusters</td>
+<td align="left">No</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+<td align="left">Yes</td>
+</tr>
+<tr class="odd">
+<td align="left">Theoretical basis</td>
+<td align="left">Minimise variance</td>
+<td align="left">Density reachability</td>
+<td align="left">Graph partitioning</td>
+<td align="left">Modularity optimisation</td>
+</tr>
+<tr class="even">
+<td align="left">Best for</td>
+<td align="left">Round blobs</td>
+<td align="left">Dense, noisy data</td>
+<td align="left">Complex shapes, moderate <span
+class="math inline">\(n\)</span></td>
+<td align="left">Large-scale scRNA-seq</td>
+</tr>
+</tbody>
+</table>
+<p>For moderate-sized datasets with complex cluster shapes, spectral
+clustering is an excellent choice. For very large scRNA-seq datasets,
+Louvain/Leiden (as used in Seurat and Scanpy) scale better.</p>
+</div>
+<div id="practical-tips" class="section level1">
+<h1>Practical Tips</h1>
+<p><strong>Preprocessing:</strong></p>
+<ul>
+<li>Normalise and log-transform expression data.</li>
+<li>Run PCA and select the top 10–30 components.</li>
+<li>Standardise features if they are on different scales.</li>
+</ul>
+<p><strong>Choosing parameters:</strong></p>
+<ol style="list-style-type: decimal">
+<li>Start with <code>kpar = "automatic"</code> and inspect results.</li>
+<li>If clusters look merged or fragmented, try
+<code>kpar = "local"</code> for adaptive scaling.</li>
+<li>Use the eigengap heuristic to choose <span
+class="math inline">\(k\)</span>, or try a range and evaluate with
+silhouette scores.</li>
+</ol>
+<p><strong>When to move beyond {kernlab}:</strong></p>
+<ul>
+<li>Dataset <span class="math inline">\(&gt; 50{,}000\)</span> points:
+use Spectrum or Specter.</li>
+<li>Need noise detection: combine with DBSCAN or HDBSCAN.</li>
+<li>Need soft assignments: consider Gaussian mixture models.</li>
+</ul>
+</div>
+<div id="session-information" class="section level1">
+<h1>Session information</h1>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] patchwork_1.3.2 kernlab_0.9-33  lubridate_1.9.5 forcats_1.0.1  
+ [5] stringr_1.6.0   dplyr_1.2.0     purrr_1.2.1     readr_2.2.0    
+ [9] tidyr_1.3.2     tibble_3.3.1    ggplot2_4.0.2   tidyverse_2.0.0
+[13] workflowr_1.7.2
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      hms_1.1.4         
+ [5] digest_0.6.39      magrittr_2.0.4     timechange_0.4.0   evaluate_1.0.5    
+ [9] grid_4.5.2         RColorBrewer_1.1-3 fastmap_1.2.0      rprojroot_2.1.1   
+[13] jsonlite_2.0.0     processx_3.8.6     whisker_0.4.1      ps_1.9.1          
+[17] promises_1.5.0     httr_1.4.8         scales_1.4.0       jquerylib_0.1.4   
+[21] cli_3.6.5          rlang_1.1.7        withr_3.0.2        cachem_1.1.0      
+[25] yaml_2.3.12        otel_0.2.0         tools_4.5.2        tzdb_0.5.0        
+[29] httpuv_1.6.17      vctrs_0.7.2        R6_2.6.1           lifecycle_1.0.5   
+[33] git2r_0.36.2       fs_2.0.1           pkgconfig_2.0.3    callr_3.7.6       
+[37] pillar_1.11.1      bslib_0.10.0       later_1.4.8        gtable_0.3.6      
+[41] glue_1.8.0         Rcpp_1.1.1         xfun_0.57          tidyselect_1.2.1  
+[45] rstudioapi_0.18.0  knitr_1.51         farver_2.1.2       htmltools_0.5.9   
+[49] labeling_0.4.3     rmarkdown_2.31     compiler_4.5.2     getPass_0.2-4     
+[53] S7_0.2.1          </code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] patchwork_1.3.2 kernlab_0.9-33  lubridate_1.9.5 forcats_1.0.1  
+ [5] stringr_1.6.0   dplyr_1.2.0     purrr_1.2.1     readr_2.2.0    
+ [9] tidyr_1.3.2     tibble_3.3.1    ggplot2_4.0.2   tidyverse_2.0.0
+[13] workflowr_1.7.2
+
+loaded via a namespace (and not attached):
+ [1] sass_0.4.10        generics_0.1.4     stringi_1.8.7      hms_1.1.4         
+ [5] digest_0.6.39      magrittr_2.0.4     timechange_0.4.0   evaluate_1.0.5    
+ [9] grid_4.5.2         RColorBrewer_1.1-3 fastmap_1.2.0      rprojroot_2.1.1   
+[13] jsonlite_2.0.0     processx_3.8.6     whisker_0.4.1      ps_1.9.1          
+[17] promises_1.5.0     httr_1.4.8         scales_1.4.0       jquerylib_0.1.4   
+[21] cli_3.6.5          rlang_1.1.7        withr_3.0.2        cachem_1.1.0      
+[25] yaml_2.3.12        otel_0.2.0         tools_4.5.2        tzdb_0.5.0        
+[29] httpuv_1.6.17      vctrs_0.7.2        R6_2.6.1           lifecycle_1.0.5   
+[33] git2r_0.36.2       fs_2.0.1           pkgconfig_2.0.3    callr_3.7.6       
+[37] pillar_1.11.1      bslib_0.10.0       later_1.4.8        gtable_0.3.6      
+[41] glue_1.8.0         Rcpp_1.1.1         xfun_0.57          tidyselect_1.2.1  
+[45] rstudioapi_0.18.0  knitr_1.51         farver_2.1.2       htmltools_0.5.9   
+[49] labeling_0.4.3     rmarkdown_2.31     compiler_4.5.2     getPass_0.2-4     
+[53] S7_0.2.1          </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
