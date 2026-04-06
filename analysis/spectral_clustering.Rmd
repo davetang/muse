@@ -1,0 +1,475 @@
+---
+title: "Spectral Clustering"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r packages, message=FALSE}
+if (!require("kernlab", quietly = TRUE)) {
+  install.packages("kernlab")
+}
+
+library(kernlab)
+```
+
+# Introduction
+
+Spectral clustering is a family of methods that use the eigenvalues (spectrum) of a similarity matrix to reduce the dimensionality of the data before clustering in fewer dimensions. Unlike _k_-means, which assumes clusters are convex (blob-shaped), spectral clustering can discover clusters with complex, non-convex shapes, such as concentric rings or interleaving spirals.
+
+The intuition is rooted in graph theory. We treat observations as nodes in a graph, connect nearby observations with weighted edges, and then find a partition of the graph that cuts the fewest (or lowest-weight) edges. The eigenvectors of the graph Laplacian encode this connectivity structure and provide a low-dimensional representation where standard methods like _k_-means work well.
+
+A motivating example comes from single-cell RNA-seq: you have thousands of cells measured across thousands of genes and need to identify cell types. Some populations form non-standard shapes — crescents, elongated streams, intertwined spirals — rather than round clusters in UMAP visualisations. Spectral clustering finds clusters based on **connectivity** rather than distance to a centre, making it well suited for these situations.
+
+# The Limits of Distance-Based Clustering
+
+Before diving into spectral clustering, it helps to understand where standard methods break down.
+
+**_k_-means** assigns each point to its nearest centroid. This works well for round, well-separated blobs, but it will always carve the space into convex (roughly spherical) Voronoi regions — even when the data does not conform to that geometry.
+
+**DBSCAN** finds clusters by density and can handle arbitrary shapes, but requires choosing $\varepsilon$ and MinPts. A single global density threshold struggles when clusters have varying densities.
+
+The core question spectral clustering asks instead is: _if I built a network connecting similar data points, which groups of points are tightly connected internally but loosely connected to each other?_ This reframes clustering as a **graph partitioning** problem — a shift from geometry (distances, centroids) to topology (connections, paths).
+
+Think of a social network analogy: people (data points) are connected by friendships (similarity). Communities (clusters) are groups where everyone knows each other but has few friends outside. Finding clusters is equivalent to finding communities — cutting the fewest friendships to separate the groups.
+
+# Algorithm Overview
+
+Given $n$ observations and a desired number of clusters $k$:
+
+1. **Build a similarity graph.** Construct an $n \times n$ similarity matrix $W$ using a kernel function, commonly the Gaussian (RBF) kernel: $w_{ij} = \exp\!\left(-\frac{\|x_i - x_j\|^2}{2\sigma^2}\right)$. Close points get similarity $\approx 1$; distant points get similarity $\approx 0$. Think of $W$ like a co-expression matrix: cells with similar expression profiles get a strong connection, dissimilar cells get a weak one, and $\sigma$ controls how broadly you define "similar".
+2. **Compute the graph Laplacian.** Form the degree matrix $D$ where $d_{ii} = \sum_j w_{ij}$ and compute the normalised Laplacian $L = D^{-1/2}(D - W)D^{-1/2}$. The Laplacian captures the structure of connections in the graph.
+3. **Eigendecomposition.** Compute the first $k$ eigenvectors of $L$ (those corresponding to the smallest eigenvalues). If the data has $k$ perfectly separated clusters, $L$ has exactly $k$ eigenvalues equal to zero and the corresponding eigenvectors are indicator vectors — constant within each cluster, different between clusters. In practice the eigenvectors are approximately piecewise constant. This step is analogous to running PCA, but instead of finding directions of maximum variance, you find directions that best separate connected components of the similarity graph.
+4. **Embed and cluster.** Stack the $k$ eigenvectors as columns of a matrix $U$. Each row of $U$ gives a new $k$-dimensional representation of one data point. Apply _k_-means to these rows. In this transformed space, even complex non-convex clusters are "untangled" into well-separated blobs that _k_-means can handle.
+
+| Step | What happens | Biological analogy |
+| :- | :- | :- |
+| 1 | Build similarity matrix $W$ | Compute cell–cell similarity from expression |
+| 2 | Compute graph Laplacian $L$ | Encode the cell–cell network structure |
+| 3 | Find $k$ smallest eigenvectors | Embed cells into a space where clusters are clear |
+| 4 | Run _k_-means on eigenvectors | Assign cell type labels |
+
+The bandwidth parameter $\sigma$ controls neighbourhood size: a small $\sigma$ only connects very close points, while a large $\sigma$ connects more distant points. Spectral clustering transforms a hard non-convex problem into an easy convex one.
+
+# Concentric Circles
+
+_k_-means fails on non-convex shapes because it partitions space into Voronoi cells. Spectral clustering handles this naturally.
+
+```{r circles_data, fig.width=6, fig.height=6, fig.cap="Two concentric circles — a classic non-convex clustering problem."}
+set.seed(1984)
+
+n <- 300
+
+theta_inner <- runif(n / 2, 0, 2 * pi)
+inner <- data.frame(
+  x = cos(theta_inner) + rnorm(n / 2, sd = 0.1),
+  y = sin(theta_inner) + rnorm(n / 2, sd = 0.1),
+  true_cluster = 1L
+)
+
+theta_outer <- runif(n / 2, 0, 2 * pi)
+outer <- data.frame(
+  x = 3 * cos(theta_outer) + rnorm(n / 2, sd = 0.1),
+  y = 3 * sin(theta_outer) + rnorm(n / 2, sd = 0.1),
+  true_cluster = 2L
+)
+
+circles <- rbind(inner, outer)
+
+ggplot(circles, aes(x, y)) +
+  geom_point(size = 1) +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = "Concentric circles data")
+```
+
+## _k_-means
+
+```{r circles_kmeans, fig.width=6, fig.height=6, fig.cap="k-means splits the data into two halves rather than recognising the rings."}
+km <- kmeans(circles[, c("x", "y")], centers = 2, nstart = 25)
+
+circles$kmeans <- factor(km$cluster)
+
+ggplot(circles, aes(x, y, colour = kmeans)) +
+  geom_point(size = 1) +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = "k-means (k = 2)", colour = "Cluster")
+```
+
+## Spectral clustering
+
+The {kernlab} package provides `specc()`, which implements the spectral clustering algorithm using an RBF kernel.
+
+```{r circles_spectral, fig.width=6, fig.height=6, fig.cap="Spectral clustering correctly identifies the two rings."}
+sc <- specc(as.matrix(circles[, c("x", "y")]), centers = 2)
+
+circles$spectral <- factor(sc@.Data)
+
+ggplot(circles, aes(x, y, colour = spectral)) +
+  geom_point(size = 1) +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = "Spectral clustering (k = 2)", colour = "Cluster")
+```
+
+# Spirals
+
+Spirals are another topology where _k_-means fails badly.
+
+```{r spirals_data, fig.width=6, fig.height=6, fig.cap="Two interleaving spirals."}
+set.seed(1984)
+n <- 300
+
+t <- seq(0.5, 4 * pi, length.out = n / 2)
+spiral1 <- data.frame(
+  x = t * cos(t) + rnorm(n / 2, sd = 0.3),
+  y = t * sin(t) + rnorm(n / 2, sd = 0.3),
+  true_cluster = 1L
+)
+
+spiral2 <- data.frame(
+  x = t * cos(t + pi) + rnorm(n / 2, sd = 0.3),
+  y = t * sin(t + pi) + rnorm(n / 2, sd = 0.3),
+  true_cluster = 2L
+)
+
+spirals <- rbind(spiral1, spiral2)
+
+ggplot(spirals, aes(x, y)) +
+  geom_point(size = 1) +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = "Two spirals data")
+```
+
+```{r spirals_comparison, fig.width=10, fig.height=5, fig.cap="k-means vs spectral clustering on two spirals."}
+km_spiral <- kmeans(spirals[, c("x", "y")], centers = 2, nstart = 25)
+sc_spiral <- specc(as.matrix(spirals[, c("x", "y")]), centers = 2)
+
+spirals$kmeans <- factor(km_spiral$cluster)
+spirals$spectral <- factor(sc_spiral@.Data)
+
+p1 <- ggplot(spirals, aes(x, y, colour = kmeans)) +
+  geom_point(size = 1) +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = "k-means", colour = "Cluster")
+
+p2 <- ggplot(spirals, aes(x, y, colour = spectral)) +
+  geom_point(size = 1) +
+  coord_equal() +
+  theme_minimal() +
+  labs(title = "Spectral clustering", colour = "Cluster")
+
+library(patchwork)
+p1 + p2
+```
+
+# Step by Step
+
+To demystify the algorithm, let us implement each step manually on the concentric circles data.
+
+## Similarity matrix
+
+```{r similarity, fig.width=6, fig.height=5, fig.cap="Heatmap of the similarity matrix (first 50 observations)."}
+X <- as.matrix(circles[, c("x", "y")])
+
+sigma <- 0.5
+dist_sq <- as.matrix(dist(X))^2
+W <- exp(-dist_sq / (2 * sigma^2))
+
+image(
+  W[1:50, 1:50],
+  main = "Similarity matrix (50 x 50 subset)",
+  xlab = "",
+  ylab = ""
+)
+```
+
+## Graph Laplacian
+
+We compute the normalised Laplacian $L_\text{sym} = I - D^{-1/2} W D^{-1/2}$.
+
+A useful physical analogy: imagine each data point as a mass and each similarity weight as a spring connecting two masses. Strong similarities are stiff springs; weak similarities are loose springs. Masses connected by stiff springs move together when the system vibrates. The lowest-frequency vibration modes (eigenvectors of $L$ with the smallest eigenvalues) reveal which groups of masses move together — and those groups are the clusters.
+
+```{r laplacian}
+D_vec <- rowSums(W)
+D_inv_sqrt <- diag(1 / sqrt(D_vec))
+
+L_sym <- diag(nrow(W)) - D_inv_sqrt %*% W %*% D_inv_sqrt
+```
+
+## Eigenvectors
+
+The smallest eigenvalue of $L_\text{sym}$ is always zero. The next $k - 1$ eigenvectors carry the clustering information.
+
+```{r eigenvectors, fig.width=6, fig.height=5, fig.cap="Observations projected onto the second eigenvector of the Laplacian, coloured by true cluster."}
+eig <- eigen(L_sym, symmetric = TRUE)
+
+# Eigenvectors for the two smallest eigenvalues
+U <- eig$vectors[, (ncol(eig$vectors) - 1):ncol(eig$vectors)]
+
+df_eig <- data.frame(
+  ev1 = U[, 1],
+  ev2 = U[, 2],
+  true_cluster = factor(circles$true_cluster)
+)
+
+ggplot(df_eig, aes(ev1, ev2, colour = true_cluster)) +
+  geom_point(size = 1) +
+  theme_minimal() +
+  labs(
+    title = "Laplacian eigenvector embedding",
+    x = "Eigenvector 1",
+    y = "Eigenvector 2",
+    colour = "True cluster"
+  )
+```
+
+In this embedding the two clusters are linearly separable, so _k_-means works.
+
+```{r manual_final}
+km_eig <- kmeans(U, centers = 2, nstart = 25)
+
+table(manual = km_eig$cluster, true = circles$true_cluster)
+```
+
+# The Kernel Trick and `specc()`
+
+A kernel function measures similarity between two data points. Formally, $k(x, x')$ computes a dot product in some (possibly infinite-dimensional) feature space without explicitly transforming the data. The similarity matrix $W$ at the heart of spectral clustering _is_ a kernel matrix — different kernels define different notions of "similar".
+
+| Kernel | Formula | When to use |
+| :- | :- | :- |
+| Gaussian RBF | $\exp\!\left(-\frac{\|x - x'\|^2}{2\sigma^2}\right)$ | Most common; general-purpose clustering |
+| Polynomial | $(s \langle x, x' \rangle + c)^d$ | When relationships are polynomial |
+| Linear | $\langle x, x' \rangle$ | Equivalent to PCA-based approaches |
+
+Choosing a kernel is like choosing a distance metric for your cells. The Gaussian RBF says "cells within a certain neighbourhood are similar, and similarity falls off smoothly with distance". The $\sigma$ parameter controls how big that neighbourhood is.
+
+## Key `specc()` parameters
+
+The {kernlab} package uses R's S4 object system, so results are accessed with functions like `centers()`, `size()`, and `withinss()` rather than `$` notation.
+
+| Parameter | Default | What it controls |
+| :- | :- | :- |
+| `centers` | (required) | Number of clusters $k$ |
+| `kernel` | `"rbfdot"` | Kernel function for similarity |
+| `kpar` | `"automatic"` | Kernel hyperparameters; `"automatic"` uses a heuristic; `"local"` uses per-point adaptive scaling |
+| `iterations` | 200 | Max iterations for the _k_-means step |
+| `nystrom.red` | `FALSE` | Nyström approximation for large datasets |
+
+```{r specc_accessors}
+sc_demo <- specc(as.matrix(circles[, c("x", "y")]), centers = 2)
+
+centers(sc_demo)     # Cluster centroids (in eigenvector space)
+size(sc_demo)        # Number of points per cluster
+withinss(sc_demo)    # Within-cluster sum of squares
+head(sc_demo@.Data)  # Cluster assignments as integer vector
+```
+
+## Kernel width conventions
+
+The classical formula uses bandwidth $\sigma$ where a larger $\sigma$ means a wider neighbourhood. However, {kernlab} parameterises the RBF kernel as $\sigma_\text{kl} = 1 / (2\sigma^2)$, so a **larger** `sigma` in {kernlab} means a **narrower** neighbourhood (opposite convention). You do not need to remember this if you use the automatic settings.
+
+When `kpar = "automatic"`, {kernlab} estimates $\sigma$ by sampling pairwise distances and picking a value between the 0.1 and 0.9 quantiles of $\|x - x'\|$ distances. The `kpar = "local"` option computes a local width for each point based on neighbourhood density, handling clusters at different densities (analogous to how HDBSCAN adapts its density threshold).
+
+# Effect of Sigma
+
+The bandwidth $\sigma$ has a large impact on results. Too small and the graph fragments into many tiny clusters; too large and even distant points are considered similar, merging everything into one cluster.
+
+```{r sigma_sweep, fig.width=10, fig.height=8, fig.cap="Spectral clustering results for different sigma values on the concentric circles."}
+sigmas <- c(0.1, 0.5, 1, 5)
+
+plots <- lapply(sigmas, function(s) {
+  rbf <- rbfdot(sigma = 1 / (2 * s^2))
+  sc_s <- specc(X, centers = 2, kernel = rbf)
+  df <- data.frame(x = X[, 1], y = X[, 2], cluster = factor(sc_s@.Data))
+  ggplot(df, aes(x, y, colour = cluster)) +
+    geom_point(size = 1) +
+    coord_equal() +
+    theme_minimal() +
+    labs(title = bquote(sigma == .(s)), colour = "Cluster")
+})
+
+library(patchwork)
+wrap_plots(plots, ncol = 2)
+```
+
+# The Eigengap Heuristic
+
+Spectral clustering requires specifying $k$. The **eigengap heuristic** provides a data-driven way to choose it:
+
+1. Compute all eigenvalues $\lambda_1 \leq \lambda_2 \leq \ldots \leq \lambda_n$ of the graph Laplacian.
+2. Plot them in order.
+3. Look for the largest gap between consecutive eigenvalues.
+
+If the data has $k$ well-separated clusters, the first $k$ eigenvalues will be very small (near zero) with a large jump to $\lambda_{k+1}$. For example, eigenvalues of 0.01, 0.02, 0.03, **0.8**, 1.2, ... suggest 3 clusters.
+
+```{r eigengap, fig.width=8, fig.height=5, fig.cap="Eigenvalue spectrum of the graph Laplacian for the concentric circles. The gap after the second eigenvalue indicates k = 2."}
+eigenvalues <- sort(eig$values)
+n_show <- 20
+
+df_eig_vals <- data.frame(
+  index = seq_len(n_show),
+  eigenvalue = eigenvalues[seq_len(n_show)]
+)
+
+ggplot(df_eig_vals, aes(index, eigenvalue)) +
+  geom_point(size = 2) +
+  geom_line() +
+  scale_x_continuous(breaks = seq_len(n_show)) +
+  theme_minimal() +
+  labs(
+    title = "Eigengap heuristic",
+    x = "Eigenvalue index",
+    y = "Eigenvalue"
+  )
+```
+
+When clusters are not well separated, the eigengap may be small and ambiguous. In such cases, combine with other metrics like silhouette scores.
+
+# Gene Expression Clustering Example
+
+A common workflow in single-cell analysis is to cluster cells in PCA space. Here we simulate three cell types with distinct expression programmes across 10 PCs.
+
+```{r gene_expression, fig.width=7, fig.height=6, fig.cap="Spectral clustering of simulated cells in PCA space."}
+set.seed(42)
+
+group1 <- matrix(rnorm(80 * 10, mean = 0), ncol = 10)
+group2 <- matrix(rnorm(70 * 10, mean = 3), ncol = 10)
+group3 <- matrix(rnorm(50 * 10, mean = rep(c(0, 3), 5)),
+                 ncol = 10, byrow = TRUE)
+pca_data <- rbind(group1, group2, group3)
+true_labels <- rep(1:3, c(80, 70, 50))
+
+sc_expr <- specc(pca_data, centers = 3)
+
+table(spectral = sc_expr@.Data, true = true_labels)
+```
+
+```{r gene_expression_plot, fig.width=7, fig.height=6, fig.cap="Cells coloured by spectral cluster assignment, projected onto the first two PCs."}
+df_expr <- data.frame(
+  PC1 = pca_data[, 1],
+  PC2 = pca_data[, 2],
+  cluster = factor(sc_expr@.Data)
+)
+
+ggplot(df_expr, aes(PC1, PC2, colour = cluster)) +
+  geom_point(size = 1.5) +
+  theme_minimal() +
+  labs(
+    title = "Spectral clustering of cells",
+    colour = "Cluster"
+  )
+```
+
+## Adaptive scaling with `kpar = "local"`
+
+When clusters have varying densities, the `"local"` option computes a per-point kernel width rather than a single global $\sigma$.
+
+```{r kpar_local}
+sc_local <- specc(pca_data, centers = 3, kpar = "local")
+
+table(local = sc_local@.Data, true = true_labels)
+```
+
+# Scaling to Large Datasets
+
+Spectral clustering computes an $n \times n$ similarity matrix and its eigendecomposition, giving $O(n^3)$ time complexity. For large datasets, {kernlab} provides the **Nyström approximation**, which samples a subset of points to approximate the eigendecomposition.
+
+```r
+# For a dataset with 50,000 cells
+sc_large <- specc(large_data, centers = 10,
+                  nystrom.red = TRUE,
+                  nystrom.sample = 5000)
+```
+
+| Dataset size | Approach |
+| :- | :- |
+| $< 5{,}000$ points | Use `specc()` directly |
+| $5{,}000$–$50{,}000$ | Enable `nystrom.red = TRUE` |
+| $> 50{,}000$ | Consider specialised tools (Spectrum, Specter) |
+
+For very large single-cell datasets, tools like [Spectrum](https://cran.r-project.org/package=Spectrum) (density-aware spectral clustering) and Specter are optimised for hundreds of thousands of cells.
+
+# Applications in Biology
+
+## Single-cell RNA-seq
+
+- **Cell type identification.** After dimensionality reduction (PCA), spectral clustering identifies cell types forming non-spherical clusters. Kernel-based similarity captures relationships that simple Euclidean distance misses.
+- **Trajectory analysis.** Cells along developmental trajectories form elongated, branching structures. Spectral clustering identifies groups because it reasons about connectivity, not centroid distance.
+- **Multi-omic integration.** Spectrum extends spectral clustering to combine RNA-seq, ATAC-seq, and protein data using multiple similarity kernels.
+
+Spectral clustering gives you direct control over $k$ and uses a mathematically principled eigendecomposition, while Louvain/Leiden resolution parameters have a less direct interpretation.
+
+## Spatial biology
+
+Spatial transcriptomics data can combine spatial coordinates with gene expression to define similarity. Spectral clustering identifies tissue domains coherent in both space and expression, and the kernel can weight spatial and molecular similarity differently.
+
+## Protein structure
+
+Residue–residue contact maps define a natural graph. Spectral clustering of this graph identifies protein domains — structurally compact units that fold semi-independently.
+
+## Ecological communities
+
+Species co-occurrence data defines a network. Spectral clustering of the co-occurrence graph identifies ecological communities — groups of species that tend to appear together. This works because community boundaries are rarely spherical in species-space.
+
+# Common Pitfalls
+
+1. **Ignoring the kernel width parameter.** Using `kpar = "automatic"` without checking may give poor results. Always visualise your clusters and consider trying `kpar = "local"` if clusters have varying densities.
+
+2. **Forgetting to scale features.** Like _k_-means, spectral clustering is affected by feature scales. High-magnitude features dominate similarity computation. Standardise first, or work with PCA components (which have consistent units).
+
+3. **Wrong number of clusters.** Use the eigengap heuristic or combine with silhouette analysis — do not just guess.
+
+4. **Assuming it handles noise like DBSCAN.** Spectral clustering assigns every point to a cluster with no built-in noise detection. Outliers are forced into the nearest cluster. Pre-filter problematic cells (doublets, damaged cells) before clustering.
+
+5. **Running on too many features.** Spectral clustering works best in low to moderate dimensions. On raw gene expression (thousands of features), the similarity matrix becomes noisy. Always reduce dimensions first (PCA) and then cluster the top components.
+
+# Spectral Clustering vs Other Methods
+
+| Criterion | _k_-Means | DBSCAN | Spectral | Louvain/Leiden |
+| :- | :- | :- | :- | :- |
+| Cluster shape | Spherical | Arbitrary | Arbitrary | Arbitrary |
+| Must specify $k$ | Yes | No | Yes | No (resolution) |
+| Noise handling | None | Built-in | None | None |
+| Varying density | Poor | Poor | Moderate (local scaling) | Good |
+| Scalability | Excellent | Good | Moderate (Nyström helps) | Excellent |
+| Non-convex clusters | No | Yes | Yes | Yes |
+| Theoretical basis | Minimise variance | Density reachability | Graph partitioning | Modularity optimisation |
+| Best for | Round blobs | Dense, noisy data | Complex shapes, moderate $n$ | Large-scale scRNA-seq |
+
+For moderate-sized datasets with complex cluster shapes, spectral clustering is an excellent choice. For very large scRNA-seq datasets, Louvain/Leiden (as used in Seurat and Scanpy) scale better.
+
+# Practical Tips
+
+**Preprocessing:**
+
+- Normalise and log-transform expression data.
+- Run PCA and select the top 10–30 components.
+- Standardise features if they are on different scales.
+
+**Choosing parameters:**
+
+1. Start with `kpar = "automatic"` and inspect results.
+2. If clusters look merged or fragmented, try `kpar = "local"` for adaptive scaling.
+3. Use the eigengap heuristic to choose $k$, or try a range and evaluate with silhouette scores.
+
+**When to move beyond {kernlab}:**
+
+- Dataset $> 50{,}000$ points: use Spectrum or Specter.
+- Need noise detection: combine with DBSCAN or HDBSCAN.
+- Need soft assignments: consider Gaussian mixture models.
+
+# Session information
+
+```{r session_info}
+sessionInfo()
+```
