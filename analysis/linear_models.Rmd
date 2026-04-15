@@ -353,3 +353,117 @@ ttest <- t.test(s[["hf"]], s[["chow"]], var.equal=TRUE)
 summary(fit)$coefficients[2,3]
 ttest$statistic
 ```
+
+### Chick weight
+
+The built-in `ChickWeight` dataset records the body weight of chicks fed one of four experimental diets, measured every couple of days from hatching. It is a convenient playground for illustrating the core concepts of linear modelling: a continuous predictor (`Time`), a categorical predictor (`Diet`), and repeated measurements on individual chicks (`Chick`).
+
+```{r}
+head(ChickWeight)
+str(ChickWeight)
+```
+
+Growth trajectories vary between chicks and between diets:
+
+```{r chick_weight_trajectories, fig.cap="Individual chick growth trajectories, faceted by diet."}
+ggplot(ChickWeight, aes(x = Time, y = weight, group = Chick, colour = Diet)) +
+  geom_line(alpha = 0.6) +
+  facet_wrap(~ Diet) +
+  theme_bw() +
+  labs(x = "Days since hatching", y = "Weight (g)")
+```
+
+#### A simple linear model
+
+We start with the simplest possible model: weight as a linear function of time, ignoring diet.
+
+$$
+\text{weight}_i = \beta_0 + \beta_1\,\text{Time}_i + \varepsilon_i
+$$
+
+```{r}
+fit_time <- lm(weight ~ Time, data = ChickWeight)
+summary(fit_time)
+```
+
+The two coefficients have a direct, intuitive interpretation:
+
+* `(Intercept)` is the expected weight at `Time = 0` (the day of hatching).
+* `Time` is the average daily weight gain in grams, pooled across all diets and chicks.
+
+```{r chick_weight_simple_fit, fig.cap="Simple linear regression of weight on time."}
+ggplot(ChickWeight, aes(x = Time, y = weight)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "lm", se = FALSE, colour = "red") +
+  theme_bw() +
+  labs(x = "Days since hatching", y = "Weight (g)")
+```
+
+#### Adding a categorical predictor
+
+Pooling across diets hides the effect we probably care about. We add `Diet` as an additional predictor. Because `Diet` is a factor with four levels, R expands it into three indicator variables, leaving Diet 1 as the reference level:
+
+$$
+\text{weight}_i = \beta_0 + \beta_1\,\text{Time}_i + \beta_2 D2_i + \beta_3 D3_i + \beta_4 D4_i + \varepsilon_i
+$$
+
+```{r}
+fit_add <- lm(weight ~ Time + Diet, data = ChickWeight)
+summary(fit_add)
+```
+
+This is an _additive_ model: every diet is assumed to share the same growth rate (the single `Time` coefficient), but each diet is allowed its own intercept. The `Diet2`, `Diet3`, `Diet4` coefficients are the average difference in weight relative to Diet 1.
+
+Inspecting the design matrix makes the encoding explicit:
+
+```{r}
+head(model.matrix(fit_add))
+```
+
+#### Interaction: does diet change the growth rate?
+
+Looking at the trajectory plot, the slopes look different between diets — chicks on Diet 3 seem to grow faster than those on Diet 1. To test this we include an interaction between `Time` and `Diet`:
+
+$$
+\text{weight}_i = \beta_0 + \beta_1\,\text{Time}_i + \sum_{d=2}^{4} \beta_d D_{d,i} + \sum_{d=2}^{4} \gamma_d\,(D_{d,i}\!\times\!\text{Time}_i) + \varepsilon_i
+$$
+
+```{r}
+fit_int <- lm(weight ~ Time * Diet, data = ChickWeight)
+summary(fit_int)
+```
+
+Now each diet has its own intercept _and_ its own slope. The `Time:Diet2`, `Time:Diet3` and `Time:Diet4` coefficients are the differences in growth rate relative to Diet 1. A significant interaction coefficient indicates that chicks on that diet gain weight at a different rate to those on Diet 1.
+
+```{r chick_weight_interaction_fit, fig.cap="Linear model with a Time-by-Diet interaction: each diet has its own slope and intercept."}
+ggplot(ChickWeight, aes(x = Time, y = weight, colour = Diet)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_bw() +
+  labs(x = "Days since hatching", y = "Weight (g)")
+```
+
+#### Comparing nested models
+
+Each model is a special case of the next. We can compare them formally with `anova()`, which performs a sequential F-test:
+
+```{r}
+anova(fit_time, fit_add, fit_int)
+```
+
+Small p-values indicate that the extra parameters significantly improve the fit. Here, both adding `Diet` and adding the `Time:Diet` interaction are justified by the data.
+
+#### Extracting the design matrix
+
+For diagnostic work (or when implementing the normal equations by hand, as we did earlier) it is useful to have the design matrix $\mathbf{X}$ attached to the fitted model. Passing `x = TRUE` to `lm` stores it in the returned object:
+
+```{r}
+fit <- lm(weight ~ Diet + Chick, data = ChickWeight, x = TRUE)
+
+design <- model.matrix(fit)
+identical(design, fit$x)
+```
+
+The design matrix is the bridge between the formula we write and the matrix algebra `lm` uses under the hood. Once you are comfortable reading it, the meaning of every coefficient in the summary output becomes transparent.
+
+
