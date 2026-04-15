@@ -1,0 +1,430 @@
+---
+title: "The Central Limit Theorem"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+    code_folding: hide
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(patchwork)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## A Population of Petri Dishes
+
+Picture 10,000 petri dishes, each holding a highly variable bacterial colony count. The dish-to-dish counts are very spread out and skewed to the right: most dishes have a modest number of colonies but a handful have huge counts.
+
+We will simulate that situation with a negative binomial distribution, which is right-skewed and a reasonable shape for count data like colony counts.
+
+```{r petri_population}
+set.seed(1984)
+
+n_dishes <- 10000
+dish_counts <- rnbinom(n_dishes, mu = 50, size = 0.8)
+
+pop_mean <- mean(dish_counts)
+pop_sd   <- sd(dish_counts)
+
+tibble(
+  statistic = c("Population mean (mu)",
+                "Population SD (sigma)",
+                "Minimum",
+                "Maximum",
+                "Median"),
+  value = c(round(pop_mean, 2),
+            round(pop_sd, 2),
+            min(dish_counts),
+            max(dish_counts),
+            median(dish_counts))
+) |>
+  knitr::kable()
+```
+
+The mean sits well above the median and the maximum dwarfs the typical count due to the right skew. Here we plot the population to see the shape.
+
+```{r population_hist, fig.width=7, fig.height=4}
+ggplot(data.frame(count = dish_counts), aes(x = count)) +
+  geom_histogram(binwidth = 5, fill = "steelblue", colour = "white") +
+  geom_vline(xintercept = pop_mean, colour = "red", linetype = "dashed", linewidth = 1) +
+  labs(
+    title = "Population: 10,000 petri dishes",
+    subtitle = "Right-skewed colony counts (red dashed = population mean)",
+    x = "Colony count per dish",
+    y = "Number of dishes"
+  ) +
+  theme_minimal()
+```
+
+The original distribution is decidedly *not* bell-shaped.
+
+## Group the Dishes and Take Means
+
+Now do something simple:
+
+1. Randomly group the dishes into sets of 30
+2. Take the mean count of each set
+3. You now have a bag of ~333 "group means"
+
+```{r group_means_30}
+group_size <- 30
+
+group_id <- rep(seq_len(n_dishes %/% group_size), each = group_size)
+grouped  <- dish_counts[seq_along(group_id)]
+
+group_means_30 <- tapply(grouped, group_id, mean)
+
+tibble(
+  group = head(seq_along(group_means_30)),
+  mean_count = round(head(group_means_30), 2)
+) |>
+  knitr::kable(caption = paste0("First 6 of ", length(group_means_30), " group means"))
+```
+
+We now have 333 numbers where each value is the average colony count over 30 dishes.
+
+## What Happens to the Spread?
+
+Those group means are much less spread out than the individual counts.
+
+```{r spread_compare}
+tibble(
+  quantity = c("Population SD (single dishes)",
+               "SD of group means (n = 30)",
+               "Ratio (pop SD / SD of means)",
+               "sqrt(30)"),
+  value = round(c(pop_sd,
+                  sd(group_means_30),
+                  pop_sd / sd(group_means_30),
+                  sqrt(30)), 2)
+) |>
+  knitr::kable()
+```
+
+The spread of the group means is roughly $\sqrt{30}$ times smaller than the spread of single dishes; this ratio is not a coincidence and we will return to it.
+
+## What Happens to the Shape?
+
+This histogram looks bell-shaped, even though the original counts did not.
+
+```{r group_means_hist, fig.width=7, fig.height=4}
+ggplot(data.frame(mean_count = group_means_30), aes(x = mean_count)) +
+  geom_histogram(bins = 25, fill = "darkorange", colour = "white") +
+  geom_vline(xintercept = pop_mean, colour = "red", linetype = "dashed", linewidth = 1) +
+  labs(
+    title = "Sampling distribution of the mean (n = 30)",
+    subtitle = "~333 group means from the skewed petri-dish population",
+    x = "Group mean colony count",
+    y = "Number of groups"
+  ) +
+  theme_minimal()
+```
+
+The original population was lopsided; the distribution of group means is symmetric and bell-shaped. That is the CLT in action.
+
+## Bigger Groups, Narrower Bell
+
+Increase the group size from 30 to 100 and the bell gets narrower. So far we have only looked at one group size ($n = 30$) and partitioned the 10,000 dishes into 333 groups exactly once. To see how the bell changes shape across different group sizes, we need a more thorough experiment:
+
+1. Pick a group size $n$ (we will try $n = 1, 5, 30, 100$)
+2. Randomly draw $n$ dishes from the population and take their mean
+3. Repeat step 2 **5,000 times**, giving us 5,000 independent sample means for that $n$
+4. Repeat 1–3 for each $n$
+
+Drawing 5,000 samples (instead of the ~333 from a single partition) gives a smooth, high-resolution picture of the sampling distribution at each $n$. The helper below wraps steps 2–3, and `map_dfr()` runs it across all four group sizes.
+
+```{r sample_means_function}
+sample_means <- function(population, n, n_samples = 5000) {
+  replicate(n_samples, mean(sample(population, n, replace = TRUE)))
+}
+
+set.seed(1)
+sizes <- c(1, 5, 30, 100)
+sims <- map_dfr(sizes, function(group_n) {
+  tibble(
+    group_n = group_n,
+    sample_mean = sample_means(dish_counts, group_n)
+  )
+})
+
+sims |>
+  group_by(group_n) |>
+  summarise(
+    n_samples     = n(),
+    mean_of_means = mean(sample_mean),
+    se_observed   = sd(sample_mean),
+    .groups = "drop"
+  ) |>
+  knitr::kable(
+    digits = 3,
+    caption = "5,000 sample means drawn for each group size"
+  )
+```
+
+The `n_samples` column confirms we have 5,000 sample means per row. Every group size lands on the same population mean (`mean_of_means` $\approx \mu$), but the SD of the sample means (`se_observed`) shrinks as $n$ grows — that is the bell narrowing.
+
+```{r sample_means_facet, fig.width=8, fig.height=5}
+ggplot(sims, aes(x = sample_mean)) +
+  geom_histogram(bins = 40, fill = "steelblue", colour = "white") +
+  geom_vline(xintercept = pop_mean, colour = "red", linetype = "dashed") +
+  facet_wrap(~ group_n, scales = "free", labeller = label_both) +
+  labs(
+    title = "Sampling distribution of the mean for different group sizes",
+    subtitle = "Larger n produces a narrower, more normal bell",
+    x = "Sample mean",
+    y = "Frequency"
+  ) +
+  theme_minimal()
+```
+
+* `group_n = 1` is just the original skewed population
+* `group_n = 5` is already pulling toward symmetry
+* `group_n = 30` looks unmistakably normal
+* `group_n = 100` is the same shape, but tighter
+
+## Why Intuitively?
+
+Why does averaging tame the extremes? Think about what it would take to push a *group mean* of 30 dishes up to, say, 300 colonies. One unlucky dish with 300 colonies is not enough — the other 29 dishes, being typical, will pull the average back down toward the population mean of around 50. To actually land at a group mean of 300 you would need *most* of the 30 dishes to be unusually high at the same time. That is far less likely than any single dish being unusually high.
+
+Two ideas are doing the work here:
+
+1. **Cancellation.** In any random group of dishes, some will be above the population mean and some below. When you average them, the highs and lows partly cancel each other out. The mean of the group is therefore much less variable than any single dish.
+
+2. **Joint extremes are rare.** A single dish being "extreme" might happen 5% of the time. But for an entire *group* mean to look extreme, you need many extreme dishes to land together by chance — and that probability shrinks dramatically as the group grows.
+
+The Central Limit Theorem is just these two effects, made precise.
+
+### A Tangible Demonstration
+
+Let's make this concrete. The population mean is around 50, so call any value well above 50 "extreme". Rather than fix one threshold, sweep across several — 60, 80, 100, 150, 200 — and ask, for each one:
+
+* What fraction of *single dishes* exceed it?
+* What fraction of *means of 30 dishes* exceed it?
+* What fraction of *means of 100 dishes* exceed it?
+
+If averaging really cancels extremes, then for every threshold the second number should be smaller than the first, and the third smaller still. The gap should also widen as the threshold gets more extreme.
+
+```{r cancellation}
+set.seed(2)
+single_draws   <- sample(dish_counts, 5000, replace = TRUE)
+mean_draws_30  <- sample_means(dish_counts, 30,  n_samples = 5000)
+mean_draws_100 <- sample_means(dish_counts, 100, n_samples = 5000)
+
+thresholds <- c(60, 80, 100, 150, 200)
+
+map_dfr(thresholds, function(t) {
+  tibble(
+    threshold        = t,
+    single_dish      = mean(single_draws   > t),
+    mean_of_30       = mean(mean_draws_30  > t),
+    mean_of_100      = mean(mean_draws_100 > t)
+  )
+}) |>
+  knitr::kable(
+    digits = 4,
+    caption = "Probability of exceeding the threshold, by sample size"
+  )
+```
+
+Read across each row: the probability shrinks fast as the group size grows. Read down each column: as the threshold gets more extreme, single dishes still manage to clear it occasionally, but the group means give up almost entirely. By a threshold of 100 a single dish is still over the bar maybe one time in ten, but a mean of 30 is essentially never that high, and a mean of 100 has effectively no chance.
+
+Notice that the underlying population has not changed — there are just as many extreme dishes as before. What changed is that any one extreme dish now has to *outvote* 29 (or 99) typical neighbours in order to budge the mean past the threshold, and the typical neighbours nearly always win.
+
+This is also why the bell narrows as $n$ grows: the larger the group, the more cancellation happens, and the harder it is for the group mean to wander far from the population mean $\mu$.
+
+## The CLT, Stated Formally
+
+Formally: if you draw independent samples of size $n$ from any population with finite mean $\mu$ and finite variance $\sigma^2$, the distribution of the sample mean $\bar{X}$ approaches a normal distribution as $n$ grows, regardless of the shape of the original population:
+
+$$
+\bar{X} \sim \mathcal{N}\left(\mu,\ \frac{\sigma^2}{n}\right)
+$$
+
+We can check this directly: overlay $\mathcal{N}(\mu, \sigma^2 / n)$ on the simulated sampling distribution at $n = 30$ — no fitting, just plug in $\mu$ and $\sigma$ from the population.
+
+```{r normal_overlay, fig.width=7, fig.height=4}
+predicted_se <- pop_sd / sqrt(30)
+
+means_30 <- sims |> filter(group_n == 30)
+
+ggplot(means_30, aes(x = sample_mean)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 40,
+                 fill = "darkorange", colour = "white") +
+  stat_function(fun = dnorm,
+                args = list(mean = pop_mean, sd = predicted_se),
+                colour = "black", linewidth = 1) +
+  labs(
+    title = "Sampling distribution of mean (n = 30) vs theoretical normal",
+    subtitle = "Black curve: N(mu, sigma^2 / n) — no fitting, just plugging in",
+    x = "Sample mean",
+    y = "Density"
+  ) +
+  theme_minimal()
+```
+
+The theoretical normal curve falls right on top of the histogram even though the underlying counts were nowhere near normal.
+
+## Standard Error of the Mean
+
+The standard deviation of that sampling distribution, $\sigma / \sqrt{n}$, is the **standard error of the mean** — how much we expect a sample mean to wobble from sample to sample:
+
+$$
+\mathrm{SE}(\bar{X}) = \frac{\sigma}{\sqrt{n}}
+$$
+
+Two consequences worth highlighting: SE shrinks as $n$ grows, but only with $\sqrt{n}$ — to halve the SE you need *four times* the data. And SE is not the same as the population SD: SD describes spread of individuals, SE describes spread of *averages*.
+
+Compare the predicted SE with the SD observed across many simulated sample means:
+
+```{r se_table}
+n_grid <- c(2, 5, 10, 30, 100, 300, 1000)
+
+se_compare <- tibble(
+  n             = n_grid,
+  se_predicted  = pop_sd / sqrt(n_grid),
+  se_observed   = map_dbl(n_grid, ~ sd(sample_means(dish_counts, .x, n_samples = 2000)))
+)
+
+knitr::kable(se_compare, digits = 3)
+```
+
+```{r se_curve, fig.width=7, fig.height=4}
+ggplot(se_compare, aes(x = n)) +
+  geom_line(aes(y = se_predicted), colour = "steelblue", linewidth = 1) +
+  geom_point(aes(y = se_observed), colour = "darkorange", size = 3) +
+  scale_x_log10() +
+  labs(
+    title = "Standard error of the mean shrinks like 1/sqrt(n)",
+    subtitle = "Line: sigma/sqrt(n).  Points: SD of 2,000 simulated sample means.",
+    x = "Sample size n (log scale)",
+    y = "Standard error of the mean"
+  ) +
+  theme_minimal()
+```
+
+## Estimating SE From a Single Sample
+
+In practice we don't know $\sigma$, so we estimate the standard error from a single sample using the sample standard deviation $s$:
+
+$$
+\widehat{\mathrm{SE}}(\bar{X}) = \frac{s}{\sqrt{n}}
+$$
+
+Even one sample of 30 dishes already gives a reasonable estimate of how much the sample mean is likely to wobble:
+
+```{r se_from_sample}
+set.seed(42)
+one_sample <- sample(dish_counts, 30)
+
+tibble(
+  quantity = c("Sample mean",
+               "Sample SD (s)",
+               "Estimated SE = s/sqrt(n)",
+               "True SE = sigma/sqrt(n)"),
+  value = round(c(mean(one_sample),
+                  sd(one_sample),
+                  sd(one_sample) / sqrt(30),
+                  pop_sd / sqrt(30)), 2)
+) |>
+  knitr::kable()
+```
+
+## A Sanity Check With a Truly Wild Population
+
+To prove the CLT does not depend on the shape of the population, repeat with a mixture of two extremes — half the dishes near zero, half near a hundred. The population is bimodal and clearly non-normal, yet the sampling distribution of the mean is still bell-shaped and centred on the population mean.
+
+```{r bimodal_clt, fig.width=8, fig.height=4}
+set.seed(99)
+weird_pop <- c(rpois(5000, lambda = 2),
+               rpois(5000, lambda = 100))
+
+weird_means <- sample_means(weird_pop, n = 30, n_samples = 5000)
+
+p1 <- ggplot(data.frame(x = weird_pop), aes(x)) +
+  geom_histogram(bins = 50, fill = "steelblue", colour = "white") +
+  labs(title = "Population (bimodal)", x = NULL, y = NULL) +
+  theme_minimal()
+
+p2 <- ggplot(data.frame(x = weird_means), aes(x)) +
+  geom_histogram(bins = 40, fill = "darkorange", colour = "white") +
+  labs(title = "Sample means, n = 30", x = NULL, y = NULL) +
+  theme_minimal()
+
+p1 + p2
+```
+
+## Doing the Experiment in Practice
+
+We have spent the whole notebook simulating thousands of replicates because we wanted to *see* the sampling distribution of the mean. But what if you actually had to run this experiment in the lab? Do you need to repeat it 5,000 times — or even just five times — to estimate the mean colony count and how precise that estimate is?
+
+The CLT says no. A single sample of $n$ dishes is enough. Here is why: the CLT promises that the sampling distribution of $\bar{X}$ is approximately $\mathcal{N}(\mu,\ \sigma^2/n)$. So once you have one sample, you can estimate
+
+* the **population mean** with the sample mean $\bar{x}$
+* the **standard error** of that estimate with $s / \sqrt{n}$, where $s$ is the sample SD
+
+You do not need to observe the sampling distribution — the CLT lets you derive it from one experiment.
+
+To make this concrete, compare three strategies for estimating the mean colony count:
+
+* **Strategy A** — run one experiment of 30 dishes
+* **Strategy B** — run five experiments of 30 dishes each (150 dishes total), then average the five batch means
+* **Strategy C** — run one big experiment of 150 dishes
+
+```{r practical_strategies}
+set.seed(11)
+
+# A: one batch of 30
+exp_A <- sample(dish_counts, 30)
+mean_A <- mean(exp_A)
+se_A   <- sd(exp_A) / sqrt(30)
+
+# B: five batches of 30
+batches_B <- replicate(5, sample(dish_counts, 30), simplify = FALSE)
+batch_means_B <- sapply(batches_B, mean)
+mean_B <- mean(batch_means_B)
+se_B   <- sd(batch_means_B) / sqrt(5)
+
+# C: one batch of 150
+exp_C <- sample(dish_counts, 150)
+mean_C <- mean(exp_C)
+se_C   <- sd(exp_C) / sqrt(150)
+
+tibble(
+  strategy       = c("A: 1 batch of 30",
+                     "B: 5 batches of 30",
+                     "C: 1 batch of 150"),
+  total_dishes   = c(30, 150, 150),
+  estimate_of_mu = round(c(mean_A, mean_B, mean_C), 2),
+  estimated_SE   = round(c(se_A, se_B, se_C), 2),
+  ci_low         = round(c(mean_A, mean_B, mean_C) - 1.96 * c(se_A, se_B, se_C), 2),
+  ci_high        = round(c(mean_A, mean_B, mean_C) + 1.96 * c(se_A, se_B, se_C), 2)
+) |>
+  knitr::kable(caption = paste0(
+    "True population mean = ", round(pop_mean, 2),
+    ".  95% CI computed as estimate +/- 1.96 * SE."
+  ))
+```
+
+A few things to notice:
+
+1. **All three strategies give a usable estimate of the mean** along with a 95% CI that brackets the true value. You did not need to repeat anything to get the CI — Strategy A used only one batch and the CLT did the rest.
+
+2. **Strategies B and C use the same number of dishes (150) and produce SEs of roughly the same size.** Splitting 150 dishes across 5 batches did not buy you extra precision. What buys precision is the *total* sample size $n$, not how it is sliced.
+
+3. **Strategy C has a slightly tighter SE than B** because it estimates $s$ from all 150 dishes at once. B's SE is built from only 5 batch means, so it has fewer degrees of freedom. In practice this difference is small — the dominant factor is total $n$.
+
+4. **Strategy A's CI is roughly $\sqrt{5} \approx 2.24$ times wider than C's.** That matches the $1/\sqrt{n}$ rule: going from $n = 30$ to $n = 150$ is a 5× increase in $n$, which shrinks the SE by $\sqrt{5}$.
+
+So the practical recipe: **run one experiment with as large an $n$ as you can afford, then use $\bar{x} \pm 1.96\,s/\sqrt{n}$ as your 95% CI for $\mu$.** Replication across batches is still useful for *other* reasons — checking for batch effects, validating that the SE assumption holds, catching technical errors — but it is not what gives you the standard error. The CLT does that for free from one sample.
+
+## Key Takeaways
+
+1. The CLT is about the distribution of *averages*, not individuals
+2. With enough samples per group ($n$ around 30 is the textbook rule of thumb), the sampling distribution of the mean is approximately normal regardless of the population shape
+3. The mean of that sampling distribution equals the population mean $\mu$
+4. Its spread is the **standard error**, $\sigma / \sqrt{n}$, which shrinks as $\sqrt{n}$
+5. The standard error tells you how precisely a single sample mean estimates $\mu$
+6. When $\sigma$ is unknown, estimate the SE with $s / \sqrt{n}$ from one sample
+7. Confidence intervals, $z$-tests, and $t$-tests all lean on the CLT to justify treating $\bar{X}$ as approximately normal
