@@ -1,0 +1,348 @@
+---
+title: "Decontamination of ambient RNA with DecontX"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Introduction
+
+Droplet-based single-cell RNA-seq protocols, such as those produced by the 10x Genomics Chromium platform, do not actually sequence isolated cells. They sequence droplets. Each droplet ideally contains a single cell, but every droplet — empty or not — also receives a small volume of the input cell suspension, and that suspension carries free-floating mRNA released by cells that lysed before encapsulation. The count matrix that comes out of Cell Ranger for any given cell is therefore a mixture of two things: transcripts that genuinely came from that cell's transcriptome, and a low-level background of "ambient" transcripts that came from lysed cells in the suspension.
+
+This ambient contamination has a characteristic signature. The genes that dominate the ambient pool are the genes that are most highly expressed in the cells that died most readily during dissociation — typically erythrocytes (releasing haemoglobin transcripts), plasma cells (immunoglobulins), and other fragile populations. These transcripts then appear at low levels in *every* cell, even in cell types that biologically cannot express them. Downstream this manifests as clusters that look weakly positive for markers they should not express, inflated p-values in differential expression, and misleading marker signatures.
+
+[DecontX](https://bioconductor.org/packages/release/bioc/html/decontX.html) (Yang S. *et al.*, *Decontamination of ambient RNA in single-cell RNA-seq with DecontX.* [Genome Biology 21:57, 2020](https://doi.org/10.1186/s13059-020-1950-6)) is one of several methods for estimating and removing this contamination. It models the observed expression of each cell as a mixture of two multinomial distributions: a "native" distribution representing the cell's actual transcriptome (taken to resemble the average profile of its assigned cluster) and a "contamination" distribution representing the ambient pool (taken to resemble a weighted combination of the other clusters' average profiles). A Bayesian variational EM procedure jointly estimates the mixing proportion `rho` (the contamination fraction) for every cell and the cluster-level expression profiles. The corrected counts assay is produced by removing the expected contamination contribution from each cell.
+
+### How DecontX differs from SoupX
+
+This repository already has a [SoupX walk-through](soupx.html) on the same PBMC dataset. The two methods solve the same problem but make different assumptions, which is worth understanding before choosing one:
+
+* **SoupX** estimates the ambient profile *directly* from empty droplets in the raw 10x output and then estimates a per-cell contamination fraction by looking for genes that should be soup-only in particular clusters (`autoEstCont`).
+* **DecontX** estimates the ambient profile *implicitly* from the other cell clusters in the filtered matrix, treating the contamination distribution for each cell as a weighted sum of the profiles of the other clusters. It does not require empty droplets to run, but it can also accept the raw matrix via the `background` argument to anchor the ambient estimate empirically.
+
+In practice the two methods often agree on which genes are most contaminated and produce broadly similar corrections. DecontX is appealing when the empty-droplet population may not represent the full ambient pool — for example when the sample was FACS-sorted before loading, so that the cells most prone to lysis (and most likely to be in the soup) were never present in the chip in the first place.
+
+This notebook reproduces the [official DecontX vignette](https://www.bioconductor.org/packages/release/bioc/vignettes/decontX/inst/doc/decontX.html) on the same `SC3pv3_GEX_Human_PBMC` dataset that the SoupX notebook uses, so that the two results can be compared like-for-like. The data files are tracked outside the repository; download them with `script/download_data.sh` before knitting.
+
+## Packages
+
+`decontX` provides the model and the helper plotting functions, `SingleCellExperiment` is the container we use throughout, `Seurat::Read10X_h5` is the fastest way to read the 10x HDF5 matrices, `celda` provides a couple of UMAP-overlay plotting helpers, and `scater` gives us `logNormCounts` for normalising the counts before plotting marker expression.
+
+```{r packages, message=FALSE, warning=FALSE}
+suppressPackageStartupMessages({
+  library(decontX)
+  library(SingleCellExperiment)
+  library(Matrix)
+  library(Seurat)
+  library(celda)
+  library(scater)
+  library(ggplot2)
+})
+```
+
+## Loading the 10x data
+
+DecontX works with two count matrices in the same way SoupX does:
+
+* The **filtered matrix** — barcodes that Cell Ranger has classified as cells. This is what we will eventually decontaminate.
+* The **raw matrix** — every barcode that received any UMI, including the empty droplets. We will pass this to DecontX as the `background` argument so that the ambient distribution is estimated empirically rather than implicitly from the other clusters.
+
+The 10x convenience function `Read10X_h5()` returns a sparse matrix with gene symbols as row names and cell barcodes as column names — exactly the shape DecontX expects.
+
+```{r load_h5}
+filtered_counts <- Seurat::Read10X_h5("data/SC3pv3_GEX_Human_PBMC_filtered_feature_bc_matrix.h5")
+raw_counts      <- Seurat::Read10X_h5("data/SC3pv3_GEX_Human_PBMC_raw_feature_bc_matrix.h5")
+
+dim(filtered_counts)
+dim(raw_counts)
+```
+
+The raw matrix has the same number of genes (rows) as the filtered matrix but many more barcodes (columns), because it includes all the empty droplets that the filtered matrix excludes.
+
+## Building the SingleCellExperiment
+
+DecontX accepts either a sparse matrix or a `SingleCellExperiment` (SCE) object. The SCE workflow is the more useful one because the function adds its outputs (the contamination estimate, the cluster labels, the UMAP, and the decontaminated counts assay) back onto the same object, keeping everything in one place. We wrap the filtered matrix in an SCE and convert the counts to `dgCMatrix`, which is the sparse format DecontX prefers.
+
+```{r build_sce}
+sce     <- SingleCellExperiment(assays = list(counts = filtered_counts))
+sce.raw <- SingleCellExperiment(assays = list(counts = raw_counts))
+
+counts(sce)     <- as(counts(sce),     "CsparseMatrix")
+counts(sce.raw) <- as(counts(sce.raw), "CsparseMatrix")
+
+sce
+```
+
+## Running DecontX with an empirical background
+
+We will run `decontX()` with the raw matrix as `background`. This tells DecontX to estimate the ambient distribution from the empty droplets in the raw matrix rather than from the other clusters in the filtered matrix. If any barcodes appear in both the filtered and raw matrices, DecontX automatically removes them from the background estimate so that real cells are never counted as ambient.
+
+If you do not have a raw matrix available, calling `decontX(sce)` without `background` is fine — the model just falls back to estimating the contamination distribution from the other clusters. We will compare the two below.
+
+```{r decontx, message=FALSE, results='hide'}
+set.seed(1984)
+sce <- decontX(sce, background = sce.raw)
+```
+
+DecontX adds several things to the SCE:
+
+* `colData(sce)$decontX_contamination` — the per-cell contamination fraction, between 0 and 1.
+* `colData(sce)$decontX_clusters` — the heuristic cluster label DecontX assigned to each cell. By default DecontX runs its own quick clustering pass (via `celda`) that tends to identify broad cell types rather than fine subpopulations. Custom labels can be supplied via the `z` argument if you already have an annotation.
+* `reducedDim(sce, "decontX_UMAP")` — a 2D UMAP embedding of the cells, used for the diagnostic plots below.
+* `decontXcounts(sce)` — the decontaminated count matrix, with the expected ambient contribution removed from each cell.
+* `metadata(sce)$decontX$estimates` — the fitted parameters, including the Dirichlet concentration `delta` discussed below.
+
+A first look at the contamination distribution:
+
+```{r contam_summary}
+summary(sce$decontX_contamination)
+```
+
+For PBMC datasets a median contamination fraction in the range 5–15% is typical. Individual cells can be much higher; cells that were on the brink of lysing themselves often look very contaminated.
+
+## Visualising the result
+
+### Cluster labels on the DecontX UMAP
+
+The clustering is "broad" by design — DecontX wants enough resolution to separate things like T-cells from monocytes from B-cells, but not so much that closely related subtypes are split apart, because splitting subtypes makes the contamination model harder to identify.
+
+```{r umap_clusters}
+umap <- reducedDim(sce, "decontX_UMAP")
+plotDimReduceCluster(
+  x = sce$decontX_clusters,
+  dim1 = umap[, 1],
+  dim2 = umap[, 2]
+)
+```
+
+### Per-cell contamination on the UMAP
+
+Overlaying the contamination fraction on the UMAP is the single most useful diagnostic plot. Clusters that are uniformly high-contamination usually correspond to cell types that are intrinsically lower in total mRNA (and therefore swamped by a fixed amount of soup); occasional individual hot spots are usually dying cells.
+
+```{r contam_umap}
+plotDecontXContamination(sce)
+```
+
+### Marker expression on the UMAP
+
+To interpret the cluster labels we need to know what cell type each cluster corresponds to. We log-normalise the original counts and overlay the canonical PBMC markers:
+
+* **T cells**: `CD3D`, `CD3E`
+* **B cells**: `CD79A`, `CD79B`, `MS4A1`
+* **Monocytes**: `LYZ`, `S100A8`, `S100A9`
+* **NK cells**: `GNLY`
+* **Megakaryocytes / platelets**: `PPBP`
+
+```{r logcounts}
+sce <- logNormCounts(sce)
+```
+
+```{r marker_umap, fig.width=8, fig.height=8, message=FALSE}
+plotDimReduceFeature(
+  as.matrix(logcounts(sce)),
+  dim1 = umap[, 1],
+  dim2 = umap[, 2],
+  features = c("CD3D", "CD3E", "GNLY",
+               "LYZ", "S100A8", "S100A9",
+               "CD79A", "CD79B", "MS4A1"),
+  exactMatch = TRUE
+)
+```
+
+### Mapping clusters to cell types
+
+To use the marker-percentage and violin plots below we need a `groupClusters` list that tells DecontX which cluster ID corresponds to which cell type. The vignette hard-codes this list because the cluster IDs are stable on the pbmc4k example, but the IDs depend on the random seed and on the data, so we work them out programmatically: for each cell-type marker set, find the cluster with the highest mean log-normalised expression of those markers.
+
+```{r identify_clusters}
+identify_cluster <- function(sce, marker_genes, group = sce$decontX_clusters) {
+  marker_genes <- intersect(marker_genes, rownames(sce))
+  expr_per_cell <- Matrix::colMeans(logcounts(sce)[marker_genes, , drop = FALSE])
+  mean_per_cluster <- tapply(expr_per_cell, group, mean)
+  as.integer(names(which.max(mean_per_cluster)))
+}
+
+markers <- list(
+  Tcell_Markers    = c("CD3E", "CD3D"),
+  Bcell_Markers    = c("CD79A", "CD79B", "MS4A1"),
+  Monocyte_Markers = c("S100A8", "S100A9", "LYZ"),
+  NKcell_Markers   = "GNLY"
+)
+
+cellTypeMappings <- list(
+  Tcells    = identify_cluster(sce, markers$Tcell_Markers),
+  Bcells    = identify_cluster(sce, markers$Bcell_Markers),
+  Monocytes = identify_cluster(sce, markers$Monocyte_Markers),
+  NKcells   = identify_cluster(sce, markers$NKcell_Markers)
+)
+
+cellTypeMappings
+```
+
+If the same cluster is being picked for two different cell types then the broad clustering has lumped them together; you would either need to re-run with finer clustering (via `z`) or merge the cell-type labels (e.g. group T and NK cells together) to interpret the diagnostics that follow.
+
+### Marker detection percentage by cluster — original counts
+
+A useful summary of contamination is the percentage of cells in each cluster that have at least one count of each marker. Markers should be detected in nearly all cells of their own cell type, and in close to zero cells of the other cell types. Any non-trivial detection in the wrong cell type is a candidate for soup contamination.
+
+```{r barplot_counts, fig.width=8, fig.height=4}
+plotDecontXMarkerPercentage(
+  sce,
+  markers = markers,
+  groupClusters = cellTypeMappings,
+  assayName = "counts"
+)
+```
+
+### Marker detection percentage by cluster — decontaminated counts
+
+After decontamination, the off-diagonal bars (e.g. monocyte markers detected in T cells) should drop substantially, while the on-diagonal bars (e.g. monocyte markers detected in monocytes) should be largely unchanged.
+
+```{r barplot_decont, fig.width=8, fig.height=4}
+plotDecontXMarkerPercentage(
+  sce,
+  markers = markers,
+  groupClusters = cellTypeMappings,
+  assayName = "decontXcounts"
+)
+```
+
+### Marker detection — side by side
+
+Listing both assays side-by-side makes the before/after comparison easier to read. This only works on `SingleCellExperiment` objects (because we need a single object holding both assays).
+
+```{r barplot_both, fig.width=10, fig.height=4}
+plotDecontXMarkerPercentage(
+  sce,
+  markers = markers,
+  groupClusters = cellTypeMappings,
+  assayName = c("counts", "decontXcounts")
+)
+```
+
+### Marker expression distributions — violin plots
+
+The marker-percentage barplots show *whether* a gene is detected. The violin plots show *how much* of it is detected. We focus on monocyte markers — they are the most consistently soup-prone in PBMC preps — and look at how the distribution shifts across cell types after decontamination.
+
+```{r violin_counts, fig.width=8, fig.height=4}
+plotDecontXMarkerExpression(
+  sce,
+  markers = markers[["Monocyte_Markers"]],
+  groupClusters = cellTypeMappings,
+  ncol = 3
+)
+```
+
+We expect to see the bulk of the off-target distributions (monocyte markers in T-cells, B-cells, NK-cells) collapse toward zero after decontamination, while the on-target distribution (monocyte markers in monocytes) is largely preserved.
+
+The same plot can be drawn on log-normalised counts by passing both the original and decontaminated log-counts as separate assays:
+
+```{r violin_lognorm, fig.width=8, fig.height=5}
+sce <- logNormCounts(
+  sce,
+  exprs_values = "decontXcounts",
+  name = "decontXlogcounts"
+)
+
+plotDecontXMarkerExpression(
+  sce,
+  markers = markers[["Monocyte_Markers"]],
+  groupClusters = cellTypeMappings,
+  ncol = 3,
+  assayName = c("logcounts", "decontXlogcounts")
+)
+```
+
+## Tuning the contamination prior
+
+DecontX places a Dirichlet prior with concentration parameter `delta` on the proportions of native and contamination counts in each cell. `delta` is a length-2 numeric: the first element is the prior pseudocount for native expression, the second is the prior pseudocount for contamination. By default `estimateDelta = TRUE` and `delta` is updated at each iteration; the supplied value is only used to seed the optimisation. The fitted value is stored in the metadata:
+
+```{r delta_value}
+metadata(sce)$decontX$estimates$all_cells$delta
+```
+
+If you have prior knowledge that a particular dataset is heavily contaminated (for example because you can see haemoglobin transcripts everywhere), you can fix `delta` and bias the prior toward a higher contamination fraction. The trade-off is that decontamination becomes more aggressive and may start to remove genuine native expression as well — so this is a knob to be turned with care.
+
+```{r decontx_delta, message=FALSE, results='hide'}
+set.seed(1984)
+sce.delta <- decontX(sce, delta = c(9, 20), estimateDelta = FALSE)
+```
+
+```{r delta_compare, fig.width=5, fig.height=5}
+plot(
+  sce$decontX_contamination,
+  sce.delta$decontX_contamination,
+  xlab = "Default (estimated) delta",
+  ylab = "Forced delta = c(9, 20)",
+  pch  = 16, cex = 0.3
+)
+abline(0, 1, col = "red", lwd = 2)
+```
+
+Points above the red `y = x` line are cells where the forced prior produced a higher contamination estimate than the data-driven default. The general shape of the cloud tells you how sensitive the contamination estimates are to the prior on this particular dataset.
+
+## Sanity-checking against haemoglobin
+
+Haemoglobin genes (`HBB`, `HBA1`, `HBA2`) are the canonical contamination signal in PBMC preps — released by lysed red blood cells, present in essentially every droplet, and *not* genuinely expressed by any PBMC type. A successful decontamination should remove most of the haemoglobin counts. We tabulate the global before/after totals across all cells:
+
+```{r hb_table}
+hb_genes <- intersect(c("HBB", "HBA1", "HBA2"), rownames(sce))
+
+data.frame(
+  gene    = hb_genes,
+  before  = Matrix::rowSums(counts(sce)[hb_genes, ]),
+  after   = Matrix::rowSums(decontXcounts(sce)[hb_genes, ]),
+  removed = Matrix::rowSums(counts(sce)[hb_genes, ]) -
+            Matrix::rowSums(decontXcounts(sce)[hb_genes, ])
+)
+```
+
+A good correction should remove the large majority of these counts.
+
+## Using the corrected matrix downstream
+
+The decontaminated counts are floating-point because the model removes a fractional expected contribution rather than discrete UMIs. Most downstream tools — including Seurat — accept non-integer counts without complaint. If you have a tool that requires strict integers, `round()` the matrix before handing it over.
+
+To continue with Seurat:
+
+```{r seurat_handoff}
+srat_clean <- CreateSeuratObject(counts = round(decontXcounts(sce)))
+srat_clean
+```
+
+You would then re-run normalisation, feature selection, dimension reduction, and clustering on the cleaned matrix. The broad cluster structure on PBMC data is usually unchanged after decontamination, but contamination-driven artefacts — clusters that appeared to express haemoglobin or monocyte markers purely because of soup — are substantially reduced, and downstream differential expression becomes cleaner.
+
+## Working without a background matrix
+
+For comparison, here is what DecontX does when no `background` is supplied. The contamination distribution for each cell is then estimated as a weighted combination of the *other* clusters' profiles, rather than from empty droplets.
+
+```{r decontx_nobg, message=FALSE, results='hide'}
+set.seed(1984)
+sce.nobg <- SingleCellExperiment(assays = list(counts = filtered_counts))
+counts(sce.nobg) <- as(counts(sce.nobg), "CsparseMatrix")
+sce.nobg <- decontX(sce.nobg)
+```
+
+```{r nobg_compare, fig.width=5, fig.height=5}
+plot(
+  sce$decontX_contamination,
+  sce.nobg$decontX_contamination,
+  xlab = "With empty-droplet background",
+  ylab = "Without background",
+  pch  = 16, cex = 0.3
+)
+abline(0, 1, col = "red", lwd = 2)
+```
+
+If the two estimates lie close to the `y = x` line, the empty-droplet background is not adding much information beyond what the inter-cluster comparison already provides — which is the common case for unsorted PBMC samples where the cells in the chip are a faithful sample of the cells that contributed to the ambient pool.
+
+## Session info
+
+```{r session_info}
+sessionInfo()
+```
