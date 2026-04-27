@@ -317,6 +317,25 @@ srat_clean
 
 You would then re-run normalisation, feature selection, dimension reduction, and clustering on the cleaned matrix. The broad cluster structure on PBMC data is usually unchanged after decontamination, but contamination-driven artefacts — clusters that appeared to express haemoglobin or monocyte markers purely because of soup — are substantially reduced, and downstream differential expression becomes cleaner.
 
+## Saving the corrected matrix
+
+We save the decontaminated counts together with the per-cell contamination estimate and cluster label so that another notebook can compare these results to other ambient-RNA correction methods on the same dataset. See [ambient.html](ambient.html) for the side-by-side comparison with SoupX.
+
+```{r save_output}
+saveRDS(
+  list(
+    counts = decontXcounts(sce),
+    meta   = data.frame(
+      barcode = colnames(sce),
+      rho     = sce$decontX_contamination,
+      cluster = sce$decontX_clusters,
+      row.names = colnames(sce)
+    )
+  ),
+  "output/decontx_corrected.rds"
+)
+```
+
 ## Working without a background matrix
 
 For comparison, here is what DecontX does when no `background` is supplied. The contamination distribution for each cell is then estimated as a weighted combination of the *other* clusters' profiles, rather than from empty droplets.

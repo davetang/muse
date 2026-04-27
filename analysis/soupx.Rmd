@@ -214,6 +214,25 @@ srat_clean
 
 You would then re-run normalisation, feature selection, dimension reduction, and clustering on the cleaned matrix. In most PBMC datasets the broad cluster structure is unchanged, but contamination-driven artefacts — for example, clusters that appeared to express haemoglobin or immunoglobulin genes purely because of soup — disappear, and downstream differential expression becomes substantially cleaner.
 
+## Saving the corrected matrix
+
+We save the corrected counts together with the per-cell contamination estimate and cluster label so that another notebook can compare these results to other ambient-RNA correction methods on the same dataset. See [ambient.html](ambient.html) for the side-by-side comparison with DecontX.
+
+```{r save_output}
+saveRDS(
+  list(
+    counts = out,
+    meta   = data.frame(
+      barcode = colnames(out),
+      rho     = sc$metaData[colnames(out), "rho"],
+      cluster = sc$metaData[colnames(out), "clusters"],
+      row.names = colnames(out)
+    )
+  ),
+  "output/soupx_corrected.rds"
+)
+```
+
 ## Cleaning up
 
 Reset the `future` plan so the background R sessions are released.
