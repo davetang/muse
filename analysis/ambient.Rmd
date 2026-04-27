@@ -20,7 +20,7 @@ To recap the two methods briefly:
 * **SoupX** estimates the soup profile directly from the empty droplets in the raw 10x output and then estimates a per-cell contamination fraction `rho` by looking for genes that should be soup-only in particular clusters.
 * **DecontX** treats the contamination distribution for each cell as a weighted combination of the other clusters' profiles. The version run in the companion notebook additionally uses the raw matrix as an empirical anchor for the ambient distribution.
 
-Both methods produce a corrected count matrix of the same shape as the input filtered matrix, plus a per-cell contamination fraction in `[0, 1]`. We can therefore line up the two outputs cell-by-cell and gene-by-gene to see where they agree and where they diverge.
+Both methods produce a corrected count matrix of the same shape as the input filtered matrix. They differ in how they parameterise contamination: DecontX produces a per-cell contamination fraction; SoupX's `autoEstCont()` produces a single global value that is applied to every cell. The most informative comparison is therefore at the level of the corrections themselves — UMIs removed per cell, UMIs removed per gene, and the (cell × gene) corrected matrix — rather than the contamination fractions.
 
 ## Packages
 
@@ -67,42 +67,32 @@ soupx$meta     <- soupx$meta[common_cells, ]
 decontx$meta   <- decontx$meta[common_cells, ]
 ```
 
-## Per-cell contamination fraction
+## Contamination fractions
 
-The most direct comparison is the per-cell contamination fraction. SoupX estimates this via `autoEstCont()` and stores it in `sc$metaData$rho`; DecontX produces it as `colData(sce)$decontX_contamination`. Both are bounded in `[0, 1]`.
+It is tempting to start by comparing the per-cell contamination fractions reported by each method, but the two methods don't actually produce comparable quantities here. DecontX returns a true per-cell estimate in `colData(sce)$decontX_contamination`. SoupX's `autoEstCont()`, by contrast, fits a contamination fraction per cluster, averages across clusters, and then calls `setContaminationFraction()` with a *single* global value — so every cell in `sc$metaData$rho` ends up with the same number:
 
 ```{r rho_summary}
 summary(soupx$meta$rho)
+length(unique(soupx$meta$rho))
+
 summary(decontx$meta$rho)
 ```
 
+A direct cell-by-cell rho-rho scatter is therefore degenerate (it would be a vertical line at the SoupX global rho). Showing the DecontX distribution alone is still informative — it tells us how much heterogeneity DecontX sees in contamination across cells, on top of whatever common level SoupX assumes:
+
 ```{r rho_hist, fig.width=8, fig.height=4}
-rho_long <- rbind(
-  data.frame(method = "SoupX",   rho = soupx$meta$rho),
-  data.frame(method = "DecontX", rho = decontx$meta$rho)
-)
-
-ggplot(rho_long, aes(rho, fill = method)) +
-  geom_histogram(bins = 60, alpha = 0.6, position = "identity") +
-  labs(x = "Estimated contamination fraction", y = "Cells") +
+ggplot(decontx$meta, aes(rho)) +
+  geom_histogram(bins = 60, fill = "steelblue") +
+  geom_vline(xintercept = soupx$meta$rho[1],
+             colour = "red", linetype = "dashed") +
+  labs(
+    x = "DecontX per-cell contamination (red dashed = SoupX global rho)",
+    y = "Cells"
+  ) +
   theme_minimal()
 ```
 
-A scatter plot of the two estimates per cell shows whether the methods agree on which cells are most contaminated. A diagonal trend means they agree on the relative ranking; the absolute level often differs because the two estimators use different priors and different anchors for the ambient distribution.
-
-```{r rho_scatter, fig.width=5, fig.height=5}
-ggplot(
-  data.frame(soupx = soupx$meta$rho, decontx = decontx$meta$rho),
-  aes(soupx, decontx)
-) +
-  geom_point(size = 0.3, alpha = 0.4) +
-  geom_abline(slope = 1, intercept = 0, colour = "red") +
-  coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
-  labs(x = "SoupX rho", y = "DecontX contamination") +
-  theme_minimal()
-
-cor(soupx$meta$rho, decontx$meta$rho, method = "spearman")
-```
+For an actual head-to-head comparison we should look at the corrections themselves — the UMIs each method removed from each cell and from each gene — which are per-cell and per-gene for both methods regardless of how the underlying contamination fraction was parameterised.
 
 ## Per-cell UMIs removed
 
@@ -221,7 +211,7 @@ summary(cell_cor)
 ## Summary
 
 * The two methods typically agree on the *identity* of the most-contaminated genes — haemoglobin and immunoglobulin transcripts dominate both top-removed lists for PBMC preps.
-* They agree less precisely on the *magnitude* of the per-cell contamination fraction, because they use different priors and different anchors for the ambient distribution.
+* They differ in how they parameterise contamination: SoupX's `autoEstCont()` collapses to a single global rho, while DecontX produces a per-cell rho. The interesting per-cell heterogeneity in this dataset therefore only shows up in the DecontX distribution.
 * For routine PBMC analysis the choice between SoupX and DecontX is rarely critical; for sorted samples or unusual tissue preparations where the empty-droplet population may not represent the full ambient pool, the assumptions matter more.
 
 ## Session info
