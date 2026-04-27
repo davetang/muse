@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+<meta name="date" content="2026-04-27" />
+
+<title>Decontamination of ambient RNA with DecontX</title>
+
+<script src="site_libs/header-attrs-2.31/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.5.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<link rel="icon" href="https://github.com/workflowr/workflowr-assets/raw/main/img/reproducible.png">
+<!-- Add a small amount of space between sections. -->
+<style type="text/css">
+div.section {
+  padding-top: 12px;
+}
+</style>
+
+
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">My blog</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="license.html">License</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="https://github.com/davetang/muse">
+    <span class="fa fa-github"></span>
+     
+    Source code
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Decontamination of ambient RNA with
+DecontX</h1>
+<h4 class="date">2026-04-27</h4>
+
+</div>
+
+
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-report" data-toggle="collapse" data-target="#workflowr-report">
+<span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+workflowr <span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span>
+</button>
+</p>
+<div id="workflowr-report" class="collapse">
+<ul class="nav nav-tabs">
+<li class="active">
+<a data-toggle="tab" href="#summary">Summary</a>
+</li>
+<li>
+<a data-toggle="tab" href="#checks"> Checks <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
+</a>
+</li>
+<li>
+<a data-toggle="tab" href="#versions">Past versions</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="summary" class="tab-pane fade in active">
+<p>
+<strong>Last updated:</strong> 2026-04-27
+</p>
+<p>
+<strong>Checks:</strong> <span
+class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7
+<span class="glyphicon glyphicon-exclamation-sign text-danger"
+aria-hidden="true"></span> 0
+</p>
+<p>
+<strong>Knit directory:</strong> <code>muse/</code> <span
+class="glyphicon glyphicon-question-sign" aria-hidden="true"
+title="This is the local directory in which the code in this file was executed.">
+</span>
+</p>
+<p>
+This reproducible <a href="https://rmarkdown.rstudio.com">R Markdown</a>
+analysis was created with <a
+  href="https://github.com/workflowr/workflowr">workflowr</a> (version
+1.7.2). The <em>Checks</em> tab describes the reproducibility checks
+that were applied when the results were created. The <em>Past
+versions</em> tab lists the development history.
+</p>
+<hr>
+</div>
+<div id="checks" class="tab-pane fade">
+<div id="workflowr-checks" class="panel-group">
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRMarkdownfilestronguptodate">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>R Markdown file:</strong> up-to-date
+</a>
+</p>
+</div>
+<div id="strongRMarkdownfilestronguptodate"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great! Since the R Markdown file has been committed to the Git
+repository, you know the exact version of the code that produced these
+results.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
+</p>
+</div>
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the
+global environment can affect the analysis in your R Markdown file in
+unknown ways. For reproduciblity it’s best to always run the code in an
+empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20200712code">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Seed:</strong>
+<code>set.seed(20200712)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20200712code"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20200712)</code> was run prior to running
+the code in the R Markdown file. Setting a seed ensures that any results
+that rely on randomness, e.g. subsampling or permutations, are
+reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Session information:</strong>
+recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package
+versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be
+confident that you successfully produced the results during this
+run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr
+project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4fa07ce54c2723256636ace525e1c9850a3748f3targetblank4fa07cea">
+<span class="glyphicon glyphicon-ok text-success"
+aria-hidden="true"></span> <strong>Repository version:</strong>
+<a href="https://github.com/davetang/muse/tree/4fa07ce54c2723256636ace525e1c9850a3748f3" target="_blank">4fa07ce</a>
+</a>
+</p>
+</div>
+<div
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree4fa07ce54c2723256636ace525e1c9850a3748f3targetblank4fa07cea"
+class="panel-collapse collapse">
+<div class="panel-body">
+<p>
+Great! You are using Git for version control. Tracking code development
+and connecting the code version to the results is critical for
+reproducibility.
+</p>
+<p>
+The results in this page were generated with repository version
+<a href="https://github.com/davetang/muse/tree/4fa07ce54c2723256636ace525e1c9850a3748f3" target="_blank">4fa07ce</a>.
+See the <em>Past versions</em> tab to see a history of the changes made
+to the R Markdown and HTML files.
+</p>
+<p>
+Note that you need to be careful to ensure that all relevant files for
+the analysis have been committed to Git prior to generating the results
+(you can use <code>wflow_publish</code> or
+<code>wflow_git_commit</code>). workflowr only checks the R Markdown
+file, but you know if there are other scripts or data files that it
+depends on. Below is the status of the Git repository when the results
+were generated:
+</p>
+<pre><code>
+Ignored files:
+    Ignored:    .Rproj.user/
+    Ignored:    data/1M_neurons_filtered_gene_bc_matrices_h5.h5
+    Ignored:    data/293t/
+    Ignored:    data/293t_3t3_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/293t_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/5k_Human_Donor1_PBMC_3p_gem-x_5k_Human_Donor1_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor2_PBMC_3p_gem-x_5k_Human_Donor2_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor3_PBMC_3p_gem-x_5k_Human_Donor3_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/5k_Human_Donor4_PBMC_3p_gem-x_5k_Human_Donor4_PBMC_3p_gem-x_count_sample_filtered_feature_bc_matrix.h5
+    Ignored:    data/97516b79-8d08-46a6-b329-5d0a25b0be98.h5ad
+    Ignored:    data/Parent_SC3v3_Human_Glioblastoma_filtered_feature_bc_matrix.tar.gz
+    Ignored:    data/brain_counts/
+    Ignored:    data/cl.obo
+    Ignored:    data/cl.owl
+    Ignored:    data/jurkat/
+    Ignored:    data/jurkat:293t_50:50_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/jurkat_293t/
+    Ignored:    data/jurkat_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc20k/
+    Ignored:    data/pbmc20k_seurat/
+    Ignored:    data/pbmc3k.csv
+    Ignored:    data/pbmc3k.csv.gz
+    Ignored:    data/pbmc3k.h5ad
+    Ignored:    data/pbmc3k/
+    Ignored:    data/pbmc3k_bpcells_mat/
+    Ignored:    data/pbmc3k_export.mtx
+    Ignored:    data/pbmc3k_matrix.mtx
+    Ignored:    data/pbmc3k_seurat.rds
+    Ignored:    data/pbmc4k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    data/pbmc_1k_v3_filtered_feature_bc_matrix.h5
+    Ignored:    data/pbmc_1k_v3_raw_feature_bc_matrix.h5
+    Ignored:    data/refdata-gex-GRCh38-2020-A.tar.gz
+    Ignored:    data/seurat_1m_neuron.rds
+    Ignored:    data/t_3k_filtered_gene_bc_matrices.tar.gz
+    Ignored:    r_packages_4.5.2/
+
+Untracked files:
+    Untracked:  .claude/
+    Untracked:  CLAUDE.md
+    Untracked:  analysis/.claude/
+    Untracked:  analysis/aucc.Rmd
+    Untracked:  analysis/bimodal.Rmd
+    Untracked:  analysis/bioc.Rmd
+    Untracked:  analysis/bioc_scrnaseq.Rmd
+    Untracked:  analysis/chick_weight.Rmd
+    Untracked:  analysis/likelihood.Rmd
+    Untracked:  analysis/modelling.Rmd
+    Untracked:  analysis/sampleqc.Rmd
+    Untracked:  analysis/wordpress_readability.Rmd
+    Untracked:  bpcells_matrix/
+    Untracked:  data/Caenorhabditis_elegans.WBcel235.113.gtf.gz
+    Untracked:  data/GCF_043380555.1-RS_2024_12_gene_ontology.gaf.gz
+    Untracked:  data/SC3pv3_GEX_Human_PBMC_filtered_feature_bc_matrix.h5
+    Untracked:  data/SC3pv3_GEX_Human_PBMC_raw_feature_bc_matrix.h5
+    Untracked:  data/SeuratObj.rds
+    Untracked:  data/arab.rds
+    Untracked:  data/astronomicalunit.csv
+    Untracked:  data/davetang039sblog.WordPress.2026-02-12.xml
+    Untracked:  data/femaleMiceWeights.csv
+    Untracked:  data/lung_bcell.rds
+    Untracked:  m3/
+    Untracked:  women.json
+
+Unstaged changes:
+    Modified:   analysis/isoform_switch_analyzer.Rmd
+
+</code></pre>
+<p>
+Note that any generated files, e.g. HTML, png, CSS, etc., are not
+included in this status report because it is ok for generated content to
+have uncommitted changes.
+</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+</div>
+<div id="versions" class="tab-pane fade">
+<p>
+These are the previous versions of the repository in which changes were
+made to the R Markdown (<code>analysis/decontx.Rmd</code>) and HTML
+(<code>docs/decontx.html</code>) files. If you’ve configured a remote
+Git repository (see <code>?wflow_git_remote</code>), click on the
+hyperlinks in the table below to view the files as they were in that
+past version.
+</p>
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+File
+</th>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+<th>
+Message
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/4fa07ce54c2723256636ace525e1c9850a3748f3/analysis/decontx.Rmd" target="_blank">4fa07ce</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-27
+</td>
+<td>
+DecontX
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<hr>
+</div>
+</div>
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>Droplet-based single-cell RNA-seq protocols, such as those produced
+by the 10x Genomics Chromium platform, do not actually sequence isolated
+cells. They sequence droplets. Each droplet ideally contains a single
+cell, but every droplet — empty or not — also receives a small volume of
+the input cell suspension, and that suspension carries free-floating
+mRNA released by cells that lysed before encapsulation. The count matrix
+that comes out of Cell Ranger for any given cell is therefore a mixture
+of two things: transcripts that genuinely came from that cell’s
+transcriptome, and a low-level background of “ambient” transcripts that
+came from lysed cells in the suspension.</p>
+<p>This ambient contamination has a characteristic signature. The genes
+that dominate the ambient pool are the genes that are most highly
+expressed in the cells that died most readily during dissociation —
+typically erythrocytes (releasing haemoglobin transcripts), plasma cells
+(immunoglobulins), and other fragile populations. These transcripts then
+appear at low levels in <em>every</em> cell, even in cell types that
+biologically cannot express them. Downstream this manifests as clusters
+that look weakly positive for markers they should not express, inflated
+p-values in differential expression, and misleading marker
+signatures.</p>
+<p><a
+href="https://bioconductor.org/packages/release/bioc/html/decontX.html">DecontX</a>
+(Yang S. <em>et al.</em>, <em>Decontamination of ambient RNA in
+single-cell RNA-seq with DecontX.</em> <a
+href="https://doi.org/10.1186/s13059-020-1950-6">Genome Biology 21:57,
+2020</a>) is one of several methods for estimating and removing this
+contamination. It models the observed expression of each cell as a
+mixture of two multinomial distributions: a “native” distribution
+representing the cell’s actual transcriptome (taken to resemble the
+average profile of its assigned cluster) and a “contamination”
+distribution representing the ambient pool (taken to resemble a weighted
+combination of the other clusters’ average profiles). A Bayesian
+variational EM procedure jointly estimates the mixing proportion
+<code>rho</code> (the contamination fraction) for every cell and the
+cluster-level expression profiles. The corrected counts assay is
+produced by removing the expected contamination contribution from each
+cell.</p>
+<div id="how-decontx-differs-from-soupx" class="section level3">
+<h3>How DecontX differs from SoupX</h3>
+<p>This repository already has a <a href="soupx.html">SoupX
+walk-through</a> on the same PBMC dataset. The two methods solve the
+same problem but make different assumptions, which is worth
+understanding before choosing one:</p>
+<ul>
+<li><strong>SoupX</strong> estimates the ambient profile
+<em>directly</em> from empty droplets in the raw 10x output and then
+estimates a per-cell contamination fraction by looking for genes that
+should be soup-only in particular clusters
+(<code>autoEstCont</code>).</li>
+<li><strong>DecontX</strong> estimates the ambient profile
+<em>implicitly</em> from the other cell clusters in the filtered matrix,
+treating the contamination distribution for each cell as a weighted sum
+of the profiles of the other clusters. It does not require empty
+droplets to run, but it can also accept the raw matrix via the
+<code>background</code> argument to anchor the ambient estimate
+empirically.</li>
+</ul>
+<p>In practice the two methods often agree on which genes are most
+contaminated and produce broadly similar corrections. DecontX is
+appealing when the empty-droplet population may not represent the full
+ambient pool — for example when the sample was FACS-sorted before
+loading, so that the cells most prone to lysis (and most likely to be in
+the soup) were never present in the chip in the first place.</p>
+<p>This notebook reproduces the <a
+href="https://www.bioconductor.org/packages/release/bioc/vignettes/decontX/inst/doc/decontX.html">official
+DecontX vignette</a> on the same <code>SC3pv3_GEX_Human_PBMC</code>
+dataset that the SoupX notebook uses, so that the two results can be
+compared like-for-like. The data files are tracked outside the
+repository; download them with <code>script/download_data.sh</code>
+before knitting.</p>
+</div>
+</div>
+<div id="packages" class="section level2">
+<h2>Packages</h2>
+<p><code>decontX</code> provides the model and the helper plotting
+functions, <code>SingleCellExperiment</code> is the container we use
+throughout, <code>Seurat::Read10X_h5</code> is the fastest way to read
+the 10x HDF5 matrices, <code>celda</code> provides a couple of
+UMAP-overlay plotting helpers, and <code>scater</code> gives us
+<code>logNormCounts</code> for normalising the counts before plotting
+marker expression.</p>
+<pre class="r"><code>suppressPackageStartupMessages({
+  library(decontX)
+  library(SingleCellExperiment)
+  library(Matrix)
+  library(Seurat)
+  library(celda)
+  library(scater)
+  library(ggplot2)
+})</code></pre>
+</div>
+<div id="loading-the-10x-data" class="section level2">
+<h2>Loading the 10x data</h2>
+<p>DecontX works with two count matrices in the same way SoupX does:</p>
+<ul>
+<li>The <strong>filtered matrix</strong> — barcodes that Cell Ranger has
+classified as cells. This is what we will eventually decontaminate.</li>
+<li>The <strong>raw matrix</strong> — every barcode that received any
+UMI, including the empty droplets. We will pass this to DecontX as the
+<code>background</code> argument so that the ambient distribution is
+estimated empirically rather than implicitly from the other
+clusters.</li>
+</ul>
+<p>The 10x convenience function <code>Read10X_h5()</code> returns a
+sparse matrix with gene symbols as row names and cell barcodes as column
+names — exactly the shape DecontX expects.</p>
+<pre class="r"><code>filtered_counts &lt;- Seurat::Read10X_h5(&quot;data/SC3pv3_GEX_Human_PBMC_filtered_feature_bc_matrix.h5&quot;)
+raw_counts      &lt;- Seurat::Read10X_h5(&quot;data/SC3pv3_GEX_Human_PBMC_raw_feature_bc_matrix.h5&quot;)
+
+dim(filtered_counts)</code></pre>
+<pre><code>[1] 36601  5140</code></pre>
+<pre class="r"><code>dim(raw_counts)</code></pre>
+<pre><code>[1]  36601 909706</code></pre>
+<p>The raw matrix has the same number of genes (rows) as the filtered
+matrix but many more barcodes (columns), because it includes all the
+empty droplets that the filtered matrix excludes.</p>
+</div>
+<div id="building-the-singlecellexperiment" class="section level2">
+<h2>Building the SingleCellExperiment</h2>
+<p>DecontX accepts either a sparse matrix or a
+<code>SingleCellExperiment</code> (SCE) object. The SCE workflow is the
+more useful one because the function adds its outputs (the contamination
+estimate, the cluster labels, the UMAP, and the decontaminated counts
+assay) back onto the same object, keeping everything in one place. We
+wrap the filtered matrix in an SCE and convert the counts to
+<code>dgCMatrix</code>, which is the sparse format DecontX prefers.</p>
+<pre class="r"><code>sce     &lt;- SingleCellExperiment(assays = list(counts = filtered_counts))
+sce.raw &lt;- SingleCellExperiment(assays = list(counts = raw_counts))
+
+counts(sce)     &lt;- as(counts(sce),     &quot;CsparseMatrix&quot;)
+counts(sce.raw) &lt;- as(counts(sce.raw), &quot;CsparseMatrix&quot;)
+
+sce</code></pre>
+<pre><code>class: SingleCellExperiment 
+dim: 36601 5140 
+metadata(0):
+assays(1): counts
+rownames(36601): MIR1302-2HG FAM138A ... AC007325.4 AC007325.2
+rowData names(0):
+colnames(5140): AAACCCAGTCGGCCTA-1 AAACCCATCAGATGCT-1 ...
+  TTTGTTGTCGAAGTGG-1 TTTGTTGTCGCATAGT-1
+colData names(0):
+reducedDimNames(0):
+mainExpName: NULL
+altExpNames(0):</code></pre>
+</div>
+<div id="running-decontx-with-an-empirical-background"
+class="section level2">
+<h2>Running DecontX with an empirical background</h2>
+<p>We will run <code>decontX()</code> with the raw matrix as
+<code>background</code>. This tells DecontX to estimate the ambient
+distribution from the empty droplets in the raw matrix rather than from
+the other clusters in the filtered matrix. If any barcodes appear in
+both the filtered and raw matrices, DecontX automatically removes them
+from the background estimate so that real cells are never counted as
+ambient.</p>
+<p>If you do not have a raw matrix available, calling
+<code>decontX(sce)</code> without <code>background</code> is fine — the
+model just falls back to estimating the contamination distribution from
+the other clusters. We will compare the two below.</p>
+<pre class="r"><code>set.seed(1984)
+sce &lt;- decontX(sce, background = sce.raw)</code></pre>
+<p>DecontX adds several things to the SCE:</p>
+<ul>
+<li><code>colData(sce)$decontX_contamination</code> — the per-cell
+contamination fraction, between 0 and 1.</li>
+<li><code>colData(sce)$decontX_clusters</code> — the heuristic cluster
+label DecontX assigned to each cell. By default DecontX runs its own
+quick clustering pass (via <code>celda</code>) that tends to identify
+broad cell types rather than fine subpopulations. Custom labels can be
+supplied via the <code>z</code> argument if you already have an
+annotation.</li>
+<li><code>reducedDim(sce, "decontX_UMAP")</code> — a 2D UMAP embedding
+of the cells, used for the diagnostic plots below.</li>
+<li><code>decontXcounts(sce)</code> — the decontaminated count matrix,
+with the expected ambient contribution removed from each cell.</li>
+<li><code>metadata(sce)$decontX$estimates</code> — the fitted
+parameters, including the Dirichlet concentration <code>delta</code>
+discussed below.</li>
+</ul>
+<p>A first look at the contamination distribution:</p>
+<pre class="r"><code>summary(sce$decontX_contamination)</code></pre>
+<pre><code>     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+2.368e-05 6.639e-03 1.614e-02 6.977e-02 7.397e-02 9.995e-01 </code></pre>
+<p>For PBMC datasets a median contamination fraction in the range 5–15%
+is typical. Individual cells can be much higher; cells that were on the
+brink of lysing themselves often look very contaminated.</p>
+</div>
+<div id="visualising-the-result" class="section level2">
+<h2>Visualising the result</h2>
+<div id="cluster-labels-on-the-decontx-umap" class="section level3">
+<h3>Cluster labels on the DecontX UMAP</h3>
+<p>The clustering is “broad” by design — DecontX wants enough resolution
+to separate things like T-cells from monocytes from B-cells, but not so
+much that closely related subtypes are split apart, because splitting
+subtypes makes the contamination model harder to identify.</p>
+<pre class="r"><code>umap &lt;- reducedDim(sce, &quot;decontX_UMAP&quot;)
+plotDimReduceCluster(
+  x = sce$decontX_clusters,
+  dim1 = umap[, 1],
+  dim2 = umap[, 2]
+)</code></pre>
+<pre><code>Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+ℹ Please use tidy evaluation idioms with `aes()`.
+ℹ See also `vignette(&quot;ggplot2-in-packages&quot;)` for more information.
+ℹ The deprecated feature was likely used in the celda package.
+  Please report the issue at &lt;https://github.com/campbio/celda/issues&gt;.
+This warning is displayed once per session.
+Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+generated.</code></pre>
+<p><img src="figure/decontx.Rmd/umap_clusters-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="per-cell-contamination-on-the-umap" class="section level3">
+<h3>Per-cell contamination on the UMAP</h3>
+<p>Overlaying the contamination fraction on the UMAP is the single most
+useful diagnostic plot. Clusters that are uniformly high-contamination
+usually correspond to cell types that are intrinsically lower in total
+mRNA (and therefore swamped by a fixed amount of soup); occasional
+individual hot spots are usually dying cells.</p>
+<pre class="r"><code>plotDecontXContamination(sce)</code></pre>
+<p><img src="figure/decontx.Rmd/contam_umap-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+</div>
+<div id="marker-expression-on-the-umap" class="section level3">
+<h3>Marker expression on the UMAP</h3>
+<p>To interpret the cluster labels we need to know what cell type each
+cluster corresponds to. We log-normalise the original counts and overlay
+the canonical PBMC markers:</p>
+<ul>
+<li><strong>T cells</strong>: <code>CD3D</code>, <code>CD3E</code></li>
+<li><strong>B cells</strong>: <code>CD79A</code>, <code>CD79B</code>,
+<code>MS4A1</code></li>
+<li><strong>Monocytes</strong>: <code>LYZ</code>, <code>S100A8</code>,
+<code>S100A9</code></li>
+<li><strong>NK cells</strong>: <code>GNLY</code></li>
+<li><strong>Megakaryocytes / platelets</strong>: <code>PPBP</code></li>
+</ul>
+<pre class="r"><code>sce &lt;- logNormCounts(sce)</code></pre>
+<pre class="r"><code>plotDimReduceFeature(
+  as.matrix(logcounts(sce)),
+  dim1 = umap[, 1],
+  dim2 = umap[, 2],
+  features = c(&quot;CD3D&quot;, &quot;CD3E&quot;, &quot;GNLY&quot;,
+               &quot;LYZ&quot;, &quot;S100A8&quot;, &quot;S100A9&quot;,
+               &quot;CD79A&quot;, &quot;CD79B&quot;, &quot;MS4A1&quot;),
+  exactMatch = TRUE
+)</code></pre>
+<pre><code>Warning in asMethod(object): sparse-&gt;dense coercion: allocating vector of size
+1.4 GiB</code></pre>
+<p><img src="figure/decontx.Rmd/marker_umap-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="mapping-clusters-to-cell-types" class="section level3">
+<h3>Mapping clusters to cell types</h3>
+<p>To use the marker-percentage and violin plots below we need a
+<code>groupClusters</code> list that tells DecontX which cluster ID
+corresponds to which cell type. The vignette hard-codes this list
+because the cluster IDs are stable on the pbmc4k example, but the IDs
+depend on the random seed and on the data, so we work them out
+programmatically: for each cell-type marker set, find the cluster with
+the highest mean log-normalised expression of those markers.</p>
+<pre class="r"><code>identify_cluster &lt;- function(sce, marker_genes, group = sce$decontX_clusters) {
+  marker_genes &lt;- intersect(marker_genes, rownames(sce))
+  expr_per_cell &lt;- Matrix::colMeans(logcounts(sce)[marker_genes, , drop = FALSE])
+  mean_per_cluster &lt;- tapply(expr_per_cell, group, mean)
+  as.integer(names(which.max(mean_per_cluster)))
+}
+
+markers &lt;- list(
+  Tcell_Markers    = c(&quot;CD3E&quot;, &quot;CD3D&quot;),
+  Bcell_Markers    = c(&quot;CD79A&quot;, &quot;CD79B&quot;, &quot;MS4A1&quot;),
+  Monocyte_Markers = c(&quot;S100A8&quot;, &quot;S100A9&quot;, &quot;LYZ&quot;),
+  NKcell_Markers   = &quot;GNLY&quot;
+)
+
+cellTypeMappings &lt;- list(
+  Tcells    = identify_cluster(sce, markers$Tcell_Markers),
+  Bcells    = identify_cluster(sce, markers$Bcell_Markers),
+  Monocytes = identify_cluster(sce, markers$Monocyte_Markers),
+  NKcells   = identify_cluster(sce, markers$NKcell_Markers)
+)
+
+cellTypeMappings</code></pre>
+<pre><code>$Tcells
+[1] 2
+
+$Bcells
+[1] 3
+
+$Monocytes
+[1] 8
+
+$NKcells
+[1] 4</code></pre>
+<p>If the same cluster is being picked for two different cell types then
+the broad clustering has lumped them together; you would either need to
+re-run with finer clustering (via <code>z</code>) or merge the cell-type
+labels (e.g. group T and NK cells together) to interpret the diagnostics
+that follow.</p>
+</div>
+<div id="marker-detection-percentage-by-cluster-original-counts"
+class="section level3">
+<h3>Marker detection percentage by cluster — original counts</h3>
+<p>A useful summary of contamination is the percentage of cells in each
+cluster that have at least one count of each marker. Markers should be
+detected in nearly all cells of their own cell type, and in close to
+zero cells of the other cell types. Any non-trivial detection in the
+wrong cell type is a candidate for soup contamination.</p>
+<pre class="r"><code>plotDecontXMarkerPercentage(
+  sce,
+  markers = markers,
+  groupClusters = cellTypeMappings,
+  assayName = &quot;counts&quot;
+)</code></pre>
+<p><img src="figure/decontx.Rmd/barplot_counts-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="marker-detection-percentage-by-cluster-decontaminated-counts"
+class="section level3">
+<h3>Marker detection percentage by cluster — decontaminated counts</h3>
+<p>After decontamination, the off-diagonal bars (e.g. monocyte markers
+detected in T cells) should drop substantially, while the on-diagonal
+bars (e.g. monocyte markers detected in monocytes) should be largely
+unchanged.</p>
+<pre class="r"><code>plotDecontXMarkerPercentage(
+  sce,
+  markers = markers,
+  groupClusters = cellTypeMappings,
+  assayName = &quot;decontXcounts&quot;
+)</code></pre>
+<p><img src="figure/decontx.Rmd/barplot_decont-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+</div>
+<div id="marker-detection-side-by-side" class="section level3">
+<h3>Marker detection — side by side</h3>
+<p>Listing both assays side-by-side makes the before/after comparison
+easier to read. This only works on <code>SingleCellExperiment</code>
+objects (because we need a single object holding both assays).</p>
+<pre class="r"><code>plotDecontXMarkerPercentage(
+  sce,
+  markers = markers,
+  groupClusters = cellTypeMappings,
+  assayName = c(&quot;counts&quot;, &quot;decontXcounts&quot;)
+)</code></pre>
+<p><img src="figure/decontx.Rmd/barplot_both-1.png" alt="" width="960" style="display: block; margin: auto;" /></p>
+</div>
+<div id="marker-expression-distributions-violin-plots"
+class="section level3">
+<h3>Marker expression distributions — violin plots</h3>
+<p>The marker-percentage barplots show <em>whether</em> a gene is
+detected. The violin plots show <em>how much</em> of it is detected. We
+focus on monocyte markers — they are the most consistently soup-prone in
+PBMC preps — and look at how the distribution shifts across cell types
+after decontamination.</p>
+<pre class="r"><code>plotDecontXMarkerExpression(
+  sce,
+  markers = markers[[&quot;Monocyte_Markers&quot;]],
+  groupClusters = cellTypeMappings,
+  ncol = 3
+)</code></pre>
+<p><img src="figure/decontx.Rmd/violin_counts-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+<p>We expect to see the bulk of the off-target distributions (monocyte
+markers in T-cells, B-cells, NK-cells) collapse toward zero after
+decontamination, while the on-target distribution (monocyte markers in
+monocytes) is largely preserved.</p>
+<p>The same plot can be drawn on log-normalised counts by passing both
+the original and decontaminated log-counts as separate assays:</p>
+<pre class="r"><code>sce &lt;- logNormCounts(
+  sce,
+  exprs_values = &quot;decontXcounts&quot;,
+  name = &quot;decontXlogcounts&quot;
+)
+
+plotDecontXMarkerExpression(
+  sce,
+  markers = markers[[&quot;Monocyte_Markers&quot;]],
+  groupClusters = cellTypeMappings,
+  ncol = 3,
+  assayName = c(&quot;logcounts&quot;, &quot;decontXlogcounts&quot;)
+)</code></pre>
+<p><img src="figure/decontx.Rmd/violin_lognorm-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+</div>
+</div>
+<div id="tuning-the-contamination-prior" class="section level2">
+<h2>Tuning the contamination prior</h2>
+<p>DecontX places a Dirichlet prior with concentration parameter
+<code>delta</code> on the proportions of native and contamination counts
+in each cell. <code>delta</code> is a length-2 numeric: the first
+element is the prior pseudocount for native expression, the second is
+the prior pseudocount for contamination. By default
+<code>estimateDelta = TRUE</code> and <code>delta</code> is updated at
+each iteration; the supplied value is only used to seed the
+optimisation. The fitted value is stored in the metadata:</p>
+<pre class="r"><code>metadata(sce)$decontX$estimates$all_cells$delta</code></pre>
+<pre><code>[1] 3.124520 0.363168</code></pre>
+<p>If you have prior knowledge that a particular dataset is heavily
+contaminated (for example because you can see haemoglobin transcripts
+everywhere), you can fix <code>delta</code> and bias the prior toward a
+higher contamination fraction. The trade-off is that decontamination
+becomes more aggressive and may start to remove genuine native
+expression as well — so this is a knob to be turned with care.</p>
+<pre class="r"><code>set.seed(1984)
+sce.delta &lt;- decontX(sce, delta = c(9, 20), estimateDelta = FALSE)</code></pre>
+<pre class="r"><code>plot(
+  sce$decontX_contamination,
+  sce.delta$decontX_contamination,
+  xlab = &quot;Default (estimated) delta&quot;,
+  ylab = &quot;Forced delta = c(9, 20)&quot;,
+  pch  = 16, cex = 0.3
+)
+abline(0, 1, col = &quot;red&quot;, lwd = 2)</code></pre>
+<p><img src="figure/decontx.Rmd/delta_compare-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
+<p>Points above the red <code>y = x</code> line are cells where the
+forced prior produced a higher contamination estimate than the
+data-driven default. The general shape of the cloud tells you how
+sensitive the contamination estimates are to the prior on this
+particular dataset.</p>
+</div>
+<div id="sanity-checking-against-haemoglobin" class="section level2">
+<h2>Sanity-checking against haemoglobin</h2>
+<p>Haemoglobin genes (<code>HBB</code>, <code>HBA1</code>,
+<code>HBA2</code>) are the canonical contamination signal in PBMC preps
+— released by lysed red blood cells, present in essentially every
+droplet, and <em>not</em> genuinely expressed by any PBMC type. A
+successful decontamination should remove most of the haemoglobin counts.
+We tabulate the global before/after totals across all cells:</p>
+<pre class="r"><code>hb_genes &lt;- intersect(c(&quot;HBB&quot;, &quot;HBA1&quot;, &quot;HBA2&quot;), rownames(sce))
+
+data.frame(
+  gene    = hb_genes,
+  before  = Matrix::rowSums(counts(sce)[hb_genes, ]),
+  after   = Matrix::rowSums(decontXcounts(sce)[hb_genes, ]),
+  removed = Matrix::rowSums(counts(sce)[hb_genes, ]) -
+            Matrix::rowSums(decontXcounts(sce)[hb_genes, ])
+)</code></pre>
+<pre><code>     gene  before     after  removed
+HBB   HBB 1502534 1421097.4 81436.61
+HBA1 HBA1  485458  461128.2 24329.84
+HBA2 HBA2  832936  790524.2 42411.80</code></pre>
+<p>A good correction should remove the large majority of these
+counts.</p>
+</div>
+<div id="using-the-corrected-matrix-downstream" class="section level2">
+<h2>Using the corrected matrix downstream</h2>
+<p>The decontaminated counts are floating-point because the model
+removes a fractional expected contribution rather than discrete UMIs.
+Most downstream tools — including Seurat — accept non-integer counts
+without complaint. If you have a tool that requires strict integers,
+<code>round()</code> the matrix before handing it over.</p>
+<p>To continue with Seurat:</p>
+<pre class="r"><code>srat_clean &lt;- CreateSeuratObject(counts = round(decontXcounts(sce)))
+srat_clean</code></pre>
+<pre><code>An object of class Seurat 
+36601 features across 5140 samples within 1 assay 
+Active assay: RNA (36601 features, 0 variable features)
+ 1 layer present: counts</code></pre>
+<p>You would then re-run normalisation, feature selection, dimension
+reduction, and clustering on the cleaned matrix. The broad cluster
+structure on PBMC data is usually unchanged after decontamination, but
+contamination-driven artefacts — clusters that appeared to express
+haemoglobin or monocyte markers purely because of soup — are
+substantially reduced, and downstream differential expression becomes
+cleaner.</p>
+</div>
+<div id="working-without-a-background-matrix" class="section level2">
+<h2>Working without a background matrix</h2>
+<p>For comparison, here is what DecontX does when no
+<code>background</code> is supplied. The contamination distribution for
+each cell is then estimated as a weighted combination of the
+<em>other</em> clusters’ profiles, rather than from empty droplets.</p>
+<pre class="r"><code>set.seed(1984)
+sce.nobg &lt;- SingleCellExperiment(assays = list(counts = filtered_counts))
+counts(sce.nobg) &lt;- as(counts(sce.nobg), &quot;CsparseMatrix&quot;)
+sce.nobg &lt;- decontX(sce.nobg)</code></pre>
+<pre class="r"><code>plot(
+  sce$decontX_contamination,
+  sce.nobg$decontX_contamination,
+  xlab = &quot;With empty-droplet background&quot;,
+  ylab = &quot;Without background&quot;,
+  pch  = 16, cex = 0.3
+)
+abline(0, 1, col = &quot;red&quot;, lwd = 2)</code></pre>
+<p><img src="figure/decontx.Rmd/nobg_compare-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
+<p>If the two estimates lie close to the <code>y = x</code> line, the
+empty-droplet background is not adding much information beyond what the
+inter-cluster comparison already provides — which is the common case for
+unsorted PBMC samples where the cells in the chip are a faithful sample
+of the cells that contributed to the ambient pool.</p>
+</div>
+<div id="session-info" class="section level2">
+<h2>Session info</h2>
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] scater_1.38.1               ggplot2_4.0.3              
+ [3] scuttle_1.20.0              celda_1.26.0               
+ [5] Seurat_5.5.0                SeuratObject_5.4.0         
+ [7] sp_2.2-1                    Matrix_1.7-4               
+ [9] SingleCellExperiment_1.32.0 SummarizedExperiment_1.40.0
+[11] Biobase_2.70.0              GenomicRanges_1.62.1       
+[13] Seqinfo_1.0.0               IRanges_2.44.0             
+[15] S4Vectors_0.48.1            BiocGenerics_0.56.0        
+[17] generics_0.1.4              MatrixGenerics_1.22.0      
+[19] matrixStats_1.5.0           decontX_1.8.0              
+[21] workflowr_1.7.2            
+
+loaded via a namespace (and not attached):
+  [1] RcppAnnoy_0.0.23       splines_4.5.2          later_1.4.8           
+  [4] tibble_3.3.1           polyclip_1.10-7        pROC_1.19.0.1         
+  [7] fastDummies_1.7.6      lifecycle_1.0.5        doParallel_1.0.17     
+ [10] rprojroot_2.1.1        StanHeaders_2.32.10    hdf5r_1.3.12          
+ [13] globals_0.19.1         processx_3.9.0         lattice_0.22-7        
+ [16] MASS_7.3-65            dendextend_1.19.1      magrittr_2.0.5        
+ [19] plotly_4.12.0          sass_0.4.10            rmarkdown_2.31        
+ [22] jquerylib_0.1.4        yaml_2.3.12            httpuv_1.6.17         
+ [25] otel_0.2.0             sctransform_0.4.3      spam_2.11-3           
+ [28] pkgbuild_1.4.8         spatstat.sparse_3.1-0  reticulate_1.46.0     
+ [31] cowplot_1.2.0          pbapply_1.7-4          RColorBrewer_1.1-3    
+ [34] abind_1.4-8            Rtsne_0.17             purrr_1.2.2           
+ [37] WriteXLS_6.8.0         git2r_0.36.2           ggrepel_0.9.8         
+ [40] inline_0.3.21          irlba_2.3.7            listenv_0.10.1        
+ [43] spatstat.utils_3.2-2   goftest_1.2-3          RSpectra_0.16-2       
+ [46] spatstat.random_3.4-5  fitdistrplus_1.2-6     parallelly_1.47.0     
+ [49] codetools_0.2-20       DelayedArray_0.36.1    tidyselect_1.2.1      
+ [52] farver_2.1.2           ScaledMatrix_1.18.0    viridis_0.6.5         
+ [55] spatstat.explore_3.8-0 jsonlite_2.0.0         BiocNeighbors_2.4.0   
+ [58] progressr_0.19.0       ggridges_0.5.7         survival_3.8-3        
+ [61] iterators_1.0.14       foreach_1.5.2          dbscan_1.2.4          
+ [64] tools_4.5.2            ica_1.0-3              Rcpp_1.1.1-1.1        
+ [67] glue_1.8.1             gridExtra_2.3          SparseArray_1.10.10   
+ [70] xfun_0.57              dplyr_1.2.1            loo_2.9.0             
+ [73] withr_3.0.2            combinat_0.0-8         fastmap_1.2.0         
+ [76] MCMCprecision_0.4.2    rsvd_1.0.5             callr_3.7.6           
+ [79] digest_0.6.39          R6_2.6.1               mime_0.13             
+ [82] scattermore_1.2        tensor_1.5.1           spatstat.data_3.1-9   
+ [85] tidyr_1.3.2            data.table_1.18.2.1    httr_1.4.8            
+ [88] htmlwidgets_1.6.4      S4Arrays_1.10.1        whisker_0.4.1         
+ [91] uwot_0.2.4             pkgconfig_2.0.3        gtable_0.3.6          
+ [94] lmtest_0.9-40          S7_0.2.2               XVector_0.50.0        
+ [97] htmltools_0.5.9        dotCall64_1.2          scales_1.4.0          
+[100] png_0.1-9              spatstat.univar_3.1-7  ggdendro_0.2.0        
+[103] enrichR_3.4            knitr_1.51             rstudioapi_0.18.0     
+[106] rjson_0.2.23           reshape2_1.4.5         curl_7.1.0            
+[109] nlme_3.1-168           cachem_1.1.0           zoo_1.8-15            
+[112] stringr_1.6.0          KernSmooth_2.23-26     vipor_0.4.7           
+[115] parallel_4.5.2         miniUI_0.1.2           pillar_1.11.1         
+[118] grid_4.5.2             vctrs_0.7.3            RANN_2.6.2            
+[121] promises_1.5.0         BiocSingular_1.26.1    beachmat_2.26.0       
+[124] xtable_1.8-8           cluster_2.1.8.1        beeswarm_0.4.0        
+[127] evaluate_1.0.5         cli_3.6.6              compiler_4.5.2        
+[130] rlang_1.2.0            rstantools_2.6.0       future.apply_1.20.2   
+[133] labeling_0.4.3         ps_1.9.3               ggbeeswarm_0.7.3      
+[136] getPass_0.2-4          plyr_1.8.9             fs_2.1.0              
+[139] stringi_1.8.7          rstan_2.32.7           BiocParallel_1.44.0   
+[142] viridisLite_0.4.3      deldir_2.0-4           QuickJSR_1.9.2        
+[145] lazyeval_0.2.3         spatstat.geom_3.7-3    RcppHNSW_0.6.0        
+[148] RcppEigen_0.3.4.0.2    patchwork_1.3.2        bit64_4.8.0           
+[151] future_1.70.0          shiny_1.13.0           ROCR_1.0-12           
+[154] igraph_2.3.0           RcppParallel_5.1.11-2  bslib_0.10.0          
+[157] bit_4.6.0             </code></pre>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 4.5.2 (2025-10-31)
+Platform: x86_64-pc-linux-gnu
+Running under: Ubuntu 24.04.4 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
+LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.26.so;  LAPACK version 3.12.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+time zone: Etc/UTC
+tzcode source: system (glibc)
+
+attached base packages:
+[1] stats4    stats     graphics  grDevices utils     datasets  methods  
+[8] base     
+
+other attached packages:
+ [1] scater_1.38.1               ggplot2_4.0.3              
+ [3] scuttle_1.20.0              celda_1.26.0               
+ [5] Seurat_5.5.0                SeuratObject_5.4.0         
+ [7] sp_2.2-1                    Matrix_1.7-4               
+ [9] SingleCellExperiment_1.32.0 SummarizedExperiment_1.40.0
+[11] Biobase_2.70.0              GenomicRanges_1.62.1       
+[13] Seqinfo_1.0.0               IRanges_2.44.0             
+[15] S4Vectors_0.48.1            BiocGenerics_0.56.0        
+[17] generics_0.1.4              MatrixGenerics_1.22.0      
+[19] matrixStats_1.5.0           decontX_1.8.0              
+[21] workflowr_1.7.2            
+
+loaded via a namespace (and not attached):
+  [1] RcppAnnoy_0.0.23       splines_4.5.2          later_1.4.8           
+  [4] tibble_3.3.1           polyclip_1.10-7        pROC_1.19.0.1         
+  [7] fastDummies_1.7.6      lifecycle_1.0.5        doParallel_1.0.17     
+ [10] rprojroot_2.1.1        StanHeaders_2.32.10    hdf5r_1.3.12          
+ [13] globals_0.19.1         processx_3.9.0         lattice_0.22-7        
+ [16] MASS_7.3-65            dendextend_1.19.1      magrittr_2.0.5        
+ [19] plotly_4.12.0          sass_0.4.10            rmarkdown_2.31        
+ [22] jquerylib_0.1.4        yaml_2.3.12            httpuv_1.6.17         
+ [25] otel_0.2.0             sctransform_0.4.3      spam_2.11-3           
+ [28] pkgbuild_1.4.8         spatstat.sparse_3.1-0  reticulate_1.46.0     
+ [31] cowplot_1.2.0          pbapply_1.7-4          RColorBrewer_1.1-3    
+ [34] abind_1.4-8            Rtsne_0.17             purrr_1.2.2           
+ [37] WriteXLS_6.8.0         git2r_0.36.2           ggrepel_0.9.8         
+ [40] inline_0.3.21          irlba_2.3.7            listenv_0.10.1        
+ [43] spatstat.utils_3.2-2   goftest_1.2-3          RSpectra_0.16-2       
+ [46] spatstat.random_3.4-5  fitdistrplus_1.2-6     parallelly_1.47.0     
+ [49] codetools_0.2-20       DelayedArray_0.36.1    tidyselect_1.2.1      
+ [52] farver_2.1.2           ScaledMatrix_1.18.0    viridis_0.6.5         
+ [55] spatstat.explore_3.8-0 jsonlite_2.0.0         BiocNeighbors_2.4.0   
+ [58] progressr_0.19.0       ggridges_0.5.7         survival_3.8-3        
+ [61] iterators_1.0.14       foreach_1.5.2          dbscan_1.2.4          
+ [64] tools_4.5.2            ica_1.0-3              Rcpp_1.1.1-1.1        
+ [67] glue_1.8.1             gridExtra_2.3          SparseArray_1.10.10   
+ [70] xfun_0.57              dplyr_1.2.1            loo_2.9.0             
+ [73] withr_3.0.2            combinat_0.0-8         fastmap_1.2.0         
+ [76] MCMCprecision_0.4.2    rsvd_1.0.5             callr_3.7.6           
+ [79] digest_0.6.39          R6_2.6.1               mime_0.13             
+ [82] scattermore_1.2        tensor_1.5.1           spatstat.data_3.1-9   
+ [85] tidyr_1.3.2            data.table_1.18.2.1    httr_1.4.8            
+ [88] htmlwidgets_1.6.4      S4Arrays_1.10.1        whisker_0.4.1         
+ [91] uwot_0.2.4             pkgconfig_2.0.3        gtable_0.3.6          
+ [94] lmtest_0.9-40          S7_0.2.2               XVector_0.50.0        
+ [97] htmltools_0.5.9        dotCall64_1.2          scales_1.4.0          
+[100] png_0.1-9              spatstat.univar_3.1-7  ggdendro_0.2.0        
+[103] enrichR_3.4            knitr_1.51             rstudioapi_0.18.0     
+[106] rjson_0.2.23           reshape2_1.4.5         curl_7.1.0            
+[109] nlme_3.1-168           cachem_1.1.0           zoo_1.8-15            
+[112] stringr_1.6.0          KernSmooth_2.23-26     vipor_0.4.7           
+[115] parallel_4.5.2         miniUI_0.1.2           pillar_1.11.1         
+[118] grid_4.5.2             vctrs_0.7.3            RANN_2.6.2            
+[121] promises_1.5.0         BiocSingular_1.26.1    beachmat_2.26.0       
+[124] xtable_1.8-8           cluster_2.1.8.1        beeswarm_0.4.0        
+[127] evaluate_1.0.5         cli_3.6.6              compiler_4.5.2        
+[130] rlang_1.2.0            rstantools_2.6.0       future.apply_1.20.2   
+[133] labeling_0.4.3         ps_1.9.3               ggbeeswarm_0.7.3      
+[136] getPass_0.2-4          plyr_1.8.9             fs_2.1.0              
+[139] stringi_1.8.7          rstan_2.32.7           BiocParallel_1.44.0   
+[142] viridisLite_0.4.3      deldir_2.0-4           QuickJSR_1.9.2        
+[145] lazyeval_0.2.3         spatstat.geom_3.7-3    RcppHNSW_0.6.0        
+[148] RcppEigen_0.3.4.0.2    patchwork_1.3.2        bit64_4.8.0           
+[151] future_1.70.0          shiny_1.13.0           ROCR_1.0-12           
+[154] igraph_2.3.0           RcppParallel_5.1.11-2  bslib_0.10.0          
+[157] bit_4.6.0             </code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Adjust MathJax settings so that all math formulae are shown using
+TeX fonts only; see
+https://docs.mathjax.org/en/latest/web/configuration.html. This will make
+the presentation more consistent at the cost of the webpage sometimes
+taking slightly longer to load. Note that this only works because the
+footer is added to webpages before the MathJax javascript. -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
