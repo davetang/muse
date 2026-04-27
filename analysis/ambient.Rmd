@@ -1,0 +1,231 @@
+---
+title: "Comparing SoupX and DecontX ambient RNA correction"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Introduction
+
+This notebook compares the ambient-RNA corrections produced by [SoupX](soupx.html) and [DecontX](decontx.html) on the same `SC3pv3_GEX_Human_PBMC` dataset. Both source notebooks save their corrected count matrix and per-cell contamination estimate to `output/`; we load both here and compare them at the per-cell, per-gene, and per-(cell × gene) level.
+
+To recap the two methods briefly:
+
+* **SoupX** estimates the soup profile directly from the empty droplets in the raw 10x output and then estimates a per-cell contamination fraction `rho` by looking for genes that should be soup-only in particular clusters.
+* **DecontX** treats the contamination distribution for each cell as a weighted combination of the other clusters' profiles. The version run in the companion notebook additionally uses the raw matrix as an empirical anchor for the ambient distribution.
+
+Both methods produce a corrected count matrix of the same shape as the input filtered matrix, plus a per-cell contamination fraction in `[0, 1]`. We can therefore line up the two outputs cell-by-cell and gene-by-gene to see where they agree and where they diverge.
+
+## Packages
+
+```{r packages, message=FALSE, warning=FALSE}
+suppressPackageStartupMessages({
+  library(Matrix)
+  library(Seurat)
+  library(ggplot2)
+})
+```
+
+## Loading the inputs
+
+We need three things: the original filtered count matrix (so we can compute the per-gene and per-cell totals removed by each method), the SoupX corrected matrix, and the DecontX corrected matrix.
+
+```{r load}
+original <- Seurat::Read10X_h5("data/SC3pv3_GEX_Human_PBMC_filtered_feature_bc_matrix.h5")
+
+soupx   <- readRDS("output/soupx_corrected.rds")
+decontx <- readRDS("output/decontx_corrected.rds")
+```
+
+The two corrected matrices should cover the same set of cells, since both notebooks start from the same Cell Ranger filtered output:
+
+```{r dims}
+dim(original)
+dim(soupx$counts)
+dim(decontx$counts)
+```
+
+To make per-cell comparisons we re-order both corrected matrices and their metadata to match the column order of the original filtered matrix.
+
+```{r align}
+common_cells <- Reduce(
+  intersect,
+  list(colnames(original), colnames(soupx$counts), colnames(decontx$counts))
+)
+length(common_cells)
+
+original       <- original[, common_cells]
+soupx$counts   <- soupx$counts[, common_cells]
+decontx$counts <- decontx$counts[, common_cells]
+soupx$meta     <- soupx$meta[common_cells, ]
+decontx$meta   <- decontx$meta[common_cells, ]
+```
+
+## Per-cell contamination fraction
+
+The most direct comparison is the per-cell contamination fraction. SoupX estimates this via `autoEstCont()` and stores it in `sc$metaData$rho`; DecontX produces it as `colData(sce)$decontX_contamination`. Both are bounded in `[0, 1]`.
+
+```{r rho_summary}
+summary(soupx$meta$rho)
+summary(decontx$meta$rho)
+```
+
+```{r rho_hist, fig.width=8, fig.height=4}
+rho_long <- rbind(
+  data.frame(method = "SoupX",   rho = soupx$meta$rho),
+  data.frame(method = "DecontX", rho = decontx$meta$rho)
+)
+
+ggplot(rho_long, aes(rho, fill = method)) +
+  geom_histogram(bins = 60, alpha = 0.6, position = "identity") +
+  labs(x = "Estimated contamination fraction", y = "Cells") +
+  theme_minimal()
+```
+
+A scatter plot of the two estimates per cell shows whether the methods agree on which cells are most contaminated. A diagonal trend means they agree on the relative ranking; the absolute level often differs because the two estimators use different priors and different anchors for the ambient distribution.
+
+```{r rho_scatter, fig.width=5, fig.height=5}
+ggplot(
+  data.frame(soupx = soupx$meta$rho, decontx = decontx$meta$rho),
+  aes(soupx, decontx)
+) +
+  geom_point(size = 0.3, alpha = 0.4) +
+  geom_abline(slope = 1, intercept = 0, colour = "red") +
+  coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(x = "SoupX rho", y = "DecontX contamination") +
+  theme_minimal()
+
+cor(soupx$meta$rho, decontx$meta$rho, method = "spearman")
+```
+
+## Per-cell UMIs removed
+
+The estimated `rho` is what each model believes; the UMIs actually subtracted from each cell are what the model produced. These two are not exactly equal because both `adjustCounts()` and `decontXcounts()` distribute the removed counts across genes in a constrained way. Comparing per-cell UMIs removed is therefore a useful complement to the `rho` comparison.
+
+```{r umi_removed, fig.width=5, fig.height=5}
+total_orig    <- Matrix::colSums(original)
+removed_soup  <- total_orig - Matrix::colSums(soupx$counts)
+removed_decon <- total_orig - Matrix::colSums(decontx$counts)
+
+ggplot(
+  data.frame(soupx = removed_soup, decontx = removed_decon),
+  aes(soupx, decontx)
+) +
+  geom_point(size = 0.3, alpha = 0.4) +
+  geom_abline(slope = 1, intercept = 0, colour = "red") +
+  labs(x = "SoupX UMIs removed (per cell)",
+       y = "DecontX UMIs removed (per cell)") +
+  theme_minimal()
+```
+
+## Per-gene removal
+
+Summing the corrections across cells gives a per-gene total of how many UMIs each method assigned to soup. The genes at the top of these lists are the methods' best guesses at the most soup-contaminated genes in the dataset.
+
+```{r gene_totals}
+gene_totals <- data.frame(
+  gene          = rownames(original),
+  before        = Matrix::rowSums(original),
+  after_soupx   = Matrix::rowSums(soupx$counts),
+  after_decontx = Matrix::rowSums(decontx$counts)
+)
+gene_totals$removed_soupx   <- gene_totals$before - gene_totals$after_soupx
+gene_totals$removed_decontx <- gene_totals$before - gene_totals$after_decontx
+```
+
+The 20 genes with the largest counts removed by each method:
+
+```{r top_removed_soupx}
+head(
+  gene_totals[order(-gene_totals$removed_soupx),
+              c("gene", "before", "removed_soupx", "removed_decontx")],
+  20
+)
+```
+
+```{r top_removed_decontx}
+head(
+  gene_totals[order(-gene_totals$removed_decontx),
+              c("gene", "before", "removed_soupx", "removed_decontx")],
+  20
+)
+```
+
+A scatter plot at the gene level — log-scaled because a handful of soup genes dominate the totals — shows whether the two methods agree on per-gene removal:
+
+```{r gene_scatter, fig.width=5, fig.height=5}
+ggplot(
+  gene_totals,
+  aes(removed_soupx + 1, removed_decontx + 1)
+) +
+  geom_point(size = 0.3, alpha = 0.4) +
+  geom_abline(slope = 1, intercept = 0, colour = "red") +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(x = "SoupX UMIs removed per gene (+1)",
+       y = "DecontX UMIs removed per gene (+1)") +
+  theme_minimal()
+```
+
+## Marker genes
+
+The classical ambient-RNA markers in PBMC preps are the haemoglobin genes (`HBB`, `HBA1`, `HBA2`) — released by lysed red blood cells — and immunoglobulin genes (`IGKC`, `IGLC2`, `IGHA1`) — released by lysed plasma cells. Both methods should remove the haemoglobin counts almost entirely; the immunoglobulin counts should be preserved in the B / plasma cell cluster but removed from elsewhere.
+
+```{r markers_total}
+markers <- intersect(
+  c("HBB", "HBA1", "HBA2", "IGKC", "IGLC2", "IGHA1"),
+  rownames(original)
+)
+
+data.frame(
+  gene            = markers,
+  before          = Matrix::rowSums(original[markers, ]),
+  after_soupx     = round(Matrix::rowSums(soupx$counts[markers, ])),
+  after_decontx   = round(Matrix::rowSums(decontx$counts[markers, ])),
+  removed_soupx   = round(Matrix::rowSums(original[markers, ]) -
+                            Matrix::rowSums(soupx$counts[markers, ])),
+  removed_decontx = round(Matrix::rowSums(original[markers, ]) -
+                            Matrix::rowSums(decontx$counts[markers, ]))
+)
+```
+
+## Agreement at the (cell × gene) level
+
+Finally, we ask how similar the two corrected matrices are at the (cell × gene) level. For each cell we compute the Pearson correlation between the SoupX-corrected and DecontX-corrected expression vectors. A correlation close to 1 means the two methods broadly agree on which counts to remove from that cell; a correlation noticeably below 1 means they disagree on the per-cell distribution of corrections.
+
+We sample 2000 cells to keep the computation cheap.
+
+```{r per_cell_correlation, fig.width=6, fig.height=4}
+set.seed(1984)
+sample_cells <- sample(common_cells, min(2000, length(common_cells)))
+
+cell_cor <- vapply(sample_cells, function(b) {
+  cor(as.numeric(soupx$counts[, b]), as.numeric(decontx$counts[, b]))
+}, numeric(1))
+
+ggplot(data.frame(r = cell_cor), aes(r)) +
+  geom_histogram(bins = 50, fill = "steelblue") +
+  labs(x = "Per-cell Pearson correlation (SoupX vs DecontX)",
+       y = "Cells") +
+  theme_minimal()
+
+summary(cell_cor)
+```
+
+## Summary
+
+* The two methods typically agree on the *identity* of the most-contaminated genes — haemoglobin and immunoglobulin transcripts dominate both top-removed lists for PBMC preps.
+* They agree less precisely on the *magnitude* of the per-cell contamination fraction, because they use different priors and different anchors for the ambient distribution.
+* For routine PBMC analysis the choice between SoupX and DecontX is rarely critical; for sorted samples or unusual tissue preparations where the empty-droplet population may not represent the full ambient pool, the assumptions matter more.
+
+## Session info
+
+```{r session_info}
+sessionInfo()
+```
