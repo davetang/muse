@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2817957b28f6891240f2576c1bffb291cb8272cdtargetblank2817957a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree13ee82757c33abe29c14af191be418310f1891e0targetblank13ee827a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/2817957b28f6891240f2576c1bffb291cb8272cd" target="_blank">2817957</a>
+<a href="https://github.com/davetang/muse/tree/13ee82757c33abe29c14af191be418310f1891e0" target="_blank">13ee827</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree2817957b28f6891240f2576c1bffb291cb8272cdtargetblank2817957a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree13ee82757c33abe29c14af191be418310f1891e0targetblank13ee827a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/2817957b28f6891240f2576c1bffb291cb8272cd" target="_blank">2817957</a>.
+<a href="https://github.com/davetang/muse/tree/13ee82757c33abe29c14af191be418310f1891e0" target="_blank">13ee827</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -669,6 +669,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/13ee82757c33abe29c14af191be418310f1891e0/analysis/ambient.Rmd" target="_blank">13ee827</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-27
+</td>
+<td>
+Remove rho comparison
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/9ffee01b53139d0d6335e4eb5463fa250aa786ab/docs/ambient.html" target="_blank">9ffee01</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/2817957b28f6891240f2576c1bffb291cb8272cd/analysis/ambient.Rmd" target="_blank">2817957</a>
 </td>
 <td>
@@ -708,10 +742,13 @@ version run in the companion notebook additionally uses the raw matrix
 as an empirical anchor for the ambient distribution.</li>
 </ul>
 <p>Both methods produce a corrected count matrix of the same shape as
-the input filtered matrix, plus a per-cell contamination fraction in
-<code>[0, 1]</code>. We can therefore line up the two outputs
-cell-by-cell and gene-by-gene to see where they agree and where they
-diverge.</p>
+the input filtered matrix. They differ in how they parameterise
+contamination: DecontX produces a per-cell contamination fraction;
+SoupX’s <code>autoEstCont()</code> produces a single global value that
+is applied to every cell. The most informative comparison is therefore
+at the level of the corrections themselves — UMIs removed per cell, UMIs
+removed per gene, and the (cell × gene) corrected matrix — rather than
+the contamination fractions.</p>
 </div>
 <div id="packages" class="section level2">
 <h2>Packages</h2>
@@ -753,48 +790,82 @@ decontx$counts &lt;- decontx$counts[, common_cells]
 soupx$meta     &lt;- soupx$meta[common_cells, ]
 decontx$meta   &lt;- decontx$meta[common_cells, ]</code></pre>
 </div>
-<div id="per-cell-contamination-fraction" class="section level2">
-<h2>Per-cell contamination fraction</h2>
-<p>The most direct comparison is the per-cell contamination fraction.
-SoupX estimates this via <code>autoEstCont()</code> and stores it in
-<code>sc$metaData$rho</code>; DecontX produces it as
-<code>colData(sce)$decontX_contamination</code>. Both are bounded in
-<code>[0, 1]</code>.</p>
+<div id="contamination-fractions" class="section level2">
+<h2>Contamination fractions</h2>
+<p>It is tempting to start by comparing the per-cell contamination
+fractions reported by each method, but the two methods don’t actually
+produce comparable quantities here. DecontX returns a true per-cell
+estimate in <code>colData(sce)$decontX_contamination</code>. SoupX’s
+<code>autoEstCont()</code>, by contrast, fits a contamination fraction
+per cluster, averages across clusters, and then calls
+<code>setContaminationFraction()</code> with a <em>single</em> global
+value — so every cell in <code>sc$metaData$rho</code> ends up with the
+same number:</p>
 <pre class="r"><code>summary(soupx$meta$rho)</code></pre>
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
    0.01    0.01    0.01    0.01    0.01    0.01 </code></pre>
+<pre class="r"><code>length(unique(soupx$meta$rho))</code></pre>
+<pre><code>[1] 1</code></pre>
 <pre class="r"><code>summary(decontx$meta$rho)</code></pre>
 <pre><code>     Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
 2.368e-05 6.639e-03 1.614e-02 6.977e-02 7.397e-02 9.995e-01 </code></pre>
-<pre class="r"><code>rho_long &lt;- rbind(
-  data.frame(method = &quot;SoupX&quot;,   rho = soupx$meta$rho),
-  data.frame(method = &quot;DecontX&quot;, rho = decontx$meta$rho)
-)
-
-ggplot(rho_long, aes(rho, fill = method)) +
-  geom_histogram(bins = 60, alpha = 0.6, position = &quot;identity&quot;) +
-  labs(x = &quot;Estimated contamination fraction&quot;, y = &quot;Cells&quot;) +
+<p>A direct cell-by-cell rho-rho scatter is therefore degenerate (it
+would be a vertical line at the SoupX global rho). Showing the DecontX
+distribution alone is still informative — it tells us how much
+heterogeneity DecontX sees in contamination across cells, on top of
+whatever common level SoupX assumes:</p>
+<pre class="r"><code>ggplot(decontx$meta, aes(rho)) +
+  geom_histogram(bins = 60, fill = &quot;steelblue&quot;) +
+  geom_vline(xintercept = soupx$meta$rho[1],
+             colour = &quot;red&quot;, linetype = &quot;dashed&quot;) +
+  labs(
+    x = &quot;DecontX per-cell contamination (red dashed = SoupX global rho)&quot;,
+    y = &quot;Cells&quot;
+  ) +
   theme_minimal()</code></pre>
 <p><img src="figure/ambient.Rmd/rho_hist-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
-<p>A scatter plot of the two estimates per cell shows whether the
-methods agree on which cells are most contaminated. A diagonal trend
-means they agree on the relative ranking; the absolute level often
-differs because the two estimators use different priors and different
-anchors for the ambient distribution.</p>
-<pre class="r"><code>ggplot(
-  data.frame(soupx = soupx$meta$rho, decontx = decontx$meta$rho),
-  aes(soupx, decontx)
-) +
-  geom_point(size = 0.3, alpha = 0.4) +
-  geom_abline(slope = 1, intercept = 0, colour = &quot;red&quot;) +
-  coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
-  labs(x = &quot;SoupX rho&quot;, y = &quot;DecontX contamination&quot;) +
-  theme_minimal()</code></pre>
-<p><img src="figure/ambient.Rmd/rho_scatter-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>cor(soupx$meta$rho, decontx$meta$rho, method = &quot;spearman&quot;)</code></pre>
-<pre><code>Warning in cor(soupx$meta$rho, decontx$meta$rho, method = &quot;spearman&quot;): the
-standard deviation is zero</code></pre>
-<pre><code>[1] NA</code></pre>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-rho_hist-1">
+Past versions of rho_hist-1.png
+</button>
+</p>
+<div id="fig-rho_hist-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/9ffee01b53139d0d6335e4eb5463fa250aa786ab/docs/figure/ambient.Rmd/rho_hist-1.png" target="_blank">9ffee01</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-27
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>For an actual head-to-head comparison we should look at the
+corrections themselves — the UMIs each method removed from each cell and
+from each gene — which are per-cell and per-gene for both methods
+regardless of how the underlying contamination fraction was
+parameterised.</p>
 </div>
 <div id="per-cell-umis-removed" class="section level2">
 <h2>Per-cell UMIs removed</h2>
@@ -818,6 +889,43 @@ ggplot(
        y = &quot;DecontX UMIs removed (per cell)&quot;) +
   theme_minimal()</code></pre>
 <p><img src="figure/ambient.Rmd/umi_removed-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-umi_removed-1">
+Past versions of umi_removed-1.png
+</button>
+</p>
+<div id="fig-umi_removed-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/9ffee01b53139d0d6335e4eb5463fa250aa786ab/docs/figure/ambient.Rmd/umi_removed-1.png" target="_blank">9ffee01</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-27
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="per-gene-removal" class="section level2">
 <h2>Per-gene removal</h2>
@@ -901,6 +1009,43 @@ per-gene removal:</p>
        y = &quot;DecontX UMIs removed per gene (+1)&quot;) +
   theme_minimal()</code></pre>
 <p><img src="figure/ambient.Rmd/gene_scatter-1.png" alt="" width="480" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-gene_scatter-1">
+Past versions of gene_scatter-1.png
+</button>
+</p>
+<div id="fig-gene_scatter-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/9ffee01b53139d0d6335e4eb5463fa250aa786ab/docs/figure/ambient.Rmd/gene_scatter-1.png" target="_blank">9ffee01</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-27
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="marker-genes" class="section level2">
 <h2>Marker genes</h2>
@@ -956,6 +1101,43 @@ ggplot(data.frame(r = cell_cor), aes(r)) +
        y = &quot;Cells&quot;) +
   theme_minimal()</code></pre>
 <p><img src="figure/ambient.Rmd/per_cell_correlation-1.png" alt="" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-per_cell_correlation-1">
+Past versions of per_cell_correlation-1.png
+</button>
+</p>
+<div id="fig-per_cell_correlation-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/9ffee01b53139d0d6335e4eb5463fa250aa786ab/docs/figure/ambient.Rmd/per_cell_correlation-1.png" target="_blank">9ffee01</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-27
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>summary(cell_cor)</code></pre>
 <pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. 
 0.005074 0.999209 0.999972 0.992423 0.999993 1.000000 </code></pre>
@@ -966,9 +1148,11 @@ ggplot(data.frame(r = cell_cor), aes(r)) +
 <li>The two methods typically agree on the <em>identity</em> of the
 most-contaminated genes — haemoglobin and immunoglobulin transcripts
 dominate both top-removed lists for PBMC preps.</li>
-<li>They agree less precisely on the <em>magnitude</em> of the per-cell
-contamination fraction, because they use different priors and different
-anchors for the ambient distribution.</li>
+<li>They differ in how they parameterise contamination: SoupX’s
+<code>autoEstCont()</code> collapses to a single global rho, while
+DecontX produces a per-cell rho. The interesting per-cell heterogeneity
+in this dataset therefore only shows up in the DecontX
+distribution.</li>
 <li>For routine PBMC analysis the choice between SoupX and DecontX is
 rarely critical; for sorted samples or unusual tissue preparations where
 the empty-droplet population may not represent the full ambient pool,
