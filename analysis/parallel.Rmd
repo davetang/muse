@@ -4,8 +4,6 @@ date: "`r Sys.Date()`"
 output:
   workflowr::wflow_html:
     toc: true
-editor_options:
-  chunk_output_type: console
 params:
   threads: 4
 ---
@@ -128,9 +126,9 @@ Note that forking is faster.
 If you run the code below:
 
 ```{r no_export, eval=FALSE}
-cl <- makeCluster(4)
+cl <- makeCluster(params$threads)
 system.time(
-  test <- parLapply(cl, 1:4, function(x){
+  test <- parLapply(cl, seq_len(params$threads), function(x){
     class(my_list)
   })
 )
@@ -147,10 +145,10 @@ Error in checkForRemoteErrors(val) :
 This is because each worker is using a different environment. To make the `my_list` object available to each worker, we use the `clusterExport()` function.
 
 ```{r cluster_export}
-cl <- makeCluster(4)
+cl <- makeCluster(params$threads)
 clusterExport(cl, list("my_list"))
 system.time(
-  test2 <- parSapply(cl, 1:4, function(x){
+  test2 <- parSapply(cl, seq_len(params$threads), function(x){
     class(my_list)
   })
 )
