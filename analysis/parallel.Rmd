@@ -25,7 +25,41 @@ There are several packages that make it easy to run tasks in parallel:
 * The [BiocParallel](https://bioconductor.org/packages/release/bioc/html/BiocParallel.html) package tailored for use with Bioconductor.
 * The [furrr](https://furrr.futureverse.org/) package parallelises mapping functions from the [purrr](https://purrr.tidyverse.org/) package.
 * The [pbapply](https://github.com/psolymos/pbapply#parallel-backends) package, which is a package for adding a progress bar, but supports parallel execution.
-* The [future](https://cran.r-project.org/web/packages/future/index.html) package, unified parallel and distributed processing in R for everyone
+* The [future](https://cran.r-project.org/web/packages/future/index.html) package, unified parallel and distributed processing in R for everyone.
+
+### Why are there so many parallelisation packages?
+
+R's parallel computing ecosystem has grown over more than two decades, and the variety reflects a mix of historical accident, ecosystem-specific needs, and evolving design ideas:
+
+* **Historical core.** The base R `parallel` package (introduced in R 2.14.0 in 2011) was created by merging two earlier packages: `snow` (Simple Network of Workstations, 1999) for socket-based clusters, and `multicore` (2009) for forked workers on Unix. Most other packages either build on `parallel` or replace it.
+* **Different programming styles.** Some users prefer imperative loops (`foreach`), some prefer apply-style functions (`*apply`, `bplapply`, `future_lapply`), and tidyverse users prefer functional mapping (`map`, `future_map`). Each style has at least one parallelisation package tailored to it.
+* **Different ecosystems.** `BiocParallel` was written for [Bioconductor](https://bioconductor.org/), where workflows commonly run on HPC clusters with schedulers like SLURM or SGE, and where robust error handling and logging matter. `furrr` was written for the tidyverse. `doParallel` was written by Revolution Analytics (now Microsoft) as a backend for `foreach`.
+* **Different backends.** Forking (Unix only), socket clusters (cross-platform), MPI, batch job schedulers, and cloud workers all need different machinery underneath. Some packages (`future`, `BiocParallel`) try to abstract this away; others expose it directly.
+* **Progressive features.** Newer packages typically add capabilities the older ones lack: progress bars (`pbapply`), automatic detection of variables that need to be exported (`future`), reproducible parallel RNG, structured error handling, and so on.
+
+A useful mental model is that there are really only **two parallelisation mechanisms** in R — forking and socket clusters — and most of the packages above are different *frontends* on top of those mechanisms.
+
+### Forking vs socket clusters
+
+Almost every package in this notebook is ultimately doing one of these two things:
+
+* **Forking** copies the parent R process using the operating system's `fork()` call. Workers share memory with the parent (copy-on-write), so objects in the parent environment are automatically available to every worker — no explicit export step is needed. Forking starts up quickly and avoids data transfer cost, but it is **only available on Unix-like systems** (Linux and macOS) and can be unsafe inside multi-threaded host processes such as the RStudio GUI.
+* **Socket clusters** spawn fresh R processes that communicate with the parent over network sockets. Each worker starts with an empty environment, so any objects, packages, or functions it needs must be explicitly transferred (`clusterExport`, `clusterEvalQ`, or — for `future`-based tools — automatic globals detection). Socket clusters are slower to start and have higher communication overhead, but they work on **all platforms including Windows**.
+
+When you see `mclapply`, `MulticoreParam`, or `plan(multicore)`, that is forking. When you see `makeCluster`, `SnowParam`, `parLapply`, or `plan(multisession)`, that is a socket cluster.
+
+### Frontends and backends
+
+A second useful distinction is between *frontends* — the API you write your code against — and *backends* — what actually runs the work:
+
+| Frontend                                                  | Typical backends                                                            |
+| --------------------------------------------------------- | --------------------------------------------------------------------------- |
+| `parallel::mclapply` / `parLapply`                        | fork / socket (built in)                                                    |
+| `foreach::%dopar%`                                        | `doParallel`, `doMC`, `doSNOW`, `doFuture`, `doMPI`, ...                    |
+| `BiocParallel::bplapply`                                  | `MulticoreParam`, `SnowParam`, `BatchtoolsParam`, ...                       |
+| `future.apply::future_lapply`, `furrr::future_map`        | any `future` plan: `sequential`, `multicore`, `multisession`, `cluster`     |
+
+The same loop body can usually be moved between frontends with little change, but the *backend* you pick determines startup cost, memory behaviour, OS portability, and how variables are shared with the workers.
 
 ## Timing processes with `system.time`
 
@@ -78,6 +112,8 @@ params$threads
 ```
 
 ## `parallel`
+
+The `parallel` package ships with base R and is the foundation that almost every other package in this notebook builds on. It exposes both parallelisation mechanisms directly: forking (via `mclapply`, `mcmapply`, etc.) and socket clusters (via `makeCluster`, `parLapply`, `parSapply`, etc.). It is low-level and unopinionated — there is no progress reporting, no automatic globals detection, and error handling is bare-bones — but it has zero dependencies and is always available.
 
 Load the `parallel` package.
 
@@ -159,6 +195,8 @@ test2
 
 ## `pbapply`
 
+`pbapply` is primarily a progress-bar package: it provides drop-in replacements for `*apply` (`pblapply`, `pbsapply`, etc.) that show a progress bar in interactive sessions. Parallel support is layered on top — internally it dispatches to `parLapply` when given a cluster object and to `mclapply` when given an integer worker count — so you get progress reporting "for free" without changing parallelisation backend. Reach for it when a long-running job benefits from a visible progress indicator.
+
 Parallelisation with a progress bar! From the help page of `pblapply`:
 
 >Parallel processing can be enabled through the cl argument. parLapply is called when cl is a 'cluster' object, mclapply is called when cl is an integer. Showing the progress bar increases the communication overhead between the main process and nodes / child processes compared to the parallel equivalents of the functions without the progress bar. The functions fall back to their original equivalents when the progress bar is disabled (i.e. getOption("pboptions")$type == "none" or dopb() is FALSE). This is the default when interactive() if FALSE (i.e. called from command line R script).
@@ -186,6 +224,8 @@ identical(my_sum_pb, my_sum_pb_fork)
 
 ## `doParallel`
 
+`doParallel` is a *backend* for the [`foreach`](https://cran.r-project.org/web/packages/foreach/vignettes/foreach.html) frontend. `foreach` looks like a `for` loop but returns a value (like `lapply`) and — crucially — is parallel-backend agnostic: the same `foreach(...) %dopar% { ... }` block can be run sequentially, on a forked or socket cluster (via `doParallel`), on an MPI cluster (`doMPI`), or via the `future` framework (`doFuture`), depending on which backend you register. Reach for `foreach` when your loop body is more complex than a single function application (e.g. multiple result accumulators, custom `.combine` strategies, or nested loops with `%:%`).
+
 Load the `doParallel` package.
 
 ```{r load_doparallel}
@@ -209,6 +249,15 @@ identical(my_sum_mc, my_sum_dopar)
 ```
 
 ## `BiocParallel`
+
+`BiocParallel` is Bioconductor's unified parallelisation interface, designed for the kinds of workloads common in genomics: long-running jobs over large objects, where workers can fail mid-run and where logs and checkpoints matter. The frontend is a small set of `bp*` functions (`bplapply`, `bpmapply`, `bpiterate`, ...) that all take a `BPPARAM` argument describing the backend:
+
+* `MulticoreParam` — forking on Unix (falls back to `SnowParam` on Windows).
+* `SnowParam` — socket cluster; can be `type = "PSOCK"` (default) or `type = "FORK"`.
+* `SerialParam` — no parallelism, useful for debugging.
+* `BatchtoolsParam` — submit jobs to HPC schedulers (SLURM, SGE, LSF, Torque, ...) via the [`batchtools`](https://mllg.github.io/batchtools/) package.
+
+Reach for `BiocParallel` when you are working inside the Bioconductor ecosystem, when you need structured error handling and per-task logging, or when you want the same code to run on a laptop and a cluster by changing only the `BPPARAM`.
 
 Load `BiocParallel`.
 
@@ -251,6 +300,8 @@ identical(my_sum_bp_fork, my_sum_bp_mc)
 
 ## `furrr`
 
+`furrr` is a tidyverse-flavoured parallelisation package: it provides `future_map`, `future_map2`, `future_pmap`, `future_walk`, etc., which are drop-in replacements for the corresponding `purrr` functions. Under the hood it uses the [`future`](https://cran.r-project.org/web/packages/future/index.html) framework, which means switching between sequential, multicore, multisession, and cluster execution is just a matter of calling `plan()` — your `future_map(...)` code does not change. `furrr` also handles globals (variables captured from the enclosing environment) and packages automatically, so you rarely need an explicit `clusterExport`-style step.
+
 Load required libraries.
 
 ```{r rrr}
@@ -281,6 +332,16 @@ identical(my_sum_pur, my_sum_fur)
 
 ## `future`
 
+The `future` package, by Henrik Bengtsson, is a unified abstraction for parallel and distributed computing in R. The central idea is the *future*: a placeholder for a value that may still be computing somewhere — possibly in another process, possibly on another machine. Code that uses futures is written once and the choice of *where* to run it is made separately, by calling `plan()`:
+
+* `plan(sequential)` — run in the current process (no parallelism).
+* `plan(multicore)` — fork on Unix; not available on Windows or inside RStudio.
+* `plan(multisession)` — socket cluster of background R sessions; works everywhere.
+* `plan(cluster)` — explicit `parallel::makeCluster` cluster, including remote machines over SSH.
+* `plan(remote)` / `plan(batchtools_*)` — remote workers, HPC schedulers, etc.
+
+`future` itself is mostly a low-level engine; in practice you usually use one of its frontends — `future.apply` (`*apply`-style), `furrr` (`purrr`-style), or `doFuture` (as a `foreach` backend). The companion package [`future.apply`](https://future.apply.futureverse.org/) used below provides parallel versions of `lapply`, `sapply`, `vapply`, `mapply`, and `apply`.
+
 Load required libraries.
 
 ```{r future}
@@ -301,8 +362,15 @@ identical(my_sum, my_sum_future_lapply)
 
 ## Summary
 
-So, which package should you use? `BiocParallel` and `furrr` are tailored for use with Bioconductor and `purrr`, so use those packages accordingly.
+So, which package should you use? A few rules of thumb:
 
-For parallelisation over a list, use `parallel`. The [foreach](https://cran.r-project.org/web/packages/foreach/vignettes/foreach.html) function provides more flexibility when parallelising, so use the `doParallel` package if you have a more complicated task.
+* **Stick with what your ecosystem uses.** If you're working in Bioconductor, use `BiocParallel`; if you're already writing tidyverse / `purrr` code, use `furrr`. The cost of consistency with surrounding code is usually worth more than a small performance difference.
+* **For a quick parallel `lapply`, reach for base `parallel`.** It's already installed, has no dependencies, and `mclapply` is a one-line change from `lapply` on Unix.
+* **For complex loop bodies, use `foreach` + `doParallel`** (or `doFuture`). `foreach` shines when you need custom result combination (`.combine`), nested loops (`%:%`), or to accumulate multiple outputs per iteration.
+* **For portability across laptop / server / HPC, use `future`.** Writing your code once against `future_lapply` / `future_map` and switching backends with `plan()` is the most flexible option, and the `future` framework also handles globals, packages, and reproducible RNG (`future.seed = TRUE`) for you.
+* **Add `pbapply` when you want a progress bar** on an otherwise straightforward parallel `*apply`.
 
-Lastly, forking is faster than using sockets. If you're not using Windows, consider using forking over sockets.
+Two cross-cutting points worth remembering:
+
+* **Forking is faster than sockets, but Unix-only.** Forked workers share memory copy-on-write, so there is no startup data transfer and no need to export variables. On Windows (or inside some GUI host processes) you have no choice but to use a socket cluster.
+* **Parallel is not always faster.** For very fast per-element work, the cost of starting workers and shipping data to them can dominate. If `lapply` already runs in milliseconds, parallelising it will usually make things slower.
