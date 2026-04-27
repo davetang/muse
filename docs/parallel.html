@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree81dfe8d3e136c63e4a8b0997a9133b47449d4733targetblank81dfe8da">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8709228fa0b9f7b2d2d3d13abcda657274104b9dtargetblank8709228a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/81dfe8d3e136c63e4a8b0997a9133b47449d4733" target="_blank">81dfe8d</a>
+<a href="https://github.com/davetang/muse/tree/8709228fa0b9f7b2d2d3d13abcda657274104b9d" target="_blank">8709228</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree81dfe8d3e136c63e4a8b0997a9133b47449d4733targetblank81dfe8da"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree8709228fa0b9f7b2d2d3d13abcda657274104b9dtargetblank8709228a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/81dfe8d3e136c63e4a8b0997a9133b47449d4733" target="_blank">81dfe8d</a>.
+<a href="https://github.com/davetang/muse/tree/8709228fa0b9f7b2d2d3d13abcda657274104b9d" target="_blank">8709228</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -659,6 +659,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/8709228fa0b9f7b2d2d3d13abcda657274104b9d/analysis/parallel.Rmd" target="_blank">8709228</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-27
+</td>
+<td>
+Add background information
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/3253d99acbb8e795c5b4d8ab27183fb263a3ad3a/docs/parallel.html" target="_blank">3253d99</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-27
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -955,8 +989,123 @@ parallel execution.</li>
 <li>The <a
 href="https://cran.r-project.org/web/packages/future/index.html">future</a>
 package, unified parallel and distributed processing in R for
-everyone</li>
+everyone.</li>
 </ul>
+<div id="why-are-there-so-many-parallelisation-packages"
+class="section level3">
+<h3>Why are there so many parallelisation packages?</h3>
+<p>R’s parallel computing ecosystem has grown over more than two
+decades, and the variety reflects a mix of historical accident,
+ecosystem-specific needs, and evolving design ideas:</p>
+<ul>
+<li><strong>Historical core.</strong> The base R <code>parallel</code>
+package (introduced in R 2.14.0 in 2011) was created by merging two
+earlier packages: <code>snow</code> (Simple Network of Workstations,
+1999) for socket-based clusters, and <code>multicore</code> (2009) for
+forked workers on Unix. Most other packages either build on
+<code>parallel</code> or replace it.</li>
+<li><strong>Different programming styles.</strong> Some users prefer
+imperative loops (<code>foreach</code>), some prefer apply-style
+functions (<code>*apply</code>, <code>bplapply</code>,
+<code>future_lapply</code>), and tidyverse users prefer functional
+mapping (<code>map</code>, <code>future_map</code>). Each style has at
+least one parallelisation package tailored to it.</li>
+<li><strong>Different ecosystems.</strong> <code>BiocParallel</code> was
+written for <a href="https://bioconductor.org/">Bioconductor</a>, where
+workflows commonly run on HPC clusters with schedulers like SLURM or
+SGE, and where robust error handling and logging matter.
+<code>furrr</code> was written for the tidyverse.
+<code>doParallel</code> was written by Revolution Analytics (now
+Microsoft) as a backend for <code>foreach</code>.</li>
+<li><strong>Different backends.</strong> Forking (Unix only), socket
+clusters (cross-platform), MPI, batch job schedulers, and cloud workers
+all need different machinery underneath. Some packages
+(<code>future</code>, <code>BiocParallel</code>) try to abstract this
+away; others expose it directly.</li>
+<li><strong>Progressive features.</strong> Newer packages typically add
+capabilities the older ones lack: progress bars (<code>pbapply</code>),
+automatic detection of variables that need to be exported
+(<code>future</code>), reproducible parallel RNG, structured error
+handling, and so on.</li>
+</ul>
+<p>A useful mental model is that there are really only <strong>two
+parallelisation mechanisms</strong> in R — forking and socket clusters —
+and most of the packages above are different <em>frontends</em> on top
+of those mechanisms.</p>
+</div>
+<div id="forking-vs-socket-clusters" class="section level3">
+<h3>Forking vs socket clusters</h3>
+<p>Almost every package in this notebook is ultimately doing one of
+these two things:</p>
+<ul>
+<li><strong>Forking</strong> copies the parent R process using the
+operating system’s <code>fork()</code> call. Workers share memory with
+the parent (copy-on-write), so objects in the parent environment are
+automatically available to every worker — no explicit export step is
+needed. Forking starts up quickly and avoids data transfer cost, but it
+is <strong>only available on Unix-like systems</strong> (Linux and
+macOS) and can be unsafe inside multi-threaded host processes such as
+the RStudio GUI.</li>
+<li><strong>Socket clusters</strong> spawn fresh R processes that
+communicate with the parent over network sockets. Each worker starts
+with an empty environment, so any objects, packages, or functions it
+needs must be explicitly transferred (<code>clusterExport</code>,
+<code>clusterEvalQ</code>, or — for <code>future</code>-based tools —
+automatic globals detection). Socket clusters are slower to start and
+have higher communication overhead, but they work on <strong>all
+platforms including Windows</strong>.</li>
+</ul>
+<p>When you see <code>mclapply</code>, <code>MulticoreParam</code>, or
+<code>plan(multicore)</code>, that is forking. When you see
+<code>makeCluster</code>, <code>SnowParam</code>,
+<code>parLapply</code>, or <code>plan(multisession)</code>, that is a
+socket cluster.</p>
+</div>
+<div id="frontends-and-backends" class="section level3">
+<h3>Frontends and backends</h3>
+<p>A second useful distinction is between <em>frontends</em> — the API
+you write your code against — and <em>backends</em> — what actually runs
+the work:</p>
+<table>
+<colgroup>
+<col width="43%" />
+<col width="56%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Frontend</th>
+<th>Typical backends</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>parallel::mclapply</code> / <code>parLapply</code></td>
+<td>fork / socket (built in)</td>
+</tr>
+<tr class="even">
+<td><code>foreach::%dopar%</code></td>
+<td><code>doParallel</code>, <code>doMC</code>, <code>doSNOW</code>,
+<code>doFuture</code>, <code>doMPI</code>, …</td>
+</tr>
+<tr class="odd">
+<td><code>BiocParallel::bplapply</code></td>
+<td><code>MulticoreParam</code>, <code>SnowParam</code>,
+<code>BatchtoolsParam</code>, …</td>
+</tr>
+<tr class="even">
+<td><code>future.apply::future_lapply</code>,
+<code>furrr::future_map</code></td>
+<td>any <code>future</code> plan: <code>sequential</code>,
+<code>multicore</code>, <code>multisession</code>,
+<code>cluster</code></td>
+</tr>
+</tbody>
+</table>
+<p>The same loop body can usually be moved between frontends with little
+change, but the <em>backend</em> you pick determines startup cost,
+memory behaviour, OS portability, and how variables are shared with the
+workers.</p>
+</div>
 </div>
 <div id="timing-processes-with-system.time" class="section level2">
 <h2>Timing processes with <code>system.time</code></h2>
@@ -1016,6 +1165,15 @@ code examples is 4.</p>
 </div>
 <div id="parallel" class="section level2">
 <h2><code>parallel</code></h2>
+<p>The <code>parallel</code> package ships with base R and is the
+foundation that almost every other package in this notebook builds on.
+It exposes both parallelisation mechanisms directly: forking (via
+<code>mclapply</code>, <code>mcmapply</code>, etc.) and socket clusters
+(via <code>makeCluster</code>, <code>parLapply</code>,
+<code>parSapply</code>, etc.). It is low-level and unopinionated — there
+is no progress reporting, no automatic globals detection, and error
+handling is bare-bones — but it has zero dependencies and is always
+available.</p>
 <p>Load the <code>parallel</code> package.</p>
 <pre class="r"><code>library(parallel)</code></pre>
 <p>Create a summary of each variable in each data frame without
@@ -1024,7 +1182,7 @@ parallelisation.</p>
   my_sum &lt;- lapply(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  3.428   0.008   3.437 </code></pre>
+  3.394   0.008   3.402 </code></pre>
 <p>The <code>mclapply</code> function can be used to process a list in
 parallel. Note that this function uses forking, which is not available
 on Windows.</p>
@@ -1032,7 +1190,7 @@ on Windows.</p>
   my_sum_mc &lt;- mclapply(my_list, summary, mc.cores = params$threads)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.019   0.016   1.028 </code></pre>
+  0.021   0.016   1.028 </code></pre>
 <p>Compare the two summaries.</p>
 <pre class="r"><code>identical(my_sum, my_sum_mc)</code></pre>
 <pre><code>[1] TRUE</code></pre>
@@ -1045,7 +1203,7 @@ system.time(
   my_sum_sock &lt;- parLapply(cl, my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.327   0.119   2.004 </code></pre>
+  0.373   0.073   1.997 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 identical(my_sum_mc, my_sum_sock)</code></pre>
@@ -1084,6 +1242,15 @@ test2</code></pre>
 </div>
 <div id="pbapply" class="section level2">
 <h2><code>pbapply</code></h2>
+<p><code>pbapply</code> is primarily a progress-bar package: it provides
+drop-in replacements for <code>*apply</code> (<code>pblapply</code>,
+<code>pbsapply</code>, etc.) that show a progress bar in interactive
+sessions. Parallel support is layered on top — internally it dispatches
+to <code>parLapply</code> when given a cluster object and to
+<code>mclapply</code> when given an integer worker count — so you get
+progress reporting “for free” without changing parallelisation backend.
+Reach for it when a long-running job benefits from a visible progress
+indicator.</p>
 <p>Parallelisation with a progress bar! From the help page of
 <code>pblapply</code>:</p>
 <blockquote>
@@ -1103,7 +1270,7 @@ system.time(
   my_sum_pb &lt;- pblapply(my_list, summary, cl = cl)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.344   0.100   1.990 </code></pre>
+  0.357   0.086   1.989 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 identical(my_sum_mc, my_sum_pb)</code></pre>
@@ -1113,12 +1280,25 @@ identical(my_sum_mc, my_sum_pb)</code></pre>
   my_sum_pb_fork &lt;- pblapply(my_list, summary, cl = params$threads)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  1.888   0.168   1.026 </code></pre>
+  0.953   0.092   1.024 </code></pre>
 <pre class="r"><code>identical(my_sum_pb, my_sum_pb_fork)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
 <div id="doparallel" class="section level2">
 <h2><code>doParallel</code></h2>
+<p><code>doParallel</code> is a <em>backend</em> for the <a
+href="https://cran.r-project.org/web/packages/foreach/vignettes/foreach.html"><code>foreach</code></a>
+frontend. <code>foreach</code> looks like a <code>for</code> loop but
+returns a value (like <code>lapply</code>) and — crucially — is
+parallel-backend agnostic: the same
+<code>foreach(...) %dopar% { ... }</code> block can be run sequentially,
+on a forked or socket cluster (via <code>doParallel</code>), on an MPI
+cluster (<code>doMPI</code>), or via the <code>future</code> framework
+(<code>doFuture</code>), depending on which backend you register. Reach
+for <code>foreach</code> when your loop body is more complex than a
+single function application (e.g. multiple result accumulators, custom
+<code>.combine</code> strategies, or nested loops with
+<code>%:%</code>).</p>
 <p>Load the <code>doParallel</code> package.</p>
 <pre class="r"><code>library(doParallel)</code></pre>
 <pre><code>Loading required package: foreach</code></pre>
@@ -1133,7 +1313,7 @@ system.time(
   }
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.406   0.091   2.761 </code></pre>
+  0.452   0.084   2.724 </code></pre>
 <pre class="r"><code>stopCluster(cl)
 
 identical(my_sum_mc, my_sum_dopar)</code></pre>
@@ -1141,6 +1321,30 @@ identical(my_sum_mc, my_sum_dopar)</code></pre>
 </div>
 <div id="biocparallel" class="section level2">
 <h2><code>BiocParallel</code></h2>
+<p><code>BiocParallel</code> is Bioconductor’s unified parallelisation
+interface, designed for the kinds of workloads common in genomics:
+long-running jobs over large objects, where workers can fail mid-run and
+where logs and checkpoints matter. The frontend is a small set of
+<code>bp*</code> functions (<code>bplapply</code>,
+<code>bpmapply</code>, <code>bpiterate</code>, …) that all take a
+<code>BPPARAM</code> argument describing the backend:</p>
+<ul>
+<li><code>MulticoreParam</code> — forking on Unix (falls back to
+<code>SnowParam</code> on Windows).</li>
+<li><code>SnowParam</code> — socket cluster; can be
+<code>type = "PSOCK"</code> (default) or
+<code>type = "FORK"</code>.</li>
+<li><code>SerialParam</code> — no parallelism, useful for
+debugging.</li>
+<li><code>BatchtoolsParam</code> — submit jobs to HPC schedulers (SLURM,
+SGE, LSF, Torque, …) via the <a
+href="https://mllg.github.io/batchtools/"><code>batchtools</code></a>
+package.</li>
+</ul>
+<p>Reach for <code>BiocParallel</code> when you are working inside the
+Bioconductor ecosystem, when you need structured error handling and
+per-task logging, or when you want the same code to run on a laptop and
+a cluster by changing only the <code>BPPARAM</code>.</p>
 <p>Load <code>BiocParallel</code>.</p>
 <pre class="r"><code>library(BiocParallel)</code></pre>
 <p>Using <code>bplapply</code>.</p>
@@ -1149,7 +1353,7 @@ system.time(
   my_sum_bp &lt;- bplapply(my_list, summary, BPPARAM = param)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.461   0.077   4.633 </code></pre>
+  0.441   0.099   4.626 </code></pre>
 <pre class="r"><code>identical(my_sum_mc, my_sum_bp)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <p>Forking.</p>
@@ -1158,7 +1362,7 @@ system.time(
   my_sum_bp_fork &lt;- bplapply(my_list, summary, BPPARAM = param)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.161   0.109   1.676 </code></pre>
+  0.122   0.145   1.687 </code></pre>
 <pre class="r"><code>identical(my_sum_bp, my_sum_bp_fork)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <p>Using <code>MulticoreParam</code>.</p>
@@ -1167,12 +1371,24 @@ system.time(
   my_sum_bp_mc &lt;- bplapply(my_list, summary, BPPARAM = param)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.956   0.144   1.063 </code></pre>
+  0.949   0.140   1.063 </code></pre>
 <pre class="r"><code>identical(my_sum_bp_fork, my_sum_bp_mc)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
 <div id="furrr" class="section level2">
 <h2><code>furrr</code></h2>
+<p><code>furrr</code> is a tidyverse-flavoured parallelisation package:
+it provides <code>future_map</code>, <code>future_map2</code>,
+<code>future_pmap</code>, <code>future_walk</code>, etc., which are
+drop-in replacements for the corresponding <code>purrr</code> functions.
+Under the hood it uses the <a
+href="https://cran.r-project.org/web/packages/future/index.html"><code>future</code></a>
+framework, which means switching between sequential, multicore,
+multisession, and cluster execution is just a matter of calling
+<code>plan()</code> — your <code>future_map(...)</code> code does not
+change. <code>furrr</code> also handles globals (variables captured from
+the enclosing environment) and packages automatically, so you rarely
+need an explicit <code>clusterExport</code>-style step.</p>
 <p>Load required libraries.</p>
 <pre class="r"><code>library(furrr)</code></pre>
 <pre><code>Loading required package: future</code></pre>
@@ -1187,7 +1403,7 @@ Attaching package: &#39;purrr&#39;</code></pre>
   my_sum_pur &lt;- map(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  3.460   0.031   3.490 </code></pre>
+  3.462   0.023   3.485 </code></pre>
 <pre class="r"><code>identical(my_sum_mc, my_sum_pur)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <p>Map with parallelisation.</p>
@@ -1196,12 +1412,41 @@ system.time(
   my_sum_fur &lt;- future_map(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.169   0.113   2.183 </code></pre>
+  0.147   0.133   2.149 </code></pre>
 <pre class="r"><code>identical(my_sum_pur, my_sum_fur)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
 <div id="future" class="section level2">
 <h2><code>future</code></h2>
+<p>The <code>future</code> package, by Henrik Bengtsson, is a unified
+abstraction for parallel and distributed computing in R. The central
+idea is the <em>future</em>: a placeholder for a value that may still be
+computing somewhere — possibly in another process, possibly on another
+machine. Code that uses futures is written once and the choice of
+<em>where</em> to run it is made separately, by calling
+<code>plan()</code>:</p>
+<ul>
+<li><code>plan(sequential)</code> — run in the current process (no
+parallelism).</li>
+<li><code>plan(multicore)</code> — fork on Unix; not available on
+Windows or inside RStudio.</li>
+<li><code>plan(multisession)</code> — socket cluster of background R
+sessions; works everywhere.</li>
+<li><code>plan(cluster)</code> — explicit
+<code>parallel::makeCluster</code> cluster, including remote machines
+over SSH.</li>
+<li><code>plan(remote)</code> / <code>plan(batchtools_*)</code> — remote
+workers, HPC schedulers, etc.</li>
+</ul>
+<p><code>future</code> itself is mostly a low-level engine; in practice
+you usually use one of its frontends — <code>future.apply</code>
+(<code>*apply</code>-style), <code>furrr</code>
+(<code>purrr</code>-style), or <code>doFuture</code> (as a
+<code>foreach</code> backend). The companion package <a
+href="https://future.apply.futureverse.org/"><code>future.apply</code></a>
+used below provides parallel versions of <code>lapply</code>,
+<code>sapply</code>, <code>vapply</code>, <code>mapply</code>, and
+<code>apply</code>.</p>
 <p>Load required libraries.</p>
 <pre class="r"><code>library(future)
 library(future.apply)</code></pre>
@@ -1211,21 +1456,49 @@ system.time(
   my_sum_future_lapply &lt;- future_lapply(my_list, summary)
 )</code></pre>
 <pre><code>   user  system elapsed 
-  0.304   0.553   4.757 </code></pre>
+  0.377   0.478   4.760 </code></pre>
 <pre class="r"><code>identical(my_sum, my_sum_future_lapply)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
-<p>So, which package should you use? <code>BiocParallel</code> and
-<code>furrr</code> are tailored for use with Bioconductor and
-<code>purrr</code>, so use those packages accordingly.</p>
-<p>For parallelisation over a list, use <code>parallel</code>. The <a
-href="https://cran.r-project.org/web/packages/foreach/vignettes/foreach.html">foreach</a>
-function provides more flexibility when parallelising, so use the
-<code>doParallel</code> package if you have a more complicated task.</p>
-<p>Lastly, forking is faster than using sockets. If you’re not using
-Windows, consider using forking over sockets.</p>
+<p>So, which package should you use? A few rules of thumb:</p>
+<ul>
+<li><strong>Stick with what your ecosystem uses.</strong> If you’re
+working in Bioconductor, use <code>BiocParallel</code>; if you’re
+already writing tidyverse / <code>purrr</code> code, use
+<code>furrr</code>. The cost of consistency with surrounding code is
+usually worth more than a small performance difference.</li>
+<li><strong>For a quick parallel <code>lapply</code>, reach for base
+<code>parallel</code>.</strong> It’s already installed, has no
+dependencies, and <code>mclapply</code> is a one-line change from
+<code>lapply</code> on Unix.</li>
+<li><strong>For complex loop bodies, use <code>foreach</code> +
+<code>doParallel</code></strong> (or <code>doFuture</code>).
+<code>foreach</code> shines when you need custom result combination
+(<code>.combine</code>), nested loops (<code>%:%</code>), or to
+accumulate multiple outputs per iteration.</li>
+<li><strong>For portability across laptop / server / HPC, use
+<code>future</code>.</strong> Writing your code once against
+<code>future_lapply</code> / <code>future_map</code> and switching
+backends with <code>plan()</code> is the most flexible option, and the
+<code>future</code> framework also handles globals, packages, and
+reproducible RNG (<code>future.seed = TRUE</code>) for you.</li>
+<li><strong>Add <code>pbapply</code> when you want a progress
+bar</strong> on an otherwise straightforward parallel
+<code>*apply</code>.</li>
+</ul>
+<p>Two cross-cutting points worth remembering:</p>
+<ul>
+<li><strong>Forking is faster than sockets, but Unix-only.</strong>
+Forked workers share memory copy-on-write, so there is no startup data
+transfer and no need to export variables. On Windows (or inside some GUI
+host processes) you have no choice but to use a socket cluster.</li>
+<li><strong>Parallel is not always faster.</strong> For very fast
+per-element work, the cost of starting workers and shipping data to them
+can dominate. If <code>lapply</code> already runs in milliseconds,
+parallelising it will usually make things slower.</li>
+</ul>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
