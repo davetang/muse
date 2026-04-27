@@ -54,5 +54,10 @@ download https://cf.10xgenomics.com/samples/cell-exp/9.0.0/5k_Human_Donor4_PBMC_
 # edgeR pseudobulk data
 download https://bioinf.wehi.edu.au/edgeR/UserGuideData/SeuratObj.rds
 
+# 5k Human PBMCs, 3' v3.1, Chromium Controller
+# https://www.10xgenomics.com/datasets/5k-human-pbmcs-3-v3-1-chromium-controller-3-1-standard
+download https://cf.10xgenomics.com/samples/cell-exp/7.0.1/SC3pv3_GEX_Human_PBMC/SC3pv3_GEX_Human_PBMC_filtered_feature_bc_matrix.h5
+download https://cf.10xgenomics.com/samples/cell-exp/7.0.1/SC3pv3_GEX_Human_PBMC/SC3pv3_GEX_Human_PBMC_raw_feature_bc_matrix.h5
+
 >&2 echo Done
 exit 0
