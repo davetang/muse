@@ -1,0 +1,283 @@
+---
+title: "Calling cells from droplets with DropletUtils"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Introduction
+
+Cell Ranger's filtered output is the standard input to ambient-RNA correction tools like [SoupX](soupx.html) and [DecontX](decontx.html), but the cell call itself can be wrong: empty droplets can sneak into the filtered matrix, and real but low-UMI cells can be missed. When that happens, downstream contamination correction either over-corrects legitimate biology (because real cells have polluted the ambient profile) or under-corrects soup (because empty droplets are masquerading as cells).
+
+[DropletUtils](https://bioconductor.org/packages/release/bioc/html/DropletUtils.html) (Lun A. *et al.*, *EmptyDrops: distinguishing cells from empty droplets in droplet-based single-cell RNA sequencing data.* [Genome Biology 20:63, 2019](https://doi.org/10.1186/s13059-019-1662-y)) provides an alternative cell-calling procedure that you can run yourself directly from the raw 10x output. The core function `emptyDrops()` tests, for every barcode above a low UMI cutoff, whether its expression profile is statistically distinguishable from the ambient distribution estimated from the very-low-UMI barcodes. Barcodes whose profile differs significantly are called as cells regardless of where they fall on the barcode rank plot — so DropletUtils can recover real but low-UMI cell types (e.g. small cells with little mRNA) that a knee-based cutoff would discard.
+
+This notebook runs DropletUtils on the same `SC3pv3_GEX_Human_PBMC` dataset used in the SoupX and DecontX notebooks, times the call with [tictoc](https://cran.r-project.org/package=tictoc), and compares the resulting cell set to Cell Ranger's filtered output.
+
+## Background: how Cell Ranger calls cells
+
+Cell Ranger has changed cell-calling algorithms across major versions, and the version of Cell Ranger that produced your filtered matrix matters for how you interpret the comparison below.
+
+### Cell Ranger 2.x and earlier
+
+Cell Ranger 2.x used a single UMI threshold derived from the barcode rank plot: the 99th percentile of total UMI counts among the top `N` expected cells, divided by 10. Every barcode above that threshold was a cell, every barcode below was empty. The method works when there is a clean knee — i.e. one dominant cell population with similar transcript content — but it systematically discards smaller cells in heterogeneous samples.
+
+### Cell Ranger 3.0 (2018) — EmptyDrops-style two-step
+
+Cell Ranger 3.0 replaced the single-threshold approach with a two-step procedure inspired by the [EmptyDrops paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1662-y), the same algorithm `DropletUtils::emptyDrops()` implements:
+
+1. **High-confidence cells from the knee.** A UMI cutoff (similar to the 2.x rule) identifies the obvious cells in the high-UMI plateau.
+2. **Statistical recovery from the ambiguous range.** For every remaining barcode, the RNA profile is compared against an ambient background profile estimated from the lowest-UMI barcodes. Barcodes whose profile differs significantly from ambient are added to the cell set even if their total UMI is well below the knee.
+
+The second step is what allows recovery of small or low-mRNA cell types that the 2.x rule would have discarded. As a side effect, mitochondrially-enriched dying cells started being called more often in 3.0 than in 2.x — these have low total UMI but a non-ambient profile, so they pass the statistical test ([10x KB](https://kb.10xgenomics.com/hc/en-us/articles/360026505392)). This is the underlying reason the mitochondrial-percentage diagnostic later in this notebook is worth running.
+
+`DropletUtils` also exposes `emptyDropsCellRanger()`, which mimics the specific variant of EmptyDrops that Cell Ranger applies internally; the plain `emptyDrops()` used in this notebook is the original from the EmptyDrops paper.
+
+### Cell Ranger 8.0 (2024) — refinements
+
+Cell Ranger 8.0 keeps the 3.0 two-step structure but tightens three knobs around the EmptyDrops step ([Cell Ranger 8.0 release notes](https://www.10xgenomics.com/support/software/cell-ranger/8.0/release-notes/cr-release-notes)):
+
+* **Higher minimum UMI for the EmptyDrops step.** The minimum UMI a barcode needs in order to be tested at all was changed to `max(500, 1 + max UMI observed in the ambient range)`. Some barcodes that previously passed the filter are now classified as background, particularly in samples where the ambient pool extends to relatively high UMI counts.
+* **Wider ambient range for HT chemistry.** For NextGEM HT chemistries (`SC3Pv3HT`, `SC5PHT`), the ambient background range shifted from 45,000–90,000 to 80,000–160,000 barcodes to fix undercalling on cell loads above ~30,000. The new range only applies when the chemistry is specified manually; autodetection does not pick it up.
+* **Restricted auto-`expect-cells` upper bound.** The auto-estimated upper bound on expected cells was reduced from 262,000 to 45,000 for standard analyses (the change was introduced in 7.1 and codified in 8.0). This is a guardrail against the algorithm over-calling cells in unusual samples.
+
+### What this means for the present dataset
+
+The `SC3pv3_GEX_Human_PBMC` dataset used here was distributed with Cell Ranger 7.0.1, so the filtered matrix predates the 8.0 tightenings — but the 3.0+ two-step structure is already in place. We should therefore expect the DropletUtils call to overlap heavily with Cell Ranger's call rather than disagree wildly; the disagreements that do exist will tend to sit near the inflection point where the two procedures' decision thresholds are marginal.
+
+If you ever need to compare the cell sets across Cell Ranger versions on the *same* sample, a re-run of `cellranger count` is the cleanest way to do it; the algorithm differences described above mean two versions can produce noticeably different cell counts even from the same FASTQs.
+
+## Packages
+
+```{r packages, message=FALSE, warning=FALSE}
+suppressPackageStartupMessages({
+  library(DropletUtils)
+  library(Seurat)
+  library(Matrix)
+  library(tictoc)
+  library(ggplot2)
+  library(S4Vectors)
+  library(BiocParallel)
+  library(ComplexHeatmap)
+})
+```
+
+## Parallelisation
+
+The only step in this notebook that benefits from parallelisation is the Monte Carlo simulation inside `emptyDrops()`, which accepts a `BPPARAM` argument from `BiocParallel`. We configure a `MulticoreParam` with four workers; setting `RNGseed` on the param is the recommended way to get reproducible Monte Carlo results across workers, since each worker is given a deterministic substream of the master seed. The other steps in the notebook are either single-threaded by design (`barcodeRanks` is a sort plus a smoothing-spline fit) or sparse-matrix operations that don't go through BLAS, so there is no point setting BLAS threads here.
+
+```{r parallel_setup}
+bpp <- MulticoreParam(workers = 4, RNGseed = 1984)
+```
+
+## Loading the 10x data
+
+Both matrices come from the same Cell Ranger run. The raw matrix contains every barcode that received at least one UMI; the filtered matrix is Cell Ranger's call of which of those barcodes correspond to real cells.
+
+```{r load_h5}
+raw      <- Seurat::Read10X_h5("data/SC3pv3_GEX_Human_PBMC_raw_feature_bc_matrix.h5")
+filtered <- Seurat::Read10X_h5("data/SC3pv3_GEX_Human_PBMC_filtered_feature_bc_matrix.h5")
+
+dim(raw)
+dim(filtered)
+```
+
+## The barcode rank plot
+
+`barcodeRanks()` ranks barcodes by total UMI count and identifies two characteristic points on the resulting curve: the **knee** (the steep transition between the high-UMI region clearly populated by cells and the long low-UMI tail) and the **inflection** (a less stringent cutoff further down the curve). Barcodes above the knee are almost certainly cells; barcodes far below the inflection are almost certainly empty; barcodes between the two are ambiguous and are exactly where `emptyDrops()` does its work.
+
+```{r barcode_ranks}
+tic("barcodeRanks")
+br <- barcodeRanks(raw)
+toc()
+
+metadata(br)$knee
+metadata(br)$inflection
+```
+
+```{r barcode_rank_plot, fig.width=6, fig.height=5}
+br_df <- as.data.frame(br)
+br_df <- br_df[br_df$total > 0, ]
+
+ggplot(br_df, aes(rank, total)) +
+  geom_point(size = 0.3, alpha = 0.4) +
+  geom_hline(yintercept = metadata(br)$knee,
+             colour = "dodgerblue", linetype = "dashed") +
+  geom_hline(yintercept = metadata(br)$inflection,
+             colour = "forestgreen", linetype = "dashed") +
+  scale_x_log10() +
+  scale_y_log10() +
+  labs(
+    x = "Barcode rank", y = "Total UMI",
+    title = "Barcode rank plot",
+    subtitle = sprintf("Knee = %.0f, Inflection = %.0f",
+                       metadata(br)$knee, metadata(br)$inflection)
+  ) +
+  theme_minimal()
+```
+
+## Running emptyDrops
+
+`emptyDrops()` tests every barcode whose total UMI count is above `lower` (default 100) against the ambient distribution estimated from barcodes at or below `lower`. The test is Monte Carlo, so we pass the four-worker `MulticoreParam` configured above (its `RNGseed` covers reproducibility) and time the call with `tictoc`.
+
+```{r empty_drops}
+tic("emptyDrops")
+e_out <- emptyDrops(raw, BPPARAM = bpp)
+toc()
+
+e_out
+```
+
+`emptyDrops()` returns a `DataFrame` with one row per barcode in the raw matrix. Barcodes at or below `lower` get `NA` for everything (they are assumed empty by construction). Barcodes above `lower` get a `LogProb` (the test log-probability), a `PValue`, the number of Monte Carlo iterations, and an `FDR` (Benjamini–Hochberg adjusted).
+
+The standard call uses an FDR threshold of 0.001:
+
+```{r call_cells}
+is_cell <- !is.na(e_out$FDR) & e_out$FDR <= 0.001
+sum(is_cell)
+
+du_cells <- colnames(raw)[is_cell]
+length(du_cells)
+```
+
+A useful diagnostic is to check whether the number of significant tests is hitting the Monte Carlo iteration limit. Barcodes that exhaust their iterations without rejecting the null may be true cells whose p-values are merely capped by the simulation budget; if many of these exist you should re-run with a larger `niters`.
+
+```{r limited_check}
+table(Limited = e_out$Limited, Significant = is_cell)
+```
+
+## Comparing with Cell Ranger
+
+Cell Ranger 3.0+ also runs an EmptyDrops-style step internally, so the two cell sets should overlap heavily. The interesting questions are *how many* cells they disagree on and *where on the barcode rank plot* the disagreements live.
+
+```{r compare_sets}
+cr_cells <- colnames(filtered)
+
+both    <- intersect(cr_cells, du_cells)
+only_cr <- setdiff(cr_cells, du_cells)
+only_du <- setdiff(du_cells, cr_cells)
+
+c(
+  cell_ranger        = length(cr_cells),
+  droplet_utils      = length(du_cells),
+  both               = length(both),
+  only_cell_ranger   = length(only_cr),
+  only_droplet_utils = length(only_du)
+)
+```
+
+An UpSet plot is the most compact way to display this comparison, even though with only two sets it conveys the same information as a Venn diagram. `ComplexHeatmap::make_comb_mat()` builds a combination matrix from a named list of barcode vectors and `UpSet()` draws it; the top annotation gives the size of each combination (intersection) and the right annotation gives the total size of each input set.
+
+```{r upset_plot, fig.width=6, fig.height=3}
+m <- make_comb_mat(list(
+  `Cell Ranger`  = cr_cells,
+  `DropletUtils` = du_cells
+))
+
+UpSet(
+  m,
+  set_order        = c("Cell Ranger", "DropletUtils"),
+  comb_order       = order(-comb_size(m)),
+  top_annotation   = upset_top_annotation(m, add_numbers = TRUE),
+  right_annotation = upset_right_annotation(m, add_numbers = TRUE)
+)
+```
+
+A barcode rank plot coloured by which method called each barcode shows where the disagreements sit. Cells called by both methods sit in the high-UMI plateau above the knee; method-specific calls tend to cluster around the inflection point, where the test statistics are marginal.
+
+```{r compare_plot, fig.width=7, fig.height=5}
+totals <- Matrix::colSums(raw)
+
+call_label <- rep("empty", ncol(raw))
+names(call_label) <- colnames(raw)
+call_label[both]    <- "both"
+call_label[only_cr] <- "Cell Ranger only"
+call_label[only_du] <- "DropletUtils only"
+
+plot_df <- data.frame(
+  total = totals,
+  rank  = rank(-totals, ties.method = "first"),
+  call  = factor(call_label,
+                 levels = c("empty", "both",
+                            "Cell Ranger only", "DropletUtils only"))
+)
+
+# Drop the bulk of the empty droplets to keep the plot legible.
+plot_df <- plot_df[plot_df$total >= 10, ]
+
+ggplot(plot_df, aes(rank, total, colour = call)) +
+  geom_point(size = 0.4, alpha = 0.6) +
+  scale_x_log10() +
+  scale_y_log10() +
+  scale_colour_manual(values = c(
+    "empty"             = "grey80",
+    "both"              = "black",
+    "Cell Ranger only"  = "tomato",
+    "DropletUtils only" = "dodgerblue"
+  )) +
+  labs(x = "Barcode rank", y = "Total UMI", colour = "Called by") +
+  theme_minimal()
+```
+
+The UMI distributions of the disagreement set tell us what kind of barcode each method considers a cell that the other does not:
+
+```{r disagreement_umi}
+summary(totals[only_cr])
+summary(totals[only_du])
+```
+
+## Sanity-checking the disagreements
+
+Cells called by DropletUtils but missed by Cell Ranger should look like real cells, not dying ones. The proportion of mitochondrial reads is a standard low-quality flag — a barcode with ~100% mitochondrial UMI is almost certainly a lysed or dying cell whose cytoplasmic mRNA leaked out, not a small healthy cell.
+
+```{r mito_check, fig.width=8, fig.height=4}
+mito_genes <- grep("^MT-", rownames(raw), value = TRUE)
+length(mito_genes)
+
+pct_mito <- function(barcodes) {
+  if (length(barcodes) == 0) return(numeric(0))
+  100 * Matrix::colSums(raw[mito_genes, barcodes, drop = FALSE]) /
+        Matrix::colSums(raw[, barcodes, drop = FALSE])
+}
+
+mito_df <- rbind(
+  data.frame(set = "both",              pct = pct_mito(both)),
+  data.frame(set = "Cell Ranger only",  pct = pct_mito(only_cr)),
+  data.frame(set = "DropletUtils only", pct = pct_mito(only_du))
+)
+
+ggplot(mito_df, aes(pct, fill = set)) +
+  geom_histogram(bins = 50, alpha = 0.7, position = "identity") +
+  facet_wrap(~ set, scales = "free_y") +
+  labs(x = "% mitochondrial UMI", y = "Barcodes") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+A healthy disagreement set has a mitochondrial distribution overlapping the "both" set; a disagreement set dominated by very high mitochondrial percentage suggests that method is recovering dying cells rather than genuine low-mRNA cell types.
+
+## Saving the cell call
+
+Save the DropletUtils call so a downstream notebook can use it as an alternative to Cell Ranger's filtered matrix when constructing `SoupChannel` or `SingleCellExperiment` objects.
+
+```{r save_call}
+saveRDS(
+  list(
+    e_out = e_out,
+    cells = du_cells,
+    fdr   = 0.001
+  ),
+  "output/dropletutils_cells.rds"
+)
+```
+
+## Session info
+
+```{r session_info}
+sessionInfo()
+```
