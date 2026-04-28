@@ -1,0 +1,339 @@
+---
+title: "Reading the Cell Ranger web summary"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+```
+
+## Introduction
+
+The first thing to look at after `cellranger count` finishes is the **web summary** (`web_summary.html`) and the metrics CSV (`metrics_summary.csv`) it is built from. Almost every conclusion you can draw from a 10x experiment depends on whether the upstream metrics are in good shape; a poorly QC'd library will silently undermine every downstream step — from cell calling, to ambient correction (see [SoupX](soupx.html), [DecontX](decontx.html), and the [DropletUtils notebook](droplet_utils.html)), to clustering and differential expression.
+
+This notebook is a reference for what each metric in the web summary means, what value you should expect from a good-quality library, why a metric might come in lower than expected, and what to do about it. It is built from the official 10x technical notes plus the patterns we have seen interpreting the `SC3pv3_GEX_Human_PBMC` dataset across the SoupX/DecontX/DropletUtils notebooks in this project.
+
+The expected ranges below are guidelines, not hard cutoffs. They are calibrated for **standard 10x Chromium 3'/5' Single Cell Gene Expression** on whole cells from a well-prepared mammalian sample (human or mouse PBMC is the cleanest case). Tissues, nuclei, and non-standard chemistries shift several of these numbers — those differences are flagged where they matter.
+
+## The web summary at a glance
+
+A Cell Ranger web summary has three groups of metrics that should be read together:
+
+1. **Sequencing metrics** — how good is the raw sequencing data feeding the pipeline?
+2. **Mapping metrics** — where in the genome did the reads end up?
+3. **Cell metrics** — how many cells were called, and how concentrated is the read mass in those cells?
+
+Cell Ranger colour-codes any metric outside its expected range (yellow warning, red alert) and lists every failed metric in the **Alerts** banner at the top. A green report is rare in practice — most real samples have at least one yellow flag — but how *many* yellow flags and *which* ones is a strong signal of overall library quality.
+
+## Sequencing metrics
+
+These metrics describe the raw sequencing data before any biology is done.
+
+### Q30 Bases in Barcode / UMI / RNA Read
+
+The fraction of base calls with a Phred quality score ≥ 30 (one error in 1000 bases) on each of the three reads (cell barcode, UMI, and RNA read).
+
+| Metric                  | Good       | Borderline | Concerning |
+|-------------------------|------------|------------|------------|
+| Q30 in Barcode          | ≥ 95%      | 90–95%     | < 90%      |
+| Q30 in UMI              | ≥ 95%      | 90–95%     | < 90%      |
+| Q30 in RNA Read         | ≥ 85%      | 75–85%     | < 75%      |
+
+The RNA read (typically R2) is allowed to drop a little because the second read of a paired-end sequencing run usually has lower quality. The barcode and UMI reads (typically R1) are short and at the start of the run, so they should be very high.
+
+**Why might Q30 be low?** Old flow cell, sequencer maintenance issue, library overloaded onto the lane, very low cluster density, or a bad sequencing run upstream. Cell Ranger's barcode-correction step recovers some of the loss, but if Q30 in Barcode is truly low you will also see a low Valid Barcodes percentage.
+
+### Valid Barcodes
+
+Fraction of reads whose 16 bp cell barcode matches the 10x inclusion list (a known list of barcodes for the chemistry in use), after a one-mismatch correction.
+
+| Good   | Borderline | Concerning |
+|--------|------------|------------|
+| ≥ 90%  | 75–90%     | < 75%      |
+
+10x's documented warning threshold is 75%. Good libraries typically clear 90%.
+
+**Why might Valid Barcodes be low?** Sequencing quality issue (correlated with low Q30 in Barcode), a chemistry mismatch (wrong `--chemistry` argument), or a library prep problem.
+
+### Valid UMIs
+
+Fraction of reads whose 12 bp UMI does not contain an `N` and is not a homopolymer.
+
+| Good   | Borderline | Concerning |
+|--------|------------|------------|
+| ≥ 99%  | 95–99%     | < 95%      |
+
+This is almost always close to 100%; a low value is a sequencing-quality red flag.
+
+### Sequencing Saturation
+
+The fraction of confidently mapped reads that originate from a UMI that has already been seen. High saturation means most unique transcripts have been captured and additional sequencing yields diminishing returns; low saturation means deeper sequencing would still discover new molecules.
+
+| Saturation | Interpretation                                                        |
+|------------|------------------------------------------------------------------------|
+| < 30%      | Severely under-sequenced; sequence deeper before drawing conclusions. |
+| 30–60%     | Acceptable for exploratory or comparative analyses.                   |
+| 60–80%     | Typical mature library — most studies aim here.                       |
+| > 80%      | Saturated; sequencing more is essentially wasted spend.               |
+
+There is no universally correct value: saturation should be high enough that the median UMI count per cell is close to its asymptote for your tissue, which usually means somewhere in 60–80% for whole-cell prep.
+
+**Why might saturation be low?** Insufficient sequencing depth (the most common cause), library complexity higher than expected (rich tissue with many distinct transcripts), or under-loaded cell count (fewer cells means each one gets more reads).
+
+### Mean Reads per Cell
+
+Total confidently mapped read pairs divided by the number of called cells.
+
+| Good          | Borderline       | Concerning    |
+|---------------|------------------|----------------|
+| ≥ 20,000      | 10,000–20,000   | < 10,000      |
+
+10x's documented minimum is 20,000 read pairs per cell. Most published work targets 25,000–50,000; some applications (rare-variant detection, isoform analysis) target 100,000+. Mean reads per cell ties directly to sequencing saturation and to the median UMI/gene counts you can expect downstream.
+
+## Mapping metrics
+
+These metrics describe where the reads aligned in the reference genome and transcriptome.
+
+### Reads Mapped to Genome
+
+Fraction of all reads that aligned somewhere in the genome.
+
+| Good    | Borderline | Concerning |
+|---------|------------|------------|
+| ≥ 90%   | 80–90%     | < 80%      |
+
+10x's documented threshold for this metric is 85% for human/mouse. Anything significantly lower indicates a serious upstream issue.
+
+**Why might this be low?** Wrong reference genome, contamination from a different species, residual rRNA in the library, adapter or polyA contamination that survived trimming, or a fundamentally low-quality library.
+
+### Reads Mapped Confidently to Genome
+
+Fraction of all reads aligned uniquely to the genome (Cell Ranger uses MAPQ = 255 as its "confident" cutoff). Multi-mapping reads — to repetitive elements, paralogues, etc. — are excluded.
+
+| Good    | Borderline | Concerning |
+|---------|------------|------------|
+| ≥ 80%   | 70–80%     | < 70%      |
+
+The gap between "Mapped" and "Confidently Mapped" tells you what fraction of reads went to repetitive sequence; on a typical mammalian library it is 5–10%.
+
+### Reads Mapped Confidently to Transcriptome
+
+Fraction of all reads that aligned uniquely to a known transcript on the correct strand. This is the metric that determines how much of your sequencing budget actually contributed to gene quantification.
+
+| Good     | Borderline | Concerning |
+|----------|------------|------------|
+| ≥ 50%    | 30–50%     | < 30%      |
+
+10x lists 30% as the floor. Typical good libraries land in 50–80% for whole-cell preps from well-annotated genomes; nuclei preps run lower because most reads come from pre-mRNA.
+
+### Confidently Mapped to Exonic / Intronic / Intergenic
+
+These three sum to "Confidently Mapped to Genome". They tell you what kind of sequence the reads represent.
+
+| Region     | Whole-cell good | Whole-cell concerning | Nuclei good |
+|------------|-----------------|------------------------|--------------|
+| Exonic     | 50–80%          | < 50%                  | 30–60%       |
+| Intronic   | 5–15%           | > 25% (for cells)      | 30–60%       |
+| Intergenic | 2–5%            | > 8%                   | 2–5%         |
+
+From Cell Ranger 7 onwards `--include-introns=true` is the default, so intronic reads are now included in the gene count — this means whole-cell intronic percentages of 10–15% are normal for current pipelines. They were lower in older versions because intronic reads were being thrown away.
+
+**Why might intergenic be elevated?** Genomic DNA contamination of the library, mis-annotated reference, non-poly(A) priming artefacts, or fragmented transcripts whose UTRs were lost.
+
+**Why might intronic be elevated unexpectedly (in a whole-cell prep)?** Some pre-mRNA / nuclear leakage from damaged cells, or inclusion of intronic counts where you were not expecting it. Some cell types — neutrophils for example — naturally have unusually high intron retention.
+
+### Antisense Reads
+
+Fraction of confidently mapped reads that aligned on the *opposite* strand of a known gene with no sense-strand alignment.
+
+| Good   | Borderline | Concerning |
+|--------|------------|------------|
+| 1–3%   | 3–6%       | > 6%       |
+
+10x 3' libraries are stranded; antisense reads are not expected. Some always sneak through.
+
+**Why might antisense be elevated?**
+
+* **Internal poly(T) priming** on genomic regions with A-rich stretches in introns or 3' UTRs of antisense genes — common in stressed or damaged cells with degraded mRNA.
+* **Template-switching artefacts** during reverse transcription.
+* **Genuine antisense transcription** in some tissues, but at most a couple of percent.
+* **Compromised input** — a damaged/lysing cell suspension produces more degradation and therefore more antisense.
+
+Elevated antisense (>6–8%) combined with elevated intergenic (>5–7%) is a recognisable signature of a sample where some fraction of the input was damaged before the chip was run.
+
+## Cell metrics
+
+These metrics describe Cell Ranger's call about which barcodes are cells and what those cells look like.
+
+### Estimated Number of Cells
+
+The number of barcodes Cell Ranger called as cells. This should match what you expected from the loading.
+
+For non-HT 3' v3 / v3.1 chemistry, the practical recovery ranges are:
+
+| Loaded cells | Expected recovered cells | Expected multiplet rate |
+|---------------|---------------------------|--------------------------|
+| 1,000         | ~600                      | < 1%                     |
+| 5,000         | ~3,000                    | ~4%                      |
+| 10,000        | ~6,000                    | ~8%                      |
+| 20,000        | ~12,000                   | ~15%                     |
+| > 30,000      | hard ceiling              | > 25% (data unusable)    |
+
+For the HT chemistries (`SC3Pv3HT`, `SC5PHT`) the ceiling is much higher — up to ~60,000 recovered cells per channel.
+
+**If the cell count is much higher than expected:** the algorithm may be over-calling (often a high-ambient signature). Inspect the barcode rank plot — see the [DropletUtils notebook](droplet_utils.html). Cells far below the inflection point are suspicious.
+
+**If the cell count is much lower than expected:** the algorithm may be under-calling, *or* the prep produced fewer healthy cells than loaded. The barcode rank plot tells you which: a clean knee at a low cell count means the cells weren't there; a messy curve means the algorithm struggled.
+
+### Fraction Reads in Cells
+
+Of the confidently mapped reads, the fraction that came from barcodes called as cells.
+
+| Good    | Borderline | Concerning |
+|---------|------------|------------|
+| ≥ 80%   | 70–80%     | < 70%      |
+
+10x's documented warning threshold is 70%. Good libraries from clean preps typically clear 80% and often 90%+.
+
+A low Fraction Reads in Cells means a non-trivial share of read mass landed on barcodes Cell Ranger called as empty. There are two possible causes (Cell Ranger's own alert text lists both):
+
+1. **High ambient RNA** — the soup is rich enough that empty droplets carry meaningful read mass.
+2. **A real population of low-RNA cells the algorithm missed** — those reads then count as "non-cell" by construction.
+
+Disambiguating these matters, because the corrective actions are opposite: option 2 calls for `--force-cells` to capture more barcodes; option 1 calls for *not* doing that, because the missing read mass is in barcodes with ambient-like profiles. The diagnostics in the [DropletUtils notebook](droplet_utils.html) (barcode rank plot, mitochondrial percentage of disagreement sets, gene-count distributions) are the cheapest way to tell which is which.
+
+### Median UMI Counts per Cell
+
+The median total UMI count among called cells.
+
+| Sample type           | Good          | Concerning  |
+|------------------------|---------------|--------------|
+| PBMC (whole-cell)     | 3,000–10,000  | < 1,000      |
+| Solid tissue (cells)  | 1,000–5,000   | < 500        |
+| Nuclei (snRNA-seq)    | 1,000–5,000   | < 500        |
+| Stressed / damaged    | < 1,000       |               |
+
+This metric scales with sequencing depth, so always read it together with Mean Reads per Cell and Sequencing Saturation. Low UMI per cell at low saturation means "sequence deeper"; low UMI per cell at high saturation means "the cells genuinely don't have much mRNA".
+
+### Median Genes per Cell
+
+The median number of genes with at least one UMI in each called cell.
+
+| Sample type           | Good           | Concerning   |
+|------------------------|----------------|---------------|
+| PBMC (whole-cell)     | 1,000–3,000+   | < 500         |
+| Solid tissue          | 500–2,500      | < 300         |
+| Nuclei (snRNA-seq)    | 500–2,500      | < 300         |
+
+Median genes per cell scales sub-linearly with UMI per cell (the relationship saturates). Drops here without a corresponding drop in UMI per cell suggest the data is dominated by a small set of highly-expressed genes — typical of stressed or apoptotic cells producing lots of mitochondrial / heat-shock / immediate-early gene transcripts.
+
+### Total Genes Detected
+
+The number of genes detected in *any* cell, across the whole sample.
+
+| Good for human/mouse  | Concerning   |
+|------------------------|---------------|
+| 15,000–25,000+         | < 10,000      |
+
+This is one of the more forgiving metrics — almost any well-prepared mammalian sample at reasonable depth will detect 15–25k genes.
+
+## Reading a web summary holistically
+
+Single metrics rarely tell you what is going on; combinations do. Here is a working example using the metrics from a real sample we discussed in this project.
+
+| Metric                                       | Value | Expected      | Verdict     |
+|----------------------------------------------|-------|---------------|-------------|
+| Reads Mapped to Genome                       | 97.0% | ≥ 90%         | Excellent   |
+| Confidently Mapped to Genome                 | 87.2% | ≥ 80%         | Good        |
+| Confidently Mapped to Transcriptome          | 70.2% | ≥ 50%         | Good        |
+| Confidently Mapped to Exonic                 | 69.1% | 50–80%        | Good        |
+| Confidently Mapped to Intronic               | 10.1% | 5–15%         | Borderline  |
+| Confidently Mapped to Intergenic             |  7.9% | 2–5%          | Elevated    |
+| Antisense                                    |  8.7% | 1–3%          | Elevated    |
+| Fraction Reads in Cells                      | 64.7% | ≥ 70%         | Low alert   |
+| Estimated Number of Cells                    | 11,245 | matches loading | OK        |
+
+Read in isolation, each metric tells a slightly different story; read together, they are a coherent signature of one underlying problem. The mapping rates (genome, transcriptome, exonic) are all healthy, so the *sequencing* and *upstream alignment* are fine. But two metrics push consistently in the same direction — antisense at 8.7% and intergenic at 7.9% — and together they point at compromised input: stressed or partially-degraded cells contribute reads that are stranded inconsistently and prime in non-standard places. The Fraction Reads in Cells at 64.7% then closes the loop: 35% of read mass sits on non-cell barcodes, which is exactly what you would expect when (a) the soup is rich because damaged cells have leaked RNA into the supernatant, and/or (b) some fraction of dying cells were rejected by the cell-calling step but still carry significant read mass.
+
+The same dataset showed `emptyDrops()` and CellBender each adding roughly 35,000 "extra" cells on top of Cell Ranger's 11,245 — a 4× inflation. That is consistent with the same underlying issue: the EmptyDrops-style test asks "does this barcode differ from ambient?", and damaged-but-not-fully-empty barcodes pass that test even though they are not viable cells. The web summary signature (elevated antisense + elevated intergenic + low Fraction Reads in Cells) is the upstream confirmation that this is what is happening.
+
+The general lesson is: **pair web-summary metrics with downstream diagnostics.** A low Fraction Reads in Cells alert can mean either "missed cells" or "leaked RNA", and Cell Ranger's alert text lists both. The web summary alone cannot disambiguate them; the per-cell mitochondrial percentage and gene-count distributions of the disagreement sets can.
+
+## Common alert patterns
+
+| Alert pattern                                                                | Most likely cause                                                                  | First thing to do                                                                    |
+|------------------------------------------------------------------------------|------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+| Low Fraction Reads in Cells alone                                            | High ambient or genuinely missed cells                                             | Inspect barcode rank plot and disagreement-set mito-%.                              |
+| Low Q30 in Barcode + Low Valid Barcodes                                      | Sequencing-quality issue                                                           | Check the sequencer run report; consider re-sequencing.                             |
+| Low Reads Mapped to Genome                                                   | Wrong reference, contamination, or adapter/polyA leak                              | Verify the reference and the chemistry; check FastQC for adapter content.           |
+| Elevated antisense + elevated intergenic                                     | Damaged or partially-degraded input                                                | Tighten dissociation; inspect mitochondrial-% per cell.                             |
+| Estimated cells far above expected loading                                   | Over-calling driven by ambient                                                     | Re-call with stricter `lower` or use `emptyDropsCellRanger()` with FDR adjustment.  |
+| Estimated cells far below expected loading, with sharp knee                  | Cells didn't make it onto the chip                                                 | Recount input cell concentration; tighten viability gating.                         |
+| Low Sequencing Saturation                                                    | Under-sequenced library                                                            | Sequence deeper (more reads per cell).                                              |
+| Low Median Genes per Cell with high UMI/Cell                                 | Stressed cells dominated by a few highly-expressed genes                           | Inspect mito-%, ribosomal-%, immediate-early genes.                                 |
+| Low Mean Reads per Cell                                                      | Either too many cells loaded or under-sequenced                                    | Decide which by checking saturation: low saturation = sequence more.                |
+
+## Troubleshooting workflow
+
+When the web summary has multiple alerts, work through them in this order:
+
+1. **Sequencing first.** If Q30 or Valid Barcodes is bad, every downstream metric is suspect. Fix or re-sequence before doing anything else.
+2. **Mapping second.** If Reads Mapped to Genome is below 80%, you have a reference, contamination, or adapter problem. Confirm the reference matches the species, check the chemistry argument matches the kit, and look at FastQC of the raw reads.
+3. **Cell calling third.** Once sequencing and mapping are healthy, the cell-calling alerts are the part you can usually do something about post-hoc. The barcode rank plot in the [DropletUtils notebook](droplet_utils.html) is the right tool here; in particular, the comparison between the knee, the inflection, and what `emptyDrops()` returns will tell you whether the cell call is conservative, aggressive, or about right.
+4. **Per-cell QC fourth.** Within the called cells, inspect mitochondrial percentage (`pct_mito`), ribosomal percentage, and the joint distribution of UMI count and gene count. This is where you separate genuinely viable cells from debris, doublets, and stressed cells. This step belongs in the downstream Seurat / SingleCellExperiment notebook, not in the web summary.
+
+A useful guard rail: never ramp `--force-cells` to make an alert go away without first confirming the underlying biology supports the change. `--force-cells` simply takes the top *N* barcodes by UMI; if those barcodes have ambient-like profiles, you are converting a yellow alert into a quietly-corrupted dataset.
+
+## Reading metrics_summary.csv programmatically
+
+The web summary is built from `metrics_summary.csv` in the Cell Ranger output directory. Reading it into R and checking the values against the ranges above is a useful pre-flight step before launching downstream analyses, especially across batches of samples.
+
+```{r read_metrics, eval=FALSE}
+# Replace with the path to a real metrics_summary.csv
+metrics_path <- "data/metrics_summary.csv"
+
+if (file.exists(metrics_path)) {
+  metrics <- read.csv(metrics_path, check.names = FALSE)
+  metrics <- as.list(metrics[1, ])
+
+  pct <- function(x) as.numeric(sub("%", "", x))
+
+  checks <- list(
+    valid_barcodes              = pct(metrics[["Valid Barcodes"]]) >= 75,
+    q30_barcode                 = pct(metrics[["Q30 Bases in Barcode"]]) >= 90,
+    q30_rna                     = pct(metrics[["Q30 Bases in RNA Read"]]) >= 75,
+    reads_mapped_to_genome      = pct(metrics[["Reads Mapped to Genome"]]) >= 85,
+    confident_to_transcriptome  = pct(metrics[["Reads Mapped Confidently to Transcriptome"]]) >= 30,
+    intergenic_under_8          = pct(metrics[["Reads Mapped Confidently to Intergenic Regions"]]) <= 8,
+    antisense_under_6           = pct(metrics[["Reads Mapped Antisense to Gene"]]) <= 6,
+    fraction_reads_in_cells     = pct(metrics[["Fraction Reads in Cells"]]) >= 70
+  )
+
+  data.frame(
+    check = names(checks),
+    pass  = unlist(checks)
+  )
+}
+```
+
+Wrap this in a function over a directory of `metrics_summary.csv` files and you have a batch QC sweep that flags samples deviating from the cohort.
+
+## Sources and further reading
+
+* [Cell Ranger Web Summary documentation (10x Genomics)](https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/outputs/cr-outputs-web-summary-count) — the authoritative reference for every field.
+* [Quality Assessment Using the Cell Ranger Web Summary (10x analysis guide)](https://www.10xgenomics.com/analysis-guides/quality-assessment-using-the-cell-ranger-web-summary) — official guide with worked examples.
+* [Interpreting Cell Ranger Web Summary Files (Tech Note CG000329)](https://assets.ctfassets.net/an68im79xiti/163qWiQBTVi2YLbskJphQX/e90bb82151b1cdab6d7e9b6c845e6130/CG000329_TechnicalNote_InterpretingCellRangerWebSummaryFiles_RevA.pdf) — long-form PDF with field-by-field commentary.
+* [Interpreting Intronic and Antisense Reads (Tech Note CG000376)](https://assets.ctfassets.net/an68im79xiti/awNZTarmwqmwxKcvDv9wv/b05500661e36290b8ce59689ff889ea8/CG000376_TechNote_Antisense_Intronic_Reads_SingleCellGeneExpression_RevA.pdf) — focused PDF on the elevated-antisense / elevated-intronic case.
+* [Are my sample's antisense and intronic reads levels normal? (10x KB)](https://kb.10xgenomics.com/hc/en-us/articles/19966101549709) — short answer for the most common QC question.
+* [Best Practices for Analysis of 10x scRNA-seq Data (10x analysis guide)](https://www.10xgenomics.com/analysis-guides/best-practices-analysis-10x-single-cell-rnaseq-data) — broader downstream-analysis guide.
+* [Cell Ranger 8.0 Release Notes](https://www.10xgenomics.com/support/software/cell-ranger/8.0/release-notes/cr-release-notes) — the cell-calling tightenings discussed in the [DropletUtils notebook](droplet_utils.html).
+
+## Session info
+
+```{r session_info}
+sessionInfo()
+```
