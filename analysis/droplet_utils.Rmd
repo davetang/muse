@@ -89,7 +89,35 @@ dim(filtered)
 
 ## The barcode rank plot
 
-`barcodeRanks()` ranks barcodes by total UMI count and identifies two characteristic points on the resulting curve: the **knee** (the steep transition between the high-UMI region clearly populated by cells and the long low-UMI tail) and the **inflection** (a less stringent cutoff further down the curve). Barcodes above the knee are almost certainly cells; barcodes far below the inflection are almost certainly empty; barcodes between the two are ambiguous and are exactly where `emptyDrops()` does its work.
+The barcode rank plot is the diagnostic centrepiece of droplet-based cell calling. Every barcode in the raw matrix is ranked from highest to lowest by its total UMI count; the result is plotted with rank on the x-axis and total UMI on the y-axis, both log-scaled. On most well-prepared 10x experiments three regions are visible on this curve:
+
+* A high-UMI **plateau** at low ranks, populated by genuine cells with substantial transcript content.
+* A steep **descent** in the middle, the ambiguous zone where some barcodes are real but low-mRNA cells and others are empty droplets that happened to capture a few floating transcripts.
+* A long low-UMI **tail** at high ranks, dominated by empty droplets.
+
+### What `barcodeRanks()` computes
+
+`barcodeRanks()` fits a smoothing spline to the log-log curve (barcodes with total UMI at or below `lower`, default 100, are excluded from the fit because the very-low-UMI tail is mostly noise and would distort the spline). From that fitted curve it derives two reference points, returned in `metadata(br)`:
+
+* The **knee** is the point of *maximum curvature* on the fitted curve — informally, where the curve "bends" most sharply from the high-UMI plateau into the descent. It sits at a high UMI count and is the strict cutoff: barcodes above the knee are almost certainly real cells.
+* The **inflection** is the point of *steepest negative slope* on the fitted curve — informally, where the curve is descending fastest. It sits at a *lower* UMI count than the knee, further down the descent, and is the lenient cutoff: barcodes below the inflection are almost certainly empty droplets.
+
+So in UMI value, **knee > inflection**, and the ambiguous zone is the band between them. This is exactly where `emptyDrops()` does its real work: its statistical test asks whether each ambiguous-zone barcode's expression profile differs from ambient, independently of where its total UMI happens to fall on the curve.
+
+### What you can do with the knee and inflection
+
+The knee/inflection pair can be used in three ways:
+
+1. **As hard thresholds.** Without running `emptyDrops()` at all, calling every barcode above the knee a cell is a reasonable conservative cutoff (Cell Ranger 2.x essentially used this). The inflection is a permissive cutoff that catches more low-mRNA cells but admits more empty droplets. Picking a threshold *between* the two is a sensible interim if the EmptyDrops test is not available.
+2. **As a sanity check on `emptyDrops()`.** Almost every cell called by `emptyDrops()` should sit at or above the inflection; anything called below the inflection deserves a close look. Conversely, a barcode above the knee that `emptyDrops()` does *not* call as a cell is unusual — usually it means that barcode's expression profile happens to look ambient despite its high UMI count, which can be a sign of a stripped-nucleus or otherwise unusual droplet.
+3. **As a sample-quality flag.** When the knee and inflection are close together — a sharp curve — the cell vs empty-droplet distributions are cleanly separated and any reasonable algorithm will work. When they are far apart — a long, gentle descent — the ambiguous zone is wide, simple thresholds will perform badly, and methods like `emptyDrops()` (or CellBender) become essential rather than optional. `metadata(br)$knee / metadata(br)$inflection` is a one-number summary of how clean the curve is.
+
+A few additional details worth knowing:
+
+* The `metadata(br)` values are **UMI counts**, not barcode ranks. They are convenient horizontal reference lines on the rank plot, which is why the code below draws them as `geom_hline`s.
+* `barcodeRanks()` also returns `br$fitted`, the spline-smoothed total at each rank. This is what the knee and inflection are computed from, not the raw points.
+* The `lower` argument controls both the spline fit *and*, downstream, which barcodes `emptyDrops()` even tests. The two functions share the same convention so that the rank plot you draw with `barcodeRanks()` matches the cell calls you get from `emptyDrops()`.
+* For samples with no clear knee — fragile cell types, deeply contaminated libraries, fixed-RNA profiling at low input — `barcodeRanks()` will still return a number, but it may be near-meaningless. The two-point summary should always be cross-checked against the actual rank plot.
 
 ```{r barcode_ranks}
 tic("barcodeRanks")
