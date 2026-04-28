@@ -520,15 +520,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree71e4ee40898f5bcbdabc8fcf353f15ba1fb405c2targetblank71e4ee4a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree83e20223d441f76af1aa41363135487706646817targetblank83e2022a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/71e4ee40898f5bcbdabc8fcf353f15ba1fb405c2" target="_blank">71e4ee4</a>
+<a href="https://github.com/davetang/muse/tree/83e20223d441f76af1aa41363135487706646817" target="_blank">83e2022</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree71e4ee40898f5bcbdabc8fcf353f15ba1fb405c2targetblank71e4ee4a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree83e20223d441f76af1aa41363135487706646817targetblank83e2022a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -538,7 +538,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/71e4ee40898f5bcbdabc8fcf353f15ba1fb405c2" target="_blank">71e4ee4</a>.
+<a href="https://github.com/davetang/muse/tree/83e20223d441f76af1aa41363135487706646817" target="_blank">83e2022</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -665,6 +665,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/davetang/muse/blob/83e20223d441f76af1aa41363135487706646817/analysis/droplet_utils.Rmd" target="_blank">83e2022</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-28
+</td>
+<td>
+Expand on the barcode rank plot
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/134b4413091a68d160ff228497c84bae74a7edfa/docs/droplet_utils.html" target="_blank">134b441</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-28
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -853,19 +887,101 @@ dim(raw)</code></pre>
 </div>
 <div id="the-barcode-rank-plot" class="section level2">
 <h2>The barcode rank plot</h2>
-<p><code>barcodeRanks()</code> ranks barcodes by total UMI count and
-identifies two characteristic points on the resulting curve: the
-<strong>knee</strong> (the steep transition between the high-UMI region
-clearly populated by cells and the long low-UMI tail) and the
-<strong>inflection</strong> (a less stringent cutoff further down the
-curve). Barcodes above the knee are almost certainly cells; barcodes far
-below the inflection are almost certainly empty; barcodes between the
-two are ambiguous and are exactly where <code>emptyDrops()</code> does
-its work.</p>
+<p>The barcode rank plot is the diagnostic centrepiece of droplet-based
+cell calling. Every barcode in the raw matrix is ranked from highest to
+lowest by its total UMI count; the result is plotted with rank on the
+x-axis and total UMI on the y-axis, both log-scaled. On most
+well-prepared 10x experiments three regions are visible on this
+curve:</p>
+<ul>
+<li>A high-UMI <strong>plateau</strong> at low ranks, populated by
+genuine cells with substantial transcript content.</li>
+<li>A steep <strong>descent</strong> in the middle, the ambiguous zone
+where some barcodes are real but low-mRNA cells and others are empty
+droplets that happened to capture a few floating transcripts.</li>
+<li>A long low-UMI <strong>tail</strong> at high ranks, dominated by
+empty droplets.</li>
+</ul>
+<div id="what-barcoderanks-computes" class="section level3">
+<h3>What <code>barcodeRanks()</code> computes</h3>
+<p><code>barcodeRanks()</code> fits a smoothing spline to the log-log
+curve (barcodes with total UMI at or below <code>lower</code>, default
+100, are excluded from the fit because the very-low-UMI tail is mostly
+noise and would distort the spline). From that fitted curve it derives
+two reference points, returned in <code>metadata(br)</code>:</p>
+<ul>
+<li>The <strong>knee</strong> is the point of <em>maximum curvature</em>
+on the fitted curve — informally, where the curve “bends” most sharply
+from the high-UMI plateau into the descent. It sits at a high UMI count
+and is the strict cutoff: barcodes above the knee are almost certainly
+real cells.</li>
+<li>The <strong>inflection</strong> is the point of <em>steepest
+negative slope</em> on the fitted curve — informally, where the curve is
+descending fastest. It sits at a <em>lower</em> UMI count than the knee,
+further down the descent, and is the lenient cutoff: barcodes below the
+inflection are almost certainly empty droplets.</li>
+</ul>
+<p>So in UMI value, <strong>knee &gt; inflection</strong>, and the
+ambiguous zone is the band between them. This is exactly where
+<code>emptyDrops()</code> does its real work: its statistical test asks
+whether each ambiguous-zone barcode’s expression profile differs from
+ambient, independently of where its total UMI happens to fall on the
+curve.</p>
+</div>
+<div id="what-you-can-do-with-the-knee-and-inflection"
+class="section level3">
+<h3>What you can do with the knee and inflection</h3>
+<p>The knee/inflection pair can be used in three ways:</p>
+<ol style="list-style-type: decimal">
+<li><strong>As hard thresholds.</strong> Without running
+<code>emptyDrops()</code> at all, calling every barcode above the knee a
+cell is a reasonable conservative cutoff (Cell Ranger 2.x essentially
+used this). The inflection is a permissive cutoff that catches more
+low-mRNA cells but admits more empty droplets. Picking a threshold
+<em>between</em> the two is a sensible interim if the EmptyDrops test is
+not available.</li>
+<li><strong>As a sanity check on <code>emptyDrops()</code>.</strong>
+Almost every cell called by <code>emptyDrops()</code> should sit at or
+above the inflection; anything called below the inflection deserves a
+close look. Conversely, a barcode above the knee that
+<code>emptyDrops()</code> does <em>not</em> call as a cell is unusual —
+usually it means that barcode’s expression profile happens to look
+ambient despite its high UMI count, which can be a sign of a
+stripped-nucleus or otherwise unusual droplet.</li>
+<li><strong>As a sample-quality flag.</strong> When the knee and
+inflection are close together — a sharp curve — the cell vs
+empty-droplet distributions are cleanly separated and any reasonable
+algorithm will work. When they are far apart — a long, gentle descent —
+the ambiguous zone is wide, simple thresholds will perform badly, and
+methods like <code>emptyDrops()</code> (or CellBender) become essential
+rather than optional.
+<code>metadata(br)$knee / metadata(br)$inflection</code> is a one-number
+summary of how clean the curve is.</li>
+</ol>
+<p>A few additional details worth knowing:</p>
+<ul>
+<li>The <code>metadata(br)</code> values are <strong>UMI
+counts</strong>, not barcode ranks. They are convenient horizontal
+reference lines on the rank plot, which is why the code below draws them
+as <code>geom_hline</code>s.</li>
+<li><code>barcodeRanks()</code> also returns <code>br$fitted</code>, the
+spline-smoothed total at each rank. This is what the knee and inflection
+are computed from, not the raw points.</li>
+<li>The <code>lower</code> argument controls both the spline fit
+<em>and</em>, downstream, which barcodes <code>emptyDrops()</code> even
+tests. The two functions share the same convention so that the rank plot
+you draw with <code>barcodeRanks()</code> matches the cell calls you get
+from <code>emptyDrops()</code>.</li>
+<li>For samples with no clear knee — fragile cell types, deeply
+contaminated libraries, fixed-RNA profiling at low input —
+<code>barcodeRanks()</code> will still return a number, but it may be
+near-meaningless. The two-point summary should always be cross-checked
+against the actual rank plot.</li>
+</ul>
 <pre class="r"><code>tic(&quot;barcodeRanks&quot;)
 br &lt;- barcodeRanks(raw)
 toc()</code></pre>
-<pre><code>barcodeRanks: 0.108 sec elapsed</code></pre>
+<pre><code>barcodeRanks: 0.11 sec elapsed</code></pre>
 <pre class="r"><code>metadata(br)$knee</code></pre>
 <pre><code>[1] 6466.777</code></pre>
 <pre class="r"><code>metadata(br)$inflection</code></pre>
@@ -889,6 +1005,44 @@ ggplot(br_df, aes(rank, total)) +
   ) +
   theme_minimal()</code></pre>
 <p><img src="figure/droplet_utils.Rmd/barcode_rank_plot-1.png" alt="" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-barcode_rank_plot-1">
+Past versions of barcode_rank_plot-1.png
+</button>
+</p>
+<div id="fig-barcode_rank_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/134b4413091a68d160ff228497c84bae74a7edfa/docs/figure/droplet_utils.Rmd/barcode_rank_plot-1.png" target="_blank">134b441</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 </div>
 <div id="running-emptydrops" class="section level2">
 <h2>Running emptyDrops</h2>
@@ -901,7 +1055,7 @@ covers reproducibility) and time the call with <code>tictoc</code>.</p>
 <pre class="r"><code>tic(&quot;emptyDrops&quot;)
 e_out &lt;- emptyDrops(raw, BPPARAM = bpp)
 toc()</code></pre>
-<pre><code>emptyDrops: 10.37 sec elapsed</code></pre>
+<pre><code>emptyDrops: 10.303 sec elapsed</code></pre>
 <pre class="r"><code>e_out</code></pre>
 <pre><code>DataFrame with 909706 rows and 5 columns
                        Total   LogProb    PValue   Limited       FDR
@@ -985,6 +1139,43 @@ UpSet(
   right_annotation = upset_right_annotation(m, add_numbers = TRUE)
 )</code></pre>
 <p><img src="figure/droplet_utils.Rmd/upset_plot-1.png" alt="" width="576" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-upset_plot-1">
+Past versions of upset_plot-1.png
+</button>
+</p>
+<div id="fig-upset_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/134b4413091a68d160ff228497c84bae74a7edfa/docs/figure/droplet_utils.Rmd/upset_plot-1.png" target="_blank">134b441</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>A barcode rank plot coloured by which method called each barcode
 shows where the disagreements sit. Cells called by both methods sit in
 the high-UMI plateau above the knee; method-specific calls tend to
@@ -1022,6 +1213,43 @@ ggplot(plot_df, aes(rank, total, colour = call)) +
   labs(x = &quot;Barcode rank&quot;, y = &quot;Total UMI&quot;, colour = &quot;Called by&quot;) +
   theme_minimal()</code></pre>
 <p><img src="figure/droplet_utils.Rmd/compare_plot-1.png" alt="" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-compare_plot-1">
+Past versions of compare_plot-1.png
+</button>
+</p>
+<div id="fig-compare_plot-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/134b4413091a68d160ff228497c84bae74a7edfa/docs/figure/droplet_utils.Rmd/compare_plot-1.png" target="_blank">134b441</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The UMI distributions of the disagreement set tell us what kind of
 barcode each method considers a cell that the other does not:</p>
 <pre class="r"><code>summary(totals[only_cr])</code></pre>
@@ -1060,6 +1288,43 @@ ggplot(mito_df, aes(pct, fill = set)) +
   theme_minimal() +
   theme(legend.position = &quot;none&quot;)</code></pre>
 <p><img src="figure/droplet_utils.Rmd/mito_check-1.png" alt="" width="768" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-mito_check-1">
+Past versions of mito_check-1.png
+</button>
+</p>
+<div id="fig-mito_check-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/davetang/muse/blob/134b4413091a68d160ff228497c84bae74a7edfa/docs/figure/droplet_utils.Rmd/mito_check-1.png" target="_blank">134b441</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-04-28
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>A healthy disagreement set has a mitochondrial distribution
 overlapping the “both” set; a disagreement set dominated by very high
 mitochondrial percentage suggests that method is recovering dying cells
