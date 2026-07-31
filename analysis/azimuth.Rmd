@@ -18,6 +18,15 @@ suppressPackageStartupMessages({
 
 Azimuth provides a reference and a query cell is placed individually on this reference, and then labelled by a weighted vote using the reference cells it lands near.
 
+1. **Load the reference**, a Seurat object of already annotated cells trimmed down to the 5,000 genes it was built from, together with the coordinate system those genes define and a prebuilt nearest neighbour index over it.
+2. **Check the gene identifiers** so that query and reference use the same species and the same flavour of gene name.
+3. **Normalise the query using the reference's model.** The reference ships an SCTransform model: a per-gene regularised negative binomial regression of counts on sequencing depth. The query's own counts are turned into Pearson residuals using the reference's coefficients, i.e. nothing is refit on the query, so a residual means the same thing in both datasets.
+4. **Project the query into the reference's space** by multiplying those residuals by the reference's feature loadings. No dimensional reduction is computed on the query; it borrows the reference's.
+5. **Find anchors**, pairs of query and reference cells that are mutual nearest neighbours in that shared space. These are the links along which everything else is carried.
+6. **Transfer the labels**: each query cell's label is a distance-weighted vote over the reference cells it is anchored to, producing a score for every possible label, with the highest scoring one becoming the prediction.
+7. **Place the query on the reference UMAP** using the reference's saved UMAP model, so query and reference cells can be drawn on the same axes.
+8. **Score the mapping** to flag query cells that the reference describes poorly, which matters because every query cell is given a label whether or not the reference contains a sensible one for it.
+
 ## Installation
 
 Install as per the [official instructions](https://github.com/satijalab/azimuth#installation).
