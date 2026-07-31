@@ -99,3 +99,43 @@ Neighbour names.
 neighbour_names <- names(methods::slot(azimuth_obj$map, "neighbors"))
 neighbour_names
 ```
+
+## pbmc3k
+
+Directly import from [my server](https://davetang.github.io/muse/pbmc3k.html).
+
+```{r pbmc3k}
+pbmc3k <- readRDS(url("https://davetang.org/file/pbmc3k_seurat.rds", "rb"))
+pbmc3k
+```
+
+`RunAzimuth()` is a wrapper around the entire mapping pipeline, so a single call does everything from loading the reference to writing the predicted labels back into the query object. The messages it prints are a running commentary of those steps.
+
+```{r run_azimuth}
+pbmc3k_anno <- Azimuth::RunAzimuth(query = pbmc3k, reference = azimuth_model)
+pbmc3k_anno
+```
+
+* The first three warnings come from `LoadReference()`, the function we called ourselves above.
+* `Overwriting miscellanous data for model` is bookkeeping as the stored SCT model is attached to `refAssay`
+* `Adding a dimensional reduction (refUMAP) without the associated assay being present` appears once for `$map` and once for `$plot` because the trimmed objects keep the UMAP coordinates but not the assay the UMAP was originally computed from.
+
+* `detected inputs from HUMAN with id type Gene.name` and the matching line for the reference are Azimuth checking that both objects use the same species and the same flavour of gene identifier.
+
+* `Normalizing query using reference SCT model` is the key step for comparability: rather than fitting a fresh SCTransform model on `pbmc3k`, Azimuth computes the query's Pearson residuals using the gene-level regression parameters that were fit on the reference, putting query and reference values on a common scale.
+* `No layers found matching search pattern provided` is Seurat v5 layer bookkeeping. The feature message tells us that of the reference's 5,000 SCT features, 952 are absent from `pbmc3k`, so the mapping proceeds on the 4,048 shared genes; these are the genes from `refdr_features` that can actually influence where a query cell lands.
+
+* `Projecting cell embeddings` multiplies the query residuals by the `refDR` feature loadings. No PCA is computed on the query; it simply inherits the reference's coordinate system.
+
+* `Finding query neighbors` / `Finding neighborhoods` / `Finding anchors` is `FindTransferAnchors()` using the `idx.annoy` index to look up reference neighbours quickly. An anchor is a query–reference cell pair that are mutual nearest neighbours in `refDR` space, and 3,015 of them were found for the 2,700 query cells.
+* `Finding integration vectors` and the progress bar for `integration vector weights` then decide how much each anchor contributes to each query cell, weighted by distance.
+
+* `Predicting cell labels` appears three times because the PBMC reference carries three annotation levels: `celltype.l1`, `celltype.l2` and `celltype.l3`. For each level, the labels of the anchor reference cells become a weighted vote, giving every query cell a score for every possible label.
+
+* `Integrating dataset 2 with reference dataset` corrects the projected query coordinates towards the reference using the same anchors, producing the `integrated_dr` reduction.
+
+* `Computing nearest neighbors` and `Running UMAP projection` do not compute a new UMAP. They feed the query neighbours into the reference's saved uwot model so that the query cells land in the reference's existing 2D coordinates, giving the `ref.umap` reduction. This is what makes query and reference plottable on the same axes.
+
+The final block of projecting the reference PCA onto the query, projecting the query back into its original PCA space, then comparing neighbourhoods is `MappingScore()`. It asks whether each query cell keeps the same neighbours after a round trip through the reference space. A cell that does is well described by the reference; a low score hints that the cell is a type the reference does not contain, which is worth knowing because every query cell gets a label whether or not the reference has a sensible one for it.
+
+The returned object has 32,833 features across 4 assays. `RNA` is still the active assay with the original 32,738 genes and only a `counts` layer, i.e. the SCT normalisation used internally is not handed back. The extra 95 features are the rows of `prediction.score.celltype.l1`, `prediction.score.celltype.l2` and `prediction.score.celltype.l3`, one row per candidate label at that level plus a `max` row. The labels themselves are in the metadata as `predicted.celltype.l1`, `predicted.celltype.l2` and `predicted.celltype.l3` with their matching `.score` columns, alongside `mapping.score`.
