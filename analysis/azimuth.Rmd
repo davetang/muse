@@ -1,0 +1,101 @@
+---
+title: "Checking out Azimuth"
+date: "`r Sys.Date()`"
+output:
+  workflowr::wflow_html:
+    toc: true
+---
+
+```{r load_libraries, include=FALSE}
+suppressPackageStartupMessages({
+  library(tidyverse)
+  library(Seurat)
+  library(Azimuth)
+})
+```
+
+## Background
+
+Azimuth provides a reference and a query cell is placed individually on this reference, and then labelled by a weighted vote using the reference cells it lands near.
+
+## Installation
+
+Install as per the [official instructions](https://github.com/satijalab/azimuth#installation).
+
+```{r install_azimuth, eval=FALSE}
+if (!requireNamespace('remotes', quietly = TRUE)) {
+  install.packages('remotes')
+}
+remotes::install_github('satijalab/azimuth', ref = 'master')
+```
+
+## Azimuth reference
+
+We will examine the [Human PBMC](https://zenodo.org/records/4546839) reference that has been downloaded using [zenodo_get](https://davetang.org/muse/2024/04/12/downloading-data-from-zenodo-using-zenodo_get/).
+
+```
+zenodo_get -r 4546839
+```
+
+An Azimuth model holds two files:
+
+* `ref.Rds`, a Seurat object carrying the reference cells, their labels and a **precomputed** dimensional reduction
+* `idx.annoy`, an approximate nearest neighbor index over that reduction.
+
+```{r azimuth_model}
+azimuth_model <- paste0("data/azimuth_pbmc/")
+stopifnot(dir.exists(azimuth_model))
+```
+
+`RunAzimuth()` calls `Azimuth:::LoadReference()` internally; we will call the same function directly. It accepts a local directory or a URL, and returns a list of two Seurat objects:
+
+* `$map` used for the annotation, and
+* `$plot` a lighter copy used only for drawing the reference UMAP.
+
+```{r azimuth_obj, warning=FALSE, message=FALSE}
+azimuth_obj <- Azimuth:::LoadReference(path = azimuth_model)
+azimuth_obj
+```
+
+`refAssay` is the default assay.
+
+```{r ref_assay_name}
+ref_assay_name <- SeuratObject::DefaultAssay(azimuth_obj$map)
+ref_assay_name
+```
+
+We already saw above that there are 5,000 features.
+
+```{r all_features}
+all_features <- rownames(azimuth_obj$map)
+length(all_features)
+```
+
+`refDR` is the reduction the reference was built with. Its feature loadings define the coordinate system query cells are projected into, so its rownames are the genes that can influence where a query cell lands.
+
+```{r refdr}
+refdr_loadings <- SeuratObject::Loadings(azimuth_obj$map[["refDR"]])
+refdr_features <- rownames(refdr_loadings)
+dim(refdr_loadings)
+```
+
+`SCTAssay`.
+
+```{r assay_obj}
+assay_obj <- azimuth_obj$map[[ref_assay_name]]
+assay_obj
+all(row.names(assay_obj) == all_features)
+```
+
+The labels Azimuth can transfer are simply the reference's metadata columns.
+
+```{r celltypes}
+head(azimuth_obj$map@meta.data)
+```
+
+Neighbour names.
+
+```{r neighbour_names}
+neighbour_names <- names(methods::slot(azimuth_obj$map, "neighbors"))
+neighbour_names
+```
