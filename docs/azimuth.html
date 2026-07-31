@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree43ca5801792d6a964fd9ab0bca6218076a8c710etargetblank43ca580a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1d3a2834074129eb34ed38a618955800e336ba7ftargetblank1d3a283a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/43ca5801792d6a964fd9ab0bca6218076a8c710e" target="_blank">43ca580</a>
+<a href="https://github.com/davetang/muse/tree/1d3a2834074129eb34ed38a618955800e336ba7f" target="_blank">1d3a283</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree43ca5801792d6a964fd9ab0bca6218076a8c710etargetblank43ca580a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1d3a2834074129eb34ed38a618955800e336ba7ftargetblank1d3a283a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/43ca5801792d6a964fd9ab0bca6218076a8c710e" target="_blank">43ca580</a>.
+<a href="https://github.com/davetang/muse/tree/1d3a2834074129eb34ed38a618955800e336ba7f" target="_blank">1d3a283</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -672,6 +672,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/1d3a2834074129eb34ed38a618955800e336ba7f/analysis/azimuth.Rmd" target="_blank">1d3a283</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-07-31
+</td>
+<td>
+Running Azimuth on pbmc3k and explaining the steps
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/6c3efd833a0010302bd9934d01c2c5e3b2206e9b/docs/azimuth.html" target="_blank">6c3efd8</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-07-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/43ca5801792d6a964fd9ab0bca6218076a8c710e/analysis/azimuth.Rmd" target="_blank">43ca580</a>
 </td>
 <td>
@@ -794,6 +828,163 @@ L1_AAAGAACCAAGCGGAT               0                 0</code></pre>
 <pre class="r"><code>neighbour_names &lt;- names(methods::slot(azimuth_obj$map, &quot;neighbors&quot;))
 neighbour_names</code></pre>
 <pre><code>[1] &quot;refdr.annoy.neighbors&quot;</code></pre>
+</div>
+<div id="pbmc3k" class="section level2">
+<h2>pbmc3k</h2>
+<p>Directly import from <a
+href="https://davetang.github.io/muse/pbmc3k.html">my server</a>.</p>
+<pre class="r"><code>pbmc3k &lt;- readRDS(url(&quot;https://davetang.org/file/pbmc3k_seurat.rds&quot;, &quot;rb&quot;))
+pbmc3k</code></pre>
+<pre><code>An object of class Seurat 
+32738 features across 2700 samples within 1 assay 
+Active assay: RNA (32738 features, 0 variable features)
+ 1 layer present: counts</code></pre>
+<p><code>RunAzimuth()</code> is a wrapper around the entire mapping
+pipeline, so a single call does everything from loading the reference to
+writing the predicted labels back into the query object. The messages it
+prints are a running commentary of those steps.</p>
+<pre class="r"><code>pbmc3k_anno &lt;- Azimuth::RunAzimuth(query = pbmc3k, reference = azimuth_model)</code></pre>
+<pre><code>Warning: Overwriting miscellanous data for model</code></pre>
+<pre><code>Warning: Adding a dimensional reduction (refUMAP) without the associated assay
+being present
+Warning: Adding a dimensional reduction (refUMAP) without the associated assay
+being present</code></pre>
+<pre><code>detected inputs from HUMAN with id type Gene.name</code></pre>
+<pre><code>reference rownames detected HUMAN with id type Gene.name</code></pre>
+<pre><code>Normalizing query using reference SCT model</code></pre>
+<pre><code>Warning: No layers found matching search pattern provided</code></pre>
+<pre><code>Warning: 952 features of the features specified were not present in both the reference query assays. 
+Continuing with remaining 4048 features.</code></pre>
+<pre><code>Only one SCT model detected; no need to select.</code></pre>
+<pre><code>Projecting cell embeddings</code></pre>
+<pre><code>Finding query neighbors</code></pre>
+<pre><code>Finding neighborhoods</code></pre>
+<pre><code>Finding anchors</code></pre>
+<pre><code>    Found 3015 anchors</code></pre>
+<pre><code>Finding integration vectors</code></pre>
+<pre><code>Finding integration vector weights</code></pre>
+<pre><code>Predicting cell labels
+Predicting cell labels</code></pre>
+<pre><code>Warning: Feature names cannot have underscores (&#39;_&#39;), replacing with dashes
+(&#39;-&#39;)</code></pre>
+<pre><code>Predicting cell labels</code></pre>
+<pre><code>Warning: Feature names cannot have underscores (&#39;_&#39;), replacing with dashes
+(&#39;-&#39;)</code></pre>
+<pre><code>
+Integrating dataset 2 with reference dataset</code></pre>
+<pre><code>Finding integration vectors</code></pre>
+<pre><code>Integrating data</code></pre>
+<pre><code>Warning: Keys should be one or more alphanumeric characters followed by an
+underscore, setting key from integrated_dr_ to integrateddr_</code></pre>
+<pre><code>Computing nearest neighbors</code></pre>
+<pre><code>Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to &#39;umap-learn&#39; and metric to &#39;correlation&#39;
+This message will be shown once per session</code></pre>
+<pre><code>Running UMAP projection</code></pre>
+<pre><code>Warning in RunUMAP.default(object = neighborlist, reduction.model =
+reduction.model, : Number of neighbors between query and reference is not equal
+to the number of neighbors within reference</code></pre>
+<pre><code>02:36:00 Read 2700 rows</code></pre>
+<pre><code>02:36:00 Processing block 1 of 1</code></pre>
+<pre><code>02:36:00 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 20
+02:36:00 Initializing by weighted average of neighbor coordinates using 1 thread
+02:36:00 Commencing optimization for 67 epochs, with 54000 positive edges
+02:36:01 Finished</code></pre>
+<pre><code>Warning: No assay specified, setting assay as RNA by default.</code></pre>
+<pre><code>Projecting reference PCA onto query
+Finding integration vector weights
+Projecting back the query cells into original PCA space
+Finding integration vector weights
+Computing scores:
+    Finding neighbors of original query cells
+    Finding neighbors of transformed query cells
+    Computing query SNN
+    Determining bandwidth and computing transition probabilities
+Total elapsed time: 1.89865231513977</code></pre>
+<pre class="r"><code>pbmc3k_anno</code></pre>
+<pre><code>An object of class Seurat 
+32833 features across 2700 samples within 4 assays 
+Active assay: RNA (32738 features, 0 variable features)
+ 1 layer present: counts
+ 3 other assays present: prediction.score.celltype.l1, prediction.score.celltype.l2, prediction.score.celltype.l3
+ 2 dimensional reductions calculated: integrated_dr, ref.umap</code></pre>
+<ul>
+<li><p>The first three warnings come from <code>LoadReference()</code>,
+the function we called ourselves above.</p></li>
+<li><p><code>Overwriting miscellanous data for model</code> is
+bookkeeping as the stored SCT model is attached to
+<code>refAssay</code></p></li>
+<li><p><code>Adding a dimensional reduction (refUMAP) without the associated assay being present</code>
+appears once for <code>$map</code> and once for <code>$plot</code>
+because the trimmed objects keep the UMAP coordinates but not the assay
+the UMAP was originally computed from.</p></li>
+<li><p><code>detected inputs from HUMAN with id type Gene.name</code>
+and the matching line for the reference are Azimuth checking that both
+objects use the same species and the same flavour of gene
+identifier.</p></li>
+<li><p><code>Normalizing query using reference SCT model</code> is the
+key step for comparability: rather than fitting a fresh SCTransform
+model on <code>pbmc3k</code>, Azimuth computes the query’s Pearson
+residuals using the gene-level regression parameters that were fit on
+the reference, putting query and reference values on a common
+scale.</p></li>
+<li><p><code>No layers found matching search pattern provided</code> is
+Seurat v5 layer bookkeeping. The feature message tells us that of the
+reference’s 5,000 SCT features, 952 are absent from <code>pbmc3k</code>,
+so the mapping proceeds on the 4,048 shared genes; these are the genes
+from <code>refdr_features</code> that can actually influence where a
+query cell lands.</p></li>
+<li><p><code>Projecting cell embeddings</code> multiplies the query
+residuals by the <code>refDR</code> feature loadings. No PCA is computed
+on the query; it simply inherits the reference’s coordinate
+system.</p></li>
+<li><p><code>Finding query neighbors</code> /
+<code>Finding neighborhoods</code> / <code>Finding anchors</code> is
+<code>FindTransferAnchors()</code> using the <code>idx.annoy</code>
+index to look up reference neighbours quickly. An anchor is a
+query–reference cell pair that are mutual nearest neighbours in
+<code>refDR</code> space, and 3,015 of them were found for the 2,700
+query cells.</p></li>
+<li><p><code>Finding integration vectors</code> and the progress bar for
+<code>integration vector weights</code> then decide how much each anchor
+contributes to each query cell, weighted by distance.</p></li>
+<li><p><code>Predicting cell labels</code> appears three times because
+the PBMC reference carries three annotation levels:
+<code>celltype.l1</code>, <code>celltype.l2</code> and
+<code>celltype.l3</code>. For each level, the labels of the anchor
+reference cells become a weighted vote, giving every query cell a score
+for every possible label.</p></li>
+<li><p><code>Integrating dataset 2 with reference dataset</code>
+corrects the projected query coordinates towards the reference using the
+same anchors, producing the <code>integrated_dr</code>
+reduction.</p></li>
+<li><p><code>Computing nearest neighbors</code> and
+<code>Running UMAP projection</code> do not compute a new UMAP. They
+feed the query neighbours into the reference’s saved uwot model so that
+the query cells land in the reference’s existing 2D coordinates, giving
+the <code>ref.umap</code> reduction. This is what makes query and
+reference plottable on the same axes.</p></li>
+</ul>
+<p>The final block of projecting the reference PCA onto the query,
+projecting the query back into its original PCA space, then comparing
+neighbourhoods is <code>MappingScore()</code>. It asks whether each
+query cell keeps the same neighbours after a round trip through the
+reference space. A cell that does is well described by the reference; a
+low score hints that the cell is a type the reference does not contain,
+which is worth knowing because every query cell gets a label whether or
+not the reference has a sensible one for it.</p>
+<p>The returned object has 32,833 features across 4 assays.
+<code>RNA</code> is still the active assay with the original 32,738
+genes and only a <code>counts</code> layer, i.e. the SCT normalisation
+used internally is not handed back. The extra 95 features are the rows
+of <code>prediction.score.celltype.l1</code>,
+<code>prediction.score.celltype.l2</code> and
+<code>prediction.score.celltype.l3</code>, one row per candidate label
+at that level plus a <code>max</code> row. The labels themselves are in
+the metadata as <code>predicted.celltype.l1</code>,
+<code>predicted.celltype.l2</code> and
+<code>predicted.celltype.l3</code> with their matching
+<code>.score</code> columns, alongside <code>mapping.score</code>.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
@@ -826,10 +1017,11 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] Azimuth_0.5.1      shinyBS_0.65.0     Seurat_5.5.1       SeuratObject_5.4.0
- [5] sp_2.2-3           lubridate_1.9.5    forcats_1.0.1      stringr_1.6.0     
- [9] dplyr_1.2.1        purrr_1.2.2        readr_2.1.6        tidyr_1.3.2       
-[13] tibble_3.3.1       ggplot2_4.0.3      tidyverse_2.0.0    workflowr_1.7.2   
+ [1] future_1.75.0      Azimuth_0.5.1      shinyBS_0.65.0     Seurat_5.5.1      
+ [5] SeuratObject_5.4.0 sp_2.2-3           lubridate_1.9.5    forcats_1.0.1     
+ [9] stringr_1.6.0      dplyr_1.2.1        purrr_1.2.2        readr_2.1.6       
+[13] tidyr_1.3.2        tibble_3.3.1       ggplot2_4.0.3      tidyverse_2.0.0   
+[17] workflowr_1.7.2   
 
 loaded via a namespace (and not attached):
   [1] fs_2.1.0                          ProtGenerics_1.42.0              
@@ -918,15 +1110,14 @@ loaded via a namespace (and not attached):
 [167] evaluate_1.0.5                    JASPAR2020_0.99.10               
 [169] tzdb_0.5.0                        httpuv_1.6.17                    
 [171] RANN_2.6.2                        polyclip_1.10-7                  
-[173] future_1.75.0                     SeuratData_0.2.2.9002            
-[175] scattermore_1.2                   xtable_1.8-8                     
-[177] restfulr_0.0.17                   AnnotationFilter_1.34.0          
-[179] RSpectra_0.16-2                   later_1.4.8                      
-[181] googledrive_2.1.2                 viridisLite_0.4.3                
-[183] memoise_2.0.1                     AnnotationDbi_1.72.0             
-[185] GenomicAlignments_1.46.0          IRanges_2.44.0                   
-[187] cluster_2.1.8.1                   timechange_0.4.0                 
-[189] globals_0.19.1                   </code></pre>
+[173] SeuratData_0.2.2.9002             scattermore_1.2                  
+[175] xtable_1.8-8                      restfulr_0.0.17                  
+[177] AnnotationFilter_1.34.0           RSpectra_0.16-2                  
+[179] later_1.4.8                       googledrive_2.1.2                
+[181] viridisLite_0.4.3                 memoise_2.0.1                    
+[183] AnnotationDbi_1.72.0              GenomicAlignments_1.46.0         
+[185] IRanges_2.44.0                    cluster_2.1.8.1                  
+[187] timechange_0.4.0                  globals_0.19.1                   </code></pre>
 </div>
 </div>
 </div>
