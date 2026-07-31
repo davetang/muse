@@ -519,15 +519,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1d3a2834074129eb34ed38a618955800e336ba7ftargetblank1d3a283a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree229bc3354fb924f5afccaba33edbad1d6c8db32atargetblank229bc33a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/davetang/muse/tree/1d3a2834074129eb34ed38a618955800e336ba7f" target="_blank">1d3a283</a>
+<a href="https://github.com/davetang/muse/tree/229bc3354fb924f5afccaba33edbad1d6c8db32a" target="_blank">229bc33</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree1d3a2834074129eb34ed38a618955800e336ba7ftargetblank1d3a283a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomdavetangmusetree229bc3354fb924f5afccaba33edbad1d6c8db32atargetblank229bc33a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -537,7 +537,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/davetang/muse/tree/1d3a2834074129eb34ed38a618955800e336ba7f" target="_blank">1d3a283</a>.
+<a href="https://github.com/davetang/muse/tree/229bc3354fb924f5afccaba33edbad1d6c8db32a" target="_blank">229bc33</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -672,6 +672,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/davetang/muse/blob/229bc3354fb924f5afccaba33edbad1d6c8db32a/analysis/azimuth.Rmd" target="_blank">229bc33</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-07-31
+</td>
+<td>
+Include the steps in the background
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/davetang/muse/44edac5181c49c8312d1cd9bb178ad5a80348756/docs/azimuth.html" target="_blank">44edac5</a>
+</td>
+<td>
+Dave Tang
+</td>
+<td>
+2026-07-31
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/davetang/muse/blob/1d3a2834074129eb34ed38a618955800e336ba7f/analysis/azimuth.Rmd" target="_blank">1d3a283</a>
 </td>
 <td>
@@ -730,6 +764,38 @@ Checking out an Azimuth model
 <p>Azimuth provides a reference and a query cell is placed individually
 on this reference, and then labelled by a weighted vote using the
 reference cells it lands near.</p>
+<ol style="list-style-type: decimal">
+<li><strong>Load the reference</strong>, a Seurat object of already
+annotated cells trimmed down to the 5,000 genes it was built from,
+together with the coordinate system those genes define and a prebuilt
+nearest neighbour index over it.</li>
+<li><strong>Check the gene identifiers</strong> so that query and
+reference use the same species and the same flavour of gene name.</li>
+<li><strong>Normalise the query using the reference’s model.</strong>
+The reference ships an SCTransform model: a per-gene regularised
+negative binomial regression of counts on sequencing depth. The query’s
+own counts are turned into Pearson residuals using the reference’s
+coefficients, i.e. nothing is refit on the query, so a residual means
+the same thing in both datasets.</li>
+<li><strong>Project the query into the reference’s space</strong> by
+multiplying those residuals by the reference’s feature loadings. No
+dimensional reduction is computed on the query; it borrows the
+reference’s.</li>
+<li><strong>Find anchors</strong>, pairs of query and reference cells
+that are mutual nearest neighbours in that shared space. These are the
+links along which everything else is carried.</li>
+<li><strong>Transfer the labels</strong>: each query cell’s label is a
+distance-weighted vote over the reference cells it is anchored to,
+producing a score for every possible label, with the highest scoring one
+becoming the prediction.</li>
+<li><strong>Place the query on the reference UMAP</strong> using the
+reference’s saved UMAP model, so query and reference cells can be drawn
+on the same axes.</li>
+<li><strong>Score the mapping</strong> to flag query cells that the
+reference describes poorly, which matters because every query cell is
+given a label whether or not the reference contains a sensible one for
+it.</li>
+</ol>
 </div>
 <div id="installation" class="section level2">
 <h2>Installation</h2>
@@ -884,12 +950,12 @@ This message will be shown once per session</code></pre>
 <pre><code>Warning in RunUMAP.default(object = neighborlist, reduction.model =
 reduction.model, : Number of neighbors between query and reference is not equal
 to the number of neighbors within reference</code></pre>
-<pre><code>02:36:00 Read 2700 rows</code></pre>
-<pre><code>02:36:00 Processing block 1 of 1</code></pre>
-<pre><code>02:36:00 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 20
-02:36:00 Initializing by weighted average of neighbor coordinates using 1 thread
-02:36:00 Commencing optimization for 67 epochs, with 54000 positive edges
-02:36:01 Finished</code></pre>
+<pre><code>02:45:49 Read 2700 rows</code></pre>
+<pre><code>02:45:49 Processing block 1 of 1</code></pre>
+<pre><code>02:45:49 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 20
+02:45:49 Initializing by weighted average of neighbor coordinates using 1 thread
+02:45:49 Commencing optimization for 67 epochs, with 54000 positive edges
+02:45:49 Finished</code></pre>
 <pre><code>Warning: No assay specified, setting assay as RNA by default.</code></pre>
 <pre><code>Projecting reference PCA onto query
 Finding integration vector weights
@@ -900,7 +966,7 @@ Computing scores:
     Finding neighbors of transformed query cells
     Computing query SNN
     Determining bandwidth and computing transition probabilities
-Total elapsed time: 1.89865231513977</code></pre>
+Total elapsed time: 1.89516639709473</code></pre>
 <pre class="r"><code>pbmc3k_anno</code></pre>
 <pre><code>An object of class Seurat 
 32833 features across 2700 samples within 4 assays 
